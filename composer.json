@@ -1,0 +1,32 @@
+{
+  "name": "seatplus/web",
+  "description": "Web frontend of seatplus",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Felix Huber",
+      "email": "felix.a.huber@gmx.net"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Seatplus\\Web\\": "src/"
+    }
+  },
+  "minimum-stability": "alpha",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=7.1",
+    "laravel/framework": "5.8.*"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Seatplus\\Web\\WebServiceProvider "
+      ]
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~5.0"
+  }
+}
