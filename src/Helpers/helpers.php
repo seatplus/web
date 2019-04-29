@@ -56,8 +56,8 @@ if (! function_exists('setting')) {
 
             if ($global)
                 return \Seatplus\Web\Models\Settings\GlobalSettings::updateOrCreate(
-                    ['name' => $name[0] ],
-                    ['value' => $name[1] ]
+                    ['name' => $name[0]],
+                    ['value' => $name[1]]
                 )
                     ->value;
 
