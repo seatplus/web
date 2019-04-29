@@ -11,5 +11,14 @@ const mix = require('laravel-mix');
  |
  */
 
+mix.setPublicPath('src/public');
+
 mix.js('src/resources/js/app.js', 'src/public/js')
    .sass('src/resources/sass/app.scss', 'src/public/css');
+
+
+if (! mix.inProduction()) {
+  mix.copyDirectory('src/public', '../../../public')
+}
+
+mix.browserSync('seatplus.test');
