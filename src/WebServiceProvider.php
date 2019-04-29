@@ -23,6 +23,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Add views
         $this->loadViewsFrom(__DIR__ . '/resources/views', 'web');
+
+        //Add Migrations
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
     }
 
     private function addPublications()

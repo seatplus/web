@@ -15,6 +15,9 @@ abstract class TestCase extends OrchestraTestCase
 
         // setup database
         $this->setupDatabase($this->app);
+
+        // setup factories
+        $this->withFactories(__DIR__ . '/database/factories');
     }
 
     /**
@@ -37,7 +40,7 @@ abstract class TestCase extends OrchestraTestCase
     private function setupDatabase($app)
     {
         // Path to our migrations to load
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        //$this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->artisan('migrate', ['--database' => 'testbench']);
     }
 
