@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
@@ -18,6 +19,17 @@ abstract class TestCase extends OrchestraTestCase
 
         // setup factories
         $this->withFactories(__DIR__ . '/database/factories');
+    }
+
+    /**
+     * Resolve application HTTP Kernel implementation.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationHttpKernel($app)
+    {
+        $app->singleton('Illuminate\Contracts\Http\Kernel', Kernel::class);
     }
 
     /**
@@ -59,6 +71,10 @@ abstract class TestCase extends OrchestraTestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+
+        config(['app.debug' => true]);
+
+        $app['router']->aliasMiddleware('auth', Authenticate::class);
     }
 
 }

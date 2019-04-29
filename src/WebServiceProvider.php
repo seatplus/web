@@ -5,6 +5,7 @@ namespace Seatplus\Web;
 
 
 use Illuminate\Support\ServiceProvider;
+use Seatplus\Web\Http\Middleware\Authenticate;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,9 @@ class WebServiceProvider extends ServiceProvider
 
         //Add Migrations
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
+
+        // Add Middlewares
+        $this->addMiddleware();
     }
 
     private function addPublications()
@@ -39,6 +43,13 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/resources/js' => public_path(''),
             __DIR__ . '/resources/css' => public_path(''),
         ], 'web');
+    }
+
+    private function addMiddleware()
+    {
+        $router = $this->app['router'];
+
+        $router->aliasMiddleware('auth', Authenticate::class);
     }
 
 }

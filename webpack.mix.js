@@ -21,4 +21,8 @@ if (! mix.inProduction()) {
   mix.copyDirectory('src/public', '../../../public')
 }
 
+if ( mix.inProduction()) {
+  mix.version()
+}
+
 mix.browserSync('seatplus.test');

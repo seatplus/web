@@ -1,31 +1,6 @@
 <?php
 
 
-if (! function_exists('img')) {
-
-    /**
-     * Return an <img> tag ready for the lazy
-     * loading plugin.
-     *
-     * @param           $type
-     * @param           $id
-     * @param           $size
-     * @param array     $attr
-     * @param bool|true $lazy
-     *
-     * @return string
-     * @throws \Seat\Services\Exceptions\EveImageException
-     */
-    /*function img($type, $id, $size, array $attr, $lazy = true)
-    {
-
-        $image = (new \Seat\Services\Image\Eve($type, (int) $id, $size, $attr, $lazy))
-            ->html();
-
-        return $image;
-    }*/
-}
-
 if (! function_exists('setting')) {
 
     /**

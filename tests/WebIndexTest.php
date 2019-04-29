@@ -14,7 +14,9 @@ class WebIndexTest extends TestCase
     {
         $response = $this->get('/test');
 
-        $response->assertSeeText('test');
-        $this->assertTrue(true);
+        $response->assertRedirect('auth/login');
+
+        /*$response->assertSeeText('test');
+        $this->assertTrue(true);*/
     }
 }
