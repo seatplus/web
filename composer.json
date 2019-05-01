@@ -25,8 +25,7 @@
   "prefer-stable": true,
   "require": {
     "php": ">=7.1",
-    "laravel/framework": "5.8.*",
-    "seatplus/services": "~1.0.0"
+    "laravel/framework": "5.8.*"
   },
   "require-dev": {
     "orchestra/testbench": "^3.8"
