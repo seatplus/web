@@ -3,9 +3,15 @@
 namespace Seatplus\Web\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class User extends Authenticatable
 {
+
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -13,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'character_owner_hash',
     ];
 
     /**
@@ -33,4 +39,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function characters()
+    {
+
+        return $this->hasMany(CharacterUser::class, 'character_id', 'id');
+    }
 }

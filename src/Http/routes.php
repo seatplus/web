@@ -6,24 +6,21 @@ Route::group([
     'middleware' => 'web',
 ], function () {
 
-    Route::get('/test', [
-        'as'   => 'web.test',
-        'middleware' => 'auth',
-        'uses' => 'HomeController@test',
-    ]);
-
     // Authentication & Registration Routes.
     Route::group([
         'namespace'  => 'Auth',
     ], function () {
 
-        // Since Laravel 5.3, its recommended to use Auth::routes(),
-        // for these. We use named routes though, so that does not
-        // *really* work for us here.
         Route::group(['prefix' => 'auth'], function () {
 
             include __DIR__ . '/Routes/Auth/Auth.php';
+            include __DIR__ . '/Routes/Auth/Sso.php';
         });
 
     });
+
+    Route::get('/home', [
+        'middleware' => 'auth',
+        'uses' => 'HomeController@home',
+    ]);
 });

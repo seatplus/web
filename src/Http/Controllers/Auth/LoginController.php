@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Controllers\Auth;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\App;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class LoginController extends Controller
@@ -46,7 +47,7 @@ class LoginController extends Controller
 
         // Warn if SSO has not been configured yet.
         if (strlen(env('EVE_CLIENT_SECRET')) < 5 || strlen(env('EVE_CLIENT_ID')) < 5)
-            session()->flash('warning', trans('web::seat.sso_config_warning'));
+            session()->flash('warning', trans('web::auth.sso_config_warning'));
 
         return view('web::auth.login');
     }

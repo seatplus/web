@@ -17,7 +17,7 @@ class Kernel extends \Orchestra\Testbench\Http\Kernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth'                => Authenticate::class,
+        'auth'  => Authenticate::class,
         'guest' => RedirectIfAuthenticated::class,
     ];
 

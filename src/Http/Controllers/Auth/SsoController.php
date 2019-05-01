@@ -1,0 +1,245 @@
+<?php
+
+
+namespace Seatplus\Web\Http\Controllers\Auth;
+
+
+use Laravel\Socialite\Contracts\Factory as Socialite;
+use Seatplus\Web\Http\Actions\Sso\GetSsoScopesAction;
+use Seatplus\Web\Http\Controllers\Controller;
+
+class SsoController extends Controller
+{
+    /**
+     * Redirect the user to the Eve Online authentication page.
+     *
+     * @param \Laravel\Socialite\Contracts\Factory              $social
+     *
+     * @param \Seatplus\Web\Http\Actions\Sso\GetSsoScopesAction $get_sso_scopes_action
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function redirectToProvider(Socialite $social, GetSsoScopesAction $get_sso_scopes_action)
+    {
+
+        $scopes = $get_sso_scopes_action->execute();
+
+        return $social->driver('eveonline')
+            ->scopes($scopes)
+            ->redirect();
+    }
+
+    /**
+     * Obtain the user information from Eve Online.
+     *
+     * @param \Laravel\Socialite\Contracts\Factory $social
+     *
+     * @return \Seat\Web\Http\Controllers\Auth\Response
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
+    public function handleProviderCallback(Socialite $social)
+    {
+        $eve_data = $social->driver('eveonline')->user();
+
+        dd($eve_data);
+
+        // Get or create the User bound to this login.
+        $user = $this->findOrCreateUser($eve_data);
+
+        // Update the refresh token for this character.
+        $this->updateRefreshToken($eve_data);
+
+        // If a deactivated user provides a new RefreshToken, the user should be reactivated
+        if(! $user->active)
+            $this->activateUser($user);
+
+        if (! $this->loginUser($user))
+            return redirect()->route('auth.login')
+                ->with('error', 'Login failed. Please contact your administrator.');
+
+        // ensure the user got a valid group - spawn it otherwise
+        if (is_null($user->group)) {
+            Group::forceCreate([
+                'id' => $user->group_id,
+            ]);
+
+            // force laravel to update model relationship information
+            $user->load('group');
+        }
+
+        // Set the main characterID based on the response.
+        $this->updateMainCharacterId($user);
+
+        return redirect()->intended();
+    }
+
+    /**
+     * Check if a user exists in the database, else, create
+     * and return the User object.
+     *
+     * Group memberships are also managed here, ensuring that
+     * characters are automatically 'linked' via a group. If
+     * an existsing, logged in session is detected, the new login
+     * will be associated with that sessions group. Otherwise,
+     * a new group for this user will be created.
+     *
+     * @param \Laravel\Socialite\Two\User $eve_user
+     *
+     * @return \Seat\Web\Models\User
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
+    private function findOrCreateUser(SocialiteUser $eve_user): User
+    {
+
+        // Check if this user already exists in the database.
+        if ($existing = User::find($eve_user->character_id)) {
+
+            // If the character_owner_hash has changed, it might be that
+            // this character was transferred. We will still allow the login,
+            // but the group memberships the character had will be removed.
+            if ($existing->character_owner_hash !== $eve_user->character_owner_hash) {
+
+                // Update the group_id for this user based on the current
+                // session status. If there is a user already logged in,
+                // simply associate the user with a new group id. If not,
+                // a new group is generated and given to this user.
+                $existing->group_id = auth()->check() ?
+                    auth()->user()->group->id : Group::create()->id;
+
+                // Update the new character_owner_hash
+                $existing->character_owner_hash = $eve_user->character_owner_hash;
+                $existing->save();
+            }
+
+            // Detect if the current session is already logged in. If
+            // it is, update the group_id for the new login to the same
+            // as the current session, thereby associating the characters.
+            if (auth()->check()) {
+
+                // Log the association update
+                event('security.log', [
+                    'Updating ' . $existing->name . ' to be part of ' . auth()->user()->name,
+                    'authentication',
+                ]);
+
+                // Re-associate the group membership for the newly logged in user.
+                $existing->group_id = auth()->user()->group->id;
+                $existing->save();
+
+                // Remove any orphan groups we could create during the attachment process
+                Group::doesntHave('users')->delete();
+
+            }
+
+            return $existing;
+        }
+
+        // Detect if registration is disabled
+        // Abort user creation.
+        if (setting('registration', true) === 'no') {
+
+            // Log the account creation attempt
+            event('security.log', [
+                'Account creation for ' . $eve_user->name, ' failed. Registration has been disabled.',
+            ]);
+
+            return redirect()->route('auth.login')
+                ->with('error', 'Registration is administratively disabled.')
+                ->send();
+        }
+
+        // Log the new account creation
+        event('security.log', [
+            'Creating new account for ' . $eve_user->name, 'authentication',
+        ]);
+
+        // Detect if the current session is already logged in. If
+        // it is, update the group_id for the new login to the same
+        // as the current session, thereby associating the characters.
+        if (auth()->check()) {
+
+            // Log the association update
+            event('security.log', [
+                'Updating ' . $eve_user->name . ' to be part of ' . auth()->user()->name,
+                'authentication',
+            ]);
+        }
+
+        return User::forceCreate([  // Only because I don't want to set id as fillable
+            'id'                   => $eve_user->character_id,
+            'group_id'             => auth()->check() ?
+                auth()->user()->group->id : Group::create()->id,
+            'name'                 => $eve_user->name,
+            'active'               => true,
+            'character_owner_hash' => $eve_user->character_owner_hash,
+        ]);
+    }
+
+    /**
+     * @param \Laravel\Socialite\Two\User $eve_data
+     */
+    public function updateRefreshToken(SocialiteUser $eve_data): void
+    {
+
+        RefreshToken::withTrashed()->firstOrNew(['character_id' => $eve_data->character_id])
+            ->fill([
+                'refresh_token' => $eve_data->refresh_token,
+                'scopes'        => explode(' ', $eve_data->scopes),
+                'token'         => $eve_data->token,
+                'expires_on'    => $eve_data->expires_on,
+            ])
+            ->save();
+
+        // restore soft deleted token if any
+        RefreshToken::onlyTrashed()->where('character_id', $eve_data->character_id)->restore();
+    }
+
+    /**
+     * Login the user.
+     *
+     * This method returns a boolean as a status flag for the
+     * login routine. If a false is returned, it might mean
+     * that that account is not allowed to sign in.
+     *
+     * @param \Seat\Web\Models\User $user
+     *
+     * @return bool
+     */
+    public function loginUser(User $user): bool
+    {
+
+        auth()->login($user, true);
+
+        return true;
+    }
+
+    /**
+     * Set the main character_id for a group if it is
+     * not already set.
+     *
+     * @param \Seat\Web\Models\User $user
+     *
+     * @throws \Seat\Services\Exceptions\SettingException
+     */
+    private function updateMainCharacterId(User $user)
+    {
+
+        if (setting('main_character_id') == 0)
+            setting(['main_character_id', $user->character_id]);
+    }
+
+    /**
+     * If a deactivated user provides a new RefreshToken
+     * the user is reactivated and a note is created.
+     *
+     * @param \Seat\Web\Models\User $user
+     */
+    private function activateUser(User $user)
+    {
+        $user->active = true;
+
+        CharacterInfo::addNote(
+            $user->id, 'User reactivated', 'User has been reactivated by providing a new refresh token.');
+    }
+
+}

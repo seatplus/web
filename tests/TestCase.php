@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 
@@ -43,6 +44,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         return [
             WebServiceProvider::class,
+            EveapiServiceProvider::class,
         ];
     }
 

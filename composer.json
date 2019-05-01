@@ -10,7 +10,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "Seatplus\\Web\\": "src/"
+      "Seatplus\\Web\\": "src/",
+      "Seatplus\\Eveapi\\": "../eveapi/src"
     },
     "files": [
       "src/Helpers/helpers.php"
@@ -25,7 +26,8 @@
   "prefer-stable": true,
   "require": {
     "php": ">=7.1",
-    "laravel/framework": "5.8.*"
+    "laravel/framework": "5.8.*",
+    "laravel/socialite": "^4.1"
   },
   "require-dev": {
     "orchestra/testbench": "^3.8"

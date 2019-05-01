@@ -5,18 +5,11 @@ namespace Seatplus\Web\Tests;
 
 class WebIndexTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testExample()
+    /** @test */
+    public function redirectsToLoginIfUnauthorized()
     {
-        $response = $this->get('/test');
+        $response = $this->get('/home');
 
         $response->assertRedirect('auth/login');
-
-        /*$response->assertSeeText('test');
-        $this->assertTrue(true);*/
     }
 }

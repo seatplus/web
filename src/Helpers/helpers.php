@@ -45,7 +45,8 @@ if (! function_exists('setting')) {
                 ->first())
                 ->value;
 
-        return \Seat\Services\Settings\Profile::get($name);
+        //return \Seat\Services\Settings\Profile::get($name);
+        return ''; //TODO: return user-settings
 
     }
 }
@@ -81,5 +82,24 @@ if (! function_exists('number_roman')) {
         }
 
         return $returnValue;
+    }
+}
+
+if (! function_exists('carbon')) {
+
+    /**
+     * A helper to get a fresh instance of Carbon.
+     *
+     * @param null $data
+     *
+     * @return \Carbon\Carbon
+     */
+    function carbon($data = null)
+    {
+
+        if (! is_null($data))
+            return new \Carbon\Carbon($data);
+
+        return new \Carbon\Carbon;
     }
 }
