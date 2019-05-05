@@ -18,10 +18,13 @@ class CreateCharacterUsersTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('character_id');
             $table->string('character_owner_hash');
-
             $table->timestamps();
 
-            $table->index(['user_id','character_id']);
+            $table->foreign('user_id')
+                ->references('id')->on('users')
+                ->onDelete('cascade');
+
+            $table->unique(['user_id','character_id']);
         });
     }
 

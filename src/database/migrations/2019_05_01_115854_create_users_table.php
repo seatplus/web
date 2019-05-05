@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
 
-            $table->bigInteger('id')->primary();
+            $table->bigIncrements('id');
             $table->string('name')->unique();
             $table->boolean('active')->default(true);
             $table->string('character_owner_hash');

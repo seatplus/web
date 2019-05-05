@@ -27,7 +27,8 @@
   "require": {
     "php": ">=7.1",
     "laravel/framework": "5.8.*",
-    "laravel/socialite": "^4.1"
+    "laravel/socialite": "^4.1",
+    "seatplus/eveapi": "dev-develop"
   },
   "require-dev": {
     "orchestra/testbench": "^3.8"
