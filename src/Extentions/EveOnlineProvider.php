@@ -117,9 +117,11 @@ class EveOnlineProvider extends AbstractProvider implements ProviderInterface
      */
     protected function getTokenFields($code)
     {
+        $tokenFields = parent::getTokenFields($code);
 
-        return array_add(
-            parent::getTokenFields($code), 'grant_type', 'authorization_code');
+        $tokenFields['grant_type'] = 'authorization_code';
+
+        return $tokenFields;
     }
 
     /**
