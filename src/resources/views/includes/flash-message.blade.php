@@ -1,4 +1,4 @@
-<div id="app">
+
   @if (count($errors->all()) > 0)
     <alert-component type="danger" :dismissible="true">
       <h4 slot="header">
@@ -83,5 +83,5 @@
       </div>
     </alert-component>
   @endif
-</div>
+
 

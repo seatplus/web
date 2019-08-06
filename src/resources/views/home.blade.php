@@ -9,5 +9,12 @@
   congratulation this is a Authed page
 
 
+    <div>
+      <b-button href="{{route('auth.logout')}}">Logout</b-button>
+      <b-button variant="danger">Button</b-button>
+      <b-button variant="success">Button</b-button>
+      <b-button variant="outline-primary">Button</b-button>
+    </div>
+
 
 @endsection

@@ -5,6 +5,8 @@ namespace Seatplus\Web\Tests;
 
 class WebIndexTest extends TestCase
 {
+    //TODO: Add logout test
+
     /** @test */
     public function redirectsToLoginIfUnauthorized()
     {

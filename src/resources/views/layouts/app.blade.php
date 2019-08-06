@@ -18,6 +18,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
 
+  <div id="app">
   <!-- Navbar -->
 @include('web::includes.header')
 <!-- /.navbar -->
@@ -79,6 +80,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
   </footer>
 </div>
 <!-- ./wrapper -->
+
+</div>
 
 <!-- REQUIRED SCRIPTS -->
 
