@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Seatplus\Web\Http\Controllers;
-
 
 class HomeController extends Controller
 {
@@ -10,5 +8,4 @@ class HomeController extends Controller
     {
         return view('web::home');
     }
-
 }

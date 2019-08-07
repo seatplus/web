@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Seatplus\Web\Http\Actions\Sso;
-
 
 use Laravel\Socialite\Two\User as EveUser;
 use Seatplus\Web\Models\CharacterUser;
@@ -49,5 +47,4 @@ class FindOrCreateUserAction
             'character_owner_hash' => $eve_user->character_owner_hash,
         ]);
     }
-
 }

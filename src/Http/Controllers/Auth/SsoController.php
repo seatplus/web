@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Seatplus\Web\Http\Controllers\Auth;
-
 
 use Laravel\Socialite\Contracts\Factory as Socialite;
 use Seatplus\Web\Http\Actions\Sso\FindOrCreateUserAction;
@@ -82,5 +80,4 @@ class SsoController extends Controller
 
         return true;
     }
-
 }

@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;

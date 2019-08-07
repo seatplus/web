@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Seatplus\Web\Http\Actions\Sso;
 
 use Laravel\Socialite\Two\User as EveUser;
@@ -24,5 +23,4 @@ class UpdateRefreshTokenAction
 
         //TODO: if user was deactivated reactivate him https://github.com/eveseat/web/blob/a0c1dd6a73c10e91813276cd57b5b51460bdfc43/src/Http/Controllers/Auth/SsoController.php#L264
     }
-
 }

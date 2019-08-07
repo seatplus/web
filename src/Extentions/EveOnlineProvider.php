@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Seatplus\Web\Extentions;
 
 use Laravel\Socialite\Two\AbstractProvider;
