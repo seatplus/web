@@ -1,0 +1,35 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=1ba66b56bc5a04c17474d52e94124cb04d4a520c7c46a01ace9ce25e7b58b85d
+
+language: php
+
+php:
+  - '7.3'
+  - 7.2.4
+
+services:
+  - redis-server
+
+addons:
+  hosts:
+    - redis
+
+install:
+  - npm install
+
+before_script:
+  - composer self-update
+  - composer install --no-interaction
+  - composer dump-autoload
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  - npm run dev
+
+script:
+  - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - npm run test
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
