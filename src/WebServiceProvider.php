@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Seatplus\Web;
-
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\SocialiteManager;
@@ -74,7 +72,6 @@ class WebServiceProvider extends ServiceProvider
          */
         $router->aliasMiddleware('locale', Locale::class);
 
-
     }
 
     private function register_services()
@@ -97,5 +94,4 @@ class WebServiceProvider extends ServiceProvider
             }
         );
     }
-
 }

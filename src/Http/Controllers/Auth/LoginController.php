@@ -3,7 +3,6 @@
 namespace Seatplus\Web\Http\Controllers\Auth;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\App;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class LoginController extends Controller

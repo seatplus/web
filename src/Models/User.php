@@ -3,7 +3,6 @@
 namespace Seatplus\Web\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class User extends Authenticatable
 {

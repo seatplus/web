@@ -17,6 +17,6 @@ class CharacterUser extends Model
      * @var array
      */
     protected $fillable = [
-        'character_id', 'user_id', 'character_owner_hash'
+        'character_id', 'user_id', 'character_owner_hash',
     ];
 }

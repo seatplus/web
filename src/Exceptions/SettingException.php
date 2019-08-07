@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Seatplus\Web\Exceptions;
 
 use Exception;

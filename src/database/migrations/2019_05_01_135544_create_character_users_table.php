@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateCharacterUsersTable extends Migration
 {
@@ -24,7 +24,7 @@ class CreateCharacterUsersTable extends Migration
                 ->references('id')->on('users')
                 ->onDelete('cascade');
 
-            $table->unique(['user_id','character_id']);
+            $table->unique(['user_id', 'character_id']);
         });
     }
 

@@ -1,6 +1,5 @@
 <?php
 
-
 Route::get('/eve', [
     'as'   => 'auth.eve',
     'uses' => 'SsoController@redirectToProvider',
