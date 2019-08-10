@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -58,6 +59,7 @@ abstract class TestCase extends OrchestraTestCase
         return [
             WebServiceProvider::class,
             EveapiServiceProvider::class,
+            HorizonServiceProvider::class,
         ];
     }
 

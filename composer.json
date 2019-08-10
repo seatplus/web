@@ -31,7 +31,8 @@
     "seatplus/eveapi": "dev-develop"
   },
   "require-dev": {
-    "orchestra/testbench": "^3.8"
+    "orchestra/testbench": "^3.8",
+    "spatie/phpunit-watcher": "^1.11"
   },
   "extra": {
     "laravel": {
@@ -39,5 +40,8 @@
         "Seatplus\\Web\\WebServiceProvider "
       ]
     }
+  },
+  "scripts": {
+    "watch": "vendor/bin/phpunit-watcher watch"
   }
 }
