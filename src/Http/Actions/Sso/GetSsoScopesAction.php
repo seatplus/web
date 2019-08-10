@@ -11,6 +11,7 @@ class GetSsoScopesAction
         if(is_array($scopes))
             return $scopes;
 
-        return ['publicData', 'esi-characters.read_titles.v1'];
+        //return ['publicData', 'esi-characters.read_titles.v1'];
+        return ['publicData'];
     }
 }

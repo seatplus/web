@@ -14,13 +14,9 @@
         "@vue/test-utils": "^1.0.0-beta.29",
         "axios": "^0.18",
         "bootstrap": "^4.0.0",
-        "browser-sync": "^2.26.5",
-        "browser-sync-webpack-plugin": "2.0.1",
-        "cross-env": "^5.1",
+        "cross-env": "^5.2.0",
         "expect": "^24.7.1",
         "jquery": "^3.2",
-        "jsdom": "^15.0.0",
-        "jsdom-global": "^3.0.2",
         "laravel-mix": "^4.0.7",
         "lodash": "^4.17.5",
         "mocha": "^6.1.4",
@@ -34,6 +30,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.8.1",
-        "admin-lte": "^3.0.0-alpha.2"
+        "admin-lte": "^3.0.0-beta.2",
+        "bootstrap-vue": "^2.0.0-rc.27"
     }
 }

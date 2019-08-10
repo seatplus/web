@@ -17,8 +17,18 @@ window.Vue = require('vue');
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
- const files = require.context('./', true, /\.vue$/i);
- files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
+const files = require.context('./', true, /\.vue$/i, 'lazy').keys();
+
+files.forEach(file => {
+  Vue.component(file.split('/').pop().split('.')[0], () => import(`${file}`));
+});
+
+/*
+* Install bootstrap-vue components
+*/
+import BootstrapVue from 'bootstrap-vue' //Importing
+
+Vue.use(BootstrapVue); // Telling Vue to use this in whole application
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

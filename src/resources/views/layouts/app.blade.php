@@ -21,6 +21,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <div id="app">
   <!-- Navbar -->
 @include('web::includes.header')
+    <navbar-component route="{{route('horizon.index')}}"></navbar-component>
+    <example-component></example-component>
 <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
@@ -86,5 +88,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <!-- REQUIRED SCRIPTS -->
 
 <script src="{{ mix('/js/app.js') }}"></script>
+<!-- view specific scripts -->
+@stack('javascript')
 </body>
 </html>

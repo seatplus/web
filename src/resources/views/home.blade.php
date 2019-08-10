@@ -9,6 +9,8 @@
   congratulation this is a Authed page
 
 
+
+
     <div>
       <b-button href="{{route('auth.logout')}}">Logout</b-button>
       <b-button variant="danger">Button</b-button>
@@ -18,3 +20,16 @@
 
 
 @endsection
+
+@push('javascript')
+
+  <script type="text/javascript">
+    Swal.fire(
+        'Good job!',
+        'You clicked the button!',
+        'success'
+    )
+  </script>
+
+
+@endpush
