@@ -3,7 +3,7 @@
 // Namespace all of the routes for this package.
 Route::group([
     'namespace'  => 'Seatplus\Web\Http\Controllers',
-    'middleware' => 'web',
+    'middleware' => 'web', //TODO add locale
 ], function () {
 
     // Authentication & Registration Routes.
@@ -15,6 +15,18 @@ Route::group([
 
             include __DIR__ . '/Routes/Auth/Auth.php';
             include __DIR__ . '/Routes/Auth/Sso.php';
+        });
+
+    });
+
+    // Authentication & Registration Routes.
+    Route::group([
+        'namespace'  => 'Queue',
+    ], function () {
+
+        Route::group(['prefix' => 'queue'], function () {
+
+            include __DIR__ . '/Routes/Queue/Queue.php';
         });
 
     });

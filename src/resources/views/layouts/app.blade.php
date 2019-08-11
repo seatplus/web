@@ -21,8 +21,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <div id="app">
   <!-- Navbar -->
 @include('web::includes.header')
-    <navbar-component route="{{route('horizon.index')}}"></navbar-component>
-    <example-component></example-component>
+    <navbar-component
+            horizon-index="{{route('horizon.index')}}"
+            horizon-error="{{route('horizon.index')}}"
+    >
+    </navbar-component>
 <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
