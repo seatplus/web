@@ -81,7 +81,7 @@
 
     computed : {
       isLoading: function () {
-        return jQuery.isEmptyObject(this.stats)
+        return $.isEmptyObject(this.stats)
       }
     }
   }
