@@ -6,6 +6,8 @@
       <b-nav-item data-widget="pushmenu" href="#">
         <i class="fas fa-bars"></i>
       </b-nav-item>
+
+      i'll test smth
     </ul>
 
     <!-- Right navbar links -->
