@@ -39,6 +39,8 @@
 </template>
 
 <script>
+  import axios from 'axios';
+
   export default {
     name: "navbar-component",
     props: {
@@ -81,7 +83,14 @@
 
     computed : {
       isLoading: function () {
-        return $.isEmptyObject(this.stats)
+
+        var obj = this.stats;
+
+        for(var key in obj) {
+          if(obj.hasOwnProperty(key))
+            return false;
+        }
+        return true;
       }
     }
   }
