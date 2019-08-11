@@ -51,6 +51,10 @@ class WebServiceProvider extends ServiceProvider
          */
         $this->publishes([
             __DIR__ . '/public/img' => public_path('img'),
+            __DIR__ . '/resources/js' => resource_path('js'),
+            __DIR__ . '/resources/sass' => resource_path('sass'),
+            $this->getPackageJsonFile() => base_path('package.json'),
+            $this->getPackageLockJsonFile() => base_path('package-lock.json'),
         ], 'web');
     }
 
@@ -90,5 +94,15 @@ class WebServiceProvider extends ServiceProvider
                 return $eveonline->buildProvider(EveOnlineProvider::class, $config);
             }
         );
+    }
+
+    private function getPackageJsonFile()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'package.json';
+    }
+
+    private function getPackageLockJsonFile()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'package-lock.json';
     }
 }
