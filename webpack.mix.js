@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const path = require('path')
 
 /*
  |--------------------------------------------------------------------------
@@ -13,7 +14,19 @@ const mix = require('laravel-mix');
 mix.setPublicPath('src/public');
 
 mix.js('src/resources/js/app.js', 'src/public/js')
-    .sass('src/resources/sass/app.scss', 'src/public/css');
+    .sass('src/resources/sass/app.scss', 'src/public/css')
+    .webpackConfig({
+      output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
+      resolve: {
+        alias: {
+          vue$: 'vue/dist/vue.runtime.esm.js',
+          '@' : path.resolve('resources/js'),
+        },
+      },
+    })
+    .babelConfig({
+      plugins: ['@babel/plugin-syntax-dynamic-import'],
+    })
 
 if ( mix.inProduction()) {
   mix.version();

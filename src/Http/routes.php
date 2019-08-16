@@ -35,4 +35,8 @@ Route::group([
         'middleware' => 'auth',
         'uses' => 'HomeController@home',
     ]);
+
+    Route::get('/inertia', [
+        'uses' => 'HomeController@inertia',
+    ]);
 });

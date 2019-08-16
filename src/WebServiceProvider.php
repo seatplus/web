@@ -3,6 +3,8 @@
 namespace Seatplus\Web;
 
 use Illuminate\Support\ServiceProvider;
+use Inertia\Inertia;
+use Inertia\Middleware;
 use Laravel\Socialite\SocialiteManager;
 use Seatplus\Web\Extentions\EveOnlineProvider;
 use Seatplus\Web\Http\Middleware\Authenticate;
@@ -40,6 +42,8 @@ class WebServiceProvider extends ServiceProvider
     {
         // Register any extra services
         $this->register_services();
+
+        $this->registerIntertiaJs();
     }
 
     private function addPublications()
@@ -73,6 +77,9 @@ class WebServiceProvider extends ServiceProvider
          */
         $router->aliasMiddleware('locale', Locale::class);
 
+        // Inertia.JS adding
+        $router->pushMiddlewareToGroup('web', Middleware::class);
+
     }
 
     private function register_services()
@@ -104,5 +111,27 @@ class WebServiceProvider extends ServiceProvider
     private function getPackageLockJsonFile()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'package-lock.json';
+    }
+
+    private function registerIntertiaJs()
+    {
+        Inertia::setRootView('web::app');
+
+        Inertia::version(function () {
+            return md5_file(public_path('mix-manifest.json'));
+        });
+
+        Inertia::share([
+            'flash' => function () {
+                return [
+                    'success' => Session::get('success'),
+                ];
+            },
+            'errors' => function () {
+                return Session::get('errors')
+                    ? Session::get('errors')->getBag('default')->getMessages()
+                    : (object) [];
+            },
+        ]);
     }
 }

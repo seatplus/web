@@ -24,11 +24,11 @@
 @push('javascript')
 
   <script type="text/javascript">
-    Swal.fire(
+    /*Swal.fire(
         'Good job!',
         'You clicked the button!',
         'success'
-    )
+    )*/
   </script>
 
 
