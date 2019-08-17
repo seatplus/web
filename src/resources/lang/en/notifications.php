@@ -5,6 +5,5 @@ return [
     'error'   => 'Error',
     'success' => 'Success',
     'warning' => 'Warning',
-    'notice'  => 'Notice',
     'info'    => 'Info',
 ];

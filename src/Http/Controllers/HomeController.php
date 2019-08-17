@@ -8,11 +8,6 @@ class HomeController extends Controller
 {
     public function home()
     {
-        return view('web::home');
-    }
-
-    public function inertia()
-    {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Dashboard/Index');
     }
 }

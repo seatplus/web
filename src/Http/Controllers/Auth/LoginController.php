@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Controllers\Auth;
 
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Inertia\Inertia;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class LoginController extends Controller
@@ -38,8 +39,7 @@ class LoginController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws \Seatplus\Web\Exceptions\SettingException
+     * @return \Inertia\Response
      */
     public function showLoginForm()
     {
@@ -48,6 +48,9 @@ class LoginController extends Controller
         if (strlen(env('EVE_CLIENT_SECRET')) < 5 || strlen(env('EVE_CLIENT_ID')) < 5)
             session()->flash('warning', trans('web::auth.sso_config_warning'));
 
-        return view('web::auth.login');
+        return Inertia::render('Auth/Login', [
+            'login_welcome' => trans('web::auth.login_welcome'),
+            'evesso_img_src' => asset('img/evesso.png')
+        ]);
     }
 }

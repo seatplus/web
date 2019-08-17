@@ -2,6 +2,7 @@
 
 namespace Seatplus\Web;
 
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Inertia\Middleware;
@@ -125,6 +126,16 @@ class WebServiceProvider extends ServiceProvider
             'flash' => function () {
                 return [
                     'success' => Session::get('success'),
+                    'info' => Session::get('info'),
+                    'warning' => Session::get('warning')
+                ];
+            },
+            'translation' => function () {
+                return [
+                    'success' => trans('web::notifications.success'),
+                    'info' => trans('web::notifications.info'),
+                    'warning' => trans('web::notifications.warning'),
+                    'error' => trans('web::notifications.error')
                 ];
             },
             'errors' => function () {
