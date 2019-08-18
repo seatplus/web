@@ -1,12 +1,15 @@
 <template>
-  <div>
+  <Navbar>
     Dashboard
-  </div>
+  </Navbar>
 </template>
 
 <script>
+  import Navbar from '@/Shared/Navbar'
+
   export default {
-    name: "Index"
+    name: "Index",
+    components: {Navbar}
   }
 </script>
 

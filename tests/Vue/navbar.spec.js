@@ -1,6 +1,6 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import expect from 'expect';
-import Navbar from '../../src/resources/js/components/NavbarComponent.vue'
+import Navbar from '../../src/resources/js/Shared/Navbar'
 import BootstrapVue from 'bootstrap-vue' //Importing
 import moxios from 'moxios'
 
