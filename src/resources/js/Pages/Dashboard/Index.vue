@@ -1,15 +1,15 @@
 <template>
-  <Navbar>
+  <Layout>
     Dashboard
-  </Navbar>
+  </Layout>
 </template>
 
 <script>
-  import Navbar from '@/Shared/Navbar'
+  import Layout from "../../Shared/Layout"
 
   export default {
     name: "Index",
-    components: {Navbar}
+    components: {Layout}
   }
 </script>
 

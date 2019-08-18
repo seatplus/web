@@ -9,7 +9,7 @@
   <script src="{{ mix('/js/app.js') }}" defer></script>
   @routes
 </head>
-<body>
+<body class="hold-transition sidebar-mini">
 
 @inertia
 
