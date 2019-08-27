@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "40056978336620d6d93ec37b863a07ee",
+    "content-hash": "b6694c5e6db4fed5ad4b13141ddb808c",
     "packages": [
         {
             "name": "cakephp/chronos",
@@ -539,16 +539,16 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v0.1.0",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "2bdd1af10f488007a8981b66982d011054464e88"
+                "reference": "f563b279a62a6234546d4954ba756ebc432c55f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/2bdd1af10f488007a8981b66982d011054464e88",
-                "reference": "2bdd1af10f488007a8981b66982d011054464e88",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/f563b279a62a6234546d4954ba756ebc432c55f5",
+                "reference": "f563b279a62a6234546d4954ba756ebc432c55f5",
                 "shasum": ""
             },
             "require-dev": {
@@ -586,7 +586,7 @@
                 "inertia",
                 "laravel"
             ],
-            "time": "2019-08-10T13:58:04+00:00"
+            "time": "2019-08-26T17:04:43+00:00"
         },
         {
             "name": "laravel/framework",
@@ -3103,6 +3103,57 @@
             "time": "2019-07-27T06:42:46+00:00"
         },
         {
+            "name": "tightenco/ziggy",
+            "version": "v0.7.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tightenco/ziggy.git",
+                "reference": "aa4c42aaec9516da892bc2e9f6e992582646af77"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tightenco/ziggy/zipball/aa4c42aaec9516da892bc2e9f6e992582646af77",
+                "reference": "aa4c42aaec9516da892bc2e9f6e992582646af77",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "~5.4"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.6",
+                "orchestra/testbench": "~3.6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Tightenco\\Ziggy\\ZiggyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Tightenco\\Ziggy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Matt Stauffer",
+                    "email": "matt@tighten.co"
+                },
+                {
+                    "name": "Daniel Coulbourne",
+                    "email": "daniel@tighten.co"
+                }
+            ],
+            "description": "Generates a Blade directive exporting all of your named Laravel routes. Also provides a nice route() helper function in JavaScript.",
+            "time": "2019-04-26T22:03:47+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.1",
             "source": {
@@ -5358,8 +5409,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "arne@blankerts.de"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
