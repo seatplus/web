@@ -20,11 +20,10 @@ class WebIndexTest extends TestCase
         // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
         $this->app->instance('path.public', __DIR__ .'/../src/public');
 
-        $welcome_text = trans('login_welcome');
+        $response = $this->followingRedirects()
+            ->get('/home');
 
-        $this->followingRedirects()
-            ->get('/home')
-            ->assertSee($welcome_text);
+        $response->assertComponent('Auth/Login');
     }
 
     /** @test */
@@ -36,7 +35,7 @@ class WebIndexTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get('/home');
 
-        $response->assertSee('Dashboard');
+        $response->assertComponent('Dashboard/Index');
 
         $this->assertAuthenticatedAs($this->test_user);
         $this->assertTrue(auth()->check());
