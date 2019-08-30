@@ -130,7 +130,7 @@ class WebServiceProvider extends ServiceProvider
                     'success' => Session::get('success'),
                     'info' => Session::get('info'),
                     'warning' => Session::get('warning'),
-                    'error' => Session::get('error')
+                    'error' => Session::get('error'),
                 ];
             },
             'translation' => function () {
@@ -152,7 +152,7 @@ class WebServiceProvider extends ServiceProvider
     private function registerConfigurations()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/config/web.config.php', 'web.config'
+            __DIR__ . '/config/web.config.php', 'web.config'
         );
     }
 }
