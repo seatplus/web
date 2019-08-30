@@ -127,7 +127,7 @@ class WebServiceProvider extends ServiceProvider
                 return [
                     'success' => Session::get('success'),
                     'info' => Session::get('info'),
-                    'warning' => Session::get('warning')
+                    'warning' => Session::get('warning'),
                 ];
             },
             'translation' => function () {
@@ -135,7 +135,7 @@ class WebServiceProvider extends ServiceProvider
                     'success' => trans('web::notifications.success'),
                     'info' => trans('web::notifications.info'),
                     'warning' => trans('web::notifications.warning'),
-                    'error' => trans('web::notifications.error')
+                    'error' => trans('web::notifications.error'),
                 ];
             },
             'errors' => function () {
