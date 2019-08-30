@@ -67,7 +67,7 @@
         Promise.all([
 
           // Make an ajax request to our server - /queue/status
-          axios.get('/queue/status').then(response => this.stats = response.data)
+            this.loadStats(),
 
         ]).then(() => {
           this.ready = true;
@@ -75,8 +75,21 @@
           this.timeout = setTimeout(() => {
             this.refreshStatsPeriodically(false);
           }, 5000);
-        });
+        }).catch((error) => {
+          console.log(error);
+        })
       },
+
+      /*
+       * load stats
+       */
+      loadStats() {
+        return axios
+            .get('/queue/status')
+            .then( function (response) {
+              this.stats = response.data
+            })
+      }
     },
 
     computed : {

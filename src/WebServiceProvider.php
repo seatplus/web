@@ -127,7 +127,8 @@ class WebServiceProvider extends ServiceProvider
                 return [
                     'success' => Session::get('success'),
                     'info' => Session::get('info'),
-                    'warning' => Session::get('warning')
+                    'warning' => Session::get('warning'),
+                    'error' => Session::get('error')
                 ];
             },
             'translation' => function () {
