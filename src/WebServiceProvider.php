@@ -45,6 +45,8 @@ class WebServiceProvider extends ServiceProvider
         $this->register_services();
 
         $this->registerIntertiaJs();
+
+        $this->registerConfigurations();
     }
 
     private function addPublications()
@@ -128,6 +130,7 @@ class WebServiceProvider extends ServiceProvider
                     'success' => Session::get('success'),
                     'info' => Session::get('info'),
                     'warning' => Session::get('warning'),
+                    'error' => Session::get('error'),
                 ];
             },
             'translation' => function () {
@@ -144,5 +147,12 @@ class WebServiceProvider extends ServiceProvider
                     : (object) [];
             },
         ]);
+    }
+
+    private function registerConfigurations()
+    {
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.config.php', 'web.config'
+        );
     }
 }
