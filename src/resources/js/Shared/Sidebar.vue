@@ -23,7 +23,7 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
         <li v-for="item in $page.sidebar" :class="['nav-item', {'has-treeview' : hasTreeview(item)} ]">
-          <a :href="route( item.route )" class="nav-link">
+          <a :href="!hasTreeview(item) ? route( item.route ) : '#'" class="nav-link">
             <i :class="['nav-icon', item.icon ]"></i>
             <p>
               {{ item.name }}
