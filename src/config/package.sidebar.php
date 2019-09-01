@@ -9,12 +9,12 @@ return [
     'settings' => [
         'name'    => 'Settings',
         'icon'    => 'fas fa-cogs',
-        'route'   => 'home',
+        'route'   => '',
         'entries' => [
             [
                 'name'  => 'help',
                 'icon'  => 'far fa-question-circle',
-                'route' => 'home',
+                'route' => 'settings',
             ],
         ],
     ],
