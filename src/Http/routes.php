@@ -33,10 +33,11 @@ Route::group([
 
     Route::get('/home', [
         'middleware' => 'auth',
+        'as' => 'home',
         'uses' => 'HomeController@home',
     ]);
 
-    Route::get('/inertia', [
+    /*Route::get('/inertia', [
         'uses' => 'HomeController@inertia',
-    ]);
+    ]);*/
 });
