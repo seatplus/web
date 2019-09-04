@@ -46,7 +46,7 @@ class WebServiceProvider extends ServiceProvider
 
         $this->registerIntertiaJs();
 
-        $this->registerConfigurations();
+        $this->mergeConfigurations();
     }
 
     private function addPublications()
@@ -133,6 +133,9 @@ class WebServiceProvider extends ServiceProvider
                     'error' => Session::get('error'),
                 ];
             },
+            'sidebar' => function () {
+                return config('package.sidebar');
+            },
             'translation' => function () {
                 return [
                     'success' => trans('web::notifications.success'),
@@ -149,10 +152,14 @@ class WebServiceProvider extends ServiceProvider
         ]);
     }
 
-    private function registerConfigurations()
+    private function mergeConfigurations()
     {
         $this->mergeConfigFrom(
             __DIR__ . '/config/web.config.php', 'web.config'
+        );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/package.sidebar.php', 'package.sidebar'
         );
     }
 }

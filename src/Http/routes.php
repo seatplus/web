@@ -1,42 +1,32 @@
 <?php
 
-// Namespace all of the routes for this package.
-Route::group([
-    'namespace'  => 'Seatplus\Web\Http\Controllers',
-    'middleware' => 'web', //TODO add locale
-], function () {
+Route::namespace('Seatplus\Web\Http\Controllers')
+    ->middleware('web')
+    ->group(function () {
 
-    // Authentication & Registration Routes.
-    Route::group([
-        'namespace'  => 'Auth',
-    ], function () {
+        // Authentication & Registration Routes.
+        Route::namespace('Auth')
+            ->prefix('auth')
+            ->group(function () {
+                include __DIR__ . '/Routes/Auth/Auth.php';
+                include __DIR__ . '/Routes/Auth/Sso.php';
+            });
 
-        Route::group(['prefix' => 'auth'], function () {
+        Route::middleware('auth')
+            ->group(function () {
+                Route::get('/home', 'HomeController@home')->name('home');
 
-            include __DIR__ . '/Routes/Auth/Auth.php';
-            include __DIR__ . '/Routes/Auth/Sso.php';
-        });
+                Route::namespace('Queue')
+                    ->prefix('queue')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Queue/Queue.php';
+                    });
+
+                Route::namespace('Configuration')
+                    ->prefix('configuration')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Configuration/Configuration.php';
+                    });
+            });
 
     });
-
-    // Authentication & Registration Routes.
-    Route::group([
-        'namespace'  => 'Queue',
-    ], function () {
-
-        Route::group(['prefix' => 'queue'], function () {
-
-            include __DIR__ . '/Routes/Queue/Queue.php';
-        });
-
-    });
-
-    Route::get('/home', [
-        'middleware' => 'auth',
-        'uses' => 'HomeController@home',
-    ]);
-
-    Route::get('/inertia', [
-        'uses' => 'HomeController@inertia',
-    ]);
-});

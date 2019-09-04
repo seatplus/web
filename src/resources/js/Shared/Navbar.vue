@@ -67,7 +67,7 @@
         Promise.all([
 
           // Make an ajax request to our server - /queue/status
-            this.loadStats(),
+          this.loadStats(),
 
         ]).then(() => {
           this.ready = true;
@@ -86,9 +86,9 @@
       loadStats() {
         return axios
             .get('/queue/status')
-            .then( function (response) {
-              this.stats = response.data
-            })
+            .then( response =>
+                this.stats = response.data
+            );
       }
     },
 

@@ -36,6 +36,7 @@
         <!-- /.content -->
       </div>
       <!-- /.content-wrapper -->
+      <Footer />
 
     </div>
   </div>
@@ -46,12 +47,14 @@
   import Navbar from "@/Shared/Navbar"
   import Sidebar from "@/Shared/Sidebar"
   import FlashMessages from "@/Shared/FlashMessages"
+  import Footer from "@/Shared/Footer"
 
   export default {
     name: "Layout",
     components: {
       FlashMessages,
       Sidebar,
+      Footer,
       Navbar
     }
   }

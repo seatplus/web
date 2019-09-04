@@ -21,39 +21,23 @@
     <!-- Sidebar Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-             with font-awesome or any other icon font library -->
-        <li class="nav-item has-treeview menu-open">
-          <a href="#" class="nav-link active">
-            <i class="fab fa-algolia"></i>
+
+        <li v-for="item in $page.sidebar" :class="['nav-item', {'has-treeview' : hasTreeview(item), 'menu-open': hasActiveEntries(item) } ]">
+          <a :href="!hasTreeview(item) ? route( item.route ) : '#'" :class="['nav-link', {'active' : isActive(item) || hasActiveEntries(item)} ]">
+            <i :class="['nav-icon', item.icon ]"></i>
             <p>
-              Starter Pages
-              <i class="right fa fa-angle-left"></i>
+              {{ item.name }}
+              <i v-if="hasTreeview(item)" class="right fa fa-angle-left"></i>
             </p>
           </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="#" class="nav-link active">
-                <i class="fa fa-circle-o nav-icon"></i>
-                <p>Active Page</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="fa fa-circle-o nav-icon"></i>
-                <p>Inactive Page</p>
+          <ul v-if="hasTreeview(item)" class="nav nav-treeview">
+            <li v-for="entry in item.entries" class="nav-item">
+              <a :href="route(entry.route)" :class="['nav-link', {active: isActive(entry)}]">
+                <i :class="['nav-icon', entry.icon ]"></i>
+                <p> {{ entry.name }}</p>
               </a>
             </li>
           </ul>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon fa fa-th"></i>
-            <p>
-              Simple Link
-              <span class="right badge badge-danger">New</span>
-            </p>
-          </a>
         </li>
       </ul>
     </nav>
@@ -65,7 +49,33 @@
 
 <script>
   export default {
-    name: "Sidebar"
+    name: "Sidebar",
+
+    methods: {
+      hasTreeview(item) {
+
+        return item.hasOwnProperty('entries')
+      },
+      isActive(entry) {
+
+        return window.location.href == route(entry.route).url()
+      },
+      hasActiveEntries(item) {
+
+        let returnValue = false
+
+        if (item.hasOwnProperty('entries')) {
+          Object.keys(item.entries).forEach(key => {
+            if(this.isActive(item.entries[key])){
+              returnValue = true
+              return false;
+            }
+          })
+        }
+
+        return returnValue;
+      }
+    }
   }
 </script>
 
