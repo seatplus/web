@@ -2,8 +2,8 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
-use Seatplus\Web\Http\Controllers\Controller;
 use Inertia\Inertia;
+use Seatplus\Web\Http\Controllers\Controller;
 
 class SeatPlusController extends Controller
 {
