@@ -17,8 +17,16 @@ Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application
 import { InertiaApp } from '@inertiajs/inertia-vue'
 Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
 
+import I18n from './vendor/I18n'
+window.I18n = I18n
+Vue.prototype.$I18n = new I18n;
+
 // Add route helper to vue
-Vue.mixin({ methods: { route: window.route } })
+Vue.mixin({
+  methods: {
+    route: window.route
+  }
+})
 
 const app = document.getElementById('app')
 

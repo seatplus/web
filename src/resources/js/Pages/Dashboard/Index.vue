@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    Dashboard
+    Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
   </Layout>
 </template>
 

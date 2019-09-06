@@ -30,7 +30,8 @@
     "laravel/socialite": "^4.1",
     "seatplus/eveapi": "dev-develop",
     "inertiajs/inertia-laravel": "^0.1.0",
-    "tightenco/ziggy": "^0.7.1"
+    "tightenco/ziggy": "^0.7.1",
+    "thepinecode/i18n": "^0.6.7"
   },
   "require-dev": {
     "orchestra/testbench": "^3.8",
