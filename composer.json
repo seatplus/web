@@ -21,7 +21,7 @@
       "Seatplus\\Web\\Tests\\": "tests/"
     }
   },
-  "minimum-stability": "alpha",
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
     "php": ">=7.1",
