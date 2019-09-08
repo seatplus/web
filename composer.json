@@ -10,8 +10,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Seatplus\\Web\\": "src/",
-      "Seatplus\\Eveapi\\": "../eveapi/src"
+      "Seatplus\\Web\\": "src/"
     },
     "files": [
       "src/Helpers/helpers.php"
@@ -30,7 +29,7 @@
     "laravel/socialite": "^4.1",
     "seatplus/eveapi": "dev-develop",
     "inertiajs/inertia-laravel": "^0.1.0",
-    "tightenco/ziggy": "^0.7.1",
+    "tightenco/ziggy": "^0.8.0",
     "thepinecode/i18n": "^0.6.7"
   },
   "require-dev": {
@@ -40,7 +39,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Seatplus\\Web\\WebServiceProvider "
+        "Seatplus\\Web\\WebServiceProvider"
       ]
     }
   },
