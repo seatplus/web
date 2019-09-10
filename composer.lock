@@ -3311,16 +3311,16 @@
     "packages-dev": [
         {
             "name": "clue/stdio-react",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clue/reactphp-stdio.git",
-                "reference": "43d24e4617b2d001554ebbe78e3ae968e9114b21"
+                "reference": "5f42a3a5a29f52432f0f68b57890353e8ca65069"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/reactphp-stdio/zipball/43d24e4617b2d001554ebbe78e3ae968e9114b21",
-                "reference": "43d24e4617b2d001554ebbe78e3ae968e9114b21",
+                "url": "https://api.github.com/repos/clue/reactphp-stdio/zipball/5f42a3a5a29f52432f0f68b57890353e8ca65069",
+                "reference": "5f42a3a5a29f52432f0f68b57890353e8ca65069",
                 "shasum": ""
             },
             "require": {
@@ -3333,7 +3333,7 @@
             "require-dev": {
                 "clue/arguments": "^2.0",
                 "clue/commander": "^1.2",
-                "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
+                "phpunit/phpunit": "^7.0 || ^6.4 || ^5.7 || ^4.8.35"
             },
             "suggest": {
                 "ext-mbstring": "Using ext-mbstring should provide slightly better performance for handling I/O"
@@ -3369,7 +3369,7 @@
                 "stdio",
                 "stdout"
             ],
-            "time": "2018-09-03T11:39:08+00:00"
+            "time": "2019-08-28T12:01:30+00:00"
         },
         {
             "name": "clue/term-react",
@@ -4000,18 +4000,18 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "role": "Developer",
-                    "email": "arne@blankerts.de"
+                    "email": "arne@blankerts.de",
+                    "role": "Developer"
                 },
                 {
                     "name": "Sebastian Heuer",
-                    "role": "Developer",
-                    "email": "sebastian@phpeople.de"
+                    "email": "sebastian@phpeople.de",
+                    "role": "Developer"
                 },
                 {
                     "name": "Sebastian Bergmann",
-                    "role": "Developer",
-                    "email": "sebastian@phpunit.de"
+                    "email": "sebastian@phpunit.de",
+                    "role": "Developer"
                 }
             ],
             "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
@@ -5319,16 +5319,16 @@
         },
         {
             "name": "spatie/phpunit-watcher",
-            "version": "1.11.0",
+            "version": "1.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/phpunit-watcher.git",
-                "reference": "dc227698a4168ec77486452e5886d64e21080411"
+                "reference": "7627864903f2af1ac590a87273e79016aba8f6a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/phpunit-watcher/zipball/dc227698a4168ec77486452e5886d64e21080411",
-                "reference": "dc227698a4168ec77486452e5886d64e21080411",
+                "url": "https://api.github.com/repos/spatie/phpunit-watcher/zipball/7627864903f2af1ac590a87273e79016aba8f6a8",
+                "reference": "7627864903f2af1ac590a87273e79016aba8f6a8",
                 "shasum": ""
             },
             "require": {
@@ -5359,9 +5359,9 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "role": "Developer",
                     "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be"
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
                 }
             ],
             "description": "Automatically rerun PHPUnit tests when source code changes",
@@ -5370,20 +5370,20 @@
                 "phpunit-watcher",
                 "spatie"
             ],
-            "time": "2019-07-22T13:06:46+00:00"
+            "time": "2019-09-09T15:55:47+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.3.3",
+            "version": "v4.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "34d29c2acd1ad65688f58452fd48a46bd996d5a6"
+                "reference": "5a0b7c32dc3ec56fd4abae8a4a71b0cf05013686"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/34d29c2acd1ad65688f58452fd48a46bd996d5a6",
-                "reference": "34d29c2acd1ad65688f58452fd48a46bd996d5a6",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/5a0b7c32dc3ec56fd4abae8a4a71b0cf05013686",
+                "reference": "5a0b7c32dc3ec56fd4abae8a4a71b0cf05013686",
                 "shasum": ""
             },
             "require": {
@@ -5429,7 +5429,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2019-07-24T14:47:54+00:00"
+            "time": "2019-08-20T14:27:59+00:00"
         },
         {
             "name": "theseer/tokenizer",
