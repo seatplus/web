@@ -1,11 +1,8 @@
 <?php
 
-
 namespace Seatplus\Web\Models\Permissions;
 
-
 use Illuminate\Database\Eloquent\Model;
-use Seatplus\Web\Models\User;
 
 class Affiliation extends Model
 {
@@ -22,7 +19,7 @@ class Affiliation extends Model
     protected $casts = [
         'allowed' => 'array',
         'inverse' => 'array',
-        'forbidden' => 'array'
+        'forbidden' => 'array',
     ];
 
     /**
