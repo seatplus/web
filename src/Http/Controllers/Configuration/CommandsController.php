@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Seatplus\Web\Http\Controllers\Configuration;
-
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Redis;
@@ -19,6 +17,4 @@ class CommandsController extends Controller
 
         return response('Success');
     }
-
-
 }
