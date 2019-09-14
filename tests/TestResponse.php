@@ -32,7 +32,9 @@ class TestResponse extends BaseResponse
     }
     public function assertComponent($component)
     {
+
         PHPUnit::assertEquals($component, $this->original['page']['component']);
+
         return $this;
     }
     protected function props($key = null)
