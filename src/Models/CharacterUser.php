@@ -19,4 +19,9 @@ class CharacterUser extends Model
     protected $fillable = [
         'character_id', 'user_id', 'character_owner_hash',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

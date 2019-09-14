@@ -7,6 +7,7 @@ use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Models\CharacterUser;
 use Seatplus\Web\Models\User;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
@@ -30,9 +31,20 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_user = factory(User::class)->create();
 
-        $this->test_character = factory(CharacterInfo::class)->create([
+        $character_user = factory(CharacterUser::class)->make([
+            'user_id' => $this->test_user->id,
             'character_id' => $this->test_user->id,
-            'name' => $this->test_user->name
+        ]);
+
+        $this->test_user->characters()->save($character_user);
+
+        $this->test_user->characters()->createMany(
+            factory(CharacterUser::class, 3)->create()->toArray()
+        );
+
+        $this->test_character = factory(CharacterInfo::class)->create([
+            'character_id' => $this->test_user->characters->first()->character_id,
+            'name' => $this->test_user->characters->first()->user->name
         ]);
     }
 
@@ -92,6 +104,11 @@ abstract class TestCase extends OrchestraTestCase
         config(['app.debug' => true]);
 
         $app['router']->aliasMiddleware('auth', Authenticate::class);
+
+        // Use test User model for users provider
+        $app['config']->set('auth.providers.users.model', User::class);
+
+        $app['config']->set('cache.prefix', 'seatplus_tests---');
     }
 
     /**

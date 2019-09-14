@@ -3,9 +3,11 @@
 namespace Seatplus\Web\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use HasRoles;
 
     /**
      * @var bool
@@ -45,6 +47,6 @@ class User extends Authenticatable
     public function characters()
     {
 
-        return $this->hasMany(CharacterUser::class, 'character_id', 'id');
+        return $this->hasMany(CharacterUser::class, 'user_id', 'id');
     }
 }
