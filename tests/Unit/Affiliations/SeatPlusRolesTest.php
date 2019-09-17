@@ -59,7 +59,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertTrue($role->hasAffiliation($this->test_user));
+        $this->assertTrue($role->isAllowed($this->test_user));
     }
 
     /** @test */
@@ -75,46 +75,96 @@ class SeatPlusRolesTest extends TestCase
 
         //dd(Arr::flatten($role->affiliations->allowed));
 
-        $this->assertTrue($role->hasAffiliation($this->test_user));
+        $this->assertTrue($role->isAllowed($this->test_user));
     }
 
     /** @test */
     public function characterIsInCharacterInversedAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'inverse' => collect([
+                'character_ids' => [$this->test_user->id, 12345]
+            ])
+        ]);
+
+        //dd(Arr::flatten($role->affiliations->allowed));
+
+        $this->assertFalse($role->isAllowed($this->test_user));
     }
 
     /** @test */
     public function characterIsInCharacterForbiddenAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'forbidden' => collect([
+                'character_ids' => [$this->test_user->id, 12345]
+            ])
+        ]);
+
+        $this->assertFalse($role->isAllowed($this->test_user));
     }
+
+    //TODO: Assertion that checks combination of forbidden character and allowed/inverse corporation
 
     // Corporation
 
     /** @test */
     public function characterIsInCorporationAllowedAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'allowed' => collect([
+                'corporation_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->corporation_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertTrue($role->isAllowed($this->test_user));
     }
 
     /** @test */
     public function characterIsInCorporationInversedAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'inverse' => collect([
+                'corporation_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->corporation_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertFalse($role->isAllowed($this->test_user));
     }
 
     /** @test */
     public function characterIsInCorporationForbiddenAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'forbidden' => collect([
+                'corporation_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->corporation_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertFalse($role->isAllowed($this->test_user));
     }
 
     // Alliance
     /** @test */
     public function characterIsInAllianceAllowedAffiliationTest()
     {
-        //TODO
+        // TODO Setup Alliance_Info table and set test-character up to have alliance
     }
 
     /** @test */

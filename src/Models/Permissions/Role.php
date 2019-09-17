@@ -8,35 +8,74 @@ use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
+    private $user;
+
     public function affiliations()
     {
 
         return $this->hasOne(Affiliation::class, 'role_id');
     }
 
-    public function hasAffiliation(User $user)
+    public function isAllowed(User $user)
     {
+        $this->setUser($user);
 
-        if(! empty($this->affiliations->forbidden) && in_array($user->id, Arr::flatten($this->affiliations->forbidden)))
+        if($this->isInForbiddenAffiliation())
             return false;
 
-        if($this->isAllowed($user))
+        if($this->isInAllowedAffiliation())
             return true;
-        /*if(in_array($user->id, Arr::flatten($this->affiliations->allowed)))
-            return true;*/
 
-        if(! in_array($user->id, Arr::flatten($this->affiliations->inverse)))
+        if(! $this->isInInverseAffiliation())
             return true;
 
         return false;
     }
 
-    private function isAllowed(User $user)
+    /**
+     * @param \Seatplus\Web\Models\User $user
+     */
+    private function setUser(User $user): void
     {
-        $resut = array_intersect(
-            $user->characters->pluck('character_id')->toArray(),
-            Arr::flatten($this->affiliations->allowed)
-        );
+
+        $this->user = $user;
+    }
+
+    private function isInForbiddenAffiliation()
+    {
+
+        return $this->isAffiliated($this->affiliations->forbidden);
+    }
+
+    private function isInAllowedAffiliation()
+    {
+
+        return $this->isAffiliated($this->affiliations->allowed);
+    }
+
+    private function isInInverseAffiliation()
+    {
+
+        return $this->isAffiliated($this->affiliations->inverse);
+    }
+
+    /**
+     * @param array|null $affiliations
+     *
+     * @return bool
+     */
+    private function isAffiliated(?Array $affiliations)
+    {
+        $resut = empty($affiliations) ?
+            null :
+            array_intersect(
+                array_merge(
+                    $this->user->characters->pluck('character_id')->toArray() ,
+                    $this->user->characters->map(function ($char) {return $char->character;})
+                        ->pluck('corporation_id')->toArray()
+                ),
+                Arr::flatten($affiliations)
+            );
 
         return ! empty($resut);
     }

@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class CharacterUser extends Model
 {
@@ -23,5 +24,10 @@ class CharacterUser extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function character()
+    {
+        return $this->belongsTo(CharacterInfo::class, 'character_id');
     }
 }
