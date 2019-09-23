@@ -31,21 +31,12 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_user = factory(User::class)->create();
 
-        $character_user = factory(CharacterUser::class)->make([
-            'user_id' => $this->test_user->id,
-            'character_id' => $this->test_user->id,
-        ]);
-
-        $this->test_user->characters()->save($character_user);
-
-        $this->test_user->characters()->createMany(
-            factory(CharacterUser::class, 3)->create()->toArray()
-        );
-
         $this->test_character = factory(CharacterInfo::class)->create([
-            'character_id' => $this->test_user->characters->first()->character_id,
-            'name' => $this->test_user->characters->first()->user->name
+            'character_id' => $this->test_user->id
         ]);
+
+        $this->test_user->characters->first()->character()->associate($this->test_character);
+
     }
 
     /**

@@ -2,10 +2,8 @@
 
 namespace Seatplus\Web\Tests\Unit\Affiliations;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Seatplus\Web\Models\Permissions\Role;
-use Seatplus\Web\Models\User;
 use Seatplus\Web\Tests\TestCase;
 
 class SeatPlusRolesTest extends TestCase
@@ -39,7 +37,7 @@ class SeatPlusRolesTest extends TestCase
     }
 
     /** @test */
-    public function roleHasaAffiliationTest()
+    public function roleHasAnAffiliationTest()
     {
         $role = Role::create(['name' => 'derp']);
 
@@ -59,7 +57,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertTrue($role->isAllowed($this->test_user));
+        $this->assertTrue($role->isAffiliated($this->test_user->id));
     }
 
     /** @test */
@@ -75,7 +73,7 @@ class SeatPlusRolesTest extends TestCase
 
         //dd(Arr::flatten($role->affiliations->allowed));
 
-        $this->assertTrue($role->isAllowed($this->test_user));
+        $this->assertTrue($role->isAffiliated($this->test_user->id));
     }
 
     /** @test */
@@ -89,9 +87,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        //dd(Arr::flatten($role->affiliations->allowed));
-
-        $this->assertFalse($role->isAllowed($this->test_user));
+        $this->assertFalse($role->isAffiliated($this->test_user->id));
     }
 
     /** @test */
@@ -105,7 +101,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertFalse($role->isAllowed($this->test_user));
+        $this->assertFalse($role->isAffiliated($this->test_user->id));
     }
 
     //TODO: Assertion that checks combination of forbidden character and allowed/inverse corporation
@@ -125,7 +121,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertTrue($role->isAllowed($this->test_user));
+        $this->assertTrue($role->isAffiliated(12345));
     }
 
     /** @test */
@@ -141,7 +137,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertFalse($role->isAllowed($this->test_user));
+        $this->assertFalse($role->isAffiliated(12345));
     }
 
     /** @test */
@@ -157,7 +153,7 @@ class SeatPlusRolesTest extends TestCase
             ])
         ]);
 
-        $this->assertFalse($role->isAllowed($this->test_user));
+        $this->assertFalse($role->isAffiliated(12345));
     }
 
     // Alliance
@@ -165,6 +161,12 @@ class SeatPlusRolesTest extends TestCase
     public function characterIsInAllianceAllowedAffiliationTest()
     {
         // TODO Setup Alliance_Info table and set test-character up to have alliance
+
+        $alliance_ids= $this->test_user->characters->map(function ($char) {
+            return optional($char->character)->corporation_id;
+        });
+
+
     }
 
     /** @test */

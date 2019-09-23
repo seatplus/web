@@ -3,12 +3,13 @@
 namespace Seatplus\Web\Models\Permissions;
 
 use Illuminate\Support\Arr;
-use Seatplus\Web\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
-    private $user;
+    private $affiliated_ids;
 
     public function affiliations()
     {
@@ -16,9 +17,12 @@ class Role extends SpatieRole
         return $this->hasOne(Affiliation::class, 'role_id');
     }
 
-    public function isAllowed(User $user)
+    public function isAffiliated(int $affiliation_id)
     {
-        $this->setUser($user);
+
+        $this->affiliated_ids = collect($affiliation_id);
+
+        $this->getAffiliatedIds();
 
         if($this->isInForbiddenAffiliation())
             return false;
@@ -32,51 +36,54 @@ class Role extends SpatieRole
         return false;
     }
 
-    /**
-     * @param \Seatplus\Web\Models\User $user
-     */
-    private function setUser(User $user): void
+    private function isInForbiddenAffiliation() : bool
     {
 
-        $this->user = $user;
+        return $this->isInAffiliatedArray($this->affiliations->forbidden);
     }
 
-    private function isInForbiddenAffiliation()
+    private function isInAllowedAffiliation(): bool
     {
 
-        return $this->isAffiliated($this->affiliations->forbidden);
+        return $this->isInAffiliatedArray($this->affiliations->allowed);
     }
 
-    private function isInAllowedAffiliation()
+    private function isInInverseAffiliation() : bool
     {
 
-        return $this->isAffiliated($this->affiliations->allowed);
-    }
-
-    private function isInInverseAffiliation()
-    {
-
-        return $this->isAffiliated($this->affiliations->inverse);
+        return $this->isInAffiliatedArray($this->affiliations->inverse);
     }
 
     /**
-     * @param array|null $affiliations
+     * @param array|null $affiliation_ids
      *
      * @return bool
      */
-    private function isAffiliated(?Array $affiliations)
+    private function isInAffiliatedArray(?Array $affiliation_ids) : bool
     {
-        $resut = empty($affiliations) ?
+        $resut = empty($affiliation_ids) ?
             null :
             array_intersect(
-                array_merge(
-                    $this->user->characters->pluck('character_id')->toArray() ,
-                    $this->user->characters->map(function ($char) {return $char->character;})
-                        ->pluck('corporation_id')->toArray()
-                ),
-                Arr::flatten($affiliations)
+                $this->affiliated_ids->toArray(),
+                Arr::flatten($affiliation_ids)
             );
 
         return ! empty($resut);
+    }
+
+    private function getAffiliatedIds() : void
+    {
+        $id = $this->affiliated_ids->last();
+
+        if ($char = CharacterInfo::find($id))
+            $this->affiliated_ids->put('corporation_id', $char->corporation_id);
+
+        $corp = CorporationInfo::find($id);
+
+        if ($this->affiliated_ids->has('corporation_id') && is_null($corp))
+            $this->affiliated_ids
+                ->put(
+                    'alliance_id',
+                    (int) CorporationInfo::find($this->affiliated_ids->get('corporation_id'))->alliance_id);
     }
 }

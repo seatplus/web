@@ -24,6 +24,7 @@
  */
 
 use Faker\Generator as Faker;
+use Seatplus\Web\Models\CharacterUser;
 use Seatplus\Web\Models\User;
 
 $factory->define(User::class, function (Faker $faker) {
@@ -34,4 +35,10 @@ $factory->define(User::class, function (Faker $faker) {
         'active'               => true,
         'character_owner_hash' => sha1($faker->text),
     ];
+});
+
+$factory->afterCreating(User::class, function ($user, $faker) {
+    $user->characters()->save(factory(CharacterUser::class)->make([
+        'character_id' => $user->id
+    ]));
 });
