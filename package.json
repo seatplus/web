@@ -23,7 +23,7 @@
         "laravel-mix-copy-watched": "^2.1.4",
         "lodash": "^4.17.5",
         "mocha": "^6.1.4",
-        "mochapack": "^1.1.1",
+        "mochapack": "^1.1.5",
         "popper.js": "^1.12",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.15.2",
