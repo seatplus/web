@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Models\Permissions;
 
 use Illuminate\Support\Arr;
+use phpDocumentor\Reflection\Types\Boolean;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Spatie\Permission\Models\Role as SpatieRole;
@@ -17,7 +18,12 @@ class Role extends SpatieRole
         return $this->hasOne(Affiliation::class, 'role_id');
     }
 
-    public function isAffiliated(int $affiliation_id)
+    /**
+     * @param int $affiliation_id
+     *
+     * @return bool
+     */
+    public function isAffiliated(int $affiliation_id) : bool
     {
 
         $this->affiliated_ids = collect($affiliation_id);

@@ -160,25 +160,53 @@ class SeatPlusRolesTest extends TestCase
     /** @test */
     public function characterIsInAllianceAllowedAffiliationTest()
     {
-        // TODO Setup Alliance_Info table and set test-character up to have alliance
 
-        $alliance_ids= $this->test_user->characters->map(function ($char) {
-            return optional($char->character)->corporation_id;
-        });
+        $role = Role::create(['name' => 'derp']);
 
+        $role->affiliations()->create([
+            'allowed' => collect([
+                'alliance_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->alliance_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertTrue($role->isAffiliated(12345));
 
     }
 
     /** @test */
     public function characterIsInAllianceInversedAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'inverse' => collect([
+                'alliance_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->alliance_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertFalse($role->isAffiliated(12345));
+        $this->assertTrue($role->isAffiliated(54321));
     }
 
     /** @test */
     public function characterIsInAllianceForbiddenAffiliationTest()
     {
-        //TODO
+        $role = Role::create(['name' => 'derp']);
+
+        $role->affiliations()->create([
+            'forbidden' => collect([
+                'alliance_ids' => Arr::flatten([$this->test_user->characters->map(function ($char) {
+                    return optional($char->character)->alliance_id;
+                }), 12345])
+            ])
+        ]);
+
+        $this->assertFalse($role->isAffiliated(12345));
+        $this->assertTrue($role->isAffiliated(54321));
     }
 
 
