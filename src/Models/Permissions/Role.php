@@ -3,7 +3,6 @@
 namespace Seatplus\Web\Models\Permissions;
 
 use Illuminate\Support\Arr;
-use phpDocumentor\Reflection\Types\Boolean;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Spatie\Permission\Models\Role as SpatieRole;
@@ -66,7 +65,7 @@ class Role extends SpatieRole
      *
      * @return bool
      */
-    private function isInAffiliatedArray(?Array $affiliation_ids) : bool
+    private function isInAffiliatedArray(?array $affiliation_ids) : bool
     {
         $resut = empty($affiliation_ids) ?
             null :
