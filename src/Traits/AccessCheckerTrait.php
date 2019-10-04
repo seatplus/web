@@ -6,10 +6,14 @@ use Spatie\Permission\Models\Role;
 
 trait AccessCheckerTrait
 {
-    public function hasAccessTo($permission, ?int $id = null) : bool
+    public function hasAccessTo($permission, int $id) : bool
     {
+        // start by asserting if id to check belongs to the users characters
+        if (in_array($id, $this->characters->pluck('character_id')->toArray()))
+            return true;
+
         // start by asserting that the user has the required permission and id is set
-        if(! $this->hasPermissionTo($permission) || is_null($id))
+        if(! $this->hasPermissionTo($permission))
             return false;
 
         /*
