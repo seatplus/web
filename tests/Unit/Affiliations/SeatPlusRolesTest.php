@@ -206,7 +206,6 @@ class SeatPlusRolesTest extends TestCase
         ]);
 
         $this->assertFalse($role->isAffiliated(12345));
-        $this->assertTrue($role->isAffiliated(54321));
     }
 
 

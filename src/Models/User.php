@@ -3,11 +3,12 @@
 namespace Seatplus\Web\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Seatplus\Web\Traits\AccessCheckerTrait;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasRoles;
+    use HasRoles, AccessCheckerTrait;
 
     /**
      * @var bool
