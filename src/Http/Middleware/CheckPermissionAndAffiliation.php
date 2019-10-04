@@ -20,10 +20,9 @@ class CheckPermissionAndAffiliation
         }
 
         if(collect($request->route()->parameters())->intersectByKeys([
-            'character_id' => '', 'corporation_id' => '', 'alliance_id' => ''
+            'character_id' => '', 'corporation_id' => '', 'alliance_id' => '',
         ])->isEmpty())
             abort(403, 'Missing required route parameter.');
-
 
         // if the character belongs to the user, no permissions are required.
         if($request->character_id && in_array($request->character_id, auth()->user()->characters->pluck('character_id')->toArray()))
