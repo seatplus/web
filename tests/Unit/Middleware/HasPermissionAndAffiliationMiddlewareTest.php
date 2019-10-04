@@ -44,7 +44,7 @@ class HasPermissionAndAffiliationMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function missingPermission()
+    public function missingPermissionTest()
     {
         $this->role->affiliations()->create([
             'allowed' => collect([
@@ -53,6 +53,8 @@ class HasPermissionAndAffiliationMiddlewareTest extends TestCase
         ]);
 
         $this->actingAs($this->test_user);
+
+        // As this is the missingPermissionTest remove the permission from the role
         $this->role->revokePermissionTo($this->permission);
 
         $request = new Request([], [], [], [], [], ['REQUEST_URI' => 'testing/12345']);
