@@ -69,16 +69,12 @@ class FindOrCreateUserActionTest extends TestCase
         $test_user = factory(User::class)->create();
 
         // 2. add two characters
-        factory(CharacterUser::class)->create([
-            'user_id' => $test_user->id,
-            'character_id' => $test_user->id
-        ]);
 
-        $second_character = factory(CharacterUser::class)->create([
-            'user_id' => $test_user->id,
-        ]);
+        $test_user->characters()->save(factory(CharacterUser::class)->make());
 
         // 3. find user
+
+        $second_character = $test_user->characters->last();
 
         $socialiteUser = $this->createMock(SocialiteUser::class);
         $socialiteUser->character_id = $second_character->character_id;

@@ -1,8 +1,8 @@
 <?php
 
 use Faker\Generator as Faker;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Models\CharacterUser;
-use Seatplus\Web\Models\User;
 
 $factory->define(CharacterUser::class, function (Faker $faker) {
 
@@ -11,4 +11,8 @@ $factory->define(CharacterUser::class, function (Faker $faker) {
         'character_id'         => $faker->numberBetween(90000000, 98000000),
         'character_owner_hash' => sha1($faker->text),
     ];
+});
+
+$factory->afterCreating(CharacterUser::class, function ($character_user, $faker) {
+    $character_user->character()->associate(factory(CharacterInfo::class)->make())->toArray();
 });
