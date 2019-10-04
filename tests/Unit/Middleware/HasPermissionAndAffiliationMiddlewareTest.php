@@ -71,4 +71,54 @@ class HasPermissionAndAffiliationMiddlewareTest extends TestCase
         $response = $middleware->handle($request, function () {}, $this->permission->name);
     }
 
+    /** @test */
+    public function hasPermissionTest()
+    {
+        $this->role->affiliations()->create([
+            'allowed' => collect([
+                'character_ids' => [12345]
+            ])
+        ]);
+
+        $this->actingAs($this->test_user);
+
+        $request = new Request([], [], [], [], [], ['REQUEST_URI' => 'testing/12345']);
+
+        $request->setRouteResolver(function () use ($request) {
+            return (new Route('GET', 'testing/{character_id}', []))->bind($request);
+        });
+
+        $middleware = new CheckPermissionAndAffiliation;
+
+        $response = $middleware->handle($request, function () {}, $this->permission->name);
+
+        $this->assertNull($response);
+    }
+
+    /** @test */
+    public function accessOwnedCharactersTest()
+    {
+        // For testing create a forbidden affiliation
+        $this->role->affiliations()->create([
+            'forbidden' => collect([
+                'character_ids' => [$this->test_character->character_id]
+            ])
+        ]);
+
+        $this->actingAs($this->test_user);
+
+        $request = new Request([], [], [], [], [], ['REQUEST_URI' => 'testing/' . $this->test_character->character_id ]);
+
+        $request->setRouteResolver(function () use ($request) {
+            return (new Route('GET', 'testing/{character_id}', []))->bind($request);
+        });
+
+        $middleware = new CheckPermissionAndAffiliation;
+
+        $response = $middleware->handle($request, function () {}, $this->permission->name);
+
+        $this->assertNull($response);
+
+    }
+
 }

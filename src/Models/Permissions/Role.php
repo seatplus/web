@@ -56,8 +56,9 @@ class Role extends SpatieRole
 
     private function isInInverseAffiliation() : bool
     {
-
-        return $this->isInAffiliatedArray($this->affiliations->inverse);
+        return is_null($this->affiliations->inverse)
+            ? true
+            : $this->isInAffiliatedArray($this->affiliations->inverse);
     }
 
     /**

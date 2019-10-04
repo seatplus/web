@@ -6,10 +6,10 @@ use Spatie\Permission\Models\Role;
 
 trait AccessCheckerTrait
 {
-    public function hasAccessTo($permission, int $id) : bool
+    public function hasAccessTo($permission, ?int $id = null) : bool
     {
-        // start by asserting that the user has the required permission
-        if(! auth()->user()->hasPermissionTo($permission))
+        // start by asserting that the user has the required permission and id is set
+        if(! $this->hasPermissionTo($permission) || is_null($id))
             return false;
 
         /*
@@ -19,7 +19,7 @@ trait AccessCheckerTrait
         */
 
         // Check a users roles and only take the ones into account which have a certain permission
-        $users_roles_with_permission = app('auth')->user()->roles->filter(function (Role $role) use ($permission) {
+        $users_roles_with_permission = $this->roles->filter(function (Role $role) use ($permission) {
 
             return $role->hasPermissionTo($permission);
         });
