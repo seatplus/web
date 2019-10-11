@@ -27,7 +27,7 @@
     "php": ">=7.1",
     "laravel/framework": "^6.0",
     "laravel/socialite": "^4.1",
-    "seatplus/eveapi": "dev-feature/laravel-6.x",
+    "seatplus/eveapi": "dev-develop",
     "inertiajs/inertia-laravel": "^0.1.0",
     "tightenco/ziggy": "^0.8.0",
     "thepinecode/i18n": "^0.6.7",
