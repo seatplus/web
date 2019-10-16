@@ -39,6 +39,6 @@
         "admin-lte": "^3.0.0-rc.4",
         "bootstrap-vue": "^2.0.3",
         "moxios": "^0.4.0",
-        "sweetalert2": "^8.18.3"
+        "sweetalert2": "^8.18.4"
     }
 }
