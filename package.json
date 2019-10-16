@@ -24,7 +24,7 @@
         "lodash": "^4.17.5",
         "mocha": "^6.2.1",
         "mochapack": "^1.1.5",
-        "popper.js": "^1.12",
+        "popper.js": "^1.16",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.23.0",
         "sass-loader": "^7.3.1",
