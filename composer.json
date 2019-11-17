@@ -24,7 +24,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.2",
     "laravel/framework": "^6.0",
     "laravel/socialite": "^4.1",
     "seatplus/eveapi": "dev-develop",
