@@ -12,7 +12,7 @@ class CommandsController extends Controller
     public function clear()
     {
 
-        RedisManager::flushall();
+        Cache::flush();
 
         Artisan::call('cache:clear');
 
