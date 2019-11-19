@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Inertia\Middleware;
-use Laravel\Socialite\SocialiteManager;
-use Seatplus\Web\Extentions\EveOnlineProvider;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
 
