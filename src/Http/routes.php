@@ -4,14 +4,6 @@ Route::namespace('Seatplus\Web\Http\Controllers')
     ->middleware('web')
     ->group(function () {
 
-        // Authentication & Registration Routes.
-        Route::namespace('Auth')
-            ->prefix('auth')
-            ->group(function () {
-                include __DIR__ . '/Routes/Auth/Auth.php';
-                include __DIR__ . '/Routes/Auth/Sso.php';
-            });
-
         Route::middleware('auth')
             ->group(function () {
                 Route::get('/home', 'HomeController@home')->name('home');
