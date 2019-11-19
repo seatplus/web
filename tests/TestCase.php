@@ -5,10 +5,11 @@ namespace Seatplus\Web\Tests;
 
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Models\CharacterUser;
-use Seatplus\Web\Models\User;
+use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 
@@ -63,6 +64,7 @@ abstract class TestCase extends OrchestraTestCase
             WebServiceProvider::class,
             EveapiServiceProvider::class,
             HorizonServiceProvider::class,
+            AuthenticationServiceProvider::class,
         ];
     }
 

@@ -24,16 +24,14 @@
  */
 
 use Faker\Generator as Faker;
-use Seatplus\Web\Models\CharacterUser;
-use Seatplus\Web\Models\User;
+use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Models\User;
 
 $factory->define(User::class, function (Faker $faker) {
 
     return [
-        'id'                   => $faker->numberBetween(90000000, 98000000),
-        'name'                 => $faker->name,
-        'active'               => true,
-        'character_owner_hash' => sha1($faker->text),
+        'main_character'                 => $faker->name,
+        'active'               => true
     ];
 });
 

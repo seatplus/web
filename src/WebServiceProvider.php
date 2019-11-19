@@ -87,23 +87,7 @@ class WebServiceProvider extends ServiceProvider
 
     private function register_services()
     {
-        // Register the Socialite Factory.
-        // From: Laravel\Socialite\SocialiteServiceProvider
-        $this->app->singleton('Laravel\Socialite\Contracts\Factory', function ($app) {
 
-            return new SocialiteManager($app);
-        });
-
-        // Slap in the Eveonline Socialite Provider
-        $eveonline = $this->app->make('Laravel\Socialite\Contracts\Factory');
-        $eveonline->extend('eveonline',
-            function ($app) use ($eveonline) {
-
-                $config = $app['config']['services.eveonline'];
-
-                return $eveonline->buildProvider(EveOnlineProvider::class, $config);
-            }
-        );
     }
 
     private function getPackageJsonFile()
@@ -162,8 +146,5 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/config/package.sidebar.php', 'package.sidebar'
         );
 
-        $this->mergeConfigFrom(
-            __DIR__ . '/config/permission.php', 'permission'
-        );
     }
 }
