@@ -6,7 +6,7 @@ return [
             'name' => 'assets',
             'icon'  => 'fas fa-dolly-flatbed',
             'route' => 'character.assets',
-        ]
+        ],
     ],
     'home'     => [
         [
