@@ -119,7 +119,7 @@ class WebServiceProvider extends ServiceProvider
                 return config('package.sidebar');
             },
             'user' => function () {
-                return auth()->user()->load('main_character');
+                return auth()->guest() ? '' : auth()->user()->load('main_character');
             },
             'translation' => function () {
                 return [

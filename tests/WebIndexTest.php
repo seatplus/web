@@ -35,6 +35,8 @@ class WebIndexTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get('/home');
 
+        dd($response);
+
         $response->assertComponent('Dashboard/Index');
 
         $this->assertAuthenticatedAs($this->test_user);
