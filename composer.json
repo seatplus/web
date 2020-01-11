@@ -32,7 +32,8 @@
     "inertiajs/inertia-laravel": "^0.1.0",
     "tightenco/ziggy": "^0.8.0",
     "thepinecode/i18n": "^0.6.7",
-    "spatie/laravel-permission": "^3.0"
+    "spatie/laravel-permission": "^3.0",
+    "nicmart/numbers": "^0.1.0"
   },
   "require-dev": {
     "orchestra/testbench": "^4.2",
