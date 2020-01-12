@@ -11,10 +11,10 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                   <EveImage :object="$page.user.main_character" :size=256 class="img-circle elevation-2" :alt="$page.user.main_character.name"></EveImage>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">Alexander Pierce</a>
+                    <a href="#" class="d-block">{{$page.user.main_character.name}}</a>
                 </div>
             </div>
 
@@ -22,30 +22,34 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
-                    <li v-for="item in $page.sidebar" :class="['nav-item', {'has-treeview' : hasTreeview(item), 'menu-open': hasActiveEntries(item) } ]">
-                        <inertia-link v-if="!hasTreeview(item)" :href="!hasTreeview(item) ? route( item.route ) : '#'" :class="['nav-link', {'active' : isActive(item) || hasActiveEntries(item)} ]">
-                            <i :class="['nav-icon', item.icon ]"></i>
-                            <p>
-                                {{ item.name }}
-                                <i v-if="hasTreeview(item)" class="right fa fa-angle-left"></i>
-                            </p>
-                        </inertia-link>
-                        <a v-else-if="hasTreeview(item)" :href="!hasTreeview(item) ? route( item.route ) : '#'" :class="['nav-link', {'active' : isActive(item) || hasActiveEntries(item)} ]">
-                            <i :class="['nav-icon', item.icon ]"></i>
-                            <p>
-                                {{ item.name }}
-                                <i v-if="hasTreeview(item)" class="right fa fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul v-if="hasTreeview(item)" class="nav nav-treeview">
-                            <li v-for="entry in item.entries" class="nav-item">
-                                <inertia-link :href="route(entry.route)" :class="['nav-link', {active: isActive(entry)}]">
-                                    <i :class="['nav-icon', entry.icon ]"></i>
-                                    <p> {{ entry.name }}</p>
-                                </inertia-link>
-                            </li>
-                        </ul>
-                    </li>
+                    <div v-for="(header, index) in $page.sidebar">
+                        <li class="nav-header">{{index}}</li>
+                        <li v-for="item in header" :class="['nav-item', {'has-treeview' : hasTreeview(item), 'menu-open': hasActiveEntries(item) } ]">
+                            <inertia-link v-if="!hasTreeview(item)" :href="!hasTreeview(item) ? route( item.route ) : '#'" :class="['nav-link', {'active' : isActive(item) || hasActiveEntries(item)} ]">
+                                <i :class="['nav-icon', item.icon ]"></i>
+                                <p>
+                                    {{ item.name }}
+                                    <i v-if="hasTreeview(item)" class="right fa fa-angle-left"></i>
+                                </p>
+                            </inertia-link>
+                            <a v-else-if="hasTreeview(item)" :href="!hasTreeview(item) ? route( item.route ) : '#'" :class="['nav-link', {'active' : isActive(item) || hasActiveEntries(item)} ]">
+                                <i :class="['nav-icon', item.icon ]"></i>
+                                <p>
+                                    {{ item.name }}
+                                    <i v-if="hasTreeview(item)" class="right fa fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul v-if="hasTreeview(item)" class="nav nav-treeview">
+                                <li v-for="entry in item.entries" class="nav-item">
+                                    <inertia-link :href="route(entry.route)" :class="['nav-link', {active: isActive(entry)}]">
+                                        <i :class="['nav-icon', entry.icon ]"></i>
+                                        <p> {{ entry.name }} </p>
+                                    </inertia-link>
+                                </li>
+                            </ul>
+                        </li>
+                    </div>
+
                 </ul>
             </nav>
             <!-- /.sidebar-menu -->
@@ -55,10 +59,14 @@
 </template>
 
 <script>
-    export default {
-        name: "Sidebar",
-
-        methods: {
+  import EveImage from "./EveImage"
+  export default {
+      components: {EveImage},
+      name: "Sidebar",
+    props: {
+        main_character: Object
+    },
+      methods: {
             hasTreeview(item) {
 
                 return item.hasOwnProperty('entries')

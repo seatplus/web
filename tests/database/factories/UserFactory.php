@@ -26,12 +26,13 @@
 use Faker\Generator as Faker;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo as CharacterInfoAlias;
 
 $factory->define(User::class, function (Faker $faker) {
 
     return [
-        'main_character'                 => $faker->name,
-        'active'               => true
+        'active'       => true,
+        'main_character_id' => factory(CharacterInfoAlias::class)
     ];
 });
 

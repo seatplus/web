@@ -19,6 +19,12 @@ Route::namespace('Seatplus\Web\Http\Controllers')
                     ->group(function () {
                         include __DIR__ . '/Routes/Configuration/Configuration.php';
                     });
+
+                Route::namespace('Character')
+                    ->prefix('character')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Character/View.php';
+                    });
             });
 
     });
