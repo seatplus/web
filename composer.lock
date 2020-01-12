@@ -2478,12 +2478,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "d8b8c0ec869cf064c1071e4579de2bbf70d5dc4a"
+                "reference": "c3a96af0b3ff601b56d02c4c58352451cb43782e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/d8b8c0ec869cf064c1071e4579de2bbf70d5dc4a",
-                "reference": "d8b8c0ec869cf064c1071e4579de2bbf70d5dc4a",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/c3a96af0b3ff601b56d02c4c58352451cb43782e",
+                "reference": "c3a96af0b3ff601b56d02c4c58352451cb43782e",
                 "shasum": ""
             },
             "require": {
@@ -2523,7 +2523,7 @@
                 }
             ],
             "description": "SeAT plus package that handles authentication acognistic to SeAT plus usage as pure API or Web",
-            "time": "2020-01-02T19:47:08+00:00"
+            "time": "2020-01-12T08:45:12+00:00"
         },
         {
             "name": "seatplus/eseye",

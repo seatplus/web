@@ -32,7 +32,7 @@ $factory->define(User::class, function (Faker $faker) {
 
     return [
         'active'       => true,
-        'main_character' => factory(CharacterInfoAlias::class)
+        'main_character_id' => factory(CharacterInfoAlias::class)
     ];
 });
 
