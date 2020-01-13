@@ -18,8 +18,8 @@
                       </div>
                       <!-- /.card-header -->
                       <div class="card-body p-0">
-                          <table class="table table-responsive-md">
-                              <thead>
+                          <table class="table table-responsive-md table-sm">
+                              <thead class="thead-light">
                               <tr>
                                   <th>Quantity</th>
                                   <th>Type</th>
