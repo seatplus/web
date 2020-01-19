@@ -2,10 +2,10 @@
     <nav aria-label="pagination">
         <ul class="pagination justify-content-end">
             <li :class="['page-item', collection.meta.current_page <= 1 ? 'disabled' : '']">
-                <inertia-link class="page-link" :href="collection.links.first" tabindex="-2">First</inertia-link>
+                <inertia-link class="page-link" :href="buildHref(1)" tabindex="-2">First</inertia-link>
             </li>
             <li :class="['page-item', collection.meta.current_page <= 1 ? 'disabled' : '']">
-                <inertia-link class="page-link" :href="collection.links.prev" tabindex="-1">Previous</inertia-link>
+                <inertia-link class="page-link" :href="buildHref(collection.meta.current_page - 1)" tabindex="-1">Previous</inertia-link>
             </li>
 
             <li v-for="page in pages" class="page-item" :class="['page-item', isCurrentPage(page) ? 'active' : '']">
@@ -13,10 +13,10 @@
             </li>
 
             <li :class="['page-item', collection.meta.current_page >= collection.meta.last_page ? 'disabled' : '']">
-                <inertia-link class="page-link" :href="collection.links.next">Next</inertia-link>
+                <inertia-link class="page-link" :href="buildHref(collection.meta.current_page + 1)">Next</inertia-link>
             </li>
             <li :class="['page-item', collection.meta.current_page >= collection.meta.last_page ? 'disabled' : '']">
-                <inertia-link class="page-link" :href="collection.links.last">Last</inertia-link>
+                <inertia-link class="page-link" :href="buildHref(collection.meta.last_page)">Last</inertia-link>
             </li>
 
         </ul>
@@ -36,14 +36,24 @@
         default: 5
       }
     },
+      data() {
+        return {
+
+        }
+      },
     methods: {
       isCurrentPage(page) {
         return this.collection.meta.current_page === page;
       },
       buildHref(page) {
 
-        return this.collection.meta.path + '/?page=' + page
-      }
+        let uri = window.location.search.substring(1);
+        let searchParams = new URLSearchParams(uri);
+
+        searchParams.set("page", page);
+
+        return this.collection.meta.path + '?' + searchParams.toString();
+      },
     },
     computed: {
       pages() {
@@ -62,7 +72,7 @@
         }
         return pages;
       }
-    }
+    },
   }
 </script>
 

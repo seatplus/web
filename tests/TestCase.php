@@ -31,11 +31,11 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_user = factory(User::class)->create();
 
-        $this->test_character = factory(CharacterInfo::class)->create([
-            'character_id' => $this->test_user->id
-        ]);
+        $this->test_character = $this->test_user->main_character;
 
         $this->test_user->characters->first()->character()->associate($this->test_character);
+
+        $this->app->instance('path.public', __DIR__ .'/../src/public');
 
     }
 

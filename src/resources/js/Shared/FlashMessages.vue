@@ -3,7 +3,7 @@
 
     <b-alert v-if="Object.keys($page.errors).length > 0" show variant="danger" dismissible>
       <h4 class="alert-heading">{{ $page.translation.error }}</h4>
-      <span v-for="error in $page.errors">{{ error }}</span>
+      <span v-for="error in $page.errors">{{ error.toString() }}</span>
     </b-alert>
 
     <b-alert v-if="$page.flash.error" show variant="danger" dismissible>
