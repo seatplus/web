@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Database\Eloquent\Collection;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+
 if (! function_exists('setting')) {
 
     /**
@@ -100,5 +103,24 @@ if (! function_exists('carbon')) {
             return new \Carbon\Carbon($data);
 
         return new \Carbon\Carbon;
+    }
+}
+
+if (! function_exists('getAffiliatedCharacters')) {
+
+    /**
+     * A helper to get all affiliated Characters.
+     *
+     * @param string $class
+     *
+     * @return void
+     */
+    function getAffiliatedCharacters(string $class) : Collection
+    {
+/**/
+        $permission_name = config('eveapi.permissions.' . $class);
+
+        return CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedCharacterIdsByPermission($permission_name))
+            ->get();
     }
 }
