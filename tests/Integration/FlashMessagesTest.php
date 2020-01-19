@@ -13,9 +13,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['success','SuccessFlashMessage'])
             ->get('auth/login');
 
-
-        $response->assertSee('Success');
-        $response->assertSee('SuccessFlashMessage');
+        $response->assertHasProp('flash.success');
     }
 
     /** @test */
@@ -24,9 +22,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['error','ErrorFlashMessage'])
             ->get('auth/login');
 
-
-        $response->assertSee('Error');
-        $response->assertSee('ErrorFlashMessage');
+        $response->assertHasProp('flash.error');
     }
 
     /** @test */
@@ -35,9 +31,8 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['warning','WarningFlashMessage'])
             ->get('auth/login');
 
+        $response->assertHasProp('flash.warning');
 
-        $response->assertSee('Warning');
-        $response->assertSee('WarningFlashMessage');
     }
 
     /** @test */
@@ -46,8 +41,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['info','InfoFlashMessage'])
             ->get('auth/login');
 
+        $response->assertHasProp('flash.info');
 
-        $response->assertSee('Info');
-        $response->assertSee('InfoFlashMessage');
     }
 }
