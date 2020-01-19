@@ -29,9 +29,9 @@
     "laravel/socialite": "^4.1",
     "seatplus/eveapi": "dev-develop",
     "seatplus/auth": "dev-develop",
-    "inertiajs/inertia-laravel": "^0.1.0",
+    "inertiajs/inertia-laravel": "^0.2.4",
     "tightenco/ziggy": "^0.8.0",
-    "thepinecode/i18n": "^0.6.7",
+    "thepinecode/i18n": "^0.7.0",
     "spatie/laravel-permission": "^3.0",
     "nicmart/numbers": "^0.1.0"
   },
