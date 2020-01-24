@@ -9,8 +9,9 @@ class CommandControllerTest extends TestCase
 
     public function testIfPostCacheClearClearsCache()
     {
-        if(!env('APP_ENV') == 'travis')
-            $this->markTestSkipped('this test is only made on travis, due to local issues');
+
+        /*if(!env('APP_ENV') == 'testing')
+            $this->markTestSkipped('this test is only made on travis, due to local issues');*/
 
         $route = route('cache.clear');
 
@@ -22,8 +23,11 @@ class CommandControllerTest extends TestCase
 
         $this->assertEquals('value', cache('key'));
 
-        $this->actingAs($this->test_user)
-            ->post($route)->assertOk();
+        $response = $this->actingAs($this->test_user)
+            ->post($route);//->assertOk();
+
+        dd($response);
+
 
         $this->assertNotEquals('value', cache('key'));
 
