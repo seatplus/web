@@ -24,10 +24,7 @@ class CommandControllerTest extends TestCase
         $this->assertEquals('value', cache('key'));
 
         $response = $this->actingAs($this->test_user)
-            ->post($route);//->assertOk();
-
-        dd($response);
-
+            ->post($route)->assertOk();
 
         $this->assertNotEquals('value', cache('key'));
 
