@@ -42,7 +42,7 @@ class UserRessource extends JsonResource
         return [
             'name' => $this->name,
             'id' => $this->id,
-            'main_character' => $this->main_character
+            'main_character' => $this->main_character,
         ];
     }
 }
