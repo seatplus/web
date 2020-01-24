@@ -1,4 +1,5 @@
 env:
+  - APP_ENV=travis
   global:
     - CC_TEST_REPORTER_ID=1ba66b56bc5a04c17474d52e94124cb04d4a520c7c46a01ace9ce25e7b58b85d
 

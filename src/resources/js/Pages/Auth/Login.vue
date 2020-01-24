@@ -11,9 +11,9 @@
         <div class="card-body login-card-body">
           {{ $page.login_welcome }}
           <div class="social-auth-links text-center mb-3">
-            <inertia-link :href="route('auth.eve')">
+            <a :href="route('auth.eve')">
                 <b-img :src="$page.evesso_img_src" fluid />
-            </inertia-link>
+            </a>
           </div>
         </div>
         <!-- /.login-card-body -->
