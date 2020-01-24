@@ -20,6 +20,9 @@ $fa-font-path: "../webfonts";
 // Bootstrap Vue CSS
 @import '~bootstrap-vue/src/index.scss';
 
+// Multiselect
+@import "~vue-multiselect/dist/vue-multiselect.min.css";
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);

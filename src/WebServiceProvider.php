@@ -171,5 +171,9 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/config/package.sidebar.php', 'package.sidebar'
         );
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.permissions.php', 'web.permissions'
+        );
+
     }
 }

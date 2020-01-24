@@ -24,40 +24,41 @@
  * SOFTWARE.
  */
 
-return [
-    'home'     => [
-        [
-            'name'  => 'Home',
-            'icon'  => 'fa fa-th',
-            'route' => 'home',
-        ],
-    ],
-    'character' => [
-        [
-            'name' => 'assets',
-            'icon'  => 'fas fa-dolly-flatbed',
-            'route' => 'character.assets',
-        ],
-    ],
-    'Access Control' => [
-        [
-            'name' => 'Control Group',
-            'icon'  => 'fas fa-users-cog',
-            'route' => 'acl.groups',
-        ],
-    ],
-    'settings' => [
-        [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'help',
-                    'icon'  => 'far fa-question-circle',
-                    'route' => 'settings',
-                ],
-            ],
-        ],
-    ],
-];
+namespace Seatplus\Web\Http\Controllers\Request;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateControlGroup extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'permissions.*.name' => 'string',
+            'allowed.*.character_id' => 'integer',
+            'allowed.*.corporation_id' => 'integer',
+            'allowed.*.alliance_id' => 'integer',
+            'inverse.*.character_id' => 'integer',
+            'inverse.*.corporation_id' => 'integer',
+            'inverse.*.alliance_id' => 'integer',
+            'forbidden.*.character_id' => 'integer',
+            'forbidden.*.corporation_id' => 'integer',
+            'forbidden.*.alliance_id' => 'integer',
+            'roleName' => 'required|string',
+        ];
+    }
+}

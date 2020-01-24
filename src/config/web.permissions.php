@@ -25,39 +25,5 @@
  */
 
 return [
-    'home'     => [
-        [
-            'name'  => 'Home',
-            'icon'  => 'fa fa-th',
-            'route' => 'home',
-        ],
-    ],
-    'character' => [
-        [
-            'name' => 'assets',
-            'icon'  => 'fas fa-dolly-flatbed',
-            'route' => 'character.assets',
-        ],
-    ],
-    'Access Control' => [
-        [
-            'name' => 'Control Group',
-            'icon'  => 'fas fa-users-cog',
-            'route' => 'acl.groups',
-        ],
-    ],
-    'settings' => [
-        [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'help',
-                    'icon'  => 'far fa-question-circle',
-                    'route' => 'settings',
-                ],
-            ],
-        ],
-    ],
+    'superuser',
 ];

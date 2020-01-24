@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="login-page" style="min-height: 512.8px;">
     <div class="login-box">
       <flash-messages/>
       <div class="login-logo">
-        <a href="../../index2.html"><b>Admin</b>LTE</a>
+        <b>SeAT</b>plus
       </div>
       <!-- /.login-logo -->
       <div class="card">
@@ -11,10 +11,8 @@
         <div class="card-body login-card-body">
           {{ $page.login_welcome }}
           <div class="social-auth-links text-center mb-3">
-            <a :href="route('auth.eve')">Inertia Link 1</a>
-            <inertia-link :href="route('auth.eve')">Inertia Link 2</inertia-link>
             <a :href="route('auth.eve')">
-              <img :src="$page.evesso_img_src">
+                <b-img :src="$page.evesso_img_src" fluid />
             </a>
           </div>
         </div>

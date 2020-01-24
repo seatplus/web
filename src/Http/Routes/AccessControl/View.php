@@ -24,40 +24,10 @@
  * SOFTWARE.
  */
 
-return [
-    'home'     => [
-        [
-            'name'  => 'Home',
-            'icon'  => 'fa fa-th',
-            'route' => 'home',
-        ],
-    ],
-    'character' => [
-        [
-            'name' => 'assets',
-            'icon'  => 'fas fa-dolly-flatbed',
-            'route' => 'character.assets',
-        ],
-    ],
-    'Access Control' => [
-        [
-            'name' => 'Control Group',
-            'icon'  => 'fas fa-users-cog',
-            'route' => 'acl.groups',
-        ],
-    ],
-    'settings' => [
-        [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'help',
-                    'icon'  => 'far fa-question-circle',
-                    'route' => 'settings',
-                ],
-            ],
-        ],
-    ],
-];
+use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+
+Route::get('/', 'ControlGroupsController@index')->name('acl.groups');
+Route::post('/create', 'ControlGroupsController@create')->name('acl.create');
+
+Route::get('/edit/{role_id}', 'ControlGroupsController@edit')->name('acl.edit');
+Route::post('/edit/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');

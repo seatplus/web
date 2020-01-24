@@ -24,40 +24,25 @@
  * SOFTWARE.
  */
 
-return [
-    'home'     => [
-        [
-            'name'  => 'Home',
-            'icon'  => 'fa fa-th',
-            'route' => 'home',
-        ],
-    ],
-    'character' => [
-        [
-            'name' => 'assets',
-            'icon'  => 'fas fa-dolly-flatbed',
-            'route' => 'character.assets',
-        ],
-    ],
-    'Access Control' => [
-        [
-            'name' => 'Control Group',
-            'icon'  => 'fas fa-users-cog',
-            'route' => 'acl.groups',
-        ],
-    ],
-    'settings' => [
-        [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'help',
-                    'icon'  => 'far fa-question-circle',
-                    'route' => 'settings',
-                ],
-            ],
-        ],
-    ],
-];
+namespace Seatplus\Web\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class UserRessource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
+    {
+
+        return [
+            'name' => $this->name,
+            'id' => $this->id,
+            'main_character' => $this->main_character,
+        ];
+    }
+}

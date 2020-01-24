@@ -10,6 +10,9 @@ class CommandControllerTest extends TestCase
     public function testIfPostCacheClearClearsCache()
     {
 
+        /*if(!env('APP_ENV') == 'testing')
+            $this->markTestSkipped('this test is only made on travis, due to local issues');*/
+
         $route = route('cache.clear');
 
         // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
@@ -20,7 +23,7 @@ class CommandControllerTest extends TestCase
 
         $this->assertEquals('value', cache('key'));
 
-        $this->actingAs($this->test_user)
+        $response = $this->actingAs($this->test_user)
             ->post($route)->assertOk();
 
         $this->assertNotEquals('value', cache('key'));

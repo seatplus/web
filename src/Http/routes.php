@@ -49,6 +49,12 @@ Route::namespace('Seatplus\Web\Http\Controllers')
                     ->group(function () {
                         include __DIR__ . '/Routes/Character/View.php';
                     });
+
+                Route::namespace('AccessControl')
+                    ->prefix('acl')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/AccessControl/View.php';
+                    });
             });
 
     });
