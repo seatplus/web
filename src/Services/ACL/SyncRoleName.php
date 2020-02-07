@@ -30,10 +30,8 @@ use Seatplus\Auth\Models\Permissions\Role;
 
 class SyncRoleName
 {
-    /**
-     * @var \Seatplus\Auth\Models\Permissions\Role
-     */
-    private $role;
+
+    private Role $role;
 
     /**
      * SyncRoleName constructor.
