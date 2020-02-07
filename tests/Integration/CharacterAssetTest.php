@@ -38,8 +38,13 @@ class CharacterAssetTest extends TestCase
             'character_id' => $this->test_character->character_id
         ]);
 
+        // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
+        //$this->app->instance('path.public', __DIR__ .'/../../src/public');
+
         $response = $this->actingAs($this->test_user)
             ->get(route('character.assets'));
+
+        //dd($response->exception->getMessage());
 
         $response->assertHasProp('assets');
     }
