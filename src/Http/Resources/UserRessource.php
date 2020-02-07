@@ -43,7 +43,7 @@ class UserRessource extends JsonResource
         return [
             'id' => $this->id,
             'main_character' => $this->main_character,
-            'characters' => CharacterInfoResource::collection($this->characters)
+            'characters' => CharacterInfoResource::collection($this->characters),
         ];
     }
 }
