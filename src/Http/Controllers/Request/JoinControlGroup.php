@@ -24,45 +24,31 @@
  * SOFTWARE.
  */
 
-return [
-    'home'     => [
-        [
-            'name'  => 'Home',
-            'icon'  => 'fa fa-th',
-            'route' => 'home',
-        ],
-    ],
-    'character' => [
-        [
-            'name' => 'assets',
-            'icon'  => 'fas fa-dolly-flatbed',
-            'route' => 'character.assets',
-        ],
-    ],
-    'Access Control' => [
-        [
-            'name' => 'Control Group',
-            'icon'  => 'fas fa-users-cog',
-            'route' => 'acl.groups',
-        ],
-    ],
-    'settings' => [
-        [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'Server Settings',
-                    'icon'  => 'fas fa-server',
-                    'route' => 'server.settings',
-                ],
-                [
-                    'name'  => 'User Settings',
-                    'icon'  => 'fas fa-user-cog',
-                    'route' => 'user.settings',
-                ],
-            ],
-        ],
-    ],
-];
+namespace Seatplus\Web\Http\Controllers\Request;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class JoinControlGroup extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'role_id' => 'bail|required|integer|exists:roles,id',
+        ];
+    }
+}

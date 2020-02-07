@@ -32,6 +32,7 @@ use Inertia\Inertia;
 use Inertia\Middleware;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
+use Seatplus\Web\Http\Resources\UserRessource;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -143,7 +144,7 @@ class WebServiceProvider extends ServiceProvider
                 return config('package.sidebar');
             },
             'user' => function () {
-                return auth()->guest() ? '' : auth()->user()->load('main_character');
+                return auth()->guest() ? '' : UserRessource::make(auth()->user());
             },
             'translation' => function () {
                 return [

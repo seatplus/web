@@ -24,10 +24,19 @@
  * SOFTWARE.
  */
 
+use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\ManageControllGroupMembersController;
 
 Route::get('/', 'ControlGroupsController@index')->name('acl.groups');
+Route::post('/', [ControlGroupsController::class, 'join'])->name('acl.join');
+
+// TODO: get this routes protected
 Route::post('/create', 'ControlGroupsController@create')->name('acl.create');
+Route::delete('/delete', [ControlGroupsController::class, 'delete'])->name('acl.delete');
 
 Route::get('/edit/{role_id}', 'ControlGroupsController@edit')->name('acl.edit');
 Route::post('/edit/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
+
+Route::get('/manage_members/{role_id}', [ManageControllGroupMembersController::class, 'index'])->name('acl.manage');
+Route::post('/manage_members/{role_id}', [ManageControllGroupMembersController::class, 'update'])->name('acl.manage.update');

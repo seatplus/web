@@ -26,10 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Web\Http\Controllers\Request\DeleteControlGroup;
+use Seatplus\Web\Http\Controllers\Request\JoinControlGroup;
 use Seatplus\Web\Http\Controllers\Request\UpdateControlGroup;
 use Seatplus\Web\Http\Resources\RoleRessource;
 use Seatplus\Web\Services\ACL\SyncRoleAffiliations;
@@ -58,7 +61,7 @@ class ControlGroupsController
         $role = Role::create(['name' => $name]);
 
         return redirect()
-            ->action([ControlGroupsController::class, 'edit'], $role->role_id)
+            ->action([ControlGroupsController::class, 'edit'], $role->id)
             ->with('success', 'Role was created');
     }
 
@@ -95,5 +98,21 @@ class ControlGroupsController
         return redirect()
             ->action([ControlGroupsController::class, 'edit'], $role_id)
             ->with('success', 'Access control group updated');
+    }
+
+    public function delete(DeleteControlGroup $delete_control_group)
+    {
+        $role_id = $delete_control_group->input('role_id');
+
+        Role::findById($role_id)->delete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Access control group deleted');
+    }
+
+    public function join(JoinControlGroup $join_control_group)
+    {
+        dd('TODO: implement join');
     }
 }

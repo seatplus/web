@@ -11,10 +11,11 @@
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                   <EveImage :object="$page.user.main_character" :size=256 class="img-circle elevation-2" :alt="$page.user.main_character.name"></EveImage>
+                    <EveImage :object="$page.user.data.main_character" :size=256 class="img-circle elevation-2"
+                              :alt="$page.user.data.main_character.name"/>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">{{$page.user.main_character.name}}</a>
+                    <a href="#" class="d-block">{{$page.user.data.main_character.name}}</a>
                 </div>
             </div>
 

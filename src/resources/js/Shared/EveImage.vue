@@ -3,7 +3,9 @@
             v-bind="mainProps"
             :src="getImageUrl()"
             class="img-circle"
-            v-b-tooltip.hover :title="this.object.name"></b-img-lazy>
+            v-b-tooltip.hover :title="this.object.name"
+            :alt="this.object.name"
+        ></b-img-lazy>
 </template>
 
 <script>
