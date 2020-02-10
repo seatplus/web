@@ -33,7 +33,7 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Spatie\Permission\PermissionRegistrar;
 
-class ManageControllGroupMembersController
+class ManageControlGroupMembersController
 {
     public function index($role_id)
     {
@@ -82,7 +82,7 @@ class ManageControllGroupMembersController
         app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
 
         return redirect()
-            ->action([ManageControllGroupMembersController::class, 'index'], $role_id)
+            ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
             ->with('Success', 'Control Group updated');
 
     }
