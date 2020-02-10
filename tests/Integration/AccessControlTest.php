@@ -50,6 +50,28 @@ class AccessControlTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_control_group()
+    {
+
+        $role = Role::create(['name' => 'test']);
+
+        $this->assertDatabaseHas('roles',[
+            'name' => 'test'
+        ]);
+
+        $response = $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('DELETE', route('acl.delete'), [
+                'role_id' => $role->id
+            ]);
+
+        $this->assertDatabaseMissing('roles',[
+            'name' => 'test'
+        ]);
+
+    }
+
+    /** @test */
     public function it_updates_permissions()
     {
         $name = 'update permissions';
