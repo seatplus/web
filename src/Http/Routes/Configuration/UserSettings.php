@@ -24,26 +24,7 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+use Seatplus\Web\Http\Controllers\Configuration\UserSettingsController;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\CharacterInfoResource;
-
-class UserRessource extends JsonResource
-{
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
-    {
-
-        return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => CharacterInfoResource::collection($this->characters),
-        ];
-    }
-}
+Route::get('/settings/user', [UserSettingsController::class, 'index'])->name('user.settings');
+Route::post('/settings/user/main_character', [UserSettingsController::class, 'update_main_character'])->name('update.main_character');

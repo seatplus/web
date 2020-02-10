@@ -6,6 +6,7 @@ namespace Seatplus\Web\Tests\Integration;
 
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Tests\TestCase;
 
 class AccessControlTest extends TestCase
@@ -46,6 +47,28 @@ class AccessControlTest extends TestCase
         $this->assertDatabaseHas('roles',[
             'name' => 'test'
         ]);
+    }
+
+    /** @test */
+    public function it_deletes_control_group()
+    {
+
+        $role = Role::create(['name' => 'test']);
+
+        $this->assertDatabaseHas('roles',[
+            'name' => 'test'
+        ]);
+
+        $response = $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('DELETE', route('acl.delete'), [
+                'role_id' => $role->id
+            ]);
+
+        $this->assertDatabaseMissing('roles',[
+            'name' => 'test'
+        ]);
+
     }
 
     /** @test */
@@ -143,6 +166,48 @@ class AccessControlTest extends TestCase
         $this->assertDatabaseMissing('roles',[
             'name' => $name
         ]);
+    }
+
+    /** @test */
+    public function one_can_manage_control_group_members()
+    {
+        $role = Role::create(['name' => 'test']);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.manage', ['role_id' => $role->id]));
+
+        $response->assertComponent('AccessControl/ManageControlGroup');
+    }
+
+    /** @test */
+    public function on_can_sync_control_group_members()
+    {
+        $role = Role::create(['name' => 'test']);
+
+        //dd($this->test_user->hasRole('test'));
+
+        $this->assertFalse($this->test_user->hasRole('test'));
+
+        $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('POST', route('acl.manage.update', ['role_id' => $role->id]), [
+                "selectedValues" => [
+                    [
+                        "id" => $this->test_user->id,
+                    ],
+                ]
+            ]);
+
+        $this->assertTrue($this->test_user->fresh()->hasRole('test'));
+
+        //Remove the member from the access control group again
+        $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('POST', route('acl.manage.update', ['role_id' => $role->id]), [
+                ]);
+
+        $this->assertFalse($this->test_user->fresh()->hasRole('test'));
+
     }
 
 }

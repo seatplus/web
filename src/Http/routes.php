@@ -42,6 +42,7 @@ Route::namespace('Seatplus\Web\Http\Controllers')
                     ->prefix('configuration')
                     ->group(function () {
                         include __DIR__ . '/Routes/Configuration/Configuration.php';
+                        include __DIR__ . '/Routes/Configuration/UserSettings.php';
                     });
 
                 Route::namespace('Character')

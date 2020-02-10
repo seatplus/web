@@ -24,26 +24,31 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\CharacterInfoResource;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UserRessource extends JsonResource
+class DeleteControlGroup extends FormRequest
 {
     /**
-     * Transform the resource into an array.
+     * Determine if the user is authorized to make this request.
      *
-     * @param  \Illuminate\Http\Request
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array
      */
-    public function toArray($request)
+    public function rules()
     {
-
         return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => CharacterInfoResource::collection($this->characters),
+            'role_id' => 'bail|required|integer|exists:roles,id',
         ];
     }
 }

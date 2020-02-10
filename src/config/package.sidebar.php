@@ -53,9 +53,14 @@ return [
             'route'   => '',
             'entries' => [
                 [
-                    'name'  => 'help',
-                    'icon'  => 'far fa-question-circle',
-                    'route' => 'settings',
+                    'name'  => 'Server Settings',
+                    'icon'  => 'fas fa-server',
+                    'route' => 'server.settings',
+                ],
+                [
+                    'name'  => 'User Settings',
+                    'icon'  => 'fas fa-user-cog',
+                    'route' => 'user.settings',
                 ],
             ],
         ],

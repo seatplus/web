@@ -22,20 +22,50 @@
             </b-card>
 
             <b-card>
+                <div class="d-flex flex-row justify-content-around" v-for="roles in chunkedRoles">
+                    <b-card bg-variant="light"  v-for="role in roles" :key="role.id" class="flex-fill">
+
+                        <b-card-title>
+                            {{role.name}}
+                        </b-card-title>
+
+                        <b-card-text>Members</b-card-text>
+
+                        <b-button-group>
+                            <inertia-link :href="route('acl.join')"
+                                          class="btn btn-success"
+                                          method="post"
+                                          :data="{ role_id: role.id }"
+                            >
+                                Join
+                            </inertia-link>
+                            <inertia-link :href="route('acl.manage', role.id)" class="btn btn-warning">
+                                Manage Members
+                            </inertia-link>
+                        </b-button-group>
+
+
+                        <b-button-group class="float-right">
+                            <inertia-link :href="route('acl.edit', role.id)" class="btn btn-primary">
+                                Edit
+                            </inertia-link>
+                            <inertia-link
+                                :href="route('acl.delete')"
+                                method="delete"
+                                :data="{ role_id: role.id }"
+                                class="btn btn-danger"
+                            >
+                                Delete
+                            </inertia-link>
+                        </b-button-group>
+
+                    </b-card>
+                </div>
                 <b-row>
                     <span v-if="hasNoRoles"> No control groups has been created. Go ahead create one! </span>
-                    <b-col md="4" v-for="role in this.roles.data" :key="role.id">
-                        <b-card bg-variant="light" style="max-width: 20rem;">
+                    <!--<b-col md="4" v-for="role in this.roles.data" :key="role.id">
 
-                            <b-card-text>
-                                {{role.name}}
-                            </b-card-text>
-
-                            <b-button class="float-right" @click="edit(role.id)">
-                                Edit
-                            </b-button>
-                        </b-card>
-                    </b-col>
+                    </b-col>-->
                 </b-row>
             </b-card>
             <Pagination :collection="roles" class="float-right"/>
@@ -86,17 +116,14 @@
                       only: [],
                   })
               }
-          },
-          edit: function (role_id) {
-
-              Inertia.visit(route('acl.edit', role_id), {
-                  preserveState: true,
-              })
           }
       },
       computed: {
           hasNoRoles: function () {
               return _.isEmpty(this.roles.data)
+          },
+          chunkedRoles: function () {
+              return _.chunk(this.roles.data, 3)
           }
       }
   }

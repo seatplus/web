@@ -14,7 +14,7 @@ use Seatplus\Web\WebServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    protected $test_user;
+    protected User $test_user;
 
     protected $test_character;
 
@@ -33,7 +33,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_character = $this->test_user->main_character;
 
-        $this->test_user->characters->first()->character()->associate($this->test_character);
+        $this->test_user->character_users->first()->character()->associate($this->test_character);
 
         $this->app->instance('path.public', __DIR__ .'/../src/public');
 

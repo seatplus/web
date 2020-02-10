@@ -24,26 +24,35 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Http\Controllers\Configuration;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\CharacterInfoResource;
+use Inertia\Inertia;
+use Seatplus\Web\Http\Resources\UserRessource;
 
-class UserRessource extends JsonResource
+class UserSettingsController
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function index()
     {
 
-        return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => CharacterInfoResource::collection($this->characters),
-        ];
+        return Inertia::render('Configuration/UserSettings', [
+            'user' => UserRessource::make(auth()->user()),
+        ]);
+    }
+
+    public function update_main_character()
+    {
+        $user = auth()->user();
+
+        request()->validate([
+            'character_id' => 'required|integer',
+        ]);
+
+        //TODO only accept character_ids that are within the users characters
+
+        $user->main_character_id = request()->input('character_id');
+        $user->save();
+
+        return redirect()->action([UserSettingsController::class, 'index'])->with('success', 'Main character updated');
+
     }
 }
