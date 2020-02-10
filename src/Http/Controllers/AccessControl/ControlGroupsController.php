@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
