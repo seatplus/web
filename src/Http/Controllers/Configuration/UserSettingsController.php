@@ -47,6 +47,8 @@ class UserSettingsController
             'character_id' => 'required|integer',
         ]);
 
+        //TODO only accept character_ids that are within the users characters
+
         $user->main_character_id = request()->input('character_id');
         $user->save();
 
