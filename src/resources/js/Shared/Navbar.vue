@@ -70,7 +70,7 @@
           // Make an ajax request to our server - /queue/status
           this.loadStats(),
 
-        ]).catch((error) => {
+        ]).catch(error => {
           console.log(error);
         })
       },
@@ -83,7 +83,7 @@
             .get('/queue/status')
             .then( response =>
                 this.stats = response.data
-            ).catch((error) => {
+            ).catch(error => {
                 console.log(error);
             });
       }
