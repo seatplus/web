@@ -5,7 +5,7 @@
       <!-- Left navbar links -->
       <ul class="navbar-nav">
         <b-nav-item data-widget="pushmenu" href="#">
-          <i class="fas fa-bars"></i>
+            <i class="fas fa-bars"/>
         </b-nav-item>
 
       </ul>
@@ -13,25 +13,25 @@
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
 
-        <b-spinner variant="primary" label="Spinning" v-if="isLoading"></b-spinner>
+          <b-spinner variant="primary" label="Spinning" v-if="isLoading"/>
 
-        <b-nav-item :href="route('horizon.index')" v-if="stats.status == 'running'">
-          <i class="fas fa-truck-loading"></i>
+        <b-nav-item :href="route('horizon.index')" v-if="stats.status === 'running'">
+            <i class="fas fa-truck-loading"/>
           <b-badge variant="primary">{{ stats.queue_count }}</b-badge>
         </b-nav-item>
 
-        <b-nav-item :href="route('horizon.index')" v-if="stats.status == 'running'">
-          <i class="fas fa-bug"></i>
+        <b-nav-item :href="route('horizon.index')" v-if="stats.status === 'running'">
+            <i class="fas fa-bug"/>
           Route:
           <b-badge variant="danger">{{ stats.error_count }}</b-badge>
         </b-nav-item>
 
-        <b-nav-item :href="route('horizon.index')" v-if="stats.status == 'paused'">
-          <i class="fas fa-pause"></i> Worker is paused
+        <b-nav-item :href="route('horizon.index')" v-if="stats.status === 'paused'">
+            <i class="fas fa-pause"/> Worker is paused
         </b-nav-item>
 
-        <b-nav-item :href="route('horizon.index')" v-if="stats.status == 'inactive'">
-          <i class="fas fa-stop"></i> Worker has stopped
+        <b-nav-item :href="route('horizon.index')" v-if="stats.status === 'inactive'">
+            <i class="fas fa-stop"/> Worker has stopped
         </b-nav-item>
 
       </ul>
@@ -54,8 +54,9 @@
     },
     mounted() {
 
-      this.refreshStatsPeriodically();
+        this.refreshStats();
 
+        setInterval(() => { this.refreshStats() }, 5000)
     },
 
     methods: {
@@ -63,21 +64,15 @@
       /**
        * Refresh the stats every period of time.
        */
-      refreshStatsPeriodically() {
-        Promise.all([
+      async refreshStats() {
+          Promise.all([
 
-          // Make an ajax request to our server - /queue/status
-          this.loadStats(),
+              // Make an ajax request to our server - /queue/status
+              await this.loadStats(),
 
-        ]).then(() => {
-          this.ready = true;
-
-          this.timeout = setTimeout(() => {
-            this.refreshStatsPeriodically(false);
-          }, 5000);
-        }).catch((error) => {
-          console.log(error);
-        })
+          ]).catch(error => {
+              console.log(error);
+          })
       },
 
       /*
@@ -88,7 +83,9 @@
             .get('/queue/status')
             .then( response =>
                 this.stats = response.data
-            );
+            ).catch(error => {
+                console.log(error);
+            });
       }
     },
 

@@ -37,7 +37,7 @@ describe('Navbar', () => {
     });
 
     moxios.wait(function () {
-      expect(wrapper.html()).toContain("<i class=\"fas fa-truck-loading\"></i>");
+      expect(wrapper.html()).toContain('<i class="fas fa-truck-loading"/>');
       done()
     })
 
@@ -55,7 +55,7 @@ describe('Navbar', () => {
     });
 
     moxios.wait(function () {
-      expect(wrapper.html()).toContain("<i class=\"fas fa-pause\"></i>");
+      expect(wrapper.html()).toContain("<i class=\"fas fa-pause\"/>");
       done()
     })
 
