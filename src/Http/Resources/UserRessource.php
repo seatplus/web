@@ -44,7 +44,7 @@ class UserRessource extends JsonResource
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => CharacterInfoResource::collection($this->characters),
-            'impersonating' => session('impersonation_origin') ? true : false
+            'impersonating' => session('impersonation_origin') ? true : false,
         ];
     }
 }
