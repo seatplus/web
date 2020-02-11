@@ -83,7 +83,9 @@
             .get('/queue/status')
             .then( response =>
                 this.stats = response.data
-            );
+            ).catch((error) => {
+                console.log(error);
+            });
       }
     },
 
