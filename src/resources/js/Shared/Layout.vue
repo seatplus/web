@@ -28,8 +28,12 @@
 
         <!-- Main content -->
         <section class="content">
-
-          <FlashMessages />
+            <div class="container-fluid">
+                <b-card no-body v-if="$page.user.data.impersonating">
+                    <inertia-link  :href="route('impersonate.stop')" class="btn-block btn btn-warning">Stop Impersonate</inertia-link>
+                </b-card>
+                <FlashMessages />
+            </div>
           <slot />
 
         </section>
@@ -56,7 +60,7 @@
       Sidebar,
       Footer,
       Navbar
-    }
+    },
   }
 </script>
 
