@@ -17,7 +17,7 @@
         "cross-env": "^7.0.0",
         "expect": "^25.1.0",
         "jquery": "^3.4",
-        "jsdom": "^16.0.0",
+        "jsdom": "^16.1.0",
         "jsdom-global": "^3.0.2",
         "laravel-mix": "^5.0.1",
         "laravel-mix-copy-watched": "^2.2.2",
