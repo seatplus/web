@@ -64,15 +64,15 @@
       /**
        * Refresh the stats every period of time.
        */
-      refreshStats() {
-        Promise.all([
+      async refreshStats() {
+          Promise.all([
 
-          // Make an ajax request to our server - /queue/status
-          this.loadStats(),
+              // Make an ajax request to our server - /queue/status
+              await this.loadStats(),
 
-        ]).catch(error => {
-          console.log(error);
-        })
+          ]).catch(error => {
+              console.log(error);
+          })
       },
 
       /*
