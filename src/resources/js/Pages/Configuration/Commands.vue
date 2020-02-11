@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <b-card>
         <b-button @click="clearCache">Clear Cache</b-button>
-    </div>
+    </b-card>
 </template>
 
 <script>

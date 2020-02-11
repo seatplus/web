@@ -1,12 +1,15 @@
 <template>
   <Layout>
-    Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
+      <div class="container-fluid">
+          Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
 
-      <b-button v-on:click="log">Check Info</b-button>
+          <b-button v-on:click="log">Check Info</b-button>
 
-      <b-button v-on:click="getPersonalAccessToken">Get Personal Access Token</b-button>
+          <b-button v-on:click="getPersonalAccessToken">Get Personal Access Token</b-button>
 
-      <b-button v-on:click="createPersonalAccessToken">Create Personal Access Token</b-button>
+          <b-button v-on:click="createPersonalAccessToken">Create Personal Access Token</b-button>
+      </div>
+
 
 
   </Layout>

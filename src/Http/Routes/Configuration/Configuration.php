@@ -24,6 +24,15 @@
  * SOFTWARE.
  */
 
+use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
+
 Route::get('/settings', 'SeatPlusController@settings')->name('server.settings');
 
 Route::post('/cache/clear', 'CommandsController@clear')->name('cache.clear');
+
+Route::get('/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
+
+Route::get('/stop/impersonate', [SeatPlusController::class, 'stopImpersonate'])->name('impersonate.stop');
+
+Route::get('/settings/scopes', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');

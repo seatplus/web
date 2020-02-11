@@ -35,6 +35,8 @@
 
                 </div>
             </div>
+
+            <inertia-link :href="route('auth.logout')" class="btn btn-danger">Logout</inertia-link>
         </div>
     </Layout>
 </template>
