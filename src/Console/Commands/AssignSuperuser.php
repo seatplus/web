@@ -1,8 +1,30 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 namespace Seatplus\Web\Console\Commands;
-
 
 use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -50,16 +72,16 @@ class AssignSuperuser extends Command
                 ->map(function ($user) {
                     return [
                         'id' => $user->id,
-                        'characters' => $user->characters->implode('name', ', ')
+                        'characters' => $user->characters->implode('name', ', '),
                     ];
                 });
 
-            $this->table(['user_id', 'characters'],$users);
+            $this->table(['user_id', 'characters'], $users);
 
             $this->error('aborting');
+
             return;
         }
-
 
         $character_name = $this->argument('characterName');
 
@@ -69,12 +91,12 @@ class AssignSuperuser extends Command
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
-                    'characters' => $user->characters->implode('name', ', ')
+                    'characters' => $user->characters->implode('name', ', '),
                 ];
             })
             ->toArray();
 
-        $this->table(['user_id', 'characters'],$users);
+        $this->table(['user_id', 'characters'], $users);
 
         $this->info('please select the approriate user_id which should receive the superuser permission');
 
@@ -82,11 +104,10 @@ class AssignSuperuser extends Command
 
         $this->user = User::find($user_id);
 
-        if (!$this->user)
+        if (! $this->user)
             return $this->alert('illegal user_id selected');
 
         $this->info('Please note after setting a superuser via console, you are only able to set another via web ui.');
-
 
         if(! $this->confirm('Do you wish to a continue?')) {
             return $this->error('aborted');
@@ -109,13 +130,11 @@ class AssignSuperuser extends Command
         $permission = Permission::findOrCreate('superuser');
 
         $role->givePermissionTo($permission);
-        return;
+
     }
 
     private function hasAlreadyRun()
     {
         return User::permission('superuser')->get()->isNotEmpty();
     }
-
-
 }
