@@ -42,27 +42,22 @@ return [
     'Access Control' => [
         [
             'name' => 'Control Group',
+            'permission' => 'view access control',
             'icon'  => 'fas fa-users-cog',
             'route' => 'acl.groups',
         ],
     ],
     'settings' => [
         [
-            'name'    => 'Settings',
-            'icon'    => 'fas fa-cogs',
-            'route'   => '',
-            'entries' => [
-                [
-                    'name'  => 'Server Settings',
-                    'icon'  => 'fas fa-server',
-                    'route' => 'server.settings',
-                ],
-                [
-                    'name'  => 'User Settings',
-                    'icon'  => 'fas fa-user-cog',
-                    'route' => 'user.settings',
-                ],
-            ],
+            'name'  => 'Server Settings',
+            'permission' => 'superuser',
+            'icon'  => 'fas fa-cogs',
+            'route' => 'server.settings',
+        ],
+        [
+            'name'  => 'User Settings',
+            'icon'  => 'fas fa-user-cog',
+            'route' => 'user.settings',
         ],
     ],
 ];
