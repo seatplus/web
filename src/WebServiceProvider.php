@@ -142,7 +142,7 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'sidebar' => function () {
-                return (new SidebarEntries)->filter();
+                return auth()->guest() ? [] : (new SidebarEntries)->filter();
             },
             'user' => function () {
                 return auth()->guest() ? '' : UserRessource::make(auth()->user());
