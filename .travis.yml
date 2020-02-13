@@ -15,12 +15,15 @@ jobs:
       before_install:
         - composer self-update
         - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+      install:
+        - npm install
       before_script:
         - composer install --no-interaction
         - composer dump-autoload
         - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
         - chmod +x ./cc-test-reporter
         - ./cc-test-reporter before-build
+        - npm run prod
       script:
         - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
       after_script:
