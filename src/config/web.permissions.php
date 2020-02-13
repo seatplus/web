@@ -26,5 +26,5 @@
 
 return [
     'superuser',
-    'view access control'
+    'view access control',
 ];
