@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Inertia\Middleware;
+use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
@@ -61,6 +62,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Add Middlewares
         $this->addMiddleware();
+
+        // Add commands
+        $this->addCommands();
     }
 
     public function register()
@@ -177,5 +181,14 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/config/web.permissions.php', 'web.permissions'
         );
 
+    }
+
+    private function addCommands()
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                AssignSuperuser::class,
+            ]);
+        }
     }
 }
