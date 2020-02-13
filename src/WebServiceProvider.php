@@ -33,6 +33,7 @@ use Inertia\Middleware;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
+use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -141,7 +142,7 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'sidebar' => function () {
-                return config('package.sidebar');
+                return auth()->guest() ? [] : (new SidebarEntries)->filter();
             },
             'user' => function () {
                 return auth()->guest() ? '' : UserRessource::make(auth()->user());

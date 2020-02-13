@@ -29,7 +29,7 @@
     components: {
       FlashMessages,
     },
-    name      : "Login"
+    name: "Login",
 
 
   }

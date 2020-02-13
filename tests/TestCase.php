@@ -6,6 +6,7 @@ namespace Seatplus\Web\Tests;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Auth\Models\User;
@@ -37,6 +38,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->app->instance('path.public', __DIR__ .'/../src/public');
 
+        Permission::findOrCreate('superuser');
     }
 
     /**
