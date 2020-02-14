@@ -43,5 +43,3 @@ Route::middleware(['permission:manage access control group'])->group(function ()
     Route::get('/manage_members/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
     Route::post('/manage_members/{role_id}', [ManageControlGroupMembersController::class, 'update'])->name('acl.manage.update');
 });
-
-
