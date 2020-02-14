@@ -2,7 +2,9 @@
 
 namespace Seatplus\Web\Tests\Unit\ConfigurationController;
 
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
+use Spatie\Permission\PermissionRegistrar;
 
 class CommandControllerTest extends TestCase
 {
@@ -10,8 +12,6 @@ class CommandControllerTest extends TestCase
     public function testIfPostCacheClearClearsCache()
     {
 
-        /*if(!env('APP_ENV') == 'testing')
-            $this->markTestSkipped('this test is only made on travis, due to local issues');*/
 
         $route = route('cache.clear');
 
@@ -22,6 +22,13 @@ class CommandControllerTest extends TestCase
         cache(['key' => 'value'], now()->addCenturies(1));
 
         $this->assertEquals('value', cache('key'));
+
+        $permission = Permission::findOrCreate('superuser');
+
+        $this->test_user->givePermissionTo($permission);
+
+        // now re-register all the roles and permissions
+        $this->app->make(PermissionRegistrar::class)->registerPermissions();
 
         $response = $this->actingAs($this->test_user)
             ->post($route)->assertOk();

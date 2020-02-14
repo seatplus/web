@@ -24,6 +24,8 @@
  * SOFTWARE.
  */
 
+use Illuminate\Support\Facades\Route;
+
 Route::namespace('Seatplus\Web\Http\Controllers')
     ->middleware('web')
     ->group(function () {
@@ -53,6 +55,7 @@ Route::namespace('Seatplus\Web\Http\Controllers')
 
                 Route::namespace('AccessControl')
                     ->prefix('acl')
+                    ->middleware(['permission:view access control'])
                     ->group(function () {
                         include __DIR__ . '/Routes/AccessControl/View.php';
                     });
