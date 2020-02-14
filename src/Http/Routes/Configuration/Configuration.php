@@ -40,5 +40,3 @@ Route::middleware(['permission:superuser'])->group(function () {
 
 // Route must not be protected
 Route::get('/stop/impersonate', [SeatPlusController::class, 'stopImpersonate'])->name('impersonate.stop');
-
-
