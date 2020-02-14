@@ -27,4 +27,6 @@
 return [
     'superuser',
     'view access control',
+    'create,update and delete access control group',
+    'manage access control group',
 ];

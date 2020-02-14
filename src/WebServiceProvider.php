@@ -35,6 +35,7 @@ use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -110,6 +111,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Inertia.JS adding
         $router->pushMiddlewareToGroup('web', Middleware::class);
+
+        // Add permission Middelware
+        $router->aliasMiddleware('permission', PermissionMiddleware::class);
 
     }
 

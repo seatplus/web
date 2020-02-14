@@ -27,12 +27,16 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
 
-Route::get('/settings', 'SeatPlusController@settings')->name('server.settings');
+Route::middleware(['permission:superuser'])->group(function () {
 
-Route::post('/cache/clear', 'CommandsController@clear')->name('cache.clear');
+    Route::get('/settings', 'SeatPlusController@settings')->name('server.settings');
 
-Route::get('/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
+    Route::post('/cache/clear', 'CommandsController@clear')->name('cache.clear');
 
+    Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
+
+    Route::get('/settings/scopes', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');
+});
+
+// Route must not be protected
 Route::get('/stop/impersonate', [SeatPlusController::class, 'stopImpersonate'])->name('impersonate.stop');
-
-Route::get('/settings/scopes', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');
