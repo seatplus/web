@@ -47,7 +47,7 @@ class ManageControlGroupMembersController
         return Inertia::render('AccessControl/ManageControlGroup', [
             'users' => $users,
             'role' => $role,
-            'members' => $this->mapUserForMultiselect(User::role($role->name))
+            'members' => $this->mapUserForMultiselect(User::role($role->name)),
         ]);
     }
 
@@ -75,7 +75,7 @@ class ManageControlGroupMembersController
 
     }
 
-    private function mapUserForMultiselect(Builder $users) : Collection
+    private function mapUserForMultiselect(Builder $users): Collection
     {
         return $users->with('main_character', 'characters')
             ->get()
