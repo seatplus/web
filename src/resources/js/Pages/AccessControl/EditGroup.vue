@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout page-header="Access Control Groups" page-description="Edit Group" :active-sidebar-element="route('acl.groups')">
         <b-card>
             <div class="container-fluid">
                 <div class="row">

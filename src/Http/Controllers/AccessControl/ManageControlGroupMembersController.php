@@ -26,8 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -37,29 +39,15 @@ class ManageControlGroupMembersController
 {
     public function index($role_id)
     {
-        $users = User::all()->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->main_character->name,
-                'character_id' => $user->main_character->character_id,
-                'characters' => $user->characters->filter(function ($character) use ($user) {
-                    return $character->character_id !== $user->main_character->character_id;
-                }),
-            ];
-        });
+
+        $users = $this->mapUserForMultiselect(User::query());
+
+        $role = Role::findById($role_id);
 
         return Inertia::render('AccessControl/ManageControlGroup', [
             'users' => $users,
-            'members' => Role::findById($role_id)->users()->get()->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->main_character->name,
-                    'character_id' => $user->main_character->character_id,
-                    'characters' => $user->characters->filter(function ($character) use ($user) {
-                        return $character->character_id !== $user->main_character->character_id;
-                    }),
-                ];
-            }),
+            'role' => $role,
+            'members' => $this->mapUserForMultiselect(User::role($role->name)),
         ]);
     }
 
@@ -85,5 +73,21 @@ class ManageControlGroupMembersController
             ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
             ->with('Success', 'Control Group updated');
 
+    }
+
+    private function mapUserForMultiselect(Builder $users): Collection
+    {
+        return $users->with('main_character', 'characters')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->main_character->name,
+                    'character_id' => $user->main_character->character_id,
+                    'characters' => $user->characters->filter(function ($character) use ($user) {
+                        return $character->character_id !== $user->main_character->character_id;
+                    }),
+                ];
+            });
     }
 }

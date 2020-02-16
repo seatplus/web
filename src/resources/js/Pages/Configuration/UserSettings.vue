@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout page-header="Settings" page-description="User">
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">

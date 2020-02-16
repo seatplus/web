@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout page-header="Edit" :page-description="this.role.name" :active-sidebar-element="route('acl.groups')">
         <div class="container-fluid">
             <b-card no-body>
                 <b-tabs v-model="tabIndex" pills card>
@@ -121,6 +121,10 @@
         name      : "ManageControlGroup",
         components: {Layout, Multiselect, EveImage},
         props: {
+            role: {
+                type: Array,
+                required: true
+            },
             users: {
                 type: Array,
                 required: true
