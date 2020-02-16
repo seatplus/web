@@ -1,6 +1,8 @@
 <template>
-    <Layout>
-        Settings
+    <Layout :page-header="this.layoutObject.pageHeader"
+            :page-description="this.layoutObject.pageDescription"
+            :active-sidebar-element="this.layoutObject.activeSidebarElement"
+    >
         <Commands />
         <b-card title="Server Settings" no-body>
             <b-card-header header-tag="nav">
@@ -34,14 +36,20 @@
                 navItems: [
                     {id: 1, route: 'server.settings', name: 'User List'},
                     {id: 2, route: 'settings.scopes', name: 'Scope Settings'}
-                ]
+                ],
+            }
+        },
+        props: {
+            layoutObject: {
+                type: Object,
+                required: true,
             }
         },
         methods: {
             isActive(string) {
                 return route().current(string);
             },
-        }
+        },
     }
 </script>
 

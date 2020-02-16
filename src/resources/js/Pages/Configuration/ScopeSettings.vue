@@ -1,5 +1,5 @@
 <template>
-    <Settings>
+    <Settings :layout-object="this.layoutObject">
         Scopes
     </Settings>
 
@@ -11,6 +11,15 @@
     export default {
         name: "ScopeSettings",
         components: {Settings},
+        data() {
+            return {
+                layoutObject: {
+                    pageHeader: 'Server Settings',
+                    pageDescription: 'Scope',
+                    activeSidebarElement: route('server.settings')
+                }
+            }
+        },
     }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout page-header="Character" page-description="Assets">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">

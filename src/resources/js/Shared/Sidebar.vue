@@ -69,7 +69,11 @@
       components: {EveImage},
       name: "Sidebar",
     props: {
-        main_character: Object
+        main_character: Object,
+        activeEntryUrl: {
+            type: String,
+            required: true
+        }
     },
       methods: {
             hasTreeview(item) {
@@ -78,7 +82,7 @@
             },
             isActive(entry) {
 
-                return window.location.href == route(entry.route).url()
+                return this.activeEntryUrl == route(entry.route).url()
             },
             hasActiveEntries(item) {
 

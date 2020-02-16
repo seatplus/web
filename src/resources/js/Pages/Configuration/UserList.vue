@@ -1,6 +1,6 @@
 <template>
-    <Settings>
-        <b-container fluid>
+    <Settings :layout-object="this.layoutObject">
+        <b-container>
             <b-row>
                 <b-col md="6"/>
                 <b-col md="6">
@@ -73,6 +73,10 @@
         data() {
             return {
                 search: this.buildSearchParams().get('search_param'),
+                layoutObject: {
+                    pageHeader: 'Server Settings',
+                    pageDescription: 'User List'
+                }
             }
         },
         methods: {

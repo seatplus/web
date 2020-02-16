@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout page-header="Access Control Groups" page-description="Overview">
         <div class="container-fluid">
             <b-card>
                 <b-row>

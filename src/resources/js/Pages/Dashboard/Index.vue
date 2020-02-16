@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <Layout page-header="Home" page-description="Dashboard">
       <div class="container-fluid">
           Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
 
