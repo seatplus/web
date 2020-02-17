@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\CharacterInfoResource;
 
 class UserRessource extends JsonResource
 {
@@ -43,7 +42,13 @@ class UserRessource extends JsonResource
         return [
             'id' => $this->id,
             'main_character' => $this->main_character,
-            'characters' => CharacterInfoResource::collection($this->characters),
+            'characters' => $this->characters->map(function ($character) {
+                return [
+                    'character_id' => $character->character_id,
+                    'name' => $character->name,
+                    'scopes' => $character->refresh_token->scopes,
+                ];
+            }),
             'impersonating' => session('impersonation_origin') ? true : false,
         ];
     }

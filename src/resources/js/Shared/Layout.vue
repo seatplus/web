@@ -34,6 +34,7 @@
                             <inertia-link  :href="route('impersonate.stop')" class="btn-block btn btn-warning">Stop Impersonate</inertia-link>
                         </b-card>
                         <FlashMessages />
+                        <RequiredScopesWarning :v-if="hasRequiredScopes()" :scopes="this.requiredScopes" />
                     </div>
                     <slot />
 
@@ -53,6 +54,7 @@
     import Sidebar from "@/Shared/Sidebar"
     import FlashMessages from "@/Shared/FlashMessages"
     import Footer from "@/Shared/Footer"
+    import RequiredScopesWarning from "./RequiredScopesWarning"
 
     export default {
         name: "Layout",
@@ -60,7 +62,8 @@
             FlashMessages,
             Sidebar,
             Footer,
-            Navbar
+            Navbar,
+            RequiredScopesWarning
         },
         props   : {
             pageHeader: {
@@ -77,11 +80,21 @@
                 type: String,
                 default: null,
                 required: false
+            },
+            requiredScopes: {
+                type: Array,
+                default: function () {
+                    return []
+                },
+                required: false
             }
         },
         methods: {
             getActiveSidebarElement() {
                 return this.activeSidebarElement ?? window.location.href
+            },
+            hasRequiredScopes() {
+                return ! _.isEmpty(this.requiredScopes)
             }
         }
     }
