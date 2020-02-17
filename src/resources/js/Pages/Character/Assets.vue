@@ -1,5 +1,5 @@
 <template>
-    <Layout page-header="Character" page-description="Assets">
+    <Layout page-header="Character" page-description="Assets" :required-scopes="this.requiredScopes">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
@@ -163,7 +163,8 @@
         data() {
             return {
                 search: this.buildSearchParams().get('search_param'),
-                last_page: this.assets.meta.last_page
+                last_page: this.assets.meta.last_page,
+                requiredScopes: ['esi-assets.read_assets.v1',  'esi-universe.read_structures.v1']
             }
         },
         methods: {
