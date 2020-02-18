@@ -50,7 +50,7 @@ class AssetsController extends Controller
 
         $query = CharacterAsset::Affiliated($character_id)
             //TODO get rid of with
-            ->with('location.locatable', 'owner')
+            ->with('location.locatable', 'owner', 'type')
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->orderBy('location_id', 'desc');
 

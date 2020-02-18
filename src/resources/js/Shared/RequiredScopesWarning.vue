@@ -8,6 +8,14 @@
                         <div class="p-2"><EveImage :object="character" :size="32" /></div>
                         <div class="p-2 align-self-center">{{character.name}}</div>
                         <div class="p-2 align-self-center">{{ getMissingText(character.missing_scopes) }}</div>
+                        <div class="p-2 align-self-center flex-self-end">
+                            <b-link :href="route('auth.eve', {
+                                character_id: character.character_id,
+                                add_scopes: getMissingScopeString(character.missing_scopes)
+                            })">
+                                <b-button variant="primary">Add missing scopes</b-button>
+                            </b-link>
+                        </div>
                     </span>
 
         </b-alert>
@@ -38,6 +46,9 @@ export default {
         getMissingText(missing_scopes) {
 
           return 'Missing the following scopes: ' + _.join(missing_scopes, ', ')
+        },
+        getMissingScopeString (missing_scopes) {
+            return _.toString(missing_scopes)
         }
     },
     computed: {
