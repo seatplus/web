@@ -33,10 +33,10 @@ use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\UpdateOrCreateSsoScopeSetting;
 use Seatplus\Web\Http\Resources\UserRessource;
+use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SeatPlusController extends Controller
 {
@@ -88,7 +88,7 @@ class SeatPlusController extends Controller
         return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
     }
 
-    public function scopeSettings(?int $entity_id =null )
+    public function scopeSettings(?int $entity_id = null)
     {
         $available_scopes = config('eveapi.scopes');
 
@@ -98,7 +98,7 @@ class SeatPlusController extends Controller
 
                 $selectedEntity = [
                     'id' => $scope->morphable_id,
-                    'name' => optional($scope->morphable)->name
+                    'name' => optional($scope->morphable)->name,
                 ];
 
                 $selectedEntity = array_merge($selectedEntity, $scope->morphable_type === CorporationInfo::class
@@ -108,7 +108,7 @@ class SeatPlusController extends Controller
 
                 return [
                     'selectedEntity' => $selectedEntity,
-                    'selectedScopes' => $scope->selected_scopes
+                    'selectedScopes' => $scope->selected_scopes,
                 ];
             });
         };
@@ -124,7 +124,7 @@ class SeatPlusController extends Controller
     {
         $action = new RetrieveEsiDataAction;
 
-        if(Str::length($searchParam) <3)
+        if(Str::length($searchParam) < 3)
             return collect()->toJson();
 
         $search_request = new EsiRequestContainer([
@@ -132,9 +132,9 @@ class SeatPlusController extends Controller
             'version' => 'v2',
             'endpoint' => '/search/',
             'query_string' => [
-                'categories' => ['alliance','corporation'],
-                'search' => $searchParam
-            ]
+                'categories' => ['alliance', 'corporation'],
+                'search' => $searchParam,
+            ],
         ]);
 
         $search_result = $action->execute($search_request);
@@ -143,7 +143,7 @@ class SeatPlusController extends Controller
             'method' => 'post',
             'version' => 'v3',
             'endpoint' => '/universe/names/',
-            'request_body' => collect($search_result)->flatten()->toArray()
+            'request_body' => collect($search_result)->flatten()->toArray(),
         ]);
 
         $name_result = $action->execute($name_post_request);
