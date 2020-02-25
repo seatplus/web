@@ -26,6 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
+use Seatplus\Web\Http\Controllers\Configuration\SsoSettingsController;
 
 Route::middleware(['permission:superuser'])->group(function () {
 
@@ -35,7 +36,11 @@ Route::middleware(['permission:superuser'])->group(function () {
 
     Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
 
-    Route::get('/settings/scopes', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');
+    Route::get('/settings/scopes/{entity_id?}', [SsoSettingsController::class, 'scopeSettings'])->name('settings.scopes');
+    Route::post('/settings/scopes', [SsoSettingsController::class, 'updateOrCreateSsoScopeSetting'])->name('updateOrCreate.settings.scopes');
+    Route::delete('/settings/scopes/{entity_id}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
+
+    Route::get('/search/{searchParam}', [SsoSettingsController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });
 
 // Route must not be protected

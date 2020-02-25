@@ -80,11 +80,4 @@ class SeatPlusController extends Controller
 
         return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
     }
-
-    public function scopeSettings()
-    {
-        return Inertia::render('Configuration/ScopeSettings', [
-
-        ]);
-    }
 }
