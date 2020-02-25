@@ -61,13 +61,13 @@ class SsoSettingsController extends Controller
 
         (new UpdateOrCreateSsoSettings($request->all()))->execute();
 
-        return redirect()->action([SeatPlusController::class, 'scopeSettings'])->with('success', 'SSO Settings Saved');
+        return redirect()->action([SsoSettingsController::class, 'scopeSettings'])->with('success', 'SSO Settings Saved');
     }
 
     public function deleteSsoScopeSetting($entity_id)
     {
         SsoScopes::where('morphable_id', $entity_id)->delete();
 
-        return redirect()->action([SeatPlusController::class, 'scopeSettings'])->with('success', 'SSO Settings Deleted');
+        return redirect()->action([SsoSettingsController::class, 'scopeSettings'])->with('success', 'SSO Settings Deleted');
     }
 }
