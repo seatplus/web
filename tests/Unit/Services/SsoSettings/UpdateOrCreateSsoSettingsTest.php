@@ -21,7 +21,7 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedEntity' => [
+            'selectedCorpOrAlliance' => [
                 'alliance_id' => 1354830081,
                 'id' =>1354830081,
                 'name' => "Goonswarm Federation"
@@ -44,7 +44,7 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedEntity' => [
+            'selectedCorpOrAlliance' => [
                 'corporation_id' => 1184675423,
                 'id' =>1184675423,
                 'name' => "Amok."
@@ -67,7 +67,7 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedEntity' => [
+            'selectedCorpOrAlliance' => [
                 'corporation_id' => 1184675423,
                 'id' => 1184675423,
                 'name' => "Amok."
