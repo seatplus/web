@@ -26,16 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\UpdateOrCreateSsoScopeSetting;
 use Seatplus\Web\Http\Resources\UserRessource;
 
 class SeatPlusController extends Controller
