@@ -35,7 +35,11 @@ Route::middleware(['permission:superuser'])->group(function () {
 
     Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
 
-    Route::get('/settings/scopes', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');
+    Route::get('/settings/scopes/{entity_id?}', [SeatPlusController::class, 'scopeSettings'])->name('settings.scopes');
+    Route::post('/settings/scopes', [SeatPlusController::class, 'updateOrCreateSsoScopeSetting'])->name('updateOrCreate.settings.scopes');
+    Route::delete('/settings/scopes/{entity_id}', [SeatPlusController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
+
+    Route::get('/search/{searchParam}', [SeatPlusController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });
 
 // Route must not be protected
