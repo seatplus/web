@@ -25,12 +25,13 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 Route::namespace('Seatplus\Web\Http\Controllers')
     ->middleware('web')
     ->group(function () {
 
-        Route::middleware('auth')
+        Route::middleware('auth', CheckRequiredScopes::class)
             ->group(function () {
                 Route::get('/home', 'HomeController@home')->name('home');
 

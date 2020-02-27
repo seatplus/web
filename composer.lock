@@ -790,16 +790,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.16.0",
+            "version": "v6.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "b47217e41868d3049ec545cbb713aa94c6f39e55"
+                "reference": "32d1ed55dd46dcd706ff2e45bb7965be7320b87d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/b47217e41868d3049ec545cbb713aa94c6f39e55",
-                "reference": "b47217e41868d3049ec545cbb713aa94c6f39e55",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/32d1ed55dd46dcd706ff2e45bb7965be7320b87d",
+                "reference": "32d1ed55dd46dcd706ff2e45bb7965be7320b87d",
                 "shasum": ""
             },
             "require": {
@@ -932,20 +932,20 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2020-02-18T15:17:52+00:00"
+            "time": "2020-02-26T14:23:01+00:00"
         },
         {
             "name": "laravel/horizon",
-            "version": "v3.7.1",
+            "version": "v3.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/horizon.git",
-                "reference": "42f565649fa778a9a2b1c995df932871f89afa35"
+                "reference": "62d31b34f7f770a43f802ae2bb46327673e04cbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/horizon/zipball/42f565649fa778a9a2b1c995df932871f89afa35",
-                "reference": "42f565649fa778a9a2b1c995df932871f89afa35",
+                "url": "https://api.github.com/repos/laravel/horizon/zipball/62d31b34f7f770a43f802ae2bb46327673e04cbf",
+                "reference": "62d31b34f7f770a43f802ae2bb46327673e04cbf",
                 "shasum": ""
             },
             "require": {
@@ -1001,7 +1001,7 @@
                 "laravel",
                 "queue"
             ],
-            "time": "2020-02-18T19:28:58+00:00"
+            "time": "2020-02-25T15:22:42+00:00"
         },
         {
             "name": "laravel/passport",
@@ -1897,16 +1897,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.24",
+            "version": "2.0.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "40998159a0907cc523e1f2d1904d45765613a617"
+                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/40998159a0907cc523e1f2d1904d45765613a617",
-                "reference": "40998159a0907cc523e1f2d1904d45765613a617",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
+                "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
                 "shasum": ""
             },
             "require": {
@@ -1985,7 +1985,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2020-02-04T12:15:04+00:00"
+            "time": "2020-02-25T04:16:50+00:00"
         },
         {
             "name": "predis/predis",
@@ -2416,12 +2416,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "a6ead92e0e286228bf3180acfae517057fffcb48"
+                "reference": "2e63b4df8ef5d5c639e6af68a8a94413ed476030"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/a6ead92e0e286228bf3180acfae517057fffcb48",
-                "reference": "a6ead92e0e286228bf3180acfae517057fffcb48",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/2e63b4df8ef5d5c639e6af68a8a94413ed476030",
+                "reference": "2e63b4df8ef5d5c639e6af68a8a94413ed476030",
                 "shasum": ""
             },
             "require": {
@@ -2461,7 +2461,7 @@
                 }
             ],
             "description": "SeAT plus package that handles authentication acognistic to SeAT plus usage as pure API or Web",
-            "time": "2020-02-17T15:48:16+00:00"
+            "time": "2020-02-25T12:06:42+00:00"
         },
         {
             "name": "seatplus/eseye",
@@ -2520,12 +2520,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "82aa4e0722715b7849ca89f90a442da1f47107c6"
+                "reference": "20f2d58551d3fa98d09c41be2e367da1937139ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/82aa4e0722715b7849ca89f90a442da1f47107c6",
-                "reference": "82aa4e0722715b7849ca89f90a442da1f47107c6",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/20f2d58551d3fa98d09c41be2e367da1937139ae",
+                "reference": "20f2d58551d3fa98d09c41be2e367da1937139ae",
                 "shasum": ""
             },
             "require": {
@@ -2568,20 +2568,20 @@
                 }
             ],
             "description": "API for receiving informations from esi",
-            "time": "2020-02-24T13:21:45+00:00"
+            "time": "2020-02-26T14:10:22+00:00"
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "3.8.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "2339b6fae8f8aa5af047e1a0c54b6fb37546058a"
+                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/2339b6fae8f8aa5af047e1a0c54b6fb37546058a",
-                "reference": "2339b6fae8f8aa5af047e1a0c54b6fb37546058a",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
+                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
                 "shasum": ""
             },
             "require": {
@@ -2636,7 +2636,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2020-02-18T21:16:24+00:00"
+            "time": "2020-02-26T16:23:16+00:00"
         },
         {
             "name": "spatie/laravel-queueable-action",
@@ -5223,16 +5223,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "5.0.0",
+            "version": "5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "a48807183a4b819072f26e347bbd0b5199a9d15f"
+                "reference": "cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/a48807183a4b819072f26e347bbd0b5199a9d15f",
-                "reference": "a48807183a4b819072f26e347bbd0b5199a9d15f",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e",
+                "reference": "cd72d394ca794d3466a3b2fc09d5a6c1dc86b47e",
                 "shasum": ""
             },
             "require": {
@@ -5272,7 +5272,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2020-02-09T09:16:15+00:00"
+            "time": "2020-02-22T12:28:44+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
