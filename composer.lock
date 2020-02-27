@@ -368,23 +368,23 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v5.0.0",
+            "version": "v5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e"
+                "reference": "4566062c68f76f43d44f1643f4970fe89757d4c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
-                "reference": "9984a4d3a32ae7673d6971ea00bae9d0a1abba0e",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/4566062c68f76f43d44f1643f4970fe89757d4c6",
+                "reference": "4566062c68f76f43d44f1643f4970fe89757d4c6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": " 4.8.35"
+                "phpunit/phpunit": "^4.8|^5"
             },
             "type": "library",
             "autoload": {
@@ -410,7 +410,7 @@
             ],
             "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
             "homepage": "https://github.com/firebase/php-jwt",
-            "time": "2017-06-27T22:17:23+00:00"
+            "time": "2020-02-24T23:15:03+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2416,12 +2416,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "2e63b4df8ef5d5c639e6af68a8a94413ed476030"
+                "reference": "74da57cc9d49de1784129c5f58f58bd906e5aeb3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/2e63b4df8ef5d5c639e6af68a8a94413ed476030",
-                "reference": "2e63b4df8ef5d5c639e6af68a8a94413ed476030",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/74da57cc9d49de1784129c5f58f58bd906e5aeb3",
+                "reference": "74da57cc9d49de1784129c5f58f58bd906e5aeb3",
                 "shasum": ""
             },
             "require": {
@@ -2460,8 +2460,8 @@
                     "email": "felix.a.huber@gmx.net"
                 }
             ],
-            "description": "SeAT plus package that handles authentication acognistic to SeAT plus usage as pure API or Web",
-            "time": "2020-02-25T12:06:42+00:00"
+            "description": "SeAT plus package that handles authentication agnostic to SeAT plus usage as pure API or Web",
+            "time": "2020-02-27T13:42:52+00:00"
         },
         {
             "name": "seatplus/eseye",
@@ -2520,12 +2520,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "20f2d58551d3fa98d09c41be2e367da1937139ae"
+                "reference": "f392bb1107842433368e69d8aeb706ec9776f80a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/20f2d58551d3fa98d09c41be2e367da1937139ae",
-                "reference": "20f2d58551d3fa98d09c41be2e367da1937139ae",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/f392bb1107842433368e69d8aeb706ec9776f80a",
+                "reference": "f392bb1107842433368e69d8aeb706ec9776f80a",
                 "shasum": ""
             },
             "require": {
@@ -2568,7 +2568,7 @@
                 }
             ],
             "description": "API for receiving informations from esi",
-            "time": "2020-02-26T14:10:22+00:00"
+            "time": "2020-02-27T10:20:48+00:00"
         },
         {
             "name": "spatie/laravel-permission",
