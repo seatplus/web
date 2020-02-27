@@ -91,7 +91,7 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/resources/sass' => resource_path('sass'),
             $this->getPackageJsonFile() => base_path('package.json'),
             $this->getPackageLockJsonFile() => base_path('package-lock.json'),
-            $this->getPackageTailwindConfig() => base_path('tailwind.config.js')
+            $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
         ], 'web');
     }
 
