@@ -1,5 +1,6 @@
 const mix = require('laravel-mix');
 const path = require('path')
+const tailwindcss = require('tailwindcss')
 
 /*
  |--------------------------------------------------------------------------
@@ -26,6 +27,10 @@ mix.js('src/resources/js/app.js', 'src/public/js')
     })
     .babelConfig({
       plugins: ['@babel/plugin-syntax-dynamic-import'],
+    })
+    .options({
+        processCssUrls: false,
+        postCss: [ tailwindcss('./tailwind.config.js') ],
     })
 
 if ( mix.inProduction()) {

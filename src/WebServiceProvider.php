@@ -91,6 +91,7 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/resources/sass' => resource_path('sass'),
             $this->getPackageJsonFile() => base_path('package.json'),
             $this->getPackageLockJsonFile() => base_path('package-lock.json'),
+            $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
         ], 'web');
     }
 
@@ -130,6 +131,11 @@ class WebServiceProvider extends ServiceProvider
     private function getPackageLockJsonFile()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'package-lock.json';
+    }
+
+    private function getPackageTailwindConfig()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tailwind.config.js';
     }
 
     private function registerIntertiaJs()

@@ -1,11 +1,12 @@
 <template>
-        <b-img-lazy
+        <!--<b-img-lazy
             v-bind="mainProps"
             :src="getImageUrl()"
             class="img-circle"
             v-b-tooltip.hover :title="this.object.name"
             :alt="this.object.name"
-        ></b-img-lazy>
+        ></b-img-lazy>-->
+    <img class="h-12 w-12 rounded-full" :src="getImageUrl()" :alt="this.object.name" />
 </template>
 
 <script>

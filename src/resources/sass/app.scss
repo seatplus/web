@@ -23,6 +23,13 @@ $fa-font-path: "../webfonts";
 // Multiselect
 @import "~vue-multiselect/dist/vue-multiselect.min.css";
 
+// Tailwind CSS
+@import "~tailwindcss/base";
+
+@import "~tailwindcss/components";
+
+@import "~tailwindcss/utilities";
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
