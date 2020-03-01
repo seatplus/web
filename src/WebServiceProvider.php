@@ -115,7 +115,6 @@ class WebServiceProvider extends ServiceProvider
 
         // Add permission Middelware
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
-
     }
 
     private function register_services()

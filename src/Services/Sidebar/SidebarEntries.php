@@ -32,7 +32,7 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
-    public function filter(): array
+    public function filter()
     {
         return collect(config('package.sidebar'))
             ->map(function ($topic) {
@@ -42,8 +42,12 @@ class SidebarEntries
             })
             ->reject(function ($topic) {
                 return $topic->isEmpty();
-            })
-            ->toArray();
+            })->map(function ($entries, $category) {
+                return [
+                    'name' => $category,
+                    'entries' => $entries
+                ];
+            });
     }
 
     private function checkUserPermission(array $array): bool
