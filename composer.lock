@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "17497b17b0f5492f2cc28b772308db57",
@@ -603,16 +603,16 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v0.2.4",
+            "version": "v0.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "fbd2afcadf96319a0403eb10f0a70b928ea009cf"
+                "reference": "ef618736fb566e5c85d862fa0cf6061422f19046"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/fbd2afcadf96319a0403eb10f0a70b928ea009cf",
-                "reference": "fbd2afcadf96319a0403eb10f0a70b928ea009cf",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/ef618736fb566e5c85d862fa0cf6061422f19046",
+                "reference": "ef618736fb566e5c85d862fa0cf6061422f19046",
                 "shasum": ""
             },
             "require-dev": {
@@ -650,7 +650,7 @@
                 "inertia",
                 "laravel"
             ],
-            "time": "2020-01-04T20:38:07+00:00"
+            "time": "2020-02-28T14:50:19+00:00"
         },
         {
             "name": "laminas/laminas-diactoros",
