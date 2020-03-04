@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "17497b17b0f5492f2cc28b772308db57",
@@ -2572,16 +2572,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "3.9.0",
+            "version": "3.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66"
+                "reference": "e90ed6242a8fa29735529160b9c21cb77b233e7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
-                "reference": "ac0fc4cd809b1fe7ecbe9876e03bb5849601bf66",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e90ed6242a8fa29735529160b9c21cb77b233e7f",
+                "reference": "e90ed6242a8fa29735529160b9c21cb77b233e7f",
                 "shasum": ""
             },
             "require": {
@@ -2589,11 +2589,11 @@
                 "illuminate/container": "^5.8|^6.0|^7.0",
                 "illuminate/contracts": "^5.8|^6.0|^7.0",
                 "illuminate/database": "^5.8|^6.0|^7.0",
-                "php": "^7.2"
+                "php": "^7.2.5"
             },
             "require-dev": {
                 "orchestra/testbench": "^3.8|^4.0|^5.0",
-                "phpunit/phpunit": "^8.0",
+                "phpunit/phpunit": "^8.0|^9.0",
                 "predis/predis": "^1.1"
             },
             "type": "library",
@@ -2636,7 +2636,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2020-02-26T16:23:16+00:00"
+            "time": "2020-03-03T21:31:02+00:00"
         },
         {
             "name": "spatie/laravel-queueable-action",
