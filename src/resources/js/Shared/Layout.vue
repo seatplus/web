@@ -62,47 +62,11 @@
                         </button>
                     </div>
                     <div class="flex-shrink-0 flex items-center h-16 px-4 bg-gray-900">
-                        <img class="h-8 w-auto" src="/img/logos/workflow-logo-on-dark.svg" alt="Workflow" />
+                        <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus" />
+
                     </div>
                     <div class="flex-1 h-0 overflow-y-auto">
-                        <nav class="px-2 py-4">
-                            <a href="#" class="group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-white bg-gray-900 focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-300 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10M9 21h6"/>
-                                </svg>
-                                Dashboard
-                            </a>
-                            <a href="#" class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                </svg>
-                                Team
-                            </a>
-                            <a href="#" class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-                                </svg>
-                                Projects
-                            </a>
-                            <a href="#" class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                Calendar
-                            </a>
-                            <a href="#" class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
-                                </svg>
-                                Documents
-                            </a>
-                            <a href="#" class="mt-1 group flex items-center px-2 py-2 text-base leading-6 font-medium rounded-md text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none focus:text-white focus:bg-gray-700 transition ease-in-out duration-150">
-                                <svg class="mr-4 h-6 w-6 text-gray-400 group-hover:text-gray-300 group-focus:text-gray-300 transition ease-in-out duration-150" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                Reports
-                            </a>
-                        </nav>
+                        <sidebar :active-entry-url="getActiveSidebarElement()"/>
                     </div>
                 </div>
             </div>
@@ -111,11 +75,10 @@
             <div class="hidden md:flex md:flex-shrink-0">
                 <div class="flex flex-col w-64">
                     <div class="flex items-center h-16 flex-shrink-0 px-4 bg-gray-900">
-                        <img class="h-8 w-auto" src="/img/logos/workflow-logo-on-dark.svg" alt="Workflow" />
+                        <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus" />
                     </div>
                     <div class="h-0 flex-1 flex flex-col overflow-y-auto">
-                        <!-- Sidebar component, swap this element with another sidebar if you like -->
-                        <static-sidebar-desktop :active-entry-url="getActiveSidebarElement()"/>
+                        <sidebar :active-entry-url="getActiveSidebarElement()"/>
                     </div>
                 </div>
             </div>
@@ -128,7 +91,8 @@
                     </button>
                     <div class="flex-1 px-4 flex justify-between">
                         <div class="flex-1 flex">
-                            <div class="w-full flex md:ml-0">
+                            <!--Search bar-->
+                            <!--<div class="w-full flex md:ml-0">
                                 <label for="search_field" class="sr-only">Search</label>
                                 <div class="relative w-full text-gray-400 focus-within:text-gray-600">
                                     <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
@@ -138,7 +102,7 @@
                                     </div>
                                     <input id="search_field" class="block w-full h-full pl-8 pr-3 py-2 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 sm:text-sm" placeholder="Search" />
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                         <div class="ml-4 flex items-center md:ml-6">
                             <button class="p-1 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:shadow-outline focus:text-gray-500">
@@ -146,28 +110,9 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                 </svg>
                             </button>
-                            <div ref="menu" class="ml-3 relative">
-                                <div>
-                                    <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-outline">
-                                        <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                                    </button>
-                                </div>
-                                <transition
-                                    enter-active-class="duration-150 ease-out"
-                                    enter-class="opacity-0 scale-95"
-                                    enter-to-class="opacity-100 scale-100"
-                                    leave-active-class="duration-100 ease-in"
-                                    leave-class="opacity-100 scale-100"
-                                    leave-to-class="opacity-0 scale-95"
-                                >
-                                    <div v-show="menuOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg">
-                                        <div class="py-1 rounded-md bg-white shadow-xs">
-                                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150">Your Profile</a>
-                                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150">Settings</a>
-                                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150">Sign out</a>
-                                        </div>
-                                    </div>
-                                </transition>
+                            <div class="ml-3 relative">
+                                <!--User Menu-->
+                                <Menu />
                             </div>
                         </div>
                     </div>
@@ -189,21 +134,19 @@
 </template>
 
 <script>
-    import Navbar from "@/Shared/Navbar"
     import Sidebar from "@/Shared/Sidebar"
     import FlashMessages from "@/Shared/FlashMessages"
     import Footer from "@/Shared/Footer"
     import RequiredScopesWarning from "./RequiredScopesWarning"
-    import StaticSidebarDesktop from "./StaticSidebarDesktop"
+    import Menu from "@/Shared/Menu"
 
     export default {
         name: "Layout",
         components: {
-            StaticSidebarDesktop,
+            Menu,
             FlashMessages,
             Sidebar,
             Footer,
-            Navbar,
             RequiredScopesWarning
         },
         props   : {
@@ -243,17 +186,6 @@
             hasRequiredScopes() {
                 return ! _.isEmpty(this.requiredScopes)
             },
-            toggleMenu() {
-                this.menuOpen = ! this.menuOpen;
-            },
-            mounted() {
-                document.addEventListener('click', evt => {
-                    evt.stopPropagation();
-                    if(!this.$refs.menu.contains(evt.target)) {
-                        this.menuOpen = false;
-                    }
-                });
-            }
         }
     }
 </script>
