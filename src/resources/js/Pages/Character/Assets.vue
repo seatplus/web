@@ -1,147 +1,93 @@
 <template>
     <Layout page-header="Character" page-description="Assets" :required-scopes="this.requiredScopes">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <b-form-group label="Character Filter">
-                                        <character-dropdown :owned="$page.filters.owned_characters" @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
-                                    </b-form-group>
-                                </div>
-                                <div class="col-md-6">
-                                    <b-form-group label="Region Filter">
-                                        <region-dropdown :regions="$page.filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
-                                    </b-form-group>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+        <!--TODO: Filter Elements-->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md mb-3 px-4 py-5">
+            <div class="grid grid-cols-6 gap-6">
+
+                <div class="col-span-6">
+                    <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
+                    <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                 </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <b-form-group label="Character Filter">
-                                        <b-form-input v-model="search" placeholder="Enter your name" />
-                                    </b-form-group>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="col-span-6 sm:col-span-3">
+                    <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
 
-                    <div class="card" v-for="location_assets in this.getGroupedAssets()">
-                        <div class="card-header">
-                            <h3 v-if="location_assets[0]['location']" class="card-title">
-                                {{location_assets[0]['location']['locatable']['name']}}
-                            </h3>
-                            <h3 v-else class="card-title">
-                                Unknown Structure ({{location_assets[0]['location_id']}})
-                            </h3>
-                            <span class="float-right">
-                                  {{getLocationsVolume(location_assets)}} volume and {{getLoationsItemsCount(location_assets)}} items
-                              </span>
-                        </div>
-                        <!-- /.card-header -->
-                        <div class="card-body p-0">
-                            <table class="table table-responsive-md table-sm">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th>Quantity</th>
-                                    <th>Type</th>
-                                    <th>Volume</th>
-                                    <th>Group</th>
-                                </tr>
-                                </thead>
-
-                                <tbody v-for="asset in location_assets">
-                                <tr>
-                                    <td style="width: 5%">
-                                        <div v-if="asset.content[0]">
-                                            <asset-button :asset="asset" />
-                                        </div>
-                                        <div v-else>
-                                            {{ asset.quantity }}
-                                        </div>
-
-                                    </td>
-                                    <td style="width: 55%">
-                                        <b-media vertical-align="center">
-                                            <template v-slot:aside>
-                                                <EveImage v-if="multipleCharacters()" :object="asset.owner" :size=32 />
-                                                <EveImage :object="asset.type" :size=32 />
-                                            </template>
-                                            <span v-if="asset.name">
-                                              {{asset.name}} ({{ asset.type.name }})
-                                          </span>
-
-                                            <span v-else>
-                                              {{ asset.type.name }}
-                                          </span>
-
-                                            <span v-if="!asset.is_singleton" class="text-info">(packaged)</span>
-                                        </b-media>
-
-                                    </td>
-                                    <td style="width: 20%">{{getMetricPrefix(asset.quantity * asset.type.volume)}}</td>
-                                    <td style="width: 20%">{{asset.type.group.name}}</td>
-                                </tr>
-
-                                <b-collapse v-if="asset.content[0]"
-                                            v-for="content in asset.content" :key="asset.content.item_id"
-                                            :id="content.location_id.toString()" tag="tr" style="background-color: #f2f2f2">
-
-                                    <td>
-                                        <div v-if="content.content[0]">
-                                            <b-button variant="link" size="sm" v-b-toggle="content.content[0].location_id">
-                                                <i class="fas fa-plus"/>
-                                            </b-button>
-                                        </div>
-                                        <div v-else>
-                                            {{ content.quantity }}
-                                        </div>
-
-                                    </td>
-                                    <td>
-                                        <b-media vertical-align="center">
-                                            <template v-slot:aside>
-                                                <eve-image v-if="$page.numer_of_owner > 1" :object="content.owner" :size=32 />
-                                                <EveImage :object="content.type" :size=32 />
-                                            </template>
-                                            <span v-if="content.name">
-                                              {{content.name}} ({{ content.type.name }})
-                                          </span>
-
-                                            <span v-else>
-                                              {{ content.type.name }}
-                                          </span>
-                                        </b-media>
-
-                                    </td>
-                                    <td>{{getMetricPrefix(content.quantity * content.type.volume)}}</td>
-                                    <td>{{content.type.group.name}}</td>
-
-                                </b-collapse>
-
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- /.card-body -->
-                    </div>
-
-                    <pagination :collection="assets"/>
-
+                <div class="col-span-6 sm:col-span-3">
+                    <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
                 </div>
+
             </div>
         </div>
 
+        <div class="bg-white shadow overflow-hidden sm:rounded-md mb-3" v-for="location_assets in this.getGroupedAssets()">
+            <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    {{ location_assets[0]['location'] ? location_assets[0]['location']['locatable']['name'] : "Unknown Structure" + (location_assets[0]['location_id'])}}
+                </h3>
+                <p class="mt-1 text-sm leading-5 text-gray-500">
+                    {{getLocationsVolume(location_assets)}} volume and {{getLoationsItemsCount(location_assets)}} items
+                </p>
+            </div>
+            <ul>
+                <li v-for="asset in location_assets">
+                    <a href="#" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+                        <div class="flex items-center px-4 py-4 sm:px-6">
+                            <div class="min-w-0 flex-1 flex items-center">
+                                <div class="flex overflow-hidden">
+                                    <span class="inline-block relative">
+                                        <eve-image :tailwind_class="'inline-block h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
+                                        <!--<span class="absolute bottom-0 right-0 block h-3 w-3 rounded-full text-white shadow-solid bg-gray-300"></span>-->
+                                        <span v-if="asset.quantity > 1" class="absolute bottom-0 right-0 inline-flex items-center justify-center h-3 w-3 rounded-full text-white shadow-solid bg-gray-400">
+                                            <span class="text-sm font-bold leading-none text-white">{{ asset.quantity }}</span>
+                                        </span>
+                                    </span>
+                                    <EveImage v-if="multipleCharacters()" :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'" :object="asset.owner" :size="128" />
+                                    <!--<img class="relative z-0 -ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Character" />-->
+                                </div>
+                                <div class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
+                                    <div>
+                                        <div class="text-sm leading-5 font-medium text-indigo-600 truncate">
+                                            {{asset.name}}
+                                        </div>
+                                        <div class="mt-2 flex items-center text-sm leading-5 text-gray-500">
+                                            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                                            </svg>
+
+                                            <span class="truncate">{{ asset.type.name }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="hidden md:block">
+                                        <div>
+                                            <div class="text-sm leading-5 text-gray-900">
+                                                {{asset.type.group.name}} <span v-if="!asset.is_singleton" class="text-info">(packaged)</span>
+                                            </div>
+                                            <div class="mt-2 flex items-center text-sm leading-5 text-gray-500">
+                                                <svg class="flex-shrink-0 mr-1.5 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                {{getMetricPrefix(asset.quantity * asset.type.volume)}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-md mb-3">
+            <pagination :collection="assets"/>
+        </div>
     </Layout>
 </template>
 
@@ -159,6 +105,7 @@
         components: {Layout, EveImage, AssetButton, Pagination, CharacterDropdown, RegionDropdown},
         props: {
             assets: Object,
+            filters: Object,
         },
         data() {
             return {
