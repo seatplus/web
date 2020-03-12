@@ -1,6 +1,6 @@
 <template>
     <li>
-        <a href="#" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+        <inertia-link :href="this.url" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
             <div class="flex items-center px-4 py-4 sm:px-6">
                 <div class="min-w-0 flex-1 flex items-center">
                     <div class="flex overflow-x-visible">
@@ -31,13 +31,19 @@
                     <slot name="navigaton" />
                 </div>
             </div>
-        </a>
+        </inertia-link>
     </li>
 </template>
 
 <script>
   export default {
-    name: "WideListElement"
+    name: "WideListElement",
+      props: {
+          url: {
+              type    : String,
+              required: true
+          },
+      },
   }
 </script>
 

@@ -85,6 +85,19 @@ class AssetsController extends Controller
             'filters' => $filters,
             'assets' => $assets,
         ]);
+    }
 
+    public function details(int $item_id )
+    {
+        $query = CharacterAsset::Affiliated()
+            ->where('item_id', $item_id);
+
+        $assets = CharacterAssetResource::collection(
+            $query->paginate()
+        );
+
+        return Inertia::render('Character/ItemDetails', [
+            'assets' => $assets,
+        ]);
     }
 }

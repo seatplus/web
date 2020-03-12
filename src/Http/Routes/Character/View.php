@@ -24,4 +24,7 @@
  * SOFTWARE.
  */
 
+use Seatplus\Web\Http\Controllers\Character\AssetsController;
+
 Route::get('/assets', 'AssetsController@index')->name('character.assets');
+Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
