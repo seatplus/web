@@ -1,6 +1,6 @@
 <template>
-    <Layout page-header="Access Control Groups" page-description="Overview">
-        <div class="container-fluid">
+    <Layout page="Access Control" page-description="Overview">
+        <!--<div class="container-fluid">
             <b-card>
                 <b-row>
 
@@ -63,13 +63,164 @@
                 </div>
                 <b-row>
                     <span v-if="hasNoRoles"> No control groups has been created. Go ahead create one! </span>
-                    <!--<b-col md="4" v-for="role in this.roles.data" :key="role.id">
+                    &lt;!&ndash;<b-col md="4" v-for="role in this.roles.data" :key="role.id">
 
-                    </b-col>-->
+                    </b-col>&ndash;&gt;
                 </b-row>
             </b-card>
-            <Pagination :collection="roles" class="float-right"/>
+
+        </div>-->
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <!--Header-->
+            <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+                <!-- Content goes here -->
+                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                    <div class="ml-4 mt-2">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            Access Control Groups
+                        </h3>
+                    </div>
+                    <div class="ml-4 mt-2 flex-shrink-0">
+                      <span class="inline-flex rounded-md shadow-sm">
+                        <button @click="toggleCreateModal(true)" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:border-indigo-700 active:bg-indigo-700">
+                          Create new group
+                        </button>
+                      </span>
+                    </div>
+                </div>
+                <!-- We use less vertical padding on card headers on desktop than on body sections -->
+            </div>
+
+            <!--Content below-->
+            <div class="flex flex-col">
+                <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                    <div class="align-middle inline-block min-w-full overflow-hidden "> <!-- shadow sm:rounded-lg border-b border-gray-200-->
+                        <table class="min-w-full">
+                            <thead>
+                            <tr>
+                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                    Name
+                                </th>
+                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                    Members
+                                </th>
+                                <!--<th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                    Type
+                                </th>-->
+                                <!--<th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                    Role
+                                </th>-->
+                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"><!--Manage--></th>
+                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"><!--Join--></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr class="bg-white" v-for="role in roles.data">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                    {{role.name}}
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    <!--{{role.users}}--> users
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Manage
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                                    <SimpleToggle :value="dispatch" v-on:change="toggleDispatch" />
+                                    <!--<a href="#" class="text-right text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>-->
+                                    <!--<inertia-link :href="route('acl.join')"
+                                                  class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline"
+                                                  method="post"
+                                                  :data="{ role_id: role.id }"
+                                    >
+                                        Join
+                                    </inertia-link>-->
+                                </td>
+                            </tr>
+                            <!--<tr class="bg-gray-50">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                    Bernard Lane
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Director, Human Resources
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    bernardlane@example.com
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Owner
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
+                                </td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                    Bernard Lane
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Director, Human Resources
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    bernardlane@example.com
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Owner
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
+                                </td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                    Bernard Lane
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Director, Human Resources
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    bernardlane@example.com
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Owner
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
+                                </td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
+                                    Bernard Lane
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Director, Human Resources
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    bernardlane@example.com
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                    Owner
+                                </td>
+                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
+                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
+                                </td>
+                            </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
+                <!-- Content goes here -->
+                <Pagination :collection="roles" />
+                <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
+            </div>
         </div>
+
+        <template v-slot:modal>
+            <ModalWithFooter :open="openCreateModal" @change="toggleCreateModal"></ModalWithFooter>
+        </template>
     </Layout>
 </template>
 
@@ -77,9 +228,17 @@
   import Layout from "../../Shared/Layout"
   import { Inertia } from '@inertiajs/inertia'
   import Pagination from "../../Shared/Pagination"
+  import SimpleToggle from "../../Shared/SimpleToggle"
+  import ModalWithFooter from "../../Shared/ModalWithFooter"
   export default {
       name: "ControlGroups",
-      components: {Layout, Pagination},
+      components: {ModalWithFooter, SimpleToggle, Layout, Pagination},
+      data() {
+          return {
+              dispatch: false,
+              openCreateModal: false
+          }
+      },
       props: {
           roles: {
               type: Object,
@@ -87,6 +246,12 @@
           }
       },
       methods: {
+          toggleDispatch(value) {
+              this.dispatch = value;
+          },
+          toggleCreateModal(value) {
+              this.openCreateModal = value;
+          },
           create: async function () {
 
               const {value: ipAddress} = await Swal.fire({

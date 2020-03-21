@@ -2,26 +2,32 @@
     <Layout page="Character Assets" :required-scopes="this.requiredScopes">
 
         <!--TODO: Filter Elements-->
-        <div class="bg-white shadow overflow-hidden sm:rounded-md mb-3 sm:mb-6 ">
-            <div class="grid grid-cols-6 gap-6 px-4 py-5">
 
-                <div class="col-span-6">
-                    <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
-                    <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+        <div class="bg-white overflow-hidden overflow-hidden shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <!-- Content goes here -->
+                <div class="grid grid-cols-6 gap-6">
+
+                    <div class="col-span-6">
+                        <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
+                        <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
+                    </div>
+
                 </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
-                </div>
-
-                <div class="col-span-6 sm:col-span-3">
-                    <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
-                </div>
-
             </div>
-
-            <pagination :collection="assets"/>
-
+            <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
+                <!-- Content goes here -->
+                <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
+                <pagination :collection="assets"/>
+            </div>
         </div>
 
         <wide-lists v-for="(location_assets, location_id) in this.groupedAssets" :key="location_id">
