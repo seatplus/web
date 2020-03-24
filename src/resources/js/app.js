@@ -11,8 +11,8 @@ import Vue from 'vue'
 /*
 * Install bootstrap-vue components
 */
-import BootstrapVue from 'bootstrap-vue' //Importing
-Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application
+/*import BootstrapVue from 'bootstrap-vue' //Importing
+Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application*/
 
 import { InertiaApp } from '@inertiajs/inertia-vue'
 Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
