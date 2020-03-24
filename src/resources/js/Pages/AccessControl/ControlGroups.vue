@@ -94,7 +94,7 @@
             <!--Content below-->
             <div class="flex flex-col">
                 <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                    <div class="align-middle inline-block min-w-full overflow-hidden "> <!-- shadow sm:rounded-lg border-b border-gray-200-->
+                    <div class="align-middle inline-block min-w-full overflow-hidden"> <!-- shadow sm:rounded-lg border-b border-gray-200-->
                         <table class="min-w-full">
                             <thead>
                             <tr>
@@ -115,18 +115,18 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr class="bg-white" v-for="role in roles.data">
+                            <tr :class="{'bg-white' : index % 2 === 0, 'bg-gray-50': index % 2 !== 0}" ref="tr" v-for="(role, index) in roles.data">
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    {{role.name}}
+                                    {{role.name}} {{index}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    <!--{{role.users}}--> users
+                                    <AvatarGroupBottomTop :objects="getRoleMembers(role.users)" :random="true"/>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Manage
+                                    <DropdownWithIcons v-on:change="toggleHelperRow" @click="indexDropdown = index"/>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <SimpleToggle :value="dispatch" v-on:change="toggleDispatch" />
+                                    <!--<SimpleToggle :value="dispatch" v-on:change="toggleDispatch" />-->
                                     <!--<a href="#" class="text-right text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>-->
                                     <!--<inertia-link :href="route('acl.join')"
                                                   class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline"
@@ -136,6 +136,9 @@
                                         Join
                                     </inertia-link>-->
                                 </td>
+                            </tr>
+                            <tr v-show="rowHeight > 0" :class="'bg-grey-500'">
+                                <td colspan="4" :height="rowHeight" class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium" />
                             </tr>
                             <!--<tr class="bg-gray-50">
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
@@ -230,13 +233,17 @@
   import Pagination from "../../Shared/Pagination"
   import SimpleToggle from "../../Shared/SimpleToggle"
   import ModalWithFooter from "../../Shared/ModalWithFooter"
+  import AvatarGroupBottomTop from "../../Shared/AvatarGroupBottomTop"
+  import DropdownWithIcons from "../../Shared/DropdownWithIcons"
   export default {
       name: "ControlGroups",
-      components: {ModalWithFooter, SimpleToggle, Layout, Pagination},
+      components: {DropdownWithIcons, AvatarGroupBottomTop, ModalWithFooter, SimpleToggle, Layout, Pagination},
       data() {
           return {
               dispatch: false,
-              openCreateModal: false
+              openCreateModal: false,
+              rowHeight: 0,
+              indexDropdown: 0
           }
       },
       props: {
@@ -251,6 +258,18 @@
           },
           toggleCreateModal(value) {
               this.openCreateModal = value;
+          },
+          getRoleMembers(users) {
+              return _.map(users, function (user) {
+                  return user.main_character
+              })
+          },
+          toggleHelperRow(dropdownHeigth) {
+
+              this.rowHeight = dropdownHeigth - this.indexDropdown * this.evaluateRowHeight()
+          },
+          evaluateRowHeight() {
+              return this.rolesLength === 0 ? 0 : this.$refs.tr[0].clientHeight
           },
           create: async function () {
 
@@ -289,6 +308,9 @@
           },
           chunkedRoles: function () {
               return _.chunk(this.roles.data, 3)
+          },
+          rolesLength: function () {
+              return this.roles.data.length
           }
       }
   }
