@@ -55,7 +55,7 @@ class ControlGroupsController
 
     public function create(Request $request)
     {
-        $name = $request->input('input');
+        $name = $request->input('name');
 
         $role = Role::create(['name' => $name]);
 

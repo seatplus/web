@@ -123,7 +123,43 @@
                                     <AvatarGroupBottomTop :objects="getRoleMembers(role.users)" :random="true"/>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    <DropdownWithIcons v-on:change="toggleHelperRow" @click="indexDropdown = index"/>
+                                    <DropdownWithIcons :index="index"  v-on:change="toggleHelperRow" >
+                                        <div class="rounded-md bg-white shadow-xs">
+                                            <div class="py-1">
+                                                <inertia-link :href="route('acl.edit', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
+                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    Edit
+                                                </inertia-link>
+                                                <inertia-link :href="route('acl.manage', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                                                    <svg fill="currentColor" viewBox="0 0 20 20" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">
+                                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                                                    </svg>
+                                                    Manage
+                                                </inertia-link>
+                                                <!--<a href="#" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h6a2 2 0 012 2H5v8a2 2 0 01-2-2V5zm6 2a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2H9z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    Duplicate
+                                                </a>-->
+                                            </div>
+                                            <div class="border-t border-gray-100"></div>
+                                            <div class="py-1">
+                                                <inertia-link
+                                                    :href="route('acl.delete')" method="delete" :data="{ role_id: role.id }"
+                                                    class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                                                >
+                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    Delete
+                                                </inertia-link>
+                                            </div>
+                                        </div>
+                                    </DropdownWithIcons>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
                                     <!--<SimpleToggle :value="dispatch" v-on:change="toggleDispatch" />-->
@@ -222,7 +258,32 @@
         </div>
 
         <template v-slot:modal>
-            <ModalWithFooter :open="openCreateModal" @change="toggleCreateModal"></ModalWithFooter>
+            <ModalWithFooter :open="openCreateModal" @change="toggleCreateModal">
+                <template v-slot:symbol>
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor"  viewBox="0 0 24 24" >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                </template>
+                <template v-slot:title>Create New Control Group</template>
+                <template v-slot:description>
+                    <div>
+                        <label for="role" class="block text-sm font-medium leading-5 text-gray-700">Control Group</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <input id="role" class="form-input block w-full sm:text-sm sm:leading-5" placeholder="Some name" v-model="createRoleName"/>
+                        </div>
+                        <p class="mt-2 text-sm text-gray-500">Chose a descriptive name for the group to be created</p>
+                    </div>
+                </template>
+                <template v-slot:buttons>
+                    <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                        <inertia-link method="post" :href="route('acl.create')" :data="{name: createRoleName}" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            Create
+                        </inertia-link>
+                    </span>
+                </template>
+            </ModalWithFooter>
         </template>
     </Layout>
 </template>
@@ -243,7 +304,8 @@
               dispatch: false,
               openCreateModal: false,
               rowHeight: 0,
-              indexDropdown: 0
+              indexDropdown: 0,
+              createRoleName: ''
           }
       },
       props: {
@@ -264,9 +326,11 @@
                   return user.main_character
               })
           },
-          toggleHelperRow(dropdownHeigth) {
+          toggleHelperRow(object) {
 
-              this.rowHeight = dropdownHeigth - this.indexDropdown * this.evaluateRowHeight()
+              console.log(object)
+
+              this.rowHeight = object.dropdownHeight - (_.size(this.roles.data) - (object.index + 1)) * this.evaluateRowHeight()
           },
           evaluateRowHeight() {
               return this.rolesLength === 0 ? 0 : this.$refs.tr[0].clientHeight
