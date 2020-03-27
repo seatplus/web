@@ -5,6 +5,9 @@
                 <eve-image tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character" :size="256" />
             </button>
         </div>
+        <div v-if="menuOpen"  class="fixed inset-0 transition-opacity">
+            <div @click="toggleMenu" class="absolute inset-0 bg-transparent"></div>
+        </div>
         <transition
             enter-active-class="duration-150 ease-out"
             enter-class="opacity-0 scale-95"
@@ -38,14 +41,6 @@
               this.menuOpen = ! this.menuOpen;
           },
       },
-      mounted() {
-          document.addEventListener('click', evt => {
-              evt.stopPropagation();
-              if(!this.$refs.menu.contains(evt.target)) {
-                  this.menuOpen = false;
-              }
-          });
-      }
   }
 </script>
 
