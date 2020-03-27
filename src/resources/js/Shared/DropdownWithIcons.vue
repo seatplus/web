@@ -10,6 +10,9 @@
               </button>
             </span>
         </div>
+        <div v-if="open"  class="fixed inset-0 transition-opacity">
+            <div @click="toggleDropdown" class="absolute inset-0 bg-transparent"></div>
+        </div>
         <transition
             enter-active-class="transition ease-out duration-100"
             enter-class="transform opacity-0 scale-95"
