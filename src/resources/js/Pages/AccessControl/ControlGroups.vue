@@ -122,7 +122,7 @@
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
                                     <AvatarGroupBottomTop :objects="getRoleMembers(role.users)" :random="true"/>
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                <td class="px-6 py-4 whitespace-no-wrap text-center text-sm leading-5 text-gray-500">
                                     <DropdownWithIcons :index="index"  v-on:change="toggleHelperRow" >
                                         <div class="rounded-md bg-white shadow-xs">
                                             <div class="py-1">
@@ -171,6 +171,7 @@
                                     >
                                         Join
                                     </inertia-link>-->
+                                    Join
                                 </td>
                             </tr>
                             <tr v-show="rowHeight > 0" :class="'bg-grey-500'">
