@@ -168,6 +168,11 @@
             </div>
             <main class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none" tabindex="0">
 
+
+                <div v-if="isMissingRequiredScopes()" class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3">
+                    <RequiredScopesWarning :missing_characters_scopes="this.missing_characters_scopes" />
+                </div>
+
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3">
                     <h1 class="text-2xl font-semibold text-gray-900">{{ this.page}}</h1>
                 </div>
@@ -261,17 +266,39 @@
         data() {
             return {
                 sidebarOpen: false,
-                menuOpen: false
+                menuOpen: false,
             }
         },
         methods: {
             getActiveSidebarElement() {
                 return this.activeSidebarElement ?? window.location.href
             },
-            hasRequiredScopes() {
-                return ! _.isEmpty(this.requiredScopes)
+            isMissingRequiredScopes() {
+                return ! _.isEmpty(this.missing_characters_scopes)
             },
-        }
+        },
+        computed: {
+            missing_characters_scopes: function () {
+                let returnValue = []
+                let requiredScopes= this.requiredScopes
+
+                _.forEach(this.$page.user.data.characters, function (character) {
+
+                    let missing_scopes = _.difference(requiredScopes, character.scopes)
+
+                    if(_.isEmpty(missing_scopes))
+                        return
+
+                    returnValue.push({
+                        character_id: character.character_id,
+                        name: character.name,
+                        missing_scopes: missing_scopes
+                    })
+                })
+
+                return returnValue;
+            }
+        },
     }
 </script>
 

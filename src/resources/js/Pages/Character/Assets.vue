@@ -1,9 +1,20 @@
 <template>
     <Layout page="Character Assets" :required-scopes="this.requiredScopes">
 
-        <!--TODO: Filter Elements-->
+        <div class="grid gap-2 grid-cols-3">
+            <div class="col-span-2">
 
-        <div class="bg-white overflow-hidden overflow-hidden shadow rounded-lg">
+            </div>
+            <div class="col-span-1">
+                <!--<div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        &lt;!&ndash; Content goes here &ndash;&gt;
+                    </div>
+                </div>-->
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden overflow-hidden mb-3 shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <!-- Content goes here -->
                 <div class="grid grid-cols-6 gap-6">

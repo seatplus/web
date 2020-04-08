@@ -1,69 +1,85 @@
 <template>
-    <Layout :page-header="this.layoutObject.pageHeader"
-            :page-description="this.layoutObject.pageDescription"
-            :active-sidebar-element="this.layoutObject.activeSidebarElement"
-    >
-        <Commands />
-        <b-card title="Server Settings" no-body>
-            <b-card-header header-tag="nav">
-                <b-nav card-header tabs >
-                    <b-nav-item v-for="entry in this.navItems" :key="entry.id" :active="isActive(entry.route)" >
-                        <inertia-link :href="route(entry.route)" preserve-state>
-                            {{entry.name}}
-                        </inertia-link>
-                    </b-nav-item>
-                </b-nav>
-            </b-card-header>
-            <b-card-body>
+    <Layout page="Server Settings" :active-sidebar-element="this.activeSidebarElement">
+        <HorizonStats class="mb-3" />
+        <Commands class="mb-3" />
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="border-b border-gray-200 px-4 pt-5 sm:px-6">
+                <!-- Content goes here -->
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    Available Settings
+                </h3>
+                <div>
+                    <div class="sm:hidden">
+                        <select class="form-select block w-full">
+                            <option v-for="navTab in this.navTabs" >{{ navTab.name}}</option>
+                        </select>
+                    </div>
+                    <div class="hidden sm:block">
+                        <div> <!--class="border-b border-gray-200"-->
+                            <nav class="flex -mb-px">
+                                <inertia-link v-for="(navTab,index) in this.navTabs" :key="index" :href="getRoute(navTab.route)" :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 ']">
+                                    <svg v-html="navTab.logo" :class="['-ml-0.5 mr-2 h-5 w-5', isActive(navTab.route) ? 'text-indigo-500 group-focus:text-indigo-600' : 'text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600']" fill="currentColor" viewBox="0 0 20 20"></svg>
+                                    <span>{{navTab.name}}</span>
+                                </inertia-link>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- We use less vertical padding on card headers on desktop than on body sections -->
+            </div>
+            <div> <!--class="px-4 py-5 sm:p-6"-->
+                <!-- Content goes here -->
                 <slot />
-            </b-card-body>
-        </b-card>
+            </div>
+            <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
+                <!-- Content goes here -->
+                <slot name="footer" />
+                <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
+            </div>
+        </div>
 
-
-        <!--<UserList :users="users"></UserList>-->
     </Layout>
 </template>
 
 <script>
     import Layout from "@/Shared/Layout"
     import Commands from "@/Pages/Configuration/Commands"
+    import HorizonStats from "./HorizonStats"
 
     export default {
         name: "Settings",
-        components: {Layout, Commands},
+        components: {HorizonStats, Layout, Commands},
         data() {
             return {
                 navItems: [
                     {id: 1, route: 'server.settings', name: 'User List'},
                     {id: 2, route: 'settings.scopes', name: 'Scope Settings'}
                 ],
-            }
-        },
-        props: {
-            layoutObject: {
-                type: Object,
-                required: true,
+                navTabs: []
             }
         },
         methods: {
             isActive(string) {
+                console.log(route().current(string), string)
                 return route().current(string);
             },
+            getRoute(name) {
+                return route(name)
+            }
         },
+        computed: {
+            activeSidebarElement: function () {
+                return route('server.settings').url()
+            }
+        },
+        mounted() {
+            this.$nextTick(function () {
+                axios.get(route('settings.navigation')).then(result => {
+                    this.navTabs = result.data
+                })
+            })
+        }
     }
 </script>
 
-<style scoped>
-
-    .card-header {
-        background-color: rgba(0,0,0,.03)
-    }
-
-    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
-        background-color: #fff;
-        border-color:
-            #dee2e6
-            #dee2e6
-            #fff;
-    }
-</style>

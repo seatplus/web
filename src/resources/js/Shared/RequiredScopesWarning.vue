@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-alert :show="isShown()" variant="info" dismissible>
+        <!--<b-alert :show="isShown()" variant="info" dismissible>
             <h4 class="alert-heading">Missing Scopes</h4>
             <span>Some characters are missing some scopes on their refresh_token for seatplus to fetch information from esi.</span>
 
@@ -18,7 +18,41 @@
                         </div>
                     </span>
 
-        </b-alert>
+        </b-alert>-->
+        <div class="bg-yellow-100 shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-yellow-900">
+                    Missing scopes warning
+                </h3>
+                <p class="text-base leading-6 font-medium text-yellow-900">
+                    Some characters are missing some scopes on their refresh_token for seatplus to fetch information from esi.
+                </p>
+                <div class="mt-5">
+                    <div v-for="character in missing_characters_scopes" class="rounded-md bg-yellow-200 px-6 py-5 sm:flex sm:items-start sm:justify-between">
+                        <div class="sm:flex sm:items-start">
+                            <eve-image :object="character" :size="128" />
+                            <div class="mt-3 sm:mt-0 sm:ml-4">
+                                <div class="text-sm leading-5 font-medium text-yellow-900">
+                                    {{character.name}}
+                                </div>
+                                <div class="mt-1 text-sm leading-5 text-yellow-600 sm:flex sm:items-center">
+
+                                    {{getMissingText(character.missing_scopes)}}
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
+                            <span class="inline-flex rounded-md shadow-sm">
+                                <a :href="route('auth.eve', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                    Fix
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -31,7 +65,7 @@ export default {
       EveImage
     },
     props: {
-      scopes: {
+        missing_characters_scopes: {
           type: Array,
           required: true,
           default: function () {
@@ -51,27 +85,5 @@ export default {
             return _.toString(missing_scopes)
         }
     },
-    computed: {
-      characters: function () {
-          let returnValue = []
-          let requiredScopes= this.scopes
-
-          _.forEach(this.$page.user.data.characters, function (character) {
-
-              let missing_scopes = _.difference(requiredScopes, character.scopes)
-
-              if(_.isEmpty(missing_scopes))
-                  return
-
-              returnValue.push({
-                  character_id: character.character_id,
-                  name: character.name,
-                  missing_scopes: missing_scopes
-              })
-          })
-
-          return returnValue;
-      }
-    }
 }
 </script>

@@ -33,13 +33,20 @@ use Seatplus\Web\Http\Resources\UserRessource;
 
 class SeatPlusController extends Controller
 {
+    public function navigation()
+    {
+        $navigation_tabs = config('web.settings');
+
+        return collect($navigation_tabs)->toJson();
+    }
+
     public function settings()
     {
         $validatedData = request()->validate([
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters');
+        $query = User::with('characters', 'main_character.corporation');
 
         if(request()->has('search_param'))
             $query = $query->search($validatedData['search_param']);

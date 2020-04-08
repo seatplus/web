@@ -195,6 +195,10 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/config/web.permissions.php', 'web.permissions'
         );
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.settings.php', 'web.settings'
+        );
+
     }
 
     private function addCommands()

@@ -36,6 +36,9 @@ Route::middleware(['permission:superuser'])->group(function () {
 
     Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
 
+    //TODO: create own controller for server
+    Route::get('/settings/navigation', [SeatPlusController::class, 'navigation'])->name('settings.navigation');
+
     Route::get('/settings/scopes/{entity_id?}', [SsoSettingsController::class, 'scopeSettings'])->name('settings.scopes');
     Route::post('/settings/scopes', [SsoSettingsController::class, 'updateOrCreateSsoScopeSetting'])->name('updateOrCreate.settings.scopes');
     Route::delete('/settings/scopes/{entity_id}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
