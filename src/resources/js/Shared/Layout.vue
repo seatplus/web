@@ -1,53 +1,4 @@
 <template>
-    <!--<div>
-        <div class="wrapper">
-            <navbar />
-            <sidebar :activeEntryUrl="getActiveSidebarElement()" />
-            &lt;!&ndash; Content Wrapper. Contains page content &ndash;&gt;
-            <div class="content-wrapper">
-                &lt;!&ndash; Content Header (Page header) &ndash;&gt;
-                <div class="content-header">
-                    <div class="container-fluid">
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <h1 class="m-0 text-dark">
-                                    {{ this.pageHeader}}
-                                    <small>{{ this.pageDescription}}</small>
-                                </h1>
-                            </div>&lt;!&ndash; /.col &ndash;&gt;
-
-                            &lt;!&ndash;<div class="col-sm-6">
-                                <ol class="breadcrumb float-sm-right">
-                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li class="breadcrumb-item active">Starter Page</li>
-                                </ol>
-                            </div>&ndash;&gt;&lt;!&ndash; /.col &ndash;&gt;
-                        </div>&lt;!&ndash; /.row &ndash;&gt;
-                    </div>&lt;!&ndash; /.container-fluid &ndash;&gt;
-                </div>
-                &lt;!&ndash; /.content-header &ndash;&gt;
-
-                &lt;!&ndash; Main content &ndash;&gt;
-                <section class="content">
-                    <div class="container-fluid">
-                        <b-card no-body v-if="$page.user.data.impersonating">
-                            <inertia-link  :href="route('impersonate.stop')" class="btn-block btn btn-warning">Stop Impersonate</inertia-link>
-                        </b-card>
-                        <FlashMessages />
-                        <RequiredScopesWarning :v-if="hasRequiredScopes()" :scopes="this.requiredScopes" />
-                    </div>
-                    <slot />
-
-                </section>
-                &lt;!&ndash; /.content &ndash;&gt;
-            </div>
-            &lt;!&ndash; /.content-wrapper &ndash;&gt;
-            <Footer />
-
-        </div>
-    </div>-->
-    <!--<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v1.9.3/dist/alpine.js" defer></script>-->
-
     <!--TODO: Include Alert Component-->
 
     <div class="h-screen flex overflow-hidden bg-gray-100" @keydown.window.escape="sidebarOpen = false">
@@ -146,7 +97,7 @@
                         </div>-->
                     </div>
                     <div class="ml-4 flex items-center md:ml-6">
-                        <button class="p-1 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:shadow-outline focus:text-gray-500">
+                        <button @click="emmitEvent" class="p-1 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:shadow-outline focus:text-gray-500">
                             <!--<svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                             </svg>-->
@@ -168,6 +119,7 @@
             </div>
             <main class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none" tabindex="0">
 
+                <Notifications class="md:mt-16 z-40" />
 
                 <div v-if="isMissingRequiredScopes()" class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3">
                     <RequiredScopesWarning :missing_characters_scopes="this.missing_characters_scopes" />
@@ -234,10 +186,13 @@
     import Footer from "@/Shared/Footer"
     import RequiredScopesWarning from "./RequiredScopesWarning"
     import Menu from "@/Shared/Menu"
+    import Notifications from "./Notifications"
+
 
     export default {
         name: "Layout",
         components: {
+            Notifications,
             Menu,
             FlashMessages,
             Sidebar,
@@ -276,6 +231,9 @@
             isMissingRequiredScopes() {
                 return ! _.isEmpty(this.missing_characters_scopes)
             },
+            emmitEvent() {
+                this.$eventBus.$emit('notification','test')
+            }
         },
         computed: {
             missing_characters_scopes: function () {

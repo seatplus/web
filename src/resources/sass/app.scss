@@ -2,24 +2,6 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
-// Variables
-@import 'variables';
-
-//$fa-font-path: "../webfonts";
-
-// Bootstrap
-//@import '~bootstrap/scss/bootstrap';
-//@import '~admin-lte/dist/css/adminlte.css';
-
-// Font Awesome Icons
-//@import "~@fortawesome/fontawesome-free/scss/fontawesome.scss";
-//@import "~@fortawesome/fontawesome-free/scss/solid.scss";
-//@import "~@fortawesome/fontawesome-free/scss/brands.scss";
-//@import "~@fortawesome/fontawesome-free/scss/regular.scss";
-
-// Bootstrap Vue CSS
-//@import '~bootstrap-vue/src/index.scss';
-
 // Multiselect
 @import "~vue-multiselect/dist/vue-multiselect.min.css";
 
@@ -30,11 +12,34 @@
 
 @import "~tailwindcss/utilities";
 
-.navbar-laravel {
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+.delay-75 {
+    transition-delay: 75ms;
 }
 
-.card-header {
-    background-color: transparent;
+.delay-100 {
+    transition-delay: 100ms;
+}
+
+.delay-150 {
+    transition-delay: 150ms;
+}
+
+.delay-200 {
+    transition-delay: 200ms;
+}
+
+.delay-300 {
+    transition-delay: 300ms;
+}
+
+.delay-500 {
+    transition-delay: 500ms;
+}
+
+.delay-700 {
+    transition-delay: 700ms;
+}
+
+.delay-1000 {
+    transition-delay: 1000ms;
 }

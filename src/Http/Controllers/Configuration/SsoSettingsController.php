@@ -56,6 +56,20 @@ class SsoSettingsController extends Controller
         return (new SearchCorporationOrAlliance($searchParam))->search();
     }
 
+    public function create()
+    {
+        $available_scopes = config('eveapi.scopes');
+
+        $sso_scopes_entries = function () {
+            return (new GetSsoScopeEntries)->execute();
+        };
+
+        return Inertia::render('Configuration/CreateScopeSettings', [
+            'available_scopes' => $available_scopes,
+            'entries' => $sso_scopes_entries,
+        ]);
+    }
+
     public function updateOrCreateSsoScopeSetting(UpdateOrCreateSsoScopeSetting $request)
     {
 

@@ -21,6 +21,10 @@ import I18n from './vendor/I18n'
 window.I18n = I18n
 Vue.prototype.$I18n = new I18n;
 
+// Create EventBus
+const eventBus = new Vue();
+Vue.prototype.$eventBus = eventBus
+
 // Add route helper to vue
 Vue.mixin({
   methods: {
