@@ -14,6 +14,7 @@
                 <Notification
                     :key="notification.id"
                     :id="notification.id"
+                    :payload="notification.payload"
                     v-for="(notification, index) in slicedNotifications"
                     :class="[{'mt-4': index > 0 }]"
                     @remove="removeNotification"
@@ -25,12 +26,13 @@
 
 <script>
     import Notification from "./Notification"
+    import { v4 as uuidv4 } from 'uuid';
+
     export default {
         name: "Notifications",
         components: {Notification},
         data() {
             return {
-                count: 0,
                 notifications: []
             }
         },
@@ -40,18 +42,62 @@
             }
         },
         mounted() {
-            this.$eventBus.$on('notification', $payload => {
-                const notification = { id: this.count }
+            this.$eventBus.$on('notification', payload => {
+                const notification = {
+                    id: this.getId(payload),
+                    payload: payload
+                }
                 this.notifications.unshift(notification)
-                this.count++
                 setTimeout(() => {
-                    this.removeNotification(notification.id)
+                    this.hideNotification(notification.id)
                 }, 5000)
             })
         },
         methods : {
-            removeNotification(id) {
+            hideNotification(id) {
                 this.notifications = _.reject(this.notifications, notification => {return notification.id === id})
+            },
+            getId(payload) {
+                return payload.hasOwnProperty('id') ? payload.id : this.getUuid(payload)
+            },
+            getUuid(payload) {
+                const notification =  this.storeInLocalStorage(payload)
+
+                return notification.id
+            },
+            storeInLocalStorage(payload) {
+
+                const notification = {
+                    id: uuidv4(),
+                    payload: payload
+                }
+
+                const notifications = JSON.parse(localStorage.getItem('notifications')) ?? []
+
+                notifications.unshift(notification)
+
+                localStorage.setItem('notifications', JSON.stringify(notifications))
+
+                this.flipNotificationIndicator()
+
+                return notification
+            },
+            removeNotification(id) {
+                this.hideNotification(id)
+
+                let notifications = JSON.parse(localStorage.getItem('notifications'))
+
+                notifications = _.reject(notifications, notification => {return notification.id === id})
+
+                localStorage.setItem('notifications' , JSON.stringify(notifications))
+
+                return this.flipNotificationIndicator()
+            },
+            flipNotificationIndicator() {
+
+                const notifications = JSON.parse(localStorage.getItem('notifications'))
+
+                this.$eventBus.$emit('notification-indicator', notifications.length > 0)
             }
         }
     }
