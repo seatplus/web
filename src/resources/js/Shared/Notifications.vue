@@ -38,15 +38,12 @@
         },
         computed: {
             slicedNotifications() {
-                return this.notifications.slice(0,4)
+                return _.uniqBy(this.notifications.slice(0,4), 'id')
             }
         },
         mounted() {
             this.$eventBus.$on('notification', payload => {
-                const notification = {
-                    id: this.getId(payload),
-                    payload: payload
-                }
+                const notification = payload.hasOwnProperty('id') ? payload : this.storeInLocalStorage(payload)
                 this.notifications.unshift(notification)
                 setTimeout(() => {
                     this.hideNotification(notification.id)
@@ -56,14 +53,6 @@
         methods : {
             hideNotification(id) {
                 this.notifications = _.reject(this.notifications, notification => {return notification.id === id})
-            },
-            getId(payload) {
-                return payload.hasOwnProperty('id') ? payload.id : this.getUuid(payload)
-            },
-            getUuid(payload) {
-                const notification =  this.storeInLocalStorage(payload)
-
-                return notification.id
             },
             storeInLocalStorage(payload) {
 
@@ -101,10 +90,6 @@
             }
         }
     }
-
-    /*
-    * TODO: pagination next click prevention on no more
-    * */
 </script>
 
 
