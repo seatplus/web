@@ -119,21 +119,19 @@
             }
         },
         mounted() {
-            this.refreshStats();
-            setInterval(() => { this.refreshStats() }, 5000)
+            this.refreshStats()
+
+            setInterval(() => {
+                this.refreshStats()
+            }, 5000)
         },
         methods: {
             /**
              * Refresh the stats every period of time.
              */
-            async refreshStats() {
-                Promise.all([
-                    // Make an ajax request to our server - /queue/status
-                    await this.loadStats(),
-                ]).catch(error => {
-                    console.log(error);
-                })
-            },
+            refreshStats: _.throttle(function() {
+                    this.loadStats()
+                }, 5000),
             /*
              * load stats
              */
@@ -141,7 +139,7 @@
                 return axios
                     .get('/queue/status')
                     .then( response =>
-                        this.stats = response.data
+                        this.stats = response.data,
                     ).catch(error => {
                         console.log(error);
                     });
