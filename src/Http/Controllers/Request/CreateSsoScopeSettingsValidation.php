@@ -24,36 +24,46 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Queue;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-use Laravel\Horizon\Contracts\JobRepository;
-use Laravel\Horizon\Contracts\MasterSupervisorRepository;
-use Laravel\Horizon\Contracts\WorkloadRepository;
-use Seatplus\Web\Http\Controllers\Controller;
+use Illuminate\Foundation\Http\FormRequest;
 
-class QueueController extends Controller
+class CreateSsoScopeSettingsValidation extends FormRequest
 {
-    public function __invoke()
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
     {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+
         return [
-            'queue_count' => collect(resolve(WorkloadRepository::class)->get())
-                ->sum('length'),
-            'error_count' => app(JobRepository::class)->countRecentlyFailed(),
-            'status' => $this->currentStatus(),
+            'selectedScopes' => 'required|array',
+            'selectedEntities' => 'required|array',
         ];
     }
 
     /**
-     * @return string
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
      */
-    private function currentStatus()
+    public function messages()
     {
-        if (! $masters = app(MasterSupervisorRepository::class)->all()) {
-            return 'inactive';
-        }
-
-        return collect($masters)->contains(function ($master) {
-            return $master->status === 'paused';
-        }) ? 'paused' : 'running';
+        return [
+            'selectedEntities.required'  => 'At least one corporation or alliance is required to be selected',
+            'selectedScopes.required' => 'At least one character or corporation scope is required'
+        ];
     }
 }

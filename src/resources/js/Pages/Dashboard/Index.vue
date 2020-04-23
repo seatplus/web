@@ -31,10 +31,7 @@
     methods: {
         emmitEvent() {
             this.$eventBus.$emit('notification', {
-                link1: {
-                    route: 'auth.login',
-                    text: 'test'
-                }
+                type: 'success',
             })
         },
 
@@ -44,28 +41,6 @@
               console.log(response.data);
             })
       },
-
-      getPersonalAccessToken: function () {
-        axios.get('/oauth/personal-access-tokens')
-            .then(response => {
-              console.log(response.data);
-            });
-      },
-
-      createPersonalAccessToken: function () {
-        const data = {
-          name: 'Token Name',
-          scopes: []
-        };
-
-        axios.post('/oauth/personal-access-tokens', data)
-            .then(response => {
-              console.log(response.data.accessToken);
-            })
-            .catch (response => {
-              // List errors on response...
-            });
-      }
     }
   }
 </script>

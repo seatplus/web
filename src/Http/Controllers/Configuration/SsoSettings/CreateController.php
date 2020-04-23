@@ -24,35 +24,31 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Inertia\Inertia;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
+use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
+use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
-class UpdateOrCreateSsoScopeSetting extends FormRequest
+class CreateController extends Controller
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function view()
     {
-        return true;
+        $available_scopes = config('eveapi.scopes');
+
+        return Inertia::render('Configuration/Scopes/EditScopeSettings', [
+            'available_scopes' => $available_scopes
+        ]);
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function create(CreateSsoScopeSettingsValidation $validation)
     {
 
-        return [
-            'selectedCorpOrAlliance' => 'required|array',
-            'selectedCorpOrAlliance.id' => 'required|integer',
-            'selectedScopes.character' => 'array',
-            'selectedScopes.corporation' => 'array',
-        ];
+        (new UpdateOrCreateSsoSettings($validation->all()))->execute();
+
+        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
     }
+
 }

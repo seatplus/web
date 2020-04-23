@@ -6,7 +6,7 @@
 
             </template>-->
             <template v-slot:elements>
-                <wide-list-element v-for="asset in contents" :key="asset.item_id" :url="url(asset)">
+                <wide-list-element v-for="(asset, index) in contents" :key="asset.item_id" :url="url(asset)" :class="{'border-t border-gray-200': index >0}">
                     <template v-slot:avatar>
                         <span class="inline-block relative">
                             <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>

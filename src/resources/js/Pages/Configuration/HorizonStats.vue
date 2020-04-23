@@ -115,13 +115,14 @@
         name: "HorizonStats",
         data() {
             return {
-                stats: {}
+                stats: {},
+                timer: ''
             }
         },
         mounted() {
             this.refreshStats()
 
-            setInterval(() => {
+            this.timer = setInterval(() => {
                 this.refreshStats()
             }, 5000)
         },
@@ -130,17 +131,18 @@
              * Refresh the stats every period of time.
              */
             refreshStats: _.throttle(function() {
-                    this.loadStats()
-                }, 5000),
+                this.loadStats()
+            }, 5000),
             /*
              * load stats
              */
             loadStats() {
                 return axios
                     .get('/queue/status')
-                    .then( response =>
-                        this.stats = response.data,
-                    ).catch(error => {
+                    .then( (response) => {
+                        this.stats = response.data;
+                    })
+                    .catch(error => {
                         console.log(error);
                     });
             }
@@ -154,6 +156,9 @@
                 }
                 return true;
             }
+        },
+        beforeDestroy () {
+            clearInterval(this.timer)
         }
     }
 </script>

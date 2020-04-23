@@ -61,7 +61,6 @@
         },
         methods: {
             isActive(string) {
-                console.log(route().current(string), string)
                 return route().current(string);
             },
             getRoute(name) {

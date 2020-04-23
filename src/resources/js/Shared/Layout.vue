@@ -105,7 +105,10 @@
                     </div>
                 </div>
             </div>
+
             <main class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none" tabindex="0">
+
+                <Alerts />
 
                 <Notifications class="md:mt-16 z-40" />
 
@@ -170,21 +173,21 @@
 
 <script>
     import Sidebar from "@/Shared/Sidebar"
-    import FlashMessages from "@/Shared/FlashMessages"
     import Footer from "@/Shared/Footer"
     import RequiredScopesWarning from "./RequiredScopesWarning"
     import Menu from "@/Shared/Menu"
     import Notifications from "./Notifications"
     import NotificationsBell from "./NotificationsBell"
+    import Alerts from "./Alerts"
 
 
     export default {
         name: "Layout",
         components: {
+            Alerts,
             NotificationsBell,
             Notifications,
             Menu,
-            FlashMessages,
             Sidebar,
             Footer,
             RequiredScopesWarning

@@ -76,12 +76,9 @@
 </template>
 
 <script>
-  import FlashMessages from '@/Shared/FlashMessages'
 
   export default {
-    components: {
-      FlashMessages,
-    },
+    components: {},
     name: "Login",
 
 

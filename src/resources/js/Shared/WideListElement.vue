@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div>
-                    <slot name="navigaton" />
+                    <slot name="navigation" />
                 </div>
             </div>
         </inertia-link>

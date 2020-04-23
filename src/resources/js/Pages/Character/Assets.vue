@@ -53,7 +53,7 @@
                 </div>
             </template>
             <template v-slot:elements>
-                <wide-list-element v-for="asset in location_assets" :key="asset.item_id" :url="url(asset)">
+                <wide-list-element v-for="(asset, index) in location_assets" :key="asset.item_id" :url="url(asset)" :class="{'border-t border-gray-200': index >0}">
                     <template v-slot:avatar>
                         <span class="inline-block relative">
                             <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
@@ -83,7 +83,7 @@
                         {{getMetricPrefix(asset.quantity * asset.type.volume)}}
                     </template>
 
-                    <template slot="navigaton">
+                    <template slot="navigation">
                         <inertia-link :href="route('character.item', asset.item_id)" >
                             <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
