@@ -1,9 +1,10 @@
 <template>
-    <div class="bg-white shadow overflow-hidden sm:rounded-md mb-3">
+    <div class="bg-white shadow overflow-hidden sm:rounded-md rounded-lg mb-3">
         <slot name="header" />
         <ul>
             <slot name="elements" />
         </ul>
+        <slot name="footer" />
     </div>
 </template>
 
