@@ -24,16 +24,13 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration;
+namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
 use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
 use Seatplus\Web\Services\SsoSettings\SearchCorporationOrAlliance;
-use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SsoSettingsController extends Controller
 {
@@ -71,18 +68,10 @@ class SsoSettingsController extends Controller
         ]);
     }
 
-    public function updateOrCreateSsoScopeSetting(CreateSsoScopeSettingsValidation $request)
-    {
-
-        (new UpdateOrCreateSsoSettings($request->all()))->execute();
-
-        return redirect()->action([CreateController::class, 'scopeSettings'])->with('success', 'SSO Settings Saved');
-    }
-
     public function deleteSsoScopeSetting($entity_id)
     {
         SsoScopes::where('morphable_id', $entity_id)->delete();
 
-        return redirect()->action([CreateController::class, 'scopeSettings'])->with('success', 'SSO Settings Deleted');
+        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
     }
 }

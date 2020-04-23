@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Support\Facades\Bus;
 use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
@@ -31,7 +32,7 @@ class ScopeSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('settings.scopes'));
 
-        $response->assertComponent('Configuration/ScopeSettings');
+        $response->assertComponent('Configuration/Scopes/OverviewScopeSettings');
     }
 
     /** @test */
@@ -46,13 +47,17 @@ class ScopeSettingsTest extends TestCase
             'morphable_id' => 1184675423
         ]);
 
+
         $response = $this->actingAs($this->test_user)
-            ->post(route('updateOrCreate.settings.scopes'),
+            ->post(route('create.scopes'),
                 [
-                    'selectedCorpOrAlliance' => [
-                        'corporation_id' => 1184675423,
-                        'id' =>1184675423,
-                        'name' => "Amok."
+                    'selectedEntities' => [
+                        [
+                            'corporation_id' => 1184675423,
+                            'id' =>1184675423,
+                            'name' => "Amok.",
+                            'category' => 'corporation'
+                        ],
                     ],
                     'selectedScopes' => [
                         'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
@@ -79,12 +84,15 @@ class ScopeSettingsTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->test_user)
-            ->post(route('updateOrCreate.settings.scopes'),
+            ->post(route('create.scopes'),
                 [
-                    'selectedCorpOrAlliance' => [
-                        'corporation_id' => 1184675423,
-                        'id' =>1184675423,
-                        'name' => "Amok."
+                    'selectedEntities' => [
+                        [
+                            'corporation_id' => 1184675423,
+                            'id' =>1184675423,
+                            'name' => "Amok.",
+                            'category' => 'corporation'
+                        ],
                     ],
                     'selectedScopes' => [
                         'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],

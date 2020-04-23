@@ -30,7 +30,7 @@ use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\EditController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettingsController;
+use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
 
 Route::middleware(['permission:superuser'])->group(function () {
 
@@ -49,7 +49,7 @@ Route::middleware(['permission:superuser'])->group(function () {
 
     Route::get('settings/scopes/{entity_id}/edit', EditController::class)->name('edit.scopes.settings');
 
-    Route::delete('/settings/scopes/{entity_id}', [CreateController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
+    Route::delete('/settings/scopes/{entity_id}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
 
     Route::get('/search/{searchParam}', [SsoSettingsController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });
