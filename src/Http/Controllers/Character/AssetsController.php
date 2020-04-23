@@ -87,7 +87,7 @@ class AssetsController extends Controller
         ]);
     }
 
-    public function details(int $item_id )
+    public function details(int $item_id)
     {
         $query = CharacterAsset::Affiliated()
             ->where('item_id', $item_id);

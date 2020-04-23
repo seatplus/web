@@ -45,7 +45,7 @@ class SidebarEntries
             })->map(function ($entries, $category) {
                 return [
                     'name' => $category,
-                    'entries' => $entries
+                    'entries' => $entries,
                 ];
             });
     }
