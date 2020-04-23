@@ -26,7 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Configuration\CommandsController;
-use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;;
+use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\EditController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
