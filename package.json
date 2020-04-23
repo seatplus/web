@@ -35,7 +35,7 @@
         "@inertiajs/inertia": "^0.1.7",
         "@inertiajs/inertia-vue": "^0.1.2",
         "@popperjs/core": "^2.3.3",
-        "@tailwindcss/ui": "^0.1.4",
+        "@tailwindcss/ui": "^0.2.2",
         "lodash": "^4.17.15",
         "metric-prefix": "^0.9.0",
         "moxios": "^0.4.0",
