@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Configuration;
 
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
 use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;

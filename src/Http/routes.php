@@ -46,14 +46,12 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Configuration/UserSettings.php';
                     });
 
-                Route::namespace('Character')
-                    ->prefix('character')
+                Route::prefix('character')
                     ->group(function () {
                         include __DIR__ . '/Routes/Character/View.php';
                     });
 
-                Route::namespace('AccessControl')
-                    ->prefix('acl')
+                Route::prefix('acl')
                     ->middleware(['permission:view access control'])
                     ->group(function () {
                         include __DIR__ . '/Routes/AccessControl/View.php';

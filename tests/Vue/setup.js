@@ -2,4 +2,6 @@ require('jsdom-global')();
 
 window.Date = Date;
 
-//global.expect = require('expect')
+_ = require('lodash');
+
+axios = require('axios');

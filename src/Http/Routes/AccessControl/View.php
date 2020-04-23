@@ -28,14 +28,14 @@ use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 
-Route::get('/', 'ControlGroupsController@index')->name('acl.groups');
+Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
 Route::post('/', [ControlGroupsController::class, 'join'])->name('acl.join');
 
 Route::middleware(['permission:create or update or delete access control group'])->group(function () {
-    Route::post('/create', 'ControlGroupsController@create')->name('acl.create');
+    Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');
     Route::delete('/delete', [ControlGroupsController::class, 'delete'])->name('acl.delete');
 
-    Route::get('/edit/{role_id}', 'ControlGroupsController@edit')->name('acl.edit');
+    Route::get('/edit/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
     Route::post('/edit/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
 });
 
