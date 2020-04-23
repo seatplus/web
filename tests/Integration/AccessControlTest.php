@@ -50,7 +50,7 @@ class AccessControlTest extends TestCase
 
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
-            ->json('POST', route('acl.create', ['role_id' => 1]), ['input' => 'test']);
+            ->json('POST', route('acl.create', ['role_id' => 1]), ['name' => 'test']);
 
         $this->assertDatabaseHas('roles',[
             'name' => 'test'

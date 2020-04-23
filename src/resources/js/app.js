@@ -11,8 +11,8 @@ import Vue from 'vue'
 /*
 * Install bootstrap-vue components
 */
-import BootstrapVue from 'bootstrap-vue' //Importing
-Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application
+/*import BootstrapVue from 'bootstrap-vue' //Importing
+Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application*/
 
 import { InertiaApp } from '@inertiajs/inertia-vue'
 Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
@@ -20,6 +20,10 @@ Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
 import I18n from './vendor/I18n'
 window.I18n = I18n
 Vue.prototype.$I18n = new I18n;
+
+// Create EventBus
+const eventBus = new Vue();
+Vue.prototype.$eventBus = eventBus
 
 // Add route helper to vue
 Vue.mixin({

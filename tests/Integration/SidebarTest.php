@@ -27,7 +27,7 @@ class SidebarTest extends TestCase
 
         $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertFalse(array_key_exists('Access Control', $sidebar));
+        $this->assertFalse(isset($sidebar['Access Control']));
     }
 
     /** @test */
@@ -40,7 +40,7 @@ class SidebarTest extends TestCase
 
         $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertTrue(array_key_exists('Access Control', $sidebar));
+        $this->assertTrue(isset($sidebar['Access Control']));
     }
 
     /** @test */
@@ -55,7 +55,7 @@ class SidebarTest extends TestCase
 
         $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertTrue(array_key_exists('Access Control', $sidebar));
+        $this->assertTrue(isset($sidebar['Access Control']));
     }
 
 }

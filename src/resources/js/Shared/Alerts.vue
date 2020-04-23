@@ -1,5 +1,6 @@
 <template>
-  <div>
+    <div></div>
+  <!--<div>
 
     <b-alert v-if="Object.keys($page.errors).length > 0" show variant="danger" dismissible>
       <h4 class="alert-heading">{{ $page.translation.error }}</h4>
@@ -27,11 +28,26 @@
     </b-alert>
 
 
-  </div>
+  </div>-->
 </template>
 
 <script>
 export default {
-  name: "FlashMessages",
+    name: "Alerts",
+    mounted() {
+        const types = ['info', 'warning', 'error', 'success']
+
+        this.$nextTick(function () {
+            for (let type of types) {
+                if (this.$page.flash[type])
+                    this.$eventBus.$emit('notification', {
+                        title: this.$I18n.trans(type),
+                        text: this.$page.flash[type],
+                        type: type,
+                    })
+            }
+        })
+
+    }
 }
 </script>

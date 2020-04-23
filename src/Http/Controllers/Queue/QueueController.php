@@ -33,7 +33,7 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class QueueController extends Controller
 {
-    public function getStatus()
+    public function __invoke()
     {
         return [
             'queue_count' => collect(resolve(WorkloadRepository::class)->get())

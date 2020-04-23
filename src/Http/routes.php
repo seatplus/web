@@ -25,37 +25,33 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
-Route::namespace('Seatplus\Web\Http\Controllers')
-    ->middleware('web')
+Route::middleware('web')
     ->group(function () {
 
         Route::middleware('auth', CheckRequiredScopes::class)
             ->group(function () {
-                Route::get('/home', 'HomeController@home')->name('home');
+                Route::get('/home', [HomeController::class, 'home'])->name('home');
 
-                Route::namespace('Queue')
-                    ->prefix('queue')
+                Route::prefix('queue')
                     ->group(function () {
                         include __DIR__ . '/Routes/Queue/Queue.php';
                     });
 
-                Route::namespace('Configuration')
-                    ->prefix('configuration')
+                Route::prefix('configuration')
                     ->group(function () {
                         include __DIR__ . '/Routes/Configuration/Configuration.php';
                         include __DIR__ . '/Routes/Configuration/UserSettings.php';
                     });
 
-                Route::namespace('Character')
-                    ->prefix('character')
+                Route::prefix('character')
                     ->group(function () {
                         include __DIR__ . '/Routes/Character/View.php';
                     });
 
-                Route::namespace('AccessControl')
-                    ->prefix('acl')
+                Route::prefix('acl')
                     ->middleware(['permission:view access control'])
                     ->group(function () {
                         include __DIR__ . '/Routes/AccessControl/View.php';

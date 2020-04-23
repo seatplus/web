@@ -21,10 +21,13 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedCorpOrAlliance' => [
-                'alliance_id' => 1354830081,
-                'id' =>1354830081,
-                'name' => "Goonswarm Federation"
+            'selectedEntities' => [
+                [
+                    'alliance_id' => 1354830081,
+                    'id' =>1354830081,
+                    'name' => "Goonswarm Federation",
+                    'category' => 'alliance'
+                ]
             ],
             'selectedScopes' => [
                 'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
@@ -44,10 +47,14 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedCorpOrAlliance' => [
-                'corporation_id' => 1184675423,
-                'id' =>1184675423,
-                'name' => "Amok."
+            'selectedEntities' => [
+                [
+                    'corporation_id' => 1184675423,
+                    'id' =>1184675423,
+                    'name' => "Amok.",
+                    'category' => 'corporation'
+                ],
+
             ],
             'selectedScopes' => [
                 'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
@@ -67,10 +74,13 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             ->andReturn(null);
 
         $request = [
-            'selectedCorpOrAlliance' => [
-                'corporation_id' => 1184675423,
-                'id' => 1184675423,
-                'name' => "Amok."
+            'selectedEntities' => [
+                [
+                    'corporation_id' => 1184675423,
+                    'id' =>1184675423,
+                    'name' => "Amok.",
+                    'category' => 'corporation'
+                ],
             ],
             'selectedScopes' => [
                 'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],

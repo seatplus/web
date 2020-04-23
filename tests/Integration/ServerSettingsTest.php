@@ -39,7 +39,7 @@ class ServerSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('settings.scopes'));
 
-        $response->assertComponent('Configuration/ScopeSettings');
+        $response->assertComponent('Configuration/Scopes/OverviewScopeSettings');
     }
 
     /** @test */

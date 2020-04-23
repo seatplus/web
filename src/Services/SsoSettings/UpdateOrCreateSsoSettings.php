@@ -46,47 +46,53 @@ class UpdateOrCreateSsoSettings
      */
     private Collection $selected_scopes;
 
-    private array $entity;
-
-    private int $entity_id;
+    private Collection $entities;
 
     public function __construct(array $request)
     {
 
         $this->request = $request;
-        $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes')); //collect($this->request->input('selectedScopes'))->toJson();
-        $this->entity = Arr::get($this->request, 'selectedCorpOrAlliance');
-        $this->entity_id = Arr::get($this->entity, 'id');
+        $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'));
+        $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
+
     }
 
     public function execute()
     {
-        $morphable_type = Arr::has($this->entity, 'corporation_id') ? CorporationInfo::class : AllianceInfo::class;
 
-        $this->dispatchInfoJob($morphable_type);
+        $this->entities->each(function ($entity) {
 
-        SsoScopes::updateOrCreate([
-            'morphable_id' => $this->entity_id,
-            'selected_scopes' => $this->selected_scopes,
-        ], [
-            'morphable_type' => $morphable_type,
-        ]);
-    }
+            $entity_id = Arr::get($entity, 'id');
+            $category = Arr::get($entity, 'category');
 
-    private function dispatchInfoJob(string $morphable_type)
-    {
-        $morphable_type === AllianceInfo::class ? $this->handleAllianceInfo() : $this->handleCorporationInfo();
-    }
+            $morphable_type = $category === 'corporation' ? CorporationInfo::class : AllianceInfo::class;
 
-    private function handleAllianceInfo()
-    {
+            $this->dispatchInfoJob($morphable_type, $entity_id);
 
-        (new AllianceInfoAction)->execute($this->entity_id);
+            SsoScopes::updateOrCreate([
+                'morphable_id' => $entity_id,
+            ], [
+                'selected_scopes' => $this->selected_scopes,
+                'morphable_type' => $morphable_type,
+            ]);
+        });
 
     }
 
-    private function handleCorporationInfo()
+    private function dispatchInfoJob(string $morphable_type, int $entity_id)
     {
-        (new CorporationInfoAction)->execute($this->entity_id);
+        $morphable_type === AllianceInfo::class ? $this->handleAllianceInfo($entity_id) : $this->handleCorporationInfo($entity_id);
+    }
+
+    private function handleAllianceInfo(int $entity_id)
+    {
+
+        (new AllianceInfoAction)->execute($entity_id);
+
+    }
+
+    private function handleCorporationInfo(int $entity_id)
+    {
+        (new CorporationInfoAction)->execute($entity_id);
     }
 }

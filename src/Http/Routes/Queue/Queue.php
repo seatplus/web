@@ -24,7 +24,9 @@
  * SOFTWARE.
  */
 
+use Seatplus\Web\Http\Controllers\Queue\QueueController;
+
 Route::get('status', [
     'as'   => 'horizon.status',
-    'uses' => 'QueueController@getStatus',
+    'uses' => QueueController::class,
 ]);

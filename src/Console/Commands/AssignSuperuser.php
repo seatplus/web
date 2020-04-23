@@ -30,6 +30,7 @@ use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class AssignSuperuser extends Command
 {
@@ -135,6 +136,12 @@ class AssignSuperuser extends Command
 
     private function hasAlreadyRun()
     {
-        return User::permission('superuser')->get()->isNotEmpty();
+        try {
+            return User::permission('superuser')->get()->isNotEmpty();
+        } catch (PermissionDoesNotExist $exception)
+        {
+            return false;
+        }
+
     }
 }

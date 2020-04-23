@@ -24,15 +24,13 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration;
+namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\UpdateOrCreateSsoScopeSetting;
 use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
 use Seatplus\Web\Services\SsoSettings\SearchCorporationOrAlliance;
-use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SsoSettingsController extends Controller
 {
@@ -56,18 +54,24 @@ class SsoSettingsController extends Controller
         return (new SearchCorporationOrAlliance($searchParam))->search();
     }
 
-    public function updateOrCreateSsoScopeSetting(UpdateOrCreateSsoScopeSetting $request)
+    public function create()
     {
+        $available_scopes = config('eveapi.scopes');
 
-        (new UpdateOrCreateSsoSettings($request->all()))->execute();
+        $sso_scopes_entries = function () {
+            return (new GetSsoScopeEntries)->execute();
+        };
 
-        return redirect()->action([SsoSettingsController::class, 'scopeSettings'])->with('success', 'SSO Settings Saved');
+        return Inertia::render('Configuration/CreateScopeSettings', [
+            'available_scopes' => $available_scopes,
+            'entries' => $sso_scopes_entries,
+        ]);
     }
 
     public function deleteSsoScopeSetting($entity_id)
     {
         SsoScopes::where('morphable_id', $entity_id)->delete();
 
-        return redirect()->action([SsoSettingsController::class, 'scopeSettings'])->with('success', 'SSO Settings Deleted');
+        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
     }
 }

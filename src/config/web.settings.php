@@ -24,35 +24,15 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
-
-use Illuminate\Foundation\Http\FormRequest;
-
-class UpdateOrCreateSsoScopeSetting extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-
-        return [
-            'selectedCorpOrAlliance' => 'required|array',
-            'selectedCorpOrAlliance.id' => 'required|integer',
-            'selectedScopes.character' => 'array',
-            'selectedScopes.corporation' => 'array',
-        ];
-    }
-}
+return [
+    [
+        'name' => 'User List',
+        'logo' => '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>',
+        'route' => 'server.settings',
+    ],
+    [
+        'name' => 'SSO Setting',
+        'logo' => '<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>',
+        'route' => 'settings.scopes',
+    ],
+];

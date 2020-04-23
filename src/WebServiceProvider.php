@@ -115,7 +115,6 @@ class WebServiceProvider extends ServiceProvider
 
         // Add permission Middelware
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
-
     }
 
     private function register_services()
@@ -174,6 +173,11 @@ class WebServiceProvider extends ServiceProvider
                     ? Session::get('errors')->getBag('default')->getMessages()
                     : (object) [];
             },
+            'images' => function () {
+                return [
+                    'logo' => asset('img/seat_plus.svg'),
+                ];
+            },
         ]);
     }
 
@@ -189,6 +193,10 @@ class WebServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(
             __DIR__ . '/config/web.permissions.php', 'web.permissions'
+        );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.settings.php', 'web.settings'
         );
 
     }
