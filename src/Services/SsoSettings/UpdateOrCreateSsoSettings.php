@@ -60,7 +60,7 @@ class UpdateOrCreateSsoSettings
     public function execute()
     {
 
-        $this->entities->each( function ($entity) {
+        $this->entities->each(function ($entity) {
 
             $entity_id = Arr::get($entity, 'id');
             $category = Arr::get($entity, 'category');
