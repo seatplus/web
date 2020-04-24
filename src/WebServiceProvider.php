@@ -173,11 +173,11 @@ class WebServiceProvider extends ServiceProvider
                     ? Session::get('errors')->getBag('default')->getMessages()
                     : (object) [];
             },
-            'images' => function() {
+            'images' => function () {
                 return [
-                    'logo' => asset('img/seat_plus.svg')
+                    'logo' => asset('img/seat_plus.svg'),
                 ];
-            }
+            },
         ]);
     }
 

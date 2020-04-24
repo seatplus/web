@@ -38,7 +38,7 @@ class CreateController extends Controller
         $available_scopes = config('eveapi.scopes');
 
         return Inertia::render('Configuration/Scopes/EditScopeSettings', [
-            'available_scopes' => $available_scopes
+            'available_scopes' => $available_scopes,
         ]);
     }
 
@@ -49,5 +49,4 @@ class CreateController extends Controller
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
     }
-
 }
