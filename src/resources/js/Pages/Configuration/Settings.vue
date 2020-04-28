@@ -18,7 +18,7 @@
                     <div class="hidden sm:block">
                         <div> <!--class="border-b border-gray-200"-->
                             <nav class="flex -mb-px">
-                                <inertia-link v-for="(navTab,index) in this.navTabs" :key="index" :href="getRoute(navTab.route)" :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 ']">
+                                <inertia-link v-for="(navTab,index) in this.navTabs" :key="index" :href="$route(navTab.route)" :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 ']">
                                     <svg v-html="navTab.logo" :class="['-ml-0.5 mr-2 h-5 w-5', isActive(navTab.route) ? 'text-indigo-500 group-focus:text-indigo-600' : 'text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600']" fill="currentColor" viewBox="0 0 20 20"></svg>
                                     <span>{{navTab.name}}</span>
                                 </inertia-link>

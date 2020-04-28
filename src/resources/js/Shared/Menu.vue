@@ -18,8 +18,8 @@
         >
             <div v-show="menuOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg">
                 <div class="py-1 rounded-md bg-white shadow-xs">
-                    <inertia-link :href="route('user.settings')" :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'"> Settings </inertia-link>
-                    <inertia-link :href="route('auth.logout')" :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'">Sign out</inertia-link>
+                    <inertia-link :href="$route('user.settings')" :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'"> Settings </inertia-link>
+                    <inertia-link :href="$route('auth.logout')" :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'">Sign out</inertia-link>
                 </div>
             </div>
         </transition>

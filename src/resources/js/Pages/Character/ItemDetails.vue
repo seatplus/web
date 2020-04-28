@@ -36,7 +36,7 @@
                     </template>
 
                     <template slot="navigaton">
-                        <inertia-link :href="route('character.item', asset.item_id)" >
+                        <inertia-link :href="$route('character.item', asset.item_id)" >
                             <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -80,7 +80,7 @@
               return prefix(numeric_value, {precision: 3, unit: 'm³'})
           },
           url(asset) {
-              return asset.content[0] ? route('character.item', asset.item_id) : '#'
+              return asset.content[0] ? this.$route('character.item', asset.item_id) : '#'
           }
       }
   }

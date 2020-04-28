@@ -26,11 +26,12 @@ const eventBus = new Vue();
 Vue.prototype.$eventBus = eventBus
 
 // Add route helper to vue
-Vue.mixin({
+Vue.prototype.$route = (...args) => route(...args).url()
+/*Vue.mixin({
   methods: {
     route: window.route
   }
-})
+})*/
 
 const app = document.getElementById('app')
 

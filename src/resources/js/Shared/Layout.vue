@@ -173,7 +173,6 @@
 
 <script>
     import Sidebar from "@/Shared/Sidebar"
-    import Footer from "@/Shared/Footer"
     import RequiredScopesWarning from "./RequiredScopesWarning"
     import Menu from "@/Shared/Menu"
     import Notifications from "./Notifications"
@@ -189,7 +188,6 @@
             Notifications,
             Menu,
             Sidebar,
-            Footer,
             RequiredScopesWarning
         },
         props   : {
