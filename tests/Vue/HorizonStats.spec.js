@@ -6,7 +6,7 @@ import HorizonStats from "../../src/resources/js/Pages/Configuration/HorizonStat
 // create an extended `Vue` constructor
 const localVue = createLocalVue();
 
-const route = function (string) {return '#'}
+const $route = function (string) {return '#'}
 
 // install plugins as normal
 
@@ -24,7 +24,7 @@ describe('HorizonStats', () => {
   let wrapper = mount(HorizonStats, {
       localVue,
       mocks: {
-          route
+          $route
       }
   });
 

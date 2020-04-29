@@ -72,7 +72,7 @@
                     return
 
                 axios
-                .get(route('search.alliance.corporation', this.search))
+                .get(this.$route('search.alliance.corporation', this.search))
                     .then(results => {
 
                         this.corpOrAlliances = _.map(results.data, (result) => {

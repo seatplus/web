@@ -152,7 +152,6 @@
                 return this.collection.meta.current_page
             },
             prevDisabled() {
-                console.log(this.collection.meta.current_page <= 1)
                 return this.collection.meta.current_page <= 1
             },
             nextDisabled() {

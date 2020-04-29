@@ -28,7 +28,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-4 sm:px-6">
                     <div class="text-sm leading-5">
-                        <a :href="route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
+                        <a :href="$route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
                             View all
                         </a>
                     </div>
@@ -61,7 +61,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-4 sm:px-6">
                     <div class="text-sm leading-5">
-                        <a :href="route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
+                        <a :href="$route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
                             View all
                         </a>
                     </div>
@@ -71,18 +71,7 @@
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                            <!--<svg class="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
-                            </svg>-->
-                            <svg v-if="stats.status === 'running'" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <svg v-if="stats.status === 'inactive'" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <svg v-if="stats.status === 'paused'" fill="none" stroke="currentColor"  viewBox="0 0 24 24" class="h-6 w-6 text-white">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
+                            <svg stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="h-6 w-6 text-white" v-html="symbols[stats.status]"></svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
@@ -100,7 +89,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-4 sm:px-6">
                     <div class="text-sm leading-5">
-                        <a :href="route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
+                        <a :href="$route('horizon.index')" class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150">
                             View all
                         </a>
                     </div>
@@ -116,7 +105,12 @@
         data() {
             return {
                 stats: {},
-                timer: ''
+                timer: '',
+                symbols: {
+                    'running'   : '<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                    'inactive'  : '<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>',
+                    'paused'    : '<path d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                }
             }
         },
         mounted() {

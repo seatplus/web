@@ -4,7 +4,7 @@
             <WideListElement
                 v-for="(entry,index) in this.entries"
                 :key="entry.selectedEntity.id"
-                :url="route('edit.scopes.settings', entry.selectedEntity.id)"
+                :url="$route('edit.scopes.settings', entry.selectedEntity.id)"
                 :class="{'border-t border-gray-200': index >0}"
             >
                 <template v-slot:avatar>
@@ -21,7 +21,7 @@
                 </template>
             </WideListElement>
             <li>
-                <inertia-link :href="this.route('view.create.scopes')" :class="['block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out', {'border-t border-gray-200': this.entries.length > 0 }]">
+                <inertia-link :href="$route('view.create.scopes')" :class="['block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out', {'border-t border-gray-200': this.entries.length > 0 }]">
                     <div class="flex items-center px-4 py-4 sm:px-6">
                         <div class="min-w-0 flex-1 flex items-center">
                             <div class="flex overflow-x-visible">
@@ -40,54 +40,6 @@
                 </inertia-link>
             </li>
         </ul>
-        <!--<table class="table table-hover">
-            <tbody>
-            <tr v-for="entry in this.entries">
-                <td><eve-image :object="entry.selectedEntity" :size="32" /></td>
-                <td>{{entry.selectedEntity.name}}</td>
-                <td>
-                    <b-badge v-for="scope in flatEntryScopes(entry)" variant="info" :key="scope.id" class="mr-1">{{scope.scope}} </b-badge>
-                </td>
-                <td>
-                    <div class="btn-group">
-                        <inertia-link class="btn btn-primary" :href="route('settings.scopes',entry.selectedEntity.id)">Update</inertia-link>
-                        <inertia-link class="btn btn-danger" method="delete" :href="route('delete.settings.scopes',entry.selectedEntity.id)">Delete</inertia-link>
-                    </div>
-
-                </td>
-
-            </tr>
-            </tbody>
-        </table>
-        <div class="d-flex justify-content-center">
-            <b-button @click="resetAndOpen" >Create scope settings</b-button>
-
-            <b-modal v-model="open" :title="selectedCorpOrAlliance ? selectedCorpOrAlliance.name + ' Scope Settings' : 'Scope Settings'" size="lg" scrollable>
-                <div class=" my-4 d-flex justify-content-around">
-                    <div class="flex-fill">
-                        <scope-checkbox :flavours="this.charFlavours" type="Character"
-                                        @selected-scopes="updateCharacterScopes"
-                                        :selected-flavours="this.selectedScopes.character"/>
-                    </div>
-                    <div class="flex-fill">
-                        <scope-checkbox :flavours="this.corpFlavours" type="Corporation"
-                                        @selected-scopes="updateCorporationScopes"
-                                        :selected-flavours="this.selectedScopes.corporation"/>
-                    </div>
-                </div>
-                <b-form-group v-if="creating" label="Search the corporation or alliance that the scope should be applied for" description="you might need to delete a sign to see the found results" >
-                    <search-corp-or-alliance @selected-corp-or-alliance="updateSelectedCorpOrAlliance"/>
-                </b-form-group>
-
-                <template v-slot:modal-footer="{ ok, cancel}">
-
-                    <inertia-link method="post" class="btn btn-primary" @click="ok()" :href="route('updateOrCreate.settings.scopes')" :data="{selectedScopes, selectedCorpOrAlliance}">
-                        Create
-                    </inertia-link>
-                </template>
-
-            </b-modal>
-        </div>-->
     </Settings>
 
 </template>
