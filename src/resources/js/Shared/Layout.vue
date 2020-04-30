@@ -2,66 +2,55 @@
     <!--TODO: Include Alert Component-->
 
     <div class="h-screen flex overflow-hidden bg-gray-100" @keydown.window.escape="sidebarOpen = false">
+
         <!-- Off-canvas menu for mobile -->
-        <!--<div class="md:hidden">
-            <div @click="sidebarOpen = false" class="fixed inset-0 z-30 bg-gray-600 opacity-0 pointer-events-none transition-opacity ease-linear duration-300" :class="{'opacity-75 pointer-events-auto': sidebarOpen, 'opacity-0 pointer-events-none': !sidebarOpen}"></div>
-            <div class="fixed inset-y-0 left-0 flex flex-col z-40 max-w-xs w-full bg-gray-800 transform ease-in-out duration-300 " :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}">
-                <div class="absolute top-0 right-0 -mr-14 p-1">
-                    <button v-show="sidebarOpen" @click="sidebarOpen = false" class="flex items-center justify-center h-12 w-12 rounded-full focus:outline-none focus:bg-gray-600">
-                        <svg class="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="flex-shrink-0 flex items-center h-16 px-4 bg-gray-900">
-                    <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus" />
-
-                </div>
-                <div class="flex-1 h-0 overflow-y-auto">
-                    <sidebar :active-entry-url="getActiveSidebarElement()"/>
-                </div>
-            </div>
-        </div>-->
-        <div v-show="sidebarOpen" class="md:hidden">
-            <transition
-                enter-class="opacity-0"
-                enter-to-class="opacity-100"
-                leave-class="opacity-100"
-                leave-to-class="opacity-0"
-                >
-                <div @click="sidebarOpen = false" v-show="sidebarOpen"  class="fixed inset-0 z-30 transition-opacity ease-linear duration-300">
-                    <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
-                </div>
-            </transition>
-            <div class="fixed inset-0 flex z-40">
-                <transition
-                    enter-class="-translate-x-full"
-                    enter-to-class="translate-x-0"
-                    leave-class="translate-x-0"
-                    leave-to-class="-translate-x-full"
-                >
-                    <div v-show="sidebarOpen"  class="flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-800 transform ease-in-out duration-300 ">
-                        <div class="absolute top-0 right-0 -mr-14 p-1">
-                            <button v-show="sidebarOpen" @click="sidebarOpen = false" class="flex items-center justify-center h-12 w-12 rounded-full focus:outline-none focus:bg-gray-600">
-                                <svg class="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
+        <transition leave-active-class="duration-300">
+            <div v-show="sidebarOpen" class="md:hidden">
+                <div class="fixed inset-0 flex z-40">
+                    <transition
+                        enter-active-class="transition-opacity ease-linear duration-300"
+                        enter-class="opacity-0"
+                        enter-to-class="opacity-100"
+                        leave-active-class="transition-opacity ease-linear duration-300"
+                        leave-class="opacity-100"
+                        leave-to-class="opacity-0"
+                    >
+                        <div @click="sidebarOpen = false" v-show="sidebarOpen" class="fixed inset-0">
+                            <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
                         </div>
-                        <div class="flex-shrink-0 flex items-center px-4">
-                            <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus" />
+                    </transition>
+                    <transition
+                        enter-active-class="transition ease-in-out duration-300 transform"
+                        enter-class="-translate-x-full"
+                        enter-to-class="translate-x-0"
+                        leave-active-class="transition ease-in-out duration-300 transform"
+                        leave-class="translate-x-0"
+                        leave-to-class="-translate-x-full"
+                    >
+                        <div v-show="sidebarOpen"  class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-800">
+                            <div class="absolute top-0 right-0 -mr-14 p-1">
+                                <button v-show="sidebarOpen" @click="sidebarOpen = false" class="flex items-center justify-center h-12 w-12 rounded-full focus:outline-none focus:bg-gray-600" aria-label="Close sidebar">
+                                    <svg class="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="flex-shrink-0 flex items-center px-4">
+                                <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus"  />
+                            </div>
+                            <div class="mt-5 flex-1 h-0 overflow-y-auto">
+                                <sidebar :active-entry-url="getActiveSidebarElement()"/>
+                            </div>
                         </div>
-                        <div class="mt-5 flex-1 h-0 overflow-y-auto">
-                            <sidebar :active-entry-url="getActiveSidebarElement()"/>
-                        </div>
+                    </transition>
+                    <div class="flex-shrink-0 w-14">
+                        <!-- Dummy element to force sidebar to shrink to fit close icon -->
                     </div>
-                </transition>
-
-                <div class="flex-shrink-0 w-14">
-                    <!-- Force sidebar to shrink to fit close icon -->
                 </div>
             </div>
-        </div>
+        </transition>
+
+
 
         <!-- Static sidebar for desktop -->
         <div class="hidden md:flex md:flex-shrink-0">
