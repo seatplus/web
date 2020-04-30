@@ -154,7 +154,9 @@
                 </div>-->
 
             </main>
-            <slot name="modal" />
+            <transition leave-active-class="duration-300">
+                <slot name="modal" />
+            </transition>
         </div>
     </div>
 
