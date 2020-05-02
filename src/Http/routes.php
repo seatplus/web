@@ -44,6 +44,9 @@ Route::middleware('web')
                     ->group(function () {
                         include __DIR__ . '/Routes/Configuration/Configuration.php';
                         include __DIR__ . '/Routes/Configuration/UserSettings.php';
+                        Route::middleware(['permission:superuser'])->group(function () {
+                            include __DIR__ . '/Routes/Configuration/Schedules.php';
+                        });
                     });
 
                 Route::prefix('character')
