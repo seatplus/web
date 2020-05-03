@@ -199,6 +199,10 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/config/web.settings.php', 'web.settings'
         );
 
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.cronExpressions.php', 'web.cronExpressions'
+        );
+
     }
 
     private function addCommands()

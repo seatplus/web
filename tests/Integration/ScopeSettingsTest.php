@@ -4,7 +4,6 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use Illuminate\Support\Facades\Bus;
 use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
