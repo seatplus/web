@@ -41,19 +41,19 @@
             </div>
         </div>
 
-        <wide-lists v-for="(location_assets, location_id) in this.groupedAssets" :key="location_id">
+        <wide-lists v-for="location in this.groupedAssets" :key="location.location_id">
             <template v-slot:header>
                 <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        {{ location_assets[0]['location'] ? location_assets[0]['location']['locatable']['name'] : "Unknown Structure" + (location_assets[0]['location_id'])}}
+                        {{ location.location }}
                     </h3>
                     <p class="mt-1 text-sm leading-5 text-gray-500">
-                        {{getLocationsVolume(location_assets)}} volume and {{getLoationsItemsCount(location_assets)}} items
+                        {{getLocationsVolume(location.assets)}} volume and {{getLoationsItemsCount(location.assets)}} items
                     </p>
                 </div>
             </template>
             <template v-slot:elements>
-                <wide-list-element v-for="(asset, index) in location_assets" :key="asset.item_id" :url="url(asset)" :class="{'border-t border-gray-200': index >0}">
+                <wide-list-element v-for="asset in location.assets" :key="asset.item_id" :url="url(asset)" >
                     <template v-slot:avatar>
                         <span class="inline-block relative">
                             <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
@@ -135,7 +135,7 @@
             getLocationsVolume(location_assets) {
 
                 function volume(object) {
-                    return object.quantity * object.type.volume;
+                    return object.type.volume ? object.quantity * object.type.volume : 0;
                 }
 
                 const  { prefix } = require('metric-prefix')
@@ -219,7 +219,19 @@
                 return Number(this.buildSearchParams().get('region_id'));
             },
             groupedAssets() {
-                return  _.groupBy(this.assets.data, 'location_id')
+                return  _.map(_.groupBy(this.assets.data, 'location_id'), (value, prop) => (
+                    {
+                        location_id: _.toInteger(prop),
+                        location: value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,
+                        assets: _.map(value, function(asset) {
+
+                            asset.type =  asset.type ?? { type_id: asset.type_id, name: '', group: { name: '' }}
+                            asset.type.group = asset.type.group ?? { name: '' }
+
+                            return asset
+                        }),
+                    }
+                ))
             }
         },
         watch: {
