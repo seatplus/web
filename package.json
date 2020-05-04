@@ -41,7 +41,7 @@
         "metric-prefix": "^0.9.0",
         "moxios": "^0.4.0",
         "sweetalert2": "^9.10.12",
-        "tailwindcss": "^1.3.0",
+        "tailwindcss": "^1.4.4",
         "uuid": "^7.0.3",
         "vue-multiselect": "^2.1.6"
     }
