@@ -30,7 +30,7 @@
     "seatplus/eveapi": "^0.1.0",
     "seatplus/auth": "^0.1.0",
     "inertiajs/inertia-laravel": "^0.2.4",
-    "tightenco/ziggy": "^0.8.0",
+    "tightenco/ziggy": "^0.9.2",
     "thepinecode/i18n": "^0.7.0",
     "spatie/laravel-permission": "^3.0"
   },
