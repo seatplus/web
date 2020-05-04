@@ -49,8 +49,7 @@ class AssetsController extends Controller
         $character_id = $request->has('character_id') ? $validatedData['character_id'] : null;
 
         $query = CharacterAsset::Affiliated($character_id)
-            //TODO get rid of with
-            ->with('location.locatable', 'owner', 'type')
+            ->with('location','location.locatable', 'owner', 'type', 'type.group', 'content')
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->orderBy('location_id', 'desc');
 
@@ -90,6 +89,7 @@ class AssetsController extends Controller
     public function details(int $item_id)
     {
         $query = CharacterAsset::Affiliated()
+            ->with('type', 'type.group', 'content', 'content.type', 'content.type.group')
             ->where('item_id', $item_id);
 
         $assets = CharacterAssetResource::collection(
