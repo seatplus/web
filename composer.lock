@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "2aea996fc2f60f2fb2006f9ea09a5e6f",
@@ -1833,16 +1833,16 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.1.1",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "808d71c0a945b36270f97737da8b2f107e91fad1"
+                "reference": "6129738ec2dd01af8756e784028de31226285ee3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/808d71c0a945b36270f97737da8b2f107e91fad1",
-                "reference": "808d71c0a945b36270f97737da8b2f107e91fad1",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/6129738ec2dd01af8756e784028de31226285ee3",
+                "reference": "6129738ec2dd01af8756e784028de31226285ee3",
                 "shasum": ""
             },
             "require": {
@@ -1850,9 +1850,7 @@
                 "laravel/framework": "^6.0",
                 "laravel/horizon": "^3.2",
                 "php": "^7.4",
-                "seatplus/auth": "^0.1.0",
-                "seatplus/eseye": "^2.0",
-                "spatie/laravel-queueable-action": "^2.1"
+                "seatplus/eseye": "^2.0"
             },
             "require-dev": {
                 "barryvdh/laravel-ide-helper": "^2.6",
@@ -1885,7 +1883,7 @@
                 }
             ],
             "description": "API for receiving information from esi",
-            "time": "2020-04-26T19:44:18+00:00"
+            "time": "2020-05-04T21:25:33+00:00"
         },
         {
             "name": "spatie/laravel-permission",
@@ -1954,80 +1952,6 @@
                 "spatie"
             ],
             "time": "2020-03-03T21:31:02+00:00"
-        },
-        {
-            "name": "spatie/laravel-queueable-action",
-            "version": "2.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-queueable-action.git",
-                "reference": "629f7234c394f3422d5bb8022121e0c88fbb6f94"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-queueable-action/zipball/629f7234c394f3422d5bb8022121e0c88fbb6f94",
-                "reference": "629f7234c394f3422d5bb8022121e0c88fbb6f94",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^6.0|^7.0",
-                "php": "^7.2"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.2",
-                "orchestra/testbench": "^4.0|^5.0",
-                "phpunit/phpunit": "^8.4"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Spatie\\QueueableAction\\QueueableActionServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Spatie\\QueueableAction\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Brent Roose",
-                    "email": "brent@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Alex Vanderbist",
-                    "email": "alex@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Sebastian De Deyne",
-                    "email": "sebastian@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
-                    "homepage": "https://spatie.be",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Queueable action support in Laravel",
-            "homepage": "https://github.com/spatie/laravel-queueable-action",
-            "keywords": [
-                "laravel-queueable-action",
-                "spatie"
-            ],
-            "time": "2020-03-03T14:51:13+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
