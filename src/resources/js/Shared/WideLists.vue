@@ -1,7 +1,7 @@
 <template>
     <div class="bg-white shadow overflow-hidden sm:rounded-md rounded-lg mb-3">
         <slot name="header" />
-        <ul>
+        <ul class="divide-y divide-gray-200">
             <slot name="elements" />
         </ul>
         <slot name="footer" />

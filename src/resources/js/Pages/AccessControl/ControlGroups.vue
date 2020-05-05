@@ -1,75 +1,5 @@
 <template>
     <Layout page="Access Control" page-description="Overview">
-        <!--<div class="container-fluid">
-            <b-card>
-                <b-row>
-
-                    <b-col md="9">
-                        <b-form-group label="Search for a group">
-                            <b-form-input placeholder="Search"/>
-                        </b-form-group>
-                    </b-col>
-
-                    <b-col md="3">
-                        <b-form-group label="Create a group">
-                            <b-button block variant="primary" @click="create">
-                                Create
-                            </b-button>
-                        </b-form-group>
-                    </b-col>
-
-                </b-row>
-            </b-card>
-
-            <b-card>
-                <div class="d-flex flex-row justify-content-around" v-for="roles in chunkedRoles">
-                    <b-card bg-variant="light"  v-for="role in roles" :key="role.id" class="flex-fill">
-
-                        <b-card-title>
-                            {{role.name}}
-                        </b-card-title>
-
-                        <b-card-text>Members</b-card-text>
-
-                        <b-button-group>
-                            <inertia-link :href="route('acl.join')"
-                                          class="btn btn-success"
-                                          method="post"
-                                          :data="{ role_id: role.id }"
-                            >
-                                Join
-                            </inertia-link>
-                            <inertia-link :href="route('acl.manage', role.id)" class="btn btn-warning">
-                                Manage Members
-                            </inertia-link>
-                        </b-button-group>
-
-
-                        <b-button-group class="float-right">
-                            <inertia-link :href="route('acl.edit', role.id)" class="btn btn-primary">
-                                Edit
-                            </inertia-link>
-                            <inertia-link
-                                :href="route('acl.delete')"
-                                method="delete"
-                                :data="{ role_id: role.id }"
-                                class="btn btn-danger"
-                            >
-                                Delete
-                            </inertia-link>
-                        </b-button-group>
-
-                    </b-card>
-                </div>
-                <b-row>
-                    <span v-if="hasNoRoles"> No control groups has been created. Go ahead create one! </span>
-                    &lt;!&ndash;<b-col md="4" v-for="role in this.roles.data" :key="role.id">
-
-                    </b-col>&ndash;&gt;
-                </b-row>
-            </b-card>
-
-        </div>-->
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <!--Header-->
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
@@ -126,14 +56,14 @@
                                     <DropdownWithIcons :index="index"  v-on:change="toggleHelperRow" >
                                         <div class="rounded-md bg-white shadow-xs">
                                             <div class="py-1">
-                                                <inertia-link :href="route('acl.edit', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                                                <inertia-link :href="$route('acl.edit', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
                                                     <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
                                                         <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
                                                     </svg>
                                                     Edit
                                                 </inertia-link>
-                                                <inertia-link :href="route('acl.manage', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
+                                                <inertia-link :href="$route('acl.manage', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
                                                     <svg fill="currentColor" viewBox="0 0 20 20" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">
                                                         <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
                                                     </svg>
@@ -149,7 +79,7 @@
                                             <div class="border-t border-gray-100"></div>
                                             <div class="py-1">
                                                 <inertia-link
-                                                    :href="route('acl.delete')" method="delete" :data="{ role_id: role.id }"
+                                                    :href="$route('acl.delete')" method="delete" :data="{ role_id: role.id }"
                                                     class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
                                                 >
                                                     <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">

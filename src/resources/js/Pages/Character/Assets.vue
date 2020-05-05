@@ -41,19 +41,19 @@
             </div>
         </div>
 
-        <wide-lists v-for="(location_assets, location_id) in this.groupedAssets" :key="location_id">
+        <wide-lists v-for="location in this.groupedAssets" :key="location.location_id">
             <template v-slot:header>
                 <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        {{ location_assets[0]['location'] ? location_assets[0]['location']['locatable']['name'] : "Unknown Structure" + (location_assets[0]['location_id'])}}
+                        {{ location.location }}
                     </h3>
                     <p class="mt-1 text-sm leading-5 text-gray-500">
-                        {{getLocationsVolume(location_assets)}} volume and {{getLoationsItemsCount(location_assets)}} items
+                        {{getLocationsVolume(location.assets)}} volume and {{getLoationsItemsCount(location.assets)}} items
                     </p>
                 </div>
             </template>
             <template v-slot:elements>
-                <wide-list-element v-for="(asset, index) in location_assets" :key="asset.item_id" :url="url(asset)" :class="{'border-t border-gray-200': index >0}">
+                <wide-list-element v-for="asset in location.assets" :key="asset.item_id" :url="url(asset)" >
                     <template v-slot:avatar>
                         <span class="inline-block relative">
                             <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
@@ -84,7 +84,7 @@
                     </template>
 
                     <template slot="navigation">
-                        <inertia-link :href="route('character.item', asset.item_id)" >
+                        <inertia-link :href="$route('character.item', asset.item_id)" >
                             <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -102,7 +102,6 @@
 <script>
     import Layout from "../../Shared/Layout"
     import EveImage from "../../Shared/EveImage"
-    import AssetButton from "./AssetButton"
     import Pagination from "../../Shared/Pagination"
     import CharacterDropdown from "../../Shared/CharacterDropdown"
     import {Inertia} from '@inertiajs/inertia'
@@ -114,7 +113,7 @@
         name: "Assets",
         components: {
             WideListElement,
-            WideLists, Layout, EveImage, AssetButton, Pagination, CharacterDropdown, RegionDropdown},
+            WideLists, Layout, EveImage, Pagination, CharacterDropdown, RegionDropdown},
         props: {
             assets: Object,
             filters: Object,
@@ -136,7 +135,7 @@
             getLocationsVolume(location_assets) {
 
                 function volume(object) {
-                    return object.quantity * object.type.volume;
+                    return object.type.volume ? object.quantity * object.type.volume : 0;
                 }
 
                 const  { prefix } = require('metric-prefix')
@@ -190,7 +189,7 @@
                 })
             },
             url(asset) {
-                return asset.content[0] ? route('character.item', asset.item_id) : '#'
+                return asset.content[0] ? this.$route('character.item', asset.item_id) : '#'
             }
         },
         updated: function() {
@@ -220,7 +219,19 @@
                 return Number(this.buildSearchParams().get('region_id'));
             },
             groupedAssets() {
-                return  _.groupBy(this.assets.data, 'location_id')
+                return  _.map(_.groupBy(this.assets.data, 'location_id'), (value, prop) => (
+                    {
+                        location_id: _.toInteger(prop),
+                        location: value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,
+                        assets: _.map(value, function(asset) {
+
+                            asset.type =  asset.type ?? { type_id: asset.type_id, name: '', group: { name: '' }}
+                            asset.type.group = asset.type.group ?? { name: '' }
+
+                            return asset
+                        }),
+                    }
+                ))
             }
         },
         watch: {

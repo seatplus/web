@@ -1,9 +1,9 @@
 <template>
-    <Layout :page="!this.entity ? 'Create ': 'Edit ' + 'Scope Settings'" :active-sidebar-element="this.route('server.settings').url()">
+    <Layout :page="creationMode ? 'Create ': 'Edit ' + 'Scope Settings'" :active-sidebar-element="$route('server.settings')">
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <!-- Content goes here -->
-                <SearchCorpOrAlliance v-if="!this.entity" @entities="setSelectedEntities" :error="this.$page.errors.selectedEntities"/>
+                <SearchCorpOrAlliance v-if="creationMode" @entities="setSelectedEntities" :error="this.$page.errors.selectedEntities"/>
                 <h3 v-else class="text-lg leading-6 font-medium text-gray-900 inline-flex items-center">
                     <eve-image :size="128" tailwind_class="h-12 w12 rounded-full" :object="this.object" />
                     <span class="ml-4">{{ this.object.name }}</span>
@@ -33,11 +33,11 @@
             <div class="bg-gray-50 px-4 py-4 sm:px-6 text-right">
                 <!-- Content goes here -->
                 <span class="flex-1 flex justify-between">
-                    <inertia-link :href="this.route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
+                    <inertia-link v-if="!this.entity" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
                         Delete
                     </inertia-link>
 
-                    <inertia-link :href="this.route('create.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes, selectedEntities: this.selectedEntities}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                    <inertia-link :href="$route('create.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes, selectedEntities: this.selectedEntities}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
                         Save
                     </inertia-link>
                 </span>
@@ -67,7 +67,7 @@
             entity: {
                 type: Object,
                 required: false,
-                default: {}
+                default: function () {return {}}
             }
         },
         data() {
@@ -106,7 +106,14 @@
             selectedScopes() {
                 return _.union(this.selectedCharacterScopes, this.selectedCorporationScopes, this.available_scopes.minimum)
             },
+            creationMode() {
+                return _.isEmpty(this.entity);
+            },
             object() {
+
+                if(_.isUndefined(this.entity.morphable))
+                    return {}
+
                 const object =  {
                     name: this.entity.morphable.name
                 }

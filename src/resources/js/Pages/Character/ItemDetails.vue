@@ -2,11 +2,8 @@
 
     <Layout page="Item Details">
         <wide-lists>
-            <!--<template v-slot:header>
-
-            </template>-->
             <template v-slot:elements>
-                <wide-list-element v-for="(asset, index) in contents" :key="asset.item_id" :url="url(asset)" :class="{'border-t border-gray-200': index >0}">
+                <wide-list-element v-for="(asset, index) in contents" :key="asset.item_id" :url="url(asset)">
                     <template v-slot:avatar>
                         <span class="inline-block relative">
                             <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
@@ -36,8 +33,8 @@
                     </template>
 
                     <template slot="navigaton">
-                        <inertia-link :href="route('character.item', asset.item_id)" >
-                            <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
+                        <inertia-link :href="$route('character.item', asset.item_id)" >
+                            <svg :class="[{'text-gray-400' : asset.content, 'text-transparent' : !asset.content},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
                             </svg>
                         </inertia-link>
@@ -68,8 +65,19 @@
           },
       },
       computed: {
+            contentsOld() {
+                return _.head(this.assets.data).content
+            },
         contents() {
-            return _.head(this.assets.data).content
+            return _.map(_.head(this.assets.data).content,  function(asset) {
+
+                    asset.type = asset.type ?? {type_id: asset.type_id, name: '', group: {name: ''}}
+                    asset.type.group = asset.type.group ?? {name: ''}
+
+                    return asset
+                }
+            )
+
         }
       },
       methods: {
@@ -80,7 +88,8 @@
               return prefix(numeric_value, {precision: 3, unit: 'm³'})
           },
           url(asset) {
-              return asset.content[0] ? route('character.item', asset.item_id) : '#'
+
+              return asset.content ? this.$route('character.item', asset.item_id) : '#'
           }
       }
   }
