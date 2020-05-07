@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
     "content-hash": "2aea996fc2f60f2fb2006f9ea09a5e6f",
@@ -1730,16 +1730,16 @@
         },
         {
             "name": "seatplus/auth",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "8647549b6f76bd0005a572c3690d8d8cbccbe8db"
+                "reference": "cf68dd0254e1ba6dc6cb3487fe02a0785e9d2aa4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/8647549b6f76bd0005a572c3690d8d8cbccbe8db",
-                "reference": "8647549b6f76bd0005a572c3690d8d8cbccbe8db",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/cf68dd0254e1ba6dc6cb3487fe02a0785e9d2aa4",
+                "reference": "cf68dd0254e1ba6dc6cb3487fe02a0785e9d2aa4",
                 "shasum": ""
             },
             "require": {
@@ -1778,7 +1778,7 @@
                 }
             ],
             "description": "SeAT plus package that handles authentication agnostic to SeAT plus usage as pure API or Web",
-            "time": "2020-04-25T11:47:11+00:00"
+            "time": "2020-05-07T04:56:30+00:00"
         },
         {
             "name": "seatplus/eseye",
