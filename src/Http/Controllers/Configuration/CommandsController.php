@@ -31,7 +31,6 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class CommandsController extends Controller
 {
-
     public function clear()
     {
 
