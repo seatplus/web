@@ -1,24 +1,5 @@
 <template>
     <div>
-        <!--<b-alert :show="isShown()" variant="info" dismissible>
-            <h4 class="alert-heading">Missing Scopes</h4>
-            <span>Some characters are missing some scopes on their refresh_token for seatplus to fetch information from esi.</span>
-
-                    <span class="d-flex flex-row" v-for="character in characters">
-                        <div class="p-2"><EveImage :object="character" :size="32" /></div>
-                        <div class="p-2 align-self-center">{{character.name}}</div>
-                        <div class="p-2 align-self-center">{{ getMissingText(character.missing_scopes) }}</div>
-                        <div class="p-2 align-self-center flex-self-end">
-                            <b-link :href="route('auth.eve', {
-                                character_id: character.character_id,
-                                add_scopes: getMissingScopeString(character.missing_scopes)
-                            })">
-                                <b-button variant="primary">Add missing scopes</b-button>
-                            </b-link>
-                        </div>
-                    </span>
-
-        </b-alert>-->
         <div class="bg-yellow-100 shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg leading-6 font-medium text-yellow-900">
@@ -44,7 +25,7 @@
                         </div>
                         <div class="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
                             <span class="inline-flex rounded-md shadow-sm">
-                                <a :href="route('auth.eve', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                <a :href="$route('auth.eve', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                     Fix
                                 </a>
                             </span>
