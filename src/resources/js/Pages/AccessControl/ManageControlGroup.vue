@@ -94,18 +94,7 @@
                     </multiselect>
                 </b-card-text>
 
-                <inertia-link method="post" :href="route().url()" :data="{selectedValues}" class="btn btn-success">Update</inertia-link>
-                <!--<multiselect v-model="selectedValues" :options="users.data" placeholder="Search or add a tag" :multiple="true" >
-                    <template slot="tag" slot-scope="{ option, remove }">
-                        <span class="custom__tag">{{option.id}}</span>
-                    </template>
-                    <template slot="option" slot-scope="props">
-                        <div class="option__desc">
-                            <span class="option__title">{{ props.option.main_character.name }}</span>
-                            <span class="option__small">derp {{ props.option.main_character.gender }}</span>
-                        </div>
-                    </template>
-                </multiselect>-->
+                <inertia-link method="post" :href="$route().url()" :data="{selectedValues}" class="btn btn-success">Update</inertia-link>
             </b-card>
 
         </div>

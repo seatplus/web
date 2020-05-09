@@ -54,7 +54,5 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
         return Inertia::render('Auth/MissingRequiredScopes', [
             'characters' => $missing_character,
         ]);
-
-        //TODO Build view.
     }
 }
