@@ -1,5 +1,5 @@
 <template>
-    <Layout page-header="Edit" :page-description="this.role.name" :active-sidebar-element="$route('acl.groups')">
+    <Layout :page="'Edit ' + role.name" :active-sidebar-element="activeSidebarElement">
         <div class="container-fluid">
             <b-card no-body>
                 <b-tabs v-model="tabIndex" pills card>
@@ -131,6 +131,11 @@
         methods: {
             hasOtherCharacters() {
                 return ! _.isEmpty(option.characters)
+            }
+        },
+        computed: {
+            activeSidebarElement: function () {
+                return route('acl.groups').url()
             }
         }
     }
