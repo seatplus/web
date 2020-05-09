@@ -1,5 +1,5 @@
 <template>
-    <Layout page-header="Edit" :page-description="this.role.name" :active-sidebar-element="route('acl.groups')">
+    <Layout page-header="Edit" :page-description="this.role.name" :active-sidebar-element="$route('acl.groups')">
         <div class="container-fluid">
             <b-card no-body>
                 <b-tabs v-model="tabIndex" pills card>
@@ -94,7 +94,7 @@
                     </multiselect>
                 </b-card-text>
 
-                <inertia-link method="post" :href="$route().url()" :data="{selectedValues}" class="btn btn-success">Update</inertia-link>
+                <inertia-link method="post" :href="$route('acl.manage.update',role.id)" :data="{selectedValues}" class="btn btn-success">Update</inertia-link>
             </b-card>
 
         </div>
@@ -111,7 +111,6 @@
         components: {Layout, Multiselect, EveImage},
         props: {
             role: {
-                type: Array,
                 required: true
             },
             users: {
