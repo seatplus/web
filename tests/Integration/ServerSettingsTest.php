@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Tests\TestCase;
@@ -45,7 +46,7 @@ class ServerSettingsTest extends TestCase
     /** @test */
     public function one_can_impersionate()
     {
-        $user_two = factory(User::class)->create();
+        $user_two = Event::fakeFor(fn() => factory(User::class)->create()) ;
 
         $response = $this->actingAs($this->test_user)
             ->get(route('impersonate.start', $user_two->id));
@@ -56,7 +57,7 @@ class ServerSettingsTest extends TestCase
     /** @test */
     public function one_can_stop_impersionate()
     {
-        $user_two = factory(User::class)->create();
+        $user_two = Event::fakeFor(fn() => factory(User::class)->create()) ;
 
        $this->actingAs($this->test_user)
             ->get(route('impersonate.start', $user_two->id));

@@ -71,7 +71,7 @@ class ManageControlGroupMembersController
 
         return redirect()
             ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
-            ->with('Success', 'Control Group updated');
+            ->with('success', 'Control Group updated');
 
     }
 

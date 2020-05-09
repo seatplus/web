@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Web\Tests\TestCase;
 
@@ -22,7 +23,7 @@ class UserSettingsTest extends TestCase
     /** @test */
     public function one_can_update_main_character()
     {
-        $secondary_character = factory(CharacterUser::class)->make();
+        $secondary_character = Event::fakeFor(fn() => factory(CharacterUser::class)->make());
 
         $this->test_user->character_users()->save($secondary_character);
 

@@ -90,11 +90,9 @@ class AssetsController extends Controller
     {
         $query = CharacterAsset::Affiliated()
             ->with('type', 'type.group', 'content', 'content.type', 'content.type.group')
-            ->where('item_id', $item_id);
+            ->where('location_id', $item_id);
 
-        $assets = CharacterAssetResource::collection(
-            $query->paginate()
-        );
+        $assets = CharacterAssetResource::collection($query->get());
 
         return Inertia::render('Character/ItemDetails', [
             'assets' => $assets,
