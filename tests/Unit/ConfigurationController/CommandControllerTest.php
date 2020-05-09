@@ -31,9 +31,7 @@ class CommandControllerTest extends TestCase
         $this->app->make(PermissionRegistrar::class)->registerPermissions();
 
         $response = $this->actingAs($this->test_user)
-            ->post($route);
-
-        dd($response->exception->getMessage());
+            ->post($route)->assertOk();
 
         $this->assertNotEquals('value', cache('key'));
 

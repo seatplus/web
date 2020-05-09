@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use Illuminate\Support\Facades\Event;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
@@ -30,7 +31,10 @@ abstract class TestCase extends OrchestraTestCase
         // setup factories
         $this->withFactories(__DIR__ . '/database/factories');
 
-        $this->test_user = factory(User::class)->create();
+
+        $this->test_user = Event::fakeFor(function () {
+            return factory(User::class)->create();
+        });
 
         $this->test_character = $this->test_user->main_character;
 
