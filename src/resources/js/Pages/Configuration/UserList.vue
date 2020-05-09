@@ -1,7 +1,7 @@
 <template>
     <Settings :layout-object="this.layoutObject">
         <ul>
-            <WideListElement v-for="user in this.users.data" :key="user.id" url="#">
+            <WideListElement v-for="user in this.users.data" :key="user.id" :url="$route('impersonate.start', user.id)">
                 <template v-slot:avatar>
                     <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="user.main_character" :size="128"/>
                 </template>

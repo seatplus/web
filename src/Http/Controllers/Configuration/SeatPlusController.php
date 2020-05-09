@@ -72,7 +72,7 @@ class SeatPlusController extends Controller
         // Clear the session value
         session()->forget('impersonation_origin');
 
-        return back()->with('success', 'Stopped Impersonate');
+        return redirect()->route('server.settings')->with('success', 'Stopped Impersonate');
     }
 
     public function impersonate($user_id)

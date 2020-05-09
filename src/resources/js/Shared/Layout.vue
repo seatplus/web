@@ -115,6 +115,8 @@
                     <!-- /End replace -->
                 </div>
 
+                <ImpersonatingBanner v-if="$page.user.data.impersonating" />
+
                 <!--<div class="fixed bottom-0 inset-x-0 pb-2 sm:pb-5">
                     <div class="max-w-screen-xl mx-auto px-2 sm:px-6 lg:px-8">
                         <div class="p-2 rounded-lg bg-indigo-600 shadow-lg sm:p-3">
@@ -169,11 +171,13 @@
     import Notifications from "./Notifications"
     import NotificationsBell from "./NotificationsBell"
     import Alerts from "./Alerts"
+    import ImpersonatingBanner from "./ImpersonatingBanner"
 
 
     export default {
         name: "Layout",
         components: {
+            ImpersonatingBanner,
             Alerts,
             NotificationsBell,
             Notifications,
