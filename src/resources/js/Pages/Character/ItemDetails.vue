@@ -32,13 +32,10 @@
                         {{getMetricPrefix(asset.quantity * asset.type.volume)}}
                     </template>
 
-                    <template slot="navigaton">
-                        <inertia-link :href="$route('character.item', asset.item_id)" >
-                            <svg :class="[{'text-gray-400' : asset.content, 'text-transparent' : !asset.content},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                        </inertia-link>
-
+                    <template slot="navigation">
+                        <svg :class="[{'text-gray-400' : hasContent(asset.content), 'text-transparent' : !hasContent(asset.content)},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                        </svg>
                     </template>
 
                 </wide-list-element>
@@ -56,7 +53,7 @@
   export default {
         name: "ItemDetails",
       components : {
-        Layout, EveImage, WideLists, WideListElement
+            Layout, EveImage, WideLists, WideListElement
       },
       props: {
           assets: {
@@ -65,20 +62,15 @@
           },
       },
       computed: {
-            contentsOld() {
-                return _.head(this.assets.data).content
-            },
-        contents() {
-            return _.map(_.head(this.assets.data).content,  function(asset) {
+            contents() {
+                return _.map(this.assets.data,  function(asset) {
 
                     asset.type = asset.type ?? {type_id: asset.type_id, name: '', group: {name: ''}}
                     asset.type.group = asset.type.group ?? {name: ''}
 
                     return asset
-                }
-            )
-
-        }
+                })
+            },
       },
       methods: {
           getMetricPrefix(numeric_value) {
@@ -89,7 +81,10 @@
           },
           url(asset) {
 
-              return asset.content ? this.$route('character.item', asset.item_id) : '#'
+              return _.isEmpty(asset.content) ? '#' : this.$route('character.item', asset.item_id)
+          },
+          hasContent(content) {
+              return !_.isEmpty(content)
           }
       }
   }

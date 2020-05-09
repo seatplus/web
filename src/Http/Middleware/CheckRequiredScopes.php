@@ -43,7 +43,7 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
             return [
                 'character_id' => $missing->character->character_id,
                 'name' => $missing->character->name,
-                'corporation' => CharacterInfo::find($missing->character->character_id)->corporation->name,
+                'corporation' => CharacterInfo::find($missing->character->character_id)->corporation->name ?? 'Unknown Corporation',
                 'upgrade_url' => route('auth.eve', [
                     'character_id' => $missing->character->character_id,
                     'add_scopes' => implode(',', $missing->missing_scopes),
