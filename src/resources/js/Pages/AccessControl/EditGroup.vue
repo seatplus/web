@@ -1,5 +1,5 @@
 <template>
-    <Layout page-header="Access Control Groups" page-description="Edit Group" :active-sidebar-element="$route('acl.groups')">
+    <Layout page="Access Control Groups" :active-sidebar-element="activeSidebarElement">
         <b-card>
             <div class="container-fluid">
                 <div class="row">
@@ -174,6 +174,11 @@
           },
           setIsDirty: function () {
               this.isDirty = true
+          }
+      },
+      computed: {
+          activeSidebarElement: function () {
+              return route('acl.groups').url()
           }
       },
       mounted: function () {
