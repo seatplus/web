@@ -33,7 +33,7 @@
             <div class="bg-gray-50 px-4 py-4 sm:px-6 text-right">
                 <!-- Content goes here -->
                 <span class="flex-1 flex justify-between">
-                    <inertia-link v-if="!this.entity" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
+                    <inertia-link v-if="this.entity.morphable_id" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
                         Delete
                     </inertia-link>
 
