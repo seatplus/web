@@ -29,8 +29,6 @@
 </template>
 
 <script>
-    import { createPopper } from '@popperjs/core'
-
     export default {
         name: "DropdownWithIcons",
         props: {

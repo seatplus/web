@@ -99,7 +99,7 @@
 
                 <Alerts />
 
-                <Notifications class="md:mt-16 z-40" />
+                <Notifications class="sm:mt-16 z-40" />
 
                 <div v-if="isMissingRequiredScopes()" class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3">
                     <RequiredScopesWarning :missing_characters_scopes="this.missing_characters_scopes" />

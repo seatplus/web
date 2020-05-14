@@ -23,12 +23,18 @@
     </nav>-->
     <div class="flex items-center justify-between "><!--removed: bg-white px-4 py-3 border-t border-gray-200  -->
         <div class="flex-1 flex justify-between sm:hidden">
-            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+            <inertia-link :href="buildHref(collection.meta.current_page - 1)"
+                          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                          :class="{'text-gray-700 hover:text-gray-500' : !prevDisabled, 'text-gray-400 pointer-events-none' : prevDisabled}"
+            >
                 Previous
-            </a>
-            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+            </inertia-link>
+            <inertia-link :href="buildHref(collection.meta.current_page + 1)"
+                          class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                          :class="{'text-gray-700 hover:text-gray-500' : !nextDisabled, 'text-gray-400 pointer-events-none' : nextDisabled}"
+            >
                 Next
-            </a>
+            </inertia-link>
         </div>
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
@@ -44,7 +50,7 @@
             </div>
             <div>
               <span class="relative z-0 inline-flex shadow-sm">
-                  <inertia-link :disabled="this.prevDisabled" :href="buildHref(1)"
+                  <inertia-link :href="buildHref(1)"
                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
                                 :class="{ 'text-gray-500 hover:text-gray-400': !prevDisabled, 'text-gray-400 pointer-events-none': prevDisabled }">
                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -55,7 +61,7 @@
                     </svg>
                   </inertia-link>
 
-                  <inertia-link :disabled="prevDisabled" :href="buildHref(collection.meta.current_page - 1)"
+                  <inertia-link :href="buildHref(collection.meta.current_page - 1)"
                           class="-ml-px relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
                           :class="{ 'text-gray-500 hover:text-gray-400': !prevDisabled, 'text-gray-400 pointer-events-none': prevDisabled }">
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -73,7 +79,7 @@
                     </inertia-link>
                   </span>
 
-                  <inertia-link  :disabled="nextDisabled" :href="buildHref(collection.meta.current_page + 1)"
+                  <inertia-link :href="buildHref(collection.meta.current_page + 1)"
                           class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md sm:rounded-none border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
                           :class="{ 'text-gray-500 hover:text-gray-400': !nextDisabled, 'text-gray-400 pointer-events-none': nextDisabled}">
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -83,7 +89,7 @@
                     </svg>
                   </inertia-link>
 
-                  <inertia-link   :href="buildHref(collection.meta.last_page)"
+                  <inertia-link  :href="buildHref(collection.meta.last_page)"
                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
                           :class="{ 'text-gray-500 hover:text-gray-400': !nextDisabled, 'text-gray-400 pointer-events-none': nextDisabled }">
                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
