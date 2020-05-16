@@ -47,7 +47,7 @@
                             <tbody>
                             <tr :class="{'bg-white' : index % 2 === 0, 'bg-gray-50': index % 2 !== 0}" ref="tr" v-for="(role, index) in roles.data">
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    {{role.name}} {{index}}
+                                    {{role.name}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
                                     <AvatarGroupBottomTop :objects="getRoleMembers(role.users)" :random="true"/>
