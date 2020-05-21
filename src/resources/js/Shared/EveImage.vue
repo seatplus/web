@@ -6,7 +6,10 @@
         v-b-tooltip.hover :title="this.object.name"
         :alt="this.object.name"
     ></b-img-lazy>-->
-    <img :class="img_class" :src="getImageUrl()" :alt="this.object.name" />
+    <div class="inline-flex items-center font-normal text-gray-500 text-sm leading-5">
+        <img :class="img_class" :src="getImageUrl()" :alt="this.object.name" />
+        <span v-if="showName" class="ml-4">{{ this.object.name }}</span>
+    </div>
 </template>
 
 <script>
@@ -25,6 +28,11 @@
                 type: String,
                 required: false,
                 default: "h-12 w-12 rounded-full"
+            },
+            showName: {
+                type: Boolean,
+                required: false,
+                default: false
             }
         },
         data() {
