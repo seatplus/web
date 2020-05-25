@@ -92,7 +92,7 @@ class AssetsController extends Controller
             $query->paginate()
         );
 
-        $dispatchable_jobs = function (){
+        $dispatchable_jobs = function () {
 
             $job_name = 'character.assets';
             $required_scopes = ['esi-assets.read_assets.v1',  'esi-universe.read_structures.v1'];
@@ -115,16 +115,16 @@ class AssetsController extends Controller
                         return [
                             'character_id' => $character_id,
                             'name' => $character->name,
-                            'job' => cache($cache_key) ? $this->jobs->getJobs([cache($cache_key)])->first() : null
+                            'job' => cache($cache_key) ? $this->jobs->getJobs([cache($cache_key)])->first() : null,
                         ];
-                    })
+                    }),
             ];
         };
 
         return Inertia::render('Character/Assets', [
             'filters' => $filters,
             'assets' => $assets,
-            'dispatchable_jobs' => $dispatchable_jobs
+            'dispatchable_jobs' => $dispatchable_jobs,
         ]);
     }
 
