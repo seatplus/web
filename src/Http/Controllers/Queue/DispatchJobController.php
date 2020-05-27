@@ -16,14 +16,17 @@ class DispatchJobController extends Controller
 
         $refresh_token = RefreshToken::find($job['character_id']);
 
-        $job_id = (new DispatchIndividualUpdate($refresh_token))->execute($job['job']);
-
         $cache_key = sprintf('%s:%s', $job['job'], $job['character_id']);
+
+        if( cache($cache_key) )
+            return redirect()->back()->with('error', 'job was already queued');
+
+
+        $job_id = (new DispatchIndividualUpdate($refresh_token))->execute($job['job']);
 
         cache([$cache_key => $job_id], now()->addHour());
 
         return redirect()->back()->with('success', 'job queued');
-
     }
 
 }
