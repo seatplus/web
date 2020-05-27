@@ -24,13 +24,37 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Queue\DispatchJobController;
-use Seatplus\Web\Http\Controllers\Queue\QueueController;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-Route::get('status', [
-    'as'   => 'horizon.status',
-    'uses' => QueueController::class,
-]);
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-Route::post('job', DispatchJobController::class)->name('dispatch.job');
+class DispatchIndividualJob extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return ! auth()->guest();
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+
+        $jobs = array_keys(config('eveapi.jobs'));
+        $character_ids = auth()->user()->characters->pluck('character_id')->toArray();
+
+        return [
+            'job' => ['required', Rule::in($jobs)],
+            'character_id' => ['required', Rule::in($character_ids)],
+        ];
+    }
+}

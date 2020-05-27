@@ -29,6 +29,8 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Laravel\Horizon\Contracts\JobRepository;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Universe\Region;
@@ -36,6 +38,16 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class AssetsController extends Controller
 {
+    /**
+     * @var \Laravel\Horizon\Contracts\JobRepository
+     */
+    private JobRepository $jobs;
+
+    public function __construct(JobRepository $jobs)
+    {
+        $this->jobs = $jobs;
+    }
+
     public function index(Request $request)
     {
 
@@ -80,9 +92,39 @@ class AssetsController extends Controller
             $query->paginate()
         );
 
+        $dispatchable_jobs = function () {
+
+            $job_name = 'character.assets';
+            $required_scopes = ['esi-assets.read_assets.v1',  'esi-universe.read_structures.v1'];
+
+            return [
+                'required_scopes' => $required_scopes,
+                'job_name' => $job_name,
+                'characters' =>  User::with('characters', 'characters.refresh_token')
+                    ->where('id', auth()->user()->id)
+                    ->first()
+                    ->characters
+                    ->filter(function ($character) use ($required_scopes) {
+                        return sizeof(array_intersect($character->refresh_token->scopes, $required_scopes)) === 2;
+                    })
+                    ->map(function ($character) use ($job_name) {
+
+                        $character_id = $character->character_id;
+                        $cache_key = sprintf('%s:%s', $job_name, $character_id);
+
+                        return [
+                            'character_id' => $character_id,
+                            'name' => $character->name,
+                            'job' => cache($cache_key) ? $this->jobs->getJobs([cache($cache_key)])->first() : null,
+                        ];
+                    }),
+            ];
+        };
+
         return Inertia::render('Character/Assets', [
             'filters' => $filters,
             'assets' => $assets,
+            'dispatchable_jobs' => $dispatchable_jobs,
         ]);
     }
 
