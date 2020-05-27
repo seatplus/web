@@ -25,7 +25,7 @@
                         </div>
                         <div class="mt-4 sm:mt-0 sm:ml-6 sm:flex-shrink-0">
                             <span class="inline-flex rounded-md shadow-sm">
-                                <a :href="$route('auth.eve', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                <a :href="$route('auth.eve.step_up', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
                                     Fix
                                 </a>
                             </span>
@@ -64,7 +64,10 @@ export default {
         },
         getMissingScopeString (missing_scopes) {
             return _.toString(missing_scopes)
-        }
+        },
     },
+    computed: {
+
+    }
 }
 </script>
