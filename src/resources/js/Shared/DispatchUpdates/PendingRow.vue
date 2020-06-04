@@ -17,7 +17,7 @@
 
 <script>
     import Timer from "../Timer"
-    import moment from 'moment'
+    import dayjs from 'dayjs'
 
     export default {
         name: "PendingRow",
@@ -37,7 +37,7 @@
             clearInterval(this.interval)
         },
         mounted() {
-            this.timer = moment().unix()
+            this.timer = dayjs().unix()
         },
         methods: {
             isPending() {
@@ -50,8 +50,6 @@
 
                 if(!this.isPending())
                     return
-
-                console.log('reload fired')
 
                 this.$inertia.reload({
                     method: 'get',

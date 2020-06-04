@@ -3,7 +3,11 @@
 </template>
 
 <script>
-    import moment from 'moment'
+
+    import relativeTime from 'dayjs/plugin/relativeTime'
+    import dayjs from 'dayjs'
+
+    dayjs.extend(relativeTime)
 
     export default {
         name: "Timer",
@@ -14,15 +18,17 @@
             }
         },
         created () {
-            this.getTimeFromNow()
-            setInterval(this.getTimeFromNow, 1000)
+            this.$nextTick(() => {
+                this.getTimeFromNow()
+                setInterval(this.getTimeFromNow, 1000)
+            })
         },
         destroyed () {
             clearInterval(this.getTimeFromNow)
         },
         methods: {
             getTimeFromNow () {
-                this.timeFromNow = moment.unix(this.created).fromNow()
+                this.timeFromNow = dayjs.unix(this.created).fromNow()
             }
         }
     }
