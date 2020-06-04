@@ -21,7 +21,7 @@
         "jsdom-global": "^3.0.2",
         "laravel-mix": "^5.0.4",
         "laravel-mix-copy-watched": "^2.2.4",
-        "mocha": "^6.2.3",
+        "mocha": "^7.2.0",
         "mochapack": "^1.1.15",
         "resolve-url-loader": "^3.1.1",
         "sass": "^1.26.3",
