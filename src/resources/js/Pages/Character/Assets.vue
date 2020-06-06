@@ -12,17 +12,21 @@
                         </div>
 
                         <div class="col-span-6 sm:col-span-3">
-                            <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
+                            <InputGroup for="character_dropdown" label="Character Filter">
+                                <SeatPlusSelect v-model="character" id="character_dropdown">
+                                    <option :value="null">All Characters</option>
+                                    <option v-for="character in filters.owned_characters" :value="character.character_id" :key="character.character_id">{{ character.name }}</option>
+                                </SeatPlusSelect>
+                            </InputGroup>
                         </div>
 
                         <div class="col-span-6 sm:col-span-3">
-                            <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
-                        </div>
-
-                    </div>
-                    <div class="mt-6 border-t border-gray-200">
-                        <div class="mt-6">
-                            <pagination :collection="assets"/>
+                            <InputGroup for="region_dropdown" label="Region Filter">
+                                <SeatPlusSelect v-model="region" id="region_dropdown">
+                                    <option :value="null">All Regions</option>
+                                    <option v-for="region in filters.regions" :value="region.region_id" :key="region.region_id">{{ region.name }}</option>
+                                </SeatPlusSelect>
+                            </InputGroup>
                         </div>
 
                     </div>
@@ -34,7 +38,7 @@
         </div>
 
 
-        <wide-lists v-for="location in this.groupedAssets" :key="location.location_id">
+        <wide-lists v-for="location in groupedAssets" :key="location.location_id">
             <template v-slot:header>
                 <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -46,49 +50,9 @@
                 </div>
             </template>
             <template v-slot:elements>
-                <wide-list-element v-for="asset in location.assets" :key="asset.item_id" :url="url(asset)" >
-                    <template v-slot:avatar>
-                        <span class="inline-block relative">
-                            <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="asset.type" :size="128"/>
-                            <span v-if="asset.quantity > 1" class="absolute bottom-0 right-0 inline-flex items-center justify-center h-3 w-3 rounded-full text-white shadow-solid bg-gray-400">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-indigo-200 text-indigo-600">{{ asset.quantity }}</span>
-                            </span>
-                        </span>
-                        <EveImage v-if="multipleCharacters()" :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'" :object="asset.owner" :size="128" />
-                    </template>
-
-                    <template slot="upper_left">{{asset.name}}</template>
-
-                    <template slot="lower_left">
-                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-                        </svg>
-
-                        <span class="truncate">{{ asset.type.name }}</span>
-                    </template>
-
-                    <template slot="upper_right">{{asset.type.group.name}} <span v-if="!asset.is_singleton" class="text-info">(packaged)</span></template>
-
-                    <template slot="lower_right">
-                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clip-rule="evenodd"></path>
-                        </svg>
-                        {{getMetricPrefix(asset.quantity * asset.type.volume)}}
-                    </template>
-
-                    <template slot="navigation">
-                        <inertia-link :href="$route('character.item', asset.item_id)" >
-                            <svg :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                        </inertia-link>
-
-                    </template>
-
-                </wide-list-element>
+                <ItemList :items="location.assets"></ItemList>
             </template>
         </wide-lists>
-
     </Layout>
 </template>
 
@@ -96,32 +60,75 @@
     import Layout from "../../Shared/Layout"
     import EveImage from "../../Shared/EveImage"
     import Pagination from "../../Shared/Pagination"
-    import CharacterDropdown from "../../Shared/CharacterDropdown"
-    import {Inertia} from '@inertiajs/inertia'
-    import RegionDropdown from "../../Shared/RegionDropdown"
     import WideLists from "../../Shared/WideLists"
     import WideListElement from "../../Shared/WideListElement"
     import DispatchUpdate from "../../Shared/DispatchUpdate"
+    import ItemList from "./ItemList"
+    import InputGroup from "../../Shared/InputGroup"
+    import SeatPlusSelect from "../../Shared/SeatPlusSelect"
 
     export default {
         name: "Assets",
         components: {
+            SeatPlusSelect,
+            InputGroup,
+            ItemList,
             DispatchUpdate,
             WideListElement,
-            WideLists, Layout, EveImage, Pagination, CharacterDropdown, RegionDropdown},
+            WideLists, Layout, EveImage, Pagination
+        },
         props: {
-            assets: Object,
             filters: Object,
             dispatchable_jobs: Object,
         },
         data() {
             return {
-                search: this.buildSearchParams().get('search_param'),
-                last_page: this.assets.meta.last_page,
                 requiredScopes: this.dispatchable_jobs.required_scopes,
+                assets_data: [],
+                path: this.$route('load.character.assets'),
+                next_url: '',
+                search: null,
+                character: null,
+                region: null,
             }
         },
         methods: {
+            loadAssets(url) {
+                const self = this;
+
+                let data = {}
+
+                if(self.character)
+                    data.character_id = self.character;
+
+                if(self.region)
+                    data.region_id = self.region;
+
+                if(self.search)
+                    data.search_param = self.search;
+
+                axios.post(url, data)
+                    .then(response => {
+                        self.assets_data.push(...response.data.data)
+                        self.next_url = response.data.links.next
+                    })
+
+            },
+            scroll: function () {
+                const self = this;
+
+                window.onscroll = () => {
+                    let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+
+                    if(bottomOfWindow) {
+
+                        if (_.isString(self.next_url)) {
+                            self.loadAssets(self.next_url)
+                        }
+                    }
+                }
+
+            },
             getMetricPrefix(numeric_value) {
 
                 const  { prefix } = require('metric-prefix')
@@ -142,69 +149,9 @@
 
                 return _.size(location_assets)
             },
-            onCharacterSelection: function (character_id) {
-
-                let searchParams = this.buildSearchParams();
-
-                if(searchParams.has('character_id') && character_id == null)
-                    searchParams.delete('character_id')
-
-                if(character_id)
-                    searchParams.set("character_id", character_id);
-
-                let url = window.location.href.split('?')[0] + '?' + searchParams.toString();
-
-                Inertia.visit(url, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: ['assets'],
-                })
-            },
-            buildSearchParams: function () {
-                return new URL(window.location.href).searchParams;
-            },
-            multipleCharacters : function () {
-                return !this.buildSearchParams().has('character_id');
-            },
-            onRegionSelection: function (region_id) {
-
-                let searchParams = this.buildSearchParams();
-
-                if(searchParams.has('region_id') && region_id == null)
-                    searchParams.delete('region_id')
-
-                if(region_id)
-                    searchParams.set("region_id", region_id);
-
-                let url = window.location.href.split('?')[0] + '?' + searchParams.toString();
-
-                Inertia.visit(url, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: ['assets'],
-                })
-            },
-            url(asset) {
-                return asset.content[0] ? this.$route('character.item', asset.item_id) : '#'
-            }
-        },
-        updated: function() {
-
-            if(this.assets.meta.last_page < this.assets.meta.current_page) {
-                let searchParams = this.buildSearchParams();
-
-                searchParams.set("page", this.assets.meta.last_page);
-
-                if(this.assets.meta.last_page === 1)
-                    searchParams.delete('page')
-
-                let url = window.location.href.split('?')[0] + '?' + searchParams.toString();
-
-                Inertia.visit(url, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: ['assets'],
-                })
+            filter() {
+                this.assets_data = []
+                this.loadAssets(this.path)
             }
         },
         computed: {
@@ -215,7 +162,8 @@
                 return Number(this.buildSearchParams().get('region_id'));
             },
             groupedAssets() {
-                return  _.map(_.groupBy(this.assets.data, 'location_id'), (value, prop) => (
+
+                return  _.map(_.groupBy(this.assets_data, 'location_id'), (value, prop) => (
                     {
                         location_id: _.toInteger(prop),
                         location: value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,
@@ -232,22 +180,18 @@
         },
         watch: {
             search: function () {
-                let searchParams = this.buildSearchParams();
-
-                if(searchParams.has('search_param') && this.search === '')
-                    searchParams.delete('search_param')
-
-                if(this.search)
-                    searchParams.set("search_param", this.search);
-
-                let url = window.location.href.split('?')[0] + '?' + searchParams.toString();
-
-                Inertia.visit(url, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: ['assets'],
-                })
+                this.filter()
             },
+            character() {
+                this.filter()
+            },
+            region() {
+                this.filter()
+            }
+        },
+        mounted() {
+            this.loadAssets(this.path)
+            this.scroll();
         }
     }
 </script>
