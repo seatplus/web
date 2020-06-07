@@ -98,14 +98,9 @@
 
                 let data = {}
 
-                if(self.character)
-                    data.character_id = self.character;
-
-                if(self.region)
-                    data.region_id = self.region;
-
-                if(self.search)
-                    data.search_param = self.search;
+                for(let prop of ['character','region','search'])
+                    if(self[prop])
+                        data[prop] = self[prop]
 
                 axios.post(url, data)
                     .then(response => {
