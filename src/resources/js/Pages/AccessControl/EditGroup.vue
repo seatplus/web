@@ -59,16 +59,6 @@
 
         <Affiliations :affiliations="affiliations" />
 
-
-
-
-       <!-- <b-form-group label="" >
-            <b-button block variant="success" @click="store" v-if="isDirty">Update</b-button>
-        </b-form-group>-->
-
-
-
-
     </Layout>
 </template>
 
