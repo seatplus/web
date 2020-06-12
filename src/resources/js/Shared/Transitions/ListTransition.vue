@@ -1,6 +1,5 @@
 <template>
     <transition-group
-        tag="div"
         :enter-active-class="entries.length > 1 ? 'transform ease-out delay-300 duration-300 transition': 'transform ease-out duration-300 transition'"
         enter-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
         enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"

@@ -106,7 +106,9 @@
                 </div>
 
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3">
-                    <h1 class="text-2xl font-semibold text-gray-900">{{ this.page}}</h1>
+                    <slot name="title">
+                        <h1 class="text-2xl font-semibold text-gray-900">{{ this.page}}</h1>
+                    </slot>
                 </div>
 
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -189,7 +191,7 @@
             page: {
                 type: String,
                 default: 'PAGE HEADER',
-                required: true
+                required: false
             },
             activeSidebarElement: {
                 type: String,

@@ -1,6 +1,18 @@
 <template>
-    <Layout page="Access Control Groups" :active-sidebar-element="activeSidebarElement">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
+    <Layout :active-sidebar-element="activeSidebarElement">
+        <template v-slot:title>
+            <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
+                Access Control Groups
+                <template v-slot:primary>
+                    <HeaderButton @click="store">
+                        Save
+                    </HeaderButton>
+                </template>
+
+            </PageHeader>
+        </template>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
             <div class="px-4 py-5 sm:p-6">
 
                 <div>
@@ -48,16 +60,9 @@
                     </div>
                 </div>
             </div>
-            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                <span class="inline-flex rounded-md shadow-sm">
-                      <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                        Save
-                      </button>
-                </span>
-            </div>
         </div>
 
-        <Affiliations :affiliations="affiliations" />
+        <Affiliations v-model="selectedAffiliations" :affiliations="affiliations"/>
 
     </Layout>
 </template>
@@ -71,13 +76,18 @@
   import SeatPlusSelect from "../../Shared/SeatPlusSelect"
   import AddAffiliations from "./AddAffiliations"
   import Affiliations from "./Affiliations"
+  import PageHeader from "../../Shared/Layout/PageHeader"
+  import HeaderButton from "../../Shared/Layout/HeaderButton"
   export default {
       name: "EditGroup",
-      components: {Affiliations, AddAffiliations, SeatPlusSelect, EveImage, ListElement, List, Layout},
+      components: {
+          HeaderButton,
+          PageHeader, Affiliations, AddAffiliations, SeatPlusSelect, EveImage, ListElement, List, Layout},
       data () {
           return {
               roleName: '',
               selectedPermissions: [],
+              selectedAffiliations: this.affiliations,
               isDirty: false
           }
       },
@@ -114,13 +124,12 @@
 
               return permissionOption;
           },
-
           store: function () {
 
               let data = {
-                  allowed: this.allowed,
-                  inverse: this.inverse,
-                  forbidden: this.forbidden,
+                  allowed: this.selectedAffiliations.allowed,
+                  inverse: this.selectedAffiliations.inverse,
+                  forbidden: this.selectedAffiliations.forbidden,
                   roleName: this.roleName,
                   permissions: this.selectedPermissions
               }
@@ -165,8 +174,6 @@
           }
       },
       mounted: function () {
-
-
 
           this.roleName = this.role.name
 

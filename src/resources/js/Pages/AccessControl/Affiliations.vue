@@ -1,7 +1,8 @@
 <template>
+
     <div>
 
-        <div class="bg-white overflow-hidden shadow rounded-lg mt-12">
+        <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
                 <!-- Content goes here -->
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -40,7 +41,7 @@
                                             {{ entity.name }}
                                         </div>
                                         <div class="text-sm leading-5 text-gray-500">
-                                            bernardlane@example.com
+                                            {{ getType(entity) }}
                                         </div>
                                     </div>
                                 </div>
@@ -68,7 +69,7 @@
             </div>
         </div>
 
-        <div class="m-12 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none">
+        <div class="mb-3 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none">
             <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
                 <div class="flex-1 bg-white flex flex-col justify-between">
                     <div class="flex-1 p-6 ">
@@ -79,21 +80,11 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <div :class="['bg-white overflow-hidden sm:rounded-md', {'shadow' : !isEmpty(allowed)}]">
-                        <div class="divide-y divide-grey-200">
-                            <ListTransition :entries="allowed">
-                                <div v-for="(entity, index) of allowed" :key="index" class="px-4 py-4 flex items-center sm:px-6 block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out cursor-pointer">
-                                    <EveImage :object="entity" :size="128" tailwind_class="h-12 w-12 rounded-full" show-name />
-                                </div>
-                            </ListTransition>
-
-                        </div>
-                    </div>
-
+                    <AffiliationList v-model="allowed" />
                 </div>
             </div>
             <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
-                <div class="flex-1 bg-white flex flex-col justify-start">
+                <div class="flex-1 bg-white flex flex-col justify-between">
                     <div class="flex-1 p-6 ">
                         <h3 class="mt-2 text-xl leading-7 font-semibold text-gray-900">
                             Inverse
@@ -102,13 +93,7 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <div :class="['flex-1 bg-white sm:rounded-md', {'shadow' : !isEmpty(inverse)}]">
-                        <ListTransition :entries="inverse">
-                            <div v-for="(entity, index) of inverse" :key="index" class="px-4 py-4 flex items-center sm:px-6 block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out cursor-pointer">
-                                <EveImage :object="entity" :size="128" tailwind_class="h-12 w-12 rounded-full" show-name />
-                            </div>
-                        </ListTransition>
-                    </div>
+                    <AffiliationList v-model="inverse" />
                 </div>
             </div>
             <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
@@ -121,13 +106,7 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <div :class="['bg-white overflow-hidden sm:rounded-md', {'shadow' : !isEmpty(forbidden)}]">
-                        <ListTransition :entries="forbidden">
-                            <div v-for="(entity, index) of forbidden" :key="index" class="px-4 py-4 flex items-center sm:px-6 block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out cursor-pointer">
-                                <EveImage :object="entity" :size="128" tailwind_class="h-12 w-12 rounded-full" show-name />
-                            </div>
-                        </ListTransition>
-                    </div>
+                    <AffiliationList v-model="forbidden" />
                 </div>
             </div>
         </div>
@@ -140,16 +119,12 @@
     import axios from "axios"
     import EveImage from "../../Shared/EveImage"
     import ListTransition from "../../Shared/Transitions/ListTransition"
+    import AffiliationList from "./AffiliationList"
 
     export default {
         name: "Affiliations",
-        components: {ListTransition, EveImage},
-        props: {
-            affiliations: {
-                type: Array,
-                required: true
-            }
-        },
+        components: {AffiliationList, ListTransition, EveImage},
+        props: ['value', 'affiliations'],
         data() {
             return {
                 entities: [],
@@ -162,13 +137,11 @@
         methods: {
             addAffiliation(type, entity) {
                 this[type].unshift(entity)
-
-                //delete this[type][this[type].indexOf(entity)]
             },
-            getInfo: function (url, info = []) {
-                return axios
+            getInfo: async function (url, info = []) {
+                return await axios
                     .get(url)
-                    .then(response => {
+                    .then((response) => {
 
                         response.data.data.forEach(object => info.push(object))
 
@@ -203,6 +176,9 @@
             },
             sortByName(entities) {
                 return _.sortBy(entities, (entity) => entity.name)
+            },
+            getType(entity) {
+                return entity.character_id ? 'Character' : (entity.corporation_id ? 'Corporation' : 'Alliance')
             }
         },
         computed: {
@@ -216,8 +192,7 @@
                 let term = this.search
 
                 return this.sortByName(_.filter(entities, (entity) => entity.name.toUpperCase().includes(term.toUpperCase())))
-
-            }
+            },
         },
         watch: {
             entities() {
@@ -225,6 +200,10 @@
 
                 _.each(affiliations, (affiliation) => this[affiliation] = this.getAffiliatedEntities(affiliation))
             },
+            test(newValue) {
+
+                this.$emit('input', newValue)
+            }
         },
         mounted() {
             let routes = ['get.character_info', 'get.corporation_info', 'get.alliance_info']

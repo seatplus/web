@@ -259,8 +259,6 @@
           },
           toggleHelperRow(object) {
 
-              console.log(object)
-
               this.rowHeight = object.dropdownHeight - (_.size(this.roles.data) - (object.index + 1)) * this.evaluateRowHeight()
           },
           evaluateRowHeight() {
