@@ -1,45 +1,38 @@
 <template>
     <Layout page="Character Assets" :required-scopes="this.requiredScopes">
 
-        <div class="grid gap-2 grid-cols-3">
-            <div class="col-span-2">
+        <div class="grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none mb-6">
+            <div class="flex flex-col rounded-lg shadow-lg overflow-hidden col-span-2">
+                <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+                    <div class="grid grid-cols-6 gap-5">
 
-            </div>
-            <div class="col-span-1">
-                <!--<div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        &lt;!&ndash; Content goes here &ndash;&gt;
+                        <div class="col-span-6">
+                            <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
+                            <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
+                        </div>
+
                     </div>
-                </div>-->
-            </div>
-        </div>
+                    <div class="mt-6 border-t border-gray-200">
+                        <div class="mt-6">
+                            <pagination :collection="assets"/>
+                        </div>
 
-        <div class="bg-white overflow-hidden overflow-hidden mb-3 shadow rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-                <!-- Content goes here -->
-                <div class="grid grid-cols-6 gap-6">
-
-                    <div class="col-span-6">
-                        <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
-                        <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     </div>
-
-                    <div class="col-span-6 sm:col-span-3">
-                        <character-dropdown @selectedCharacterId="onCharacterSelection" :character-id="selectedCharacterId"/>
-                    </div>
-
-                    <div class="col-span-6 sm:col-span-3">
-                        <region-dropdown :regions="filters.regions" @selectedRegionId="onRegionSelection" :region-id="selectedRegionId" />
-                    </div>
-
                 </div>
             </div>
-            <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
-                <!-- Content goes here -->
-                <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
-                <pagination :collection="assets"/>
+            <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+                <DispatchUpdate :dispatchable_jobs="dispatchable_jobs" />
             </div>
         </div>
+
 
         <wide-lists v-for="location in this.groupedAssets" :key="location.location_id">
             <template v-slot:header>
@@ -108,21 +101,24 @@
     import RegionDropdown from "../../Shared/RegionDropdown"
     import WideLists from "../../Shared/WideLists"
     import WideListElement from "../../Shared/WideListElement"
+    import DispatchUpdate from "../../Shared/DispatchUpdate"
 
     export default {
         name: "Assets",
         components: {
+            DispatchUpdate,
             WideListElement,
             WideLists, Layout, EveImage, Pagination, CharacterDropdown, RegionDropdown},
         props: {
             assets: Object,
             filters: Object,
+            dispatchable_jobs: Object,
         },
         data() {
             return {
                 search: this.buildSearchParams().get('search_param'),
                 last_page: this.assets.meta.last_page,
-                requiredScopes: ['esi-assets.read_assets.v1',  'esi-universe.read_structures.v1']
+                requiredScopes: this.dispatchable_jobs.required_scopes,
             }
         },
         methods: {

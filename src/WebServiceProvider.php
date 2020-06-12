@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Inertia\Middleware;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\Locale;
@@ -147,6 +148,7 @@ class WebServiceProvider extends ServiceProvider
 
         Inertia::share([
             'flash' => function () {
+
                 return [
                     'success' => Session::get('success'),
                     'info' => Session::get('info'),
@@ -155,12 +157,19 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'sidebar' => function () {
+
                 return auth()->guest() ? [] : (new SidebarEntries)->filter();
             },
             'user' => function () {
-                return auth()->guest() ? '' : UserRessource::make(auth()->user());
+
+                return auth()->guest() ? '' : UserRessource::make(
+                    User::with('main_character', 'characters', 'characters.refresh_token')
+                        ->where('id', auth()->user()->id)
+                        ->first()
+                );
             },
             'translation' => function () {
+
                 return [
                     'success' => trans('web::notifications.success'),
                     'info' => trans('web::notifications.info'),
@@ -169,11 +178,13 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'errors' => function () {
+
                 return Session::get('errors')
                     ? Session::get('errors')->getBag('default')->getMessages()
                     : (object) [];
             },
             'images' => function () {
+
                 return [
                     'logo' => asset('img/seat_plus.svg'),
                 ];
