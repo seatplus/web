@@ -24,10 +24,35 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\PostAssetsController;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::post('/assets', PostAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+
+class GetCharacterAssets extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'character' => ['sometimes', 'required', Rule::in(auth()->user()->getAffiliatedCharacterIdsByPermission(CharacterAsset::class)), 'numeric'],
+            'region' => ['sometimes', 'required', 'exists:universe_regions,region_id', 'numeric'],
+            'search' => ['sometimes', 'required', 'string'],
+        ];
+    }
+}

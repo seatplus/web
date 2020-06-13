@@ -46,7 +46,7 @@ class CharacterAssetTest extends TestCase
 
         //dd($response->exception->getMessage());
 
-        $response->assertHasProp('assets');
+        $response->assertHasProp('filters');
     }
 
 }

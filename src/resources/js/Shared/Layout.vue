@@ -1,7 +1,7 @@
 <template>
     <!--TODO: Include Alert Component-->
 
-    <div class="h-screen flex overflow-hidden bg-gray-100" @keydown.window.escape="sidebarOpen = false">
+    <div class="h-full min-h-screen flex overflow-hidden bg-gray-100" @keydown.window.escape="sidebarOpen = false">
 
         <!-- Off-canvas menu for mobile -->
         <transition leave-active-class="duration-300">
