@@ -25,7 +25,6 @@
                 default: 32
             },
             tailwind_class: {
-                type: String,
                 required: false,
                 default: "h-12 w-12 rounded-full"
             },

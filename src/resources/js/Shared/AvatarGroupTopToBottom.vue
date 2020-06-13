@@ -1,13 +1,18 @@
 <template>
-    <div class="flex overflow-hidden">
-        <EveImage v-for="(element,key) in elements" :key="key" :tailwind_class="key > 0 ? '-ml-2' : '' + 'inline-block h-8 w-8 rounded-full text-white shadow-solid'" :object="element" />
+    <div class="flex relative z-0 overflow-hidden">
+        <img v-for="(element, index) in elements" :key="index"
+                  :class="[{'-ml-2' : index > 0, 'z-30': index === 0, 'z-20': index === 1, 'z-10': index === 2, 'z-0': index === 3 },
+                  'relative inline-block h-8 w-8 rounded-full text-white shadow-solid']" :object="element"
+             :src="`https://images.evetech.net/characters/${element.character_id}/portrait/?size=${size}&tenant=tranquility`"
+        />
     </div>
 </template>
 
 <script>
     import EveImage from "./EveImage"
+
     export default {
-        name: "AvatarGroupBottomTop",
+        name: "AvatarGroupTopToBottom",
         components: {EveImage},
         props: {
             objects: {
@@ -16,7 +21,7 @@
             },
             size: {
                 type: Number,
-                default: 8
+                default: 128
             },
             random: {
                 type: Boolean,

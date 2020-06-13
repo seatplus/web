@@ -136,7 +136,7 @@
 
               Inertia.post(window.location.href, data, {
                   replace: false,
-                  preserveState: true,
+                  preserveState: false,
                   preserveScroll: false,
                   only: [],
               })

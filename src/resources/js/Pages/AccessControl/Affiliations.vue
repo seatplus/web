@@ -80,7 +80,7 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <AffiliationList v-model="allowed" />
+                    <AffiliationList v-model="allowed"/>
                 </div>
             </div>
             <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
@@ -93,7 +93,7 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <AffiliationList v-model="inverse" />
+                    <AffiliationList v-model="inverse"/>
                 </div>
             </div>
             <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
@@ -106,7 +106,7 @@
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
                         </p>
                     </div>
-                    <AffiliationList v-model="forbidden" />
+                    <AffiliationList v-model="forbidden"/>
                 </div>
             </div>
         </div>

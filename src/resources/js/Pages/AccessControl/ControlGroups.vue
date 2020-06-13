@@ -50,7 +50,7 @@
                                     {{role.name}}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    <AvatarGroupBottomTop :objects="getRoleMembers(role.users)" :random="true"/>
+                                    <AvatarGroupTopToBottom :objects="getRoleMembers(role.users)" :random="true"/>
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-center text-sm leading-5 text-gray-500">
                                     <DropdownWithIcons :index="index"  v-on:change="toggleHelperRow" >
@@ -221,15 +221,16 @@
 
 <script>
   import Layout from "../../Shared/Layout"
-  import { Inertia } from '@inertiajs/inertia'
   import Pagination from "../../Shared/Pagination"
   import SimpleToggle from "../../Shared/SimpleToggle"
   import ModalWithFooter from "../../Shared/ModalWithFooter"
-  import AvatarGroupBottomTop from "../../Shared/AvatarGroupBottomTop"
   import DropdownWithIcons from "../../Shared/DropdownWithIcons"
+  import AvatarGroupTopToBottom from "../../Shared/AvatarGroupTopToBottom"
+
   export default {
       name: "ControlGroups",
-      components: {DropdownWithIcons, AvatarGroupBottomTop, ModalWithFooter, SimpleToggle, Layout, Pagination},
+      components: {
+          AvatarGroupTopToBottom, DropdownWithIcons, ModalWithFooter, SimpleToggle, Layout, Pagination},
       data() {
           return {
               dispatch: false,
