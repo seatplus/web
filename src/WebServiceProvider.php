@@ -150,10 +150,10 @@ class WebServiceProvider extends ServiceProvider
             'flash' => function () {
 
                 return [
-                    'success' => Session::get('success'),
-                    'info' => Session::get('info'),
-                    'warning' => Session::get('warning'),
-                    'error' => Session::get('error'),
+                    'success' => session()->pull('success'),
+                    'info' => session()->pull('info'),
+                    'warning' => session()->pull('warning'),
+                    'error' => session()->pull('error'),
                 ];
             },
             'sidebar' => function () {
