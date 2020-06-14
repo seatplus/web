@@ -41,6 +41,7 @@
         "sweetalert2": "^9.10.12",
         "tailwindcss": "^1.4.6",
         "uuid": "^7.0.3",
-        "vue-multiselect": "^2.1.6"
+        "vue-multiselect": "^2.1.6",
+        "vuedraggable": "^2.23.2"
     }
 }

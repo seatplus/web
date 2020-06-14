@@ -1,77 +1,93 @@
 <template>
-    <Layout page="Access Control Groups" :active-sidebar-element="activeSidebarElement">
-        <b-card>
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12">
-                        <b-form-group label="Access control group name">
-                            <b-form-input v-model="roleName" @update="setIsDirty"/>
-                        </b-form-group>
+    <Layout :active-sidebar-element="activeSidebarElement">
+        <template v-slot:title>
+            <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
+                Access Control Groups
+                <template v-slot:primary>
+                    <HeaderButton @click="store">
+                        Save
+                    </HeaderButton>
+                </template>
+
+            </PageHeader>
+        </template>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
+            <div class="px-4 py-5 sm:p-6">
+
+                <div>
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            Settings
+                        </h3>
+                        <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
+                            First set a name and which permission should be applied to the access control group
+                        </p>
+                    </div>
+                    <div class="mt-6 sm:mt-5">
+                        <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                            <label for="roleName" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                Access control group name
+                            </label>
+                            <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                <div class="max-w-xs rounded-md shadow-sm">
+                                    <input id="roleName" v-model="roleName" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" :placeholder="roleName">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                            <label for="permissions" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                                Permissions
+                            </label>
+                            <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                <div id="permissions" class="sm:grid sm:grid-cols-2 sm:gap-4">
+                                    <div v-for="permission in available_permissions" >
+                                        <label  class="inline-flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                :value="permission"
+                                                v-model="selectedPermissions"
+                                                class="form-checkbox"
+                                            >
+                                            <span class="ml-2">{{ permission }}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!--<Permissions id="permissions" v-model="selectedPermissions" :available-permissions="available_permissions" />-->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </b-card>
-        <b-card>
-            <b-card-title class="mr-3">Access control settings</b-card-title>
-            <b-card-sub-title>
-                Setup the access group and define what anyone in this group should be able to achieve for which asset. F.e. if this is your recruiter access contol group you would define f.e. that a recruiter should have access to assets of characters in any but (inverse) a specific corporation. Note: you will be able to assign the access control group to users in another step.
-            </b-card-sub-title>
-            <b-card-text>
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <b-form-group label="Permission">
-                                <multiselect @select="setIsDirty" @remove="setIsDirty" v-model="selectedPermissions" :options="getPermissionOptions()" :multiple="true" placeholder="Type to search" track-by="name" label="name"><span slot="noResult">Oops! No elements found. Consider changing the search query.</span></multiselect>
-                            </b-form-group>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b-form-group label="Allowed">
-                                <multiselect @select="setIsDirty" @remove="setIsDirty" v-model="allowed" :options="getOptions()" :multiple="true" group-values="options" group-label="category" :group-select="true" placeholder="Type to search" track-by="name" label="name"><span slot="noResult">Oops! No elements found. Consider changing the search query.</span></multiselect>
-                            </b-form-group>
-                        </div>
-                        <div class="col-md-4">
-                            <b-form-group label="Inverse">
-                                <multiselect @select="setIsDirty" @remove="setIsDirty"  v-model="inverse" :options="getOptions()" :multiple="true" group-values="options" group-label="category" :group-select="true" placeholder="Type to search" track-by="name" label="name"><span slot="noResult">Oops! No elements found. Consider changing the search query.</span></multiselect>
-                            </b-form-group>
-                        </div>
-                        <div class="col-md-4">
-                            <b-form-group label="Forbidden">
-                                <multiselect @select="setIsDirty" @remove="setIsDirty" v-model="forbidden" :options="getOptions()" :multiple="true" group-values="options" group-label="category" :group-select="true" placeholder="Type to search" track-by="name" label="name"><span slot="noResult">Oops! No elements found. Consider changing the search query.</span></multiselect>
-                            </b-form-group>
-                        </div>
-                    </div>
-                </div>
-            </b-card-text>
+        </div>
 
-        </b-card>
-
-        <b-form-group label="" >
-            <b-button block variant="success" @click="store" v-if="isDirty">Update</b-button>
-        </b-form-group>
+        <Affiliations v-model="selectedAffiliations" :affiliations="affiliations"/>
 
     </Layout>
 </template>
 
 <script>
   import Layout from "../../Shared/Layout"
-  import Multiselect from 'vue-multiselect'
-  import axios from 'axios'
   import { Inertia } from '@inertiajs/inertia'
+  import List from "../../Shared/List"
+  import ListElement from "../../Shared/ListElement"
+  import EveImage from "../../Shared/EveImage"
+  import SeatPlusSelect from "../../Shared/SeatPlusSelect"
+  import AddAffiliations from "./AddAffiliations"
+  import Affiliations from "./Affiliations"
+  import PageHeader from "../../Shared/Layout/PageHeader"
+  import HeaderButton from "../../Shared/Layout/HeaderButton"
   export default {
       name: "EditGroup",
-      components: {Layout, Multiselect},
+      components: {
+          HeaderButton,
+          PageHeader, Affiliations, AddAffiliations, SeatPlusSelect, EveImage, ListElement, List, Layout},
       data () {
           return {
-              available_characters: null,
-              available_corporations: null,
-              available_alliances: null,
-              allowed: [],
-              inverse: [],
-              forbidden: [],
               roleName: '',
               selectedPermissions: [],
+              selectedAffiliations: this.affiliations,
               isDirty: false
           }
       },
@@ -94,22 +110,12 @@
           }
       },
       methods: {
-          getOptions: function () {
-
-              return [
-                  {
-                      category: 'Characters',
-                      options:  this.available_characters
-                  },
-                  {
-                      category: 'Corporations',
-                      options: this.available_corporations
-                  },
-                  {
-                      category: 'Alliances',
-                      options: this.available_alliances
-                  }
-              ]
+          getOptions() {
+              return {
+                  characters: this.available_characters,
+                  corporations: this.available_corporations,
+                  alliances: this.available_alliances
+              }
           },
           getPermissionOptions: function () {
               let permissionOption = []
@@ -118,33 +124,19 @@
 
               return permissionOption;
           },
-          getInfo: function (url, info = []) {
-              return axios
-                      .get(url)
-                      .then(response => {
-
-                          response.data.data.forEach(object => info.push(object))
-
-                          if (_.isNull(response.data.links.next))
-                              return info
-
-                          return this.getInfo(response.data.links.next, info)
-                      })
-                      .catch(error => console.log(error))
-          },
           store: function () {
 
               let data = {
-                  allowed: this.allowed,
-                  inverse: this.inverse,
-                  forbidden: this.forbidden,
+                  allowed: this.selectedAffiliations.allowed,
+                  inverse: this.selectedAffiliations.inverse,
+                  forbidden: this.selectedAffiliations.forbidden,
                   roleName: this.roleName,
                   permissions: this.selectedPermissions
               }
 
               Inertia.post(window.location.href, data, {
                   replace: false,
-                  preserveState: true,
+                  preserveState: false,
                   preserveScroll: false,
                   only: [],
               })
@@ -183,16 +175,10 @@
       },
       mounted: function () {
 
-          this.getInfo(route('get.character_info')).then(info => this.available_characters = info).then(info => this.buildAffiliatedCharacterIds())
-
-          this.getInfo(route('get.corporation_info')).then(info => this.available_corporations = info)
-
-          this.getInfo(route('get.alliance_info')).then(info => this.available_alliances = info)
-
           this.roleName = this.role.name
 
           _.each(this.permissions, permission =>
-              this.selectedPermissions.push({name: permission.name})
+              this.selectedPermissions.push(permission.name)
           )
       },
   }

@@ -96,14 +96,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
                 "roleName" => $name,
-                "permissions" => [
-                    [
-                        "name" => "character.assets"
-                    ],
-                    [
-                        "name" => "superuser"
-                    ]
-                ]
+                "permissions" => ["character.assets", "superuser"]
             ]);
 
         $this->assertDatabaseHas('permissions',[
@@ -115,11 +108,7 @@ class AccessControlTest extends TestCase
         $this->actingAs($this->test_user)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
                 "roleName" => $name,
-                "permissions" => [
-                    [
-                        "name" => "superuser"
-                    ]
-                ]
+                "permissions" => ["superuser"]
             ]);
 
         $this->assertDatabaseMissing('role_has_permissions',[
