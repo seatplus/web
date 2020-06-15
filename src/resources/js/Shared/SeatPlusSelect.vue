@@ -11,7 +11,7 @@
                 </svg>
             </div>
         </div>
-        <p v-if="hasError" class="mt-2 text-sm text-red-600" id="email-error">{{ this.$page.errors[this.id][0]}}</p>
+        <p v-if="hasError" class="mt-2 text-sm text-red-600" :id="id">{{ this.$page.errors[this.id][0]}}</p>
     </div>
 </template>
 

@@ -24,10 +24,37 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\PostAssetsController;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::post('/assets', PostAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class DispatchIndividualJob extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return ! auth()->guest();
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+
+        $jobs = array_keys(config('eveapi.jobs'));
+        $character_ids = auth()->user()->characters->pluck('character_id')->toArray();
+
+        return [
+            'job' => ['required', Rule::in($jobs)],
+            'character_id' => ['required', Rule::in($character_ids)],
+        ];
+    }
+}

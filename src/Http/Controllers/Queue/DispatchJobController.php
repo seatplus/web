@@ -24,10 +24,29 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\PostAssetsController;
+namespace Seatplus\Web\Http\Controllers\Queue;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::post('/assets', PostAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Seatplus\Eveapi\Models\RefreshToken;
+use Seatplus\Eveapi\Services\DispatchIndividualUpdate;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\DispatchIndividualJob;
+
+class DispatchJobController extends Controller
+{
+    public function __invoke(DispatchIndividualJob $job)
+    {
+
+        $refresh_token = RefreshToken::find($job['character_id']);
+
+        $cache_key = sprintf('%s:%s', $job['job'], $job['character_id']);
+
+        if(cache($cache_key))
+            return redirect()->back()->with('error', 'job was already queued');
+
+        $job_id = (new DispatchIndividualUpdate($refresh_token))->execute($job['job']);
+
+        cache([$cache_key => $job_id], now()->addHour());
+
+        return redirect()->back()->with('success', 'job queued');
+    }
+}

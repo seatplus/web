@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests;
 
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
@@ -24,6 +25,9 @@ abstract class TestCase extends OrchestraTestCase
     {
 
         parent::setUp();
+
+        //Do not use the queue
+        Queue::fake();
 
         // setup database
         $this->setupDatabase($this->app);

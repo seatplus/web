@@ -37,11 +37,12 @@
 
 <script>
   export default {
-    name: "WideListElement",
+      name: "WideListElement",
       props: {
           url: {
               type    : String,
-              required: true
+              required: false,
+              default: '#'
           },
       },
   }

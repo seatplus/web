@@ -24,9 +24,13 @@
  * SOFTWARE.
  */
 
+use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Queue\DispatchJobController;
 use Seatplus\Web\Http\Controllers\Queue\QueueController;
 
 Route::get('status', [
     'as'   => 'horizon.status',
     'uses' => QueueController::class,
 ]);
+
+Route::post('job', DispatchJobController::class)->name('dispatch.job');

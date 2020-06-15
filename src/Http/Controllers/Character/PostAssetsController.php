@@ -24,10 +24,31 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\PostAssetsController;
+namespace Seatplus\Web\Http\Controllers\Character;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::post('/assets', PostAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
+use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+use Seatplus\Web\Http\Controllers\Request\GetCharacterAssets;
+
+class PostAssetsController
+{
+    public function __invoke(GetCharacterAssets $request)
+    {
+
+        $query = CharacterAsset::Affiliated($request->character)
+            ->with('location', 'location.locatable', 'owner', 'type', 'type.group', 'content')
+            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
+            ->orderBy('location_id', 'asc');
+
+        if($request->has('region'))
+            $query = $query->inRegion($request->region);
+
+        if($request->has('search'))
+            $query = $query->search($request->search);
+
+        return CharacterAssetResource::collection(
+            $query->paginate()
+        );
+
+    }
+}

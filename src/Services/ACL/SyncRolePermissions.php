@@ -62,7 +62,7 @@ class SyncRolePermissions
         if($permissions)
         {
             foreach ($permissions as $permission){
-                $name = $permission['name'];
+                $name = $permission;
 
                 $this->target_permissions->push($name);
                 try {
