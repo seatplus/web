@@ -46,7 +46,7 @@ class UserRessource extends JsonResource
                 return [
                     'character_id' => $character->character_id,
                     'name' => $character->name,
-                    'scopes' => $this->character->refresh_token->scopes ?? null,
+                    'scopes' => $character->refresh_token->scopes ?? null,
                 ];
             }),
             'impersonating' => session('impersonation_origin') ? true : false,
