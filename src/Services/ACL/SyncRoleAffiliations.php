@@ -88,7 +88,7 @@ class SyncRoleAffiliations
         })->each(function ($affiliation) {
             Affiliation::where([
                 'role_id' => $affiliation->role_id,
-                'affiliatable_id' => $affiliation->id,
+                'affiliatable_id' => $affiliation->affiliatable_id,
                 'type' => $affiliation->type,
             ])->delete();
         });

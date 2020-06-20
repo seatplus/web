@@ -7,6 +7,7 @@ namespace Seatplus\Web\Tests\Integration;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -129,11 +130,13 @@ class AccessControlTest extends TestCase
 
         $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
+        // Adding Affiliation
         $response = $this->actingAs($this->test_user)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
                 "allowed" => [
                     [
                         "character_id" => 95725047,
+                        "id" => 95725047,
                         "name" => "Herpaderp Aldent"
                     ],
                 ],
@@ -141,7 +144,20 @@ class AccessControlTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('affiliations',[
-            'role_id' => $role->id
+            'role_id' => $role->id,
+            'affiliatable_id' => 95725047
+        ]);
+
+        // Delete Affiliation
+        $response = $this->actingAs($this->test_user)
+            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+                "allowed" => [],
+                "roleName" => $name,
+            ]);
+
+        $this->assertDatabaseMissing('affiliations',[
+            'role_id' => $role->id,
+            'affiliatable_id' => 95725047
         ]);
     }
 
@@ -162,6 +178,7 @@ class AccessControlTest extends TestCase
                 "allowed" => [
                     [
                         "character_id" => 95725047,
+                        "id" => 95725047,
                         "name" => "Herpaderp Aldent"
                     ],
                 ],
