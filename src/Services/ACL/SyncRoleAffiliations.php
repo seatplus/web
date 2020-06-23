@@ -29,6 +29,9 @@ namespace Seatplus\Web\Services\ACL;
 use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class SyncRoleAffiliations
 {
@@ -71,25 +74,11 @@ class SyncRoleAffiliations
             $this->target_affiliations->push(
                 Affiliation::firstOrCreate([
                     'role_id' => $this->role->id,
-                    'character_id' => $affiliation['character_id'] ?? null,
-                    'corporation_id' => $affiliation['corporation_id'] ?? null,
-                    'alliance_id' => $affiliation['alliance_id'] ?? null,
+                    'affiliatable_id' => $affiliation['id'],
+                    'affiliatable_type' => $this->getAffiliatableType($affiliation),
                     'type' => $type,
                 ])
             );
-    }
-
-    private function createAffiliations()
-    {
-        $this->target_affiliations = $this->target_affiliations->map(function ($affiliation) {
-            return Affiliation::firstOrCreate([
-                'role_id' => $this->role->id,
-                'character_id' => $affiliation['character_id'],
-                'corporation_id' => $affiliation['corporation_id'],
-                'alliance_id' => $affiliation['alliance_id'],
-                'type' => $affiliation['type'],
-            ]);
-        });
     }
 
     private function removeUnassignedAffiliations()
@@ -99,11 +88,16 @@ class SyncRoleAffiliations
         })->each(function ($affiliation) {
             Affiliation::where([
                 'role_id' => $affiliation->role_id,
-                'character_id' => $affiliation->character_id,
-                'corporation_id' => $affiliation->corporation_id,
-                'alliance_id' => $affiliation->alliance_id,
+                'affiliatable_id' => $affiliation->affiliatable_id,
                 'type' => $affiliation->type,
             ])->delete();
         });
+    }
+
+    private function getAffiliatableType($affiliation)
+    {
+        return Arr::has($affiliation, 'character_id')
+            ? CharacterInfo::class
+            : (Arr::has($affiliation, 'corporation_id') ? CorporationInfo::class : AllianceInfo::class);
     }
 }

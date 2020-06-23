@@ -165,10 +165,10 @@
                 let filtered_affiliations =  _.filter(this.affiliations, (affiliation) => {return _.isEqual(affiliation.type, type)})
 
                 return _.map(filtered_affiliations, (affiliation) => {
-                    let id = _.isNumber(affiliation.alliance_id) ? affiliation.alliance_id
-                        : (_.isNumber(affiliation.corporation_id) ? affiliation.corporation_id : affiliation.character_id)
+                    /*let id = _.isNumber(affiliation.alliance_id) ? affiliation.alliance_id
+                        : (_.isNumber(affiliation.corporation_id) ? affiliation.corporation_id : affiliation.character_id)*/
 
-                    return _.find(this.entities, {id: id})
+                    return _.find(this.entities, {id: affiliation.affiliatable_id})
                 })
             },
             isEmpty(array) {
@@ -179,6 +179,15 @@
             },
             getType(entity) {
                 return entity.character_id ? 'Character' : (entity.corporation_id ? 'Corporation' : 'Alliance')
+            },
+            emitValues() {
+                let selectedValues = {
+                    allowed: this.allowed,
+                    inverse: this.inverse,
+                    forbidden: this.forbidden,
+                }
+
+                this.$emit('input', selectedValues)
             }
         },
         computed: {
@@ -200,10 +209,15 @@
 
                 _.each(affiliations, (affiliation) => this[affiliation] = this.getAffiliatedEntities(affiliation))
             },
-            test(newValue) {
-
-                this.$emit('input', newValue)
-            }
+            allowed() {
+                this.emitValues();
+            },
+            inverse() {
+                this.emitValues();
+            },
+            forbidden() {
+                this.emitValues();
+            },
         },
         mounted() {
             let routes = ['get.character_info', 'get.corporation_info', 'get.alliance_info']
