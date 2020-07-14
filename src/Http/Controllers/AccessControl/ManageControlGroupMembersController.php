@@ -40,18 +40,17 @@ class ManageControlGroupMembersController
     public function index($role_id)
     {
 
-        $users = $this->mapUserForMultiselect(User::query());
 
-        $role = Role::findById($role_id);
+        $role = Role::whereId($role_id)
+            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character' )
+            ->first();
 
         return Inertia::render('AccessControl/ManageControlGroup', [
-            'users' => $users,
             'role' => $role,
-            'members' => $this->mapUserForMultiselect(User::role($role->name)),
         ]);
     }
 
-    public function update(Request $request, $role_id)
+    /*public function update(Request $request, $role_id)
     {
 
         $validated_data = $request->validate([
@@ -73,21 +72,5 @@ class ManageControlGroupMembersController
             ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
             ->with('success', 'Control Group updated');
 
-    }
-
-    private function mapUserForMultiselect(Builder $users): Collection
-    {
-        return $users->with('main_character', 'characters')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->main_character->name,
-                    'character_id' => $user->main_character->character_id,
-                    'characters' => $user->characters->filter(function ($character) use ($user) {
-                        return $character->character_id !== $user->main_character->character_id;
-                    }),
-                ];
-            });
-    }
+    }*/
 }

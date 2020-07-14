@@ -25,8 +25,15 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\AccessControl\AddAclAffiliationController;
+use Seatplus\Web\Http\Controllers\AccessControl\AddMemberController;
+use Seatplus\Web\Http\Controllers\AccessControl\ChangeRoleTypeController;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
+use Seatplus\Web\Http\Controllers\AccessControl\RemoveAclAffiliationController;
+use Seatplus\Web\Http\Controllers\AccessControl\RemoveMemberController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
 
 Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
 Route::post('/', [ControlGroupsController::class, 'join'])->name('acl.join');
@@ -41,5 +48,7 @@ Route::middleware(['permission:create or update or delete access control group']
 
 Route::middleware(['permission:manage access control group'])->group(function () {
     Route::get('/manage_members/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
-    Route::post('/manage_members/{role_id}', [ManageControlGroupMembersController::class, 'update'])->name('acl.manage.update');
+    Route::post('/manage_members/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
+
+    Route::get('/user', ListUserController::class)->name('list.users');
 });

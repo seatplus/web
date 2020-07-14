@@ -3,7 +3,7 @@
         <div class="bg-white overflow-hidden shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
                 <!-- Content goes here -->
-                <SearchCorpOrAlliance v-if="creationMode" @entities="setSelectedEntities" :error="this.$page.errors.selectedEntities"/>
+                <SearchCorpOrAlliance v-if="creationMode" v-model=selectedEntities />
                 <h3 v-else class="text-lg leading-6 font-medium text-gray-900 inline-flex items-center">
                     <eve-image :size="128" tailwind_class="h-12 w12 rounded-full" :object="this.object" />
                     <span class="ml-4">{{ this.object.name }}</span>
@@ -49,16 +49,17 @@
 </template>
 
 <script>
-    import SearchCorpOrAlliance from "@/Pages/Configuration/SearchCorpOrAlliance"
+
     import Layout from "@/Shared/Layout"
     import CharacterScopes from "./CharacterScopes"
     import CorporationScopes from "./CorporationScopes"
     import Alerts from "@/Shared/Alerts"
     import EveImage from "@/Shared/EveImage"
+    import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
 
     export default {
         name: "ScopeSettings",
-        components: {EveImage, Alerts, CorporationScopes, CharacterScopes, Layout, SearchCorpOrAlliance},
+        components: {SearchCorpOrAlliance, EveImage, Alerts, CorporationScopes, CharacterScopes, Layout},
         props: {
             available_scopes: {
                 type: Object,
