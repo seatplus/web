@@ -4,7 +4,6 @@
             This is the very basic member setting. It means you need to manually add users to the role.
         </p>
 
-
         <Members v-model="members" requires-removal-button class="mt-6"/>
         <Users v-model="members" requiresAddingButton class="mt-6" />
 

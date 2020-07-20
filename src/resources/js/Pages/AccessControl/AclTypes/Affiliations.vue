@@ -76,7 +76,6 @@
           getObject(entity) {
 
               return entity.hasOwnProperty('affiliatable') ? entity.affiliatable : entity
-
           }
       },
       watch: {

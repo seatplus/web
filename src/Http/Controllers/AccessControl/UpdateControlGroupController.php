@@ -11,12 +11,16 @@ use Seatplus\Web\Container\ControlGroupUpdateData;
 use Seatplus\Web\Services\Pipes\AutomaticControlGroupUpdatePipe;
 use Seatplus\Web\Services\Pipes\ManualControlGroupControlGroupUpdatePipe;
 use Illuminate\Pipeline\Pipeline;
+use Seatplus\Web\Services\Pipes\OnRequestControlGroupUpdatePipe;
+use Seatplus\Web\Services\Pipes\OptInControlGroupUpdatePipe;
 
 class UpdateControlGroupController extends Controller
 {
     private array $pipes = [
         ManualControlGroupControlGroupUpdatePipe::class,
-        AutomaticControlGroupUpdatePipe::class
+        AutomaticControlGroupUpdatePipe::class,
+        OptInControlGroupUpdatePipe::class,
+        OnRequestControlGroupUpdatePipe::class
     ];
 
     public function __invoke(ControlGroupUpdate $control_group_update, int $role_id)
@@ -34,6 +38,8 @@ class UpdateControlGroupController extends Controller
             ->send($control_group_update_data)
             ->through($this->pipes)
             ->then(fn () => logger()->info('Control group updated'));
+
+        return redirect()->route('acl.manage', $role_id)->with('success', 'updated');
 
     }
 

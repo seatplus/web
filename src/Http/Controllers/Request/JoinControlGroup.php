@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Auth\Models\Permissions\Role;
 
 class JoinControlGroup extends FormRequest
 {
@@ -37,6 +38,7 @@ class JoinControlGroup extends FormRequest
      */
     public function authorize()
     {
+
         return true;
     }
 
@@ -49,6 +51,7 @@ class JoinControlGroup extends FormRequest
     {
         return [
             'role_id' => 'bail|required|integer|exists:roles,id',
+            'user_id' => 'bail|sometimes|integer|exists:users,id',
         ];
     }
 }

@@ -29,14 +29,18 @@ use Seatplus\Web\Http\Controllers\AccessControl\AddAclAffiliationController;
 use Seatplus\Web\Http\Controllers\AccessControl\AddMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\ChangeRoleTypeController;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\JoinControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveAclAffiliationController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
+use Seatplus\Web\Http\Controllers\Request\JoinControlGroup;
 
 Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
-Route::post('/', [ControlGroupsController::class, 'join'])->name('acl.join');
+Route::post('/', JoinControlGroupController::class)->name('acl.join');
+Route::delete('/role/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware(['permission:create or update or delete access control group'])->group(function () {
     Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');

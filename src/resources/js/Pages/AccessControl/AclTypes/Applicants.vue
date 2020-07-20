@@ -1,5 +1,5 @@
 <template>
-    <div v-if="members.length > 0">
+    <div v-if="filteredMembers.length > 0">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Applicants
         </h3>
@@ -18,7 +18,7 @@
                 <div class="border-t border-gray-200">
                     <div class="-mt-px flex">
                         <div class="w-0 flex-1 flex border-r border-gray-200">
-                            <button @click="addMember(member.user)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-green-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-green-700 focus:outline-none focus:shadow-outline-green focus:border-green-300 focus:z-10 transition ease-in-out duration-150">
+                            <button @click="addMember(member)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-green-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-green-700 focus:outline-none focus:shadow-outline-green focus:border-green-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path>
                                 </svg>
@@ -26,7 +26,7 @@
                             </button>
                         </div>
                         <div class="-ml-px w-0 flex-1 flex">
-                            <button @click="removeMember(member.user)" class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:bg-red-100 hover:text-red-700 focus:outline-none focus:shadow-outline-red focus:border-red-300 focus:z-10 transition ease-in-out duration-150">
+                            <button @click="removeMember(member)" class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:bg-red-100 hover:text-red-700 focus:outline-none focus:shadow-outline-red focus:border-red-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M11 6a3 3 0 11-6 0 3 3 0 016 0zM14 17a6 6 0 00-12 0h12zM13 8a1 1 0 100 2h4a1 1 0 100-2h-4z"></path>
                                 </svg>
@@ -44,7 +44,8 @@
 
 <script>
   import EveImage from "@/Shared/EveImage"
-  import axios from "axios"
+
+
   export default {
       name: "Applicants",
       components: {EveImage},
@@ -70,11 +71,28 @@
 
               return _.shuffle(characters).join(', ')
           },
-          removeMember(user) {
+          removeMember(member) {
 
-              this.members = _.remove(this.members, (member) => member.user_id !== user.id )
+              this.$inertia.delete(this.$route('acl.leave', member.role_id, member.user_id), {
+                  replace: false,
+                  preserveState: false,
+                  preserveScroll: false,
+                  only: [],
+              })
           },
-          addMember(obj1) {
+          addMember(member) {
+
+              let data = {
+                  user_id: member.user_id,
+                  role_id: member.role_id
+              };
+
+              this.$inertia.post(this.$route('acl.join'), data, {
+                  replace: false,
+                  preserveState: false,
+                  preserveScroll: false,
+                  only: [],
+              })
           }
       },
       computed: {

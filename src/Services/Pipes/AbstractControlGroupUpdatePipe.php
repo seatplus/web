@@ -4,11 +4,13 @@
 namespace Seatplus\Web\Services\Pipes;
 
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Container\ControlGroupUpdateData;
+use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
 
 abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 {
@@ -27,6 +29,8 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 
         collect($data->members)
             ->reject(fn($member) => in_array($member['user_id'], $current_member_ids->toArray()))
+            // remove members on waitlist or paused
+            ->reject(fn($member) => Arr::has($member, 'status') ? $member['status'] !== 'member' : false)
             ->each(fn($member) => $data->role->activateMember(User::find($member['user_id'])));
     }
 
@@ -62,6 +66,36 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
             })
             ->whenEmpty(fn($affiliations) => $data->role->acl_affiliations()->delete());
 
+        $data->role->refresh()
+            ->acl_affiliations()
+            ->whereDoesntHaveMorph('affiliatable',
+                [CorporationInfo::class, AllianceInfo::class]
+            )
+            ->get()
+            ->each(fn($affiliation) => (new DispatchCorporationOrAllianceInfoJob)->handle($affiliation->affiliatable_type, $affiliation->affiliatable_id));
 
+    }
+
+    public function cleanWaitlist(ControlGroupUpdateData $data)
+    {
+        $data->role->acl_members()->whereStatus('waitlist')->delete();
+    }
+
+    public function removeModerators(ControlGroupUpdateData $data)
+    {
+        $data->role->moderators()->delete();
+    }
+
+    public function removeUnaffiliatedUsers(ControlGroupUpdateData $data)
+    {
+        $acl_affiliated_ids = $data->role->acl_affiliated_ids;
+
+        $users = User::role($data->role)->whereHas('character_users', function (Builder $query) use ($acl_affiliated_ids) {
+            $query->whereNotIn('character_id', $acl_affiliated_ids);
+        })->cursor();
+
+        foreach ($users as $user) {
+            $data->role->removeMember($user);
+        }
     }
 }

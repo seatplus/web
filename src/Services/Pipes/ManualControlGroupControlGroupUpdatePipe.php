@@ -22,6 +22,9 @@ class ManualControlGroupControlGroupUpdatePipe extends AbstractControlGroupUpdat
     private function update(ControlGroupUpdateData $data)
     {
         $this->handleMember($data);
+
+        $this->cleanWaitlist($data);
+        $this->removeModerators($data);
     }
 
 

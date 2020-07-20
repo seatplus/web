@@ -26,6 +26,7 @@
 use Faker\Generator as Faker;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo as CharacterInfoAlias;
 
 $factory->define(User::class, function (Faker $faker) {
@@ -38,7 +39,10 @@ $factory->define(User::class, function (Faker $faker) {
 
 $factory->afterCreating(User::class, function ($user, $faker) {
     $character_user =$user->character_users()->save(factory(CharacterUser::class)->make([
-        'character_id' => $user->id
+        'character_id' => $user->main_character_id
     ]));
+    factory(CharacterAffiliation::class)->create([
+        'character_id' => $user->main_character_id
+    ]);
     //$user->refresh()->character_users()->character()->save(factory(CharacterInfoAlias::class)->create
 });

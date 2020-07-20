@@ -6,11 +6,11 @@
 
         <Applicants v-model="members" class="mt-6" />
 
-        <SearchCorpOrAlliance v-model="selectedEntities" class="mt-6">
+        <SearchCorpOrAlliance v-model="affiliations" class="mt-6">
             Search for corporation or alliance that you wish to affiliate
         </SearchCorpOrAlliance>
 
-        <Affiliations v-model="this.selectedEntities"></Affiliations>
+        <Affiliations v-model="this.affiliations"></Affiliations>
 
         <Members v-model="members" class="mt-6" />
 
@@ -31,19 +31,22 @@
       },
       data() {
           return {
-              selectedEntities: this.value.affiliations,
+              affiliations: this.value.affiliations,
               members: this.value.members
           }
       },
       computed: {
           acl() {
               return {
-
+                  affiliations: this.affiliations,
+                  members: this.members
               }
           }
       },
       watch: {
-
+          acl(newValue) {
+              this.$emit('input', newValue)
+          }
       }
   }
 </script>
