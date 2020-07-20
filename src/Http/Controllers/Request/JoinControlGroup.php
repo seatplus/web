@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Seatplus\Auth\Models\Permissions\Role;
 
 class JoinControlGroup extends FormRequest
 {
