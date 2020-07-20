@@ -23,7 +23,7 @@ class JoinControlGroupController extends Controller
         if(!in_array($this->role->type, ['opt-in', 'on-request']))
             return abort(403);
 
-        (auth()->user()->can('superuser') || auth()->user()->characters->pluck('character_ids')->intersect($this->role->moderator_ids)->isNotEmpty())
+        (auth()->user()->can('superuser') || $this->role->isModerator(auth()->user()))
             ? $this->becomeMember() : $this->joinWaitlist();
 
         return redirect()->back();

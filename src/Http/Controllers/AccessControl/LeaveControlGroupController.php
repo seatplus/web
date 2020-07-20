@@ -36,7 +36,7 @@ class LeaveControlGroupController extends Controller
 
     private function isSuperuserOrModerator() : bool
     {
-        return (auth()->user()->can('superuser') || auth()->user()->characters->pluck('character_id')->intersect($this->role->moderator_ids)->isNotEmpty());
+        return (auth()->user()->can('superuser') || $this->role->isModerator(auth()->user()));
     }
 
     private function isActionOnYourself() : bool

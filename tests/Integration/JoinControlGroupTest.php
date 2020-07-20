@@ -79,7 +79,8 @@ class JoinControlGroupTest extends TestCase
 
 
         $this->assertFalse($this->test_user->hasRole($this->role));
-        $this->assertEquals('waitlist', $this->test_user->getStatus($this->role));
+
+        $this->assertEquals($this->test_user->id, $this->role->acl_members()->whereStatus('waitlist')->first()->user_id);
     }
 
     /** @test */
@@ -107,7 +108,7 @@ class JoinControlGroupTest extends TestCase
 
         $this->assertFalse($this->role->refresh()->acl_affiliations->isEmpty());
 
-        $this->assertFalse($this->test_user->hasRole($this->role));
+        $this->assertFalse($this->test_user->roles->isNotEmpty());
 
         $response = $this->actingAs($this->test_user)
             ->json('POST', route('acl.join'), [
@@ -117,7 +118,9 @@ class JoinControlGroupTest extends TestCase
 
 
         $this->assertTrue($this->test_user->refresh()->hasRole($this->role));
-        $this->assertEquals('member', $this->test_user->getStatus($this->role));
+
+        $this->assertEquals($this->test_user->id, $this->role->members()->first()->user_id);
+
     }
 
     private function assignPermissionToTestUser(array $array)
