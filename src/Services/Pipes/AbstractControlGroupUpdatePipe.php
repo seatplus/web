@@ -65,6 +65,8 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
                 // Delete removed affiliations
                 $affiliatable_ids = $affiliations
                     ->filter(fn ($affiliation) => Arr::has($affiliation, 'affiliatable_id'))
+                    // Remove Moderators
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? !Arr::get($affiliation, 'can_moderate') : true)
                     ->map(fn ($affiliation) => $affiliation['affiliatable_id']);
 
                 $data->role
@@ -79,6 +81,7 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
                 // add affiliations
                 $affiliations
                     ->filter(fn ($affiliation) => Arr::has($affiliation, 'id'))
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? !Arr::get($affiliation, 'can_moderate') : true)
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id' => $affiliation['id'],
                         'affiliatable_type' => $affiliation['category'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
@@ -95,7 +98,6 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
             )
             ->get()
             ->each(fn ($affiliation) => (new DispatchCorporationOrAllianceInfoJob)->handle($affiliation->affiliatable_type, $affiliation->affiliatable_id));
-
     }
 
     public function cleanWaitlist(ControlGroupUpdateData $data)

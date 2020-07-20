@@ -1,7 +1,9 @@
 <template>
     <div>
         <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Available Users
+            <slot name="title">
+                Available Users
+            </slot>
         </h3>
         <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
             <li :key="user.id" v-for="user of this.filteredUsers" class="col-span-1 bg-white rounded-lg shadow">
@@ -22,7 +24,11 @@
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path>
                                 </svg>
-                                <span class="ml-3">Add member</span>
+                                <span class="ml-3">
+                                    <slot name="button-text">
+                                        Add member
+                                    </slot>
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -88,13 +94,22 @@
                   user: user
               }
 
-
               this.members = [... this.members , memberObject]
           },
       },
       computed: {
           filteredUsers() {
-              let memberIds = _.toArray(_.map(this.value, (member) => member.user.id))
+
+              let memberIds = []
+
+              _.each(this.value, (member) => {
+
+                  if(member.hasOwnProperty('user'))
+                      memberIds.push(member.user.id)
+
+                  if(member.hasOwnProperty('affiliatable'))
+                      memberIds.push(member.affiliatable.id)
+              })
 
               return _.filter(this.users, (user) => memberIds.indexOf(user.id) === -1)
           }

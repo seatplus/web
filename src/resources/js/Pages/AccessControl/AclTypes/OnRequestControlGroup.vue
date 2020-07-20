@@ -12,6 +12,14 @@
 
         <Affiliations v-model="this.affiliations"></Affiliations>
 
+        <!--Moderators-->
+        <Moderators v-model="moderators" class="mt-6" ></Moderators>
+        <Users v-model="moderators" class="mt-6" requires-adding-button>
+            <template v-slot:title>Available Moderators</template>
+            <template v-slot:button-text>Add Moderator</template>
+        </Users>
+
+
         <Members v-model="members" class="mt-6" />
 
     </div>
@@ -23,24 +31,35 @@
   import Members from "./Members"
   import Affiliations from "./Affiliations"
   import Applicants from "./Applicants"
+  import Users from "./Users"
+  import Moderators from "./Moderators"
   export default {
       name: "OnRequestControlGroup",
-      components: {Applicants, Affiliations, Members, EveImage, SearchCorpOrAlliance},
+      components: {Moderators, Users, Applicants, Affiliations, Members, EveImage, SearchCorpOrAlliance},
       props: {
           value: {}
       },
       data() {
           return {
               affiliations: this.value.affiliations,
-              members: this.value.members
+              members: this.value.members,
+              moderators: this.value.moderators
           }
       },
       computed: {
           acl() {
               return {
                   affiliations: this.affiliations,
-                  members: this.members
+                  members: this.members,
+                  moderators: this.enhancedModerators
               }
+          },
+          enhancedModerators() {
+              return _.map(this.moderators, (moderator) => {
+                  moderator.affiliatable_id = moderator.user_id
+                  moderator.can_moderate =  true
+                  return moderator
+              })
           }
       },
       watch: {

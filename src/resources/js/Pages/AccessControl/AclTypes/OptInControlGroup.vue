@@ -37,7 +37,8 @@
           acl() {
               return {
                   affiliations: this.affiliations,
-                  members: this.members
+                  members: this.members,
+                  moderators: []
               }
           }
       },

@@ -38,7 +38,8 @@ class ManageControlGroupMembersController
     {
 
         $role = Role::whereId($role_id)
-            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character')
+            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character',
+                'moderators.affiliatable.main_character', 'moderators.affiliatable.characters')
             ->first();
 
         return Inertia::render('AccessControl/ManageControlGroup', [

@@ -31,7 +31,8 @@
           members() {
               this.$emit('input', {
                   members: this.members,
-                  affiliations: []
+                  affiliations: [],
+                  moderators: []
               })
           }
       }

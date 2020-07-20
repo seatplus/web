@@ -116,7 +116,8 @@
                 role_type: this.role.type,
                 acl: {
                     members: this.role.acl_members,
-                    affiliations: this.role.acl_affiliations
+                    affiliations: this.role.acl_affiliations,
+                    moderators: this.role.moderators
                 },
                 changed: false
             }
@@ -132,7 +133,8 @@
                     role_type: this.role.type,
                     acl: {
                         members: this.role.acl_members,
-                        affiliations: this.role.acl_affiliations
+                        affiliations: this.role.acl_affiliations,
+                        moderators: this.role.moderators
                     }
                 }
 
@@ -148,7 +150,7 @@
                 let data = {
                     type: this.role_type,
                     members: this.acl.members,
-                    affiliations: this.acl.affiliations
+                    affiliations: [...this.acl.affiliations, ...this.acl.moderators]
                 }
 
                 this.$inertia.post(window.location.href, data, {
