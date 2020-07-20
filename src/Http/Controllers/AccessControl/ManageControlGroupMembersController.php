@@ -26,13 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
-use Seatplus\Auth\Models\User;
 use Spatie\Permission\PermissionRegistrar;
 
 class ManageControlGroupMembersController
@@ -40,9 +37,8 @@ class ManageControlGroupMembersController
     public function index($role_id)
     {
 
-
         $role = Role::whereId($role_id)
-            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character' )
+            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character')
             ->first();
 
         return Inertia::render('AccessControl/ManageControlGroup', [
