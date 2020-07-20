@@ -68,7 +68,6 @@ class UpdateOrCreateSsoSettings
 
             (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
-
             SsoScopes::updateOrCreate([
                 'morphable_id' => $entity_id,
             ], [
@@ -78,5 +77,4 @@ class UpdateOrCreateSsoSettings
         });
 
     }
-
 }
