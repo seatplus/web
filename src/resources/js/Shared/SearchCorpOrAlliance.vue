@@ -5,7 +5,9 @@
         <!--TODO: add warning if search is less then 3 characters long-->
 
         <div>
-            <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search for Corporation or Alliance</label>
+            <label for="search" class="block text-sm font-medium leading-5 text-gray-700">
+                <slot>Search for Corporation or Alliance</slot>
+            </label>
             <div class="mt-1 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg :class="['h-5 w-5', error ? 'text-red-500' : 'text-gray-400']" fill="currentColor" viewBox="0 0 20 20">
@@ -26,43 +28,38 @@
             <p v-if=error class="mt-2 text-sm text-red-600">{{error[0]}}</p>
         </div>
 
-        <div class="border-top border-grey-200 pt-5">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4" >
-                <div v-for="entity in corpOrAlliances">
-                    <label  class="inline-flex items-center">
-                        <input
-                            type="checkbox"
-                            :value="entity"
-                            v-model="selected"
-                            class="form-checkbox"
-                            @change="$emit('entities', selected)"
-                        >
-                        <EveImage :object="entity" :size="16" tailwind_class="ml-2 h-8 w-8 rounded-full" />
-                        <span class="ml-2">
-                            {{entity.name}}
-                        </span>
-                    </label>
+        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+            <li :key="entity.id" v-for="entity of corpOrAlliances" @click="flipSelect(entity)" class="col-span-1 bg-white rounded-lg shadow">
+                <div class="w-full flex items-center justify-between p-6 space-x-6">
+                    <div class="flex-1 truncate">
+                        <div class="flex items-center space-x-3">
+                            <h3 class="text-gray-900 text-sm leading-5 font-medium truncate"> {{ entity.name }}</h3>
+                            <span v-if="isSelected(entity)" class="flex-shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full">Selected</span>
+                        </div>
+                        <p class="mt-1 text-gray-500 text-sm leading-5 truncate"> {{ entity.category }}</p>
+                    </div>
+                    <EveImage :object="entity" :size="256" tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0" />
                 </div>
-            </div>
-
-        </div>
+            </li>
+        </ul>
 
     </div>
 </template>
 
 <script>
     import axios from 'axios';
-    import EveImage from "../../Shared/EveImage"
+    import EveImage from "./EveImage"
 
     export default {
         name: "SearchCorpOrAlliance",
         components: {EveImage},
-        props: ['error'],
+        props: ['value'],
         data() {
             return {
                 corpOrAlliances: [],
                 search: '',
-                selected: []
+                selected: this.value,
+                error: this.$page.errors.selectedEntities
             }
         },
         methods: {
@@ -96,12 +93,32 @@
                     .catch(error => {
                         console.log(error);
                     })
+            },
+            flipSelect(entity) {
+
+                let index = this.selectedIds.indexOf(entity.id)
+
+                if(index >= 0)
+                    return this.removeSelected(entity)
+
+                this.selected.push(entity)
+            },
+            isSelected(entity) {
+                return this.selected.includes(entity)
+            },
+            removeSelected(entity) {
+                this.selected = _.remove(this.selected, (select) => select.id !== entity.id)
+            }
+        },
+        computed: {
+            selectedIds() {
+                return _.map(this.selected, (entity) => entity.id)
             }
         },
         watch: {
-           /* selected(newValue) {
-                this.$emit('entities', newValue)
-            }*/
+           selected(newValue) {
+                this.$emit('input', newValue)
+            }
         }
     }
 </script>

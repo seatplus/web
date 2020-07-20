@@ -35,7 +35,6 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.edit', ['role_id' => $role->id]));
 
-
         $response->assertComponent('AccessControl/EditGroup');
     }
 
@@ -201,39 +200,6 @@ class AccessControlTest extends TestCase
             ->get(route('acl.manage', ['role_id' => $role->id]));
 
         $response->assertComponent('AccessControl/ManageControlGroup');
-    }
-
-    /** @test */
-    public function on_can_sync_control_group_members()
-    {
-        $role = Role::create(['name' => 'test']);
-
-        //dd($this->test_user->hasRole('test'));
-
-        $this->assertFalse($this->test_user->hasRole('test'));
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('acl.manage.update', ['role_id' => $role->id]), [
-                "selectedValues" => [
-                    [
-                        "id" => $this->test_user->id,
-                    ],
-                ]
-            ]);
-
-        $this->assertTrue($this->test_user->fresh()->hasRole('test'));
-
-        //Remove the member from the access control group again
-        $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('acl.manage.update', ['role_id' => $role->id]), [
-                ]);
-
-        $this->assertFalse($this->test_user->fresh()->hasRole('test'));
-
     }
 
     private function assignPermissionToTestUser(array $array)

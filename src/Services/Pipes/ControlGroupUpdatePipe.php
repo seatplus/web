@@ -24,33 +24,12 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Services\Pipes;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Closure;
+use Seatplus\Web\Container\ControlGroupUpdateData;
 
-class JoinControlGroup extends FormRequest
+interface ControlGroupUpdatePipe
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
-        ];
-    }
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next);
 }

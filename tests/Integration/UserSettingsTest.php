@@ -6,6 +6,7 @@ namespace Seatplus\Web\Tests\Integration;
 
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
 
 class UserSettingsTest extends TestCase

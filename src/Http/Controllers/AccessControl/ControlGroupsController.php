@@ -30,8 +30,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Request\DeleteControlGroup;
-use Seatplus\Web\Http\Controllers\Request\JoinControlGroup;
 use Seatplus\Web\Http\Controllers\Request\UpdateControlGroup;
 use Seatplus\Web\Http\Resources\RoleRessource;
 use Seatplus\Web\Services\ACL\SyncRoleAffiliations;
@@ -42,7 +43,20 @@ class ControlGroupsController
 {
     public function index(Request $request)
     {
-        $query = Role::query();
+
+        $character_ids = auth()->user()->characters->map(fn ($character) => $character->character_id)->toArray();
+
+        $query = Role::when(auth()->user()->can('superuser'),
+            // Condition if user has superuser
+            fn ($query) => $query->orWhereNotIn('id', []),
+            // if user does not have superuser
+            fn ($query) => $query
+                ->whereHas('members', fn ($query) => $query->whereUserId(auth()->user()->getAuthIdentifier()))
+                ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph('affiliatable',
+                    [CorporationInfo::class, AllianceInfo::class],
+                    fn ($query) => $query->whereHas('characters', fn ($query) => $query->whereIn('character_infos.character_id', $character_ids))
+                ))
+        );
 
         $roles = RoleRessource::collection(
             $query->paginate()
@@ -108,10 +122,5 @@ class ControlGroupsController
         return redirect()
             ->back()
             ->with('success', 'Access control group deleted');
-    }
-
-    public function join(JoinControlGroup $join_control_group)
-    {
-        dd('TODO: implement join');
     }
 }

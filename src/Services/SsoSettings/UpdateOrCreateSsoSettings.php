@@ -28,11 +28,10 @@ namespace Seatplus\Web\Services\SsoSettings;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Actions\Jobs\Alliance\AllianceInfoAction;
-use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
 
 class UpdateOrCreateSsoSettings
 {
@@ -67,7 +66,7 @@ class UpdateOrCreateSsoSettings
 
             $morphable_type = $category === 'corporation' ? CorporationInfo::class : AllianceInfo::class;
 
-            $this->dispatchInfoJob($morphable_type, $entity_id);
+            (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
             SsoScopes::updateOrCreate([
                 'morphable_id' => $entity_id,
@@ -77,22 +76,5 @@ class UpdateOrCreateSsoSettings
             ]);
         });
 
-    }
-
-    private function dispatchInfoJob(string $morphable_type, int $entity_id)
-    {
-        $morphable_type === AllianceInfo::class ? $this->handleAllianceInfo($entity_id) : $this->handleCorporationInfo($entity_id);
-    }
-
-    private function handleAllianceInfo(int $entity_id)
-    {
-
-        (new AllianceInfoAction)->execute($entity_id);
-
-    }
-
-    private function handleCorporationInfo(int $entity_id)
-    {
-        (new CorporationInfoAction)->execute($entity_id);
     }
 }

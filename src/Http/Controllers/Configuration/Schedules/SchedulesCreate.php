@@ -38,7 +38,7 @@ class SchedulesCreate extends Controller
 
         return Inertia::render('Configuration/Schedules/SchedulesCreate', [
             'cron' => $cron,
-            'jobs' => config('eveapi.updateJobs'),
+            'jobs' => config('seatplus.updateJobs'),
         ]);
     }
 }

@@ -24,33 +24,29 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Services;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Eveapi\Actions\Jobs\Alliance\AllianceInfoAction;
+use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 
-class JoinControlGroup extends FormRequest
+class DispatchCorporationOrAllianceInfoJob
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function handle(string $type, int $id)
     {
+        $type === AllianceInfo::class ? $this->handleAllianceInfo($id) : $this->handleCorporationInfo($id);
 
-        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    private function handleAllianceInfo(int $entity_id)
     {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
-        ];
+
+        (new AllianceInfoAction)->execute($entity_id);
+
+    }
+
+    private function handleCorporationInfo(int $entity_id)
+    {
+        (new CorporationInfoAction)->execute($entity_id);
     }
 }

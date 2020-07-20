@@ -115,10 +115,9 @@ class AssignSuperuser extends Command
         }
 
         $role = $this->createRole();
-        $this->assignPermuissionToRole($role);
+        $this->assignPermissionToRole($role);
 
-        $this->user->assignRole($role);
-
+        $role->activateMember($this->user);
     }
 
     private function createRole(): Role
@@ -126,7 +125,7 @@ class AssignSuperuser extends Command
         return Role::findOrCreate('Superuser');
     }
 
-    private function assignPermuissionToRole(Role $role)
+    private function assignPermissionToRole(Role $role)
     {
         $permission = Permission::findOrCreate('superuser');
 

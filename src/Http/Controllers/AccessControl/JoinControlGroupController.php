@@ -24,33 +24,40 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\JoinControlGroup;
 
-class JoinControlGroup extends FormRequest
+class JoinControlGroupController extends Controller
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
+    private Role $role;
 
-        return true;
+    private User $user;
+
+    public function __invoke(JoinControlGroup $request)
+    {
+        $this->role = Role::find($request->role_id);
+        $this->user = User::find($request->user_id ?? auth()->user()->getAuthIdentifier());
+
+        if(! in_array($this->role->type, ['opt-in', 'on-request']))
+            return abort(403);
+
+        (auth()->user()->can('superuser') || $this->role->isModerator(auth()->user()))
+            ? $this->becomeMember() : $this->joinWaitlist();
+
+        return redirect()->back();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    private function becomeMember()
     {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
-        ];
+        $this->role->activateMember($this->user);
+    }
+
+    private function joinWaitlist()
+    {
+        $this->role->joinWaitlist($this->user);
     }
 }

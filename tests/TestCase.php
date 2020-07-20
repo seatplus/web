@@ -40,9 +40,9 @@ abstract class TestCase extends OrchestraTestCase
             return factory(User::class)->create();
         });
 
-        $this->test_character = $this->test_user->main_character;
+        //dd($this->test_user->characters);
 
-        $this->test_user->character_users->first()->character()->associate($this->test_character);
+        $this->test_character = $this->test_user->characters->first();
 
         $this->app->instance('path.public', __DIR__ .'/../src/public');
 

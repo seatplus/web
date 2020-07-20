@@ -26,47 +26,48 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
-use Spatie\Permission\PermissionRegistrar;
+use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Controllers\Controller;
 
-class ManageControlGroupMembersController
+class LeaveControlGroupController extends Controller
 {
-    public function index($role_id)
+    private Role $role;
+
+    private User $user;
+
+    public function __invoke(int $role_id, int $user_id)
     {
+        $this->role = Role::find($role_id);
+        $this->user = User::find($user_id);
 
-        $role = Role::whereId($role_id)
-            ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character')
-            ->first();
+        if(! in_array($this->role->type, ['opt-in', 'on-request']))
+            return abort(403, 'This action is not allowed on this access control group');
 
-        return Inertia::render('AccessControl/ManageControlGroup', [
-            'role' => $role,
-        ]);
+        $this->isActionOnYourself()
+            ? $this->removeMember()
+            : ($this->isSuperuserOrModerator() ? $this->removeMember() : $this->illegalAction());
+
+        return redirect()->back();
     }
 
-    /*public function update(Request $request, $role_id)
+    private function removeMember()
     {
+        $this->role->removeMember($this->user);
+    }
 
-        $validated_data = $request->validate([
-            'selectedValues.*.id' => 'bail|integer|exists:users,id',
-        ]);
+    private function isSuperuserOrModerator(): bool
+    {
+        return auth()->user()->can('superuser') || $this->role->isModerator(auth()->user());
+    }
 
-        $role = Role::findById($role_id);
+    private function isActionOnYourself(): bool
+    {
+        return auth()->user()->getAuthIdentifier() === $this->user->id;
+    }
 
-        $users_should_have_role = empty($validated_data) ? collect() : collect($validated_data['selectedValues'])->map(function ($vaule) {
-            return Arr::get($vaule, 'id');
-        });
-
-        $role->users()->sync($users_should_have_role->toArray());
-
-        //Update Cache
-        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
-
-        return redirect()
-            ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
-            ->with('success', 'Control Group updated');
-
-    }*/
+    private function illegalAction()
+    {
+        return abort(403, 'You are not allowed to perform this action');
+    }
 }

@@ -28,7 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class JoinControlGroup extends FormRequest
+class ControlGroupUpdate extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -37,8 +37,7 @@ class JoinControlGroup extends FormRequest
      */
     public function authorize()
     {
-
-        return true;
+        return auth()->user()->can('manage access control group');
     }
 
     /**
@@ -48,9 +47,11 @@ class JoinControlGroup extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
+            'type' => ['required', 'string'],
+            'affiliations' => ['array'],
+            'members' => ['array'],
         ];
     }
 }

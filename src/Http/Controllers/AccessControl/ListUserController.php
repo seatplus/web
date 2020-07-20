@@ -24,33 +24,15 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Controllers\Controller;
 
-class JoinControlGroup extends FormRequest
+class ListUserController extends Controller
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function __invoke()
     {
-
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
-        ];
+        return User::with('main_character')->paginate();
     }
 }

@@ -24,33 +24,19 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Container;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Auth\Models\Permissions\Role;
+use Spatie\DataTransferObject\DataTransferObject;
 
-class JoinControlGroup extends FormRequest
+class ControlGroupUpdateData extends DataTransferObject
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
+    public Role $role;
 
-        return true;
-    }
+    public string $role_type;
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-            'user_id' => 'bail|sometimes|integer|exists:users,id',
-        ];
-    }
+    public ?array $affiliations;
+
+    public ?array $members;
+
 }
