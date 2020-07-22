@@ -52,7 +52,7 @@ class UserRessource extends JsonResource
                     ];
             }),
             'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status)
+            'status' => $this->when($this->status ? true : false, $this->status),
         ];
     }
 }
