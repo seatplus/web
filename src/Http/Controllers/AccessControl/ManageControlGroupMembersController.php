@@ -26,11 +26,8 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
-use Spatie\Permission\PermissionRegistrar;
 
 class ManageControlGroupMembersController
 {
