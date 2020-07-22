@@ -22,7 +22,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.groups'));
 
-        $response->assertComponent('AccessControl/ControlGroups');
+        $response->assertComponent('AccessControl/ControlGroupsIndex');
     }
 
     /** @test */
@@ -71,9 +71,7 @@ class AccessControlTest extends TestCase
 
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
-            ->json('DELETE', route('acl.delete'), [
-                'role_id' => $role->id
-            ]);
+            ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
 
         $this->assertDatabaseMissing('roles',[
             'name' => 'test'
