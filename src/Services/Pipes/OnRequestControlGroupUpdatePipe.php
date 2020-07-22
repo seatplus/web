@@ -57,10 +57,10 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
                 // Delete removed moderators
                 $affiliatable_ids = $affiliations
-                    ->filter(fn($affiliation) => Arr::has($affiliation, 'affiliatable_id'))
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'affiliatable_id'))
                     // Only keep moderators
-                    ->filter(fn($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
-                    ->map(fn($affiliation) => $affiliation['affiliatable_id']);
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
+                    ->map(fn ($affiliation) => $affiliation['affiliatable_id']);
 
                 $data->role
                     ->moderators()
@@ -73,16 +73,16 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
                 // add affiliations
                 $affiliations
-                    ->filter(fn($affiliation) => Arr::has($affiliation, 'user_id'))
-                    ->filter(fn($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
-                    ->each(fn($affiliation) => $data->role->acl_affiliations()->create([
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'user_id'))
+                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
+                    ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id'   => Arr::get($affiliation, 'user_id'),
                         'affiliatable_type' => User::class,
-                        'can_moderate'      => true
+                        'can_moderate'      => true,
                     ]));
 
                 return $affiliations;
             })
-            ->whenEmpty(fn($affiliations) => $data->role->moderators()->delete());
+            ->whenEmpty(fn ($affiliations) => $data->role->moderators()->delete());
     }
 }
