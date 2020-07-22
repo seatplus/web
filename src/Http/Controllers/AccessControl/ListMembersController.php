@@ -41,15 +41,15 @@ class ListMembersController extends Controller
         abort_unless($role->isModerator(auth()->user()), 403);
 
         $users = User::query()
-            ->join('acl_members', fn($join) => (
+            ->join('acl_members', fn ($join) => (
             $join->on('users.id', '=', 'acl_members.user_id')
                 ->where('acl_members.role_id', $role_id)
             ))
             ->addSelect([
-            'status' => AclMember::select('status')->whereColumn('user_id','users.id')
-                ->where('role_id','=', $role_id)
-                ->limit(1)
-        ]);
+                'status' => AclMember::select('status')->whereColumn('user_id', 'users.id')
+                    ->where('role_id', '=', $role_id)
+                    ->limit(1),
+            ]);
 
         return UserRessource::collection(
             $users->paginate()
