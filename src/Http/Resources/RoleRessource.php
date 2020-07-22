@@ -42,7 +42,23 @@ class RoleRessource extends JsonResource
         return [
             'name' => $this->name,
             'id' => $this->id,
-            'users' => UserRessource::collection($this->users),
+            'members' => $this->users->count(),
+            'type' => $this->type,
+            'can_edit' => $this->when(auth()->user()->can('create,update and delete access control group'), true),
+            'can_moderate' => $this->when($this->canModerate(), true),
+            'status' => $this->acl_members()->whereUserId(auth()->user()->getAuthIdentifier())->get()->first()->status ?? false,
         ];
+    }
+
+    private function canModerate(): bool
+    {
+        if($this->type !== 'on-request')
+            return false;
+
+        if(auth()->user()->can('superuser'))
+            return true;
+
+        return $this->isModerator(auth()->user());
+
     }
 }

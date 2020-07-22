@@ -2,7 +2,7 @@
     <Layout :active-sidebar-element="activeSidebarElement">
         <template v-slot:title>
             <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
-                Edit {{ role.name }}
+                Manage {{ role.name }}
                 <template v-slot:primary>
                     <HeaderButton @click="store">
                         Save
@@ -85,7 +85,6 @@
 
 <script>
     import Layout from "../../Shared/Layout"
-    import Multiselect from 'vue-multiselect'
     import EveImage from "../../Shared/EveImage"
     import PageHeader from "../../Shared/Layout/PageHeader"
     import HeaderButton from "../../Shared/Layout/HeaderButton"
@@ -105,7 +104,7 @@
             OnRequestControlGroup,
             AutomaticRole,
             InputGroup,
-            Manual, AffiliationList, ListTransition, HeaderButton, PageHeader, Layout, Multiselect, EveImage},
+            Manual, AffiliationList, ListTransition, HeaderButton, PageHeader, Layout, EveImage},
         props: {
             role: {
                 required: true
@@ -116,7 +115,8 @@
                 role_type: this.role.type,
                 acl: {
                     members: this.role.acl_members,
-                    affiliations: this.role.acl_affiliations
+                    affiliations: this.role.acl_affiliations,
+                    moderators: this.role.moderators
                 },
                 changed: false
             }
@@ -132,7 +132,8 @@
                     role_type: this.role.type,
                     acl: {
                         members: this.role.acl_members,
-                        affiliations: this.role.acl_affiliations
+                        affiliations: this.role.acl_affiliations,
+                        moderators: this.role.moderators
                     }
                 }
 
@@ -148,7 +149,7 @@
                 let data = {
                     type: this.role_type,
                     members: this.acl.members,
-                    affiliations: this.acl.affiliations
+                    affiliations: [...this.acl.affiliations, ...this.acl.moderators]
                 }
 
                 this.$inertia.post(window.location.href, data, {

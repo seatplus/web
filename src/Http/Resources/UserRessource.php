@@ -42,14 +42,17 @@ class UserRessource extends JsonResource
         return [
             'id' => $this->id,
             'main_character' => $this->main_character,
-            'characters' => $this->characters->map(function ($character) {
-                return [
-                    'character_id' => $character->character_id,
-                    'name' => $character->name,
-                    'scopes' => $character->refresh_token->scopes ?? null,
-                ];
+            'characters' => $this->characters
+                //->reject(fn($character) => $character->character_id === $this->main_character_id)
+                ->map(function ($character) {
+                    return [
+                        'character_id' => $character->character_id,
+                        'name' => $character->name,
+                        'scopes' => $character->refresh_token->scopes,
+                    ];
             }),
-            'impersonating' => session('impersonation_origin') ? true : false,
+            'impersonating' => $this->when(session('impersonation_origin'), true),
+            'status' => $this->when($this->status ? true : false, $this->status),
         ];
     }
 }

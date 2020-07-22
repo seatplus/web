@@ -3,7 +3,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Affiliations
         </h3>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+        <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
             <li :key="entity.affiliatable_id" v-for="entity in this.entities" class="col-span-1 bg-white rounded-lg shadow">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
                     <div class="flex-1 truncate">
@@ -22,7 +22,7 @@
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M11 6a3 3 0 11-6 0 3 3 0 016 0zM14 17a6 6 0 00-12 0h12zM13 8a1 1 0 100 2h4a1 1 0 100-2h-4z"></path>
                                 </svg>
-                                <span class="ml-3">Remove member</span>
+                                <span class="ml-3">Remove affiliation</span>
                             </button>
                         </div>
                     </div>
@@ -41,7 +41,12 @@
       name: "Affiliations",
       components: {EveImage},
       props: {
-          value: {}
+          value: {},
+          twoColumns: {
+              type: Boolean,
+              requires: false,
+              default: false
+          }
       },
       data() {
           return {

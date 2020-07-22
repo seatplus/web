@@ -26,27 +26,34 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\JoinControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
+use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
 
 Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
+Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
+Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
+Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');
 Route::post('/', JoinControlGroupController::class)->name('acl.join');
-Route::delete('/role/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
+Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware(['permission:create or update or delete access control group'])->group(function () {
     Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');
-    Route::delete('/delete', [ControlGroupsController::class, 'delete'])->name('acl.delete');
 
-    Route::get('/edit/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
-    Route::post('/edit/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
+    Route::get('/acl/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
+    Route::post('/acl/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
+    Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
 });
 
 Route::middleware(['permission:manage access control group'])->group(function () {
-    Route::get('/manage_members/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
-    Route::post('/manage_members/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
+    Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
+    Route::post('/manage_control_group/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
 
     Route::get('/user', ListUserController::class)->name('list.users');
 });

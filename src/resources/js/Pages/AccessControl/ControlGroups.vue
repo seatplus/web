@@ -1,283 +1,118 @@
 <template>
-    <Layout page="Access Control" page-description="Overview">
-        <div class="bg-white overflow-hidden shadow rounded-lg">
-            <!--Header-->
-            <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
-                <!-- Content goes here -->
-                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
-                    <div class="ml-4 mt-2">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            Access Control Groups
-                        </h3>
-                    </div>
-                    <div class="ml-4 mt-2 flex-shrink-0">
-                      <span class="inline-flex rounded-md shadow-sm">
-                        <button @click="toggleCreateModal(true)" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:border-indigo-700 active:bg-indigo-700">
-                          Create new group
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <li :key="role.id" v-for="role in this.roles" class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow">
+            <div class="flex-1 flex flex-col p-8">
+                <Avatar :name="role.name"></Avatar>
+                <h3 class="mt-6 text-gray-900 text-sm leading-5 font-medium">{{ role.name }}</h3>
+                <dl class="mt-1 flex-grow flex flex-col justify-between">
+                    <dd class="text-gray-500 text-sm leading-5">{{ role.members }} {{ role.members > 1 ? 'Members' : 'Member'}} </dd>
+                    <dd class="mt-3">
+                        <span :class="[isPausedOrWaitlist(role) ? 'bg-yellow-100 text-yellow-800': 'bg-teal-100 text-teal-800','px-2 py-1  text-xs leading-4 font-medium  rounded-full']">{{ role.status ? role.status : role.type }}</span>
+                    </dd>
+                </dl>
+            </div>
+            <div class="border-t border-gray-200">
+                <div class="-mt-px flex">
+                    <div v-if="isJoinable(role)" class="w-0 flex-1 flex border-r border-gray-200">
+                        <button @click="join(role)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path>
+                            </svg>
+                            <span class="ml-3">Join</span>
                         </button>
-                      </span>
                     </div>
-                </div>
-                <!-- We use less vertical padding on card headers on desktop than on body sections -->
-            </div>
-
-            <!--Content below-->
-            <div class="flex flex-col">
-                <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-                    <div class="align-middle inline-block min-w-full overflow-hidden"> <!-- shadow sm:rounded-lg border-b border-gray-200-->
-                        <table class="min-w-full">
-                            <thead>
-                            <tr>
-                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Name
-                                </th>
-                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Members
-                                </th>
-                                <!--<th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Type
-                                </th>-->
-                                <!--<th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Role
-                                </th>-->
-                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"><!--Manage--></th>
-                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50"><!--Join--></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr :class="{'bg-white' : index % 2 === 0, 'bg-gray-50': index % 2 !== 0}" ref="tr" v-for="(role, index) in roles.data">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    {{role.name}}
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    <AvatarGroupTopToBottom :objects="getRoleMembers(role.users)" :random="true"/>
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-center text-sm leading-5 text-gray-500">
-                                    <DropdownWithIcons :index="index"  v-on:change="toggleHelperRow" >
-                                        <div class="rounded-md bg-white shadow-xs">
-                                            <div class="py-1">
-                                                <inertia-link :href="$route('acl.edit', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
-                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
-                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Edit
-                                                </inertia-link>
-                                                <inertia-link :href="$route('acl.manage', role.id)" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
-                                                    <svg fill="currentColor" viewBox="0 0 20 20" class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500">
-                                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
-                                                    </svg>
-                                                    Manage
-                                                </inertia-link>
-                                                <!--<a href="#" class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
-                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h6a2 2 0 012 2H5v8a2 2 0 01-2-2V5zm6 2a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2H9z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Duplicate
-                                                </a>-->
-                                            </div>
-                                            <div class="border-t border-gray-100"></div>
-                                            <div class="py-1">
-                                                <inertia-link
-                                                    :href="$route('acl.delete')" method="delete" :data="{ role_id: role.id }"
-                                                    class="group flex items-center px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
-                                                >
-                                                    <svg class="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Delete
-                                                </inertia-link>
-                                            </div>
-                                        </div>
-                                    </DropdownWithIcons>
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <!--<SimpleToggle :value="dispatch" v-on:change="toggleDispatch" />-->
-                                    <!--<a href="#" class="text-right text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>-->
-                                    <!--<inertia-link :href="route('acl.join')"
-                                                  class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline"
-                                                  method="post"
-                                                  :data="{ role_id: role.id }"
-                                    >
-                                        Join
-                                    </inertia-link>-->
-                                    Join
-                                </td>
-                            </tr>
-                            <tr v-show="rowHeight > 0" :class="'bg-grey-500'">
-                                <td colspan="4" :height="rowHeight" class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium" />
-                            </tr>
-                            <!--<tr class="bg-gray-50">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    Bernard Lane
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Director, Human Resources
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    bernardlane@example.com
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Owner
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
-                                </td>
-                            </tr>
-                            <tr class="bg-white">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    Bernard Lane
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Director, Human Resources
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    bernardlane@example.com
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Owner
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
-                                </td>
-                            </tr>
-                            <tr class="bg-gray-50">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    Bernard Lane
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Director, Human Resources
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    bernardlane@example.com
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Owner
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
-                                </td>
-                            </tr>
-                            <tr class="bg-white">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-900">
-                                    Bernard Lane
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Director, Human Resources
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    bernardlane@example.com
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    Owner
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-right text-sm leading-5 font-medium">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-900 focus:outline-none focus:underline">Edit</a>
-                                </td>
-                            </tr>-->
-                            </tbody>
-                        </table>
+                    <div v-if="isLeavable(role)" class="w-0 flex-1 flex border-r border-gray-200">
+                        <button @click="leave(role)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M11 6a3 3 0 11-6 0 3 3 0 016 0zM14 17a6 6 0 00-12 0h12zM13 8a1 1 0 100 2h4a1 1 0 100-2h-4z"></path>
+                            </svg>
+                            <span class="ml-3">Leave</span>
+                        </button>
                     </div>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-200 px-4 py-4 sm:px-6">
-                <!-- Content goes here -->
-                <Pagination :collection="roles" />
-                <!-- We use less vertical padding on card footers at all sizes than on headers or body sections -->
-            </div>
-        </div>
-
-        <template v-slot:modal>
-            <ModalWithFooter :open="openCreateModal" @change="toggleCreateModal">
-                <template v-slot:symbol>
-                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor"  viewBox="0 0 24 24" >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                    </div>
-                </template>
-                <template v-slot:title>Create New Control Group</template>
-                <template v-slot:description>
-                    <div>
-                        <label for="role" class="block text-sm font-medium leading-5 text-gray-700">Control Group</label>
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <input id="role" class="form-input block w-full sm:text-sm sm:leading-5" placeholder="Some name" v-model="createRoleName"/>
-                        </div>
-                        <p class="mt-2 text-sm text-gray-500">Chose a descriptive name for the group to be created</p>
-                    </div>
-                </template>
-                <template v-slot:buttons>
-                    <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                        <inertia-link method="post" :href="$route('acl.create')" :data="{name: createRoleName}" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                            Create
+                    <div v-if="canModerate(role)" class="-ml-px w-0 flex-1 flex border-r border-gray-200">
+                        <inertia-link :href="$route('manage.acl.members', role.id)"  class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                            </svg>
+                            <svg fill="currentColor" viewBox="0 0 20 20"></svg>
+                            <span class="ml-3">Moderate</span>
                         </inertia-link>
-                    </span>
-                </template>
-            </ModalWithFooter>
-        </template>
-    </Layout>
+                    </div>
+                    <div v-if="role.can_edit" class="-ml-px w-0 flex-1 flex border-r border-gray-200">
+                        <inertia-link :href="$route('acl.edit', role.id)" class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
+                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="ml-3">Edit</span>
+                        </inertia-link>
+                    </div>
+                    <div v-if="role.can_edit" class="-ml-px w-0 flex-1 flex">
+                        <inertia-link :href="$route('acl.manage', role.id)" class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                            </svg>
+                            <span class="ml-3">Manage</span>
+                        </inertia-link>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
 </template>
 
 <script>
-  import Layout from "../../Shared/Layout"
-  import Pagination from "../../Shared/Pagination"
-  import SimpleToggle from "../../Shared/SimpleToggle"
-  import ModalWithFooter from "../../Shared/ModalWithFooter"
-  import DropdownWithIcons from "../../Shared/DropdownWithIcons"
-  import AvatarGroupTopToBottom from "../../Shared/AvatarGroupTopToBottom"
 
-  export default {
-      name: "ControlGroups",
-      components: {
-          AvatarGroupTopToBottom, DropdownWithIcons, ModalWithFooter, SimpleToggle, Layout, Pagination},
-      data() {
-          return {
-              dispatch: false,
-              openCreateModal: false,
-              rowHeight: 0,
-              indexDropdown: 0,
-              createRoleName: ''
-          }
-      },
-      props: {
-          roles: {
-              type: Object,
-              required: true
-          }
-      },
-      methods: {
-          toggleDispatch(value) {
-              this.dispatch = value;
-          },
-          toggleCreateModal(value) {
-              this.openCreateModal = value;
-          },
-          getRoleMembers(users) {
-              return _.map(users, function (user) {
-                  return user.main_character
-              })
-          },
-          toggleHelperRow(object) {
+    import Avatar from "@/Shared/Avatar"
+    export default {
+        name: "ControlGroups",
+        components: {Avatar},
+        props: {
+            roles: {
+                required: true
+            }
+        },
+        methods: {
+            isJoinable(role) {
+                return (['on-request', 'opt-in'].indexOf(role.type) > -1) && !this.isLeavable(role)
+            },
+            isLeavable(role) {
+                return !!role.status
+            },
+            canModerate(role) {
+                return role.can_moderate && !role.can_edit
+            },
+            join(role) {
+                let data = {
+                    role_id: role.id
+                };
 
-              this.rowHeight = object.dropdownHeight - (_.size(this.roles.data) - (object.index + 1)) * this.evaluateRowHeight()
-          },
-          evaluateRowHeight() {
-              return this.rolesLength === 0 ? 0 : this.$refs.tr[0].clientHeight
-          },
-      },
-      computed: {
-          hasNoRoles: function () {
-              return _.isEmpty(this.roles.data)
-          },
-          chunkedRoles: function () {
-              return _.chunk(this.roles.data, 3)
-          },
-          rolesLength: function () {
-              return this.roles.data.length
-          }
-      }
-  }
+                this.$inertia.post(this.$route('acl.join'), data, {
+                    replace: false,
+                    preserveState: false,
+                    preserveScroll: false,
+                    only: [],
+                })
+            },
+            isPausedOrWaitlist(role) {
+                return ['paused', 'waitlist'].indexOf(role.status) > -1
+            },
+            leave(role) {
+
+                let user_id = this.$page.user.data.id;
+
+                return this.$inertia.delete(this.$route('acl.leave', {role_id: role.id, user_id: user_id}), {
+                    replace: false,
+                    preserveState: false,
+                    preserveScroll: false,
+                    only: [],
+                })
+            },
+            moderate(role) {
+
+            }
+        }
+    }
 </script>
 
 <style scoped>

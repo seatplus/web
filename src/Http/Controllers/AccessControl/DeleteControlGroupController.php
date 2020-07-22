@@ -24,31 +24,20 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Auth\Http\Controllers\Controller;
+use Seatplus\Auth\Models\Permissions\Role;
 
-class DeleteControlGroup extends FormRequest
+class DeleteControlGroupController extends Controller
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
+    public function __invoke(int $role_id)
     {
-        return true;
-    }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
-    {
-        return [
-            'role_id' => 'bail|required|integer|exists:roles,id',
-        ];
+        Role::findById($role_id)->delete();
+
+        return redirect()
+            ->route('acl.groups')
+            ->with('success', 'Access control group deleted');
     }
 }

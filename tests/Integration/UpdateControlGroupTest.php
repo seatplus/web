@@ -151,6 +151,52 @@ class UpdateControlGroupTest extends TestCase
         $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
     }
 
+    /** @test */
+    public function on_request_control_group_adds_and_removes_moderators()
+    {
+
+        $this->assertTrue($this->role->moderators->isEmpty());
+
+        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
+
+        $this->assertEquals('manual', $this->role->type);
+
+        $response = $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
+                "type" => 'on-request',
+                'affiliations' => [
+                    [
+                        'can_moderate' => true,
+                        'user_id' => $this->test_user->id
+                    ]
+                ],
+                'members' => []
+            ]);
+
+        // Test if test user is moderator
+        $this->assertTrue($this->role->refresh()->moderators->isNotEmpty());
+        $this->assertTrue($this->role->refresh()->isModerator($this->test_user));
+
+        // assert that no affiliations has been created
+        $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
+
+        // now let's update again but this time no moderator
+        $response = $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
+                "type" => 'on-request',
+                'affiliations' => [],
+                'members' => []
+            ]);
+
+        // Test if test user is moderator
+        $this->assertFalse($this->role->refresh()->moderators->isNotEmpty());
+        $this->assertFalse($this->role->refresh()->isModerator($this->test_user));
+
+
+    }
+
     private function assignPermissionToTestUser(array $array)
     {
         foreach ($array as $string) {

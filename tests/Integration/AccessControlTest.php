@@ -7,7 +7,6 @@ namespace Seatplus\Web\Tests\Integration;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -22,7 +21,12 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.groups'));
 
-        $response->assertComponent('AccessControl/ControlGroups');
+        $response->assertComponent('AccessControl/ControlGroupsIndex');
+
+        // Assert Listing of Control Groups
+        $this->actingAs($this->test_user)
+            ->get(route('get.acl'))
+            ->assertOk();
     }
 
     /** @test */
@@ -71,9 +75,7 @@ class AccessControlTest extends TestCase
 
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
-            ->json('DELETE', route('acl.delete'), [
-                'role_id' => $role->id
-            ]);
+            ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
 
         $this->assertDatabaseMissing('roles',[
             'name' => 'test'
@@ -200,6 +202,30 @@ class AccessControlTest extends TestCase
             ->get(route('acl.manage', ['role_id' => $role->id]));
 
         $response->assertComponent('AccessControl/ManageControlGroup');
+    }
+
+    /** @test */
+    public function moderator_can_manage_applications()
+    {
+        $role = Role::create(['name' => 'test', 'type' => 'on-request']);
+
+        $this->assignPermissionToTestUser(['view access control']);
+
+        $role->acl_affiliations()->create([
+            'affiliatable_id' => $this->test_user->id,
+            'affiliatable_type' => User::class,
+            'can_moderate' => true
+        ]);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('manage.acl.members', ['role_id' => $role->id]));
+
+        $response->assertComponent('AccessControl/ManageMembers');
+
+        // List Members
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.members', ['role_id' => $role->id]))
+            ->assertOk();
     }
 
     private function assignPermissionToTestUser(array $array)
