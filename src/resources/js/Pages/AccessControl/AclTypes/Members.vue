@@ -5,7 +5,7 @@
                 Members
             </slot>
         </h3>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+        <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
             <li :key="member.user.id" v-for="member in filteredMembers" class="col-span-1 bg-white rounded-lg shadow">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
                     <div class="flex-1 truncate">
@@ -49,6 +49,11 @@
       props: {
           value: {},
           requiresRemovalButton: {
+              type: Boolean,
+              requires: false,
+              default: false
+          },
+          twoColumns: {
               type: Boolean,
               requires: false,
               default: false

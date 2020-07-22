@@ -3,7 +3,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Applicants
         </h3>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5">
             <li :key="member.user.id" v-for="member in filteredMembers" class="col-span-1 bg-white rounded-lg shadow">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
                     <div class="flex-1 truncate">
@@ -73,7 +73,7 @@
           },
           removeMember(member) {
 
-              this.$inertia.delete(this.$route('acl.leave', member.role_id, member.user_id), {
+              this.$inertia.delete(this.$route('acl.leave', [member.role_id, member.user_id]), {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,

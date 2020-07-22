@@ -4,23 +4,36 @@
             This is the on-request control group settings. Users with characters in the selected affilites can apply to the control group
         </p>
 
-        <Applicants v-model="members" class="mt-6" />
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <SearchCorpOrAlliance v-model="affiliations" class="mt-6">
+                    Search for corporation or alliance that you wish to affiliate
+                </SearchCorpOrAlliance>
+                <Affiliations v-model="this.affiliations" two-columns></Affiliations>
+                <Moderators v-model="moderators" class="mt-6" two-columns ></Moderators>
+                <Users v-model="moderators" class="mt-6" requires-adding-button two-columns>
+                    <template v-slot:title>Available Moderators</template>
+                    <template v-slot:button-text>Add Moderator</template>
+                </Users>
+            </div>
+            <div>
+                <Applicants v-model="members" class="mt-6" />
+                <Members v-model="members" class="mt-6" requires-removal-button two-columns/>
+            </div>
+        </div>
 
-        <SearchCorpOrAlliance v-model="affiliations" class="mt-6">
-            Search for corporation or alliance that you wish to affiliate
-        </SearchCorpOrAlliance>
 
-        <Affiliations v-model="this.affiliations"></Affiliations>
+
+
+
+
 
         <!--Moderators-->
-        <Moderators v-model="moderators" class="mt-6" ></Moderators>
-        <Users v-model="moderators" class="mt-6" requires-adding-button>
-            <template v-slot:title>Available Moderators</template>
-            <template v-slot:button-text>Add Moderator</template>
-        </Users>
 
 
-        <Members v-model="members" class="mt-6" />
+
+
+
 
     </div>
 </template>

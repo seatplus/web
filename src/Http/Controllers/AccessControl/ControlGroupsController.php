@@ -41,30 +41,9 @@ use Seatplus\Web\Services\ACL\SyncRolePermissions;
 
 class ControlGroupsController
 {
-    public function index(Request $request)
+    public function index()
     {
-
-        $character_ids = auth()->user()->characters->map(fn ($character) => $character->character_id)->toArray();
-
-        $query = Role::when(auth()->user()->can('superuser'),
-            // Condition if user has superuser
-            fn ($query) => $query->orWhereNotIn('id', []),
-            // if user does not have superuser
-            fn ($query) => $query
-                ->whereHas('members', fn ($query) => $query->whereUserId(auth()->user()->getAuthIdentifier()))
-                ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph('affiliatable',
-                    [CorporationInfo::class, AllianceInfo::class],
-                    fn ($query) => $query->whereHas('characters', fn ($query) => $query->whereIn('character_infos.character_id', $character_ids))
-                ))
-        );
-
-        $roles = RoleRessource::collection(
-            $query->paginate()
-        );
-
-        return Inertia::render('AccessControl/ControlGroups', [
-            'roles' => $roles,
-        ]);
+        return Inertia::render('AccessControl/ControlGroupsIndex');
     }
 
     public function create(Request $request)
@@ -111,16 +90,5 @@ class ControlGroupsController
         return redirect()
             ->action([ControlGroupsController::class, 'edit'], $role_id)
             ->with('success', 'Access control group updated');
-    }
-
-    public function delete(DeleteControlGroup $delete_control_group)
-    {
-        $role_id = $delete_control_group->input('role_id');
-
-        Role::findById($role_id)->delete();
-
-        return redirect()
-            ->back()
-            ->with('success', 'Access control group deleted');
     }
 }

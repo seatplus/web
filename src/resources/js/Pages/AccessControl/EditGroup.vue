@@ -4,9 +4,13 @@
             <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
                 Access Control Groups
                 <template v-slot:primary>
+                    <HeaderButton @click="remove" :secondary="true">
+                        Delete
+                    </HeaderButton>
                     <HeaderButton @click="store">
                         Save
                     </HeaderButton>
+
                 </template>
 
             </PageHeader>
@@ -166,6 +170,15 @@
           },
           setIsDirty: function () {
               this.isDirty = true
+          },
+          remove() {
+
+              this.$inertia.delete(this.$route('acl.delete', this.role.id), {
+                  replace: false,
+                  preserveState: false,
+                  preserveScroll: false,
+                  only: [],
+              })
           }
       },
       computed: {

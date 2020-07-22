@@ -3,7 +3,7 @@
         <h3 class="text-lg leading-6 font-medium text-gray-900">
             Moderators
         </h3>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+        <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
             <li :key="moderator.affiliatable_id" v-for="moderator in enhancedModerators" class="col-span-1 bg-white rounded-lg shadow">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
                     <div class="flex-1 truncate">
@@ -44,6 +44,11 @@
       components: {EveImage},
       props: {
           value: {},
+          twoColumns: {
+              type: Boolean,
+              requires: false,
+              default: false
+          }
       },
       data() {
           return {

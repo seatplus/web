@@ -46,28 +46,4 @@ class ManageControlGroupMembersController
             'role' => $role,
         ]);
     }
-
-    /*public function update(Request $request, $role_id)
-    {
-
-        $validated_data = $request->validate([
-            'selectedValues.*.id' => 'bail|integer|exists:users,id',
-        ]);
-
-        $role = Role::findById($role_id);
-
-        $users_should_have_role = empty($validated_data) ? collect() : collect($validated_data['selectedValues'])->map(function ($vaule) {
-            return Arr::get($vaule, 'id');
-        });
-
-        $role->users()->sync($users_should_have_role->toArray());
-
-        //Update Cache
-        app()->make(PermissionRegistrar::class)->forgetCachedPermissions();
-
-        return redirect()
-            ->action([ManageControlGroupMembersController::class, 'index'], $role_id)
-            ->with('success', 'Control Group updated');
-
-    }*/
 }

@@ -63,6 +63,7 @@ class LeaveControlGroupController extends Controller
 
     private function isActionOnYourself(): bool
     {
+        session()->flash('success');
         return auth()->user()->getAuthIdentifier() === $this->user->id;
     }
 

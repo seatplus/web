@@ -24,35 +24,35 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Models\AccessControl\AclMember;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\UserRessource;
 
-class UserRessource extends JsonResource
+class ListMembersController extends Controller
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function __invoke(int $role_id)
     {
+        $role = Role::find($role_id);
 
-        return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => $this->characters
-                //->reject(fn($character) => $character->character_id === $this->main_character_id)
-                ->map(function ($character) {
-                    return [
-                        'character_id' => $character->character_id,
-                        'name' => $character->name,
-                        'scopes' => $character->refresh_token->scopes,
-                    ];
-            }),
-            'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status)
-        ];
+        abort_unless($role->isModerator(auth()->user()), 403);
+
+        $users = User::query()
+            ->join('acl_members', fn($join) => (
+            $join->on('users.id', '=', 'acl_members.user_id')
+                ->where('acl_members.role_id', $role_id)
+            ))
+            ->addSelect([
+            'status' => AclMember::select('status')->whereColumn('user_id','users.id')
+                ->where('role_id','=', $role_id)
+                ->limit(1)
+        ]);
+
+        return UserRessource::collection(
+            $users->paginate()
+        );
     }
 }

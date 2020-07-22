@@ -10,7 +10,7 @@
 
         <Affiliations v-model="this.affiliations"></Affiliations>
 
-        <Members v-model="members" class="mt-6" />
+        <Members v-model="members" class="mt-6" requires-removal-button/>
 
     </div>
 </template>
