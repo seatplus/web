@@ -28,7 +28,7 @@
 
         <ControlGroups :roles="this.rolesList" class="mt-8"></ControlGroups>
 
-        <infinite-loading @infinite="infiniteHandler" spinner="waveDots">
+        <infinite-loading @infinite="infiniteHandler" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more"></div>
         </infinite-loading>
 
