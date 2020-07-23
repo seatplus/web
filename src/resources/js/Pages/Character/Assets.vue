@@ -45,7 +45,8 @@
                         {{ location.location }}
                     </h3>
                     <p class="mt-1 text-sm leading-5 text-gray-500">
-                        {{getLocationsVolume(location.assets)}} volume and {{getLoationsItemsCount(location.assets)}} items
+                        {{getLocationsVolume(location.assets)}} volume and {{getLocationsItemsCount(location.assets)}}
+                        items
                     </p>
                 </div>
             </template>
@@ -53,6 +54,11 @@
                 <ItemList :items="location.assets"></ItemList>
             </template>
         </wide-lists>
+
+        <infinite-loading @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
+            <div slot="no-more">all loaded</div>
+        </infinite-loading>
+
     </Layout>
 </template>
 
@@ -66,7 +72,7 @@
     import ItemList from "./ItemList"
     import InputGroup from "../../Shared/InputGroup"
     import SeatPlusSelect from "../../Shared/SeatPlusSelect"
-
+    import InfiniteLoading from "vue-infinite-loading"
     export default {
         name: "Assets",
         components: {
@@ -75,6 +81,7 @@
             ItemList,
             DispatchUpdate,
             WideListElement,
+            InfiniteLoading,
             WideLists, Layout, EveImage, Pagination
         },
         props: {
@@ -85,7 +92,7 @@
             return {
                 requiredScopes: this.dispatchable_jobs.required_scopes,
                 assets_data: [],
-                path: this.$route('load.character.assets'),
+                page: 1,
                 next_url: '',
                 search: null,
                 character: null,
@@ -93,7 +100,7 @@
             }
         },
         methods: {
-            loadAssets(url) {
+            loadAssets($state) {
                 const self = this;
 
                 let data = {}
@@ -102,27 +109,20 @@
                     if(self[prop])
                         data[prop] = self[prop]
 
-                axios.post(url, data)
-                    .then(response => {
-                        self.assets_data.push(...response.data.data)
-                        self.next_url = response.data.links.next
-                    })
+                axios.post(this.$route('load.character.assets'), data, {
+                    params: {
+                        page: this.page,
+                    },
+                }).then(response => {
 
-            },
-            scroll: function () {
-                const self = this;
-
-                window.onscroll = () => {
-                    let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
-
-                    if(bottomOfWindow) {
-
-                        if (_.isString(self.next_url)) {
-                            self.loadAssets(self.next_url)
-                        }
+                    if(response.data.data.length) {
+                        self.page += 1;
+                        self.assets_data.push(...response.data.data);
+                        $state.loaded();
+                    } else {
+                        $state.complete();
                     }
-                }
-
+                });
             },
             getMetricPrefix(numeric_value) {
 
@@ -140,13 +140,13 @@
 
                 return prefix(_.sum(_.map(location_assets,volume)), { precision: 3, unit: 'm³'})
             },
-            getLoationsItemsCount(location_assets) {
+            getLocationsItemsCount(location_assets) {
 
                 return _.size(location_assets)
             },
             filter() {
                 this.assets_data = []
-                this.loadAssets(this.path)
+                this.page = 1
             }
         },
         computed: {
@@ -184,10 +184,6 @@
                 this.filter()
             }
         },
-        mounted() {
-            this.loadAssets(this.path)
-            this.scroll();
-        }
     }
 </script>
 
