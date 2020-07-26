@@ -33,7 +33,7 @@
         </infinite-loading>
 
         <template v-slot:modal>
-            <ModalWithFooter>
+            <ModalWithFooter v-model="openModal">
                 <template v-slot:symbol>
                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
                         <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor"  viewBox="0 0 24 24" >
@@ -63,12 +63,13 @@
                 </template>
             </ModalWithFooter>
         </template>
+
     </Layout>
 </template>
 
 <script>
   import Layout from "../../Shared/Layout"
-  import ModalWithFooter from "../../Shared/ModalWithFooter"
+  import ModalWithFooter from "../../Shared/Modals/ModalWithFooter"
   import ControlGroups from "./ControlGroups"
   import InfiniteLoading from "vue-infinite-loading"
   import ManageMembers from "./ManageMembers"
@@ -86,8 +87,7 @@
       },
       methods: {
           toggleModal() {
-              if(this.openModal)
-                  this.managingRole = null
+              console.log('toggle')
 
               this.openModal = !this.openModal;
           },

@@ -50,22 +50,8 @@ class AssetsController extends Controller
     public function index(Request $request)
     {
 
-        $filters = function () {
+        $filters = fn() => ['regions' => Region::all()];
 
-            $affiliated_characters = getAffiliatedCharacters(CharacterAsset::class);
-            $owned_character_ids = auth()->user()->characters->pluck('character_id');
-
-            return [
-                'regions' => Region::all(),
-                //TODO: create service
-                'affiliated_characters' => $affiliated_characters->filter(function ($character_info) use ($owned_character_ids) {
-                    return ! in_array($character_info->character_id, $owned_character_ids->toArray());
-                }),
-                'owned_characters' => $affiliated_characters->filter(function ($character_info) use ($owned_character_ids) {
-                    return in_array($character_info->character_id, $owned_character_ids->toArray());
-                }),
-            ];
-        };
 
         $dispatchable_jobs = function () {
 

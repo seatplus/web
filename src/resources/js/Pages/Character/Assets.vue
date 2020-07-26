@@ -13,10 +13,18 @@
 
                         <div class="col-span-6 sm:col-span-3">
                             <InputGroup for="character_dropdown" label="Character Filter">
-                                <SeatPlusSelect v-model="character" id="character_dropdown">
+                                <span class="mt-1 inline-flex rounded-md shadow-sm box w-full">
+                                  <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:shadow-outline-gray transition ease-in-out duration-150">
+                                      {{ characterFilterModal.selectedCharacters.length === 0 ? 'Own Characters' : (characterFilterModal.selectedCharacters.length === 1 ? '1 Character' : characterFilterModal.selectedCharacters.length + ' Characters') }}
+                                      <svg class="h-6 w-6 float-right" viewBox="0 0 20 20" fill="none">
+                                          <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#9fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                  </button>
+                                </span>
+                                <!--<SeatPlusSelect v-model="character" id="character_dropdown">
                                     <option :value="null">All Characters</option>
                                     <option v-for="character in filters.owned_characters" :value="character.character_id" :key="character.character_id">{{ character.name }}</option>
-                                </SeatPlusSelect>
+                                </SeatPlusSelect>-->
                             </InputGroup>
                         </div>
 
@@ -55,9 +63,13 @@
             </template>
         </wide-lists>
 
-        <infinite-loading @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
+        <infinite-loading :identifier="infiniteId" @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more">all loaded</div>
         </infinite-loading>
+
+        <template v-slot:modal>
+            <CharacterFilterModal permission="character.assets" v-model="characterFilterModal" />
+        </template>
 
     </Layout>
 </template>
@@ -73,9 +85,15 @@
     import InputGroup from "../../Shared/InputGroup"
     import SeatPlusSelect from "../../Shared/SeatPlusSelect"
     import InfiniteLoading from "vue-infinite-loading"
+    import ModalWithFooter from "../../Shared/Modals/ModalWithFooter"
+    import Modal from "../../Shared/Modals/Modal"
+    import CharacterFilterModal from "@/Shared/Modals/CharacterFilterModal"
     export default {
         name: "Assets",
         components: {
+            CharacterFilterModal,
+            Modal,
+            ModalWithFooter,
             SeatPlusSelect,
             InputGroup,
             ItemList,
@@ -91,27 +109,27 @@
         data() {
             return {
                 requiredScopes: this.dispatchable_jobs.required_scopes,
+                infiniteId: +new Date(),
                 assets_data: [],
                 page: 1,
-                next_url: '',
                 search: null,
-                character: null,
                 region: null,
+                characterFilterModal: {
+                    open: false,
+                    selectedCharacters: []
+                }
             }
         },
         methods: {
             loadAssets($state) {
                 const self = this;
 
-                let data = {}
-
-                for(let prop of ['character','region','search'])
-                    if(self[prop])
-                        data[prop] = self[prop]
-
-                axios.post(this.$route('load.character.assets'), data, {
+                axios.get(this.$route('load.character.assets'), {
                     params: {
                         page: this.page,
+                        character_ids: this.selectedCharacterIds,
+                        search: this.search,
+                        region: this.region
                     },
                 }).then(response => {
 
@@ -145,16 +163,18 @@
                 return _.size(location_assets)
             },
             filter() {
-                this.assets_data = []
-                this.page = 1
-            }
+
+                if(_.isEmpty(this.selectedCharacterIds))
+                    return
+
+                this.assets_data = [];
+                this.page = 1;
+                this.infiniteId += 1;
+            },
         },
         computed: {
-            selectedCharacterId : function () {
-                return Number(this.buildSearchParams().get('character_id'));
-            },
-            selectedRegionId : function () {
-                return Number(this.buildSearchParams().get('region_id'));
+            selectedCharacterIds() {
+                return this.characterFilterModal.selectedCharacters
             },
             groupedAssets() {
 
@@ -171,13 +191,13 @@
                         }),
                     }
                 ))
-            }
+            },
         },
         watch: {
             search: function () {
                 this.filter()
             },
-            character() {
+            selectedCharacterIds() {
                 this.filter()
             },
             region() {

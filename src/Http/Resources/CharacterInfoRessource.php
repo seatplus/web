@@ -24,10 +24,26 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\GetAssetsController;
+namespace Seatplus\Web\Http\Resources;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::get('/assets/list', GetAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class CharacterInfoRessource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        $owned_character_ids = auth()->user()->characters->pluck('character_id');
+
+        return [
+            'character_id' => $this->character_id,
+            'name' => $this->name,
+            'owned_by_user' => in_array($this->character_id, $owned_character_ids->toArray())
+        ];
+    }
+}

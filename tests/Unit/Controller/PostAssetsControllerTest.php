@@ -13,7 +13,7 @@ class PostAssetsControllerTest extends TestCase
     public function invoke()
     {
         $this->actingAs($this->test_user)
-            ->post(route('load.character.assets'))
+            ->get(route('load.character.assets'))
             ->assertOk();
     }
 
