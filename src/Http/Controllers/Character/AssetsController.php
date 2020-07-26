@@ -50,8 +50,7 @@ class AssetsController extends Controller
     public function index(Request $request)
     {
 
-        $filters = fn() => ['regions' => Region::all()];
-
+        $filters = fn () => ['regions' => Region::all()];
 
         $dispatchable_jobs = function () {
 

@@ -43,7 +43,7 @@ class CharacterInfoRessource extends JsonResource
         return [
             'character_id' => $this->character_id,
             'name' => $this->name,
-            'owned_by_user' => in_array($this->character_id, $owned_character_ids->toArray())
+            'owned_by_user' => in_array($this->character_id, $owned_character_ids->toArray()),
         ];
     }
 }
