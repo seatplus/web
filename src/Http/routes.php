@@ -59,6 +59,11 @@ Route::middleware('web')
                     ->group(function () {
                         include __DIR__ . '/Routes/AccessControl/View.php';
                     });
+
+                Route::prefix('shared')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Shared/Shared.php';
+                    });
             });
 
     });

@@ -24,35 +24,26 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Request;
+namespace Seatplus\Web\Http\Resources;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class GetCharacterAssets extends FormRequest
+class CharacterInfoRessource extends JsonResource
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Transform the resource into an array.
      *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
+     * @param  \Illuminate\Http\Request
      * @return array
      */
-    public function rules()
+    public function toArray($request)
     {
+        $owned_character_ids = auth()->user()->characters->pluck('character_id');
+
         return [
-            'character' => ['sometimes', 'required', Rule::in(auth()->user()->getAffiliatedCharacterIdsByPermission(CharacterAsset::class)), 'numeric'],
-            'region' => ['sometimes', 'required', 'exists:universe_regions,region_id', 'numeric'],
-            'search' => ['sometimes', 'required', 'string'],
+            'character_id' => $this->character_id,
+            'name' => $this->name,
+            'owned_by_user' => in_array($this->character_id, $owned_character_ids->toArray()),
         ];
     }
 }

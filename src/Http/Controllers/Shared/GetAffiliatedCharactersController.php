@@ -24,10 +24,18 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\GetAssetsController;
+namespace Seatplus\Web\Http\Controllers\Shared;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::get('/assets/list', GetAssetsController::class)->name('load.character.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\CharacterInfoRessource;
+
+class GetAffiliatedCharactersController extends Controller
+{
+    public function __invoke(string $permission)
+    {
+        $query = CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedCharacterIdsByPermission($permission));
+
+        return CharacterInfoRessource::collection($query->paginate());
+    }
+}
