@@ -49,4 +49,12 @@ class CharacterAssetTest extends TestCase
         $response->assertHasProp('filters');
     }
 
+    /** @test */
+    public function it_has_list_affiliated_character_list_route()
+    {
+        $this->actingAs($this->test_user)
+            ->get(route('get.affiliated.characters','character.assets'))
+            ->assertOk();
+    }
+
 }
