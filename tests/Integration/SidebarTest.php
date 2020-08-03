@@ -5,6 +5,7 @@ namespace Seatplus\Web\Tests\Integration;
 
 
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 
@@ -56,6 +57,24 @@ class SidebarTest extends TestCase
         $sidebar = (new SidebarEntries)->filter();
 
         $this->assertTrue(isset($sidebar['Access Control']));
+    }
+
+    /** @test */
+    public function user_with_director_role_can_see_membertracking()
+    {
+
+        $this->actingAs($this->test_user);
+
+        $character_role = factory(CharacterRole::class)->create([
+            'character_id' => $this->test_character->character_id,
+            'roles' => ['Director']
+        ]);
+
+        $this->assertTrue($character_role->hasRole('roles', 'Director'));
+
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertTrue(isset($sidebar['corporation']));
     }
 
 }
