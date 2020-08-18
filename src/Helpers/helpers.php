@@ -144,7 +144,7 @@ if (! function_exists('getAffiliatedCharacters')) {
 
         $permission_name = config('eveapi.permissions.' . $class);
 
-        return CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedCharacterIdsByPermission($permission_name))
+        return CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedIdsByPermission($permission_name))
             ->get();
     }
 }

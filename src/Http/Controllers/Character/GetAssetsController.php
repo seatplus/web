@@ -35,8 +35,18 @@ class GetAssetsController
     public function __invoke(Request $request)
     {
 
-        $query = CharacterAsset::Affiliated($request->query('character_ids'))
-            ->with('location', 'location.locatable', 'owner', 'type', 'type.group', 'content')
+        $character_ids = $request->query('character_ids');
+
+        $query = CharacterAsset::with('location', 'location.locatable', 'owner', 'type', 'type.group', 'content')
+            ->when($character_ids, function($query, $character_ids) {
+
+                $affiliated_ids = getAffiliatedIdsByClass(CharacterAsset::class);
+
+                return $query->entityFilter(collect($character_ids)->map(fn ($character_id) => intval($character_id))->intersect($affiliated_ids)->toArray());
+            }, function ($query) {
+
+                return $query->entityFilter(auth()->user()->characters->pluck('character_id')->toArray());
+            })
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->orderBy('location_id', 'asc');
 

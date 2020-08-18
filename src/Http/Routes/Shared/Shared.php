@@ -26,5 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
+use Seatplus\Web\Http\Controllers\Shared\GetNamesFromIdsController;
 
 Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
+Route::post('resolve/ids', GetNamesFromIdsController::class)->name('resolve.ids');

@@ -54,6 +54,11 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Character/View.php';
                     });
 
+                Route::prefix('corporation')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Corporation/MemberTracking.php';
+                    });
+
                 Route::prefix('acl')
                     ->middleware(['permission:view access control'])
                     ->group(function () {
