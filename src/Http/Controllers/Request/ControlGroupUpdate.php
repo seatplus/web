@@ -47,7 +47,6 @@ class ControlGroupUpdate extends FormRequest
      */
     public function rules()
     {
-
         return [
             'type' => ['required', 'string'],
             'affiliations' => ['array'],

@@ -38,7 +38,6 @@ class CreateGlobalSettingsTable extends Migration
     public function up()
     {
         Schema::create('global_settings', function (Blueprint $table) {
-
             $table->increments('id');
             $table->string('name');
             $table->mediumText('value');

@@ -47,7 +47,6 @@ class PostSchedulesValidation extends FormRequest
      */
     public function rules()
     {
-
         return [
             'job' => 'required|string',
             'schedule' => 'required|string',

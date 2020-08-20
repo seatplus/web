@@ -33,7 +33,6 @@ use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
 
 Route::middleware(['permission:superuser'])->group(function () {
-
     Route::get('/settings', [SeatPlusController::class, 'settings'])->name('server.settings');
 
     Route::post('/cache/clear', [CommandsController::class, 'clear'])->name('cache.clear');

@@ -44,7 +44,6 @@ class CreateController extends Controller
 
     public function create(CreateSsoScopeSettingsValidation $validation)
     {
-
         (new UpdateOrCreateSsoSettings($validation->all()))->execute();
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');

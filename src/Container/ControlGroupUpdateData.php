@@ -38,5 +38,4 @@ class ControlGroupUpdateData extends DataTransferObject
     public ?array $affiliations;
 
     public ?array $members;
-
 }

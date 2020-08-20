@@ -49,7 +49,6 @@ class SyncRoleAffiliations
 
     public function __construct(Role $role)
     {
-
         $this->role = $role;
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
@@ -58,19 +57,17 @@ class SyncRoleAffiliations
     public function sync(array $validated_data)
     {
         foreach (['allowed', 'inverse', 'forbidden'] as $type) {
-            if(Arr::has($validated_data, $type) && $validated_data[$type]){
+            if (Arr::has($validated_data, $type) && $validated_data[$type]) {
                 $this->addToTarget($type, $validated_data[$type]);
             }
         }
 
         $this->removeUnassignedAffiliations();
-
     }
 
     private function addToTarget(string $type, array $affiliations)
     {
-        foreach ($affiliations as $affiliation)
-
+        foreach ($affiliations as $affiliation) {
             $this->target_affiliations->push(
                 Affiliation::firstOrCreate([
                     'role_id' => $this->role->id,
@@ -79,6 +76,7 @@ class SyncRoleAffiliations
                     'type' => $type,
                 ])
             );
+        }
     }
 
     private function removeUnassignedAffiliations()

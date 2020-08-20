@@ -48,7 +48,6 @@ class DispatchIndividualJob extends FormRequest
      */
     public function rules()
     {
-
         $jobs = array_keys(config('eveapi.jobs'));
         $character_ids = auth()->user()->characters->pluck('character_id')->toArray();
 

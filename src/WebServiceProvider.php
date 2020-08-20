@@ -120,7 +120,6 @@ class WebServiceProvider extends ServiceProvider
 
     private function register_services()
     {
-
     }
 
     private function getPackageJsonFile()
@@ -148,7 +147,6 @@ class WebServiceProvider extends ServiceProvider
 
         Inertia::share([
             'flash' => function () {
-
                 return [
                     'success' => session()->pull('success'),
                     'info' => session()->pull('info'),
@@ -157,11 +155,9 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'sidebar' => function () {
-
                 return auth()->guest() ? [] : (new SidebarEntries)->filter();
             },
             'user' => function () {
-
                 return auth()->guest() ? '' : UserRessource::make(
                     User::with('main_character', 'characters', 'characters.refresh_token')
                         ->where('id', auth()->user()->id)
@@ -169,7 +165,6 @@ class WebServiceProvider extends ServiceProvider
                 );
             },
             'translation' => function () {
-
                 return [
                     'success' => trans('web::notifications.success'),
                     'info' => trans('web::notifications.info'),
@@ -178,13 +173,11 @@ class WebServiceProvider extends ServiceProvider
                 ];
             },
             'errors' => function () {
-
                 return Session::get('errors')
                     ? Session::get('errors')->getBag('default')->getMessages()
                     : (object) [];
             },
             'images' => function () {
-
                 return [
                     'logo' => asset('img/seat_plus.svg'),
                 ];
@@ -213,7 +206,6 @@ class WebServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/config/web.cronExpressions.php', 'web.cronExpressions'
         );
-
     }
 
     private function addCommands()

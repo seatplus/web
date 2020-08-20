@@ -55,7 +55,6 @@ class ControlGroupsController
 
     public function edit(int $role_id)
     {
-
         $role = Role::findById($role_id);
 
         $permissions = function () {
@@ -72,7 +71,6 @@ class ControlGroupsController
 
     public function update(UpdateControlGroup $request, int $role_id)
     {
-
         $validated_data = $request->all();
 
         $role = Role::findById($role_id);

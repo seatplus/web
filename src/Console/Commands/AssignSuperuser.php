@@ -64,7 +64,7 @@ class AssignSuperuser extends Command
 
     public function handle()
     {
-        if ($this->hasAlreadyRun()){
+        if ($this->hasAlreadyRun()) {
             $this->warn('Superuser has already been assigned, ask any of the following users to help you out:');
 
             $users = User::with('characters')
@@ -105,12 +105,13 @@ class AssignSuperuser extends Command
 
         $this->user = User::find($user_id);
 
-        if (! $this->user)
+        if (! $this->user) {
             return $this->alert('illegal user_id selected');
+        }
 
         $this->info('Please note after setting a superuser via console, you are only able to set another via web ui.');
 
-        if(! $this->confirm('Do you wish to a continue?')) {
+        if (! $this->confirm('Do you wish to a continue?')) {
             return $this->error('aborted');
         }
 
@@ -130,17 +131,14 @@ class AssignSuperuser extends Command
         $permission = Permission::findOrCreate('superuser');
 
         $role->givePermissionTo($permission);
-
     }
 
     private function hasAlreadyRun()
     {
         try {
             return User::permission('superuser')->get()->isNotEmpty();
-        } catch (PermissionDoesNotExist $exception)
-        {
+        } catch (PermissionDoesNotExist $exception) {
             return false;
         }
-
     }
 }
