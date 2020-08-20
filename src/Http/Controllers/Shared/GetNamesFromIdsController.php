@@ -24,17 +24,25 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration;
+namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Support\Facades\Artisan;
+use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Web\Http\Controllers\Controller;
 
-class CommandsController extends Controller
+class GetNamesFromIdsController extends Controller
 {
-    public function clear()
+    public function __invoke()
     {
-        Artisan::call('seatplus:cache:clear --force');
+        $container = new EsiRequestContainer([
+            'method' => 'post',
+            'version' => 'v3',
+            'endpoint' => '/universe/names/',
+            'request_body' => request()->all(),
+        ]);
 
-        return response('Success');
+        $result = (new RetrieveEsiDataAction)->execute($container);
+
+        return collect($result)->toJson();
     }
 }

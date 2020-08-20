@@ -27,17 +27,26 @@
 namespace Seatplus\Web\Services\Sidebar;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\User;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
+    public function __construct()
+    {
+        $this->user = auth()->user();
+    }
+
     public function filter()
     {
         return collect(config('package.sidebar'))
             ->map(function ($topic) {
                 return collect($topic)->reject(function ($entry) {
-                    return Arr::has($entry, 'permission') ? $this->checkUserPermission($entry) : false;
+                    return Arr::has($entry, 'character_role')
+                        ? $this->checkUserCharacterRole($entry)
+                        : (Arr::has($entry, 'permission') ? $this->checkUserPermission($entry) : false);
                 });
             })
             ->reject(function ($topic) {
@@ -55,14 +64,28 @@ class SidebarEntries
         $permission_name = Arr::get($array, 'permission');
 
         try {
-
-            return ! auth()->user()->can($permission_name);
+            return ! $this->user->can($permission_name);
         } catch (PermissionDoesNotExist $exception) {
-
             Permission::create(['name' => $permission_name]);
 
             return $this->checkUserPermission($array);
         }
+    }
 
+    private function checkUserCharacterRole($entry): bool
+    {
+        $role = Arr::get($entry, 'permission');
+
+        return User::has('characters.roles')
+            ->whereId($this->user->getAuthIdentifier())
+            ->with('characters.roles')
+            ->get()
+            ->whenNotEmpty(fn ($collection) => $collection
+                ->first()
+                ->characters
+                ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
+                ->filter()
+            )
+            ->isNotEmpty();
     }
 }

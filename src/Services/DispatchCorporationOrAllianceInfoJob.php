@@ -35,14 +35,11 @@ class DispatchCorporationOrAllianceInfoJob
     public function handle(string $type, int $id)
     {
         $type === AllianceInfo::class ? $this->handleAllianceInfo($id) : $this->handleCorporationInfo($id);
-
     }
 
     private function handleAllianceInfo(int $entity_id)
     {
-
         (new AllianceInfoAction)->execute($entity_id);
-
     }
 
     private function handleCorporationInfo(int $entity_id)

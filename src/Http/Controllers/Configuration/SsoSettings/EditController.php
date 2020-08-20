@@ -42,6 +42,5 @@ class EditController extends Controller
             'available_scopes' => $available_scopes,
             'entity' => $entity,
         ]);
-
     }
 }

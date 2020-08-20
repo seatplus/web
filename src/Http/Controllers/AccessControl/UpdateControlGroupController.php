@@ -62,14 +62,13 @@ class UpdateControlGroupController extends Controller
             ->then(fn () => logger()->info('Control group updated'));
 
         return redirect()->route('acl.manage', $role_id)->with('success', 'updated');
-
     }
 
     private function updateType(ControlGroupUpdateData $data): void
     {
-
-        if($data->role->type === $data->role_type)
+        if ($data->role->type === $data->role_type) {
             return;
+        }
 
         $role = $data->role;
         $role->type = $data->role_type;

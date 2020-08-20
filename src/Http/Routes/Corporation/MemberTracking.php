@@ -24,17 +24,10 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Corporation\MemberTracking\IndexMemberTrackingController;
 
-use Illuminate\Support\Facades\Artisan;
-use Seatplus\Web\Http\Controllers\Controller;
-
-class CommandsController extends Controller
-{
-    public function clear()
-    {
-        Artisan::call('seatplus:cache:clear --force');
-
-        return response('Success');
-    }
-}
+Route::prefix('tracking')
+    ->group(function () {
+        Route::get('/', IndexMemberTrackingController::class)->name('corporation.member_tracking');
+    });

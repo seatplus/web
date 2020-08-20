@@ -38,7 +38,6 @@ class UserRessource extends JsonResource
      */
     public function toArray($request)
     {
-
         return [
             'id' => $this->id,
             'main_character' => $this->main_character,
@@ -50,7 +49,7 @@ class UserRessource extends JsonResource
                         'name' => $character->name,
                         'scopes' => $character->refresh_token->scopes,
                     ];
-            }),
+                }),
             'impersonating' => $this->when(session('impersonation_origin'), true),
             'status' => $this->when($this->status ? true : false, $this->status),
         ];

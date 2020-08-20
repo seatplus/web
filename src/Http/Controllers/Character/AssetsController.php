@@ -49,11 +49,9 @@ class AssetsController extends Controller
 
     public function index(Request $request)
     {
-
         $filters = fn () => ['regions' => Region::all()];
 
         $dispatchable_jobs = function () {
-
             $job_name = 'character.assets';
             $required_scopes = ['esi-assets.read_assets.v1',  'esi-universe.read_structures.v1'];
 
@@ -68,7 +66,6 @@ class AssetsController extends Controller
                         return sizeof(array_intersect($character->refresh_token->scopes, $required_scopes)) === 2;
                     })
                     ->map(function ($character) use ($job_name) {
-
                         $character_id = $character->character_id;
                         $cache_key = sprintf('%s:%s', $job_name, $character_id);
 

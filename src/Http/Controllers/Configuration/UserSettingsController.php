@@ -33,7 +33,6 @@ class UserSettingsController
 {
     public function index()
     {
-
         return Inertia::render('Configuration/UserSettings', [
             'user' => UserRessource::make(auth()->user()),
         ]);
@@ -53,6 +52,5 @@ class UserSettingsController
         $user->save();
 
         return redirect()->action([UserSettingsController::class, 'index'])->with('success', 'Main character updated');
-
     }
 }

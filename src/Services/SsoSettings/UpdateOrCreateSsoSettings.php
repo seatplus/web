@@ -49,18 +49,14 @@ class UpdateOrCreateSsoSettings
 
     public function __construct(array $request)
     {
-
         $this->request = $request;
         $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'));
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
-
     }
 
     public function execute()
     {
-
         $this->entities->each(function ($entity) {
-
             $entity_id = Arr::get($entity, 'id');
             $category = Arr::get($entity, 'category');
 
@@ -75,6 +71,5 @@ class UpdateOrCreateSsoSettings
                 'morphable_type' => $morphable_type,
             ]);
         });
-
     }
 }

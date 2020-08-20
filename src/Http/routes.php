@@ -30,7 +30,6 @@ use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 Route::middleware('web')
     ->group(function () {
-
         Route::middleware('auth', CheckRequiredScopes::class)
             ->group(function () {
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
@@ -54,6 +53,11 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Character/View.php';
                     });
 
+                Route::prefix('corporation')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Corporation/MemberTracking.php';
+                    });
+
                 Route::prefix('acl')
                     ->middleware(['permission:view access control'])
                     ->group(function () {
@@ -65,5 +69,4 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Shared/Shared.php';
                     });
             });
-
     });

@@ -35,9 +35,7 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 {
     protected function redirectTo(Collection $missing_character_scopes)
     {
-
         $missing_character = $missing_character_scopes->map(function ($missing) {
-
             $missing = (object) $missing;
 
             return [

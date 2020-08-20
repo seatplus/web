@@ -33,7 +33,6 @@ class SchedulesCreate extends Controller
 {
     public function __invoke()
     {
-
         $cron = config('web.cronExpressions');
 
         return Inertia::render('Configuration/Schedules/SchedulesCreate', [

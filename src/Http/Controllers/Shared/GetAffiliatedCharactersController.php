@@ -34,7 +34,7 @@ class GetAffiliatedCharactersController extends Controller
 {
     public function __invoke(string $permission)
     {
-        $query = CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedCharacterIdsByPermission($permission));
+        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission));
 
         return CharacterInfoRessource::collection($query->paginate());
     }

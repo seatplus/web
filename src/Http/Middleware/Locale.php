@@ -42,7 +42,6 @@ class Locale
      */
     public function handle($request, Closure $next)
     {
-
         App::setLocale(setting('language'));
 
         return $next($request);

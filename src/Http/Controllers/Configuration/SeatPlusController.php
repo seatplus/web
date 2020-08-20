@@ -48,8 +48,9 @@ class SeatPlusController extends Controller
 
         $query = User::with('characters', 'main_character.corporation');
 
-        if(request()->has('search_param'))
+        if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);
+        }
 
         $users = UserRessource::collection(
             $query->paginate()
@@ -63,8 +64,9 @@ class SeatPlusController extends Controller
     public function stopImpersonate()
     {
         // If there is no user set in the session, abort!
-        if (! session()->has('impersonation_origin'))
+        if (! session()->has('impersonation_origin')) {
             abort(404);
+        }
 
         // Login
         auth()->login(session('impersonation_origin'));
