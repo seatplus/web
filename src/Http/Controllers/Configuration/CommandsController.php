@@ -33,7 +33,6 @@ class CommandsController extends Controller
 {
     public function clear()
     {
-
         Artisan::call('seatplus:cache:clear --force');
 
         return response('Success');

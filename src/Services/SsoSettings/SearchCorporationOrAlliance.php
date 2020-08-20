@@ -45,7 +45,6 @@ class SearchCorporationOrAlliance
 
     public function __construct(string $searchParam)
     {
-
         $this->searchParam = $searchParam;
         $this->retrieve_esi_data_action = new RetrieveEsiDataAction;
     }
@@ -53,9 +52,10 @@ class SearchCorporationOrAlliance
     public function search(): string
     {
         // if search parameter is to short esi will not respond
-        if(Str::length($this->searchParam) < 3)
+        if (Str::length($this->searchParam) < 3) {
             // return an empty json response string
             return collect()->toJson();
+        }
 
         $entity_ids_that_match_sub_string = $this->searchEsi();
 

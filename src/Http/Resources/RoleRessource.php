@@ -38,7 +38,6 @@ class RoleRessource extends JsonResource
      */
     public function toArray($request)
     {
-
         return [
             'name' => $this->name,
             'id' => $this->id,
@@ -52,13 +51,14 @@ class RoleRessource extends JsonResource
 
     private function canModerate(): bool
     {
-        if($this->type !== 'on-request')
+        if ($this->type !== 'on-request') {
             return false;
+        }
 
-        if(auth()->user()->can('superuser'))
+        if (auth()->user()->can('superuser')) {
             return true;
+        }
 
         return $this->isModerator(auth()->user());
-
     }
 }

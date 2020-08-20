@@ -64,15 +64,12 @@ class SidebarEntries
         $permission_name = Arr::get($array, 'permission');
 
         try {
-
             return ! $this->user->can($permission_name);
         } catch (PermissionDoesNotExist $exception) {
-
             Permission::create(['name' => $permission_name]);
 
             return $this->checkUserPermission($array);
         }
-
     }
 
     private function checkUserCharacterRole($entry): bool
@@ -83,10 +80,10 @@ class SidebarEntries
             ->whereId($this->user->getAuthIdentifier())
             ->with('characters.roles')
             ->get()
-            ->whenNotEmpty(fn($collection) => $collection
+            ->whenNotEmpty(fn ($collection) => $collection
                 ->first()
                 ->characters
-                ->map(fn($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
+                ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
                 ->filter()
             )
             ->isNotEmpty();

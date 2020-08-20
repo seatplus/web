@@ -33,7 +33,6 @@ class ManageControlGroupMembersController
 {
     public function index($role_id)
     {
-
         $role = Role::whereId($role_id)
             ->with('acl_affiliations.affiliatable', 'acl_members.user.characters', 'acl_members.user.main_character',
                 'moderators.affiliatable.main_character', 'moderators.affiliatable.characters')

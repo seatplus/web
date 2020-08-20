@@ -30,7 +30,6 @@ use Seatplus\Auth\Models\Permissions\Role;
 
 class SyncRoleName
 {
-
     private Role $role;
 
     /**
@@ -40,14 +39,12 @@ class SyncRoleName
      */
     public function __construct(Role $role)
     {
-
         $this->role = $role;
     }
 
     public function sync(string $name)
     {
-
-        if($this->role->name !== $name){
+        if ($this->role->name !== $name) {
             $this->role->name = $name;
             $this->role->save();
         }

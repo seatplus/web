@@ -33,7 +33,6 @@ class DeleteControlGroupController extends Controller
 {
     public function __invoke(int $role_id)
     {
-
         Role::findById($role_id)->delete();
 
         return redirect()

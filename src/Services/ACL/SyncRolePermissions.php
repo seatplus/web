@@ -59,9 +59,8 @@ class SyncRolePermissions
     {
         $permissions = Arr::get($validated_data, 'permissions', null);
 
-        if($permissions)
-        {
-            foreach ($permissions as $permission){
+        if ($permissions) {
+            foreach ($permissions as $permission) {
                 $name = $permission;
 
                 $this->target_permissions->push($name);
@@ -72,7 +71,6 @@ class SyncRolePermissions
 
                     $this->role->givePermissionTo($name);
                 }
-
             }
         }
 

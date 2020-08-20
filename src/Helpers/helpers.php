@@ -48,32 +48,34 @@ if (! function_exists('setting')) {
         if (is_array($name)) {
 
             // Check that we have at least 2 keys.
-            if (count($name) < 2)
+            if (count($name) < 2) {
                 throw new \Seatplus\Web\Exceptions\SettingException(
                     'Must provide a name and value when setting a setting.');
+            }
 
             // If we have a third element in the array, set it.
             //$for_id = $name[2] ?? null;
 
-            if ($global)
+            if ($global) {
                 return \Seatplus\Web\Models\Settings\GlobalSettings::updateOrCreate(
                     ['name' => $name[0]],
                     ['value' => $name[1]]
                 )
                     ->value;
+            }
 
             return \Seatplus\Services\Settings\Profile::set($name[0], $name[1], $for_id);
         }
 
         // If we just got a string, it means we want to get.
-        if ($global)
+        if ($global) {
             return optional(\Seatplus\Web\Models\Settings\GlobalSettings::where('name', $name[0])
                 ->first())
                 ->value;
+        }
 
         //return \Seat\Services\Settings\Profile::get($name);
         return ''; //TODO: return user-settings
-
     }
 }
 
@@ -87,7 +89,6 @@ if (! function_exists('number_roman')) {
      */
     function number_roman($number)
     {
-
         $map = [
             'M'  => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50,
             'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1,
@@ -96,9 +97,7 @@ if (! function_exists('number_roman')) {
         $returnValue = '';
 
         while ($number > 0) {
-
             foreach ($map as $roman => $int) {
-
                 if ($number >= $int) {
                     $number -= $int;
                     $returnValue .= $roman;
@@ -122,9 +121,9 @@ if (! function_exists('carbon')) {
      */
     function carbon($data = null)
     {
-
-        if (! is_null($data))
+        if (! is_null($data)) {
             return new \Carbon\Carbon($data);
+        }
 
         return new \Carbon\Carbon;
     }
@@ -141,7 +140,6 @@ if (! function_exists('getAffiliatedCharacters')) {
      */
     function getAffiliatedCharacters(string $class): Collection
     {
-
         $permission_name = config('eveapi.permissions.' . $class);
 
         return CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedIdsByPermission($permission_name))

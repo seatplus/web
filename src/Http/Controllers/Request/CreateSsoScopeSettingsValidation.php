@@ -47,7 +47,6 @@ class CreateSsoScopeSettingsValidation extends FormRequest
      */
     public function rules()
     {
-
         return [
             'selectedScopes' => 'required|array',
             'selectedEntities' => 'required|array',

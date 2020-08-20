@@ -36,5 +36,4 @@ class GlobalSettings extends Model
      * @var array
      */
     protected $fillable = ['name', 'value'];
-
 }
