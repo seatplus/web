@@ -36,7 +36,6 @@ class DispatchJobController extends Controller
 {
     public function __invoke(DispatchIndividualJob $job)
     {
-
         $cache_key = sprintf('%s:%s', $job['job'], $job['character_id'] ?? $job->get('corporation_id'));
 
         if (cache($cache_key)) {
@@ -52,8 +51,9 @@ class DispatchJobController extends Controller
 
     private function getRefreshToken(DispatchIndividualJob $job)
     {
-        if($job->get('character_id'))
+        if ($job->get('character_id')) {
             return RefreshToken::find($job->get('character_id'));
+        }
 
         $dispatchable_job_class = config('eveapi.jobs')[$job->get('job')];
 

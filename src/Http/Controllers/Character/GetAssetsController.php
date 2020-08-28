@@ -34,8 +34,6 @@ class GetAssetsController
 {
     public function __invoke(Request $request)
     {
-
-
         $query = CharacterAsset::with('location', 'location.locatable', 'owner', 'type', 'type.group', 'content')
             ->affiliated(getAffiliatedIdsByClass(CharacterAsset::class), request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
