@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Corporation\MemberTracking\IndexMemberTrackingController;
 
 Route::prefix('tracking')
-    ->middleware(['permission:corporation.member_tracking'])
     ->group(function () {
         Route::get('/', IndexMemberTrackingController::class)->name('corporation.member_tracking');
     });
