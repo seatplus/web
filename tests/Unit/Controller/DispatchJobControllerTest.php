@@ -21,10 +21,6 @@ class DispatchJobControllerTest extends TestCase
         $mock = Mockery::mock('overload:' . DispatchIndividualUpdate::class);
         $mock->shouldReceive('execute')->andReturn(1);
 
-        $user_mock = Mockery::mock(User::class);
-        $user_mock->shouldReceive('getAttribute')->with('characters')->andReturn($this->test_character);
-        $user_mock->shouldReceive('getAttribute')->with('id')->andReturn(collect($this->test_user->id));
-
         $job = Arr::first(array_keys(config('eveapi.jobs')));
         $character_id = $this->test_character->character_id;
 
@@ -32,13 +28,11 @@ class DispatchJobControllerTest extends TestCase
 
         $this->assertNull(cache($cache_key));
 
-        $response = $this->actingAs($user_mock)
+        $response = $this->actingAs($this->test_user)
             ->post(route('dispatch.job'),[
                 'character_id' => $character_id,
                 'job' => $job
             ]);
-
-
 
         $this->assertNotNull(cache($cache_key));
     }

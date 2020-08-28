@@ -19,7 +19,7 @@ export default {
         },
         format: {
             type: String,
-            required: true
+            required: false
         },
     },
     data() {
@@ -37,7 +37,8 @@ export default {
     },
     methods: {
         getTimeFromNow() {
-            return dayjs(this.timestamp, this.format).fromNow()
+
+            return this.format ? dayjs(this.timestamp, this.format).fromNow() : dayjs(this.timestamp).fromNow()
         }
     }
 }

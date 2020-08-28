@@ -1,5 +1,18 @@
 <template>
     <Layout page="Corporation" page-description="Member Tracking">
+
+        <template v-slot:title>
+            <PageHeader>
+                Corporation Member Tracking
+                <template v-slot:primary>
+                    <HeaderButton @click="openSlideOver">
+                        Update
+                    </HeaderButton>
+                </template>
+
+            </PageHeader>
+        </template>
+
         <div v-for="entry in member_tracking" class="bg-white overflow-hidden shadow rounded-lg">
             <!--Header-->
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
@@ -147,6 +160,13 @@
 
 
         </div>
+
+        <template v-slot:slideOver>
+            <SlideOver>
+                <template v-slot:title>Dispatch Update Job</template>
+                <DispatchUpdate :dispatchable_jobs="dispatchable_jobs" />
+            </SlideOver>
+        </template>
     </Layout>
 </template>
 
@@ -154,20 +174,24 @@
 import Layout from "../../Shared/Layout"
 import EveImage from "../../Shared/EveImage"
 import axios from 'axios';
-import Timer from "../../Shared/Timer"
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import Time from "../../Shared/Time"
+import PageHeader from "../../Shared/Layout/PageHeader"
+import HeaderButton from "../../Shared/Layout/HeaderButton"
+import SlideOver from "../../Shared/Layout/SlideOver"
+import DispatchUpdate from "../../Shared/DispatchUpdate"
 
 dayjs.extend(customParseFormat);
 
 export default {
     name: "MemberTracking",
-    components: {Time, Timer, EveImage, Layout},
+    components: {DispatchUpdate, SlideOver, HeaderButton, PageHeader, Time, EveImage, Layout},
     props: {
         member_tracking: {
             required: true
-        }
+        },
+        dispatchable_jobs: Object
     },
     data() {
         return {
@@ -212,6 +236,9 @@ export default {
         },
         missingScopes(member) {
             return !_.isEmpty(member.missing_sso_scopes)
+        },
+        openSlideOver() {
+            this.$eventBus.$emit('open-slideOver');
         }
     },
     computed: {

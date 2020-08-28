@@ -1,6 +1,6 @@
 <template>
     <li>
-        <inertia-link :href="this.url" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+        <a @click.prevent="visit" :href="url" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
             <div class="flex items-center px-4 py-4 sm:px-6">
                 <div class="min-w-0 flex-1 flex items-center">
                     <div class="flex overflow-x-visible">
@@ -31,7 +31,7 @@
                     <slot name="navigation" />
                 </div>
             </div>
-        </inertia-link>
+        </a>
     </li>
 </template>
 
@@ -42,9 +42,16 @@
           url: {
               type    : String,
               required: false,
-              default: '#'
+              default: ''
           },
       },
+      methods: {
+          visit() {
+
+              if (this.url)
+                  return this.$inertia.visit(this.url)
+          }
+      }
   }
 </script>
 

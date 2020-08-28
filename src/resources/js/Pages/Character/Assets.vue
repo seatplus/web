@@ -1,50 +1,52 @@
 <template>
     <Layout page="Character Assets" :required-scopes="this.requiredScopes">
 
-        <div class="grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none mb-6">
-            <div class="flex flex-col rounded-lg shadow-lg overflow-hidden col-span-2">
-                <div class="flex-1 bg-white p-6 flex flex-col justify-between">
-                    <div class="grid grid-cols-6 gap-5">
+        <template v-slot:title>
+            <PageHeader>
+                Character Assets
+                <template v-slot:primary>
+                    <HeaderButton @click="openSlideOver">
+                        Update
+                    </HeaderButton>
+                </template>
 
-                        <div class="col-span-6">
-                            <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
-                            <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
-                        </div>
+            </PageHeader>
+        </template>
 
-                        <div class="col-span-6 sm:col-span-3">
-                            <InputGroup for="character_dropdown" label="Character Filter">
-                                <span class="mt-1 inline-flex rounded-md shadow-sm box w-full">
-                                  <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:shadow-outline-gray transition ease-in-out duration-150">
-                                      {{ characterFilterModal.selectedCharacters.length === 0 ? 'Own Characters' : (characterFilterModal.selectedCharacters.length === 1 ? '1 Character' : characterFilterModal.selectedCharacters.length + ' Characters') }}
-                                      <svg class="h-6 w-6 float-right" viewBox="0 0 20 20" fill="none">
-                                          <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#9fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                      </svg>
-                                  </button>
-                                </span>
-                                <!--<SeatPlusSelect v-model="character" id="character_dropdown">
-                                    <option :value="null">All Characters</option>
-                                    <option v-for="character in filters.owned_characters" :value="character.character_id" :key="character.character_id">{{ character.name }}</option>
-                                </SeatPlusSelect>-->
-                            </InputGroup>
-                        </div>
+        <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="grid grid-cols-6 gap-5">
 
-                        <div class="col-span-6 sm:col-span-3">
-                            <InputGroup for="region_dropdown" label="Region Filter">
-                                <SeatPlusSelect v-model="region" id="region_dropdown">
-                                    <option :value="null">All Regions</option>
-                                    <option v-for="region in filters.regions" :value="region.region_id" :key="region.region_id">{{ region.name }}</option>
-                                </SeatPlusSelect>
-                            </InputGroup>
-                        </div>
-
+                    <div class="col-span-6">
+                        <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
+                        <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <InputGroup for="character_dropdown" label="Character Filter">
+                            <span class="mt-1 inline-flex rounded-md shadow-sm box w-full">
+                                <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:shadow-outline-gray transition ease-in-out duration-150">
+                                    {{ characterFilterModal.selectedCharacters.length === 0 ? 'Own Characters' : (characterFilterModal.selectedCharacters.length === 1 ? '1 Character' : characterFilterModal.selectedCharacters.length + ' Characters') }}
+                                    <svg class="h-6 w-6 float-right" viewBox="0 0 20 20" fill="none">
+                                        <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#9fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </span>
+                        </InputGroup>
+                    </div>
+
+                    <div class="col-span-6 sm:col-span-3">
+                        <InputGroup for="region_dropdown" label="Region Filter">
+                            <SeatPlusSelect v-model="region" id="region_dropdown">
+                                <option :value="null">All Regions</option>
+                                <option v-for="region in filters.regions" :value="region.region_id" :key="region.region_id">{{ region.name }}</option>
+                            </SeatPlusSelect>
+                        </InputGroup>
+                    </div>
+
                 </div>
             </div>
-            <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
-                <DispatchUpdate :dispatchable_jobs="dispatchable_jobs" />
-            </div>
         </div>
-
 
         <wide-lists v-for="location in groupedAssets" :key="location.location_id">
             <template v-slot:header>
@@ -71,6 +73,13 @@
             <CharacterFilterModal permission="character.assets" v-model="characterFilterModal" />
         </template>
 
+        <template v-slot:slideOver>
+            <SlideOver>
+                <template v-slot:title>Dispatch Update Job</template>
+                <DispatchUpdate :dispatchable_jobs="dispatchable_jobs" />
+            </SlideOver>
+        </template>
+
     </Layout>
 </template>
 
@@ -88,9 +97,15 @@
     import ModalWithFooter from "../../Shared/Modals/ModalWithFooter"
     import Modal from "../../Shared/Modals/Modal"
     import CharacterFilterModal from "@/Shared/Modals/CharacterFilterModal"
+    import SlideOver from "../../Shared/Layout/SlideOver"
+    import PageHeader from "../../Shared/Layout/PageHeader"
+    import HeaderButton from "../../Shared/Layout/HeaderButton"
     export default {
         name: "Assets",
         components: {
+            HeaderButton,
+            PageHeader,
+            SlideOver,
             CharacterFilterModal,
             Modal,
             ModalWithFooter,
@@ -171,6 +186,9 @@
                 this.page = 1;
                 this.infiniteId += 1;
             },
+            openSlideOver() {
+                this.$eventBus.$emit('open-slideOver');
+            }
         },
         computed: {
             selectedCharacterIds() {
