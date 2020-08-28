@@ -24,9 +24,6 @@
  * SOFTWARE.
  */
 
-use Illuminate\Database\Eloquent\Collection;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-
 if (! function_exists('setting')) {
 
     /**
@@ -127,5 +124,4 @@ if (! function_exists('carbon')) {
 
         return new \Carbon\Carbon;
     }
-
 }

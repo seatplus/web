@@ -60,7 +60,6 @@ class AssetsController extends Controller
 
     public function details(int $item_id)
     {
-
         $query = CharacterAsset::with('type', 'type.group', 'content', 'content.type', 'content.type.group')
             ->affiliated(getAffiliatedIdsByClass(CharacterAsset::class), request()->query('character_ids'))
             ->where('location_id', $item_id);

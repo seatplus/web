@@ -56,8 +56,8 @@ class DispatchIndividualJob extends FormRequest
 
         return [
             'job' => ['required', Rule::in($jobs)],
-            'character_id' => [Rule::requiredIf(fn() => !$this->get('corporation_id')), Rule::in($affiliated_ids)],
-            'corporation_id' => [Rule::requiredIf(fn() => !$this->get('character_id')), Rule::in($affiliated_ids)],
+            'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($affiliated_ids)],
+            'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($affiliated_ids)],
         ];
     }
 
@@ -66,15 +66,14 @@ class DispatchIndividualJob extends FormRequest
         return getAffiliatedIdsByPermission($job->getRequiredPermission());
     }
 
-    private function buildDispatchableJob() : ManualDispatchableJobInterface
+    private function buildDispatchableJob(): ManualDispatchableJobInterface
     {
         $dispatchable_job_class = config('eveapi.jobs')[$this->get('job')];
 
-        if(!$dispatchable_job_class)
+        if (! $dispatchable_job_class) {
             throw new \Exception('unable to get lock of the dispatchable job');
+        }
 
         return new $dispatchable_job_class;
     }
-
-
 }
