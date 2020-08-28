@@ -1,6 +1,6 @@
 <template>
     <ul class="divide-y divide-gray-200 overflow-y-auto">
-        <li @click="dispatchJob(character)" v-for="(character, index) of characters" :class="['px-6 py-5 relative', {'cursor-pointer': isReady(character)}]">
+        <li @click="dispatchJob(character)" v-for="(character, index) of [...characters, ...corporations]" :class="['px-6 py-5 relative', {'cursor-pointer': isReady(character)}]">
             <div class="group flex justify-between items-center space-x-2">
                 <div class="-m-1 p-1 block">
                     <span class="absolute inset-0 group-hover:bg-gray-50"></span>
@@ -59,15 +59,20 @@ export default {
     computed: {
         characters() {
             return this.dispatchable_jobs.characters
+        },
+        corporations() {
+            return this.dispatchable_jobs.corporations
         }
     },
     methods: {
-        dispatchJob(character) {
+        dispatchJob(entity) {
 
-            /*:href="$route('dispatch.job')" method="post"
-                                :data="{character_id: character.character_id, job: job_name}*/
-            if(this.isReady(character))
-                return this.$inertia.post(this.$route('dispatch.job'), {character_id: character.character_id, job: this.job_name})
+            if(this.isReady(entity))
+                return this.$inertia.post(this.$route('dispatch.job'), {
+                    character_id: entity.character_id,
+                    corporation_id: entity.corporation_id,
+                    job: this.job_name
+                })
         },
         isReady(character) {
 

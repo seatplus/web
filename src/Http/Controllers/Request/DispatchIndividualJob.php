@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Seatplus\Eveapi\Jobs\ManualDispatchableJobInterface;
 
 class DispatchIndividualJob extends FormRequest
 {
@@ -49,11 +50,31 @@ class DispatchIndividualJob extends FormRequest
     public function rules()
     {
         $jobs = array_keys(config('eveapi.jobs'));
-        $character_ids = auth()->user()->characters->pluck('character_id')->toArray();
+
+        $job = $this->buildDispatchableJob();
+        $affiliated_ids = $this->buildAffiliatedIds($job);
 
         return [
             'job' => ['required', Rule::in($jobs)],
-            'character_id' => ['required', Rule::in($character_ids)],
+            'character_id' => [Rule::requiredIf(fn() => !$this->get('corporation_id')), Rule::in($affiliated_ids)],
+            'corporation_id' => [Rule::requiredIf(fn() => !$this->get('character_id')), Rule::in($affiliated_ids)],
         ];
     }
+
+    private function buildAffiliatedIds(ManualDispatchableJobInterface $job): array
+    {
+        return getAffiliatedIdsByPermission($job->getRequiredPermission());
+    }
+
+    private function buildDispatchableJob() : ManualDispatchableJobInterface
+    {
+        $dispatchable_job_class = config('eveapi.jobs')[$this->get('job')];
+
+        if(!$dispatchable_job_class)
+            throw new \Exception('unable to get lock of the dispatchable job');
+
+        return new $dispatchable_job_class;
+    }
+
+
 }

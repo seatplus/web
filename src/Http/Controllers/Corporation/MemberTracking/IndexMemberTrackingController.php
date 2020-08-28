@@ -27,14 +27,17 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
+use Seatplus\Eveapi\Jobs\Corporation\CorporationMemberTrackingJob;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\DispatchUpdates\BuildDispatchableCorporationJobs;
 
 class IndexMemberTrackingController extends Controller
 {
     public function __invoke()
     {
         return Inertia::render('Corporation/MemberTracking', [
+            'dispatchable_jobs' => $this->getDispatchableJobs(),
             'member_tracking' => CorporationMemberTracking::Affiliated()
                 ->with('corporation.ssoScopes', 'corporation.alliance.ssoScopes', 'character.refresh_token', 'location.locatable', 'ship')
                 ->get()
@@ -56,5 +59,13 @@ class IndexMemberTrackingController extends Controller
                     ];
                 }),
         ]);
+    }
+
+    private function getDispatchableJobs()
+    {
+        $dispatchableJobBuilder = new BuildDispatchableCorporationJobs;
+        $job = new CorporationMemberTrackingJob;
+
+        return $dispatchableJobBuilder($job, config('eveapi.permissions.' . CorporationMemberTracking::class));
     }
 }

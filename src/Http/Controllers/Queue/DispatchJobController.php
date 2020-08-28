@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Queue;
 
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\DispatchIndividualUpdate;
+use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\DispatchIndividualJob;
 
@@ -35,18 +36,29 @@ class DispatchJobController extends Controller
 {
     public function __invoke(DispatchIndividualJob $job)
     {
-        $refresh_token = RefreshToken::find($job['character_id']);
 
-        $cache_key = sprintf('%s:%s', $job['job'], $job['character_id']);
+        $cache_key = sprintf('%s:%s', $job['job'], $job['character_id'] ?? $job->get('corporation_id'));
 
         if (cache($cache_key)) {
             return redirect()->back()->with('error', 'job was already queued');
         }
 
-        $job_id = (new DispatchIndividualUpdate($refresh_token))->execute($job['job']);
+        $job_id = (new DispatchIndividualUpdate($this->getRefreshToken($job)))->execute($job['job']);
 
         cache([$cache_key => $job_id], now()->addHour());
 
         return redirect()->back()->with('success', 'job queued');
+    }
+
+    private function getRefreshToken(DispatchIndividualJob $job)
+    {
+        if($job->get('character_id'))
+            return RefreshToken::find($job->get('character_id'));
+
+        $dispatchable_job_class = config('eveapi.jobs')[$job->get('job')];
+
+        $dispatchable_job = new $dispatchable_job_class;
+
+        return (new FindCorporationRefreshToken)($job->get('corporation_id'), $dispatchable_job->getRequiredScope(), $dispatchable_job->getRequiredEveCorporationRole());
     }
 }

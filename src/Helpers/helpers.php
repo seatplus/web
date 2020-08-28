@@ -127,22 +127,5 @@ if (! function_exists('carbon')) {
 
         return new \Carbon\Carbon;
     }
-}
 
-if (! function_exists('getAffiliatedCharacters')) {
-
-    /**
-     * A helper to get all affiliated Characters.
-     *
-     * @param string $class
-     *
-     * @return void
-     */
-    function getAffiliatedCharacters(string $class): Collection
-    {
-        $permission_name = config('eveapi.permissions.' . $class);
-
-        return CharacterInfo::whereIn('character_id', auth()->user()->getAffiliatedIdsByPermission($permission_name))
-            ->get();
-    }
 }

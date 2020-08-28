@@ -59,7 +59,7 @@
                 return prefix(numeric_value, {precision: 3, unit: 'm³'})
             },
             url(asset) {
-                return asset.content[0] ? this.$route('character.item', asset.item_id) : '#'
+                return asset.content[0] ? this.$route('character.item', asset.item_id) : ''
             },
             buildSearchParams : function () {
                 return new URL(window.location.href).searchParams;
