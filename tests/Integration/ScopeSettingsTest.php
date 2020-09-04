@@ -134,8 +134,6 @@ class ScopeSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->delete(route('delete.global.scopes'));
 
-        $this->assertEquals('', setting('global_sso_scopes'));
-
     }
 
 }
