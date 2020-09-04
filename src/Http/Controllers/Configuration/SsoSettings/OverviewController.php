@@ -43,7 +43,7 @@ class OverviewController extends Controller
         return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
             'available_scopes' => $available_scopes,
             'entries' => $sso_scopes_entries,
-            'hasGlobalScopes' => fn () => !is_null(setting('global_sso_scopes'))
+            'hasGlobalScopes' => fn () => ! is_null(setting('global_sso_scopes')),
         ]);
     }
 }
