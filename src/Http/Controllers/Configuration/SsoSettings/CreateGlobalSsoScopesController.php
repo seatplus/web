@@ -24,37 +24,17 @@
  * SOFTWARE.
  */
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
-class CreateGlobalSettingsTable extends Migration
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\CreateGlobalSsoScopeValidation;
+
+class CreateGlobalSsoScopesController extends Controller
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function __invoke(CreateGlobalSsoScopeValidation $global_sso_scope_validation_request)
     {
-        Schema::create('global_settings', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->mediumText('value');
-            $table->timestamps();
+        setting(['global_sso_scopes', collect($global_sso_scope_validation_request->get('selectedScopes'))]);
 
-            // Indexes
-            $table->index('name');
-        });
-    }
-
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('global_settings');
+        return redirect()->route('settings.scopes')->with('success', 'Global SSO Settings Saved');
     }
 }

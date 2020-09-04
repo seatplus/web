@@ -26,24 +26,14 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
-use Inertia\Inertia;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
 
-class OverviewController extends Controller
+class DeleteGlobalSsoScopesController extends Controller
 {
     public function __invoke()
     {
-        $available_scopes = config('eveapi.scopes');
+        setting(['global_sso_scopes', '']);
 
-        $sso_scopes_entries = function () {
-            return (new GetSsoScopeEntries)->execute();
-        };
-
-        return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
-            'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
-            'hasGlobalScopes' => fn () => ! is_null(setting('global_sso_scopes')),
-        ]);
+        return redirect()->route('settings.scopes')->with('success', 'Global SSO Settings Deleted');
     }
 }

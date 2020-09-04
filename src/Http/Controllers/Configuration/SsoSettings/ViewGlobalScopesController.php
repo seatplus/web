@@ -24,16 +24,19 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Models\Settings;
+namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
-use Illuminate\Database\Eloquent\Model;
+use Inertia\Inertia;
+use Seatplus\Web\Http\Controllers\Controller;
 
-class GlobalSettings extends Model
+class ViewGlobalScopesController extends Controller
 {
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = ['name', 'value'];
+    public function __invoke()
+    {
+        return Inertia::render('Configuration/Scopes/EditScopeSettings', [
+            'available_scopes' => config('eveapi.scopes'),
+            'entity' => collect(['selected_scopes' => setting('global_sso_scopes')]),
+            'hasGlobalScopes' => true,
+        ]);
+    }
 }
