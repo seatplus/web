@@ -31,6 +31,7 @@ class ScopeSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('settings.scopes'));
 
+
         $response->assertComponent('Configuration/Scopes/OverviewScopeSettings');
     }
 
@@ -110,6 +111,31 @@ class ScopeSettingsTest extends TestCase
         $this->assertDatabaseMissing('sso_scopes',[
             'morphable_id' => 1184675423
         ]);
+    }
+
+    /** @test */
+    public function one_can_create_and_delete_global_sso_setting()
+    {
+
+        $this->assertNull(setting('global_sso_scopes'));
+
+        $response = $this->actingAs($this->test_user)
+            ->post(route('create.global.scopes'),
+                [
+                    'selectedScopes' => [
+                        'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
+                        'corporation' => []
+                    ]
+                ]
+            );
+
+        $this->assertNotNull(setting('global_sso_scopes'));
+
+        $response = $this->actingAs($this->test_user)
+            ->delete(route('delete.global.scopes'));
+
+        $this->assertEquals('', setting('global_sso_scopes'));
+
     }
 
 }

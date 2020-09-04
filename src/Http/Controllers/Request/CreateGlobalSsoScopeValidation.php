@@ -24,26 +24,43 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-use Inertia\Inertia;
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
+use Illuminate\Foundation\Http\FormRequest;
 
-class OverviewController extends Controller
+class CreateGlobalSsoScopeValidation extends FormRequest
 {
-    public function __invoke()
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
     {
-        $available_scopes = config('eveapi.scopes');
+        return true;
+    }
 
-        $sso_scopes_entries = function () {
-            return (new GetSsoScopeEntries)->execute();
-        };
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
+    {
+        return [
+            'selectedScopes' => 'required|array',
+        ];
+    }
 
-        return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
-            'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
-            'hasGlobalScopes' => fn () => !is_null(setting('global_sso_scopes'))
-        ]);
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'selectedScopes.required' => 'At least one character or corporation scope is required',
+        ];
     }
 }
