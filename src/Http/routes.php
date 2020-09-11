@@ -56,6 +56,7 @@ Route::middleware('web')
                 Route::prefix('corporation')
                     ->group(function () {
                         include __DIR__ . '/Routes/Corporation/MemberTracking.php';
+                        include __DIR__ . '/Routes/Corporation/Recruitment.php';
                     });
 
                 Route::prefix('acl')
