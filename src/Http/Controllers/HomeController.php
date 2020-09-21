@@ -37,7 +37,7 @@ class HomeController extends Controller
             'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
-            'user_application' => auth()->user()->application
+            'user_application' => auth()->user()->application,
         ]);
     }
 }
