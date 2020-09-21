@@ -24,14 +24,17 @@
  * SOFTWARE.
  */
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 Route::middleware('web')
     ->group(function () {
-        Route::middleware('auth', CheckRequiredScopes::class)
+
+        Route::middleware(['auth', CheckRequiredScopes::class])
             ->group(function () {
+
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
 
                 Route::prefix('queue')

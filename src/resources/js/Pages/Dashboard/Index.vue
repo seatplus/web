@@ -1,5 +1,15 @@
 <template>
   <Layout page="Home">
+
+      <template v-slot:title>
+          <PageHeader>
+              Home
+          </PageHeader>
+      </template>
+
+      <Characters :characters="characters" :enlistments="characterEnlistments" class="mb-4"/>
+
+      <Enlistments :enlistments="corporationEnlistments" :application="user_application" class="mb-4"/>
       <!--<div class="container-fluid">
           Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
 
@@ -22,26 +32,49 @@
 <script>
   import Layout from "../../Shared/Layout";
   import axios from 'axios';
+  import PageHeader from "../../Shared/Layout/PageHeader"
+  import Enlistments from "./Enlistments"
+  import Characters from "./Characters"
 
   export default {
-    name: "Index",
-
-    components: {Layout},
-
-    methods: {
-        emmitEvent() {
-            this.$eventBus.$emit('notification', {
-                type: 'success',
-            })
-        },
-
-      log: function () {
-        axios.get('/eveapi/character/info')
-            .then(response => {
-              console.log(response.data);
-            })
+      name: "Index",
+      components: {Characters, Enlistments, PageHeader, Layout},
+      props: {
+          characters: {
+              type: Array
+          },
+          user_application: {
+              required: true
+          }
       },
-    }
+      data() {
+          return {
+              enlistments: []
+          }
+      },
+      methods: {
+          emmitEvent() {
+              this.$eventBus.$emit('notification', {
+                  type: 'success',
+              })
+          },
+          async getEnlistments() {
+              axios.get(this.$route('list.open.enlistments'))
+                  .then((result) => this.enlistments.push(...result.data))
+          }
+      },
+      created() {
+          this.getEnlistments()
+      },
+      computed: {
+          characterEnlistments() {
+              return _.filter(this.enlistments, (enlistment) => enlistment.type === 'character')
+          },
+          corporationEnlistments() {
+
+              return _.filter(this.enlistments, (enlistment) => enlistment.type === 'user')
+          }
+      }
   }
 </script>
 

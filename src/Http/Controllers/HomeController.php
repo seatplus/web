@@ -27,11 +27,17 @@
 namespace Seatplus\Web\Http\Controllers;
 
 use Inertia\Inertia;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HomeController extends Controller
 {
     public function home()
     {
-        return Inertia::render('Dashboard/Index');
+        return Inertia::render('Dashboard/Index', [
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
+                ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
+                ->get(),
+            'user_application' => auth()->user()->application
+        ]);
     }
 }

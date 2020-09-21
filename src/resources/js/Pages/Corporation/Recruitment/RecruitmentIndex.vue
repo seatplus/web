@@ -6,13 +6,13 @@
                 Corporation Recruitment
                 <template v-if="can_manage_recruitment" v-slot:primary>
                     <HeaderButton @click="openSlideOver">
-                        Update
+                        Open new enlistment
                     </HeaderButton>
                 </template>
             </PageHeader>
         </template>
 
-        <span>Test </span>
+        <CorporationRecruitment v-for="corporation in corporations" :key="corporation.corporation_id" :corporation="corporation"></CorporationRecruitment>
 
         <template v-slot:slideOver>
             <SlideOver>
@@ -31,14 +31,18 @@ import PageHeader from "@/Shared/Layout/PageHeader"
 import HeaderButton from "@/Shared/Layout/HeaderButton"
 import SlideOver from "@/Shared/Layout/SlideOver"
 import CorporationList from "./CorporationList"
+import CorporationRecruitment from "./CorporationRecruitment"
 
 export default {
-    components: {CorporationList, SlideOver, Layout, HeaderButton, PageHeader},
+    components: {CorporationRecruitment, CorporationList, SlideOver, Layout, HeaderButton, PageHeader},
     name: "RecruitmentIndex",
     props: {
         can_manage_recruitment: {
             required: true,
             type: Boolean
+        },
+        corporations: {
+            required: false
         }
     },
     methods   : {
