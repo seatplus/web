@@ -1,5 +1,5 @@
 <template>
-    <Layout page="Corporation" page-description="Member Tracking">
+    <Layout page="Corporation" page-description="Member Tracking" :required-scopes="this.requiredScopes">
 
         <template v-slot:title>
             <PageHeader>
@@ -195,6 +195,8 @@ export default {
     },
     data() {
         return {
+            // TODO: Add Required Scopes for corporation component
+            requiredScopes: ['esi-characters.read_corporation_roles.v1', 'esi-corporations.track_members.v1'],
             unknownIds: [],
             resolvedIds: [],
         }

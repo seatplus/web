@@ -1,9 +1,9 @@
 <template>
     <div class="pb-5 border-b border-gray-200 space-y-2">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Job Postings
+            Characters
         </h3>
-        <p class="max-w-4xl text-sm leading-5 text-gray-500">Workcation is a property rental website. Etiam ullamcorper massa viverra consequat, consectetur id nulla tempus. Fringilla egestas justo massa purus sagittis malesuada.</p>
+        <p class="max-w-4xl text-sm leading-5 text-gray-500">Below you find all characters you have added to this seatplus instance</p>
         <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <li v-for="character in characters" :key="character.character_id" class="col-span-1 bg-white rounded-lg shadow">
                 <div class="w-full flex items-center justify-between p-6 space-x-6">
@@ -17,7 +17,7 @@
                     <EveImage tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0" :object="character" :size="256" />
                     <!--<img class="" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=4&amp;w=256&amp;h=256&amp;q=60" alt="">-->
                 </div>
-                <div class="border-t border-gray-200">
+                <div class="border-t border-gray-200" v-if="hasOpenEnlistments">
                     <div class="-mt-px flex">
                         <!--<div class="w-0 flex-1 flex border-r border-gray-200">
                             <a href="#" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
@@ -61,9 +61,11 @@ export default {
             default: []
         }
     },
-    methods: {
-
-    },
+    computed: {
+        hasOpenEnlistments() {
+            return !_.isEmpty(this.enlistments)
+        }
+    }
 
 }
 </script>

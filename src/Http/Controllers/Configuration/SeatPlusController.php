@@ -30,6 +30,7 @@ use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\UserRessource;
+use Seatplus\Web\Services\ImpersonateService;
 
 class SeatPlusController extends Controller
 {
@@ -61,31 +62,12 @@ class SeatPlusController extends Controller
         ]);
     }
 
-    public function stopImpersonate()
-    {
-        // If there is no user set in the session, abort!
-        if (! session()->has('impersonation_origin')) {
-            abort(404);
-        }
-
-        // Login
-        auth()->login(session('impersonation_origin'));
-
-        // Clear the session value
-        session()->forget('impersonation_origin');
-
-        return redirect()->route('server.settings')->with('success', 'Stopped Impersonate');
-    }
-
     public function impersonate($user_id)
     {
 
-        // Store the original user in the session
-        session(['impersonation_origin' => auth()->user()]);
-
         $impersonated_user = User::find($user_id);
 
-        auth()->login($impersonated_user);
+        (new ImpersonateService)->impersonateUser($impersonated_user, 'server.settings');
 
         return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
     }

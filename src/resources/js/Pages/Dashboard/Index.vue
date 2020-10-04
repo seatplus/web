@@ -9,7 +9,7 @@
 
       <Characters :characters="characters" :enlistments="characterEnlistments" class="mb-4"/>
 
-      <Enlistments :enlistments="corporationEnlistments" :application="user_application" class="mb-4"/>
+      <Enlistments v-if="hasCorporationEnlistments" :enlistments="corporationEnlistments" :application="user_application" class="mb-4"/>
       <!--<div class="container-fluid">
           Dashboard, Translation: {{ $I18n.trans('web::notifications.success') }}
 
@@ -61,7 +61,8 @@
           async getEnlistments() {
               axios.get(this.$route('list.open.enlistments'))
                   .then((result) => this.enlistments.push(...result.data))
-          }
+          },
+
       },
       created() {
           this.getEnlistments()
@@ -73,6 +74,9 @@
           corporationEnlistments() {
 
               return _.filter(this.enlistments, (enlistment) => enlistment.type === 'user')
+          },
+          hasCorporationEnlistments() {
+              return ! _.isEmpty(this.corporationEnlistments)
           }
       }
   }

@@ -59,6 +59,3 @@ Route::middleware(['permission:superuser'])->group(function () {
 
     Route::get('/search/{searchParam}', [SsoSettingsController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });
-
-// Route must not be protected
-Route::get('/stop/impersonate', [SeatPlusController::class, 'stopImpersonate'])->name('impersonate.stop');

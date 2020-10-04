@@ -2,7 +2,7 @@
 
     <div v-show="enlistments" class="pb-5 border-b border-gray-200 space-y-2">
         <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Job Postingss
+            Job Postings
         </h3>
         <p class="max-w-4xl text-sm leading-5 text-gray-500">Workcation is a property rentals website. Etiam ullamcorper massa viverra consequat, consectetur id nulla tempus. Fringilla egestas justo massa purus sagittis malesuada.</p>
         <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -22,7 +22,7 @@
                             &lt;!&ndash;Another element&ndash;&gt;
                         </div>-->
                         <div class="-ml-px w-0 flex-1 flex">
-                            <inertia-link :href="$route('delete.user.application')" method="delete" v-if="application" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <inertia-link :href="$route('delete.user.application')" method="delete" v-if="activeApplication" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5 text-red-700" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                     <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -68,6 +68,9 @@ export default {
             let application_id = this.application ? this.application.corporation_id : null;
 
             return application_id ? _.filter(this.enlistments, (enlistment) => _.isEqual(enlistment.corporation_id, application_id)) : this.enlistments
+        },
+        activeApplication() {
+            return !_.isEmpty(this.application)
         }
     }
 }

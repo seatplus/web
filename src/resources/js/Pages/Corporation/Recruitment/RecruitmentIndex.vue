@@ -16,7 +16,7 @@
 
         <template v-slot:slideOver>
             <SlideOver>
-                <template v-slot:title>Dispatch Update Job</template>
+                <template v-slot:title>Create Enlistment</template>
                 <CorporationList></CorporationList>
             </SlideOver>
         </template>

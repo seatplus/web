@@ -9,7 +9,7 @@
         </button>
         <!--<div>
             <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-outline">
-                <EveImage tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character" :size="256" />
+                <EveImage tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character"  test :size="256" />
             </button>
         </div>-->
         <div v-if="menuOpen"  class="fixed inset-0 transition-opacity">
