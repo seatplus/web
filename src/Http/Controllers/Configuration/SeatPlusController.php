@@ -67,7 +67,7 @@ class SeatPlusController extends Controller
 
         $impersonated_user = User::find($user_id);
 
-        (new ImpersonateService)->impersonateUser($impersonated_user, 'server.settings');
+        (new ImpersonateService)->impersonateUser($impersonated_user);
 
         return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
     }

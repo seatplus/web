@@ -33,6 +33,8 @@ use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
+use Seatplus\Web\Http\Middleware\CheckUserAffiliationForApplication;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
@@ -115,7 +117,7 @@ class WebServiceProvider extends ServiceProvider
         $router->pushMiddlewareToGroup('web', Middleware::class);
 
         // Add permission Middelware
-        $router->aliasMiddleware('permission', PermissionMiddleware::class);
+        $router->aliasMiddleware('permission', CheckPermissionAffiliation::class);
     }
 
     private function register_services()

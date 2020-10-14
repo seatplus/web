@@ -49,7 +49,7 @@ class ApplicationRessource extends JsonResource
             ]),
             'main_character' => $this->applicationable->main_character ?? null,
             'characters' => $this->applicationable instanceof User ? $this->applicationable->characters->map(fn ($character) => $this->buildCharacterArray($character)) : [],
-            'character' => $this->applicationable instanceof CharacterInfo ? $this->applicationable->map(fn ($character) => $this->buildCharacterArray($character)) : []
+            'character' => $this->applicationable instanceof CharacterInfo ? $this->buildCharacterArray($this->applicationable) : []
         ];
     }
 

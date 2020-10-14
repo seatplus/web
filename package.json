@@ -39,7 +39,6 @@
         "lodash": "^4.17.20",
         "metric-prefix": "^0.9.0",
         "moxios": "^0.4.0",
-        "portal-vue": "^2.1.7",
         "tailwindcss": "^1.4.6",
         "uuid": "^7.0.3",
         "vue-fragment": "^1.5.1",

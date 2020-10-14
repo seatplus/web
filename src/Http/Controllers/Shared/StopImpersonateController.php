@@ -22,7 +22,7 @@ class StopImpersonateController extends Controller
         // Clear the session value
         session()->forget(['impersonation_origin', 'route']);
 
-        return redirect()->route($route)->with('success', 'Stopped Impersonate');
+        return redirect()->to($route)->with('success', 'Stopped Impersonate');
     }
 
 }

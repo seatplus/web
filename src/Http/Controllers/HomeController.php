@@ -29,7 +29,6 @@ namespace Seatplus\Web\Http\Controllers;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HomeController extends Controller

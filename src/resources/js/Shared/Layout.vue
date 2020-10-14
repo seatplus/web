@@ -163,8 +163,6 @@
             </transition>
 
             <slot name="slideOver"></slot>
-
-            <PortalTarget name="layout"/>
         </div>
     </div>
 
@@ -179,7 +177,6 @@
     import Alerts from "./Alerts"
     import ImpersonatingBanner from "./ImpersonatingBanner"
     import SlideOver from "./Layout/SlideOver"
-    import { PortalTarget } from 'portal-vue'
 
     export default {
         name: "Layout",
@@ -192,7 +189,6 @@
             Menu,
             Sidebar,
             RequiredScopesWarning,
-            PortalTarget
         },
         props   : {
             page: {

@@ -13,7 +13,7 @@ use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
 
-class GetApplicationsController extends Controller
+class GetOpenApplicationsController extends Controller
 {
     const RECRUITERPERMISSION = 'can accept or deny applications';
 
@@ -28,7 +28,7 @@ class GetApplicationsController extends Controller
                     User::class => ['characters.refresh_token', 'main_character', 'characters.application.corporation.ssoScopes', 'characters.application.corporation.alliance.ssoScopes'],
                     CharacterInfo::class => ['refresh_token', 'application.corporation.ssoScopes', 'application.corporation.alliance.ssoScopes']
                 ]),
-            ]);
+            ])->whereStatus('open');
 
         return ApplicationRessource::collection($applications->paginate());
     }

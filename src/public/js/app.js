@@ -43,7 +43,7 @@
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "js/" + ({}[chunkId]||chunkId) + ".js?id=" + {"0":"ef41180fa95b461bbdf8","1":"8e644901fcb5c863ab07","2":"a78648ef6178ae0e0b58","3":"1575194cad22b257306b","4":"c6c310bcc1eb5b4aae2f","5":"39adb0bfa4ceedf9f235","6":"2495c75e348f49f60795","7":"916e23f3c5c2421f5c24","8":"84cf977cf2a43d5b1853","9":"b81a92dea84926cca0a8","10":"df2860aae44c7dd10daa","11":"e43a41542a4ef833dfb0","12":"f03313183e1dc206228c","13":"f0bf68bb07061a991faa","14":"67d771ba294b07c9fb3f","15":"f6bee8cab5061c60e658","16":"3a24012ab1d5f789211c","17":"07de6633487782e6ab00","18":"3c5ec972178326598174","19":"de9a25f5ad0dbf13eb16","20":"ab2b62603b9758e85beb","21":"3d3a9d7468ca589924f6","22":"c0c4c8039e606fdd1f80","23":"9717212154445f9c5b63","24":"ecd1cb44bddf1884b839","25":"367b7ed6af06ce8a6c00","26":"24a1fadf30c724664013","27":"96be8baa5b51e0417916","28":"ca1d1c64dfb7569aac45","29":"3b98448b537bd9f38e3b","30":"9dcdc6fac3b33f8f4a37","31":"8d4681cf5931b183d93e","32":"ad64f7cd7efe36332fef","33":"1875ca6bd93a6d2b0553","34":"1a8fe2961f937d84bf34","35":"8f840b9fbc661b10066d","36":"5d2446cb16fe9f38402b","37":"7a4af8a485d878d2bd0c","38":"21c26867412412982a1f","39":"d991abafd6f823cb3470","40":"a643dbebea5f5d642cb3","41":"4d0684d8a28b0819a5e0","42":"d937c29ad164248c240d"}[chunkId] + ""
+/******/ 		return __webpack_require__.p + "js/" + ({}[chunkId]||chunkId) + ".js?id=" + {"0":"7796c5d44752f7c828f9","1":"19473bbb81a4d7dc6090","2":"b7bc542b666075492aa6","3":"2300ae7d5852c4e1c382","4":"e9796fdfb1594f2895c6","5":"55c105d2a3abd64afb22","6":"8d032c2df995bf0d4873","7":"e69cba3e78dc099c9d13","8":"4ee987240bfdaa465620","9":"e19a1e25a09a1081ef80","10":"c780e556bbd088135016","11":"d247c7abe8700373a695","12":"24ce0025f3fb0826ab57","13":"93c6570f48e5dc1f5caf","14":"47caa19b252e42bc5717","15":"e6e5d13d49cbea28823e","16":"349a66df0a59119c25f4","17":"f4d6fb872512e6778870","18":"a68638d1cc77e372d350","19":"e3b14d8e35647d43e522","20":"61f82c53409bbecb2ee4","21":"5148f95743f879741b3b","22":"b650f139eb4990a1497e","23":"33a44a6af040044a6bae","24":"32268b6d85b360513406","25":"de362183c774b727e53f","26":"03248b531ab9974d7cc3","27":"a8752bf2dd1a747d633b","28":"2cb4e17b7d873535f633","29":"9c85f8d7bba3d9422616","30":"54b35a7406307b6a5982","31":"f0702f2d0aa3394226bf","32":"62eabc383b791907668d","33":"31ae99bf0b367b4d0b5b","34":"2ac7d8417e81d3c8a380","35":"06ce7671ed9461a8d124","36":"59c4ec4712cc0baf2852","37":"58052bf0773fb2c038db","38":"8dd684b5705595705eae","39":"9da6abd7eddef56fed79","40":"b30d3d9ce14a780da658","41":"9b2ec8a5f350d2ff6f21","42":"08cfd26dfac8d206fb80","43":"da1f76e5fcdb8dc186d7","44":"861e69c6206a607f18eb","45":"0f9549c4cecf1c488cea","46":"83607cf86ed68b605137","47":"1ace4d166227fc50c0a1","48":"280943218a8cee781452","49":"6ff1d500737f03f846ad","50":"6ec6d3ee9ffa10273966","51":"1a525c0fb45c989e5646","52":"c0214f683561acdbb982","53":"55f60690dd7b4c276442","54":"b29a3bba493d5da3331c","55":"77bbf2599d8436c89916","56":"55f0ca6420b18fa3b8bc","57":"65c02e54096f37b97881","58":"d153e73ccaa7596f9c38","59":"b207cf51073e2ffb80ff","60":"4a44a43de7e0951898b1","61":"45645351482b478f248c","62":"fdbbfb4d25663b1d3ad7","63":"a9e325fa3c33f7832b63","64":"ab24fc9ac79b2fb321ae","65":"1555f7947b20c1a746c2","66":"3448a64e2bf8cac7427a","67":"32d09f9838f71de670fc","68":"9fc30dfd5544f4293f78","69":"5106b9b791486763dc7c","70":"16fe91747e50480dd113","71":"423d6be34a7dcd7a866e"}[chunkId] + ""
 /******/ 	}
 /******/
 /******/ 	// The require function
@@ -2061,7 +2061,7 @@ module.exports = {
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.15';
+  var VERSION = '4.17.20';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -5768,8 +5768,21 @@ module.exports = {
      * @returns {Array} Returns the new sorted array.
      */
     function baseOrderBy(collection, iteratees, orders) {
+      if (iteratees.length) {
+        iteratees = arrayMap(iteratees, function(iteratee) {
+          if (isArray(iteratee)) {
+            return function(value) {
+              return baseGet(value, iteratee.length === 1 ? iteratee[0] : iteratee);
+            }
+          }
+          return iteratee;
+        });
+      } else {
+        iteratees = [identity];
+      }
+
       var index = -1;
-      iteratees = arrayMap(iteratees.length ? iteratees : [identity], baseUnary(getIteratee()));
+      iteratees = arrayMap(iteratees, baseUnary(getIteratee()));
 
       var result = baseMap(collection, function(value, key, collection) {
         var criteria = arrayMap(iteratees, function(iteratee) {
@@ -6026,6 +6039,10 @@ module.exports = {
         var key = toKey(path[index]),
             newValue = value;
 
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return object;
+        }
+
         if (index != lastIndex) {
           var objValue = nested[key];
           newValue = customizer ? customizer(objValue, key, nested) : undefined;
@@ -6178,11 +6195,14 @@ module.exports = {
      *  into `array`.
      */
     function baseSortedIndexBy(array, value, iteratee, retHighest) {
-      value = iteratee(value);
-
       var low = 0,
-          high = array == null ? 0 : array.length,
-          valIsNaN = value !== value,
+          high = array == null ? 0 : array.length;
+      if (high === 0) {
+        return 0;
+      }
+
+      value = iteratee(value);
+      var valIsNaN = value !== value,
           valIsNull = value === null,
           valIsSymbol = isSymbol(value),
           valIsUndefined = value === undefined;
@@ -7667,10 +7687,11 @@ module.exports = {
       if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
         return false;
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(array);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var arrStacked = stack.get(array);
+      var othStacked = stack.get(other);
+      if (arrStacked && othStacked) {
+        return arrStacked == other && othStacked == array;
       }
       var index = -1,
           result = true,
@@ -7832,10 +7853,11 @@ module.exports = {
           return false;
         }
       }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked && stack.get(other)) {
-        return stacked == other;
+      // Check that cyclic values are equal.
+      var objStacked = stack.get(object);
+      var othStacked = stack.get(other);
+      if (objStacked && othStacked) {
+        return objStacked == other && othStacked == object;
       }
       var result = true;
       stack.set(object, other);
@@ -11216,6 +11238,10 @@ module.exports = {
      * // The `_.property` iteratee shorthand.
      * _.filter(users, 'active');
      * // => objects for ['barney']
+     *
+     * // Combining several predicates using `_.overEvery` or `_.overSome`.
+     * _.filter(users, _.overSome([{ 'age': 36 }, ['age', 40]]));
+     * // => objects for ['fred', 'barney']
      */
     function filter(collection, predicate) {
       var func = isArray(collection) ? arrayFilter : baseFilter;
@@ -11965,15 +11991,15 @@ module.exports = {
      * var users = [
      *   { 'user': 'fred',   'age': 48 },
      *   { 'user': 'barney', 'age': 36 },
-     *   { 'user': 'fred',   'age': 40 },
+     *   { 'user': 'fred',   'age': 30 },
      *   { 'user': 'barney', 'age': 34 }
      * ];
      *
      * _.sortBy(users, [function(o) { return o.user; }]);
-     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 40]]
+     * // => objects for [['barney', 36], ['barney', 34], ['fred', 48], ['fred', 30]]
      *
      * _.sortBy(users, ['user', 'age']);
-     * // => objects for [['barney', 34], ['barney', 36], ['fred', 40], ['fred', 48]]
+     * // => objects for [['barney', 34], ['barney', 36], ['fred', 30], ['fred', 48]]
      */
     var sortBy = baseRest(function(collection, iteratees) {
       if (collection == null) {
@@ -16848,11 +16874,11 @@ module.exports = {
 
       // Use a sourceURL for easier debugging.
       // The sourceURL gets injected into the source that's eval-ed, so be careful
-      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
-      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
+      // to normalize all kinds of whitespace, so e.g. newlines (and unicode versions of it) can't sneak in
+      // and escape the comment, thus injecting code that gets evaled.
       var sourceURL = '//# sourceURL=' +
         (hasOwnProperty.call(options, 'sourceURL')
-          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
+          ? (options.sourceURL + '').replace(/\s/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -16885,8 +16911,6 @@ module.exports = {
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      // Like with sourceURL, we take care to not check the option's prototype,
-      // as this configuration is a code injection vector.
       var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
@@ -17593,6 +17617,9 @@ module.exports = {
      * values against any array or object value, respectively. See `_.isEqual`
      * for a list of supported value comparisons.
      *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
+     *
      * @static
      * @memberOf _
      * @since 3.0.0
@@ -17608,6 +17635,10 @@ module.exports = {
      *
      * _.filter(objects, _.matches({ 'a': 4, 'c': 6 }));
      * // => [{ 'a': 4, 'b': 5, 'c': 6 }]
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matches({ 'a': 1 }), _.matches({ 'a': 4 })]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matches(source) {
       return baseMatches(baseClone(source, CLONE_DEEP_FLAG));
@@ -17621,6 +17652,9 @@ module.exports = {
      * **Note:** Partial comparisons will match empty array and empty object
      * `srcValue` values against any array or object value, respectively. See
      * `_.isEqual` for a list of supported value comparisons.
+     *
+     * **Note:** Multiple values can be checked by combining several matchers
+     * using `_.overSome`
      *
      * @static
      * @memberOf _
@@ -17638,6 +17672,10 @@ module.exports = {
      *
      * _.find(objects, _.matchesProperty('a', 4));
      * // => { 'a': 4, 'b': 5, 'c': 6 }
+     *
+     * // Checking for several possible values
+     * _.filter(objects, _.overSome([_.matchesProperty('a', 1), _.matchesProperty('a', 4)]));
+     * // => [{ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 4, 'b': 5, 'c': 6 }]
      */
     function matchesProperty(path, srcValue) {
       return baseMatchesProperty(path, baseClone(srcValue, CLONE_DEEP_FLAG));
@@ -17861,6 +17899,10 @@ module.exports = {
      * Creates a function that checks if **all** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -17887,6 +17929,10 @@ module.exports = {
      * Creates a function that checks if **any** of the `predicates` return
      * truthy when invoked with the arguments it receives.
      *
+     * Following shorthands are possible for providing predicates.
+     * Pass an `Object` and it will be used as an parameter for `_.matches` to create the predicate.
+     * Pass an `Array` of parameters for `_.matchesProperty` and the predicate will be created using them.
+     *
      * @static
      * @memberOf _
      * @since 4.0.0
@@ -17906,6 +17952,9 @@ module.exports = {
      *
      * func(NaN);
      * // => false
+     *
+     * var matchesFunc = _.overSome([{ 'a': 1 }, { 'a': 2 }])
+     * var matchesPropertyFunc = _.overSome([['a', 1], ['a', 2]])
      */
     var overSome = createOver(arraySome);
 
@@ -28637,417 +28686,705 @@ module.exports = function(module) {
 var map = {
 	"./AccessControl/AclTypes/Affiliations": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Affiliations.vue",
-		24
+		44
 	],
 	"./AccessControl/AclTypes/Affiliations.vue": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Affiliations.vue",
-		24
+		44
+	],
+	"./AccessControl/AclTypes/Applicants": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/Applicants.vue",
+		12,
+		57
+	],
+	"./AccessControl/AclTypes/Applicants.vue": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/Applicants.vue",
+		12,
+		57
 	],
 	"./AccessControl/AclTypes/AutomaticRole": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/AutomaticRole.vue",
-		6,
-		10,
-		34
+		5,
+		31
 	],
 	"./AccessControl/AclTypes/AutomaticRole.vue": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/AutomaticRole.vue",
-		6,
-		10,
-		34
+		5,
+		31
 	],
 	"./AccessControl/AclTypes/Manual": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Manual.vue",
 		0,
-		6,
-		7,
-		25
+		5,
+		13,
+		49
 	],
 	"./AccessControl/AclTypes/Manual.vue": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Manual.vue",
 		0,
-		6,
-		7,
-		25
+		5,
+		13,
+		49
 	],
 	"./AccessControl/AclTypes/Members": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Members.vue",
-		6,
-		39
+		5,
+		58
 	],
 	"./AccessControl/AclTypes/Members.vue": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Members.vue",
-		6,
-		39
+		5,
+		58
+	],
+	"./AccessControl/AclTypes/Moderators": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/Moderators.vue",
+		45
+	],
+	"./AccessControl/AclTypes/Moderators.vue": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/Moderators.vue",
+		45
+	],
+	"./AccessControl/AclTypes/OnRequestControlGroup": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/OnRequestControlGroup.vue",
+		0,
+		5,
+		13,
+		12,
+		15,
+		64
+	],
+	"./AccessControl/AclTypes/OnRequestControlGroup.vue": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/OnRequestControlGroup.vue",
+		0,
+		5,
+		13,
+		12,
+		15,
+		64
+	],
+	"./AccessControl/AclTypes/OptInControlGroup": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/OptInControlGroup.vue",
+		5,
+		12,
+		32
+	],
+	"./AccessControl/AclTypes/OptInControlGroup.vue": [
+		"./src/resources/js/Pages/AccessControl/AclTypes/OptInControlGroup.vue",
+		5,
+		12,
+		32
 	],
 	"./AccessControl/AclTypes/Users": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Users.vue",
 		0,
-		7,
-		37
+		13,
+		65
 	],
 	"./AccessControl/AclTypes/Users.vue": [
 		"./src/resources/js/Pages/AccessControl/AclTypes/Users.vue",
 		0,
-		7,
-		37
+		13,
+		65
 	],
 	"./AccessControl/AddAffiliations": [
 		"./src/resources/js/Pages/AccessControl/AddAffiliations.vue",
-		12,
-		40
+		19,
+		68
 	],
 	"./AccessControl/AddAffiliations.vue": [
 		"./src/resources/js/Pages/AccessControl/AddAffiliations.vue",
-		12,
-		40
+		19,
+		68
 	],
 	"./AccessControl/AffiliationList": [
 		"./src/resources/js/Pages/AccessControl/AffiliationList.vue",
-		19
+		33
 	],
 	"./AccessControl/AffiliationList.vue": [
 		"./src/resources/js/Pages/AccessControl/AffiliationList.vue",
-		19
+		33
 	],
 	"./AccessControl/Affiliations": [
 		"./src/resources/js/Pages/AccessControl/Affiliations.vue",
 		0,
-		11,
-		38
+		17,
+		66
 	],
 	"./AccessControl/Affiliations.vue": [
 		"./src/resources/js/Pages/AccessControl/Affiliations.vue",
 		0,
-		11,
-		38
+		17,
+		66
 	],
 	"./AccessControl/ControlGroups": [
 		"./src/resources/js/Pages/AccessControl/ControlGroups.vue",
-		0,
-		2,
-		1,
-		3,
-		8,
-		16
+		20,
+		69
 	],
 	"./AccessControl/ControlGroups.vue": [
 		"./src/resources/js/Pages/AccessControl/ControlGroups.vue",
+		20,
+		69
+	],
+	"./AccessControl/ControlGroupsIndex": [
+		"./src/resources/js/Pages/AccessControl/ControlGroupsIndex.vue",
 		0,
-		2,
 		1,
 		3,
 		8,
-		16
+		2,
+		4,
+		21,
+		20,
+		23,
+		61
+	],
+	"./AccessControl/ControlGroupsIndex.vue": [
+		"./src/resources/js/Pages/AccessControl/ControlGroupsIndex.vue",
+		0,
+		1,
+		3,
+		8,
+		2,
+		4,
+		21,
+		20,
+		23,
+		61
 	],
 	"./AccessControl/EditGroup": [
 		"./src/resources/js/Pages/AccessControl/EditGroup.vue",
 		0,
-		2,
 		1,
 		3,
-		11,
-		12,
-		17
+		2,
+		4,
+		17,
+		19,
+		29
 	],
 	"./AccessControl/EditGroup.vue": [
 		"./src/resources/js/Pages/AccessControl/EditGroup.vue",
 		0,
-		2,
 		1,
 		3,
-		11,
-		12,
-		17
+		2,
+		4,
+		17,
+		19,
+		29
 	],
 	"./AccessControl/ManageControlGroup": [
 		"./src/resources/js/Pages/AccessControl/ManageControlGroup.vue",
 		0,
-		2,
-		42,
 		1,
 		3,
-		6,
-		7,
-		10,
-		15
+		2,
+		4,
+		5,
+		13,
+		12,
+		15,
+		27
 	],
 	"./AccessControl/ManageControlGroup.vue": [
 		"./src/resources/js/Pages/AccessControl/ManageControlGroup.vue",
 		0,
-		2,
-		42,
 		1,
 		3,
-		6,
-		7,
-		10,
-		15
+		2,
+		4,
+		5,
+		13,
+		12,
+		15,
+		27
+	],
+	"./AccessControl/ManageMembers": [
+		"./src/resources/js/Pages/AccessControl/ManageMembers.vue",
+		0,
+		1,
+		3,
+		8,
+		2,
+		4,
+		21
+	],
+	"./AccessControl/ManageMembers.vue": [
+		"./src/resources/js/Pages/AccessControl/ManageMembers.vue",
+		0,
+		1,
+		3,
+		8,
+		2,
+		4,
+		21
 	],
 	"./Auth/Login": [
 		"./src/resources/js/Pages/Auth/Login.vue",
-		29
+		52
 	],
 	"./Auth/Login.vue": [
 		"./src/resources/js/Pages/Auth/Login.vue",
-		29
+		52
 	],
 	"./Auth/MissingRequiredScopes": [
 		"./src/resources/js/Pages/Auth/MissingRequiredScopes.vue",
+		3,
 		2,
-		1,
-		30
+		53
 	],
 	"./Auth/MissingRequiredScopes.vue": [
 		"./src/resources/js/Pages/Auth/MissingRequiredScopes.vue",
+		3,
 		2,
-		1,
-		30
+		53
 	],
 	"./Character/Assets": [
 		"./src/resources/js/Pages/Character/Assets.vue",
 		0,
-		2,
-		9,
 		1,
 		3,
 		8,
-		13,
-		14
+		14,
+		26,
+		2,
+		4,
+		16,
+		24,
+		23,
+		28
 	],
 	"./Character/Assets.vue": [
 		"./src/resources/js/Pages/Character/Assets.vue",
 		0,
-		2,
-		9,
 		1,
 		3,
 		8,
-		13,
-		14
+		14,
+		26,
+		2,
+		4,
+		16,
+		24,
+		23,
+		28
 	],
 	"./Character/ItemDetails": [
 		"./src/resources/js/Pages/Character/ItemDetails.vue",
 		0,
-		2,
-		9,
 		1,
 		3,
-		20
+		14,
+		2,
+		4,
+		37
 	],
 	"./Character/ItemDetails.vue": [
 		"./src/resources/js/Pages/Character/ItemDetails.vue",
 		0,
-		2,
-		9,
 		1,
 		3,
-		20
+		14,
+		2,
+		4,
+		37
 	],
 	"./Character/ItemList": [
 		"./src/resources/js/Pages/Character/ItemList.vue",
-		9,
-		13,
-		35
+		14,
+		34
 	],
 	"./Character/ItemList.vue": [
 		"./src/resources/js/Pages/Character/ItemList.vue",
-		9,
-		13,
-		35
+		14,
+		34
 	],
 	"./Configuration/Commands": [
 		"./src/resources/js/Pages/Configuration/Commands.vue",
-		31
+		54
 	],
 	"./Configuration/Commands.vue": [
 		"./src/resources/js/Pages/Configuration/Commands.vue",
-		31
+		54
 	],
 	"./Configuration/HorizonStats": [
 		"./src/resources/js/Pages/Configuration/HorizonStats.vue",
-		4,
-		41
+		7,
+		70
 	],
 	"./Configuration/HorizonStats.vue": [
 		"./src/resources/js/Pages/Configuration/HorizonStats.vue",
-		4,
-		41
+		7,
+		70
 	],
 	"./Configuration/Schedules/SchedulesCreate": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesCreate.vue",
 		0,
-		2,
 		1,
 		3,
-		21
+		2,
+		4,
+		38
 	],
 	"./Configuration/Schedules/SchedulesCreate.vue": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesCreate.vue",
 		0,
-		2,
 		1,
 		3,
-		21
+		2,
+		4,
+		38
 	],
 	"./Configuration/Schedules/SchedulesDetails": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesDetails.vue",
 		0,
-		2,
 		1,
 		3,
-		22
+		2,
+		4,
+		39
 	],
 	"./Configuration/Schedules/SchedulesDetails.vue": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesDetails.vue",
 		0,
-		2,
 		1,
 		3,
-		22
+		2,
+		4,
+		39
 	],
 	"./Configuration/Schedules/SchedulesIndex": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesIndex.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		26
+		7,
+		10,
+		50
 	],
 	"./Configuration/Schedules/SchedulesIndex.vue": [
 		"./src/resources/js/Pages/Configuration/Schedules/SchedulesIndex.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		26
+		7,
+		10,
+		50
 	],
 	"./Configuration/Scopes/CharacterScopes": [
 		"./src/resources/js/Pages/Configuration/Scopes/CharacterScopes.vue",
-		32
+		55
 	],
 	"./Configuration/Scopes/CharacterScopes.vue": [
 		"./src/resources/js/Pages/Configuration/Scopes/CharacterScopes.vue",
-		32
+		55
 	],
 	"./Configuration/Scopes/CorporationScopes": [
 		"./src/resources/js/Pages/Configuration/Scopes/CorporationScopes.vue",
-		33
+		56
 	],
 	"./Configuration/Scopes/CorporationScopes.vue": [
 		"./src/resources/js/Pages/Configuration/Scopes/CorporationScopes.vue",
-		33
+		56
 	],
 	"./Configuration/Scopes/EditScopeSettings": [
 		"./src/resources/js/Pages/Configuration/Scopes/EditScopeSettings.vue",
 		0,
-		2,
 		1,
 		3,
-		18
+		2,
+		4,
+		30
 	],
 	"./Configuration/Scopes/EditScopeSettings.vue": [
 		"./src/resources/js/Pages/Configuration/Scopes/EditScopeSettings.vue",
 		0,
-		2,
 		1,
 		3,
-		18
+		2,
+		4,
+		30
 	],
 	"./Configuration/Scopes/OverviewScopeSettings": [
 		"./src/resources/js/Pages/Configuration/Scopes/OverviewScopeSettings.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		27
+		7,
+		10,
+		51
 	],
 	"./Configuration/Scopes/OverviewScopeSettings.vue": [
 		"./src/resources/js/Pages/Configuration/Scopes/OverviewScopeSettings.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		27
+		7,
+		10,
+		51
 	],
 	"./Configuration/Settings": [
 		"./src/resources/js/Pages/Configuration/Settings.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5
+		7,
+		10
 	],
 	"./Configuration/Settings.vue": [
 		"./src/resources/js/Pages/Configuration/Settings.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5
+		7,
+		10
 	],
 	"./Configuration/UserList": [
 		"./src/resources/js/Pages/Configuration/UserList.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		8,
-		28
+		7,
+		10,
+		24,
+		62
 	],
 	"./Configuration/UserList.vue": [
 		"./src/resources/js/Pages/Configuration/UserList.vue",
 		0,
-		2,
 		1,
 		3,
+		2,
 		4,
-		5,
-		8,
-		28
+		7,
+		10,
+		24,
+		62
 	],
 	"./Configuration/UserSettings": [
 		"./src/resources/js/Pages/Configuration/UserSettings.vue",
 		0,
-		2,
 		1,
 		3,
-		23
+		2,
+		4,
+		40
 	],
 	"./Configuration/UserSettings.vue": [
 		"./src/resources/js/Pages/Configuration/UserSettings.vue",
 		0,
-		2,
 		1,
 		3,
-		23
+		2,
+		4,
+		40
+	],
+	"./Corporation/MemberTracking": [
+		"./src/resources/js/Pages/Corporation/MemberTracking.vue",
+		0,
+		1,
+		3,
+		26,
+		2,
+		4,
+		16,
+		63
+	],
+	"./Corporation/MemberTracking.vue": [
+		"./src/resources/js/Pages/Corporation/MemberTracking.vue",
+		0,
+		1,
+		3,
+		26,
+		2,
+		4,
+		16,
+		63
+	],
+	"./Corporation/Recruitment/Applicant": [
+		"./src/resources/js/Pages/Corporation/Recruitment/Applicant.vue",
+		46
+	],
+	"./Corporation/Recruitment/Applicant.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/Applicant.vue",
+		46
+	],
+	"./Corporation/Recruitment/Applications": [
+		"./src/resources/js/Pages/Corporation/Recruitment/Applications.vue",
+		0,
+		1,
+		6,
+		11,
+		41
+	],
+	"./Corporation/Recruitment/Applications.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/Applications.vue",
+		0,
+		1,
+		6,
+		11,
+		41
+	],
+	"./Corporation/Recruitment/CharacterApplications": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CharacterApplications.vue",
+		35
+	],
+	"./Corporation/Recruitment/CharacterApplications.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CharacterApplications.vue",
+		35
+	],
+	"./Corporation/Recruitment/CorporationList": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CorporationList.vue",
+		8,
+		25,
+		59
+	],
+	"./Corporation/Recruitment/CorporationList.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CorporationList.vue",
+		8,
+		25,
+		59
+	],
+	"./Corporation/Recruitment/CorporationRecruitment": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CorporationRecruitment.vue",
+		0,
+		1,
+		6,
+		11,
+		18,
+		67
+	],
+	"./Corporation/Recruitment/CorporationRecruitment.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/CorporationRecruitment.vue",
+		0,
+		1,
+		6,
+		11,
+		18,
+		67
+	],
+	"./Corporation/Recruitment/RecruitmentIndex": [
+		"./src/resources/js/Pages/Corporation/Recruitment/RecruitmentIndex.vue",
+		0,
+		1,
+		3,
+		8,
+		2,
+		4,
+		6,
+		11,
+		18,
+		25,
+		42
+	],
+	"./Corporation/Recruitment/RecruitmentIndex.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/RecruitmentIndex.vue",
+		0,
+		1,
+		3,
+		8,
+		2,
+		4,
+		6,
+		11,
+		18,
+		25,
+		42
+	],
+	"./Corporation/Recruitment/UserApplicationModal": [
+		"./src/resources/js/Pages/Corporation/Recruitment/UserApplicationModal.vue",
+		1,
+		6,
+		71
+	],
+	"./Corporation/Recruitment/UserApplicationModal.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/UserApplicationModal.vue",
+		1,
+		6,
+		71
+	],
+	"./Corporation/Recruitment/UserApplications": [
+		"./src/resources/js/Pages/Corporation/Recruitment/UserApplications.vue",
+		1,
+		6,
+		11,
+		60
+	],
+	"./Corporation/Recruitment/UserApplications.vue": [
+		"./src/resources/js/Pages/Corporation/Recruitment/UserApplications.vue",
+		1,
+		6,
+		11,
+		60
+	],
+	"./Dashboard/CharacterApplication": [
+		"./src/resources/js/Pages/Dashboard/CharacterApplication.vue",
+		9,
+		47
+	],
+	"./Dashboard/CharacterApplication.vue": [
+		"./src/resources/js/Pages/Dashboard/CharacterApplication.vue",
+		9,
+		47
+	],
+	"./Dashboard/Characters": [
+		"./src/resources/js/Pages/Dashboard/Characters.vue",
+		9,
+		36
+	],
+	"./Dashboard/Characters.vue": [
+		"./src/resources/js/Pages/Dashboard/Characters.vue",
+		9,
+		36
+	],
+	"./Dashboard/Enlistments": [
+		"./src/resources/js/Pages/Dashboard/Enlistments.vue",
+		9,
+		22,
+		48
+	],
+	"./Dashboard/Enlistments.vue": [
+		"./src/resources/js/Pages/Dashboard/Enlistments.vue",
+		9,
+		22,
+		48
 	],
 	"./Dashboard/Index": [
 		"./src/resources/js/Pages/Dashboard/Index.vue",
 		0,
-		2,
 		1,
 		3,
-		36
+		9,
+		2,
+		4,
+		22,
+		43
 	],
 	"./Dashboard/Index.vue": [
 		"./src/resources/js/Pages/Dashboard/Index.vue",
 		0,
-		2,
 		1,
 		3,
-		36
+		9,
+		2,
+		4,
+		22,
+		43
 	]
 };
 function webpackAsyncContext(req) {
@@ -29155,19 +29492,6 @@ window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 window.axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /**
- * Next we will register the CSRF Token as a common header with Axios so that
- * all outgoing HTTP requests automatically have it attached. This is just
- * a simple convenience so we don't have to attach every token manually.
- */
-
-var token = document.head.querySelector('meta[name="csrf-token"]');
-
-if (token) {
-  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
-} else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-}
-/**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
  * allows your team to easily build robust real-time web applications.
@@ -29199,7 +29523,7 @@ function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArra
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
@@ -29371,8 +29695,8 @@ var I18n = /*#__PURE__*/function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/felix/git-repos/scripts/docker-compose-dev/seatplus/packages/seatplus/web/src/resources/js/app.js */"./src/resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/felix/git-repos/scripts/docker-compose-dev/seatplus/packages/seatplus/web/src/resources/sass/app.scss */"./src/resources/sass/app.scss");
+__webpack_require__(/*! /var/www/packages/seatplus/web/src/resources/js/app.js */"./src/resources/js/app.js");
+module.exports = __webpack_require__(/*! /var/www/packages/seatplus/web/src/resources/sass/app.scss */"./src/resources/sass/app.scss");
 
 
 /***/ })

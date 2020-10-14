@@ -10,6 +10,7 @@
 
             <UserApplications :applications="applications" />
             <CharacterApplications :applications="applications" />
+
         </div>
     </div>
 </template>
@@ -49,7 +50,7 @@ export default {
         }
     },
     created() {
-        this.getInfo(this.$route('corporation.applications', this.corporation_id));
+        this.getInfo(this.$route('open.corporation.applications', this.corporation_id));
     }
 }
 </script>
