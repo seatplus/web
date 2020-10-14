@@ -64,7 +64,6 @@ class SeatPlusController extends Controller
 
     public function impersonate($user_id)
     {
-
         $impersonated_user = User::find($user_id);
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
