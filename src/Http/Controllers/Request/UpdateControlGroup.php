@@ -58,7 +58,7 @@ class UpdateControlGroup extends FormRequest
             'forbidden.*.character_id' => 'integer',
             'forbidden.*.corporation_id' => 'integer',
             'forbidden.*.alliance_id' => 'integer',
-            'roleName' => 'required|string',
+            'roleName' => 'string',
         ];
     }
 }

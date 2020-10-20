@@ -161,6 +161,7 @@
             <transition leave-active-class="duration-300">
                 <slot name="modal" />
             </transition>
+
             <slot name="slideOver"></slot>
         </div>
     </div>
@@ -177,7 +178,6 @@
     import ImpersonatingBanner from "./ImpersonatingBanner"
     import SlideOver from "./Layout/SlideOver"
 
-
     export default {
         name: "Layout",
         components: {
@@ -188,7 +188,7 @@
             Notifications,
             Menu,
             Sidebar,
-            RequiredScopesWarning
+            RequiredScopesWarning,
         },
         props   : {
             page: {

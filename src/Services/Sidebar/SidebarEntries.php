@@ -83,7 +83,7 @@ class SidebarEntries
             ->whenNotEmpty(fn ($collection) => $collection
                 ->first()
                 ->characters
-                ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
+                ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)) ?? false)
                 ->filter()
             )
             ->isNotEmpty();

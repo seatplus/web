@@ -26,12 +26,23 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
+use Illuminate\Support\Arr;
 use Inertia\Inertia;
+use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HomeController extends Controller
 {
     public function home()
     {
-        return Inertia::render('Dashboard/Index');
+        return Inertia::render('Dashboard/Index', [
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
+                ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
+                ->get(),
+            'user_application' => collect(auth()->user()->application)->whenNotEmpty(fn ($application) => [
+                'is_user' => Arr::get($application, 'applicationable_type') === User::class,
+                'corporation_id' => Arr::get($application, 'corporation_id'),
+            ]),
+        ]);
     }
 }

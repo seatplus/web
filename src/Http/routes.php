@@ -30,7 +30,7 @@ use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 Route::middleware('web')
     ->group(function () {
-        Route::middleware('auth', CheckRequiredScopes::class)
+        Route::middleware(['auth', CheckRequiredScopes::class])
             ->group(function () {
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
 
@@ -56,6 +56,7 @@ Route::middleware('web')
                 Route::prefix('corporation')
                     ->group(function () {
                         include __DIR__ . '/Routes/Corporation/MemberTracking.php';
+                        include __DIR__ . '/Routes/Corporation/Recruitment.php';
                     });
 
                 Route::prefix('acl')

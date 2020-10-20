@@ -1,5 +1,5 @@
 <template>
-    <Layout page="Corporation" page-description="Member Tracking">
+    <Layout page="Corporation" page-description="Member Tracking" :required-scopes="this.requiredScopes">
 
         <template v-slot:title>
             <PageHeader>
@@ -36,7 +36,7 @@
                     <li v-for="member in entry.members">
                         <a href="#" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
                             <div class="px-4 py-4 sm:px-6">
-                                <div class="flex items-center justify-between">
+                                <div class="flex items-center justify-between ">
                                     <div class="text-sm leading-5 font-medium text-indigo-600 truncate inline-flex items-center space-x-2">
                                         <EveImage :object="{character_id: member.character_id}" :size="256" tailwind_class="h-6 w-6 rounded-full" />
                                         <span v-if="hasCharacter(member)">{{ member.character.name }}</span>
@@ -45,6 +45,9 @@
                                     <div class="ml-2 flex-shrink-0 flex">
                                         <span v-if="missingScopes(member)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                             Not compliant
+                                        </span>
+                                        <span v-if="missingTokens(member)" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            No Token
                                         </span>
                                         <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                             compliant
@@ -118,7 +121,7 @@
                             <tr v-for="(member,index) in entry.members" :class="index%2 ? 'bg-gray-50' :'bg-white'">
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">
                                     <div class="flex-shrink-0">
-                                        <svg v-if="missingScopes(member)" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <svg v-if="missingScopes(member) || missingTokens(member)" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                         </svg>
                                         <svg v-else class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
@@ -156,9 +159,6 @@
                     </div>
                 </div>
             </div>
-
-
-
         </div>
 
         <template v-slot:slideOver>
@@ -195,6 +195,8 @@ export default {
     },
     data() {
         return {
+            // TODO: Add Required Scopes for corporation component
+            requiredScopes: ['esi-characters.read_corporation_roles.v1', 'esi-corporations.track_members.v1'],
             unknownIds: [],
             resolvedIds: [],
         }
@@ -234,7 +236,11 @@ export default {
 
             return dayjs(formated_time, 'YYYY-MM-DD HH:mm:ss').valueOf()
         },
+        missingTokens(member) {
+            return _.isNull(member.character.refresh_token)
+        },
         missingScopes(member) {
+
             return !_.isEmpty(member.missing_sso_scopes)
         },
         openSlideOver() {

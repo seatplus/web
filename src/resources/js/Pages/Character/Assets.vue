@@ -123,7 +123,7 @@
         },
         data() {
             return {
-                requiredScopes: this.dispatchable_jobs.required_scopes,
+                requiredScopes: ['esi-assets.read_assets.v1', 'esi-universe.read_structures.v1'],
                 infiniteId: +new Date(),
                 assets_data: [],
                 page: 1,

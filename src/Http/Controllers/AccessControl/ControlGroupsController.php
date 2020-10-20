@@ -79,7 +79,9 @@ class ControlGroupsController
 
         (new SyncRoleAffiliations($role))->sync($validated_data);
 
-        (new SyncRoleName($role))->sync($validated_data['roleName']);
+        if (Arr::has($validated_data, 'roleName')) {
+            (new SyncRoleName($role))->sync($validated_data['roleName']);
+        }
 
         return redirect()
             ->action([ControlGroupsController::class, 'edit'], $role_id)

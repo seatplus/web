@@ -24,10 +24,18 @@
  * SOFTWARE.
  */
 
-return [
-    'superuser',
-    'view access control',
-    'create,update and delete access control group',
-    'manage access control group',
-    'recruiter',
-];
+namespace Seatplus\Web\Http\Controllers\Shared;
+
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\CorporationInfoRessource;
+
+class GetAffiliatedCorporationsController extends Controller
+{
+    public function __invoke(string $permission)
+    {
+        $query = CorporationInfo::with('alliance')->whereIn('corporation_id', getAffiliatedIdsByPermission($permission));
+
+        return CorporationInfoRessource::collection($query->paginate());
+    }
+}
