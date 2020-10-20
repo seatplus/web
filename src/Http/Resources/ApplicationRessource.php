@@ -41,19 +41,18 @@ class ApplicationRessource extends JsonResource
      */
     public function toArray($request)
     {
-
         return [
             'is_user' => $this->applicationable_type === User::class,
             $this->mergeWhen($this->applicationable_type === User::class, [
-                'user' => $this->applicationable
+                'user' => $this->applicationable,
             ]),
             'main_character' => $this->applicationable->main_character ?? null,
             'characters' => $this->applicationable instanceof User ? $this->applicationable->characters->map(fn ($character) => $this->buildCharacterArray($character)) : [],
-            'character' => $this->applicationable instanceof CharacterInfo ? $this->buildCharacterArray($this->applicationable) : []
+            'character' => $this->applicationable instanceof CharacterInfo ? $this->buildCharacterArray($this->applicationable) : [],
         ];
     }
 
-    private function getRequiredScopes(CharacterInfo $character) : array
+    private function getRequiredScopes(CharacterInfo $character): array
     {
         // Add global required scopes
         $global_scope = setting('global_sso_scopes');
@@ -71,7 +70,6 @@ class ApplicationRessource extends JsonResource
             ->unique()
             ->flatten(1)
             ->toArray();
-
     }
 
     private function buildCharacterArray(CharacterInfo $character)
@@ -81,8 +79,8 @@ class ApplicationRessource extends JsonResource
             'name' => $character->name,
             'token_scopes' => $character->refresh_token->scopes ?? [],
             'required_scopes' => $this->getRequiredScopes($character),
-            ])
-            ->pipe(fn($character) => Arr::add($character,'missing_scopes', array_diff(Arr::get($character,'required_scopes'), Arr::get($character,'token_scopes'))))
+        ])
+            ->pipe(fn ($character) => Arr::add($character, 'missing_scopes', array_diff(Arr::get($character, 'required_scopes'), Arr::get($character, 'token_scopes'))))
             ->toArray();
     }
 }

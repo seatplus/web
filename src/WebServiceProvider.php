@@ -34,11 +34,9 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
-use Seatplus\Web\Http\Middleware\CheckUserAffiliationForApplication;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
 {
