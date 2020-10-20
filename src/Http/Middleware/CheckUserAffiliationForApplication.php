@@ -22,20 +22,16 @@ class CheckUserAffiliationForApplication
 
         $user = $request->recruit;
 
-        if(!$user)
-            return redirect()->back()->with('error', 'required url parameter user_id is missing');
+        abort_unless($user, 404, 'required url parameter user_id is missing');
 
         $affiliated_ids = getAffiliatedIdsByPermission($permission);
 
         $application = Applications::whereIn('corporation_id', $affiliated_ids)
-            ->where('applicationable_type', User::class)
+            ->where(['applicationable_type' => User::class, 'applicationable_id' => $user->id])
             ->with('applicationable')
-            ->get()
-            ->filter(fn($application) => $application->applicationable_id === $user->id)
             ->first();
 
-        if(is_null($application))
-            return redirect()->back()->with('error', 'You are not allowed to review the user');
+        abort_unless($application, 403, 'You are not allowed to review the user');
 
         return $next($request);
     }

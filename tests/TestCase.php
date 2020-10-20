@@ -12,6 +12,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 
@@ -36,11 +37,10 @@ abstract class TestCase extends OrchestraTestCase
         $this->withFactories(__DIR__ . '/database/factories');
 
 
+        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->test_user = Event::fakeFor(function () {
             return factory(User::class)->create();
         });
-
-        //dd($this->test_user->characters);
 
         $this->test_character = $this->test_user->characters->first();
 
