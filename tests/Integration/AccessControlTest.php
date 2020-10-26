@@ -23,16 +23,7 @@ class AccessControlTest extends TestCase
 
         $response->assertOk();
 
-        dump('ok');
-
         $response->assertInertia('AccessControl/ControlGroupsIndex');
-
-        dd('stop');
-
-        // Assert Listing of Control Groups
-        $this->actingAs($this->test_user)
-            ->get(route('get.acl'))
-            ->assertOk();
     }
 
     /** @test */

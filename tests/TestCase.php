@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use ClaudioDekker\Inertia\InertiaTestingServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Horizon\HorizonServiceProvider;
@@ -73,6 +74,7 @@ abstract class TestCase extends OrchestraTestCase
             EveapiServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
+            InertiaTestingServiceProvider::class
         ];
     }
 
