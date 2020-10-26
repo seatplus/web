@@ -61,6 +61,7 @@ class BuildDispatchableCharacterJobs
     {
         return CharacterInfo::whereIn('character_id', $this->affiliated_ids)
             ->with('refresh_token')
+            ->has('refresh_token')
             ->cursor()
             ->filter(fn ($character) => collect($this->job->getRequiredScope())->diff($character->refresh_token->scopes)->isEmpty())
             ->map(function ($character) {

@@ -17,7 +17,7 @@ class CharacterAssetTest extends TestCase
         $response = $this->followingRedirects()
             ->get(route('character.assets'));
 
-        $response->assertComponent('Auth/Login');
+        $response->assertInertia('Auth/Login');
     }
 
     /** @test */
@@ -27,7 +27,7 @@ class CharacterAssetTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('character.assets'));
 
-        $response->assertComponent('Character/Assets');
+        $response->assertInertia('Character/Assets');
     }
 
     /** @test */

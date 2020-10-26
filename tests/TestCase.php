@@ -10,7 +10,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
@@ -120,9 +119,9 @@ abstract class TestCase extends OrchestraTestCase
      *
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    protected function createTestResponse($response)
+    /*protected function createTestResponse($response)
     {
         return TestResponse::fromBaseResponse($response);
-    }
+    }*/
 
 }

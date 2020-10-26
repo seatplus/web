@@ -21,7 +21,13 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.groups'));
 
-        $response->assertComponent('AccessControl/ControlGroupsIndex');
+        $response->assertOk();
+
+        dump('ok');
+
+        $response->assertInertia('AccessControl/ControlGroupsIndex');
+
+        dd('stop');
 
         // Assert Listing of Control Groups
         $this->actingAs($this->test_user)
@@ -39,7 +45,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.edit', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/EditGroup');
+        $response->assertInertia('AccessControl/EditGroup');
     }
 
     /** @test */
@@ -201,7 +207,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.manage', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/ManageControlGroup');
+        $response->assertInertia('AccessControl/ManageControlGroup');
     }
 
     /** @test */
@@ -220,7 +226,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/ManageMembers');
+        $response->assertInertia('AccessControl/ManageMembers');
 
         // List Members
         $response = $this->actingAs($this->test_user)

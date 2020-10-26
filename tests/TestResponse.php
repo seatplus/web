@@ -30,7 +30,7 @@ class TestResponse extends BaseResponse
         PHPUnit::assertCount($count, $this->props($prop));
         return $this;
     }
-    public function assertComponent($component)
+    public function assertInertia($component)
     {
 
         PHPUnit::assertEquals($component, $this->original['page']['component']);
