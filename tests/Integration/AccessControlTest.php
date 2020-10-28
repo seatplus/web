@@ -27,6 +27,18 @@ class AccessControlTest extends TestCase
     }
 
     /** @test */
+    public function it_has_list_control_groups()
+    {
+        $role = Role::create(['name' => 'test']);
+
+        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('get.acl'))
+            ->assertOk();
+    }
+
+    /** @test */
     public function it_has_edit_control_groups()
     {
         $role = Role::create(['name' => 'test']);
