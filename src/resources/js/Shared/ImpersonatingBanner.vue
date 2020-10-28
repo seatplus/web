@@ -42,7 +42,7 @@
     name: "ImpersonatingBanner",
       computed: {
         name() {
-            return this.$page.user.data.main_character.name ?? 'Unknown'
+            return this.$page.props.user.data.main_character.name ?? 'Unknown'
         }
       }
   }

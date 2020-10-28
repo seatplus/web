@@ -99,7 +99,7 @@
             },
             leave(role) {
 
-                let user_id = this.$page.user.data.id;
+                let user_id = this.$page.props.user.data.id;
 
                 return this.$inertia.delete(this.$route('acl.leave', {role_id: role.id, user_id: user_id}), {
                     replace: false,

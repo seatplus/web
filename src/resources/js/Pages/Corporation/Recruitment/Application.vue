@@ -106,7 +106,7 @@
                                     <div class="max-w-lg flex rounded-md shadow-sm">
                                         <textarea id="explanation" v-model="form.explanation" rows="3" class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" required></textarea>
                                     </div>
-                                    <p v-if="$page.errors.explanation" class="mt-2 text-sm text-red-600"> {{ $page.errors.explanation[0] }}</p>
+                                    <p v-if="$page.props.errors.explanation" class="mt-2 text-sm text-red-600"> {{ $page.errors.explanation[0] }}</p>
                                     <p class="mt-2 text-sm text-gray-500">Write a few sentences about the decision, in that recruiters in the future might learn from past decisions.</p>
                                 </div>
                             </div>

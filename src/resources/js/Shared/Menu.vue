@@ -2,7 +2,7 @@
     <div ref="menu" class="z-10">
         <div>
             <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-outline">
-                <eve-image tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character" :size="256" />
+                <eve-image tailwind_class="h-8 w-8 rounded-full" :object="$page.props.user.data.main_character" :size="256" />
             </button>
         </div>
         <div v-if="menuOpen"  class="fixed inset-0 transition-opacity">

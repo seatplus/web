@@ -59,7 +59,7 @@
                 corpOrAlliances: [],
                 search: '',
                 selected: this.value,
-                error: this.$page.errors.selectedEntities
+                error: this.$page.props.errors.selectedEntities
             }
         },
         methods: {
