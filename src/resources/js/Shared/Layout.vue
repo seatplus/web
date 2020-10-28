@@ -36,7 +36,7 @@
                                 </button>
                             </div>
                             <div class="flex-shrink-0 flex items-center px-4">
-                                <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus"  />
+                                <img class="h-8 w-auto" :src="$page.props.images.logo" alt="SeAT plus"  />
                             </div>
                             <div class="mt-5 flex-1 h-0 overflow-y-auto">
                                 <sidebar :active-entry-url="getActiveSidebarElement()"/>
@@ -56,7 +56,7 @@
         <div class="hidden md:flex md:flex-shrink-0">
             <div class="flex flex-col w-64">
                 <div class="flex items-center h-16 flex-shrink-0 px-4 bg-gray-900">
-                    <img class="h-8 w-auto" :src="$page.images.logo" alt="SeAT plus" />
+                    <img class="h-8 w-auto" :src="$page.props.images.logo" alt="SeAT plus" />
                 </div>
                 <div class="h-0 flex-1 flex flex-col overflow-y-auto">
                     <sidebar :active-entry-url="getActiveSidebarElement()"/>
@@ -117,7 +117,7 @@
                     <!-- /End replace -->
                 </div>
 
-                <ImpersonatingBanner v-if="$page.user.data.impersonating" />
+                <ImpersonatingBanner v-if="$page.props.user.data.impersonating" />
 
                 <!--<div class="fixed bottom-0 inset-x-0 pb-2 sm:pb-5">
                     <div class="max-w-screen-xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -228,7 +228,7 @@
                 let returnValue = []
                 let requiredScopes= this.requiredScopes
 
-                _.forEach(this.$page.user.data.characters, function (character) {
+                _.forEach(this.$page.props.user.data.characters, function (character) {
 
                     let missing_scopes = _.difference(requiredScopes, character.scopes)
 

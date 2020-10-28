@@ -21,10 +21,19 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.groups'));
 
-        $response->assertComponent('AccessControl/ControlGroupsIndex');
+        $response->assertOk();
 
-        // Assert Listing of Control Groups
-        $this->actingAs($this->test_user)
+        $response->assertInertia('AccessControl/ControlGroupsIndex');
+    }
+
+    /** @test */
+    public function it_has_list_control_groups()
+    {
+        $role = Role::create(['name' => 'test']);
+
+        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+
+        $response = $this->actingAs($this->test_user)
             ->get(route('get.acl'))
             ->assertOk();
     }
@@ -39,7 +48,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.edit', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/EditGroup');
+        $response->assertInertia('AccessControl/EditGroup');
     }
 
     /** @test */
@@ -201,7 +210,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.manage', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/ManageControlGroup');
+        $response->assertInertia('AccessControl/ManageControlGroup');
     }
 
     /** @test */
@@ -220,7 +229,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-        $response->assertComponent('AccessControl/ManageMembers');
+        $response->assertInertia('AccessControl/ManageMembers');
 
         // List Members
         $response = $this->actingAs($this->test_user)

@@ -26,7 +26,7 @@
         },
         data() {
             return {
-                sidebarEntries: this.$page.sidebar
+                sidebarEntries: this.$page.props.sidebar
             }
         },
         methods: {

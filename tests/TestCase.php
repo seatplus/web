@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use ClaudioDekker\Inertia\InertiaTestingServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Horizon\HorizonServiceProvider;
@@ -10,7 +11,6 @@ use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
@@ -74,6 +74,7 @@ abstract class TestCase extends OrchestraTestCase
             EveapiServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
+            InertiaTestingServiceProvider::class
         ];
     }
 
@@ -111,18 +112,6 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('auth.providers.users.model', User::class);
 
         $app['config']->set('cache.prefix', 'seatplus_tests---');
-    }
-
-    /**
-     * Create the test response instance from the given response.
-     *
-     * @param  \Illuminate\Http\Response $response
-     *
-     * @return \Illuminate\Foundation\Testing\TestResponse
-     */
-    protected function createTestResponse($response)
-    {
-        return TestResponse::fromBaseResponse($response);
     }
 
 }

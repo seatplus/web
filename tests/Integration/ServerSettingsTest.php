@@ -31,7 +31,7 @@ class ServerSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('server.settings'));
 
-        $response->assertComponent('Configuration/UserList');
+        $response->assertInertia('Configuration/UserList');
     }
 
     /** @test */
@@ -40,7 +40,7 @@ class ServerSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('settings.scopes'));
 
-        $response->assertComponent('Configuration/Scopes/OverviewScopeSettings');
+        $response->assertInertia('Configuration/Scopes/OverviewScopeSettings');
     }
 
     /** @test */

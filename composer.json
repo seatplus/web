@@ -1,52 +1,54 @@
 {
-  "name": "seatplus/web",
-  "description": "Web frontend of seatplus",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Felix Huber",
-      "email": "felix.a.huber@gmx.net"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "Seatplus\\Web\\": "src/"
+    "name": "seatplus/web",
+    "description": "Web frontend of seatplus",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Felix Huber",
+            "email": "felix.a.huber@gmx.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Seatplus\\Web\\": "src/"
+        },
+        "files": [
+            "./src/Helpers/helpers.php"
+        ]
     },
-    "files": [
-      "./src/Helpers/helpers.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Seatplus\\Web\\Tests\\": "tests/"
+    "autoload-dev": {
+        "psr-4": {
+            "Seatplus\\Web\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^7.4",
+        "laravel/framework": "^8.0",
+        "laravel/socialite": "^5.0",
+        "seatplus/eveapi": "^0.4.0",
+        "seatplus/auth": "^0.4.1",
+        "inertiajs/inertia-laravel": "^0.2.9",
+        "tightenco/ziggy": "^0.8.0",
+        "spatie/laravel-permission": "^3.0",
+        "spatie/data-transfer-object": "^2.2",
+        "conedevelopment/i18n": "^1.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "spatie/phpunit-watcher": "^1.11",
+        "laravel/legacy-factories": "^1.0",
+        "claudiodekker/inertia-laravel-testing": "^1.1"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Seatplus\\Web\\WebServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "watch": "vendor/bin/phpunit-watcher watch"
     }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "require": {
-    "php": "^7.4",
-    "laravel/framework": "^6.0",
-    "laravel/socialite": "^4.1",
-    "seatplus/eveapi": "^0.3.0",
-    "seatplus/auth": "^0.3.1",
-    "inertiajs/inertia-laravel": "^0.2.9",
-    "tightenco/ziggy": "^0.8.0",
-    "thepinecode/i18n": "^0.7.0",
-    "spatie/laravel-permission": "^3.0",
-    "spatie/data-transfer-object": "^2.2"
-  },
-  "require-dev": {
-    "orchestra/testbench": "^4.2",
-    "spatie/phpunit-watcher": "^1.11"
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Seatplus\\Web\\WebServiceProvider"
-      ]
-    }
-  },
-  "scripts": {
-    "watch": "vendor/bin/phpunit-watcher watch"
-  }
 }

@@ -16,7 +16,7 @@
     methods: {
 
       clearCache() {
-        axios.post(route('cache.clear')).
+        this.$inertia.post(route('cache.clear')).
         catch(function (error) {
           console.log(error)
         })

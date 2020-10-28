@@ -14,8 +14,8 @@ import Vue from 'vue'
 /*import BootstrapVue from 'bootstrap-vue' //Importing
 Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application*/
 
-import { InertiaApp } from '@inertiajs/inertia-vue'
-Vue.use(InertiaApp); // Telling Vue to use InertiaApp in whole application
+import { App, plugin } from '@inertiajs/inertia-vue'
+Vue.use(plugin); // Telling Vue to use InertiaApp in whole application
 
 import I18n from './vendor/I18n'
 window.I18n = I18n
@@ -33,10 +33,27 @@ Vue.prototype.$route = (...args) => route(...args).url()
   }
 })*/
 
+import { InertiaProgress } from '@inertiajs/progress'
+
+InertiaProgress.init({
+    // The delay after which the progress bar will
+    // appear during navigation, in milliseconds.
+    delay: 250,
+
+    // The color of the progress bar.
+    color: '#29d',
+
+    // Whether to include the default NProgress styles.
+    includeCSS: true,
+
+    // Whether the NProgress spinner will be shown.
+    showSpinner: false,
+})
+
 const app = document.getElementById('app')
 
 new Vue({
-  render: h => h(InertiaApp, {
+  render: h => h(App, {
     props: {
       initialPage: JSON.parse(app.dataset.page),
       resolveComponent: name => import(`@/Pages/${name}`).then(module => module.default),

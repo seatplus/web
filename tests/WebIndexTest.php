@@ -18,12 +18,12 @@ class WebIndexTest extends TestCase
     public function redirectsToLoginVueComponentIfUnauthorized()
     {
         // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-        $this->app->instance('path.public', __DIR__ .'/../src/public');
+        //$this->app->instance('path.public', __DIR__ .'/../src/public');
 
         $response = $this->followingRedirects()
             ->get('/home');
 
-        $response->assertComponent('Auth/Login');
+        $response->assertInertia('Auth/Login');
     }
 
     /** @test */
@@ -35,7 +35,7 @@ class WebIndexTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get('/home');
 
-        $response->assertComponent('Dashboard/Index');
+        $response->assertInertia('Dashboard/Index');
 
         $this->assertAuthenticatedAs($this->test_user);
         $this->assertTrue(auth()->check());

@@ -154,7 +154,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $this->actingAs($this->test_user->refresh())
             ->get(route('corporation.recruitment'))
             ->assertOk()
-            ->assertComponent('Corporation/Recruitment/RecruitmentIndex');
+            ->assertInertia('Corporation/Recruitment/RecruitmentIndex');
     }
 
     /** @test */
@@ -170,7 +170,7 @@ class RecruitmentLifeCycleTest extends TestCase
             ->get(route('corporation.recruitment'))
             ->assertOk();
 
-        $response->assertComponent('Corporation/Recruitment/RecruitmentIndex');
+        $response->assertInertia('Corporation/Recruitment/RecruitmentIndex');
     }
 
     /** @test */
@@ -195,7 +195,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('user.application', ['recruit' => $this->secondary_user->id]))
             ->assertOk()
-            ->assertComponent('Corporation/Recruitment/Application');
+            ->assertInertia('Corporation/Recruitment/Application');
 
 
         // Impersonate
@@ -260,7 +260,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('character.application', ['character_id' => $this->secondary_character->character_id]))
             ->assertOk()
-            ->assertComponent('Corporation/Recruitment/Application');
+            ->assertInertia('Corporation/Recruitment/Application');
 
         // submit review
 

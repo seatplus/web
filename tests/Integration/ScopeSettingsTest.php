@@ -32,7 +32,7 @@ class ScopeSettingsTest extends TestCase
             ->get(route('settings.scopes'));
 
 
-        $response->assertComponent('Configuration/Scopes/OverviewScopeSettings');
+        $response->assertInertia('Configuration/Scopes/OverviewScopeSettings');
     }
 
     /** @test */

@@ -30,7 +30,7 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.index'));
 
-        $response->assertComponent('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
     }
 
     /** @test */
@@ -39,7 +39,7 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.create'));
 
-        $response->assertComponent('Configuration/Schedules/SchedulesCreate');
+        $response->assertInertia('Configuration/Schedules/SchedulesCreate');
 
         $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
@@ -50,7 +50,7 @@ class SchedulesSettingTest extends TestCase
                 'schedule' => 'test-expression'
             ]);
 
-        $response->assertComponent('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
 
         $this->assertDatabaseHas('schedules', ['job' => 'test-job']);
     }
@@ -68,7 +68,7 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.details', $schedule->id));
 
-        $response->assertComponent('Configuration/Schedules/SchedulesDetails');
+        $response->assertInertia('Configuration/Schedules/SchedulesDetails');
     }
 
     /** @test */
@@ -87,7 +87,7 @@ class SchedulesSettingTest extends TestCase
 
         $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
-        $response->assertComponent('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
     }
 
 }

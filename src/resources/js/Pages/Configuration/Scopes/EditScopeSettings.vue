@@ -49,7 +49,7 @@
                                 @corporation-scopes="selectedCorporationScopes = $event"/>
                         </div>
                     </div>
-                    <p v-if=this.$page.errors.selectedScopes class="text-sm text-red-600">{{this.$page.errors.selectedScopes[0]}}</p>
+                    <p v-if=this.$page.props.errors.selectedScopes class="text-sm text-red-600">{{this.$page.props.errors.selectedScopes[0]}}</p>
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-4 sm:px-6 text-right">

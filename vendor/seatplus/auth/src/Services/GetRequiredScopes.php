@@ -38,12 +38,6 @@ class GetRequiredScopes
     public function __construct()
     {
         $this->scopes = collect(config('eveapi.scopes.minimum'));
-
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->user = User::with(
-            'application.corporation.ssoScopes',
-            'application.corporation.alliance.ssoScopes'
-        )->find(auth()->user()->getAuthIdentifier());
     }
 
     public function execute(): Collection
@@ -51,6 +45,12 @@ class GetRequiredScopes
         if (auth()->guest()) {
             return $this->scopes->merge(setting('global_sso_scopes'));
         }
+
+        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+        $this->user = User::with(
+            'application.corporation.ssoScopes',
+            'application.corporation.alliance.ssoScopes'
+        )->find(auth()->user()->getAuthIdentifier());
 
         return $this->scopes
             ->merge(collect([

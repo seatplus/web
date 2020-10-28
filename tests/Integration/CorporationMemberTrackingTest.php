@@ -17,7 +17,7 @@ class CorporationMemberTrackingTest extends  TestCase
             ->followingRedirects()
             ->get(route('corporation.member_tracking'));
 
-        $response->assertHasProp('dispatchable_jobs');
+        $response->assertInertiaHas('dispatchable_jobs');
     }
 
 }

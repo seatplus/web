@@ -18,7 +18,7 @@ class UserSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('user.settings'));
 
-        $response->assertComponent('Configuration/UserSettings');
+        $response->assertInertia('Configuration/UserSettings');
     }
 
     /** @test */
