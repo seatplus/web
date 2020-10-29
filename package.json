@@ -12,7 +12,7 @@
     },
     "devDependencies": {
         "@vue/test-utils": "^1.0.0-beta.33",
-        "axios": "^0.20",
+        "axios": "^0.21",
         "acorn": "^6.0",
         "cross-env": "^7.0.2",
         "eslint": "^6.8.0",
