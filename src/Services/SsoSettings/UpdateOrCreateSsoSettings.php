@@ -51,7 +51,7 @@ class UpdateOrCreateSsoSettings
     {
         $this->request = $request;
         $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'))
-            ->map(fn($scope) => explode(',', $scope))->flatten(1);
+            ->map(fn ($scope) => explode(',', $scope))->flatten(1);
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
     }
 
