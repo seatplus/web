@@ -60,8 +60,7 @@ class ScopeSettingsTest extends TestCase
                         ],
                     ],
                     'selectedScopes' => [
-                        'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
-                        'corporation' => []
+                        "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
                     ]
                 ]
             );
@@ -95,8 +94,7 @@ class ScopeSettingsTest extends TestCase
                         ],
                     ],
                     'selectedScopes' => [
-                        'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
-                        'corporation' => []
+                        "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
                     ]
                 ]
             );

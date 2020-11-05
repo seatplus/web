@@ -66,13 +66,14 @@ class ApplicationsController extends Controller
 
     public function getOpenCorporationApplications(int $corporation_id)
     {
-        $applications = Applications::where('corporation_id', $corporation_id)
-            ->with([
-                'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
-                    User::class => ['characters.refresh_token', 'main_character', 'characters.application.corporation.ssoScopes', 'characters.application.corporation.alliance.ssoScopes'],
-                    CharacterInfo::class => ['refresh_token', 'application.corporation.ssoScopes', 'application.corporation.alliance.ssoScopes'],
-                ]),
-            ])->whereStatus('open');
+        $applications = Applications::ofCorporation($corporation_id)->whereStatus('open');
+
+        return ApplicationRessource::collection($applications->paginate());
+    }
+
+    public function getAcceptedCorporationApplications(int $corporation_id)
+    {
+        $applications = Applications::ofCorporation($corporation_id)->whereStatus('accepted');
 
         return ApplicationRessource::collection($applications->paginate());
     }
@@ -93,7 +94,7 @@ class ApplicationsController extends Controller
 
         $recruit->application()->update([
             'status' => $request->get('decision'),
-            'comment' => $request->get('explanation', ''),
+            'comment' => $request->get('explanation') ?? '',
         ]);
 
         return redirect()->route('corporation.recruitment')->with('success', sprintf('User %s', $request->get('decision')));
@@ -122,7 +123,7 @@ class ApplicationsController extends Controller
 
         CharacterInfo::find($character_id)->application()->update([
             'status' => $request->get('decision'),
-            'comment' => $request->get('explanation', ''),
+            'comment' => $request->get('explanation') ?? '',
         ]);
 
         return redirect()->route('corporation.recruitment')->with('success', sprintf('Character %s', $request->get('decision')));

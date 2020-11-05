@@ -34,6 +34,7 @@
         <div class="px-4 py-5 sm:p-6">
 
             <Applications :corporation_id="corporation.corporation_id"></Applications>
+            <ShitList :corporation_id="corporation.corporation_id" />
 
         </div>
 
@@ -43,9 +44,10 @@
 <script>
 import EveImage from "@/Shared/EveImage"
 import Applications from "./Applications"
+import ShitList from "./ShitList";
 export default {
     name: "CorporationRecruitment",
-    components: {Applications, EveImage},
+    components: {ShitList, Applications, EveImage},
     props: {
         corporation: {
             required: true

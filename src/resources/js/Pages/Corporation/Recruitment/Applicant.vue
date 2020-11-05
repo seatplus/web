@@ -80,7 +80,10 @@ export default {
     },
     methods: {
         getMissingScopesString(missing_scopes) {
-            return _.toString(missing_scopes)
+
+          missing_scopes = _.isObject(missing_scopes) ? _.toArray(missing_scopes) : missing_scopes
+
+          return _.toString(missing_scopes)
         }
     }
 }
