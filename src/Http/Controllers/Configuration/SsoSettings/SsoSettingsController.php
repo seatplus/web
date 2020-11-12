@@ -27,10 +27,13 @@
 namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
 use Inertia\Inertia;
+use phpDocumentor\Reflection\Types\Collection;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
 use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
 use Seatplus\Web\Services\SsoSettings\SearchCorporationOrAlliance;
+use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SsoSettingsController extends Controller
 {
@@ -54,24 +57,42 @@ class SsoSettingsController extends Controller
         return (new SearchCorporationOrAlliance($searchParam))->search();
     }
 
-    public function create()
-    {
+    public function index(?int $entity_id = null) {
+
+        //$entity = SsoScopes::where('morphable_id', $entity_id)->with('morphable')->first();
+
         $available_scopes = config('eveapi.scopes');
 
-        $sso_scopes_entries = function () {
-            return (new GetSsoScopeEntries)->execute();
-        };
-
-        return Inertia::render('Configuration/CreateScopeSettings', [
+        return Inertia::render('Configuration/Scopes/ScopeSettings', [
             'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
+            'entity' => fn () => $this->getEntity($entity_id),
+            'options' => [
+                ['title' => 'default', 'description' => 'Only characters within the selected entity are required to fulfill the selected scopes'],
+                ['title' => 'user', 'description' => 'All characters of a user within this corporation are required to met the required scopes'],
+                ['title' => 'global', 'description' => 'Every character in this seat plus instance must met the requirements']
+            ]
         ]);
     }
 
-    public function deleteSsoScopeSetting($entity_id)
+    public function create(CreateSsoScopeSettingsValidation $validation)
     {
-        SsoScopes::where('morphable_id', $entity_id)->delete();
+        (new UpdateOrCreateSsoSettings($validation->all()))->execute();
+
+        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
+    }
+
+    public function deleteSsoScopeSetting(?int $entity_id = null)
+    {
+        is_null($entity_id) ? SsoScopes::global()->delete() : SsoScopes::where('morphable_id', $entity_id)->delete();
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
+    }
+
+    private function getEntity(?int $entity_id = null)
+    {
+        if(is_null($entity_id))
+            return SsoScopes::global()->first() ?? (object) [];
+
+        return SsoScopes::where('morphable_id', $entity_id)->with('morphable')->first();
     }
 }

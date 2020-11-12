@@ -15,9 +15,9 @@
                 </template>
             </WideListElement>
             <WideListElement
-                v-for="(entry,index) in this.entries"
+                v-for="(entry,index) in entities"
                 :key="entry.selectedEntity.id"
-                :url="$route('edit.scopes.settings', entry.selectedEntity.id)"
+                :url="$route('view.scopes.settings', entry.selectedEntity.id)"
             >
                 <template v-slot:avatar>
                     <eve-image :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'" :object="entry.selectedEntity" :size="128"/>
@@ -73,10 +73,6 @@
                 type: Array,
                 required: true
             },
-            hasGlobalScopes: {
-                type: Boolean,
-                default: false
-            }
         },
         data() {
             return {
@@ -91,7 +87,12 @@
 
         },
         computed: {
-
+            entities() {
+                return _.filter(this.entries, (entry) => entry.selectedEntity.id)
+            },
+            hasGlobalScopes() {
+                return _.size(this.entities) !== _.size(this.entries)
+            }
         },
     }
 </script>
