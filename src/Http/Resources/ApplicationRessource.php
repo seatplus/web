@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\BuildCharacterScopesArray;
 use Seatplus\Auth\Services\BuildUserLevelRequiredScopes;

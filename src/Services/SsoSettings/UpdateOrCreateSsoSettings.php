@@ -53,17 +53,17 @@ class UpdateOrCreateSsoSettings
     {
         $this->request = $request;
         $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'))
-            ->map(fn($scope) => explode(',', $scope))->flatten(1);
+            ->map(fn ($scope) => explode(',', $scope))->flatten(1);
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
         $this->type = Arr::get($this->request, 'type');
     }
 
     public function execute()
     {
-
         $this->entities->whenEmpty(function () {
-            if($this->type === 'global')
+            if ($this->type === 'global') {
                 SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
+            }
         }, function ($collection) {
             $collection->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
@@ -78,7 +78,7 @@ class UpdateOrCreateSsoSettings
                 ], [
                     'selected_scopes' => $this->selected_scopes,
                     'morphable_type' => $morphable_type,
-                    'type' => $this->type
+                    'type' => $this->type,
                 ]);
             });
         });

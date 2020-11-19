@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
 use Inertia\Inertia;
-use phpDocumentor\Reflection\Types\Collection;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
@@ -57,7 +56,8 @@ class SsoSettingsController extends Controller
         return (new SearchCorporationOrAlliance($searchParam))->search();
     }
 
-    public function index(?int $entity_id = null) {
+    public function index(?int $entity_id = null)
+    {
 
         //$entity = SsoScopes::where('morphable_id', $entity_id)->with('morphable')->first();
 
@@ -69,8 +69,8 @@ class SsoSettingsController extends Controller
             'options' => [
                 ['title' => 'default', 'description' => 'Only characters within the selected entity are required to fulfill the selected scopes'],
                 ['title' => 'user', 'description' => 'All characters of a user within this corporation are required to met the required scopes'],
-                ['title' => 'global', 'description' => 'Every character in this seat plus instance must met the requirements']
-            ]
+                ['title' => 'global', 'description' => 'Every character in this seat plus instance must met the requirements'],
+            ],
         ]);
     }
 
@@ -90,8 +90,9 @@ class SsoSettingsController extends Controller
 
     private function getEntity(?int $entity_id = null)
     {
-        if(is_null($entity_id))
+        if (is_null($entity_id)) {
             return SsoScopes::global()->first() ?? (object) [];
+        }
 
         return SsoScopes::where('morphable_id', $entity_id)->with('morphable')->first();
     }
