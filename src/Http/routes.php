@@ -57,6 +57,7 @@ Route::middleware('web')
                     ->group(function () {
                         include __DIR__ . '/Routes/Corporation/MemberTracking.php';
                         include __DIR__ . '/Routes/Corporation/Recruitment.php';
+                        include __DIR__ . '/Routes/Corporation/MemberCompliance.php';
                     });
 
                 Route::prefix('acl')

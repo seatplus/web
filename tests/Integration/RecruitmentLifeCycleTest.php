@@ -287,7 +287,28 @@ class RecruitmentLifeCycleTest extends TestCase
 
     }
 
+    /** @test */
+    public function juniorHR_can_see_shitlist()
+    {
+        $this->createEnlistment();
 
+        $this->test_user = $this->test_user->refresh();
+
+        // Create SSO Setting
+
+        // Give Test User required scope
+
+        // Test that test user is not on shitlist
+        $this->actingAs($this->test_user)
+            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
+            ->assertJsonCount(0, 'data');
+
+        $this->applySecondary();
+
+        $this->actingAs($this->test_user)
+            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
+            ->assertJsonCount(1, 'data');
+    }
 
     private function applySecondary(bool $user = true)
     {

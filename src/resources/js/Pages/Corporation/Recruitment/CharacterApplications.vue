@@ -1,6 +1,6 @@
 <template>
     <ul class="divide-y divide-gray-200">
-        <Applicant v-for="applicant in character_applications" :key="applicant.character_id" :character="applicant" :href="$route('character.application', applicant.character_id)"/>
+        <Applicant v-for="applicant in character_applications" :key="applicant.character_id" :character="applicant" :href="$route('character.application', applicant.character.character_id)"/>
     </ul>
 </template>
 

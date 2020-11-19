@@ -33,13 +33,18 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             'selectedScopes' => [
                 "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
                 'publicData'
-            ]
+            ],
+            'type' => 'default'
         ];
 
         (new UpdateOrCreateSsoSettings($request))->execute();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function it_calls_corporation_info_action()
     {
         $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
@@ -60,7 +65,8 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             'selectedScopes' => [
                 "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
                 'publicData'
-            ]
+            ],
+            'type' => 'default'
         ];
 
         (new UpdateOrCreateSsoSettings($request))->execute();
@@ -68,7 +74,11 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
         $this->assertCount(3, SsoScopes::where('morphable_id', 1184675423)->first()->selected_scopes);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function it_creates_sso_settings()
     {
         $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
@@ -88,7 +98,8 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
             'selectedScopes' => [
                 "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
                 'publicData'
-            ]
+            ],
+            'type' => 'default'
         ];
 
         $this->assertDatabaseMissing('sso_scopes', [

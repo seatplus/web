@@ -27,13 +27,14 @@
         "php": "^7.4",
         "laravel/framework": "^8.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^0.4.1",
-        "seatplus/auth": "^0.4.1",
+        "seatplus/eveapi": "^0.4.4",
+        "seatplus/auth": "^0.4.2",
         "inertiajs/inertia-laravel": "^0.2.9",
         "tightenco/ziggy": "^0.8.0",
         "spatie/laravel-permission": "^3.0",
         "spatie/data-transfer-object": "^2.2",
-        "conedevelopment/i18n": "^1.0"
+        "conedevelopment/i18n": "^1.0",
+        "doctrine/dbal": "^2.12"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
