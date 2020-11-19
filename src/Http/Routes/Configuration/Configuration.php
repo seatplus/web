@@ -27,13 +27,8 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Configuration\CommandsController;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateGlobalSsoScopesController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\DeleteGlobalSsoScopesController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\EditController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\ViewGlobalScopesController;
 
 Route::middleware(['permission:superuser'])->group(function () {
     Route::get('/settings', [SeatPlusController::class, 'settings'])->name('server.settings');

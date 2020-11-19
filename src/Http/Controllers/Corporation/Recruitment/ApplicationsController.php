@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Applications;

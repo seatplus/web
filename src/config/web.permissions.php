@@ -30,5 +30,5 @@ return [
     'create,update and delete access control group',
     'manage access control group',
     'recruiter',
-    'view member compliance'
+    'view member compliance',
 ];
