@@ -27,8 +27,9 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\BuildCharacterScopesArray;
+use Seatplus\Auth\Services\BuildUserLevelRequiredScopes;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class ApplicationRessource extends JsonResource
@@ -62,7 +63,7 @@ class ApplicationRessource extends JsonResource
             'alliance_scopes'                => $character->alliance->ssoScopes->selected_scopes ?? [],
             'character_application_corporation_scopes' => $character->application->corporation->ssoScopes->selected_scopes ?? [],
             'character_application_alliance_scopes'    => $character->application->corporation->alliance->ssoScopes->selected_scopes ?? [],
-            'global_scopes'                  => $global_scope,
+            'global_scopes'                  => json_decode($this->user->global_scope) ?? [],
             'user_application_corporation_scopes' => $this->applicationable->application->corporation->ssoScopes->selected_scopes ?? [],
             'user_application_alliance_scopes'    => $this->applicationable->application->corporation->alliance->ssoScopes->selected_scopes ?? [],
         ])->flatten(1)
@@ -74,13 +75,9 @@ class ApplicationRessource extends JsonResource
 
     private function buildCharacterArray(CharacterInfo $character)
     {
-        return collect([
-            'character_id' => $character->character_id,
-            'name' => $character->name,
-            'token_scopes' => $character->refresh_token->scopes ?? [],
-            'required_scopes' => $this->getRequiredScopes($character),
-        ])
-            ->pipe(fn ($character) => Arr::add($character, 'missing_scopes', array_diff(Arr::get($character, 'required_scopes'), Arr::get($character, 'token_scopes'))))
-            ->toArray();
+        // Get user level required scopes
+        $user_scopes = $this->applicationable instanceof User ? BuildUserLevelRequiredScopes::get($this->applicationable) : [];
+
+        return BuildCharacterScopesArray::get($character, $user_scopes);
     }
 }

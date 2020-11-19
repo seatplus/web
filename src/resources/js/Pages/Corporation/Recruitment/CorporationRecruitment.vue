@@ -43,6 +43,7 @@
 <script>
 import EveImage from "@/Shared/EveImage"
 import Applications from "./Applications"
+
 export default {
     name: "CorporationRecruitment",
     components: {Applications, EveImage},

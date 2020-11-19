@@ -24,19 +24,30 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
+namespace Seatplus\Web\Http\Resources;
 
-use Inertia\Inertia;
-use Seatplus\Web\Http\Controllers\Controller;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Services\BuildCharacterScopesArray;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
-class ViewGlobalScopesController extends Controller
+class CharacterComplianceResource extends JsonResource
 {
-    public function __invoke()
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
     {
-        return Inertia::render('Configuration/Scopes/EditScopeSettings', [
-            'available_scopes' => config('eveapi.scopes'),
-            'entity' => collect(['selected_scopes' => setting('global_sso_scopes')]),
-            'hasGlobalScopes' => true,
-        ]);
+        $filter = $request->query('filter', false);
+
+        $character_scopes_array = BuildCharacterScopesArray::get(CharacterInfo::find($this->character_id));
+
+        return $filter
+            ? $filter === 'renegades'
+                ? (empty(collect($character_scopes_array)->get('missing_scopes')) ? [] : $character_scopes_array)
+                : (! empty(collect($character_scopes_array)->get('missing_scopes')) ? [] : $character_scopes_array)
+            : $character_scopes_array;
     }
 }

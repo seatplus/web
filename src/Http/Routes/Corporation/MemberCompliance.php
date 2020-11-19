@@ -24,28 +24,15 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Corporation\MemberCompliance\MemberComplianceController;
 
-use Inertia\Inertia;
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
-use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
+Route::prefix('compliance')
+    ->middleware(['permission:view member compliance'])
+    ->group(function () {
+        Route::get('', [MemberComplianceController::class, 'index'])->name('corporation.member_compliance');
 
-class CreateController extends Controller
-{
-    public function view()
-    {
-        $available_scopes = config('eveapi.scopes');
-
-        return Inertia::render('Configuration/Scopes/EditScopeSettings', [
-            'available_scopes' => $available_scopes,
-        ]);
-    }
-
-    public function create(CreateSsoScopeSettingsValidation $validation)
-    {
-        (new UpdateOrCreateSsoSettings($validation->all()))->execute();
-
-        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
-    }
-}
+        Route::get('/{corporation_id}/character', [MemberComplianceController::class, 'getCharacterCompliance'])->name('character.compliance');
+        Route::get('/{corporation_id}/user', [MemberComplianceController::class, 'getUserCompliance'])->name('user.compliance');
+        Route::get('/{corporation_id}/user/missing_characters', [MemberComplianceController::class, 'getMissingCharacters'])->name('missing.characters.compliance');
+    });

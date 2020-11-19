@@ -49,7 +49,7 @@ class CreateSsoScopeSettingsValidation extends FormRequest
     {
         return [
             'selectedScopes' => 'required|array',
-            'selectedEntities' => 'required|array',
+            'selectedEntities' => ['required_unless:type,global', 'array'],
         ];
     }
 

@@ -5,7 +5,7 @@
                 User Application
                 <template v-slot:primary>
                     <HeaderButton v-if="recruit.id" @click="impersonate" :secondary="true">
-                        Impersionate
+                        Impersonate
                     </HeaderButton>
                 </template>
             </PageHeader>

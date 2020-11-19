@@ -27,13 +27,8 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Configuration\CommandsController;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\CreateGlobalSsoScopesController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\DeleteGlobalSsoScopesController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\EditController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
-use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\ViewGlobalScopesController;
 
 Route::middleware(['permission:superuser'])->group(function () {
     Route::get('/settings', [SeatPlusController::class, 'settings'])->name('server.settings');
@@ -45,17 +40,13 @@ Route::middleware(['permission:superuser'])->group(function () {
     //TODO: create own controller for server
     Route::get('/settings/navigation', [SeatPlusController::class, 'navigation'])->name('settings.navigation');
 
-    Route::get('/settings/scopes', OverviewController::class)->name('settings.scopes');
-    Route::get('/settings/scopes/create', [CreateController::class, 'view'])->name('view.create.scopes');
-    Route::post('/settings/scopes/create', [CreateController::class, 'create'])->name('create.scopes');
+    Route::get('/settings/scopes/overview', OverviewController::class)->name('settings.scopes');
 
-    Route::post('/settings/scopes/create/global', CreateGlobalSsoScopesController::class)->name('create.global.scopes');
-    Route::get('/settings/scopes/global', ViewGlobalScopesController::class)->name('view.global.scopes');
-    Route::delete('/settings/scopes/global', DeleteGlobalSsoScopesController::class)->name('delete.global.scopes');
-
-    Route::get('/settings/scopes/{entity_id}/edit', EditController::class)->name('edit.scopes.settings');
-
-    Route::delete('/settings/scopes/{entity_id}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.settings.scopes');
+    Route::get('/settings/scopes/view/{entity_id}', [SsoSettingsController::class, 'index'])->name('view.scopes.settings');
+    Route::get('/settings/scopes/global/view', [SsoSettingsController::class, 'index'])->name('view.global.scopes');
+    Route::get('/settings/scopes/create', [SsoSettingsController::class, 'index'])->name('view.create.scopes');
+    Route::post('/settings/scopes/create', [SsoSettingsController::class, 'create'])->name('create.scopes');
+    Route::delete('/settings/scopes/delete/{entity_id?}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.scopes');
 
     Route::get('/search/{searchParam}', [SsoSettingsController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });

@@ -52,6 +52,7 @@ Route::prefix('recruitment')
         Route::middleware('permission:can accept or deny applications')
             ->group(function () {
                 Route::get('/applications/{corporation_id}', [ApplicationsController::class, 'getOpenCorporationApplications'])->name('open.corporation.applications');
+                Route::get('/shit_list/{corporation_id}', [ApplicationsController::class, 'getAcceptedCorporationApplications'])->name('corporation.shitlist');
 
                 Route::get('/character_application/{character_id}', [ApplicationsController::class, 'getCharacterApplication'])->name('character.application');
                 Route::post('/character_application/{character_id}', [ApplicationsController::class, 'reviewCharacterApplication'])->name('review.character.application');

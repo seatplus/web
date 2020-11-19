@@ -47,29 +47,40 @@ class UpdateOrCreateSsoSettings
 
     private Collection $entities;
 
+    private string $type;
+
     public function __construct(array $request)
     {
         $this->request = $request;
-        $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'));
+        $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'))
+            ->map(fn ($scope) => explode(',', $scope))->flatten(1);
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
+        $this->type = Arr::get($this->request, 'type');
     }
 
     public function execute()
     {
-        $this->entities->each(function ($entity) {
-            $entity_id = Arr::get($entity, 'id');
-            $category = Arr::get($entity, 'category');
+        $this->entities->whenEmpty(function () {
+            if ($this->type === 'global') {
+                SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
+            }
+        }, function ($collection) {
+            $collection->each(function ($entity) {
+                $entity_id = Arr::get($entity, 'id');
+                $category = Arr::get($entity, 'category');
 
-            $morphable_type = $category === 'corporation' ? CorporationInfo::class : AllianceInfo::class;
+                $morphable_type = $category === 'corporation' ? CorporationInfo::class : AllianceInfo::class;
 
-            (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
+                (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
-            SsoScopes::updateOrCreate([
-                'morphable_id' => $entity_id,
-            ], [
-                'selected_scopes' => $this->selected_scopes,
-                'morphable_type' => $morphable_type,
-            ]);
+                SsoScopes::updateOrCreate([
+                    'morphable_id' => $entity_id,
+                ], [
+                    'selected_scopes' => $this->selected_scopes,
+                    'morphable_type' => $morphable_type,
+                    'type' => $this->type,
+                ]);
+            });
         });
     }
 }

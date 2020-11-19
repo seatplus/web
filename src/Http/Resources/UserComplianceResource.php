@@ -24,17 +24,25 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
+namespace Seatplus\Web\Http\Resources;
 
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\CreateGlobalSsoScopeValidation;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class CreateGlobalSsoScopesController extends Controller
+class UserComplianceResource extends JsonResource
 {
-    public function __invoke(CreateGlobalSsoScopeValidation $global_sso_scope_validation_request)
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
     {
-        setting(['global_sso_scopes', collect($global_sso_scope_validation_request->get('selectedScopes'))]);
+        $characters = collect(CharacterComplianceResource::collection($this->characters))->filter();
 
-        return redirect()->route('settings.scopes')->with('success', 'Global SSO Settings Saved');
+        return $characters->isEmpty() ? [] : [
+            'main_character' => $this->main_character,
+            'characters' => $characters,
+        ];
     }
 }

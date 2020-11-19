@@ -7,6 +7,7 @@ namespace Seatplus\Web\Tests\Unit\Services;
 use Mockery;
 use Seatplus\Eveapi\Actions\Jobs\Alliance\AllianceInfoAction;
 use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
@@ -30,15 +31,20 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
                 ]
             ],
             'selectedScopes' => [
-                'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
-                'corporation' => []
-            ]
+                "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+                'publicData'
+            ],
+            'type' => 'default'
         ];
 
         (new UpdateOrCreateSsoSettings($request))->execute();
     }
 
-    /** @test */
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function it_calls_corporation_info_action()
     {
         $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
@@ -57,15 +63,22 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
 
             ],
             'selectedScopes' => [
-                'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
-                'corporation' => []
-            ]
+                "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+                'publicData'
+            ],
+            'type' => 'default'
         ];
 
         (new UpdateOrCreateSsoSettings($request))->execute();
+
+        $this->assertCount(3, SsoScopes::where('morphable_id', 1184675423)->first()->selected_scopes);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function it_creates_sso_settings()
     {
         $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
@@ -83,9 +96,10 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
                 ],
             ],
             'selectedScopes' => [
-                'character' => ["esi-assets.read_assets.v1,esi-universe.read_structures.v1"],
-                'corporation' => []
-            ]
+                "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+                'publicData'
+            ],
+            'type' => 'default'
         ];
 
         $this->assertDatabaseMissing('sso_scopes', [
