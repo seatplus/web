@@ -51,6 +51,7 @@ Route::middleware('web')
                 Route::prefix('character')
                     ->group(function () {
                         include __DIR__ . '/Routes/Character/View.php';
+                        include __DIR__ . '/Routes/Character/Contact.php';
                     });
 
                 Route::prefix('corporation')

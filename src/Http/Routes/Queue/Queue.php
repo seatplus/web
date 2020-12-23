@@ -33,4 +33,6 @@ Route::get('status', [
     'uses' => QueueController::class,
 ]);
 
-Route::post('job', DispatchJobController::class)->name('dispatch.job');
+Route::post('manual_job/entities', [DispatchJobController::class, 'getEntities'])->name('manual_job.entities');
+
+Route::post('job', [DispatchJobController::class, 'dispatch'])->name('dispatch.job');

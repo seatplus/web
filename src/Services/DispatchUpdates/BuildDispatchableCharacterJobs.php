@@ -63,7 +63,7 @@ class BuildDispatchableCharacterJobs
             ->with('refresh_token')
             ->has('refresh_token')
             ->cursor()
-            ->filter(fn ($character) => collect($this->job->getRequiredScope())->diff($character->refresh_token->scopes)->isEmpty())
+            ->filter(fn ($character) => collect($this->job->getRequiredScopes())->intersect($character->refresh_token->scopes)->isEmpty())
             ->map(function ($character) {
                 $character_id = $character->character_id;
                 $cache_key = sprintf('%s:%s', $this->dispatchable_job_name, $character_id);

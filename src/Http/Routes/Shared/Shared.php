@@ -32,5 +32,7 @@ use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 
 Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
 Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
-Route::post('resolve/ids', GetNamesFromIdsController::class)->name('resolve.ids');
+Route::post('resolve/ids', [GetNamesFromIdsController::class, 'ids'])->name('resolve.ids');
+Route::post('resolve/character_affiliations', [GetNamesFromIdsController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
+Route::get('resolve/{corporation_id}/corporation_info', [GetNamesFromIdsController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
 Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');

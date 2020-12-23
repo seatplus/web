@@ -27,11 +27,15 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\HydrateCharacterBase;
 use Seatplus\Eveapi\Jobs\ManualDispatchableJobInterface;
 
 class DispatchIndividualJob extends FormRequest
 {
+    protected array $dispatch_transfer_object = [];
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -49,31 +53,34 @@ class DispatchIndividualJob extends FormRequest
      */
     public function rules()
     {
-        $jobs = array_keys(config('eveapi.jobs'));
+        $this->dispatch_transfer_object = $this->get('dispatch_transfer_object');
 
-        $job = $this->buildDispatchableJob();
-        $affiliated_ids = $this->buildAffiliatedIds($job);
+        $jobs = array_keys(config('web.jobs'));
+
+        $affiliated_ids = $this->buildAffiliatedIds();
 
         return [
-            'job' => ['required', Rule::in($jobs)],
+            'dispatch_transfer_object.manual_job' => ['required', Rule::in($jobs)],
+            'dispatch_transfer_object.permission' => ['required', Rule::in(config('eveapi.permissions'))],
+            'dispatch_transfer_object.required_corporation_role' => ['present'],
             'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($affiliated_ids)],
             'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($affiliated_ids)],
         ];
     }
 
-    private function buildAffiliatedIds(ManualDispatchableJobInterface $job): array
+    private function buildAffiliatedIds(): array
     {
-        return getAffiliatedIdsByPermission($job->getRequiredPermission());
+        return getAffiliatedIdsByPermission(Arr::get($this->dispatch_transfer_object, 'permission'));
     }
 
-    private function buildDispatchableJob(): ManualDispatchableJobInterface
+   /* private function buildDispatchableJob(): HydrateCharacterBase
     {
-        $dispatchable_job_class = config('eveapi.jobs')[$this->get('job')];
+        $dispatchable_job_class = Arr::get(config('web.jobs'), Arr::get($this->dispatch_transfer_object, 'manual_job'));
 
         if (! $dispatchable_job_class) {
             throw new \Exception('unable to get lock of the dispatchable job');
         }
 
         return new $dispatchable_job_class;
-    }
+    }*/
 }

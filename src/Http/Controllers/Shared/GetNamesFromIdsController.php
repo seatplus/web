@@ -32,7 +32,7 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class GetNamesFromIdsController extends Controller
 {
-    public function __invoke()
+    public function ids()
     {
         $container = new EsiRequestContainer([
             'method' => 'post',
@@ -45,4 +45,34 @@ class GetNamesFromIdsController extends Controller
 
         return collect($result)->toJson();
     }
+
+    public function characterAffiliations()
+    {
+        $character_affiliation_container = new EsiRequestContainer([
+            'method' => 'post',
+            'version' => 'v1',
+            'endpoint' => '/characters/affiliation/',
+            'request_body' => request()->all(),
+        ]);
+
+        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+
+        return collect($character_affiliations)->toJson();
+    }
+
+    public function getCorporationInfo(int $corporation_id)
+    {
+        $character_affiliation_container = new EsiRequestContainer([
+            'method' => 'get',
+            'version' => 'v4',
+            'endpoint' => '/corporations/{corporation_id}/',
+            'path_values' => ['corporation_id' => $corporation_id],
+        ]);
+
+        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+
+        return collect($character_affiliations)->toJson();
+    }
+
+
 }
