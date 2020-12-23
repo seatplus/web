@@ -73,6 +73,4 @@ class GetNamesFromIdsController extends Controller
 
         return collect($character_affiliations)->toJson();
     }
-
-
 }
