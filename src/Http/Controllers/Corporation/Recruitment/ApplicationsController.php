@@ -81,6 +81,7 @@ class ApplicationsController extends Controller
     {
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->loadMissing('main_character', 'characters'),
+            'target_corporation' => $recruit->application->corporation,
         ]);
     }
 
@@ -101,7 +102,7 @@ class ApplicationsController extends Controller
 
     public function getCharacterApplication(int $character_id)
     {
-        $character = CharacterInfo::find($character_id);
+        $character = CharacterInfo::with('application')->find($character_id);
 
         $recruit = collect([
             'main_character' => $character,
@@ -110,6 +111,7 @@ class ApplicationsController extends Controller
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit,
+            'target_corporation' => $character->application->corporation,
         ]);
     }
 

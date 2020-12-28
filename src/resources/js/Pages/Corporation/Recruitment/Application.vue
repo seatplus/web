@@ -13,35 +13,21 @@
 
 
         <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li class="col-span-2 bg-white rounded-lg shadow">
+            <li class="col-span-2">
 
-                Here shall be components of the most used review metrics such as wallet transactions
-
-                <!--<div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
-                        &lt;!&ndash; Content goes here &ndash;&gt;
-                        header
-                        &lt;!&ndash; We use less vertical padding on card headers on desktop than on body sections &ndash;&gt;
-                    </div>
-                    <div class="px-4 py-5 sm:p-6">
-                        &lt;!&ndash; Content goes here &ndash;&gt;
-                    </div>
+                <div class="space-y-4">
+                    <CharacterContactPanel
+                        v-for="character in recruit.characters"
+                        :key="character.character_id"
+                        :character="character"
+                        :corporation_id="target_corporation.corporation_id"
+                        :alliance_id="target_corporation.alliance_id"
+                    />
                 </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
-                        &lt;!&ndash; Content goes here &ndash;&gt;
-                        header
-                        &lt;!&ndash; We use less vertical padding on card headers on desktop than on body sections &ndash;&gt;
-                    </div>
-                    <div class="px-4 py-5 sm:p-6">
-                        &lt;!&ndash; Content goes here &ndash;&gt;
-                    </div>
-                </div>-->
 
             </li>
 
-            <li class="col-span-1 bg-white rounded-lg shadow">
+            <li class="col-span-1">
                 <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                     <div>
                         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
@@ -133,11 +119,16 @@
 import Layout from "@/Shared/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
+import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 export default {
     name: "UserApplication",
-    components: {HeaderButton, PageHeader, Layout},
+    components: {CharacterContactPanel, HeaderButton, PageHeader, Layout},
     props: {
         recruit: {
+            required: true,
+            type: Object
+        },
+        target_corporation: {
             required: true,
             type: Object
         }

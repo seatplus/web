@@ -206,6 +206,10 @@ class WebServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/config/web.cronExpressions.php', 'web.cronExpressions'
         );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/config/web.jobs.php', 'web.jobs'
+        );
     }
 
     private function addCommands()

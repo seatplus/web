@@ -1,5 +1,5 @@
 <template>
-    <Layout page="Corporation" page-description="Member Tracking" :required-scopes="this.requiredScopes">
+    <Layout page="Corporation" page-description="Member Tracking" :required-scopes="dispatch_transfer_object.required_scopes">
 
         <template v-slot:title>
             <PageHeader>
@@ -164,7 +164,7 @@
         <template v-slot:slideOver>
             <SlideOver>
                 <template v-slot:title>Dispatch Update Job</template>
-                <DispatchUpdate :dispatchable_jobs="dispatchable_jobs" />
+                <DispatchUpdate :dispatch_transfer_object="dispatch_transfer_object" />
             </SlideOver>
         </template>
     </Layout>
@@ -191,7 +191,10 @@ export default {
         member_tracking: {
             required: true
         },
-        dispatchable_jobs: Object
+        dispatch_transfer_object: {
+            required: true,
+            type: Object
+        }
     },
     data() {
         return {

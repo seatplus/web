@@ -24,15 +24,30 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
-use Seatplus\Web\Http\Controllers\Shared\GetNamesFromIdsController;
-use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
+namespace Seatplus\Web\Http\Resources;
 
-Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
-Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
-Route::post('resolve/ids', [GetNamesFromIdsController::class, 'ids'])->name('resolve.ids');
-Route::post('resolve/character_affiliations', [GetNamesFromIdsController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
-Route::get('resolve/{corporation_id}/corporation_info', [GetNamesFromIdsController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
-Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ContactResource extends JsonResource
+{
+    private array $character_affiliation = [];
+
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'contact_id' => $this->contact_id,
+            'contact_type' => $this->contact_type,
+            'is_blocked' => $this->is_blocked,
+            'is_watched' => $this->is_watched,
+            'standing' => $this->standing,
+            'labels' => $this->labels,
+            'affiliation' => $this->affiliations,
+        ];
+    }
+}

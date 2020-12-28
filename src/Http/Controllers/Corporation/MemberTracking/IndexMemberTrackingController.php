@@ -27,17 +27,17 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
-use Seatplus\Eveapi\Jobs\Corporation\CorporationMemberTrackingJob;
+use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\DispatchUpdates\BuildDispatchableCorporationJobs;
 
 class IndexMemberTrackingController extends Controller
 {
     public function __invoke()
     {
         return Inertia::render('Corporation/MemberTracking', [
-            'dispatchable_jobs' => $this->getDispatchableJobs(),
+            'required_scopes' => config('eveapi.scopes.character.contacts'),
+            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
             'member_tracking' => CorporationMemberTracking::Affiliated()
                 ->with('corporation.ssoScopes', 'corporation.alliance.ssoScopes', 'character.refresh_token', 'location.locatable', 'ship')
                 ->get()
@@ -61,11 +61,13 @@ class IndexMemberTrackingController extends Controller
         ]);
     }
 
-    private function getDispatchableJobs()
+    private function buildDispatchTransferObject(): object
     {
-        $dispatchableJobBuilder = new BuildDispatchableCorporationJobs;
-        $job = new CorporationMemberTrackingJob;
-
-        return $dispatchableJobBuilder($job, config('eveapi.permissions.' . CorporationMemberTracking::class));
+        return (object) [
+            'manual_job' => array_search(CorporationMemberTrackingHydrateBatch::class, config('web.jobs')),
+            'permission' => config('eveapi.permissions.' . CorporationMemberTracking::class),
+            'required_scopes' => config('eveapi.scopes.corporation.membertracking'),
+            'required_corporation_role' => 'Director',
+        ];
     }
 }

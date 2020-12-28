@@ -24,15 +24,48 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
-use Seatplus\Web\Http\Controllers\Shared\GetNamesFromIdsController;
-use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
+namespace Seatplus\Web\Jobs;
 
-Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
-Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
-Route::post('resolve/ids', [GetNamesFromIdsController::class, 'ids'])->name('resolve.ids');
-Route::post('resolve/character_affiliations', [GetNamesFromIdsController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
-Route::get('resolve/{corporation_id}/corporation_info', [GetNamesFromIdsController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
-Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');
+use Illuminate\Support\Facades\Bus;
+
+class ManualDispatchedJob
+{
+    private array $jobs;
+
+    private string $name = 'manual job';
+
+    /**
+     * @param array $jobs
+     * @return ManualDispatchedJob
+     */
+    public function setJobs(array $jobs): ManualDispatchedJob
+    {
+        $this->jobs = $jobs;
+
+        return $this;
+    }
+
+    public function handle()
+    {
+        $success_message = sprintf('Manual update batch of %s processed!', $this->name);
+
+        $batch = Bus::batch($this->jobs)
+            ->then(fn () => logger()->info($success_message))
+            ->name($this->name)
+            ->onQueue('high')
+            ->dispatch();
+
+        return $batch->id;
+    }
+
+    /**
+     * @param string $name
+     * @return ManualDispatchedJob
+     */
+    public function setName(string $name): ManualDispatchedJob
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+}

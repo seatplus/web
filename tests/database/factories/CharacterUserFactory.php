@@ -14,5 +14,5 @@ $factory->define(CharacterUser::class, function (Faker $faker) {
 });
 
 /*$factory->afterCreating(CharacterUser::class, function ($character_user, $faker) {
-    $character_user->character()->associate(factory(CharacterInfo::class)->make())->toArray();
+    $character_user->character()->associate(factory(CharacterInfoJob::class)->make())->toArray();
 });*/
