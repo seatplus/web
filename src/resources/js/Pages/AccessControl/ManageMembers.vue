@@ -4,7 +4,7 @@
             <!--Header-->
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
                 <!-- Content goes here -->
-                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
                     <div class="ml-4 mt-2">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Manage Members {{this.role.name}}
@@ -38,13 +38,13 @@
 
                                     <div class="ml-2 flex-shrink-0 flex">
                                         <span v-if="member.status === 'waitlist'" class="relative z-0 inline-flex shadow-sm rounded-md">
-                                            <button @click="approve(member)" type="button" class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+                                            <button @click="approve(member)" type="button" class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
                                                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                                 </svg>
                                                 Approve
                                             </button>
-                                            <button @click="removeMember(member)" type="button" class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
+                                            <button @click="removeMember(member)" type="button" class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">
                                                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                                 </svg>
@@ -52,7 +52,7 @@
                                             </button>
                                         </span>
                                         <span v-if="member.status === 'member'" class="inline-flex rounded-md shadow-sm">
-                                            <button @click="removeMember(member)" type="button" class="inline-flex items-center px-3 py-2 border border-gray-300t text-sm leading-4 font-medium rounded-md bg-white hover:text-gray-500 focus:outline-none focus:border-blue-700 focus:shadow-outline-blue active:text-gray-700 active:bg-gray-100 transition ease-in-out duration-150">
+                                            <button @click="removeMember(member)" type="button" class="inline-flex items-center px-3 py-2 border border-gray-300t text-sm leading-4 font-medium rounded-md bg-white hover:text-gray-500 focus:outline-none focus:border-blue-700 focus:ring-blue active:text-gray-700 active:bg-gray-100 transition ease-in-out duration-150">
                                                 <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                                                 </svg>

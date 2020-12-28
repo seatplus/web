@@ -5,13 +5,13 @@
             <PageHeader>
                 {{creationMode ? 'Create ': 'Edit '}} Scope Setting
                 <template v-slot:primary>
-                    <inertia-link :href="$route('create.scopes')" method="post" as="button" :data ="{selectedScopes: selectedScopes, selectedEntities: selectedEntities, type: type}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                    <inertia-link :href="$route('create.scopes')" method="post" as="button" :data ="{selectedScopes: selectedScopes, selectedEntities: selectedEntities, type: type}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
                         Save
                     </inertia-link>
                 </template>
                 <template v-slot:secondary v-if="!creationMode">
                     <span class="shadow-sm rounded-md">
-                        <inertia-link :href="$route('delete.scopes', object.id)" method="delete" as="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out">
+                        <inertia-link :href="$route('delete.scopes', object.id)" method="delete" as="button" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out">
                             Deletes
                         </inertia-link>
                     </span>
@@ -61,19 +61,19 @@
                 <!--<div class="bg-gray-50 px-4 py-4 sm:px-6 text-right">
                     &lt;!&ndash; Content goes here &ndash;&gt;
                     <span class="flex-1 flex justify-between">
-                    &lt;!&ndash;<inertia-link v-if="this.entity.morphable_id" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
+                    &lt;!&ndash;<inertia-link v-if="this.entity.morphable_id" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition duration-150 ease-in-out">
                         Delete
                     </inertia-link>
 
-                    <inertia-link v-if="isGlobal && !creationMode" :href="$route('delete.global.scopes')" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out">
+                    <inertia-link v-if="isGlobal && !creationMode" :href="$route('delete.global.scopes')" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition duration-150 ease-in-out">
                         Delete
                     </inertia-link>
 
-                    <inertia-link v-if="isGlobal" :href="$route('create.global.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes }" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                    <inertia-link v-if="isGlobal" :href="$route('create.global.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes }" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
                         Save
                     </inertia-link>
 
-                    <inertia-link v-else :href="$route('create.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes, selectedEntities: this.selectedEntities}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                    <inertia-link v-else :href="$route('create.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes, selectedEntities: this.selectedEntities}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
                         Save
                     </inertia-link>&ndash;&gt;
                 </span>

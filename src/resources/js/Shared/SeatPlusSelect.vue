@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="mt-1 relative rounded-md shadow-sm">
-            <select v-model="selection" :class="['form-select block w-full', hasError ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:shadow-outline-red' : '']">
+            <select v-model="selection" :class="['form-select block w-full', hasError ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red' : '']">
                 <option value="" disabled selected>Select your option</option>
                 <slot />
             </select>

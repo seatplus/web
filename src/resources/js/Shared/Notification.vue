@@ -1,6 +1,6 @@
 <template>
     <div :class="['shadow-lg rounded-lg pointer-events-auto border', {'bg-gray-50' : isDefault, 'bg-blue-50': isType('info'), 'bg-yellow-50': isType('warning'), 'bg-red-50': isType('error'), 'bg-green-50': isType('success')}]">
-        <div class="rounded-lg shadow-xs overflow-hidden">
+        <div class="rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
             <div class="p-4">
                 <div class="flex items-start">
                     <div class="flex-shrink-0">

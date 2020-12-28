@@ -20,7 +20,7 @@
                 <div v-if="requiresAddingButton" class="border-t border-gray-200">
                     <div class="-mt-px flex">
                         <div class="w-0 flex-1 flex border-r border-gray-200">
-                            <button @click="addMember(user)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-green-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-green-700 focus:outline-none focus:shadow-outline-blue focus:border-green-300 focus:z-10 transition ease-in-out duration-150">
+                            <button @click="addMember(user)" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-green-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-green-700 focus:outline-none focus:ring-blue focus:border-green-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path>
                                 </svg>

@@ -20,7 +20,7 @@
                 <div class="border-t border-gray-200" v-if="hasOpenEnlistments">
                     <div class="-mt-px flex">
                         <!--<div class="w-0 flex-1 flex border-r border-gray-200">
-                            <a href="#" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <a href="#" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
@@ -29,7 +29,7 @@
                             </a>
                         </div>-->
                         <div class="-ml-px w-0 flex-1 flex">
-                            <inertia-link :href="$route('delete.character.application', character.character_id)" method="delete" v-if="character.application" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                            <inertia-link :href="$route('delete.character.application', character.character_id)" method="delete" v-if="character.application" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5 text-red-700" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                     <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />

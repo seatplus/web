@@ -5,7 +5,7 @@
                 <!-- Content goes here -->
                 <!-- We use less vertical padding on card headers on desktop than on body sections -->
 
-                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
                     <div class="ml-4 mt-2">
                         <div class="flex items-center">
                             <div>
@@ -23,12 +23,12 @@
                     </div>
                     <div class="ml-4 mt-2 flex-shrink-0 flex">
                             <!--<span class="inline-flex rounded-md shadow-sm">
-                                <button @click="impersonateUser(application.user)" type="button" class="relative inline-flex items-center px-4 py-2 border border-grey-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-50 active:text-gray-800">
+                                <button @click="impersonateUser(application.user)" type="button" class="relative inline-flex items-center px-4 py-2 border border-grey-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 active:bg-gray-50 active:text-gray-800">
                                     Impersonate
                                 </button>
                             </span>-->
                         <span class="ml-3 inline-flex rounded-md shadow-sm">
-                                <inertia-link :href="$route('user.application', application.user.id)" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150" >
+                                <inertia-link :href="$route('user.application', application.user.id)" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition ease-in-out duration-150" >
                                     Handle Application
                                 </inertia-link>
                             </span>
