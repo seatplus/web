@@ -81,7 +81,7 @@ class ApplicationsController extends Controller
     {
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->loadMissing('main_character', 'characters'),
-            'target_corporation' => $recruit->application->corporation
+            'target_corporation' => $recruit->application->corporation,
         ]);
     }
 
@@ -111,7 +111,7 @@ class ApplicationsController extends Controller
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit,
-            'target_corporation' => $character->application->corporation
+            'target_corporation' => $character->application->corporation,
         ]);
     }
 

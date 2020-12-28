@@ -70,13 +70,13 @@ class AssetsController extends Controller
         ]);
     }
 
-    private function buildDispatchTransferObject() : object
+    private function buildDispatchTransferObject(): object
     {
         return (object) [
             'manual_job' => array_search(CharacterAssetsHydrateBatch::class, config('web.jobs')),
             'permission' => config('eveapi.permissions.' . CharacterAsset::class),
             'required_scopes' => config('eveapi.scopes.character.assets'),
-            'required_corporation_role' => ''
+            'required_corporation_role' => '',
         ];
     }
 }
