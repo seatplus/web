@@ -30,7 +30,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\HydrateCharacterBase;
-use Seatplus\Eveapi\Jobs\ManualDispatchableJobInterface;
 
 class DispatchIndividualJob extends FormRequest
 {
@@ -73,14 +72,14 @@ class DispatchIndividualJob extends FormRequest
         return getAffiliatedIdsByPermission(Arr::get($this->dispatch_transfer_object, 'permission'));
     }
 
-   /* private function buildDispatchableJob(): HydrateCharacterBase
-    {
-        $dispatchable_job_class = Arr::get(config('web.jobs'), Arr::get($this->dispatch_transfer_object, 'manual_job'));
+    /* private function buildDispatchableJob(): HydrateCharacterBase
+     {
+         $dispatchable_job_class = Arr::get(config('web.jobs'), Arr::get($this->dispatch_transfer_object, 'manual_job'));
 
-        if (! $dispatchable_job_class) {
-            throw new \Exception('unable to get lock of the dispatchable job');
-        }
+         if (! $dispatchable_job_class) {
+             throw new \Exception('unable to get lock of the dispatchable job');
+         }
 
-        return new $dispatchable_job_class;
-    }*/
+         return new $dispatchable_job_class;
+     }*/
 }
