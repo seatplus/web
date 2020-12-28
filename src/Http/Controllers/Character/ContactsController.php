@@ -23,7 +23,6 @@ class ContactsController extends Controller
         $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
 
         return inertia('Character/Contact/Index', [
-            'required_scopes' => config('eveapi.scopes.character.contacts'),
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
             'characters' => $characters
         ]);

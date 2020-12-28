@@ -1,14 +1,21 @@
 <template>
     <Layout page="Character Contacts" :required-scopes="dispatch_transfer_object.required_scopes">
 
+        <template v-slot:title>
+            <PageHeader>
+                Character Contacts
+                <template v-slot:primary>
+                    <HeaderButton @click="openSlideOver">
+                        Update
+                    </HeaderButton>
+                </template>
+
+            </PageHeader>
+        </template>
+
         <div class="space-y-4">
             <CharacterContactPanel v-for="character_affiliation in characters" :key="character_affiliation.character_id" :character="character_affiliation.character" :corporation_id="character_affiliation.corporation_id" :alliance_id="character_affiliation.alliance_id" />
         </div>
-
-
-<!--        <button @click="openSlideOver" type="button" class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Button text
-        </button>-->
 
         <template v-slot:slideOver>
             <SlideOver>
@@ -25,9 +32,11 @@ import SlideOver from "@/Shared/Layout/SlideOver";
 import DispatchUpdate from "@/Shared/DispatchUpdate";
 import CharacterContactPanel from "./CharacterContactPanel";
 import ListTransition from "@/Shared/Transitions/ListTransition";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import HeaderButton from "@/Shared/Layout/HeaderButton";
 export default {
     name: "Index",
-    components: {ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
+    components: {HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
     props: {
         dispatch_transfer_object: {
             required: true,

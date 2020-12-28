@@ -31,6 +31,7 @@ use Inertia\Inertia;
 use Laravel\Horizon\Contracts\JobRepository;
 use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
 use Seatplus\Eveapi\Jobs\Assets\CharacterAssetJob;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -54,7 +55,7 @@ class AssetsController extends Controller
 
         return Inertia::render('Character/Assets', [
             'filters' => $filters,
-            'dispatchable_jobs' => $this->getDispatchableJobs(),
+            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
         ]);
     }
 
@@ -71,11 +72,13 @@ class AssetsController extends Controller
         ]);
     }
 
-    private function getDispatchableJobs()
+    private function buildDispatchTransferObject() : object
     {
-        $dispatchableJobBuilder = new BuildDispatchableCharacterJobs;
-        $job = new CharacterAssetJob;
-
-        return $dispatchableJobBuilder($job, config('eveapi.permissions.' . CharacterAsset::class));
+        return (object) [
+            'manual_job' => array_search(CharacterAssetsHydrateBatch::class, config('web.jobs')),
+            'permission' => config('eveapi.permissions.' . CharacterAsset::class),
+            'required_scopes' => config('eveapi.scopes.character.assets'),
+            'required_corporation_role' => ''
+        ];
     }
 }
