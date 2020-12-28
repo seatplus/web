@@ -27,13 +27,9 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
-use Seatplus\Eveapi\Jobs\Corporation\CorporationMemberTrackingJob;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
-use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\DispatchUpdates\BuildDispatchableCorporationJobs;
 
 class IndexMemberTrackingController extends Controller
 {
@@ -65,13 +61,13 @@ class IndexMemberTrackingController extends Controller
         ]);
     }
 
-    private function buildDispatchTransferObject() : object
+    private function buildDispatchTransferObject(): object
     {
         return (object) [
             'manual_job' => array_search(CorporationMemberTrackingHydrateBatch::class, config('web.jobs')),
             'permission' => config('eveapi.permissions.' . CorporationMemberTracking::class),
             'required_scopes' => config('eveapi.scopes.corporation.membertracking'),
-            'required_corporation_role' => 'Director'
+            'required_corporation_role' => 'Director',
         ];
     }
 }
