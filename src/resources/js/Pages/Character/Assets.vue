@@ -19,13 +19,13 @@
 
                     <div class="col-span-6">
                         <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
-                        <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
+                        <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     </div>
 
                     <div class="col-span-6 sm:col-span-3">
                         <InputGroup for="character_dropdown" label="Character Filter">
                             <span class="mt-1 inline-flex rounded-md shadow-sm box w-full">
-                                <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:shadow-outline-gray transition ease-in-out duration-150">
+                                <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:ring-gray transition ease-in-out duration-150">
                                     {{ characterFilterModal.selectedCharacters.length === 0 ? 'Own Characters' : (characterFilterModal.selectedCharacters.length === 1 ? '1 Character' : characterFilterModal.selectedCharacters.length + ' Characters') }}
                                     <svg class="h-6 w-6 float-right" viewBox="0 0 20 20" fill="none">
                                         <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#9fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

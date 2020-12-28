@@ -16,7 +16,7 @@
                 </div>
                 <input v-model="search" @input="performSearch"
                        id="search"
-                       :class="[{'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:shadow-outline-red': error}, 'form-input block w-full pl-10 sm:text-sm sm:leading-5']"
+                       :class="[{'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red': error}, 'form-input block w-full pl-10 sm:text-sm sm:leading-5']"
                        placeholder="Amok."
                 />
                 <div v-if="error" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

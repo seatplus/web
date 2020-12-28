@@ -1,6 +1,6 @@
 <template>
     <Fragment>
-        <button ref="menu" @click="toggleMenu" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+        <button ref="menu" @click="toggleMenu" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
             <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -8,7 +8,7 @@
             <span class="ml-3">Apply</span>
         </button>
         <!--<div>
-            <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:shadow-outline">
+            <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring">
                 <EveImage tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character"  test :size="256" />
             </button>
         </div>-->
@@ -24,7 +24,7 @@
             leave-to-class="opacity-0 scale-95"
         >
             <div v-show="menuOpen" ref="list" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg">
-                <div class="py-1 rounded-md bg-white shadow-xs">
+                <div class="py-1 rounded-md bg-white ring-1 ring-black ring-opacity-5">
 
                     <inertia-link v-for="enlistment in enlistments" :key="enlistment.corporation_id" method="post" :href="$route('post.application')" :data="{corporation_id: enlistment.corporation_id, character_id: character_id}" :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150 text-left'">
                         <div class="flex items-center">

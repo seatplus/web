@@ -17,7 +17,7 @@
             <!--Header-->
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
                 <!-- Content goes here -->
-                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
                     <div class="ml-4 mt-2 inline-flex items-center space-x-4">
                         <EveImage :object="entry.corporation" />
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -119,7 +119,7 @@
                             <tbody>
 
                             <tr v-for="(member,index) in entry.members" :class="index%2 ? 'bg-gray-50' :'bg-white'">
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-900">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 text-gray-900">
                                     <div class="flex-shrink-0">
                                         <svg v-if="missingScopes(member) || missingTokens(member)" class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
@@ -129,26 +129,26 @@
                                         </svg>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 font-medium text-gray-500">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 font-medium text-gray-500">
                                     <div class="inline-flex items-center space-x-4">
                                         <EveImage :object="{character_id: member.character_id}" :size="256" tailwind_class="h-6 w-6 rounded-full" />
                                         <span v-if="hasCharacter(member)">{{ member.character.name }}</span>
                                         <span v-else> {{ getCharacterName(member) }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500 sm:max-w-xs md:max-w-sm truncate">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 text-gray-500 sm:max-w-xs md:max-w-sm truncate">
                                     {{ getLocationName(member) }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500 lg:">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 text-gray-500 lg:">
                                     <div class="inline-flex items-center space-x-4">
                                         <EveImage :object="{type_id: member.ship_type_id}" :size="256" tailwind_class="h-6 w-6 rounded-full" />
                                         <span v-if="member.ship">{{ member.ship.name }}</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 text-gray-500">
                                     <Time format="YYYY-MM-DD HH:mm:ss" :timestamp="member.start_date" />
                                 </td>
-                                <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm leading-5 text-gray-500">
                                     <Time format="YYYY-MM-DD HH:mm:ss" :timestamp="member.logon_date" />
                                 </td>
                             </tr>

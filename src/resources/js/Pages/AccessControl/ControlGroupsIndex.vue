@@ -4,7 +4,7 @@
             <!--Header-->
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
                 <!-- Content goes here -->
-                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-no-wrap">
+                <div class="-ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap">
                     <div class="ml-4 mt-2">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">
                             Access Control Groups
@@ -12,7 +12,7 @@
                     </div>
                     <div class="ml-4 mt-2 flex-shrink-0">
                       <span class="inline-flex rounded-md shadow-sm">
-                        <button @click="toggleModal" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:border-indigo-700 active:bg-indigo-700">
+                        <button @click="toggleModal" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:ring-indigo focus:border-indigo-700 active:bg-indigo-700">
                           Create new group
                         </button>
                       </span>
@@ -56,7 +56,7 @@
                 </template>
                 <template v-slot:buttons>
                     <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                        <inertia-link method="post" :href="$route('acl.create')" :data="{name: createRoleName}" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                        <inertia-link method="post" :href="$route('acl.create')" :data="{name: createRoleName}" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                             Create
                         </inertia-link>
                     </span>
