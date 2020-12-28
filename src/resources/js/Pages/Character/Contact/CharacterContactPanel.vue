@@ -260,18 +260,36 @@ export default {
 
             Promise.allSettled(promises).then(() => this.getAffiliations())
         },
+        handleContactsWithAffiliation() {
+            _.each(_.filter(this.character_contact, (contact) => _.isObject(contact.affiliation)), (contact) => {
+
+                    let pushable_object = {
+                        contact_id: contact.contact_id,
+                        character_id: contact.affiliation.character_id,
+                        corporation_id: contact.affiliation.corporation_id,
+                        alliance_id: contact.affiliation.alliance_id
+                    }
+
+                    this.entity_affiliations.push(_.omitBy(pushable_object, _.isNil))
+                })
+        },
         getAffiliations() {
             let promises = []
 
-            let character_ids = _.filter(_.map(this.character_contact, (contact) => contact.contact_type === 'character' ? contact.contact_id : null))
+            this.handleContactsWithAffiliation()
+
+            let character_contacs_without_affiliations = _.filter(this.character_contact, (contact) => !_.isObject(contact.affiliation))
+
+            //TODO with char_affiliations eager loaded only request ids which haven't been loaded
+            let character_ids = _.filter(_.map(character_contacs_without_affiliations, (contact) => contact.contact_type === 'character' ? contact.contact_id : null))
             if (!_.isEmpty(character_ids))
                 promises.push(this.resolveCharacterAffiliations(character_ids))
 
-            let corporations = _.filter(_.map(this.character_contact, (contact) => contact.contact_type === 'corporation' ? contact : null))
+            let corporations = _.filter(_.map(character_contacs_without_affiliations, (contact) => contact.contact_type === 'corporation' ? contact : null))
             if (!_.isEmpty(corporations))
                 corporations.forEach((corporation) => promises.push(this.resolveCorporationAffiliations(corporation)))
 
-            let alliances = _.filter(_.map(this.character_contact, (contact) => contact.contact_type === 'alliance' ? contact : null))
+            let alliances = _.filter(_.map(character_contacs_without_affiliations, (contact) => contact.contact_type === 'alliance' ? contact : null))
             if (!_.isEmpty(alliances))
                 alliances.forEach((contact) => this.entity_affiliations.push({
                     contact_id: contact.contact_id,

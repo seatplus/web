@@ -41,11 +41,7 @@ class ContactsController extends Controller
         abort_unless(in_array($id, $affiliated_ids), 403);
 
         $query = Contact::with('labels')
-            ->where('contactable_id', $id)
-            ->leftJoin('character_affiliations', fn($join) => $join
-                ->on('contacts.contact_id', '=', 'character_affiliations.character_id')
-                ->orOn('contacts.contact_id', '=', 'character_affiliations.corporation_id')
-            );
+            ->where('contactable_id', $id);
 
         return ContactResource::collection(
             $query->paginate()
