@@ -1,3 +1,4 @@
+<script src="../../../../../../../../../webpack.mix.js"></script>
 <template>
     <Layout page="Character Contacts" :required-scopes="dispatch_transfer_object.required_scopes">
 
@@ -30,7 +31,7 @@
 import Layout from "@/Shared/Layout";
 import SlideOver from "@/Shared/Layout/SlideOver";
 import DispatchUpdate from "@/Shared/DispatchUpdate";
-import CharacterContactPanel from "./CharacterContactPanel";
+import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import ListTransition from "@/Shared/Transitions/ListTransition";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";

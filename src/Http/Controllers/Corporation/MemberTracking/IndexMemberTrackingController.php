@@ -65,7 +65,6 @@ class IndexMemberTrackingController extends Controller
         ]);
     }
 
-    //TODO:
     private function buildDispatchTransferObject() : object
     {
         return (object) [
@@ -74,13 +73,5 @@ class IndexMemberTrackingController extends Controller
             'required_scopes' => config('eveapi.scopes.corporation.membertracking'),
             'required_corporation_role' => 'Director'
         ];
-    }
-
-    private function getDispatchableJobs()
-    {
-        $dispatchableJobBuilder = new BuildDispatchableCorporationJobs;
-        $job = new CorporationMemberTrackingJob;
-
-        return $dispatchableJobBuilder($job, config('eveapi.permissions.' . CorporationMemberTracking::class));
     }
 }

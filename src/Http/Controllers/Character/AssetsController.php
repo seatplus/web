@@ -30,12 +30,10 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Horizon\Contracts\JobRepository;
 use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
-use Seatplus\Eveapi\Jobs\Assets\CharacterAssetJob;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\DispatchUpdates\BuildDispatchableCharacterJobs;
 
 class AssetsController extends Controller
 {
