@@ -35,11 +35,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class SyncRoleAffiliations
 {
-    /**
-     * @var \Seatplus\Auth\Models\Permissions\Role
-     */
-    private $role;
-
     private $current_affiliations;
 
     /**
@@ -47,9 +42,11 @@ class SyncRoleAffiliations
      */
     private $target_affiliations;
 
-    public function __construct(Role $role)
+    public function __construct(/**
+     * @var \Seatplus\Auth\Models\Permissions\Role
+     */
+    private Role $role)
     {
-        $this->role = $role;
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
     }

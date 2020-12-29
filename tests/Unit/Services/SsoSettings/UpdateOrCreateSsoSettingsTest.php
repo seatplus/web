@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Services;
+namespace Seatplus\Web\Tests\Unit\Services\SsoSettings;
 
 
 use Mockery;

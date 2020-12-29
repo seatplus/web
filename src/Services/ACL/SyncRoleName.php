@@ -30,16 +30,11 @@ use Seatplus\Auth\Models\Permissions\Role;
 
 class SyncRoleName
 {
-    private Role $role;
-
     /**
      * SyncRoleName constructor.
-     *
-     * @param \Seatplus\Auth\Models\Permissions\Role $role
      */
-    public function __construct(Role $role)
+    public function __construct(private Role $role)
     {
-        $this->role = $role;
     }
 
     public function sync(string $name)

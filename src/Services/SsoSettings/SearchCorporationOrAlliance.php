@@ -34,18 +34,15 @@ use Seatplus\Eveapi\Containers\EsiRequestContainer;
 class SearchCorporationOrAlliance
 {
     /**
-     * @var string
-     */
-    private string $searchParam;
-
-    /**
      * @var \Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction
      */
     private RetrieveEsiDataAction $retrieve_esi_data_action;
 
-    public function __construct(string $searchParam)
+    public function __construct(/**
+     * @var string
+     */
+    private string $searchParam)
     {
-        $this->searchParam = $searchParam;
         $this->retrieve_esi_data_action = new RetrieveEsiDataAction;
     }
 

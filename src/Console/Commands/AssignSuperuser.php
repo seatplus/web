@@ -137,7 +137,7 @@ class AssignSuperuser extends Command
     {
         try {
             return User::permission('superuser')->get()->isNotEmpty();
-        } catch (PermissionDoesNotExist $exception) {
+        } catch (PermissionDoesNotExist) {
             return false;
         }
     }

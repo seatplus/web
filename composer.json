@@ -21,26 +21,33 @@
             "Seatplus\\Web\\Tests\\": "tests/"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/herpaderpaldent/i18n/"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": "^7.4",
+        "php": "^8.0",
         "laravel/framework": "^8.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^0.4.5",
-        "seatplus/auth": "^0.4.2",
-        "inertiajs/inertia-laravel": "^0.2.9",
+        "seatplus/eveapi": "^0.5.0",
+        "seatplus/auth": "^0.5.0",
+        "inertiajs/inertia-laravel": "^0.3.5",
         "tightenco/ziggy": "^0.8.0",
         "spatie/laravel-permission": "^3.0",
         "spatie/data-transfer-object": "^2.2",
-        "conedevelopment/i18n": "^1.0",
+        "conedevelopment/i18n": "dev-master",
         "doctrine/dbal": "^2.12"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
         "spatie/phpunit-watcher": "^1.11",
         "laravel/legacy-factories": "^1.0",
-        "claudiodekker/inertia-laravel-testing": "^1.1"
+        "claudiodekker/inertia-laravel-testing": "^1.2",
+        "rector/rector": "^0.9.2"
     },
     "extra": {
         "laravel": {
