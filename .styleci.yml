@@ -2,7 +2,7 @@ preset: laravel
 
 risky: false
 
-version:
+version: 8
 
 enabled:
 - concat_with_spaces
