@@ -42,8 +42,7 @@ class AssetsController extends Controller
          * @var \Laravel\Horizon\Contracts\JobRepository
          */
         private JobRepository $jobs
-    )
-    {
+    ) {
     }
 
     public function index(Request $request)
