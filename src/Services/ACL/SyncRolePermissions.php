@@ -34,11 +34,6 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 class SyncRolePermissions
 {
     /**
-     * @var \Seatplus\Auth\Models\Permissions\Role
-     */
-    private $role;
-
-    /**
      * @var \Illuminate\Support\Collection
      */
     private $current_permissions;
@@ -48,9 +43,11 @@ class SyncRolePermissions
      */
     private $target_permissions;
 
-    public function __construct(Role $role)
+    public function __construct(/**
+     * @var \Seatplus\Auth\Models\Permissions\Role
+     */
+    private Role $role)
     {
-        $this->role = $role;
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
     }
@@ -66,7 +63,7 @@ class SyncRolePermissions
                 $this->target_permissions->push($name);
                 try {
                     $this->role->givePermissionTo($name);
-                } catch (PermissionDoesNotExist $exception) {
+                } catch (PermissionDoesNotExist) {
                     Permission::create(['name' => $name]);
 
                     $this->role->givePermissionTo($name);

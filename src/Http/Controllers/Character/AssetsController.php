@@ -37,14 +37,13 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class AssetsController extends Controller
 {
-    /**
-     * @var \Laravel\Horizon\Contracts\JobRepository
-     */
-    private JobRepository $jobs;
-
-    public function __construct(JobRepository $jobs)
+    public function __construct(
+        /**
+         * @var \Laravel\Horizon\Contracts\JobRepository
+         */
+        private JobRepository $jobs
+    )
     {
-        $this->jobs = $jobs;
     }
 
     public function index(Request $request)

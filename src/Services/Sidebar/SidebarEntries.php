@@ -65,7 +65,7 @@ class SidebarEntries
 
         try {
             return ! $this->user->can($permission_name);
-        } catch (PermissionDoesNotExist $exception) {
+        } catch (PermissionDoesNotExist) {
             Permission::create(['name' => $permission_name]);
 
             return $this->checkUserPermission($array);

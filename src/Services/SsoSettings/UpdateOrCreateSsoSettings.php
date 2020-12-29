@@ -36,11 +36,6 @@ use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
 class UpdateOrCreateSsoSettings
 {
     /**
-     * @var array
-     */
-    private array $request;
-
-    /**
      * @var \Illuminate\Support\Collection
      */
     private Collection $selected_scopes;
@@ -49,9 +44,11 @@ class UpdateOrCreateSsoSettings
 
     private string $type;
 
-    public function __construct(array $request)
+    public function __construct(/**
+     * @var array
+     */
+    private array $request)
     {
-        $this->request = $request;
         $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'))
             ->map(fn ($scope) => explode(',', $scope))->flatten(1);
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
