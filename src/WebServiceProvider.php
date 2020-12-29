@@ -26,14 +26,16 @@
 
 namespace Seatplus\Web;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
-use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
+use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
+use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
@@ -74,9 +76,11 @@ class WebServiceProvider extends ServiceProvider
         // Register any extra services
         $this->register_services();
 
-        $this->registerIntertiaJs();
+        //$this->registerIntertiaJs();
 
         $this->mergeConfigurations();
+
+        $this->app->singleton(ExceptionHandler::class, Handler::class);
     }
 
     private function addPublications()
@@ -112,7 +116,8 @@ class WebServiceProvider extends ServiceProvider
         $router->aliasMiddleware('locale', Locale::class);
 
         // Inertia.JS adding
-        $router->pushMiddlewareToGroup('web', Middleware::class);
+        //$router->pushMiddlewareToGroup('web', Middleware::class);
+        $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add permission Middelware
         $router->aliasMiddleware('permission', CheckPermissionAffiliation::class);
@@ -135,54 +140,6 @@ class WebServiceProvider extends ServiceProvider
     private function getPackageTailwindConfig()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tailwind.config.js';
-    }
-
-    private function registerIntertiaJs()
-    {
-        Inertia::setRootView('web::app');
-
-        Inertia::version(function () {
-            return md5_file(public_path('mix-manifest.json'));
-        });
-
-        Inertia::share([
-            'flash' => function () {
-                return [
-                    'success' => session()->pull('success'),
-                    'info' => session()->pull('info'),
-                    'warning' => session()->pull('warning'),
-                    'error' => session()->pull('error'),
-                ];
-            },
-            'sidebar' => function () {
-                return auth()->guest() ? [] : (new SidebarEntries)->filter();
-            },
-            'user' => function () {
-                return auth()->guest() ? '' : UserRessource::make(
-                    User::with('main_character', 'characters', 'characters.refresh_token')
-                        ->where('id', auth()->user()->id)
-                        ->first()
-                );
-            },
-            'translation' => function () {
-                return [
-                    'success' => trans('web::notifications.success'),
-                    'info' => trans('web::notifications.info'),
-                    'warning' => trans('web::notifications.warning'),
-                    'error' => trans('web::notifications.error'),
-                ];
-            },
-            'errors' => function () {
-                return Session::get('errors')
-                    ? Session::get('errors')->getBag('default')->getMessages()
-                    : (object) [];
-            },
-            'images' => function () {
-                return [
-                    'logo' => asset('img/seat_plus.svg'),
-                ];
-            },
-        ]);
     }
 
     private function mergeConfigurations()

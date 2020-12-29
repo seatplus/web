@@ -3,6 +3,8 @@
 
 namespace Seatplus\Web\Tests;
 
+use Inertia\Inertia;
+
 class WebIndexTest extends TestCase
 {
 

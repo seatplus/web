@@ -21,12 +21,6 @@
             "Seatplus\\Web\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/herpaderpaldent/i18n/"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
@@ -39,7 +33,7 @@
         "tightenco/ziggy": "^0.8.0",
         "spatie/laravel-permission": "^3.0",
         "spatie/data-transfer-object": "^2.2",
-        "conedevelopment/i18n": "dev-master",
+        "conedevelopment/i18n": "^1.1",
         "doctrine/dbal": "^2.12"
     },
     "require-dev": {

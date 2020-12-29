@@ -6,6 +6,7 @@ namespace Seatplus\Web\Tests;
 use ClaudioDekker\Inertia\InertiaTestingServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Inertia\Inertia;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
@@ -13,6 +14,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 
@@ -26,6 +28,9 @@ abstract class TestCase extends OrchestraTestCase
     {
 
         parent::setUp();
+
+        //Setup Inertia Root View
+        Inertia::setRootView('web::app');
 
         //Do not use the queue
         Queue::fake();
