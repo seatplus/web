@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="divide-y divide-gray-200">
         <wide-list-element v-for="asset in uniqueItems" :key="asset.item_id" :url="url(asset)" >
             <template v-slot:avatar>
                         <span class="inline-block relative">

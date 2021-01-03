@@ -57,14 +57,14 @@ class AssetsController extends Controller
 
     public function details(int $item_id)
     {
-        $query = CharacterAsset::with('type', 'type.group', 'content', 'content.type', 'content.type.group')
+        $query = CharacterAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
             ->affiliated(getAffiliatedIdsByClass(CharacterAsset::class), request()->query('character_ids'))
-            ->where('location_id', $item_id);
+            ->where('item_id', $item_id);
 
-        $assets = CharacterAssetResource::collection($query->get());
+        $item = CharacterAssetResource::collection($query->get());
 
         return Inertia::render('Character/ItemDetails', [
-            'assets' => $assets,
+            'item' => $item,
         ]);
     }
 
