@@ -6,6 +6,7 @@ namespace Seatplus\Web\Tests\Stubs;
 
 use Orchestra\Testbench\Http\Middleware\RedirectIfAuthenticated;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 
 class Kernel extends \Orchestra\Testbench\Http\Kernel
 {

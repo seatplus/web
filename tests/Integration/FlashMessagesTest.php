@@ -3,10 +3,28 @@
 
 namespace Seatplus\Web\Tests\Integration;
 
+use Inertia\Inertia;
 use Seatplus\Web\Tests\TestCase;
 
 class FlashMessagesTest extends TestCase
 {
+
+    public function setUp(): void
+    {
+       parent::setUp();
+
+        Inertia::share([
+            'flash' => function () {
+                return [
+                    'success' => session()->pull('success'),
+                    'info' => session()->pull('info'),
+                    'warning' => session()->pull('warning'),
+                    'error' => session()->pull('error'),
+                ];
+            },
+        ]);
+    }
+
     /** @test */
     public function seeSuccessFlashMessages()
     {
