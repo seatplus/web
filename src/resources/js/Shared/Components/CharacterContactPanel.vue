@@ -9,12 +9,11 @@
         xleave-to-class="transform opacity-0 scale-95"
     >
         <div v-if="ready" class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
-        <div class="px-4 py-5 sm:px-6">
-            <!-- Content goes here -->
-            <EntityBlock :entity="character"/>
-
-        </div>
-        <div class="">
+            <div class="px-4 py-5 sm:px-6">
+                <!-- Content goes here -->
+                <EntityBlock :entity="character"/>
+            </div>
+            <div class="">
             <!-- This example requires Tailwind CSS v2.0+ -->
             <SimpleStriped>
                 <template v-slot:header>
@@ -62,7 +61,7 @@
             </SimpleStriped>
 
         </div>
-    </div>
+        </div>
     </transition>
 
 </template>

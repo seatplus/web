@@ -48,22 +48,25 @@
             </div>
         </div>
 
-        <wide-lists v-for="location in groupedAssets" :key="location.location_id">
-            <template v-slot:header>
-                <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
-                        {{ location.location }}
-                    </h3>
-                    <p class="mt-1 text-sm leading-5 text-gray-500">
-                        {{getLocationsVolume(location.assets)}} volume and {{getLocationsItemsCount(location.assets)}}
-                        items
-                    </p>
-                </div>
-            </template>
-            <template v-slot:elements>
-                <ItemList :items="location.assets"></ItemList>
-            </template>
-        </wide-lists>
+        <div class="space-y-2 sm:space-y-6">
+            <wide-lists v-for="location in groupedAssets" :key="location.location_id">
+                <template v-slot:header>
+                    <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            {{ location.location }}
+                        </h3>
+                        <p class="mt-1 text-sm leading-5 text-gray-500">
+                            {{getLocationsVolume(location.assets)}} volume and {{getLocationsItemsCount(location.assets)}}
+                            items
+                        </p>
+                    </div>
+                </template>
+                <template v-slot:elements>
+                    <ItemList :items="location.assets"></ItemList>
+                </template>
+            </wide-lists>
+        </div>
+
 
         <infinite-loading :identifier="infiniteId" @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more">all loaded</div>
