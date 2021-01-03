@@ -37,8 +37,6 @@ use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
-use Seatplus\Web\Http\Resources\UserRessource;
-use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
 class WebServiceProvider extends ServiceProvider
 {
