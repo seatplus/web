@@ -8200,16 +8200,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "0.9.4",
+            "version": "0.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "e081d8e22cfa792d86400b025533f4fc3f33c060"
+                "reference": "1281c675101cbf08f58f83dc44e6dd3ccef8b3d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/e081d8e22cfa792d86400b025533f4fc3f33c060",
-                "reference": "e081d8e22cfa792d86400b025533f4fc3f33c060",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/1281c675101cbf08f58f83dc44e6dd3ccef8b3d7",
+                "reference": "1281c675101cbf08f58f83dc44e6dd3ccef8b3d7",
                 "shasum": ""
             },
             "require": {
@@ -8399,7 +8399,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/0.9.4"
+                "source": "https://github.com/rectorphp/rector/tree/0.9.5"
             },
             "funding": [
                 {
@@ -8407,7 +8407,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-03T10:44:22+00:00"
+            "time": "2021-01-04T17:38:50+00:00"
         },
         {
             "name": "sebastian/cli-parser",
