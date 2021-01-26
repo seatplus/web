@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests\Integration;
 
+use ClaudioDekker\Inertia\Assert;
 use Inertia\Inertia;
 use Seatplus\Web\Tests\TestCase;
 
@@ -31,7 +32,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['success','SuccessFlashMessage'])
             ->get('auth/login');
 
-        $response->assertInertiaHas('flash.success');
+        $response->assertInertia( fn (Assert $page) => $page->has('flash.success'));
     }
 
     /** @test */
@@ -40,7 +41,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['error','ErrorFlashMessage'])
             ->get('auth/login');
 
-        $response->assertInertiaHas('flash.error');
+        $response->assertInertia( fn (Assert $page) => $page->has('flash.error'));
     }
 
     /** @test */
@@ -49,7 +50,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['warning','WarningFlashMessage'])
             ->get('auth/login');
 
-        $response->assertInertiaHas('flash.warning');
+        $response->assertInertia( fn (Assert $page) => $page->has('flash.warning'));
 
     }
 
@@ -59,7 +60,7 @@ class FlashMessagesTest extends TestCase
         $response = $this->withSession(['info','InfoFlashMessage'])
             ->get('auth/login');
 
-        $response->assertInertiaHas('flash.info');
+        $response->assertInertia( fn (Assert $page) => $page->has('flash.info'));
 
     }
 }

@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Schedules;
 use Seatplus\Web\Tests\TestCase;
@@ -30,7 +31,7 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.index'));
 
-        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
     }
 
     /** @test */
@@ -39,7 +40,8 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.create'));
 
-        $response->assertInertia('Configuration/Schedules/SchedulesCreate');
+        $response->assertInertia();
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesCreate'));
 
         $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
@@ -50,7 +52,7 @@ class SchedulesSettingTest extends TestCase
                 'schedule' => 'test-expression'
             ]);
 
-        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
 
         $this->assertDatabaseHas('schedules', ['job' => 'test-job']);
     }
@@ -68,7 +70,7 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.details', $schedule->id));
 
-        $response->assertInertia('Configuration/Schedules/SchedulesDetails');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesDetails'));
     }
 
     /** @test */
@@ -87,7 +89,7 @@ class SchedulesSettingTest extends TestCase
 
         $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
-        $response->assertInertia('Configuration/Schedules/SchedulesIndex');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
     }
 
 }

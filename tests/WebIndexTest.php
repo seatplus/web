@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use ClaudioDekker\Inertia\Assert;
 use Inertia\Inertia;
 
 class WebIndexTest extends TestCase
@@ -25,7 +26,7 @@ class WebIndexTest extends TestCase
         $response = $this->followingRedirects()
             ->get('/home');
 
-        $response->assertInertia('Auth/Login');
+        $response->assertInertia( fn (Assert $page) => $page->component('Auth/Login'));
     }
 
     /** @test */
@@ -37,7 +38,8 @@ class WebIndexTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get('/home');
 
-        $response->assertInertia('Dashboard/Index');
+
+        $response->assertInertia( fn (Assert $page) => $page->component('Dashboard/Index'));
 
         $this->assertAuthenticatedAs($this->test_user);
         $this->assertTrue(auth()->check());

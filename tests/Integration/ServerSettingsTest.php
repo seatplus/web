@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
@@ -31,7 +32,7 @@ class ServerSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('server.settings'));
 
-        $response->assertInertia('Configuration/UserList');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserList'));
     }
 
     /** @test */
@@ -40,7 +41,8 @@ class ServerSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('settings.scopes'));
 
-        $response->assertInertia('Configuration/Scopes/OverviewScopeSettings');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
+
     }
 
     /** @test */

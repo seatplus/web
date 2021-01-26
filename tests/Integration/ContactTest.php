@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Tests\TestCase;
@@ -19,7 +20,7 @@ class ContactTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('character.contacts'));
 
-        $response->assertInertia('Character/Contact/Index');
+        $response->assertInertia( fn (Assert $page) => $page->component('Character/Contact/Index'));
     }
 
     /** @test */
