@@ -127,7 +127,8 @@
                 selectedEntities: [],
                 selectedCharacterScopes: [],
                 selectedCorporationScopes: [],
-                selectedModula: this.creationMode ? 0 :  _.findIndex(this.options, {'title': this.entity?.type}),
+                creationMode: route().current() === 'view.create.scopes',
+                selectedModula: 0
             }
         },
         methods: {
@@ -180,9 +181,6 @@
             isGlobal() {
                 return this.options[this.selectedModula].title === 'global';
             },
-            creationMode() {
-                return route().current() === 'view.create.scopes';
-            }
         },
         watch: {
             entity(entity) {
@@ -212,8 +210,9 @@
                 id: this.entity.morphable_id,
                 category: this.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
             }]
-
-            //this.selectedModula = this.creationMode() ? 0 :  _.findIndex(this.options, {'title': this.entity?.type})
+        },
+        created() {
+            this.selectedModula = this.creationMode ? 0 :  _.findIndex(this.options, {'title': this.entity?.type});
         }
     }
 </script>

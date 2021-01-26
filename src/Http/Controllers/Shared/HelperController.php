@@ -29,48 +29,40 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\GetCharacterAffiliations;
+use Seatplus\Web\Services\GetCorporationInfo;
+use Seatplus\Web\Services\GetEntityFromId;
+use Seatplus\Web\Services\GetNamesFromIdsService;
 
-class GetNamesFromIdsController extends Controller
+class HelperController extends Controller
 {
     public function ids()
     {
-        $container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v3',
-            'endpoint' => '/universe/names/',
-            'request_body' => request()->all(),
-        ]);
 
-        $result = (new RetrieveEsiDataAction)->execute($container);
+       $result =  (new GetNamesFromIdsService())->execute(request()->all());
 
-        return collect($result)->toJson();
+       return $result->toJson();
     }
 
     public function characterAffiliations()
     {
-        $character_affiliation_container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v1',
-            'endpoint' => '/characters/affiliation/',
-            'request_body' => request()->all(),
-        ]);
 
-        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+        $result = (new GetCharacterAffiliations())->execute(request()->all());
 
-        return collect($character_affiliations)->toJson();
+        return $result->toJson();
     }
 
     public function getCorporationInfo(int $corporation_id)
     {
-        $character_affiliation_container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v4',
-            'endpoint' => '/corporations/{corporation_id}/',
-            'path_values' => ['corporation_id' => $corporation_id],
-        ]);
 
-        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+        $result = (new GetCorporationInfo())->execute($corporation_id);
 
-        return collect($character_affiliations)->toJson();
+        return collect($result)->toJson();
+    }
+
+    public function getEntityFromId(int $id)
+    {
+
+        return (new GetEntityFromId($id))->execute();
     }
 }

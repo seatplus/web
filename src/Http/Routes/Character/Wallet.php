@@ -25,15 +25,13 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
-use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
-use Seatplus\Web\Http\Controllers\Shared\HelperController;
-use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;;
+use Seatplus\Web\Http\Controllers\Character\WalletsController;
 
-Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
-Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
-Route::post('resolve/ids', [HelperController::class, 'ids'])->name('resolve.ids');
-Route::post('resolve/character_affiliations', [HelperController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
-Route::get('resolve/{corporation_id}/corporation_info', [HelperController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
-Route::get('resolve/{id}', [HelperController::class, 'getEntityFromId'])->name('resolve.id');
-Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');
+Route::prefix('wallets')
+    ->middleware(sprintf('permission:%s', config('eveapi.permissions.' . WalletJournal::class)))
+    ->group(function () {
+        Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
+        Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
+        Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
+    });

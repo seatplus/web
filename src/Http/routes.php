@@ -52,6 +52,7 @@ Route::middleware('web')
                     ->group(function () {
                         include __DIR__ . '/Routes/Character/View.php';
                         include __DIR__ . '/Routes/Character/Contact.php';
+                        include __DIR__ . '/Routes/Character/Wallet.php';
                     });
 
                 Route::prefix('corporation')
