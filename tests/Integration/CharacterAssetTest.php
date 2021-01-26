@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Web\Tests\TestCase;
 
@@ -17,7 +18,7 @@ class CharacterAssetTest extends TestCase
         $response = $this->followingRedirects()
             ->get(route('character.assets'));
 
-        $response->assertInertia('Auth/Login');
+        $response->assertInertia( fn (Assert $page) => $page->component('Auth/Login'));
     }
 
     /** @test */
@@ -27,7 +28,7 @@ class CharacterAssetTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('character.assets'));
 
-        $response->assertInertia('Character/Assets');
+        $response->assertInertia( fn (Assert $page) => $page->component('Character/Assets'));
     }
 
     /** @test */
@@ -46,7 +47,7 @@ class CharacterAssetTest extends TestCase
 
         //dd($response->exception->getMessage());
 
-        $response->assertInertiaHas('filters');
+        $response->assertInertia( fn (Assert $page) => $page->has('filters'));
     }
 
     /** @test */

@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -23,7 +24,7 @@ class AccessControlTest extends TestCase
 
         $response->assertOk();
 
-        $response->assertInertia('AccessControl/ControlGroupsIndex');
+        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
     }
 
     /** @test */
@@ -48,7 +49,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.edit', ['role_id' => $role->id]));
 
-        $response->assertInertia('AccessControl/EditGroup');
+        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/EditGroup'));
     }
 
     /** @test */
@@ -210,7 +211,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.manage', ['role_id' => $role->id]));
 
-        $response->assertInertia('AccessControl/ManageControlGroup');
+        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageControlGroup'));
     }
 
     /** @test */
@@ -229,7 +230,7 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-        $response->assertInertia('AccessControl/ManageMembers');
+        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageMembers'));
 
         // List Members
         $response = $this->actingAs($this->test_user)
