@@ -8,13 +8,70 @@
         leave-class="transform opacity-100 scale-100"
         xleave-to-class="transform opacity-0 scale-95"
     >
-        <div v-if="ready" class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+        <CardWithHeader v-if="ready">
+            <template v-slot:header>
+                <EntityBlock :entity="character"/>
+            </template>
+
+            <div>
+                <div class="flex flex-col max-h-96">
+                    <div class="flex-grow overflow-y-auto overflow-x-auto">
+                        <table class="relative table-fixed w-full">
+                            <thead class="sticky top-0 bg-gray-50">
+                            <TableHeader>
+                                <DataHeader class="w-2/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Contact
+                                </DataHeader>
+                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Labels
+                                </DataHeader>
+                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Standing
+                                </DataHeader>
+                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Corporation standing
+                                </DataHeader>
+                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Alliance standing
+                                </DataHeader>
+                            </TableHeader>
+                            </thead>
+                            <tbody>
+                            <TableRow v-for="(entity, index) in enriched_entities" :key="entity.contact_id" :class="index%2 ? 'bg-gray-50' : 'bg-white'">
+                                <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+                                    <EntityBlock :entity="entity"/>
+                                </DataCell>
+                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <div v-for="label in getLabels(entity)" type="button" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600">
+                                        <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                        </svg>
+                                        {{ label }}
+                                    </div>
+                                </DataCell>
+                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ entity.standing }}
+                                </DataCell>
+                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ getCorporationStanding(entity) }}
+                                </DataCell>
+                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ getAllianceStanding(entity) }}
+                                </DataCell>
+                            </TableRow>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </CardWithHeader>
+<!--        <div v-if="ready" class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200 max-h-full">
             <div class="px-4 py-5 sm:px-6">
-                <!-- Content goes here -->
+                &lt;!&ndash; Content goes here &ndash;&gt;
                 <EntityBlock :entity="character"/>
             </div>
             <div class="">
-            <!-- This example requires Tailwind CSS v2.0+ -->
+            &lt;!&ndash; This example requires Tailwind CSS v2.0+ &ndash;&gt;
             <SimpleStriped>
                 <template v-slot:header>
                     <TableHeader>
@@ -61,7 +118,7 @@
             </SimpleStriped>
 
         </div>
-        </div>
+        </div>-->
     </transition>
 
 </template>
@@ -75,10 +132,11 @@ import TableRow from "@/Shared/Layout/Cards/Table/TableRow";
 import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
 import DataHeader from "@/Shared/Layout/Cards/Table/DataHeader";
 import axios from "axios";
+import CardWithHeader from "../Layout/Cards/CardWithHeader";
 
 export default {
     name: "CharacterContactPanel",
-    components: {DataHeader, DataCell, TableRow, TableHeader, SimpleStriped, EntityBlock, EveImage},
+    components: {CardWithHeader, DataHeader, DataCell, TableRow, TableHeader, SimpleStriped, EntityBlock, EveImage},
     props: {
         character: {
             required: true,

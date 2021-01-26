@@ -16,9 +16,19 @@
             <li class="col-span-2">
 
                 <div class="space-y-4">
+                    <WalletJournalComponent
+                        :id="character.character_id"
+                        v-for="character in recruit.characters"
+                        :key="'wallet.journal:' + character.character_id"
+                    />
+                    <WalletTransactionComponent
+                        :id="character.character_id"
+                        v-for="character in recruit.characters"
+                        :key="'wallet.transaction:' + character.character_id"
+                    />
                     <CharacterContactPanel
                         v-for="character in recruit.characters"
-                        :key="character.character_id"
+                        :key="'character.contact:' + character.character_id"
                         :character="character"
                         :corporation_id="target_corporation.corporation_id"
                         :alliance_id="target_corporation.alliance_id"
@@ -120,9 +130,13 @@ import Layout from "@/Shared/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
+import WalletJournalComponent from "@/Shared/Components/WalletJournalComponent";
+import WalletTransactionComponent from "@/Shared/Components/WalletTransactionComponent";
 export default {
     name: "UserApplication",
-    components: {CharacterContactPanel, HeaderButton, PageHeader, Layout},
+    components: {
+        WalletTransactionComponent,
+        WalletJournalComponent, CharacterContactPanel, HeaderButton, PageHeader, Layout},
     props: {
         recruit: {
             required: true,

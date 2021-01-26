@@ -1,0 +1,84 @@
+<template>
+    <Fragment>
+        <TableRow :class="even ? 'bg-gray-50' : 'bg-white'">
+            <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+                <Time :timestamp="entry.date"></Time>
+            </DataCell>
+            <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+                {{ getTranslation(entry) }}
+            </DataCell>
+            <!--<DataCell class="px-6 py-4 truncate whitespace-nowrap text-sm text-gray-500">
+                {{ entry.description }}
+            </DataCell>
+            <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ entry.first_party_id }}
+            </DataCell>
+            <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ entry.second_party_id }}
+            </DataCell>-->
+            <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
+                {{ entry.amount ? entry.amount.toLocaleString() : '' }}
+            </DataCell>
+            <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
+                {{ entry.balance ? entry.balance.toLocaleString() : '' }}
+            </DataCell>
+            <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
+                <button type="button" @click="toggle"
+                        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']">
+
+                    <svg :class="['h-5 w-5 transform transition ease-in-out duration-200', expanded ? 'rotate-180' : 'rotate-0']" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+
+                </button>
+            </DataCell>
+        </TableRow>
+        <TableRow v-if="expanded" :class="even ? 'bg-gray-50' : 'bg-white'">
+            <DataCell colspan="5" class="px-6 pb-4 whitespace-nowrap text-sm text-gray-500">
+                <ExtendedWalletJournalRowComponent :entry="entry" />
+            </DataCell>
+        </TableRow>
+    </Fragment>
+</template>
+
+<script>
+import TableRow from "@/Shared/Layout/Cards/Table/TableRow";
+import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
+import Time from "@/Shared/Time";
+import {Fragment} from "vue-fragment"
+import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent";
+
+export default {
+    name: "WalletJournalRowComponent",
+    components: {ExtendedWalletJournalRowComponent, Time, DataCell, TableRow, Fragment},
+    props: {
+        entry: {
+            required: true
+        },
+        even: {
+            required: true,
+            type: Number
+        }
+    },
+    data() {
+        return {
+            expanded: false
+        }
+    },
+    methods: {
+        getTranslation(entry) {
+
+            let string = 'web::wallet_journal.' + _.toString(entry.ref_type)
+
+            return this.$I18n.trans(string)
+        },
+        toggle() {
+            this.expanded = !this.expanded
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

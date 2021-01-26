@@ -1,4 +1,3 @@
-<script src="../../../../../../../../../webpack.mix.js"></script>
 <template>
     <Layout page="Character Contacts" :required-scopes="dispatch_transfer_object.required_scopes">
 
