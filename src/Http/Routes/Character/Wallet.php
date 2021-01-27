@@ -25,7 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Http\Controllers\Character\WalletsController;
 
 Route::prefix('wallets')
