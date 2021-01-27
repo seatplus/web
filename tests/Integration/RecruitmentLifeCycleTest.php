@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -154,7 +155,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $this->actingAs($this->test_user->refresh())
             ->get(route('corporation.recruitment'))
             ->assertOk()
-            ->assertInertia('Corporation/Recruitment/RecruitmentIndex');
+            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
     }
 
     /** @test */
@@ -170,7 +171,7 @@ class RecruitmentLifeCycleTest extends TestCase
             ->get(route('corporation.recruitment'))
             ->assertOk();
 
-        $response->assertInertia('Corporation/Recruitment/RecruitmentIndex');
+        $response->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
     }
 
     /** @test */
@@ -195,7 +196,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('user.application', ['recruit' => $this->secondary_user->id]))
             ->assertOk()
-            ->assertInertia('Corporation/Recruitment/Application');
+            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
 
         // Impersonate
@@ -260,7 +261,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('character.application', ['character_id' => $this->secondary_character->character_id]))
             ->assertOk()
-            ->assertInertia('Corporation/Recruitment/Application');
+            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
         // submit review
 

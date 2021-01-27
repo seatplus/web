@@ -24,14 +24,39 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
+namespace Seatplus\Web\Http\Controllers\Shared;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-];
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\GetCharacterAffiliations;
+use Seatplus\Web\Services\GetCorporationInfo;
+use Seatplus\Web\Services\GetEntityFromId;
+use Seatplus\Web\Services\GetNamesFromIdsService;
+
+class HelperController extends Controller
+{
+    public function ids()
+    {
+        $result = (new GetNamesFromIdsService())->execute(request()->all());
+
+        return $result->toJson();
+    }
+
+    public function characterAffiliations()
+    {
+        $result = (new GetCharacterAffiliations())->execute(request()->all());
+
+        return $result->toJson();
+    }
+
+    public function getCorporationInfo(int $corporation_id)
+    {
+        $result = (new GetCorporationInfo())->execute($corporation_id);
+
+        return collect($result)->toJson();
+    }
+
+    public function getEntityFromId(int $id)
+    {
+        return (new GetEntityFromId($id))->execute();
+    }
+}

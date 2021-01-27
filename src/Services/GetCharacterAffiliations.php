@@ -24,14 +24,25 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
+namespace Seatplus\Web\Services;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-];
+use Illuminate\Support\Collection;
+use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
+
+class GetCharacterAffiliations
+{
+    public function execute(array $character_ids): Collection
+    {
+        $character_affiliation_container = new EsiRequestContainer([
+            'method' => 'post',
+            'version' => 'v1',
+            'endpoint' => '/characters/affiliation/',
+            'request_body' => $character_ids,
+        ]);
+
+        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+
+        return collect($character_affiliations);
+    }
+}

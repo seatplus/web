@@ -24,53 +24,22 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Shared;
+namespace Seatplus\Web\Services;
 
 use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Web\Http\Controllers\Controller;
 
-class GetNamesFromIdsController extends Controller
+class GetCorporationInfo
 {
-    public function ids()
+    public function execute($corporation_id)
     {
-        $container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v3',
-            'endpoint' => '/universe/names/',
-            'request_body' => request()->all(),
-        ]);
-
-        $result = (new RetrieveEsiDataAction)->execute($container);
-
-        return collect($result)->toJson();
-    }
-
-    public function characterAffiliations()
-    {
-        $character_affiliation_container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v1',
-            'endpoint' => '/characters/affiliation/',
-            'request_body' => request()->all(),
-        ]);
-
-        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
-
-        return collect($character_affiliations)->toJson();
-    }
-
-    public function getCorporationInfo(int $corporation_id)
-    {
-        $character_affiliation_container = new EsiRequestContainer([
+        $corporation_info_container = new EsiRequestContainer([
             'method' => 'get',
             'version' => 'v4',
             'endpoint' => '/corporations/{corporation_id}/',
             'path_values' => ['corporation_id' => $corporation_id],
         ]);
 
-        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
-
-        return collect($character_affiliations)->toJson();
+        return (new RetrieveEsiDataAction)->execute($corporation_info_container);
     }
 }

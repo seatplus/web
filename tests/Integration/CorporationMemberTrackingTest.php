@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Seatplus\Web\Tests\TestCase;
 
 class CorporationMemberTrackingTest extends  TestCase
@@ -17,7 +18,7 @@ class CorporationMemberTrackingTest extends  TestCase
             ->followingRedirects()
             ->get(route('corporation.member_tracking'));
 
-        $response->assertInertiaHas('dispatch_transfer_object');
+        $response->assertInertia( fn (Assert $page) => $page->has('dispatch_transfer_object'));
     }
 
 }

@@ -24,14 +24,14 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+use Seatplus\Web\Http\Controllers\Character\WalletsController;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-];
+Route::prefix('wallets')
+    ->middleware(sprintf('permission:%s', config('eveapi.permissions.' . WalletJournal::class)))
+    ->group(function () {
+        Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
+        Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
+        Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
+    });

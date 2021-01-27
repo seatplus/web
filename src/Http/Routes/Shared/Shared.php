@@ -27,12 +27,13 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
-use Seatplus\Web\Http\Controllers\Shared\GetNamesFromIdsController;
+use Seatplus\Web\Http\Controllers\Shared\HelperController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 
 Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
 Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
-Route::post('resolve/ids', [GetNamesFromIdsController::class, 'ids'])->name('resolve.ids');
-Route::post('resolve/character_affiliations', [GetNamesFromIdsController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
-Route::get('resolve/{corporation_id}/corporation_info', [GetNamesFromIdsController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
+Route::post('resolve/ids', [HelperController::class, 'ids'])->name('resolve.ids');
+Route::post('resolve/character_affiliations', [HelperController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
+Route::get('resolve/{corporation_id}/corporation_info', [HelperController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
+Route::get('resolve/{id}', [HelperController::class, 'getEntityFromId'])->name('resolve.id');
 Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');

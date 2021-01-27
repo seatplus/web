@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
@@ -33,7 +34,7 @@ class ScopeSettingsTest extends TestCase
             ->get(route('settings.scopes'));
 
 
-        $response->assertInertia('Configuration/Scopes/OverviewScopeSettings');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
     }
 
     /**

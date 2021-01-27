@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use ClaudioDekker\Inertia\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -18,7 +19,8 @@ class UserSettingsTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('user.settings'));
 
-        $response->assertInertia('Configuration/UserSettings');
+        //$response->assertInertia('Configuration/UserSettings');
+        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserSettings'));
     }
 
     /** @test */

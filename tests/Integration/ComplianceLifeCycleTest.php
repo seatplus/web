@@ -5,6 +5,7 @@ namespace Seatplus\Web\Tests\Integration;
 
 
 use App\Http\Middleware\VerifyCsrfToken;
+use ClaudioDekker\Inertia\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -72,7 +73,7 @@ class ComplianceLifeCycleTest extends TestCase
             ->get(route('corporation.member_compliance'))
             ->assertOk();
 
-        $response->assertInertia('Corporation/MemberCompliance/MemberCompliance');
+        $response->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/MemberCompliance'));
     }
 
     /** @test */
