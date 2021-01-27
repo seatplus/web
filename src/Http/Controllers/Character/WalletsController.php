@@ -49,7 +49,6 @@ class WalletsController extends Controller
 
     public function journal(int $character_id)
     {
-
         return WalletJournal::where('wallet_journable_id', $character_id)
             ->with('wallet_journable')
             ->orderByDesc('date')
@@ -58,7 +57,6 @@ class WalletsController extends Controller
 
     public function transaction(int $character_id)
     {
-
         return WalletTransaction::where('wallet_transactionable_id', $character_id)
             ->with('type', 'location')
             ->orderByDesc('date')
