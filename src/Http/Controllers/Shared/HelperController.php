@@ -26,8 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
@@ -38,15 +36,13 @@ class HelperController extends Controller
 {
     public function ids()
     {
+        $result = (new GetNamesFromIdsService())->execute(request()->all());
 
-       $result =  (new GetNamesFromIdsService())->execute(request()->all());
-
-       return $result->toJson();
+        return $result->toJson();
     }
 
     public function characterAffiliations()
     {
-
         $result = (new GetCharacterAffiliations())->execute(request()->all());
 
         return $result->toJson();
@@ -54,7 +50,6 @@ class HelperController extends Controller
 
     public function getCorporationInfo(int $corporation_id)
     {
-
         $result = (new GetCorporationInfo())->execute($corporation_id);
 
         return collect($result)->toJson();
@@ -62,7 +57,6 @@ class HelperController extends Controller
 
     public function getEntityFromId(int $id)
     {
-
         return (new GetEntityFromId($id))->execute();
     }
 }
