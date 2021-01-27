@@ -36,7 +36,7 @@ class HelperControllerTest extends TestCase
     }
 
     /** @test */
-    public function itReturnsCachedValue() {
+    public function itReturnsCachedValueForResolvedIds() {
 
         $id = $this->test_character->character_id;
 
@@ -53,6 +53,45 @@ class HelperControllerTest extends TestCase
 
         $result->assertJson([
             $cached_value
+        ]);
+    }
+
+    /** @test */
+    public function itResolvesCharacterAffiliation() {
+
+        $id = $this->test_character->character_id;
+
+        $esi_mock_return_data = [
+            'alliance_id' => 123,
+            'character_id' => 456,
+            'corporation_id' => 789,
+            'faction_id' => null
+        ];
+
+        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+
+        $result = $this->actingAs($this->test_user)
+            ->post(route('resolve.character_affiliation'), [$id]);
+
+        $result->assertJson([
+            $esi_mock_return_data
+        ]);
+    }
+
+    /** @test */
+    public function itResolvesCorporationInfo() {
+
+        $id = $this->test_character->corporation->corporation_id;
+
+        $esi_mock_return_data = $this->test_character->corporation->toArray();
+
+        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('resolve.corporation_info', $id));
+
+        $result->assertJson([
+            $esi_mock_return_data
         ]);
     }
 

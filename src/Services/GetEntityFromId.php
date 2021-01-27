@@ -14,13 +14,26 @@ class GetEntityFromId
 
     private Collection $names;
 
+    private GetNamesFromIdsService $get_names_from_ids_service;
+
+    private string $cache_key;
+
+    private ?array $cached_affiliation;
+
     public function __construct(public int $id)
     {
         $this->names = collect();
+        $this->get_names_from_ids_service = new GetNamesFromIdsService();
+        $this->cache_key = sprintf('entityById:%s', $id);
+        $this->cached_affiliation = cache($this->cache_key);
     }
 
     public function execute()
     {
+
+        if($this->cached_affiliation)
+            return $this->cached_affiliation;
+
         $character_affiliation = CharacterAffiliation::where('character_id', $this->id)
             ->orWhere('corporation_id', $this->id)
             ->orWhere('alliance_id', $this->id)
@@ -42,6 +55,9 @@ class GetEntityFromId
 
         $this->type = $this->names->first()->category;
 
+        if(! in_array($this->type,['character', 'corporation', 'alliance']))
+            return null;
+
         $character_affiliation = new CharacterAffiliation();
 
         if($this->type === 'character'){
@@ -56,14 +72,14 @@ class GetEntityFromId
             $character_affiliation->alliance_id = $this->id;
         }
 
-        if(! in_array($this->type,['character', 'corporation', 'alliance']))
-            return null;
+        if($this->type === 'corporation') {
+            $response = (new GetCorporationInfo())->execute($this->id);
+
+            $character_affiliation->corporation_id = $this->id;
+            $character_affiliation->alliance_id = optional($response)->alliance_id;
+        }
 
         return $character_affiliation;
-
-        //TODO
-        $corporation_info = 0;
-
     }
 
     private function determineTyp(CharacterAffiliation $character_affiliation)
@@ -83,7 +99,7 @@ class GetEntityFromId
     private function convertIdsToNames(array $ids)
     {
 
-        $result =  (new GetNamesFromIdsService())->execute($ids);
+        $result =  $this->get_names_from_ids_service->execute($ids);
 
         $this->names->push(...$result->toArray());
     }
@@ -94,16 +110,18 @@ class GetEntityFromId
             return $this->buildUnknownResponse();
         }
 
-
         $this->convertUnknownIdsToNames($character_affiliation);
 
-        return $this->type === 'character'
+        $affiliation = $this->type === 'character'
             ? $this->buildCharacterResponse($character_affiliation)
             : ($this->type === 'corporation'
                 ? $this->buildCorporationResponse($character_affiliation)
-                : $this->buildAllianceResponse()
+                : $this->buildAllianceResponse($character_affiliation)
             );
 
+        cache([$this->cache_key => $affiliation], now()->addDay());
+
+        return $affiliation;
     }
 
     private function convertUnknownIdsToNames(CharacterAffiliation $character_affiliation) : void
@@ -155,7 +173,7 @@ class GetEntityFromId
         return $corporation;
     }
 
-    private function buildAllianceResponse() : array
+    private function buildAllianceResponse(CharacterAffiliation $character_affiliation) : array
     {
         return [
             'id' => $this->id,
