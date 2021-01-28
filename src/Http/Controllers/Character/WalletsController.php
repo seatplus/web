@@ -39,10 +39,9 @@ class WalletsController extends Controller
             ? request()->get('character_ids')
             : auth()->user()->characters->pluck('character_id')->toArray();
 
-
         return inertia('Character/Wallet/Index', [
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'character_ids' => collect($ids)->map( fn ($id) => (int) $id),
+            'character_ids' => collect($ids)->map(fn ($id) => (int) $id),
         ]);
     }
 
