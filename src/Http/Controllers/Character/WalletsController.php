@@ -35,15 +35,14 @@ class WalletsController extends Controller
 {
     public function index()
     {
-        $ids = request()->has('ids')
-            ? request()->get('ids')
+        $ids = request()->has('character_ids')
+            ? request()->get('character_ids')
             : auth()->user()->characters->pluck('character_id')->toArray();
 
-        //$characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
 
         return inertia('Character/Wallet/Index', [
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'character_ids' => $ids,
+            'character_ids' => collect($ids)->map( fn ($id) => (int) $id),
         ]);
     }
 

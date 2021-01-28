@@ -1,13 +1,16 @@
 <template>
-    <Layout page="Character Contacts" :required-scopes="dispatch_transfer_object.required_scopes">
+    <Layout page="Character Contacts" :dispatch_transfer_object="dispatch_transfer_object">
 
         <template v-slot:title>
             <PageHeader>
                 Character Contacts
                 <template v-slot:primary>
-                    <HeaderButton @click="openSlideOver">
+                    <HeaderButton @click="openSlideOver('update')">
                         Update
                     </HeaderButton>
+                </template>
+                <template v-slot:secondary>
+                    <CharacterSelectionButton />
                 </template>
 
             </PageHeader>
@@ -34,9 +37,12 @@ import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import ListTransition from "@/Shared/Transitions/ListTransition";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
+import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
 export default {
     name: "Index",
-    components: {HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
+    components: {
+        CharacterSelectionButton,
+        HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
     props: {
         dispatch_transfer_object: {
             required: true,
@@ -54,8 +60,8 @@ export default {
         }
     },
     methods: {
-        openSlideOver() {
-            this.$eventBus.$emit('open-slideOver');
+        openSlideOver(value) {
+            this.$eventBus.$emit('open-slideOver', value);
         },
         async getUrl(url, contactables = []) {
             return axios.get(url)

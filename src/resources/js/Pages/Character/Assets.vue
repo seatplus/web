@@ -1,13 +1,16 @@
 <template>
-    <Layout page="Character Assets" :required-scopes="dispatch_transfer_object.required_scopes">
+    <Layout page="Character Assets" :dispatch_transfer_object="dispatch_transfer_object">
 
         <template v-slot:title>
             <PageHeader>
                 Character Assets
                 <template v-slot:primary>
-                    <HeaderButton @click="openSlideOver">
+                    <HeaderButton @click="openSlideOver('update')">
                         Update
                     </HeaderButton>
+                </template>
+                <template v-slot:secondary>
+                    <CharacterSelectionButton />
                 </template>
 
             </PageHeader>
@@ -17,31 +20,13 @@
             <div class="px-4 py-5 sm:p-6">
                 <div class="grid grid-cols-6 gap-5">
 
-                    <div class="col-span-6">
+                    <div class="col-span-6 md:col-span-4">
                         <label for="search" class="block text-sm font-medium leading-5 text-gray-700">Search</label>
                         <input v-model="search" id="search" class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                     </div>
 
-                    <div class="col-span-6 sm:col-span-3">
-                        <InputGroup for="character_dropdown" label="Character Filter">
-                            <span class="mt-1 inline-flex rounded-md shadow-sm box w-full">
-                                <button @click="characterFilterModal.open = true" type="button" class="inline-flex justify-between items-center box w-full pl-3 pr-2 py-2 border border-gray-300 text-base leading-6 rounded-md focus:outline-none focus:ring-gray transition ease-in-out duration-150">
-                                    {{ characterFilterModal.selectedCharacters.length === 0 ? 'Own Characters' : (characterFilterModal.selectedCharacters.length === 1 ? '1 Character' : characterFilterModal.selectedCharacters.length + ' Characters') }}
-                                    <svg class="h-6 w-6 float-right" viewBox="0 0 20 20" fill="none">
-                                        <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" stroke="#9fa6b2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </span>
-                        </InputGroup>
-                    </div>
-
-                    <div class="col-span-6 sm:col-span-3">
-                        <InputGroup for="region_dropdown" label="Region Filter">
-                            <SeatPlusSelect v-model="region" id="region_dropdown">
-                                <option :value="null">All Regions</option>
-                                <option v-for="region in filters.regions" :value="region.region_id" :key="region.region_id">{{ region.name }}</option>
-                            </SeatPlusSelect>
-                        </InputGroup>
+                    <div class="col-span-6 md:col-span-2">
+                        <SelectComponent v-model="region" :options="regions">Region Filter</SelectComponent>
                     </div>
 
                 </div>
@@ -72,40 +57,34 @@
             <div slot="no-more">all loaded</div>
         </infinite-loading>
 
-        <template v-slot:modal>
-            <CharacterFilterModal permission="character.assets" v-model="characterFilterModal" />
-        </template>
-
-        <template v-slot:slideOver>
-            <SlideOver>
-                <template v-slot:title>Dispatch Update Job</template>
-                <DispatchUpdate :dispatch_transfer_object="dispatch_transfer_object" />
-            </SlideOver>
-        </template>
-
     </Layout>
 </template>
 
 <script>
-    import Layout from "../../Shared/Layout"
-    import EveImage from "../../Shared/EveImage"
-    import Pagination from "../../Shared/Pagination"
-    import WideLists from "../../Shared/WideLists"
-    import WideListElement from "../../Shared/WideListElement"
-    import DispatchUpdate from "../../Shared/DispatchUpdate"
-    import ItemList from "./ItemList"
-    import InputGroup from "../../Shared/InputGroup"
-    import SeatPlusSelect from "../../Shared/SeatPlusSelect"
-    import InfiniteLoading from "vue-infinite-loading"
-    import ModalWithFooter from "../../Shared/Modals/ModalWithFooter"
-    import Modal from "../../Shared/Modals/Modal"
-    import CharacterFilterModal from "@/Shared/Modals/CharacterFilterModal"
-    import SlideOver from "../../Shared/Layout/SlideOver"
-    import PageHeader from "../../Shared/Layout/PageHeader"
-    import HeaderButton from "../../Shared/Layout/HeaderButton"
-    export default {
+import Layout from "../../Shared/Layout"
+import EveImage from "../../Shared/EveImage"
+import Pagination from "../../Shared/Pagination"
+import WideLists from "../../Shared/WideLists"
+import WideListElement from "../../Shared/WideListElement"
+import DispatchUpdate from "../../Shared/DispatchUpdate"
+import ItemList from "./ItemList"
+import InputGroup from "../../Shared/InputGroup"
+import SeatPlusSelect from "../../Shared/SeatPlusSelect"
+import InfiniteLoading from "vue-infinite-loading"
+import ModalWithFooter from "../../Shared/Modals/ModalWithFooter"
+import Modal from "../../Shared/Modals/Modal"
+import CharacterFilterModal from "@/Shared/Modals/CharacterFilterModal"
+import SlideOver from "../../Shared/Layout/SlideOver"
+import PageHeader from "../../Shared/Layout/PageHeader"
+import HeaderButton from "../../Shared/Layout/HeaderButton"
+import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import SelectComponent from "../../Shared/Components/SelectComponent";
+
+export default {
         name: "Assets",
         components: {
+            SelectComponent,
+            CharacterSelectionButton,
             HeaderButton,
             PageHeader,
             SlideOver,
@@ -129,16 +108,12 @@
         },
         data() {
             return {
-                requiredScopes: ['esi-assets.read_assets.v1', 'esi-universe.read_structures.v1'],
                 infiniteId: +new Date(),
                 assets_data: [],
                 page: 1,
                 search: null,
                 region: null,
-                characterFilterModal: {
-                    open: false,
-                    selectedCharacters: []
-                }
+                regions: []
             }
         },
         methods: {
@@ -185,20 +160,23 @@
             },
             filter() {
 
-                if(_.isEmpty(this.selectedCharacterIds))
-                    return
-
                 this.assets_data = [];
                 this.page = 1;
                 this.infiniteId += 1;
             },
-            openSlideOver() {
-                this.$eventBus.$emit('open-slideOver');
-            }
+            openSlideOver(value) {
+                this.$eventBus.$emit('open-slideOver', value);
+            },
         },
         computed: {
             selectedCharacterIds() {
-                return this.characterFilterModal.selectedCharacters
+
+                let character_ids = _.get(this.$route().params, 'character_ids')
+
+                if(!character_ids)
+                    return []
+
+                return  _.map(character_ids, (id) => parseInt(id))
             },
             groupedAssets() {
 
@@ -228,6 +206,17 @@
                 this.filter()
             }
         },
+        created() {
+
+                this.regions = _.map(this.filters.regions, (region) => {
+
+                    return {
+                        value: region.region_id,
+                        text: region.name
+                    }
+                })
+
+        }
     }
 </script>
 

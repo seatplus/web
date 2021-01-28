@@ -2,6 +2,7 @@
     <ul class="divide-y divide-gray-200 overflow-y-auto">
         <li @click="dispatchJob(entity)" v-for="(entity, index) of entities" :class="['px-6 py-5 relative', {'cursor-pointer': entity.batch === 'ready'}]">
             <div class="group flex justify-between items-center space-x-2">
+
                 <div class="-m-1 p-1 block">
                     <span class="absolute inset-0 group-hover:bg-gray-50"></span>
                     <div class="flex-1 flex items-center min-w-0 relative">
@@ -17,6 +18,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="relative inline-block text-left">
                     <svg v-if="entity.batch === 'ready'" class="h-8 w-8 text-gray-400" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
