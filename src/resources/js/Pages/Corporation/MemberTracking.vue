@@ -1,5 +1,5 @@
 <template>
-    <Layout page="Corporation" page-description="Member Tracking" :required-scopes="dispatch_transfer_object.required_scopes">
+    <Layout page="Corporation" page-description="Member Tracking" :dispatch_transfer_object="dispatch_transfer_object">
 
         <template v-slot:title>
             <PageHeader>
@@ -247,7 +247,7 @@ export default {
             return !_.isEmpty(member.missing_sso_scopes)
         },
         openSlideOver() {
-            this.$eventBus.$emit('open-slideOver');
+            this.$eventBus.$emit('open-slideOver', 'update');
         }
     },
     computed: {

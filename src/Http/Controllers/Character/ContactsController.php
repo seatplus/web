@@ -36,9 +36,13 @@ class ContactsController extends Controller
 {
     public function index()
     {
-        $ids = request()->has('ids')
-            ? fn () => collect(request()->get('ids'))->map(fn ($character_id) => intval($character_id))->intersect(getAffiliatedIdsByClass(Contact::class))->toArray()
+        $ids = request()->has('character_ids')
+            ? request()->get('character_ids')
             : auth()->user()->characters->pluck('character_id')->toArray();
+
+        $ids = collect($ids)->map(fn ($character_id) => intval($character_id))
+            ->intersect(getAffiliatedIdsByClass(Contact::class))
+            ->toArray();
 
         $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
 

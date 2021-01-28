@@ -1,13 +1,16 @@
 <template>
-    <Layout page="Character Wallets" :required-scopes="dispatch_transfer_object.required_scopes">
+    <Layout page="Character Wallets" :dispatch_transfer_object="dispatch_transfer_object">
 
         <template v-slot:title>
             <PageHeader>
                 Character Wallets
                 <template v-slot:primary>
-                    <HeaderButton @click="openSlideOver">
+                    <HeaderButton @click="openSlideOver('update')">
                         Update
                     </HeaderButton>
+                </template>
+                <template v-slot:secondary>
+                    <CharacterSelectionButton />
                 </template>
 
             </PageHeader>
@@ -17,12 +20,6 @@
             <WalletComponent :id="character_id" v-for="character_id of character_ids" :key="character_id" />
         </div>
 
-        <template v-slot:slideOver>
-            <SlideOver>
-                <template v-slot:title>Dispatch Update Job</template>
-                <DispatchUpdate :dispatch_transfer_object="dispatch_transfer_object" />
-            </SlideOver>
-        </template>
     </Layout>
 </template>
 
@@ -35,10 +32,12 @@ import ListTransition from "@/Shared/Transitions/ListTransition";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import WalletComponent from "./WalletComponent";
+import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
 
 export default {
     name: "Index",
     components: {
+        CharacterSelectionButton,
         WalletComponent,
         HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
     props: {
@@ -58,10 +57,9 @@ export default {
         }
     },
     methods: {
-        openSlideOver() {
-            this.$eventBus.$emit('open-slideOver');
+        openSlideOver(value) {
+            this.$eventBus.$emit('open-slideOver', value);
         },
-
     },
     created: function () {
 

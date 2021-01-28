@@ -34,7 +34,10 @@ class GetAffiliatedCharactersController extends Controller
 {
     public function __invoke(string $permission)
     {
-        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission));
+        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission))
+            ->with('corporation', 'alliance');
+
+        // TODO Change this to use relationship has('permission') where permission must be the name of the relation
 
         return CharacterInfoRessource::collection($query->paginate());
     }

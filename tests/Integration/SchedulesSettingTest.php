@@ -40,7 +40,6 @@ class SchedulesSettingTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('schedules.create'));
 
-        $response->assertInertia();
         $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesCreate'));
 
         $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);

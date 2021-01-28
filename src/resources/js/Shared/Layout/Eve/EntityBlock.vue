@@ -27,7 +27,7 @@ export default {
     },
     methods: {
         hasAlliance() {
-            return _.has(this.entity, 'alliance')
+            return _.has(this.entity, 'alliance.name')
         }
     },
     computed: {

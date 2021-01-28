@@ -32,7 +32,7 @@
         methods: {
             isActive(routename) {
 
-                return this.activeEntryUrl === route(routename).url()
+                return this.activeEntryUrl === this.$route(routename)
             }
         },
     }

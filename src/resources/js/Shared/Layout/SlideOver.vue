@@ -12,7 +12,7 @@
                     leave-active-class="ease-in-out duration-500"
                     leave-class="opacity-100" leave-to-class="opacity-0">
 
-                    <div v-if="open" @click="open = false" class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                    <div v-if="open" @click="flipStatus()" class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
                     </transition>
 
                     <section class="absolute inset-y-0 right-0 pl-10 max-w-full flex">
@@ -62,15 +62,27 @@
 <script>
 export default {
     name: "SlideOver",
-    data: () => ({
-        open: false,
-    }),
+    props: {
+        value: {
+        }
+    },
+    data() {
+        return {
+            //open: this.value,
+        }
+    },
     mounted() {
-        this.$eventBus.$on('open-slideOver', () => this.open = true)
+        /*this.$eventBus.$on('open-slideOver', () => this.open = true)*/
     },
     methods: {
         flipStatus() {
-            this.open = !this.open
+            //this.open = !this.open
+            this.$emit('input', !this.open)
+        }
+    },
+    computed: {
+        open() {
+            return this.value ?? false
         }
     }
 }
