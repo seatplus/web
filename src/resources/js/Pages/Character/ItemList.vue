@@ -8,7 +8,7 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium leading-4 bg-indigo-200 text-indigo-600">{{ asset.quantity }}</span>
                             </span>
                         </span>
-                <EveImage v-if="multipleCharacters()" :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'" :object="asset.owner" :size="128" />
+                <EveImage :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'" :object="asset.owner" :size="128" />
             </template>
 
             <template slot="upper_left">{{asset.name}}</template>
@@ -60,12 +60,6 @@
             },
             url(asset) {
                 return asset.content[0] ? this.$route('character.item', asset.item_id) : ''
-            },
-            buildSearchParams : function () {
-                return new URL(window.location.href).searchParams;
-            },
-            multipleCharacters: function () {
-                return !this.buildSearchParams().has('character_id');
             },
         },
         computed: {

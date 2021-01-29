@@ -5,10 +5,12 @@ namespace Seatplus\Web\Tests\Integration;
 
 
 use ClaudioDekker\Inertia\Assert;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Tests\TestCase;
 
-class CharacterAssetTest extends TestCase
+class AssetTest extends TestCase
 {
 
     /** @test */
@@ -32,11 +34,22 @@ class CharacterAssetTest extends TestCase
     }
 
     /** @test */
+    public function load_asset()
+    {
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('load.character.assets'));
+
+        $response->assertOk();
+    }
+
+    /** @test */
     public function it_has_asset_prop()
     {
 
-        $character_assets = factory(CharacterAsset::class)->create([
-            'character_id' => $this->test_character->character_id
+        $character_assets = Asset::factory()->create([
+            'assetable_id' => $this->test_character->character_id,
+            'assetable_type' => CharacterInfo::class
         ]);
 
         // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
@@ -53,8 +66,13 @@ class CharacterAssetTest extends TestCase
     /** @test */
     public function it_has_list_affiliated_character_list_route()
     {
+        Asset::factory()->create([
+            'assetable_id' => $this->test_character->character_id,
+            'assetable_type' => CharacterInfo::class
+        ]);
+
         $response = $this->actingAs($this->test_user)
-            ->get(route('get.affiliated.characters','character.assets'));
+            ->get(route('get.affiliated.characters','assets'));
             //->assertOk();
 
         $response->assertOk();

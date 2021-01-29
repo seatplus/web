@@ -27,15 +27,15 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
-use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
-use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+use Seatplus\Eveapi\Models\Assets\Asset;
+use Seatplus\Web\Http\Resources\AssetResource;
 
 class GetAssetsController
 {
     public function __invoke(Request $request)
     {
-        $query = CharacterAsset::with('location', 'location.locatable', 'owner', 'type', 'type.group', 'content')
-            ->affiliated(getAffiliatedIdsByClass(CharacterAsset::class), request()->query('character_ids'))
+        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
+            ->affiliated(getAffiliatedIdsByClass(Asset::class), request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->orderBy('location_id', 'asc');
 
@@ -47,7 +47,7 @@ class GetAssetsController
             $query = $query->search($request->query('search'));
         }
 
-        return CharacterAssetResource::collection(
+        return AssetResource::collection(
             $query->paginate()
         );
     }
