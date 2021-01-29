@@ -29,9 +29,9 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Horizon\Contracts\JobRepository;
-use Seatplus\Eveapi\Http\Resources\CharacterAsset as CharacterAssetResource;
+use Seatplus\Eveapi\Http\Resources\AssetResource;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Models\Assets\CharacterAsset;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
 
@@ -57,11 +57,11 @@ class AssetsController extends Controller
 
     public function details(int $item_id)
     {
-        $query = CharacterAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->affiliated(getAffiliatedIdsByClass(CharacterAsset::class), request()->query('character_ids'))
+        $query = Asset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
+            ->affiliated(getAffiliatedIdsByClass(Asset::class), request()->query('character_ids'))
             ->where('item_id', $item_id);
 
-        $item = CharacterAssetResource::collection($query->get());
+        $item = AssetResource::collection($query->get());
 
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,
@@ -72,7 +72,7 @@ class AssetsController extends Controller
     {
         return (object) [
             'manual_job' => array_search(CharacterAssetsHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . CharacterAsset::class),
+            'permission' => config('eveapi.permissions.' . Asset::class),
             'required_scopes' => config('eveapi.scopes.character.assets'),
             'required_corporation_role' => '',
         ];
