@@ -10,7 +10,7 @@ use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Tests\TestCase;
 
-class CharacterAssetTest extends TestCase
+class AssetTest extends TestCase
 {
 
     /** @test */
@@ -31,6 +31,16 @@ class CharacterAssetTest extends TestCase
             ->get(route('character.assets'));
 
         $response->assertInertia( fn (Assert $page) => $page->component('Character/Assets'));
+    }
+
+    /** @test */
+    public function load_asset()
+    {
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('load.character.assets'));
+
+        $response->assertOk();
     }
 
     /** @test */
@@ -56,6 +66,11 @@ class CharacterAssetTest extends TestCase
     /** @test */
     public function it_has_list_affiliated_character_list_route()
     {
+        Asset::factory()->create([
+            'assetable_id' => $this->test_character->character_id,
+            'assetable_type' => CharacterInfo::class
+        ]);
+
         $response = $this->actingAs($this->test_user)
             ->get(route('get.affiliated.characters','assets'));
             //->assertOk();
