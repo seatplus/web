@@ -130,13 +130,16 @@ import Layout from "@/Shared/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
-import WalletJournalComponent from "@/Shared/Components/WalletJournalComponent";
-import WalletTransactionComponent from "@/Shared/Components/WalletTransactionComponent";
+import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
+import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
+
+
 export default {
     name: "UserApplication",
     components: {
+        WalletJournalComponent,
         WalletTransactionComponent,
-        WalletJournalComponent, CharacterContactPanel, HeaderButton, PageHeader, Layout},
+        CharacterContactPanel, HeaderButton, PageHeader, Layout},
     props: {
         recruit: {
             required: true,
