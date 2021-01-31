@@ -59,13 +59,7 @@ class SidebarEntries
     {
         $permission_name = Arr::get($array, 'permission');
 
-        try {
-            return ! $this->user->can($permission_name);
-        } catch (PermissionDoesNotExist) {
-            Permission::create(['name' => $permission_name]);
-
-            return $this->isUserMissingPermission($array);
-        }
+        return ! $this->checkPermission($permission_name);
     }
 
     /*
@@ -73,6 +67,10 @@ class SidebarEntries
     */
     private function IsUserMissingCharacterRole($entry): bool
     {
+        if ($this->checkPermission('superuser')) {
+            return false;
+        }
+
         $role = Arr::get($entry, 'character_role');
 
         return $this->user
@@ -81,5 +79,16 @@ class SidebarEntries
             ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
             ->filter()
             ->isEmpty();
+    }
+
+    private function checkPermission(string $permission): bool
+    {
+        try {
+            return $this->user->can($permission);
+        } catch (PermissionDoesNotExist) {
+            Permission::create(['name' => $permission]);
+
+            return $this->isUserMissingPermission($permission);
+        }
     }
 }

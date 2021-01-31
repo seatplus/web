@@ -66,7 +66,7 @@
             },
             visitRoute(name) {
 
-                const url = route(name).url()
+                const url = route(name)
 
                 Inertia.visit(url,{
                     method: 'get',
