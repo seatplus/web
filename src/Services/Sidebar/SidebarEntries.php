@@ -36,18 +36,18 @@ class SidebarEntries
 {
     public function __construct()
     {
-        $this->user = User::first();//auth()->user();
+        $this->user = User::first(); //auth()->user();
     }
 
     public function filter()
     {
         return collect(config('package.sidebar'))
             ->map(function ($topic) {
-                return collect($topic)->reject(fn($entry) => Arr::has($entry, 'character_role')
+                return collect($topic)->reject(fn ($entry) => Arr::has($entry, 'character_role')
                     ? $this->IsUserMissingCharacterRole($entry)
                     : (Arr::has($entry, 'permission') ? $this->isUserMissingPermission($entry) : false));
             })
-            ->reject(fn($topic) => $topic->isEmpty())->map(function ($entries, $category) {
+            ->reject(fn ($topic) => $topic->isEmpty())->map(function ($entries, $category) {
                 return [
                     'name' => $category,
                     'entries' => $entries,
@@ -67,9 +67,9 @@ class SidebarEntries
     */
     private function IsUserMissingCharacterRole($entry): bool
     {
-
-        if($this->checkPermission('superuser'))
+        if ($this->checkPermission('superuser')) {
             return false;
+        }
 
         $role = Arr::get($entry, 'character_role');
 
@@ -81,7 +81,7 @@ class SidebarEntries
             ->isEmpty();
     }
 
-    private function checkPermission(string $permission) : bool
+    private function checkPermission(string $permission): bool
     {
         try {
             return $this->user->can($permission);
