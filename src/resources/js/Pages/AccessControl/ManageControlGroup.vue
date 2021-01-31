@@ -167,7 +167,7 @@
         },
         computed: {
             activeSidebarElement: function () {
-                return route('acl.groups').url()
+                return route('acl.groups')
             },
         },
     }
