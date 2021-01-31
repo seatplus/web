@@ -36,22 +36,18 @@ class SidebarEntries
 {
     public function __construct()
     {
-        $this->user = auth()->user();
+        $this->user = User::first(); //auth()->user();
     }
 
     public function filter()
     {
         return collect(config('package.sidebar'))
             ->map(function ($topic) {
-                return collect($topic)->reject(function ($entry) {
-                    return Arr::has($entry, 'character_role')
-                        ? $this->checkUserCharacterRole($entry)
-                        : (Arr::has($entry, 'permission') ? $this->checkUserPermission($entry) : false);
-                });
+                return collect($topic)->reject(fn ($entry) => Arr::has($entry, 'character_role')
+                    ? $this->IsUserMissingCharacterRole($entry)
+                    : (Arr::has($entry, 'permission') ? $this->isUserMissingPermission($entry) : false));
             })
-            ->reject(function ($topic) {
-                return $topic->isEmpty();
-            })->map(function ($entries, $category) {
+            ->reject(fn ($topic) => $topic->isEmpty())->map(function ($entries, $category) {
                 return [
                     'name' => $category,
                     'entries' => $entries,
@@ -59,7 +55,7 @@ class SidebarEntries
             });
     }
 
-    private function checkUserPermission(array $array): bool
+    private function isUserMissingPermission(array $array): bool
     {
         $permission_name = Arr::get($array, 'permission');
 
@@ -68,24 +64,22 @@ class SidebarEntries
         } catch (PermissionDoesNotExist) {
             Permission::create(['name' => $permission_name]);
 
-            return $this->checkUserPermission($array);
+            return $this->isUserMissingPermission($array);
         }
     }
 
-    private function checkUserCharacterRole($entry): bool
+    /*
+    * Checks if user misses required permission and role
+    */
+    private function IsUserMissingCharacterRole($entry): bool
     {
-        $role = Arr::get($entry, 'permission');
+        $role = Arr::get($entry, 'character_role');
 
-        return User::has('characters.roles')
-            ->whereId($this->user->getAuthIdentifier())
-            ->with('characters.roles')
-            ->get()
-            ->whenNotEmpty(fn ($collection) => $collection
-                ->first()
-                ->characters
-                ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)) ?? false)
-                ->filter()
-            )
-            ->isNotEmpty();
+        return $this->user
+            ->loadMissing('characters.roles')
+            ->characters
+            ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
+            ->filter()
+            ->isEmpty();
     }
 }

@@ -76,7 +76,7 @@
         },
         computed: {
             activeSidebarElement: function () {
-                return route('server.settings').url()
+                return route('server.settings')
             }
         },
         watch: {
