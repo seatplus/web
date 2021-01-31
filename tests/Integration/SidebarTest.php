@@ -5,6 +5,7 @@ namespace Seatplus\Web\Tests\Integration;
 
 
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;

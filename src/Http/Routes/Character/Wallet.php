@@ -29,9 +29,13 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Http\Controllers\Character\WalletsController;
 
 Route::prefix('wallets')
-    ->middleware(sprintf('permission:%s', config('eveapi.permissions.' . WalletJournal::class)))
     ->group(function () {
         Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
-        Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
-        Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
+
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . WalletJournal::class)))
+            ->group(function () {
+            Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
+            Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
+        });
+
     });
