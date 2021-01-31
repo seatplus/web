@@ -28,7 +28,6 @@ namespace Seatplus\Web\Exception;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
@@ -69,8 +68,6 @@ class Handler extends ExceptionHandler
 
     /**
      * Render an exception into an HTTP response.
-     *
-     *
      */
     public function render($request, Throwable $exception)
     {
@@ -78,11 +75,11 @@ class Handler extends ExceptionHandler
 
         $response = parent::render($request, $exception);
 
-        if (!app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
+        if (! app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
             return Inertia::render('Error', ['status' => $response->status()])
                 ->toResponse($request)
                 ->setStatusCode($response->status());
-        } else if ($response->status() === 419) {
+        } elseif ($response->status() === 419) {
             return back()->with([
                 'message' => 'The page expired, please try again.',
             ]);
