@@ -5,7 +5,7 @@
             <PageHeader>
                 Corporation Recruitment
                 <template v-if="can_manage_recruitment" v-slot:primary>
-                    <HeaderButton @click="openSlideOver">
+                    <HeaderButton @click="openSlideOver()">
                         Open new enlistment
                     </HeaderButton>
                 </template>
@@ -13,13 +13,6 @@
         </template>
 
         <CorporationRecruitment v-for="corporation in corporations" :key="corporation.corporation_id" :corporation="corporation"></CorporationRecruitment>
-
-        <template v-slot:slideOver>
-            <SlideOver>
-                <template v-slot:title>Create Enlistment</template>
-                <CorporationList></CorporationList>
-            </SlideOver>
-        </template>
 
     </Layout>
 
@@ -45,10 +38,15 @@ export default {
             required: false
         }
     },
+    data() {
+        return {
+            requiredScopes: this.dispatch_transfer_object ? this.dispatch_transfer_object.required_scopes : []
+        }
+    },
     methods   : {
         openSlideOver() {
-            this.$eventBus.$emit('open-slideOver');
-        }
+            this.$eventBus.$emit('open-slideOver', 'enlistment');
+        },
     }
 }
 </script>

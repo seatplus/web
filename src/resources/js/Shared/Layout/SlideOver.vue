@@ -63,8 +63,7 @@
 export default {
     name: "SlideOver",
     props: {
-        value: {
-        }
+        value: Boolean
     },
     data() {
         return {
