@@ -28,46 +28,63 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\MemberTrackingResource;
 
-class IndexMemberTrackingController extends Controller
+class MemberTrackingController extends Controller
 {
-    public function __invoke()
+    public function index()
     {
         return Inertia::render('Corporation/MemberTracking', [
             'required_scopes' => config('eveapi.scopes.character.contacts'),
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'member_tracking' => CorporationMemberTracking::Affiliated()
-                ->with('corporation.ssoScopes', 'corporation.alliance.ssoScopes', 'character.refresh_token', 'location.locatable', 'ship')
-                ->get()
-                ->groupBy('corporation_id')
-                ->map(function ($members) {
-                    $corporation = $members->first()->corporation;
-                    $sso_scopes = collect([
-                        'corporation_scopes' => $corporation->ssoScopes->selected_scopes ?? [],
-                        'alliance_scopes' => $corporation->alliance->ssoScopes->selected_scopes ?? [],
-                    ])->flatten(1)->filter();
-
-                    return [
-                        'corporation' => $corporation,
-                        'members' => $members->map(function ($member) use ($sso_scopes) {
-                            $member->missing_sso_scopes = $sso_scopes->diff($member->character->refresh_token->scopes ?? []);
-
-                            return $member;
-                        }),
-                    ];
-                }),
+            'corporations' => $this->getAffiliatedCorporations()
         ]);
+    }
+
+    public function getMemberTracking(int $corporation_id)
+    {
+        $corporation = CorporationInfo::find($corporation_id);
+        $sso_scopes = collect([
+            'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
+            'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
+        ])->flatten(1)->filter();
+
+        $query = CorporationMemberTracking::where('corporation_id', $corporation_id)
+            ->with('character.refresh_token', 'location.locatable', 'ship');
+
+        return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
+
+            /*->map(function ($member) use ($sso_scopes) {
+                $member->missing_sso_scopes = $sso_scopes->diff($member->character->refresh_token->scopes ?? []);
+
+                return $member;
+            })->paginate()*/
+
     }
 
     private function buildDispatchTransferObject(): object
     {
         return (object) [
             'manual_job' => array_search(CorporationMemberTrackingHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . CorporationMemberTracking::class),
-            'required_scopes' => config('eveapi.scopes.corporation.membertracking'),
+            'permission' => $this->getPermission(),
+            'required_scopes' => [ ...config('eveapi.scopes.corporation.membertracking'), 'esi-characters.read_corporation_roles.v1'],
             'required_corporation_role' => 'Director',
         ];
+    }
+
+    private function getPermission(): string
+    {
+        return config('eveapi.permissions.' . CorporationMemberTracking::class);
+    }
+
+    private function getAffiliatedCorporations()
+    {
+        return CorporationInfo::whereIn('corporation_id', getAffiliatedIdsByPermission($this->getPermission()))
+            ->with('alliance')
+            ->has('members')
+            ->get();
     }
 }
