@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\Type as TypeResource;
 
 class MemberTrackingResource extends JsonResource
 {
@@ -48,7 +47,7 @@ class MemberTrackingResource extends JsonResource
             'location_id' => $this->location_id,
             'location' => $this->location?->locatable,
             'ship_type_id' => $this->ship_type_id,
-            'ship' => $this->whenLoaded('ship')
+            'ship' => $this->whenLoaded('ship'),
         ];
     }
 }
