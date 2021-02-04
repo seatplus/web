@@ -57,12 +57,6 @@ class MemberTrackingController extends Controller
 
         return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
 
-            /*->map(function ($member) use ($sso_scopes) {
-                $member->missing_sso_scopes = $sso_scopes->diff($member->character->refresh_token->scopes ?? []);
-
-                return $member;
-            })->paginate()*/
-
     }
 
     private function buildDispatchTransferObject(): object
