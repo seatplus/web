@@ -40,7 +40,7 @@ class MemberTrackingController extends Controller
         return Inertia::render('Corporation/MemberTracking', [
             'required_scopes' => config('eveapi.scopes.character.contacts'),
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'corporations' => $this->getAffiliatedCorporations()
+            'corporations' => $this->getAffiliatedCorporations(),
         ]);
     }
 
@@ -57,12 +57,11 @@ class MemberTrackingController extends Controller
 
         return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
 
-            /*->map(function ($member) use ($sso_scopes) {
-                $member->missing_sso_scopes = $sso_scopes->diff($member->character->refresh_token->scopes ?? []);
+        /*->map(function ($member) use ($sso_scopes) {
+            $member->missing_sso_scopes = $sso_scopes->diff($member->character->refresh_token->scopes ?? []);
 
-                return $member;
-            })->paginate()*/
-
+            return $member;
+        })->paginate()*/
     }
 
     private function buildDispatchTransferObject(): object
@@ -70,7 +69,7 @@ class MemberTrackingController extends Controller
         return (object) [
             'manual_job' => array_search(CorporationMemberTrackingHydrateBatch::class, config('web.jobs')),
             'permission' => $this->getPermission(),
-            'required_scopes' => [ ...config('eveapi.scopes.corporation.membertracking'), 'esi-characters.read_corporation_roles.v1'],
+            'required_scopes' => [...config('eveapi.scopes.corporation.membertracking'), 'esi-characters.read_corporation_roles.v1'],
             'required_corporation_role' => 'Director',
         ];
     }
