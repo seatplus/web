@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Resources\CharacterComplianceResource;
 use Seatplus\Web\Http\Resources\UserComplianceResource;
 
@@ -43,6 +44,7 @@ class MemberComplianceController
             ->has('ssoScopes')
             ->orHas('alliance.ssoScopes')
             ->select('name', 'corporation_id')
+            ->addSelect(['type' => SsoScopes::whereColumn('morphable_id', 'corporation_id')->limit(1)->select('type')])
             ->get();
 
         return inertia('Corporation/MemberCompliance/MemberCompliance', [

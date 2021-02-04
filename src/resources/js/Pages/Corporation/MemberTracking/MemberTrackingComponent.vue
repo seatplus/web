@@ -6,13 +6,17 @@
             </div>
         </template>
         <!--List for small devices-->
-        <div class="bg-white shadow overflow-hidden sm:hidden sm:rounded-md">
-            <ul class="divide-y divide-cool-gray-200">
+        <div class="bg-white shadow overflow-y-auto sm:hidden sm:rounded-md">
+            <ul class="divide-y divide-cool-gray-200 max-h-96">
                 <MemberTrackingListElement
                     v-for="member in members" :key="member.character_id"
                     :member="member" :required_scopes="required_scopes"
                 />
+                <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
+                    <div slot="no-more">all loaded</div>
+                </infinite-loading>
             </ul>
+
         </div>
         <!--Table for medium and above-->
         <div class="sm:flex flex-col hidden max-h-96">

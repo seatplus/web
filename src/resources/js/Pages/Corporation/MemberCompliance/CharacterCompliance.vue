@@ -1,16 +1,23 @@
 <template>
-    <ul class="divide-y divide-gray-200" >
-        <CharacterComplianceElement v-for="character of characters" :key="character.character.character_id" :character="character" />
-    </ul>
+    <div class="overflow-y-auto">
+        <ul class="divide-y divide-gray-200 max-h-96" >
+            <CharacterComplianceElement v-for="character of characters" :key="character.character.character_id" :character="character" />
+            <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
+                <div slot="no-more">all loaded</div>
+            </infinite-loading>
+        </ul>
+    </div>
 </template>
 
 <script>
 import EveImage from "@/Shared/EveImage";
 import axios from "axios";
 import CharacterComplianceElement from "./CharacterComplianceElement";
+import InfiniteLoading from "vue-infinite-loading";
+
 export default {
     name: "CharacterCompliance",
-    components: {CharacterComplianceElement, EveImage},
+    components: {CharacterComplianceElement, EveImage, InfiniteLoading},
     props: {
         corporation_id: {
             required: true,
@@ -24,9 +31,29 @@ export default {
     data() {
         return {
             characters: [],
+            infiniteId: +new Date(),
+            page: 1,
         }
     },
     methods: {
+        loadEntries($state) {
+            const self = this;
+
+            axios.get(this.getRoute, {
+                params: {
+                    page: this.page,
+                },
+            }).then(response => {
+
+                if(response.data.data.length) {
+                    self.page += 1;
+                    self.characters.push(...response.data.data);
+                    $state.loaded();
+                } else {
+                    $state.complete();
+                }
+            });
+        },
         async getCharacters(route) {
             return await axios.get(route)
                 .then((response) => {
@@ -52,12 +79,10 @@ export default {
     watch: {
         queryParam() {
             this.characters = [];
-            this.getCharacters(this.getRoute)
+            this.page = 1;
+            this.infiniteId += 1
         }
     },
-    created() {
-        this.getCharacters(this.getRoute);
-    }
 }
 </script>
 
