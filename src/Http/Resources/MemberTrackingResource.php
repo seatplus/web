@@ -24,11 +24,30 @@
  * SOFTWARE.
  */
 
-use Illuminate\Support\Facades\Route;
-use Seatplus\Web\Http\Controllers\Corporation\MemberTracking\MemberTrackingController;
+namespace Seatplus\Web\Http\Resources;
 
-Route::prefix('tracking')
-    ->group(function () {
-        Route::get('', [MemberTrackingController::class, 'index'])->name('corporation.member_tracking');
-        Route::get('/members/{corporation_id}', [MemberTrackingController::class, 'getMemberTracking'])->name('get.corporation.member_tracking');
-    });
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class MemberTrackingResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'corporation_id' => $this->corporation_id,
+            'character_id' => $this->character_id,
+            'character' => $this->whenLoaded('character'),
+            'start_date' => $this->start_date,
+            'logon_date' => $this->logon_date,
+            'location_id' => $this->location_id,
+            'location' => $this->location?->locatable,
+            'ship_type_id' => $this->ship_type_id,
+            'ship' => $this->whenLoaded('ship'),
+        ];
+    }
+}

@@ -7,7 +7,7 @@
             <h3 class="text-lg leading-6 font-medium text-gray-900">
                 {{  name }}
             </h3>
-            <p v-if="entity.corporation || entity.alliance" class="text-sm text-gray-500 truncate">
+            <p v-if="withSubText && (entity.corporation || entity.alliance)" class="text-sm text-gray-500 truncate">
                 {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
             </p>
         </div>
@@ -24,6 +24,11 @@ export default {
         id: {
             required: true,
             type: Number
+        },
+        withSubText: {
+            required: false,
+            type: Boolean,
+            default: true
         }
     },
     data() {

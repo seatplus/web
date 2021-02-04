@@ -8,20 +8,23 @@
         </template>
 
         <div class="grid gap-6 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <CardWithHeader class="col-span-2" v-for="corporation of corporations" :key="corporation.corporation_id" >
-                <template v-slot:header>
-                    <div class="ml-4 mt-2 inline-flex items-center space-x-4 px-4 py-5 sm:px-6">
-                        <EveImage :object="corporation" />
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            {{ corporation.name }}
-                        </h3>
-                    </div>
-                </template>
+            <div class="col-span-2 space-y-6" >
+                <CardWithHeader v-for="corporation of corporations" :key="corporation.corporation_id" >
+                    <template v-slot:header>
+                        <EntityBlock :entity="corporation" />
+<!--                        <div class="ml-4 mt-2 inline-flex items-center space-x-4 px-4 py-5 sm:px-6">
+                            <EveImage :object="corporation" />
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                {{ corporation.name }}
+                            </h3>
+                        </div>-->
+                    </template>
 
-                <CharacterCompliance :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
-                <UserCompliance :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
+                    <CharacterCompliance v-if="corporation.type !== 'user'" :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
+                    <UserCompliance v-if="corporation.type === 'user'" :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
 
-            </CardWithHeader>
+                </CardWithHeader>
+            </div>
 
             <div class="col-span-3 md:col-span-2 lg:col-span-1">
                 <RadioListWithDescription v-model="selectedModula" :options="filterOptions" title="compliance" class="overflow-hidden shadow rounded-lg"/>
@@ -41,10 +44,12 @@ import EveImage from "@/Shared/EveImage";
 import CharacterCompliance from "./CharacterCompliance";
 import UserCompliance from "./UserCompliance";
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 
 export default {
     name: "MemberCompliance",
     components: {
+        EntityBlock,
         RadioListWithDescription,
         UserCompliance, CharacterCompliance, EveImage, CardWithHeader, HeaderButton, PageHeader, Layout},
     props: {
