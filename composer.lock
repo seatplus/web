@@ -2690,7 +2690,7 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.6.4",
+            "version": "0.6.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
@@ -2752,7 +2752,7 @@
             "description": "API for receiving information from esi",
             "support": {
                 "issues": "https://github.com/seatplus/eveapi/issues",
-                "source": "https://github.com/seatplus/eveapi/tree/0.6.4"
+                "source": "https://github.com/seatplus/eveapi/tree/0.6.5"
             },
             "time": "2021-02-04T21:43:03+00:00"
         },
