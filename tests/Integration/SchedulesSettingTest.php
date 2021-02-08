@@ -48,7 +48,7 @@ class SchedulesSettingTest extends TestCase
             ->followingRedirects()
             ->postJson(route('schedules.updateOrCreate'), [
                 'job' => 'test-job',
-                'schedule' => 'test-expression'
+                'expression' => 'test-expression'
             ]);
 
         $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
