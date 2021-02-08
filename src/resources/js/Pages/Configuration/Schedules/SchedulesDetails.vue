@@ -16,11 +16,11 @@
             </div>
             <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
                 <span class="flex-1 flex justify-between rounded-md  shadow-sm">
-                    <inertia-link method="delete" :href="$route('schedules.delete', schedule.id)" class="text-right inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-indigo active:bg-red-700 transition duration-150 ease-in-out">
+                    <inertia-link method="delete" as="button" :href="$route('schedules.delete', schedule.id)" class="text-right inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-indigo active:bg-red-700 transition duration-150 ease-in-out">
                             Delete
                       </inertia-link>
 
-                      <inertia-link method="post" :data="this.$data" preserve-state :href="$route('schedules.updateOrCreate')" class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+                      <inertia-link method="post" as="button" :data="this.$data" preserve-state :href="$route('schedules.updateOrCreate')" class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
                             Save
                       </inertia-link>
                 </span>

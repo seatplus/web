@@ -49,7 +49,7 @@ class PostSchedulesValidation extends FormRequest
     {
         return [
             'job' => 'required|string',
-            'schedule' => 'required|string',
+            'expression' => 'required|string',
         ];
     }
 }
