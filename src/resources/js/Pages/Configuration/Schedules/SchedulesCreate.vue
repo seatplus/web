@@ -4,7 +4,7 @@
             <div class="px-4 py-5 sm:p-6">
                 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <InputGroup for="schedule" label="schedule">
-                        <SeatPlusSelect v-model="schedule" id="schedule">
+                        <SeatPlusSelect v-model="expression" id="schedule">
                             <option v-for="(expression,description) in this.cron" :value="expression">{{ description }}</option>
                         </SeatPlusSelect>
                     </InputGroup>
@@ -46,7 +46,7 @@
         },
         data() {
             return {
-                schedule: '',
+                expression: '',
                 job: ''
             }
         }

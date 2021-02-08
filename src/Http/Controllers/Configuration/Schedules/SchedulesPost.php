@@ -37,7 +37,7 @@ class SchedulesPost extends Controller
         Schedules::updateOrCreate([
             'job' => $request->job,
         ], [
-            'expression' => $request->schedule,
+            'expression' => $request->expression,
         ]);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule updated or created');
