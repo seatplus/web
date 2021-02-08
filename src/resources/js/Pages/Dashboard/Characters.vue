@@ -19,15 +19,6 @@
                 </div>
                 <div class="border-t border-gray-200" v-if="hasOpenEnlistments">
                     <div class="-mt-px flex">
-                        <!--<div class="w-0 flex-1 flex border-r border-gray-200">
-                            <a href="#" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
-                                <svg class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                </svg>
-                                <span class="ml-3">Email2</span>
-                            </a>
-                        </div>-->
                         <div class="-ml-px w-0 flex-1 flex">
                             <inertia-link :href="$route('delete.character.application', character.character_id)" method="delete" v-if="character.application" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
                                 <svg class="w-5 h-5 text-red-700" viewBox="0 0 20 20" fill="currentColor">
@@ -40,6 +31,22 @@
                         </div>
                     </div>
                 </div>
+            </li>
+            <li class="col-span-1 bg-white rounded-lg shadow flex flex-wrap content-center">
+                <a :href="$route('auth.eve')" type="button" class="inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-sm text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <!-- Heroicon name: solid/user-add -->
+                    <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Add characters
+                </a>
+<!--                <div class="w-full flex items-center justify-center p-6 space-x-6">
+                    <svg class="max-h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    <div>Test</div>
+                </div>-->
             </li>
 
         </ul>
