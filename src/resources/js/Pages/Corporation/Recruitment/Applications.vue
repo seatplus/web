@@ -6,7 +6,7 @@
             </h3>
             <p class="max-w-4xl text-sm leading-5 text-gray-500">Below you will find all open applications to review</p>
         </div>
-        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <div class="bg-white sm:rounded-md">
 
             <UserApplications :applications="applications" />
             <CharacterApplications :applications="applications" />
