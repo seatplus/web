@@ -47,7 +47,7 @@ class SeatPlusController extends Controller
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters', 'main_character.corporation');
+        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'main_character.corporation');
 
         if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);
