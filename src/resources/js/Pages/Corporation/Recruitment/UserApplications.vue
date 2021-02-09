@@ -1,5 +1,5 @@
 <template>
-    <div class="divide-y-2">
+    <div class="space-y-4">
         <div v-for="application in this.user_applications" class="bg-white overflow-hidden shadow rounded-lg">
             <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
                 <!-- Content goes here -->
