@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-grow overflow-y-auto overflow-x-auto hidden sm:block">
+    <div v-show="contacts.length > 0" class="flex-grow overflow-y-auto overflow-x-auto hidden sm:block">
         <table class="relative table-fixed w-full">
             <thead class="sticky top-0 bg-gray-50">
             <TableHeader>
