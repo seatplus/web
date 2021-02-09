@@ -47,6 +47,8 @@ class UserRessource extends JsonResource
                     return [
                         'character_id' => $character->character_id,
                         'name' => $character->name,
+                        'corporation' => $character->corporation,
+                        'alliance' => $character->alliance,
                         'scopes' => $character->refresh_token->scopes,
                     ];
                 }),
