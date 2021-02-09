@@ -33,13 +33,13 @@
                         {{ label }}
                     </div>
                 </DataCell>
-                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <DataCell :class="['px-6 py-4 whitespace-nowrap text-sm', textColor(contact.standing)]">
                     {{ contact.standing }}
                 </DataCell>
-                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <DataCell :class="['px-6 py-4 whitespace-nowrap text-sm', textColor(contact.corporation_standing)]">
                     {{ contact.corporation_standing }}
                 </DataCell>
-                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <DataCell :class="['px-6 py-4 whitespace-nowrap text-sm', textColor(contact.alliance_standing)]">
                     {{ contact.alliance_standing }}
                 </DataCell>
             </TableRow>
@@ -61,6 +61,32 @@ export default {
         contacts: {
             type: Array,
             required: true
+        }
+    },
+    methods: {
+        textColor(standing) {
+
+            if(standing === 0) {
+                return 'text-gray-500'
+            }
+
+            if(-5>standing && standing>=-10) {
+                return 'text-red-500'
+            }
+
+            if(0>standing && standing>=-5) {
+                return 'text-yellow-500'
+            }
+
+            if(0<standing && standing<=5) {
+                return 'text-blue-500'
+            }
+
+            if(5<standing && standing<=10) {
+                return 'text-green-500'
+            }
+
+            return  'text-indigo-500'
         }
     }
 }
