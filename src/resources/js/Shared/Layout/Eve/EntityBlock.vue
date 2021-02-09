@@ -1,7 +1,7 @@
 <template>
     <div class="flex items-center">
         <div class="flex-shrink-0">
-            <EveImage :object="entity" :size="256" tailwind_class="h-12 w-12 rounded-full"/>
+            <EveImage :object="entity" :size="256" :tailwind_class="tailwind_class"/>
         </div>
         <div class="ml-4">
             <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -23,6 +23,11 @@ export default {
         entity: {
             required: true,
             type: Object
+        },
+        tailwind_class: {
+            required: false,
+            type: String,
+            default: 'h-12 w-12 rounded-full'
         }
     },
     methods: {

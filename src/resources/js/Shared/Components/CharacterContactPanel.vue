@@ -1,125 +1,32 @@
 <template>
     <!-- This example requires Tailwind CSS v2.0+ -->
-    <transition
-        enter-active-class="transition ease-out duration-100"
-        enter-class="transform opacity-0 scale-95"
-        enter-to-class="transform opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-75"
-        leave-class="transform opacity-100 scale-100"
-        xleave-to-class="transform opacity-0 scale-95"
-    >
-        <CardWithHeader v-if="ready">
-            <template v-slot:header>
-                <EntityBlock :entity="character"/>
-            </template>
 
-            <div>
+    <CardWithHeader>
+        <template v-slot:header>
+            <EntityBlock :entity="character"/>
+        </template>
+        <transition
+            enter-active-class="transition ease-out duration-100"
+            enter-class="transform opacity-0 scale-95"
+            enter-to-class="transform opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-class="transform opacity-100 scale-100"
+            xleave-to-class="transform opacity-0 scale-95"
+        >
+            <div v-if="ready">
                 <div class="flex flex-col max-h-96">
-                    <div class="flex-grow overflow-y-auto overflow-x-auto">
-                        <table class="relative table-fixed w-full">
-                            <thead class="sticky top-0 bg-gray-50">
-                            <TableHeader>
-                                <DataHeader class="w-2/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Contact
-                                </DataHeader>
-                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Labels
-                                </DataHeader>
-                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Standing
-                                </DataHeader>
-                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Corporation standing
-                                </DataHeader>
-                                <DataHeader class="w-1/6 sticky top-0 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Alliance standing
-                                </DataHeader>
-                            </TableHeader>
-                            </thead>
-                            <tbody>
-                            <TableRow v-for="(entity, index) in enriched_entities" :key="entity.contact_id" :class="index%2 ? 'bg-gray-50' : 'bg-white'">
-                                <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
-                                    <EntityBlock :entity="entity"/>
-                                </DataCell>
-                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <div v-for="label in getLabels(entity)" type="button" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600">
-                                        <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                                        </svg>
-                                        {{ label }}
-                                    </div>
-                                </DataCell>
-                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ entity.standing }}
-                                </DataCell>
-                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ getCorporationStanding(entity) }}
-                                </DataCell>
-                                <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ getAllianceStanding(entity) }}
-                                </DataCell>
-                            </TableRow>
-                            </tbody>
-                        </table>
-                    </div>
+                    <ContactsList :contacts="contacts" />
+                    <ContactsTable :contacts="contacts" />
                 </div>
             </div>
-        </CardWithHeader>
-<!--        <div v-if="ready" class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200 max-h-full">
-            <div class="px-4 py-5 sm:px-6">
-                &lt;!&ndash; Content goes here &ndash;&gt;
-                <EntityBlock :entity="character"/>
+            <div v-else class="flex justify-center w-full h-full p-8">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
             </div>
-            <div class="">
-            &lt;!&ndash; This example requires Tailwind CSS v2.0+ &ndash;&gt;
-            <SimpleStriped>
-                <template v-slot:header>
-                    <TableHeader>
-                        <DataHeader class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Contact
-                        </DataHeader>
-                        <DataHeader class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Labels
-                        </DataHeader>
-                        <DataHeader class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Standing
-                        </DataHeader>
-                        <DataHeader class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Corporation standing
-                        </DataHeader>
-                        <DataHeader class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Alliance standing
-                        </DataHeader>
-                    </TableHeader>
-                </template>
-                <TableRow v-for="(entity, index) in enriched_entities" :key="entity.contact_id" :class="index%2 ? 'bg-gray-50' : 'bg-white'">
-                    <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <EntityBlock :entity="entity"/>
-                    </DataCell>
-                    <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div v-for="label in getLabels(entity)" type="button" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600">
-                            <svg class="-ml-0.5 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                            </svg>
-                            {{ label }}
-                        </div>
-                    </DataCell>
-                    <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ entity.standing }}
-                    </DataCell>
-                    <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ getCorporationStanding(entity) }}
-                    </DataCell>
-                    <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ getAllianceStanding(entity) }}
-                    </DataCell>
-                </TableRow>
-
-            </SimpleStriped>
-
-        </div>
-        </div>-->
-    </transition>
+        </transition>
+    </CardWithHeader>
 
 </template>
 
@@ -133,10 +40,15 @@ import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
 import DataHeader from "@/Shared/Layout/Cards/Table/DataHeader";
 import axios from "axios";
 import CardWithHeader from "../Layout/Cards/CardWithHeader";
+import ContactsList from "./Contacts/ContactsList";
+import ContactsTable from "./Contacts/ContactsTable";
 
 export default {
     name: "CharacterContactPanel",
-    components: {CardWithHeader, DataHeader, DataCell, TableRow, TableHeader, SimpleStriped, EntityBlock, EveImage},
+    components: {
+        ContactsTable,
+        ContactsList,
+        CardWithHeader, DataHeader, DataCell, TableRow, TableHeader, SimpleStriped, EntityBlock, EveImage},
     props: {
         character: {
             required: true,
@@ -259,23 +171,23 @@ export default {
         },
         getAllianceStanding(entity) {
 
-          if(_.isUndefined(entity.character_affiliation))
-              return 'derp'
+            if(_.isUndefined(entity.character_affiliation))
+                return 'derp'
 
-          let alliance_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.corporation_id])
+            let alliance_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.corporation_id])
 
-          if(alliance_contact)
-              return alliance_contact.standing
+            if(alliance_contact)
+                return alliance_contact.standing
 
-          let corporation_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.corporation_id])
+            let corporation_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.corporation_id])
 
-          if(corporation_contact)
-              return corporation_contact.standing
+            if(corporation_contact)
+                return corporation_contact.standing
 
-          let character_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.character_id])
+            let character_contact = _.find(this.alliance_contact, ['contact_id', entity.character_affiliation.character_id])
 
-          if(character_contact)
-              return character_contact.standing
+            if(character_contact)
+                return character_contact.standing
 
             return 0
         },
@@ -320,15 +232,15 @@ export default {
         handleContactsWithAffiliation() {
             _.each(_.filter(this.character_contact, (contact) => _.isObject(contact.affiliation)), (contact) => {
 
-                    let pushable_object = {
-                        contact_id: contact.contact_id,
-                        character_id: contact.affiliation.character_id,
-                        corporation_id: contact.affiliation.corporation_id,
-                        alliance_id: contact.affiliation.alliance_id
-                    }
+                let pushable_object = {
+                    contact_id: contact.contact_id,
+                    character_id: contact.affiliation.character_id,
+                    corporation_id: contact.affiliation.corporation_id,
+                    alliance_id: contact.affiliation.alliance_id
+                }
 
-                    this.entity_affiliations.push(_.omitBy(pushable_object, _.isNil))
-                })
+                this.entity_affiliations.push(_.omitBy(pushable_object, _.isNil))
+            })
         },
         getAffiliations() {
             let promises = []
@@ -356,6 +268,19 @@ export default {
             Promise.allSettled(promises).then(() => this.resolveAffiliatedIds())
         }
 
+    },
+    computed: {
+        contacts() {
+            return _.map(this.enriched_entities, (entity) => {
+                return {
+                    entity: entity,
+                    labels: this.getLabels(entity),
+                    standing: entity.standing,
+                    corporation_standing: this.getCorporationStanding(entity),
+                    alliance_standing: this.getAllianceStanding(entity)
+                }
+            })
+        }
     },
     created() {
 

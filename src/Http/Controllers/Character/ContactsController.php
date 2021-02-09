@@ -61,7 +61,10 @@ class ContactsController extends Controller
             ->unique()
             ->toArray();
 
-        abort_unless(in_array($id, $affiliated_ids), 403);
+        abort_unless(in_array($id, $affiliated_ids),
+            403,
+            'You seem not to be affiliated to the requested id, if you seeing this error in recruiting,' .
+            'this either means the alliance or corporation contact details are not present');
 
         $query = Contact::with('labels')
             ->where('contactable_id', $id);
