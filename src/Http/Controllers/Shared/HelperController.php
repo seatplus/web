@@ -66,22 +66,22 @@ class HelperController extends Controller
 
     public function findSolarSystem(string $search)
     {
-
         $container = new EsiRequestContainer([
             'method' => 'get',
             'version' => 'v2',
             'endpoint' => '/search/',
             'query_string' => [
                 'categories' => 'solar_system',
-                'search' => $search
+                'search' => $search,
             ],
         ]);
 
         $ids_to_resolve = collect((new RetrieveEsiDataAction)->execute($container));
 
         // get names for IDs
-        if($ids_to_resolve->isEmpty())
+        if ($ids_to_resolve->isEmpty()) {
             return $ids_to_resolve;
+        }
 
         $container = new EsiRequestContainer([
             'method' => 'post',
@@ -101,10 +101,11 @@ class HelperController extends Controller
 
         $request = request()->get('search');
 
-        if($request)
+        if ($request) {
             $query->where('name', 'like', '%' . $request . '%');
+        }
 
-        return $query->limit(15)->get()->map(fn($system) => ['id' => $system->system_id, 'name' => $system->name]);
+        return $query->limit(15)->get()->map(fn ($system) => ['id' => $system->system_id, 'name' => $system->name]);
     }
 
     public function regions()
@@ -113,9 +114,10 @@ class HelperController extends Controller
 
         $request = request()->get('search');
 
-        if($request)
+        if ($request) {
             $query->where('name', 'like', '%' . $request . '%');
+        }
 
-        return $query->limit(15)->get()->map(fn($region) => ['id' => $region->region_id, 'name' => $region->name]);
+        return $query->limit(15)->get()->map(fn ($region) => ['id' => $region->region_id, 'name' => $region->name]);
     }
 }
