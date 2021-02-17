@@ -26,6 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
@@ -58,5 +62,60 @@ class HelperController extends Controller
     public function getEntityFromId(int $id)
     {
         return (new GetEntityFromId($id))->execute();
+    }
+
+    public function findSolarSystem(string $search)
+    {
+
+        $container = new EsiRequestContainer([
+            'method' => 'get',
+            'version' => 'v2',
+            'endpoint' => '/search/',
+            'query_string' => [
+                'categories' => 'solar_system',
+                'search' => $search
+            ],
+        ]);
+
+        $ids_to_resolve = collect((new RetrieveEsiDataAction)->execute($container));
+
+        // get names for IDs
+        if($ids_to_resolve->isEmpty())
+            return $ids_to_resolve;
+
+        $container = new EsiRequestContainer([
+            'method' => 'post',
+            'version' => 'v3',
+            'endpoint' => '/universe/names/',
+            'request_body' => [...$ids_to_resolve->flatten()->toArray()],
+        ]);
+
+        $esi_results = (new RetrieveEsiDataAction)->execute($container);
+
+        return collect($esi_results);
+    }
+
+    public function systems()
+    {
+        $query = System::query();
+
+        $request = request()->get('search');
+
+        if($request)
+            $query->where('name', 'like', '%' . $request . '%');
+
+        return $query->limit(15)->get()->map(fn($system) => ['id' => $system->system_id, 'name' => $system->name]);
+    }
+
+    public function regions()
+    {
+        $query = Region::query();
+
+        $request = request()->get('search');
+
+        if($request)
+            $query->where('name', 'like', '%' . $request . '%');
+
+        return $query->limit(15)->get()->map(fn($region) => ['id' => $region->region_id, 'name' => $region->name]);
     }
 }

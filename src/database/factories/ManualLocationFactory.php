@@ -24,37 +24,22 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Character;
+namespace Seatplus\Web\database\factories;
 
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Seatplus\Web\Models\ManualLocation;
 
-use Seatplus\Web\Http\Resources\AssetResource;
-use Seatplus\Web\Models\Asset\Asset;
-use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
-
-class GetAssetsController
+class ManualLocationFactory extends Factory
 {
-    public function __invoke(Request $request)
+    protected $model = ManualLocation::class;
+
+    public function definition()
     {
-        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
-            ->affiliated(getAffiliatedIdsByClass(EveApiAsset::class), request()->query('character_ids'))
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->orderBy('location_id', 'asc');
-
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
-
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
-
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
-
-        return AssetResource::collection(
-            $query->paginate()
-        );
+        return [
+            'location_id' => $this->faker->numberBetween(0,10000),
+            'user_id' => $this->faker->randomNumber(),
+            'name' => $this->faker->name,
+            'solar_system_id' => $this->faker->numberBetween(60000000,64000000),
+        ];
     }
 }

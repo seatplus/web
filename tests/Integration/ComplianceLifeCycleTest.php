@@ -211,7 +211,7 @@ class ComplianceLifeCycleTest extends TestCase
 
     }
 
-    private function givePermissionsToTestUser(array $array)
+    protected function givePermissionsToTestUser(array $array)
     {
 
         foreach ($array as $string) {

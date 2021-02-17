@@ -1,14 +1,14 @@
 <template>
     <fieldset>
         <legend class="sr-only">
-            {{ title }} setting
+            {{ title }}
         </legend>
 
         <div class="bg-white rounded-md -space-y-px" ref="radiogroup">
 
-            <div v-for="(option, index) in options" :class="{ 'border-gray-200': !(active === index), 'bg-indigo-50 border-indigo-200 z-10': active === index, 'rounded-tl-md rounded-tr-md': index === 0, 'rounded-bl-md rounded-br-md': index === option.length}" class="relative border p-4 flex">
+            <div v-for="(option, index) in options" @click="select(index)" :class="[active === index ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200', { 'rounded-tl-md rounded-tr-md': index === 0, 'rounded-bl-md rounded-br-md': index === options.length-1}]" class="relative border p-4 flex cursor-pointer">
                 <div class="flex items-center h-5">
-                    <input :id="title +'-settings-option-' + index" name="privacy_setting" type="radio" @click="select(index)" @keydown.space="select(index)" @keydown.arrow-up="onArrowUp(index)" @keydown.arrow-down="onArrowDown(index)" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out cursor-pointer" :checked="active === index"/>
+                    <input :id="title +'-settings-option-' + index" name="privacy_setting" type="radio"  @keydown.space="select(index)" @keydown.arrow-up="onArrowUp(index)" @keydown.arrow-down="onArrowDown(index)" class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out cursor-pointer" :checked="active === index"/>
                 </div>
                 <label :for="title +'-settings-option-' + index" class="ml-3 flex flex-col cursor-pointer">
                     <span :class="{ 'text-indigo-900': active === index, 'text-gray-900': !(active === index) }" class="block text-sm leading-5 font-medium capitalize">
@@ -88,7 +88,12 @@ export default {
     },
     watch: {
         active(newVal) {
-            this.$emit('input', newVal)
+            this.$emit('input', this.id)
+        }
+    },
+    computed: {
+        id() {
+            return _.get(this.options[this.active], 'id', this.active)
         }
     }
 }

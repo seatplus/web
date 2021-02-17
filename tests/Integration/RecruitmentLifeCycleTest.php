@@ -379,7 +379,7 @@ class RecruitmentLifeCycleTest extends TestCase
         ]);
     }
 
-    private function givePermissionsToTestUser(array $array)
+    /*private function givePermissionsToTestUser(array $array)
     {
 
         foreach ($array as $string) {
@@ -390,6 +390,6 @@ class RecruitmentLifeCycleTest extends TestCase
 
         // now re-register all the roles and permissions
         $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    }*/
 
 }

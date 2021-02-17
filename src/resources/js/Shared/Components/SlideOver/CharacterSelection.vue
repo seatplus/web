@@ -73,9 +73,9 @@ export default {
         let route = this.$route().current()
 
         if(_.isEmpty(this.selected_character_ids))
-            return this.$inertia.visit(this.$route(route))
+            return this.$inertia.get(this.$route(route))
 
-        this.$inertia.visit(this.$route(route, {_query: {character_ids: this.selected_character_ids}}))
+        this.$inertia.get(this.$route(route, {_query: {character_ids: this.selected_character_ids}}))
     }
 }
 </script>
