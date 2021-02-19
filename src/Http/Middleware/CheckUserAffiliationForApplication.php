@@ -29,7 +29,7 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 
 class CheckUserAffiliationForApplication
 {
@@ -46,7 +46,7 @@ class CheckUserAffiliationForApplication
 
         $affiliated_ids = getAffiliatedIdsByPermission($permission);
 
-        $application = Applications::whereIn('corporation_id', $affiliated_ids)
+        $application = Application::whereIn('corporation_id', $affiliated_ids)
             ->where(['applicationable_type' => User::class, 'applicationable_id' => $user->id])
             ->with('applicationable')
             ->first();

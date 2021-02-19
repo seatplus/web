@@ -17,6 +17,7 @@ use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
+use Spatie\Permission\PermissionRegistrar;
 
 abstract class TestCase extends OrchestraTestCase
 {
@@ -38,13 +39,9 @@ abstract class TestCase extends OrchestraTestCase
         // setup database
         $this->setupDatabase($this->app);
 
-        // setup factories
-        $this->withFactories(__DIR__ . '/database/factories');
-
-
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->test_user = Event::fakeFor(function () {
-            return factory(User::class)->create();
+            return User::factory()->create();
         });
 
         $this->test_character = $this->test_user->characters->first();
@@ -123,6 +120,19 @@ abstract class TestCase extends OrchestraTestCase
             config()->get('inertia.page.paths', []),
             [realpath(__DIR__ . '/../src/resources/js/Pages'), realpath(__DIR__ . '/../src/resources/js/Shared')],
         ));
+    }
+
+    protected function givePermissionsToTestUser(array $array)
+    {
+
+        foreach ($array as $string) {
+            $permission = Permission::findOrCreate($string);
+
+            $this->test_user->givePermissionTo($permission);
+        }
+
+        // now re-register all the roles and permissions
+        $this->app->make(PermissionRegistrar::class)->registerPermissions();
     }
 
 }

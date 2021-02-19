@@ -24,36 +24,27 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Character;
+namespace Seatplus\Web\Services;
 
-use Illuminate\Http\Request;
-use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
-use Seatplus\Web\Http\Resources\AssetResource;
-use Seatplus\Web\Models\Asset\Asset;
+use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
-class GetAssetsController
+class SearchService
 {
-    public function __invoke(Request $request)
+    public function execute(string $category, string $query): array
     {
-        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
-            ->affiliated(getAffiliatedIdsByClass(EveApiAsset::class), request()->query('character_ids'))
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->orderBy('location_id', 'asc');
+        $container = new EsiRequestContainer([
+            'method' => 'get',
+            'version' => 'v2',
+            'endpoint' => '/search/',
+            'query_string' => [
+                'categories' => $category,
+                'search' => $query,
+            ],
+        ]);
 
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
+        $result = (new RetrieveEsiDataAction)->execute($container);
 
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
-
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
-
-        return AssetResource::collection(
-            $query->paginate()
-        );
+        return $result->$category ?? [];
     }
 }

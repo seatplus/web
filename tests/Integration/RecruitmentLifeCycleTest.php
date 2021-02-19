@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
@@ -28,12 +28,12 @@ class RecruitmentLifeCycleTest extends TestCase
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->secondary_user = Event::fakeFor(function () {
-            return factory(User::class)->create();
+            return User::factory()->create();
         });
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->superuser = Event::fakeFor(function () {
-            $user = factory(User::class)->create();
+            $user = User::factory()->create();
 
             $permission = Permission::findOrCreate('superuser');
 
@@ -114,7 +114,7 @@ class RecruitmentLifeCycleTest extends TestCase
             ]);
 
         $this->assertNotNull($this->secondary_character->refresh()->application);
-        $this->assertTrue($this->secondary_character->refresh()->application instanceof Applications);
+        $this->assertTrue($this->secondary_character->refresh()->application instanceof Application);
 
         // Pull application
         $response = $this->actingAs($this->secondary_user)
@@ -134,7 +134,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $this->applySecondary();
 
         $this->assertNotNull($this->secondary_user->refresh()->application);
-        $this->assertTrue($this->secondary_user->refresh()->application instanceof Applications);
+        $this->assertTrue($this->secondary_user->refresh()->application instanceof Application);
 
         // pull application
         $response = $this->actingAs($this->secondary_user)
@@ -379,7 +379,7 @@ class RecruitmentLifeCycleTest extends TestCase
         ]);
     }
 
-    private function givePermissionsToTestUser(array $array)
+    /*private function givePermissionsToTestUser(array $array)
     {
 
         foreach ($array as $string) {
@@ -390,6 +390,6 @@ class RecruitmentLifeCycleTest extends TestCase
 
         // now re-register all the roles and permissions
         $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    }*/
 
 }

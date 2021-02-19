@@ -24,36 +24,37 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Character;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Http\Request;
-use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
-use Seatplus\Web\Http\Resources\AssetResource;
-use Seatplus\Web\Models\Asset\Asset;
-
-class GetAssetsController
+class CreateManualLocations extends Migration
 {
-    public function __invoke(Request $request)
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
     {
-        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
-            ->affiliated(getAffiliatedIdsByClass(EveApiAsset::class), request()->query('character_ids'))
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->orderBy('location_id', 'asc');
+        Schema::create('manual_locations', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('location_id');
+            $table->foreignId('user_id')->constrained();
+            $table->string('name');
+            $table->unsignedBigInteger('solar_system_id');
+            $table->boolean('selected')->default(false);
+            $table->timestamps();
+        });
+    }
 
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
-
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
-
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
-
-        return AssetResource::collection(
-            $query->paginate()
-        );
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('manual_locations');
     }
 }

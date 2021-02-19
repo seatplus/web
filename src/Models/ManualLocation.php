@@ -1,8 +1,9 @@
 <?php
-/**
- * MIT License.
+
+/*
+ * MIT License
  *
- * Copyright (c) 2019. Felix Huber
+ * Copyright (c) 2019, 2020 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,26 +24,43 @@
  * SOFTWARE.
  */
 
-use Faker\Generator as Faker;
-use Seatplus\Auth\Models\CharacterUser;
+namespace Seatplus\Web\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
-use Seatplus\Eveapi\Models\Character\CharacterInfo as CharacterInfoAlias;
+use Seatplus\Eveapi\Models\Universe\Location;
+use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Web\database\factories\ManualLocationFactory;
 
-$factory->define(User::class, function (Faker $faker) {
+class ManualLocation extends Model
+{
+    use HasFactory;
 
-    return [
-        'active'       => true,
-        'main_character_id' => factory(CharacterInfoAlias::class)
-    ];
-});
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
 
-$factory->afterCreating(User::class, function ($user, $faker) {
-    $character_user =$user->character_users()->save(factory(CharacterUser::class)->make([
-        'character_id' => $user->main_character_id
-    ]));
-    factory(CharacterAffiliation::class)->create([
-        'character_id' => $user->main_character_id
-    ]);
-    //$user->refresh()->character_users()->character()->save(factory(CharacterInfoAlias::class)->create
-});
+    protected static function newFactory()
+    {
+        return ManualLocationFactory::new();
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id', 'location_id');
+    }
+
+    public function system()
+    {
+        return $this->belongsTo(System::class, 'solar_system_id', 'system_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+}

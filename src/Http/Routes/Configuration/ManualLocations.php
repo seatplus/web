@@ -24,36 +24,13 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Character;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Shared\ManualLocationController;
 
-use Illuminate\Http\Request;
-use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
-use Seatplus\Web\Http\Resources\AssetResource;
-use Seatplus\Web\Models\Asset\Asset;
-
-class GetAssetsController
-{
-    public function __invoke(Request $request)
-    {
-        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
-            ->affiliated(getAffiliatedIdsByClass(EveApiAsset::class), request()->query('character_ids'))
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->orderBy('location_id', 'asc');
-
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
-
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
-
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
-
-        return AssetResource::collection(
-            $query->paginate()
-        );
-    }
-}
+Route::middleware(['permission:manage manual locations'])
+    ->prefix('manual_locations')
+    ->group(function () {
+        Route::get('', [ManualLocationController::class, 'index'])->name('manage.manual_locations');
+        Route::get('suggestions', [ManualLocationController::class, 'getSuggestions'])->name('get.manuel_locations.suggestions');
+        Route::post('suggestions', [ManualLocationController::class, 'acceptSuggestion'])->name('accept.manuel_locations');
+    });

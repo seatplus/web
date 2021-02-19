@@ -30,11 +30,11 @@ class JoinControlGroupTest extends TestCase
 
         //dd($this->test_character)
 
-        /*factory(CharacterAffiliation::class)->create([
+        /*CharacterAffiliation::factory()->create([
             'character_id' => $this->test_character->character_id
         ]);*/
 
-        /*factory(CharacterUser::class)->create([
+        /*CharacterUser::factory()->create([
             'user_id' => $this->test_user->id,
             'character_id' => $this->test_character->character_id
         ]);*/

@@ -31,4 +31,5 @@ return [
     'manage access control group',
     'recruiter',
     'view member compliance',
+    'manage manual locations',
 ];
