@@ -35,6 +35,7 @@ use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
 use Seatplus\Web\Services\GetEntityFromId;
 use Seatplus\Web\Services\GetNamesFromIdsService;
+use Seatplus\Web\Services\SearchService;
 
 class HelperController extends Controller
 {
@@ -67,32 +68,15 @@ class HelperController extends Controller
     public function findSolarSystem(string $search)
     {
 
-        $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v2',
-            'endpoint' => '/search/',
-            'query_string' => [
-                'categories' => 'solar_system',
-                'search' => $search
-            ],
-        ]);
-
-        $ids_to_resolve = collect((new RetrieveEsiDataAction)->execute($container));
+        $ids_to_resolve = (new SearchService)->execute('solar_system', $search);
 
         // get names for IDs
-        if($ids_to_resolve->isEmpty())
+        if(empty($ids_to_resolve))
             return $ids_to_resolve;
 
-        $container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v3',
-            'endpoint' => '/universe/names/',
-            'request_body' => [...$ids_to_resolve->flatten()->toArray()],
-        ]);
+        $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
 
-        $esi_results = (new RetrieveEsiDataAction)->execute($container);
-
-        return collect($esi_results);
+        return $esi_results;
     }
 
     public function systems()

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
@@ -114,7 +114,7 @@ class RecruitmentLifeCycleTest extends TestCase
             ]);
 
         $this->assertNotNull($this->secondary_character->refresh()->application);
-        $this->assertTrue($this->secondary_character->refresh()->application instanceof Applications);
+        $this->assertTrue($this->secondary_character->refresh()->application instanceof Application);
 
         // Pull application
         $response = $this->actingAs($this->secondary_user)
@@ -134,7 +134,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $this->applySecondary();
 
         $this->assertNotNull($this->secondary_user->refresh()->application);
-        $this->assertTrue($this->secondary_user->refresh()->application instanceof Applications);
+        $this->assertTrue($this->secondary_user->refresh()->application instanceof Application);
 
         // pull application
         $response = $this->actingAs($this->secondary_user)

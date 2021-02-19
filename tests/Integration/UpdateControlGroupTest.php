@@ -114,7 +114,7 @@ class UpdateControlGroupTest extends TestCase
                 'affiliations' => [
                     [
                         'category' => 'corporation',
-                        'id' => factory(CorporationInfo::class)->make()->corporation_id
+                        'id' => CorporationInfo::factory()->make()->corporation_id
                     ]
                 ],
                 'members' => []
@@ -130,7 +130,7 @@ class UpdateControlGroupTest extends TestCase
         $this->assertTrue($this->role->acl_affiliations->isEmpty());
 
         $this->role->acl_affiliations()->create([
-        'affiliatable_id' => factory(CorporationInfo::class)->make()->corporation_id,
+        'affiliatable_id' => CorporationInfo::factory()->make()->corporation_id,
         'affiliatable_type' => CorporationInfo::class
         ]);
 

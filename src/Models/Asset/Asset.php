@@ -20,7 +20,7 @@ class Asset extends EveApiAsset
     public function scopeInRegion(Builder $query, int|array $regions): Builder
     {
 
-        $region_ids = is_array($regions) ?: [$regions];
+        $region_ids = is_array($regions) ? $regions : [$regions];
 
         return $query->whereHas('location', function (Builder $query) use ($region_ids) {
             $query->whereHasMorph(
@@ -39,7 +39,7 @@ class Asset extends EveApiAsset
     public function scopeInSystems(Builder $query, int|array $systems): Builder
     {
 
-        $system_ids = is_array($systems) ?: [$systems];
+        $system_ids = is_array($systems) ? $systems : [$systems];
 
         return $query->whereHas('location', fn (Builder $query) => $query
             ->whereHasMorph(

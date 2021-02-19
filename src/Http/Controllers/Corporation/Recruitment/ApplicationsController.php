@@ -28,7 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
@@ -65,14 +65,14 @@ class ApplicationsController extends Controller
 
     public function getOpenCorporationApplications(int $corporation_id)
     {
-        $applications = Applications::ofCorporation($corporation_id)->whereStatus('open');
+        $applications = Application::ofCorporation($corporation_id)->whereStatus('open');
 
         return ApplicationRessource::collection($applications->paginate());
     }
 
     public function getAcceptedCorporationApplications(int $corporation_id)
     {
-        $applications = Applications::ofCorporation($corporation_id)->whereStatus('accepted');
+        $applications = Application::ofCorporation($corporation_id)->whereStatus('accepted');
 
         return ApplicationRessource::collection($applications->paginate());
     }

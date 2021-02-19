@@ -29,7 +29,7 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 
 class CheckPermissionAffiliation
 {
@@ -101,7 +101,7 @@ class CheckPermissionAffiliation
 
     private function getRecruitIds(array $affiliated_ids): array
     {
-        $applicant_ids = Applications::whereIn('corporation_id', $affiliated_ids)
+        $applicant_ids = Application::whereIn('corporation_id', $affiliated_ids)
             ->pluck('applicationable_id')
             ->toArray();
 

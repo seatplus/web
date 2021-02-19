@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Unit\Services;
 
 
+use Faker\Generator;
 use Mockery;
 use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -19,11 +20,9 @@ class GetEntityFromIdTest extends TestCase
     /** @test  */
     public function happyPath()
     {
-        $character_affiliation = factory(CharacterAffiliation::class)->create([
-            'character_id' => factory(CharacterInfo::class),
-            'corporation_id' => factory(CorporationInfo::class),
-            'alliance_id' => factory(AllianceInfo::class)
-        ]);
+        $character = CharacterInfo::factory()->create();
+
+        $character_affiliation = $character->character_affiliation;
 
         $expected_result = [
             'id' => $character_affiliation->character_id,
@@ -52,11 +51,12 @@ class GetEntityFromIdTest extends TestCase
     /** @test  */
     public function happyPathWithoutAlliance()
     {
-        $character_affiliation = factory(CharacterAffiliation::class)->create([
-            'character_id' => factory(CharacterInfo::class),
-            'corporation_id' => factory(CorporationInfo::class),
-            'alliance_id' => null
-        ]);
+        $character = CharacterInfo::factory()->create();
+
+        $character_affiliation = $character->character_affiliation;
+
+        $character_affiliation->alliance_id = null;
+        $character_affiliation->save();
 
         $expected_result = [
             'id' => $character_affiliation->character_id,
@@ -77,11 +77,9 @@ class GetEntityFromIdTest extends TestCase
     /** @test  */
     public function happyPathViaCorporationId()
     {
-        $character_affiliation = factory(CharacterAffiliation::class)->create([
-            'character_id' => factory(CharacterInfo::class),
-            'corporation_id' => factory(CorporationInfo::class),
-            'alliance_id' => factory(AllianceInfo::class)
-        ]);
+        $character = CharacterInfo::factory()->create();
+
+        $character_affiliation = $character->character_affiliation;
 
         $expected_result = [
             'id' => $character_affiliation->corporation_id,
@@ -102,11 +100,10 @@ class GetEntityFromIdTest extends TestCase
     /** @test  */
     public function happyPathViaAllianceId()
     {
-        $character_affiliation = factory(CharacterAffiliation::class)->create([
-            'character_id' => factory(CharacterInfo::class),
-            'corporation_id' => factory(CorporationInfo::class),
-            'alliance_id' => factory(AllianceInfo::class)
-        ]);
+
+        $character = CharacterInfo::factory()->create();
+
+        $character_affiliation = $character->character_affiliation;
 
         $expected_result = [
             'id' => $character_affiliation->alliance_id,
@@ -125,11 +122,14 @@ class GetEntityFromIdTest extends TestCase
     public function unknownCharacterId()
     {
 
-        $alliance = factory(AllianceInfo::class)->create();
-        $corporation = factory(CorporationInfo::class)->create([
+        $alliance = AllianceInfo::factory()->create([
+            'alliance_id' => 99000000123
+        ]);
+
+        $corporation = CorporationInfo::factory()->create([
             'alliance_id' => $alliance->alliance_id
         ]);
-        $character = factory(CharacterInfo::class)->make([
+        $character = CharacterInfo::factory()->make([
             'corporation_id' => $corporation->corporation_id
         ]);
 

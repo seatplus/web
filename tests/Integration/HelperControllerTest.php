@@ -6,6 +6,9 @@ namespace Seatplus\Web\Tests\Integration;
 
 use Mockery;
 use Seat\Eseye\Containers\EsiResponse;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Tests\TestCase;
 
 class HelperControllerTest extends TestCase
@@ -93,6 +96,82 @@ class HelperControllerTest extends TestCase
         $result->assertJson([
             $esi_mock_return_data
         ]);
+    }
+
+    /**
+     * @test
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
+    public function oneCanSearchForSolarSystems() {
+
+        $system = System::factory()->make([
+            'name' => 'test'
+        ]);
+
+        $esi_mock_return_data = [
+            'solar_system' => [$system->system_id],
+        ];
+
+        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+
+        // Mock GetNamesFromIdsService - we don't test that it's tested otherwise
+        $mock = Mockery::mock('overload:' . GetNamesFromIdsService::class);
+        $mock->shouldReceive([$system->system_id])
+            ->andReturn([
+                'category' => 'solar_system',
+                'id' => $system->system_id,
+                'faction_id' => $system->name
+            ]);
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('resolve.solar_system', 'tes'))
+            ->assertOk();
+
+    }
+
+    /** @test */
+    public function oneCanSearchExistingSystems()
+    {
+        $system = System::factory()->create([
+            'name' => 'jita'
+        ]);
+
+        System::factory()->count(4)->create();
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('autosuggestion.system', ['search' => '']))
+            ->assertOk();
+
+        $this->assertCount(5, $result->original);
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('autosuggestion.system', ['search' =>'jit']))
+            ->assertOk();
+
+        $this->assertCount(1, $result->original);
+    }
+
+    /** @test */
+    public function oneCanSearchExistingRegion()
+    {
+        Region::factory()->create([
+            'name' => 'Delve'
+        ]);
+
+        Region::factory()->count(4)->create();
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('autosuggestion.region', ['search' => '']))
+            ->assertOk();
+
+        $this->assertCount(5, $result->original);
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('autosuggestion.region', ['search' =>'Del']))
+            ->assertOk();
+
+        $this->assertCount(1, $result->original);
     }
 
     private function mockRetrieveEsiDataAction(array $body) : void

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Applications;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -118,11 +118,12 @@ class ComplianceLifeCycleTest extends TestCase
 
         $response->assertJsonCount(0, 'data');
 
-        $character_without_user = factory(CharacterInfo::class)->create();
-        factory(CharacterAffiliation::class)->create([
-            'character_id' => $character_without_user->character_id,
-            'corporation_id' => $this->secondary_character->corporation->corporation_id
-        ]);
+        $character_without_user = CharacterInfo::factory()->create();
+
+        $character_affiliation = $character_without_user->character_affiliation;
+        $character_affiliation->corporation_id = $this->secondary_character->corporation->corporation_id;
+        $character_affiliation->alliance_id = $this->secondary_character->alliance?->alliance_id;
+        $character_affiliation->save();
 
         $response = $this->actingAs($this->test_user)
             ->getJson(route('missing.characters.compliance', $this->secondary_character->corporation->corporation_id))

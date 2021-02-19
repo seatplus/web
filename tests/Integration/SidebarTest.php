@@ -66,7 +66,7 @@ class SidebarTest extends TestCase
 
         $this->actingAs($this->test_user);
 
-        $character_role = factory(CharacterRole::class)->create([
+        $character_role = CharacterRole::factory()->create([
             'character_id' => $this->test_character->character_id,
             'roles' => ['Director']
         ]);

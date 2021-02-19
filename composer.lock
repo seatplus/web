@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2112aff48e8dff6425352f74f86f4669",
+    "content-hash": "91bc9df971c9fa0fa3a541fda368069a",
     "packages": [
         {
             "name": "brick/math",
@@ -2690,16 +2690,16 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.6.7",
+            "version": "0.6.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "02e17a865034796f14ed00061289a741de611042"
+                "reference": "44804ce5af3a02d20d12e0c687a63cee60df62b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/02e17a865034796f14ed00061289a741de611042",
-                "reference": "02e17a865034796f14ed00061289a741de611042",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/44804ce5af3a02d20d12e0c687a63cee60df62b2",
+                "reference": "44804ce5af3a02d20d12e0c687a63cee60df62b2",
                 "shasum": ""
             },
             "require": {
@@ -2717,7 +2717,6 @@
                 "barryvdh/laravel-ide-helper": "^2.6",
                 "brianium/paratest": "^6.2",
                 "itsgoingd/clockwork": "^5.0",
-                "laravel/legacy-factories": "^1.0",
                 "nunomaduro/collision": "^5.3",
                 "orchestra/testbench": "^6.10",
                 "phpunit/phpunit": "^9.0",
@@ -2752,9 +2751,9 @@
             "description": "API for receiving information from esi",
             "support": {
                 "issues": "https://github.com/seatplus/eveapi/issues",
-                "source": "https://github.com/seatplus/eveapi/tree/0.6.7"
+                "source": "https://github.com/seatplus/eveapi/tree/0.6.8"
             },
-            "time": "2021-02-17T15:24:00+00:00"
+            "time": "2021-02-18T14:28:41+00:00"
         },
         {
             "name": "spatie/data-transfer-object",
@@ -7771,16 +7770,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.76",
+            "version": "0.12.77",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "7aaaf9a759a29795e8f46d48041af1c1f1b23d38"
+                "reference": "1f10b8c8d118d01e7b492f9707999d456be5812c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/7aaaf9a759a29795e8f46d48041af1c1f1b23d38",
-                "reference": "7aaaf9a759a29795e8f46d48041af1c1f1b23d38",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1f10b8c8d118d01e7b492f9707999d456be5812c",
+                "reference": "1f10b8c8d118d01e7b492f9707999d456be5812c",
                 "shasum": ""
             },
             "require": {
@@ -7811,7 +7810,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.76"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.77"
             },
             "funding": [
                 {
@@ -7827,7 +7826,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-13T11:47:44+00:00"
+            "time": "2021-02-17T16:22:19+00:00"
         },
         {
             "name": "phpstan/phpstan-phpunit",
