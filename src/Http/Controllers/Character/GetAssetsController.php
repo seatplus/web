@@ -27,10 +27,9 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
-
+use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Models\Asset\Asset;
-use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 
 class GetAssetsController
 {
