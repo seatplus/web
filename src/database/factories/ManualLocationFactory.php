@@ -36,10 +36,10 @@ class ManualLocationFactory extends Factory
     public function definition()
     {
         return [
-            'location_id' => $this->faker->numberBetween(0,10000),
+            'location_id' => $this->faker->numberBetween(0, 10000),
             'user_id' => $this->faker->randomNumber(),
             'name' => $this->faker->name,
-            'solar_system_id' => $this->faker->numberBetween(60000000,64000000),
+            'solar_system_id' => $this->faker->numberBetween(60000000, 64000000),
         ];
     }
 }
