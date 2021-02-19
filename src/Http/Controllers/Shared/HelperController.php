@@ -26,8 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -67,12 +65,12 @@ class HelperController extends Controller
 
     public function findSolarSystem(string $search)
     {
-
         $ids_to_resolve = (new SearchService)->execute('solar_system', $search);
 
         // get names for IDs
-        if(empty($ids_to_resolve))
+        if (empty($ids_to_resolve)) {
             return $ids_to_resolve;
+        }
 
         $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
 
@@ -85,10 +83,11 @@ class HelperController extends Controller
 
         $request = request()->get('search');
 
-        if($request)
+        if ($request) {
             $query->where('name', 'like', '%' . $request . '%');
+        }
 
-        return $query->limit(15)->get()->map(fn($system) => ['id' => $system->system_id, 'name' => $system->name]);
+        return $query->limit(15)->get()->map(fn ($system) => ['id' => $system->system_id, 'name' => $system->name]);
     }
 
     public function regions()
@@ -97,9 +96,10 @@ class HelperController extends Controller
 
         $request = request()->get('search');
 
-        if($request)
+        if ($request) {
             $query->where('name', 'like', '%' . $request . '%');
+        }
 
-        return $query->limit(15)->get()->map(fn($region) => ['id' => $region->region_id, 'name' => $region->name]);
+        return $query->limit(15)->get()->map(fn ($region) => ['id' => $region->region_id, 'name' => $region->name]);
     }
 }
