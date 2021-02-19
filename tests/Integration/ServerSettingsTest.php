@@ -48,7 +48,7 @@ class ServerSettingsTest extends TestCase
     /** @test */
     public function one_can_impersionate()
     {
-        $user_two = Event::fakeFor(fn() => factory(User::class)->create()) ;
+        $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
 
         $response = $this->actingAs($this->test_user)
             ->get(route('impersonate.start', $user_two->id));
@@ -59,7 +59,7 @@ class ServerSettingsTest extends TestCase
     /** @test */
     public function one_can_stop_impersionate()
     {
-        $user_two = Event::fakeFor(fn() => factory(User::class)->create()) ;
+        $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
 
        $this->actingAs($this->test_user)
             ->get(route('impersonate.start', $user_two->id));

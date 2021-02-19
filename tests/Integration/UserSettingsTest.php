@@ -26,7 +26,7 @@ class UserSettingsTest extends TestCase
     /** @test */
     public function one_can_update_main_character()
     {
-        $secondary_character = Event::fakeFor(fn() => factory(CharacterUser::class)->make());
+        $secondary_character = Event::fakeFor(fn() => CharacterUser::factory()->make());
 
         $this->test_user->character_users()->save($secondary_character);
 

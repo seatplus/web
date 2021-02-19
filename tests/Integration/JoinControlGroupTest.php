@@ -34,7 +34,7 @@ class JoinControlGroupTest extends TestCase
             'character_id' => $this->test_character->character_id
         ]);*/
 
-        /*factory(CharacterUser::class)->create([
+        /*CharacterUser::factory()->create([
             'user_id' => $this->test_user->id,
             'character_id' => $this->test_character->character_id
         ]);*/

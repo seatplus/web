@@ -34,8 +34,8 @@ class LeaveControlGroupTest extends TestCase
         $role = Role::create(['name' => 'test', 'type' => 'on-request']);
         $this->role = Role::find($role->id);
 
-        $this->secondary_user = factory(User::class)->create();
-        $this->secondary_character = $this->secondary_user->main_character;
+        $this->secondary_user = User::factory()->create();
+        $this->secondary_character = $this->secondary_user->characters->first();
 
     }
 
@@ -50,7 +50,8 @@ class LeaveControlGroupTest extends TestCase
             'affiliatable_type' => CharacterInfo::class,
         ]);
 
-        // Second make test character memebr
+
+        // Second make test character member
         $this->role->activateMember($this->test_user);
 
         $this->assertTrue($this->test_user->hasRole($this->role));

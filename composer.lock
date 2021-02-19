@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "91bc9df971c9fa0fa3a541fda368069a",
+    "content-hash": "88a8639e1c05c08ff1c5cd31feeb43d1",
     "packages": [
         {
             "name": "brick/math",
@@ -2576,16 +2576,16 @@
         },
         {
             "name": "seatplus/auth",
-            "version": "0.6.0",
+            "version": "0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "ba8c29a489cf81f683e74ecb0d56eb8c97d3b1bb"
+                "reference": "15cd8ecb17c30c73f5eb47342c4bdb4a81e03c51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/ba8c29a489cf81f683e74ecb0d56eb8c97d3b1bb",
-                "reference": "ba8c29a489cf81f683e74ecb0d56eb8c97d3b1bb",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/15cd8ecb17c30c73f5eb47342c4bdb4a81e03c51",
+                "reference": "15cd8ecb17c30c73f5eb47342c4bdb4a81e03c51",
                 "shasum": ""
             },
             "require": {
@@ -2593,7 +2593,7 @@
                 "laravel/socialite": "^5.0",
                 "php": "^8.0",
                 "seatplus/eseye": "^3.0",
-                "seatplus/eveapi": "^0.6.0",
+                "seatplus/eveapi": "^0.6.8",
                 "spatie/laravel-permission": "^4.0"
             },
             "require-dev": {
@@ -2631,9 +2631,9 @@
             "description": "SeAT plus package that handles authentication agnostic to SeAT plus usage as pure API or Web",
             "support": {
                 "issues": "https://github.com/seatplus/auth/issues",
-                "source": "https://github.com/seatplus/auth/tree/0.6.0"
+                "source": "https://github.com/seatplus/auth/tree/0.6.1"
             },
-            "time": "2021-01-29T14:53:23+00:00"
+            "time": "2021-02-19T20:25:21+00:00"
         },
         {
             "name": "seatplus/eseye",

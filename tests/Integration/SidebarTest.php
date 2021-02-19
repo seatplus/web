@@ -66,10 +66,9 @@ class SidebarTest extends TestCase
 
         $this->actingAs($this->test_user);
 
-        $character_role = CharacterRole::factory()->create([
-            'character_id' => $this->test_character->character_id,
-            'roles' => ['Director']
-        ]);
+        $character_role = $this->test_character->roles;
+        $character_role->roles = ['Director'];
+        $character_role->save();
 
         $this->assertTrue($character_role->hasRole('roles', 'Director'));
 

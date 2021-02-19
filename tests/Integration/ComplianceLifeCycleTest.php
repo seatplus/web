@@ -31,12 +31,12 @@ class ComplianceLifeCycleTest extends TestCase
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->secondary_user = Event::fakeFor(function () {
-            return factory(User::class)->create();
+            return User::factory()->create();
         });
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->superuser = Event::fakeFor(function () {
-            $user = factory(User::class)->create();
+            $user = User::factory()->create();
 
             $permission = Permission::findOrCreate('superuser');
 
