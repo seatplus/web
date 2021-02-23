@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019, 2020 Felix Huber
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,6 @@ class ApplicationsController extends Controller
 
     public function getUserApplication(User $recruit)
     {
-
         $corporation_id = $recruit->application->corporation->corporation_id;
         $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
@@ -89,8 +88,8 @@ class ApplicationsController extends Controller
             'target_corporation' => $recruit->application->corporation,
             'watchlist' => [
                 'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id')
-            ]
+                'regions' => $enlistment->regions?->pluck('region_id'),
+            ],
         ]);
     }
 
@@ -126,8 +125,8 @@ class ApplicationsController extends Controller
             'target_corporation' => $character->application->corporation,
             'watchlist' => [
                 'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id')
-            ]
+                'regions' => $enlistment->regions?->pluck('region_id'),
+            ],
         ]);
     }
 
