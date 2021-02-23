@@ -35,6 +35,7 @@ use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class ApplicationsController extends Controller
 {
@@ -79,9 +80,17 @@ class ApplicationsController extends Controller
 
     public function getUserApplication(User $recruit)
     {
+
+        $corporation_id = $recruit->application->corporation->corporation_id;
+        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
+
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->loadMissing('main_character', 'characters'),
             'target_corporation' => $recruit->application->corporation,
+            'watchlist' => [
+                'systems' => $enlistment->systems?->pluck('system_id'),
+                'regions' => $enlistment->regions?->pluck('region_id')
+            ]
         ]);
     }
 
@@ -109,9 +118,16 @@ class ApplicationsController extends Controller
             'characters' => [$character],
         ]);
 
+        $corporation_id = $character->application->corporation->corporation_id;
+        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
+
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit,
             'target_corporation' => $character->application->corporation,
+            'watchlist' => [
+                'systems' => $enlistment->systems?->pluck('system_id'),
+                'regions' => $enlistment->regions?->pluck('region_id')
+            ]
         ]);
     }
 

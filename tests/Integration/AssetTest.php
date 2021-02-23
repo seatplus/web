@@ -167,4 +167,48 @@ class AssetTest extends TestCase
         $this->assertCount(0, $response->original);
     }
 
+    /** @test */
+    public function load_asset_in_unknown_location()
+    {
+
+        // 1. create asset with location
+        $asset = Asset::factory()
+            ->create([
+                'assetable_id' => $this->test_character->character_id,
+                'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
+                'location_flag' => 'Hangar'
+            ]);
+
+        $this->assertNotNull($asset->location);
+
+        // 2. create asset without location (unknown)
+        $asset = Asset::factory()
+            ->create([
+                'assetable_id' => $this->test_character->character_id,
+                'location_id' => 12345,
+                'location_flag' => 'Hangar'
+            ]);
+
+        $this->assertNull($asset->location);
+        $this->assertNull($asset->manual_location);
+
+        // 3. call normally
+        $response = $this->actingAs($this->test_user)
+            ->get(route('load.character.assets'));
+
+        // 4. expect 2 assets
+        $this->assertCount(2, $response->original);
+
+        // 5. call only unknown locations
+        $response = $this->actingAs($this->test_user)
+            ->get(route('load.character.assets', [
+                'withUnknownLocations' => true
+            ]));
+
+        // 6. expect only one
+        $this->assertCount(1, $response->original);
+
+        // call with unknown locations
+    }
+
 }

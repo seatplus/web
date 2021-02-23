@@ -1,11 +1,17 @@
 <template>
     <div>
         <div class="space-y-2 sm:space-y-6">
-            <LocationComponent v-for="location in groupedAssets" :location="location" :key="location.location_id" @open_modal="openManualLocationModal"/>
+            <LocationComponent
+                v-for="location in groupedAssets"
+                :location="location"
+                :key="location.location_id"
+                @open_modal="openManualLocationModal"
+                :context="context"
+            />
         </div>
 
         <infinite-loading :identifier="infiniteId" @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
-            <div slot="no-more">all loaded</div>
+            <div slot="no-more">all assets loaded</div>
         </infinite-loading>
     </div>
 </template>
@@ -20,6 +26,11 @@ export default {
         params: {
             required: true,
             type: Object
+        },
+        context: {
+            required: false,
+            type: String,
+            default: 'character'
         }
     },
     data() {
@@ -45,6 +56,7 @@ export default {
                     regions: params.regions,
                     search: params.search === "" ? null : params.search,
                     systems: params.systems,
+                    withUnknownLocations: params.withUnknownLocations
                 };
             }
 

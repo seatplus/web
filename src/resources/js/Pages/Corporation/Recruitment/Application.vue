@@ -13,9 +13,13 @@
 
 
         <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li class="col-span-2">
+            <li class="col-span-2 max-h-screen overflow-auto">
 
                 <div class="space-y-4">
+                    <AssetsComponent :params="unknown_asset_params" context="recruitment" />
+                    <AssetsComponent
+                        :params="asset_params"
+                    />
                     <WalletJournalComponent
                         :id="character.character_id"
                         v-for="character in recruit.characters"
@@ -132,11 +136,13 @@ import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
+import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 
 
 export default {
     name: "UserApplication",
     components: {
+        AssetsComponent,
         WalletJournalComponent,
         WalletTransactionComponent,
         CharacterContactPanel, HeaderButton, PageHeader, Layout},
@@ -146,6 +152,10 @@ export default {
             type: Object
         },
         target_corporation: {
+            required: true,
+            type: Object
+        },
+        watchlist: {
             required: true,
             type: Object
         }
@@ -161,6 +171,19 @@ export default {
     computed: {
         characters() {
             return _.map(this.recruit.characters, (character) => character.name ).join(', ')
+        },
+        asset_params() {
+            return {
+                character_ids: _.map(this.recruit.characters, character => character.character_id),
+                regions: this.watchlist.regions,
+                systems: this.watchlist.systems
+            }
+        },
+        unknown_asset_params() {
+            return {
+                character_ids: _.map(this.recruit.characters, character => character.character_id),
+                withUnknownLocations: true
+            }
         }
     },
     methods: {

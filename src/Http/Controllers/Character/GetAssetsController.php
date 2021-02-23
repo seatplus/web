@@ -52,7 +52,10 @@ class GetAssetsController
             $query = $query->search($request->query('search'));
         }
 
-        return AssetResource::collection(
+        if ($request->has('withUnknownLocations'))
+            $query = $query->withUnknownLocations();
+
+            return AssetResource::collection(
             $query->paginate()
         );
     }

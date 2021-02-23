@@ -73,4 +73,9 @@ class Asset extends EveApiAsset
             ->whereIn('manual_locations.solar_system_id', $system_ids)
         );
     }
+
+    public function scopeWithUnknownLocations(Builder $query)
+    {
+        return $query->where(fn($query) => $query->doesntHave('location')->DoesntHave('manual_location'));
+    }
 }

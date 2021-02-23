@@ -43,6 +43,9 @@ Route::prefix('recruitment')
             ->group(function () {
                 Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
                 Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.corporation.recruitment');
+
+                Route::get('/watchlist/{corporation_id}', [EnlistmentsController::class, 'watchlist'])->name('get.watchlist');
+                Route::post('/watchlist/{corporation_id}', [EnlistmentsController::class, 'updateWatchlist'])->name('update.watchlist');
             });
 
         /* Junior HR */
