@@ -13,6 +13,8 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -311,6 +313,72 @@ class RecruitmentLifeCycleTest extends TestCase
             ->assertJsonCount(1, 'data');
     }
 
+    /** @test */
+    public function seniorHR_can_setup_watchlist()
+    {
+        $this->createEnlistment();
+
+        $this->actingAs($this->test_user->refresh())
+            ->get(route('get.watchlist', $this->test_character->corporation->corporation_id))
+            ->assertOk()
+            ->assertInertia( fn (Assert $page) => $page
+                ->component('Corporation/Recruitment/Watchlist/Index')
+                ->has('watched_systems', 0)
+                ->has('watched_regions', 0)
+            );
+
+        // create system
+        $system =  System::factory()->create();
+
+        // watchlist system
+        $this->actingAs($this->test_user->refresh())
+            ->followingRedirects()
+            ->post(route('update.watchlist', $this->test_character->corporation->corporation_id), [
+                'systems' => [
+                    (object) [
+                        'id' => $system->system_id
+                    ]
+                ]
+            ])
+            ->assertInertia( fn (Assert $page) => $page
+                ->component('Corporation/Recruitment/Watchlist/Index')
+                ->has('watched_systems', 1, fn(Assert $page) => $page
+                    ->where('id', $system->system_id)
+                    ->etc()
+                )
+                ->has('watched_regions', 0)
+            );
+
+        // add region
+        $region = Region::factory()->create();
+        $this->actingAs($this->test_user->refresh())
+            ->followingRedirects()
+            ->post(route('update.watchlist', $this->test_character->corporation->corporation_id), [
+                'systems' => [
+                    (object) [
+                        'id' => $system->system_id
+                    ]
+                ],
+                'regions' => [
+                    (object) [
+                        'id' => $region->region_id
+                    ]
+                ]
+            ])
+            ->assertInertia( fn (Assert $page) => $page
+                ->component('Corporation/Recruitment/Watchlist/Index')
+                ->has('watched_systems', 1, fn(Assert $page) => $page
+                    ->where('id', $system->system_id)
+                    ->etc()
+                )
+                ->has('watched_regions', 1, fn(Assert $page) => $page
+                    ->where('id', $region->region_id)
+                    ->etc()
+                )
+            );
+
+    }
+
     private function applySecondary(bool $user = true)
     {
 
@@ -379,17 +447,6 @@ class RecruitmentLifeCycleTest extends TestCase
         ]);
     }
 
-    /*private function givePermissionsToTestUser(array $array)
-    {
 
-        foreach ($array as $string) {
-            $permission = Permission::findOrCreate($string);
-
-            $this->test_user->givePermissionTo($permission);
-        }
-
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }*/
 
 }

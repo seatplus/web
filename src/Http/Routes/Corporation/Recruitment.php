@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019, 2020 Felix Huber
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,9 @@ Route::prefix('recruitment')
             ->group(function () {
                 Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
                 Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.corporation.recruitment');
+
+                Route::get('/watchlist/{corporation_id}', [EnlistmentsController::class, 'watchlist'])->name('get.watchlist');
+                Route::post('/watchlist/{corporation_id}', [EnlistmentsController::class, 'updateWatchlist'])->name('update.watchlist');
             });
 
         /* Junior HR */

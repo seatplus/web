@@ -24,22 +24,21 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Shared;
+namespace Seatplus\Web\Models\Recruitment;
 
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Resources\CharacterInfoRessource;
+use Seatplus\Eveapi\Models\Recruitment\Enlistments;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
 
-class GetAffiliatedCharactersController extends Controller
+class Enlistment extends Enlistments
 {
-    public function __invoke(string $permission)
+    public function systems()
     {
-        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission))
-            ->with('corporation', 'alliance')
-            ->has($permission);
+        return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');
+    }
 
-        // TODO Change this to use relationship has('permission') where permission must be the name of the relation
-
-        return CharacterInfoRessource::collection($query->paginate());
+    public function regions()
+    {
+        return $this->morphedByMany(Region::class, 'watchlistable', null, 'corporation_id');
     }
 }

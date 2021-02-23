@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019, 2020 Felix Huber
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,10 @@ class GetAssetsController
 
         if ($request->has('search')) {
             $query = $query->search($request->query('search'));
+        }
+
+        if ($request->has('withUnknownLocations')) {
+            $query = $query->withUnknownLocations();
         }
 
         return AssetResource::collection(

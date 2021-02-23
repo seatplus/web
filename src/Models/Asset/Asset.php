@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019, 2020 Felix Huber
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,5 +72,10 @@ class Asset extends EveApiAsset
         )->orWhereHas('manual_location', fn (Builder $query) => $query
             ->whereIn('manual_locations.solar_system_id', $system_ids)
         );
+    }
+
+    public function scopeWithUnknownLocations(Builder $query)
+    {
+        return $query->where(fn ($query) => $query->doesntHave('location')->DoesntHave('manual_location'));
     }
 }

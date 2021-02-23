@@ -24,22 +24,33 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Shared;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Resources\CharacterInfoRessource;
-
-class GetAffiliatedCharactersController extends Controller
+class CreateWatchlistablesTable extends Migration
 {
-    public function __invoke(string $permission)
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
     {
-        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission))
-            ->with('corporation', 'alliance')
-            ->has($permission);
+        Schema::create('watchlistables', function (Blueprint $table) {
+            $table->foreignId('corporation_id')->constrained('corporation_infos', 'corporation_id')->onDelete('cascade');
+            $table->morphs('watchlistable');
+            $table->timestamps();
+        });
+    }
 
-        // TODO Change this to use relationship has('permission') where permission must be the name of the relation
-
-        return CharacterInfoRessource::collection($query->paginate());
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('watchlists');
     }
 }
