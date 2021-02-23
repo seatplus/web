@@ -3,7 +3,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2019, 2020 Felix Huber
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
  */
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
-
 
 use Illuminate\Http\Request;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -62,23 +61,24 @@ class EnlistmentsController extends Controller
 
         return inertia('Corporation/Recruitment/Watchlist/Index', [
             'corporation_id' => $corporation_id,
-            'watched_systems' => $enlistment->systems->map(function($system) {
-                    $system->id = $system->system_id;
-                    return $system;
+            'watched_systems' => $enlistment->systems->map(function ($system) {
+                $system->id = $system->system_id;
+
+                return $system;
             }) ?? [],
-            'watched_regions' => $enlistment->regions->map(function($region) {
-                    $region->id = $region->region_id;
-                    return $region;
-                }) ?? []
+            'watched_regions' => $enlistment->regions->map(function ($region) {
+                $region->id = $region->region_id;
+
+                return $region;
+            }) ?? [],
         ]);
     }
 
     public function updateWatchlist(int $corporation_id, Request $request)
     {
-
         $validated_data = $request->validate([
             'systems' => ['array'],
-            'regions' => ['array']
+            'regions' => ['array'],
         ]);
 
         $system_ids = data_get($validated_data, 'systems.*.id');
