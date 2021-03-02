@@ -1,11 +1,11 @@
 composer.lock
 
+build/
+
 node_modules/
 
 vendor/
 
-build/
+src/public/css/
 
 .phpunit.result.cache
-
-src/public/css/
