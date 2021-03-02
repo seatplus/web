@@ -35,5 +35,5 @@ return [
     'membertracking' => CorporationMemberTrackingHydrateBatch::class,
     'assets' => CharacterAssetsHydrateBatch::class,
     'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class
+    'contract' => ContractHydrateBatch::class,
 ];
