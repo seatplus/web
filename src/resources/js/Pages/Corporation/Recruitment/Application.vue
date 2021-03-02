@@ -20,6 +20,10 @@
                     <AssetsComponent
                         :params="asset_params"
                     />
+                    <ContractComponent :id="character.character_id"
+                                       v-for="character in recruit.characters"
+                                       :key="`contract.component:${character.character_id}`"
+                    />
                     <WalletJournalComponent
                         :id="character.character_id"
                         v-for="character in recruit.characters"
@@ -137,11 +141,13 @@ import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
+import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 
 
 export default {
     name: "UserApplication",
     components: {
+        ContractComponent,
         AssetsComponent,
         WalletJournalComponent,
         WalletTransactionComponent,

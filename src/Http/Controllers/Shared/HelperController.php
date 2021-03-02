@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Support\Facades\Http;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -101,5 +102,10 @@ class HelperController extends Controller
         }
 
         return $query->limit(15)->get()->map(fn ($region) => ['id' => $region->region_id, 'name' => $region->name]);
+    }
+
+    public function getResourceVariants(string $resource_type, int $resource_id)
+    {
+        return Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
     }
 }

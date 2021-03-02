@@ -24,16 +24,37 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
+namespace Seatplus\Web\Http\Resources;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
-];
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ContractRessource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
+    {
+        return [
+            'contract_id' => $this->contract_id,
+            'issuer_id' => $this->issuer_id,
+            'issuer_corporation_id' => $this->issuer_corporation_id,
+            'for_corporation' => $this->for_corporation,
+            'assignee_id' => $this->assignee_id,
+            'acceptor_id' => $this->acceptor_id,
+            'type' => $this->type,
+            'title' => $this->title,
+            'status' => $this->status,
+            'collateral' => $this->collateral,
+            'price' => $this->price,
+            'reward' => $this->reward,
+            'items' => $this->items->count(),
+            'volume' => $this->volume,
+            'start_location' => $this->start_location?->locatable,
+            'end_location' => $this->end_location?->locatable,
+        ];
+    }
+}

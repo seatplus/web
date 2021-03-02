@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Support\Facades\Http;
 use Mockery;
 use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Universe\Region;
@@ -172,6 +173,27 @@ class HelperControllerTest extends TestCase
             ->assertOk();
 
         $this->assertCount(1, $result->original);
+    }
+
+    /** @test  */
+    public function onCanGetResourceVariants()
+    {
+        Http::fake();
+
+        $expected_response = ["render", "icon"];
+
+        Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('get.resource.variants', [
+                'resource_type' => 'types',
+                'resource_id' => 587
+            ]))
+            ->assertOk()
+            ->assertJson($expected_response);
+
+
+
     }
 
     private function mockRetrieveEsiDataAction(array $body) : void

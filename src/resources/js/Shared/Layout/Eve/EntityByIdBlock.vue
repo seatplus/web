@@ -1,10 +1,10 @@
 <template>
-    <div class="flex items-center">
-        <div v-if="ready" class="flex-shrink-0">
-            <EveImage :object="entity" :size="256" tailwind_class="h-12 w-12 rounded-full"/>
+    <div class="sm:flex">
+        <div v-if="ready" class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center">
+            <EveImage :object="entity" :size="256" :tailwind_class="image_class"/>
         </div>
-        <div v-if="ready" class="ml-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+        <div v-if="ready">
+            <h3 :class="name_class">
                 {{  name }}
             </h3>
             <p v-if="withSubText && (entity.corporation || entity.alliance)" class="text-sm text-gray-500 truncate">
@@ -29,6 +29,16 @@ export default {
             required: false,
             type: Boolean,
             default: true
+        },
+        imageSize: {
+            required: false,
+            default: 12,
+            type: Number
+        },
+        nameFontSize: {
+            required: false,
+            default: 'lg',
+            type: String
         }
     },
     data() {
@@ -62,7 +72,12 @@ export default {
         name() {
             return _.get(this.entity, 'name', 'missing name')
         },
-
+        image_class() {
+            return `h-${this.imageSize} w-${this.imageSize} rounded-full`
+        },
+        name_class() {
+            return `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
+        }
     },
     created() {
 
