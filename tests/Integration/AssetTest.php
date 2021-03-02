@@ -77,7 +77,6 @@ class AssetTest extends TestCase
             //->assertOk();
 
         $response->assertOk();
-
     }
 
     /** @test */
