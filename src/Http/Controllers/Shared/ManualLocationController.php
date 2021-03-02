@@ -46,7 +46,7 @@ class ManualLocationController extends Controller
     public function getSuggestions()
     {
         ManualLocation::query()
-            ->whereHas('location', fn($query) => $query->whereHasMorph('locatable', [Structure::class, Station::class]))
+            ->whereHas('location', fn ($query) => $query->whereHasMorph('locatable', [Structure::class, Station::class]))
             ->delete();
 
         return ManualLocation::with('system', 'user.main_character', 'user.characters')
@@ -66,7 +66,7 @@ class ManualLocationController extends Controller
         $suggestion->save();
 
         Location::updateOrCreate([
-            'location_id' => $suggestion->location_id
+            'location_id' => $suggestion->location_id,
         ], [
             'locatable_id' => $suggestion->location_id,
             'locatable_type' => ManualLocation::class,
