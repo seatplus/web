@@ -38,7 +38,6 @@ class ContractRessource extends JsonResource
      */
     public function toArray($request)
     {
-
         return [
             'contract_id' => $this->contract_id,
             'issuer_id' => $this->issuer_id,
@@ -55,7 +54,7 @@ class ContractRessource extends JsonResource
             'items' => $this->items->count(),
             'volume' => $this->volume,
             'start_location' => $this->start_location?->locatable,
-            'end_location' => $this->end_location?->locatable
+            'end_location' => $this->end_location?->locatable,
         ];
     }
 }

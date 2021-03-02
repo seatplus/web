@@ -33,7 +33,7 @@ class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    protected function getAffiliatedIds(string $class) : array
+    protected function getAffiliatedIds(string $class): array
     {
         $ids = request()->has('character_ids')
             ? request()->get('character_ids')
