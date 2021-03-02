@@ -1,1 +1,11 @@
 composer.lock
+
+build/
+
+node_modules/
+
+vendor/
+
+src/public/css/
+
+.phpunit.result.cache
