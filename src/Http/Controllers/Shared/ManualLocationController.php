@@ -30,6 +30,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Seatplus\Eveapi\Actions\Jobs\Universe\ResolveUniverseSystemsBySystemIdAction;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
+use Seatplus\Eveapi\Models\Universe\Location;
+use Seatplus\Eveapi\Models\Universe\Station;
+use Seatplus\Eveapi\Models\Universe\Structure;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\ManualLocation;
 
@@ -42,7 +45,9 @@ class ManualLocationController extends Controller
 
     public function getSuggestions()
     {
-        ManualLocation::query()->has('location')->delete();
+        ManualLocation::query()
+            ->whereHas('location', fn($query) => $query->whereHasMorph('locatable', [Structure::class, Station::class]))
+            ->delete();
 
         return ManualLocation::with('system', 'user.main_character', 'user.characters')
             ->orderByDesc('location_id')
@@ -59,6 +64,13 @@ class ManualLocationController extends Controller
         $suggestion = ManualLocation::find($validated['id']);
         $suggestion->selected = true;
         $suggestion->save();
+
+        Location::updateOrCreate([
+            'location_id' => $suggestion->location_id
+        ], [
+            'locatable_id' => $suggestion->location_id,
+            'locatable_type' => ManualLocation::class,
+        ]);
 
         ManualLocation::where('location_id', $validated['location_id'])->where('id', '<>', $validated['id'])->delete();
 
