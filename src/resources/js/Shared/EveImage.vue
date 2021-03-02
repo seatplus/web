@@ -58,18 +58,19 @@
                     .value()
             },
             resource_type() {
-                let type = 'types'
 
-                if ('character_id' in this.object)
-                    type = 'characters';
+                let array = {
+                    'character_id': 'characters',
+                    'corporation_id': 'corporations',
+                    'alliance_id': 'alliances',
+                    'type_id': 'types',
+                }
 
-                if ('corporation_id' in this.object)
-                    type =  'corporations';
-
-                if ('alliance_id' in this.object)
-                    type =  'alliances';
-
-                return type
+                return _.chain(array)
+                    .filter( (type, id) => id in this.object )
+                    .map((type) => type)
+                    .head()
+                    .value();
             },
             image_url() {
                 return `https://images.evetech.net/${this.resource_type}/${this.resource_id}/${this.resource_variant}?size=${this.resource_size}&tenant=tranquility`
