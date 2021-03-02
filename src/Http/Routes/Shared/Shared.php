@@ -47,3 +47,5 @@ Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestio
 Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');
 
 Route::get('/stop/impersonate', StopImpersonateController::class)->name('impersonate.stop');
+
+Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');

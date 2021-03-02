@@ -1,5 +1,5 @@
 const mix = require('laravel-mix');
-const path = require('path')
+const path = require('path');
 const tailwindcss = require('tailwindcss')
 
 /*
@@ -17,7 +17,9 @@ mix.setPublicPath('src/public');
 mix.js('src/resources/js/app.js', 'src/public/js')
     .sass('src/resources/sass/app.scss', 'src/public/css')
     .webpackConfig({
-      output : {chunkFilename: 'js/[name].js?id=[chunkhash]'},
+      output : {
+          chunkFilename: 'js/[name].js?id=[chunkhash]'
+      },
       resolve: {
         alias: {
           vue$: 'vue/dist/vue.runtime.esm.js',

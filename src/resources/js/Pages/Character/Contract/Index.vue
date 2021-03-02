@@ -1,9 +1,9 @@
 <template>
-    <Layout page="Character Contacts" :dispatch_transfer_object="dispatch_transfer_object">
+    <Layout page="Character Contracts" :dispatch_transfer_object="dispatch_transfer_object">
 
         <template v-slot:title>
             <PageHeader>
-                Character Contacts
+                Character Contracts
                 <template v-slot:primary>
                     <HeaderButton @click="openSlideOver('update')">
                         Update
@@ -17,7 +17,7 @@
         </template>
 
         <div class="space-y-4">
-            <CharacterContactPanel v-for="character_affiliation in characters" :key="character_affiliation.character_id" :character="character_affiliation.character" :corporation_id="character_affiliation.corporation_id" :alliance_id="character_affiliation.alliance_id" />
+            <ContractComponent :id="character.character_id" v-for="character in characters" :key="character.character_id" />
         </div>
 
         <template v-slot:slideOver>
@@ -38,9 +38,12 @@ import ListTransition from "@/Shared/Transitions/ListTransition";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
+
 export default {
     name: "Index",
     components: {
+        ContractComponent,
         CharacterSelectionButton,
         HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
     props: {
@@ -56,8 +59,8 @@ export default {
     methods: {
         openSlideOver(value) {
             this.$eventBus.$emit('open-slideOver', value);
-        },
-    }
+        }
+    },
 }
 </script>
 
