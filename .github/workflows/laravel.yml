@@ -33,15 +33,3 @@ jobs:
       with:
         coverageCommand: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
         debug: false
-
-  front-end-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12'
-      - name: install npm packages
-        run: npm install
-      - name: run npm tests
-        run: npm test
