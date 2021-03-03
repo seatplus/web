@@ -53,11 +53,27 @@ class SidebarTest extends TestCase
 
         Permission::create(['name' => 'view access control']);
 
-        $this->test_user->givePermissionTo('superuser');
+        $this->test_user->givePermissionTo('view access control');
 
         $sidebar = (new SidebarEntries)->filter();
 
         $this->assertTrue(isset($sidebar['Access Control']));
+    }
+
+    /** @test */
+    public function user_without_view_access_control_does_see_access_control()
+    {
+
+        $this->actingAs($this->test_user);
+
+        Permission::create(['name' => 'view access control']);
+
+        //$this->test_user->givePermissionTo('view access control');
+
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertFalse($this->test_user->can('view access control'));
+        $this->assertFalse(isset($sidebar['Access Control']));
     }
 
     /** @test */

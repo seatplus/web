@@ -36,7 +36,7 @@ class SidebarEntries
 {
     public function __construct()
     {
-        $this->user = User::first(); //auth()->user();
+        $this->user = auth()->user();
     }
 
     public function filter()
@@ -47,12 +47,10 @@ class SidebarEntries
                     ? $this->IsUserMissingCharacterRole($entry)
                     : (Arr::has($entry, 'permission') ? $this->isUserMissingPermission($entry) : false));
             })
-            ->reject(fn ($topic) => $topic->isEmpty())->map(function ($entries, $category) {
-                return [
-                    'name' => $category,
-                    'entries' => $entries,
-                ];
-            });
+            ->reject(fn ($topic) => $topic->isEmpty())->map(fn($entries, $category) => [
+                'name' => $category,
+                'entries' => $entries,
+            ]);
     }
 
     private function isUserMissingPermission(array $array): bool
