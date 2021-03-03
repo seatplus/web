@@ -4,15 +4,13 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Tests\TestCase;

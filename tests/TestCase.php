@@ -3,10 +3,10 @@
 
 namespace Seatplus\Web\Tests;
 
-use ClaudioDekker\Inertia\InertiaTestingServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Inertia;
+use Inertia\ServiceProvider as InertiaServiceProviderAlias;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
@@ -14,7 +14,6 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Middleware\Authenticate;
-use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\WebServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
@@ -76,7 +75,7 @@ abstract class TestCase extends OrchestraTestCase
             EveapiServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
-            InertiaTestingServiceProvider::class
+            InertiaServiceProviderAlias::class
         ];
     }
 
@@ -116,8 +115,8 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('cache.prefix', 'seatplus_tests---');
 
         //Setup Inertia for package development
-        config()->set('inertia.page.paths', array_merge(
-            config()->get('inertia.page.paths', []),
+        config()->set('inertia.testing.page_paths', array_merge(
+            config()->get('inertia.testing.page_paths', []),
             [realpath(__DIR__ . '/../src/resources/js/Pages'), realpath(__DIR__ . '/../src/resources/js/Shared')],
         ));
     }

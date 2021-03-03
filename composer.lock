@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6feaf290c510894d2855dcb1eb89cadc",
+    "content-hash": "19072aa49099715e81de5363029be2dd",
     "packages": [
         {
             "name": "brick/math",
@@ -1099,23 +1099,27 @@
         },
         {
             "name": "inertiajs/inertia-laravel",
-            "version": "v0.3.6",
+            "version": "v0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/inertiajs/inertia-laravel.git",
-                "reference": "726b1e0d4fc399089dd29820a78e40d1c9aad2eb"
+                "reference": "097fe5b3be73ab8edea1a5216a696f627c1f6b03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/726b1e0d4fc399089dd29820a78e40d1c9aad2eb",
-                "reference": "726b1e0d4fc399089dd29820a78e40d1c9aad2eb",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/097fe5b3be73ab8edea1a5216a696f627c1f6b03",
+                "reference": "097fe5b3be73ab8edea1a5216a696f627c1f6b03",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^5.4|^6.0|^7.0|^8.0"
+                "ext-json": "*",
+                "laravel/framework": "^5.4|^6.0|^7.0|^8.0",
+                "php": "^7.2|^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "~3.0"
+                "orchestra/testbench": "^4.0|^5.0|^6.0",
+                "phpunit/phpunit": "^8.0|^9.0",
+                "roave/security-advisories": "dev-master"
             },
             "type": "library",
             "extra": {
@@ -1151,7 +1155,7 @@
             ],
             "support": {
                 "issues": "https://github.com/inertiajs/inertia-laravel/issues",
-                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.3.6"
+                "source": "https://github.com/inertiajs/inertia-laravel/tree/v0.4.0"
             },
             "funding": [
                 {
@@ -1159,20 +1163,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-08T13:16:40+00:00"
+            "time": "2021-03-02T19:35:26+00:00"
         },
         {
             "name": "laravel/framework",
-            "version": "v8.30.0",
+            "version": "v8.30.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "81ef9850cc388f2f92b868fb35ffb76f0c9a0f46"
+                "reference": "ab7e1c19ee0403e15fc59983b7ccb86d85db45e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/81ef9850cc388f2f92b868fb35ffb76f0c9a0f46",
-                "reference": "81ef9850cc388f2f92b868fb35ffb76f0c9a0f46",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/ab7e1c19ee0403e15fc59983b7ccb86d85db45e6",
+                "reference": "ab7e1c19ee0403e15fc59983b7ccb86d85db45e6",
                 "shasum": ""
             },
             "require": {
@@ -1327,7 +1331,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-03-02T14:28:44+00:00"
+            "time": "2021-03-03T14:59:13+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -5710,83 +5714,6 @@
             "time": "2021-01-29T15:25:31+00:00"
         },
         {
-            "name": "claudiodekker/inertia-laravel-testing",
-            "version": "2.2.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/claudiodekker/inertia-laravel-testing.git",
-                "reference": "8c8191b2b910ebdd4979911c9fbae60a188a85b4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/claudiodekker/inertia-laravel-testing/zipball/8c8191b2b910ebdd4979911c9fbae60a188a85b4",
-                "reference": "8c8191b2b910ebdd4979911c9fbae60a188a85b4",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "inertiajs/inertia-laravel": "^v0.3",
-                "laravel/framework": "^6.0|^7.0|^8.0",
-                "php": "^7.2|^8.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^4.0|^5.0|^6.0",
-                "phpunit/phpunit": "^8.0|^9.0",
-                "roave/security-advisories": "dev-master"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "ClaudioDekker\\Inertia\\InertiaTestingServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "ClaudioDekker\\Inertia\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Claudio Dekker",
-                    "email": "claudio@ubient.net",
-                    "homepage": "https://dekker.io",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Testing helpers for https://github.com/inertiajs/inertia-laravel",
-            "homepage": "https://github.com/claudiodekker/inertia-laravel-testing",
-            "keywords": [
-                "claudiodekker",
-                "helpers",
-                "inertia",
-                "laravel",
-                "phpunit",
-                "testing"
-            ],
-            "support": {
-                "issues": "https://github.com/claudiodekker/inertia-laravel-testing/issues",
-                "source": "https://github.com/claudiodekker/inertia-laravel-testing/tree/2.2.5"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/claudiodekker",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/reinink",
-                    "type": "github"
-                }
-            ],
-            "abandoned": "inertiajs/inertia-laravel",
-            "time": "2021-01-22T11:10:25+00:00"
-        },
-        {
             "name": "clue/stdio-react",
             "version": "v2.4.0",
             "source": {
@@ -9947,16 +9874,16 @@
         },
         {
             "name": "spatie/ray",
-            "version": "1.21.0",
+            "version": "1.21.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ray.git",
-                "reference": "ee905ec17c3e81248de7cd11ea754d051ed369c5"
+                "reference": "9ed03dd8d7aa1fed5e947c6a5aa637a54a179009"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ray/zipball/ee905ec17c3e81248de7cd11ea754d051ed369c5",
-                "reference": "ee905ec17c3e81248de7cd11ea754d051ed369c5",
+                "url": "https://api.github.com/repos/spatie/ray/zipball/9ed03dd8d7aa1fed5e947c6a5aa637a54a179009",
+                "reference": "9ed03dd8d7aa1fed5e947c6a5aa637a54a179009",
                 "shasum": ""
             },
             "require": {
@@ -10006,7 +9933,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ray/issues",
-                "source": "https://github.com/spatie/ray/tree/1.21.0"
+                "source": "https://github.com/spatie/ray/tree/1.21.1"
             },
             "funding": [
                 {
@@ -10018,7 +9945,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2021-03-03T09:00:44+00:00"
+            "time": "2021-03-03T12:49:16+00:00"
         },
         {
             "name": "symfony/cache",

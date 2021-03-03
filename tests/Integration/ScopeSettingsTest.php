@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
