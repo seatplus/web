@@ -15,6 +15,7 @@ const tailwindcss = require('tailwindcss')
 mix.setPublicPath('src/public');
 
 mix.js('src/resources/js/app.js', 'src/public/js')
+    .vue()
     .sass('src/resources/sass/app.scss', 'src/public/css')
     .webpackConfig({
       output : {
