@@ -47,7 +47,7 @@ class SidebarEntries
                     ? $this->IsUserMissingCharacterRole($entry)
                     : (Arr::has($entry, 'permission') ? $this->isUserMissingPermission($entry) : false));
             })
-            ->reject(fn ($topic) => $topic->isEmpty())->map(fn($entries, $category) => [
+            ->reject(fn ($topic) => $topic->isEmpty())->map(fn ($entries, $category) => [
                 'name' => $category,
                 'entries' => $entries,
             ]);
