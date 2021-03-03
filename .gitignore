@@ -9,3 +9,5 @@ vendor/
 src/public/css/
 
 .phpunit.result.cache
+
+src/public/js/
