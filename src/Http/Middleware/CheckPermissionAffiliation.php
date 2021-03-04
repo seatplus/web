@@ -27,8 +27,10 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 
 class CheckPermissionAffiliation
@@ -64,9 +66,9 @@ class CheckPermissionAffiliation
 
         $affiliated_ids = $this->buildAffiliatedIdsByPermissions($permissions);
 
-        //dump($affiliated_ids, $requested_id);
+        $recruit_ids = $this->buildRecruitIds();
 
-        abort_unless($requested_id->intersect($affiliated_ids)->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
+        abort_unless($requested_id->intersect([...$affiliated_ids, ...$recruit_ids])->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
 
         return $next($request);
     }
@@ -90,21 +92,32 @@ class CheckPermissionAffiliation
             $affiliatedIds = getAffiliatedIdsByPermission($permission);
 
             $ids->push($affiliatedIds);
-
-            if ($permission === 'can accept or deny applications') {
-                $ids->push($this->getRecruitIds($affiliatedIds));
-            }
         }
 
         return $ids->flatten()->unique()->toArray();
     }
 
-    private function getRecruitIds(array $affiliated_ids): array
+    private function buildRecruitIds(): array
     {
-        $applicant_ids = Application::whereIn('corporation_id', $affiliated_ids)
-            ->pluck('applicationable_id')
-            ->toArray();
 
-        return $applicant_ids;
+        $recruiter_permission = 'can accept or deny applications';
+
+        if(!auth()->user()->can($recruiter_permission))
+            return [];
+
+        return Application::whereIn('corporation_id', $this->buildAffiliatedIdsByPermissions([$recruiter_permission]))
+            ->whereStatus('open')
+            ->with([
+                'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
+                    User::class => ['characters'],
+                ]),
+            ])
+            ->get()
+            ->map(fn($recruit) => $recruit->applicationable->characters
+                ? $recruit->applicationable->characters->pluck('character_id')
+                : $recruit->applicationable->character_id
+            )
+            ->flatten()
+            ->toArray();
     }
 }
