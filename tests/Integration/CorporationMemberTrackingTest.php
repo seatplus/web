@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Seatplus\Web\Tests\TestCase;
 
 class CorporationMemberTrackingTest extends  TestCase

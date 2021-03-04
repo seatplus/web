@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;

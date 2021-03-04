@@ -34,49 +34,31 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
-    public function __construct()
-    {
-        $this->user = auth()->user();
+    private array $sidebar;
+
+    public function __construct(
+        private ?User $user = null
+    ) {
+        $this->user ??= auth()->user();
+        $this->sidebar = config('package.sidebar');
     }
 
     public function filter()
     {
-        return collect(config('package.sidebar'))
-            ->map(function ($topic) {
-                return collect($topic)->reject(fn ($entry) => Arr::has($entry, 'character_role')
-                    ? $this->IsUserMissingCharacterRole($entry)
-                    : (Arr::has($entry, 'permission') ? $this->isUserMissingPermission($entry) : false));
-            })
-            ->reject(fn ($topic) => $topic->isEmpty())->map(fn ($entries, $category) => [
-                'name' => $category,
-                'entries' => $entries,
-            ]);
-    }
+        $categories = array_keys($this->sidebar);
 
-    private function isUserMissingPermission(array $array): bool
-    {
-        $permission_name = Arr::get($array, 'permission');
+        return collect($categories)->mapWithKeys(function ($category) {
+            $entries = $this->buildAvailableSidebarEntriesArray($category);
 
-        return ! $this->checkPermission($permission_name);
-    }
-
-    /*
-    * Checks if user misses required permission and role
-    */
-    private function IsUserMissingCharacterRole($entry): bool
-    {
-        if ($this->checkPermission('superuser')) {
-            return false;
-        }
-
-        $role = Arr::get($entry, 'character_role');
-
-        return $this->user
-            ->loadMissing('characters.roles')
-            ->characters
-            ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($role)))
-            ->filter()
-            ->isEmpty();
+            return empty($entries)
+                ? [$category => null]
+                : [
+                    $category => [
+                        'name' => $category,
+                        'entries' => $entries,
+                    ],
+                ];
+        })->filter();
     }
 
     private function checkPermission(string $permission): bool
@@ -86,7 +68,43 @@ class SidebarEntries
         } catch (PermissionDoesNotExist) {
             Permission::create(['name' => $permission]);
 
-            return $this->isUserMissingPermission($permission);
+            return $this->checkPermission($permission);
         }
+    }
+
+    private function buildAvailableSidebarEntriesArray(string $category): array
+    {
+        $entries = Arr::get($this->sidebar, $category);
+
+        return collect($entries)->filter(function ($entry) {
+            $permission = Arr::get($entry, 'permission');
+            $character_role = Arr::get($entry, 'character_role');
+
+            // if entry has no required permission show it to the user
+            if (is_null($permission)) {
+                return true;
+            }
+
+            // if user has required permission show element
+            if ($this->checkPermission($permission)) {
+                return true;
+            }
+
+            // if user does not have permission but got necessary character_role show element
+            return is_string($character_role) ? $this->hasUserCharacterRole($character_role) : false;
+        })->toArray();
+    }
+
+    /*
+    * Checks if user has required role
+    */
+    private function hasUserCharacterRole(string $character_role): bool
+    {
+        return $this->user
+            ->loadMissing('characters.roles')
+            ->characters
+            ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($character_role)))
+            ->filter()
+            ->isNotEmpty();
     }
 }

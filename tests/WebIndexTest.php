@@ -3,8 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
-use ClaudioDekker\Inertia\Assert;
-use Inertia\Inertia;
+use Inertia\Testing\Assert;
 
 class WebIndexTest extends TestCase
 {

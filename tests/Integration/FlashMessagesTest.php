@@ -3,7 +3,7 @@
 
 namespace Seatplus\Web\Tests\Integration;
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Inertia\Inertia;
 use Seatplus\Web\Tests\TestCase;
 

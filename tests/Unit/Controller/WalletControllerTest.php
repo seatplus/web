@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Unit\Controller;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;

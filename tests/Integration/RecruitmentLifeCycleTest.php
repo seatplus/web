@@ -4,15 +4,13 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use ClaudioDekker\Inertia\Assert;
+use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Tests\TestCase;
@@ -379,6 +377,60 @@ class RecruitmentLifeCycleTest extends TestCase
 
     }
 
+    /** @test */
+    public function RecruiterCanSeeCorporationApplications()
+    {
+        // Create Enlistment
+        $this->createEnlistment('character');
+
+        // create Senior Recruiter user
+
+        $recruiter = Event::fakeFor(fn() =>User::factory()->create());
+
+        // give user roles
+
+        $role = Role::findByName('test');
+
+        $response = $this->actingAs($this->superuser)
+            ->followingRedirects()
+            ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => [
+                    [
+                        'user_id' => $recruiter->id,
+                        'user' => $recruiter
+                    ],
+                ]
+            ])->assertOk();
+
+        $this->assertTrue($recruiter->refresh()->hasRole($role));
+
+        // get list with open appliactions
+        $response = $this->actingAs($recruiter)
+            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
+            ->assertOk();
+
+        // Apply with secondary user
+        $this->applySecondary(false);
+
+        // Get the test_users Applicaton // /character_application/{character_id}
+        $response = $this->actingAs($recruiter)
+            ->get(route('character.application', $this->secondary_character->character_id))
+            ->assertOk();
+
+        // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
+        $this->actingAs($recruiter)
+            ->get(route('character.wallet_journal.detail', $this->secondary_character->character_id))
+            ->assertOk();
+
+        // Any other character should be forbidden
+        $this->actingAs($recruiter)
+            ->get(route('character.wallet_journal.detail', $this->secondary_character->character_id+1))
+            ->assertForbidden();
+
+    }
+
     private function applySecondary(bool $user = true)
     {
 
@@ -390,7 +442,7 @@ class RecruitmentLifeCycleTest extends TestCase
             ->post(route('post.application'), $payload);
     }
 
-    private function createEnlistment($type = 'user')
+    private function createEnlistment($type = 'user',string $affiliation = 'allowed')
     {
         // create role
         $this->actingAs($this->superuser)
@@ -403,7 +455,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->superuser)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
                 "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
-                "allowed" => [
+                $affiliation => [
                     [
                         "corporation_id" => $this->test_character->corporation->corporation_id,
                         "id" => $this->test_character->corporation->corporation_id,
