@@ -12,6 +12,15 @@
 
         <infinite-loading :identifier="infiniteId" @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more">all assets loaded</div>
+            <div slot="no-results">
+                <CardWithHeader>
+                    <template v-slot:header>
+                        <div class="flex">
+                            <div class="flex-none text-right text-sm text-gray-500">No assets available</div>
+                        </div>
+                    </template>
+                </CardWithHeader>
+            </div>
         </infinite-loading>
     </div>
 </template>
@@ -19,9 +28,11 @@
 <script>
 import LocationComponent from "./LocationComponent";
 import InfiniteLoading from "vue-infinite-loading"
+import CardWithHeader from "../../Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "../../Layout/Eve/EntityByIdBlock";
 export default {
     name: "AssetsComponent",
-    components: {LocationComponent, InfiniteLoading},
+    components: {EntityByIdBlock, CardWithHeader, LocationComponent, InfiniteLoading},
     props: {
         params: {
             required: true,

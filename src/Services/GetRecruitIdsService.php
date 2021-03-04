@@ -24,24 +24,35 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers;
+namespace Seatplus\Web\Services;
 
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
-use Seatplus\Web\Services\GetRecruitIdsService;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
 
-class Controller extends BaseController
+class GetRecruitIdsService
 {
-    use ValidatesRequests;
-
-    protected function getAffiliatedIds(string $class): array
+    public static function get(): array
     {
-        $ids = request()->has('character_ids')
-            ? request()->get('character_ids')
-            : auth()->user()->characters->pluck('character_id')->toArray();
+        $recruiter_permission = 'can accept or deny applications';
 
-        return collect($ids)->map(fn ($character_id) => intval($character_id))
-            ->intersect([...getAffiliatedIdsByClass($class), ...GetRecruitIdsService::get()])
+        if (! auth()->user()->can($recruiter_permission)) {
+            return [];
+        }
+
+        return Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
+            ->whereStatus('open')
+            ->with([
+                'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
+                    User::class => ['characters'],
+                ]),
+            ])
+            ->get()
+            ->map(fn ($recruit) => $recruit->applicationable->characters
+                ? $recruit->applicationable->characters->pluck('character_id')
+                : $recruit->applicationable->character_id
+            )
+            ->flatten()
             ->toArray();
     }
 }

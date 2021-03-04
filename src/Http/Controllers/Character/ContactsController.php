@@ -31,18 +31,13 @@ use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContactResource;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class ContactsController extends Controller
 {
     public function index()
     {
-        $ids = request()->has('character_ids')
-            ? request()->get('character_ids')
-            : auth()->user()->characters->pluck('character_id')->toArray();
-
-        $ids = collect($ids)->map(fn ($character_id) => intval($character_id))
-            ->intersect(getAffiliatedIdsByClass(Contact::class))
-            ->toArray();
+        $ids = $this->getAffiliatedIds(Contact::class);
 
         $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
 
@@ -54,7 +49,7 @@ class ContactsController extends Controller
 
     public function detail(int $id)
     {
-        $affiliated_ids = CharacterAffiliation::whereIn('character_id', getAffiliatedIdsByClass(Contact::class))
+        $affiliated_ids = CharacterAffiliation::whereIn('character_id', [...getAffiliatedIdsByClass(Contact::class), ...GetRecruitIdsService::get()])
             ->cursor()
             ->map(fn ($affiliation) => [$affiliation->character_id, $affiliation->corporation_id, $affiliation->alliance_id])
             ->flatten()

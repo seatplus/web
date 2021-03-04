@@ -49,11 +49,10 @@
 <script>
 import Applicant from "./Applicant";
 import EveImage from "@/Shared/EveImage";
-import Modal from "@/Shared/Modals/Modal";
 
 export default {
     name: "UserApplications",
-    components: {Modal, EveImage, Applicant},
+    components: {EveImage, Applicant},
     props: {
         applications: {
             required: true,
