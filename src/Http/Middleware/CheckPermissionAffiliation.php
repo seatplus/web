@@ -97,7 +97,6 @@ class CheckPermissionAffiliation
 
     private function buildRecruitIds(): array
     {
-
         return GetRecruitIdsService::get();
     }
 }
