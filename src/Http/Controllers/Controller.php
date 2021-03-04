@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class Controller extends BaseController
 {
@@ -40,7 +41,7 @@ class Controller extends BaseController
             : auth()->user()->characters->pluck('character_id')->toArray();
 
         return collect($ids)->map(fn ($character_id) => intval($character_id))
-            ->intersect(getAffiliatedIdsByClass($class))
+            ->intersect([...getAffiliatedIdsByClass($class), ...GetRecruitIdsService::get()])->dump()
             ->toArray();
     }
 }

@@ -3,7 +3,10 @@
 
     <CardWithHeader>
         <template v-slot:header>
-            <EntityBlock :entity="character"/>
+            <div class="flex">
+                <EntityBlock class="flex-grow" :entity="character"/>
+                <div class="flex-none text-right text-sm text-gray-500">Contacts</div>
+            </div>
         </template>
         <transition
             enter-active-class="transition ease-out duration-100"
@@ -17,6 +20,7 @@
                 <div class="flex flex-col max-h-96">
                     <ContactsList :contacts="contacts" />
                     <ContactsTable :contacts="contacts" />
+                    <span v-if="contacts.length === 0">no contacts loaded</span>
                 </div>
             </div>
             <div v-else class="flex justify-center w-full h-full p-8">
