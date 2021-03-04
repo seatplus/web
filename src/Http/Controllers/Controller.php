@@ -41,7 +41,7 @@ class Controller extends BaseController
             : auth()->user()->characters->pluck('character_id')->toArray();
 
         return collect($ids)->map(fn ($character_id) => intval($character_id))
-            ->intersect([...getAffiliatedIdsByClass($class), ...GetRecruitIdsService::get()])->dump()
+            ->intersect([...getAffiliatedIdsByClass($class), ...GetRecruitIdsService::get()])
             ->toArray();
     }
 }
