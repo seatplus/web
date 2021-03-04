@@ -27,11 +27,9 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Application;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class CheckPermissionAffiliation
 {
@@ -99,25 +97,7 @@ class CheckPermissionAffiliation
 
     private function buildRecruitIds(): array
     {
-        $recruiter_permission = 'can accept or deny applications';
 
-        if (! auth()->user()->can($recruiter_permission)) {
-            return [];
-        }
-
-        return Application::whereIn('corporation_id', $this->buildAffiliatedIdsByPermissions([$recruiter_permission]))
-            ->whereStatus('open')
-            ->with([
-                'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
-                    User::class => ['characters'],
-                ]),
-            ])
-            ->get()
-            ->map(fn ($recruit) => $recruit->applicationable->characters
-                ? $recruit->applicationable->characters->pluck('character_id')
-                : $recruit->applicationable->character_id
-            )
-            ->flatten()
-            ->toArray();
+        return GetRecruitIdsService::get();
     }
 }

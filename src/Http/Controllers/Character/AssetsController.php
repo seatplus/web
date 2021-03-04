@@ -34,6 +34,7 @@ use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class AssetsController extends Controller
 {
@@ -58,7 +59,7 @@ class AssetsController extends Controller
     public function details(int $item_id)
     {
         $query = Asset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->affiliated(getAffiliatedIdsByClass(Asset::class), request()->query('character_ids'))
+            ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('item_id', $item_id);
 
         $item = AssetResource::collection($query->get());
