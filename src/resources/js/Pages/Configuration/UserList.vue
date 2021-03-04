@@ -1,6 +1,6 @@
 <template>
     <Settings :layout-object="this.layoutObject">
-        <ul>
+        <ul class="divide-y divide-gray-200">
             <li class="px-4 py-4 sm:px-6">
 
                 <label for="search_field" class="sr-only">Search</label>
@@ -15,7 +15,9 @@
 
 
             </li>
-            <UserListElement v-for="user in this.users.data" :key="user.id" :user="user"/>
+
+            <UserListElement v-for="(user, index) in this.users.data" :key="user.id" :user="user" :index="index"/>
+
         </ul>
 
 
@@ -28,18 +30,14 @@
 </template>
 
 <script>
-    import EveImage from "../../Shared/EveImage"
     import Pagination from "../../Shared/Pagination"
     import {Inertia} from "@inertiajs/inertia"
     import Settings from "./Settings"
-    import Layout from "../../Shared/Layout"
-    import WideListElement from "../../Shared/WideListElement"
-    import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
     import UserListElement from "./UserListElement";
 
     export default {
         name: "UserList",
-        components: {UserListElement, EntityBlock, WideListElement, Layout, Settings, Pagination, EveImage},
+        components: {UserListElement, Settings, Pagination},
         props: {
             users: {
                 type: Object,
