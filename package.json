@@ -42,7 +42,7 @@
         "tailwindcss": "^2.0.2",
         "uuid": "^8.3.2",
         "vue-autosuggest": "^2.2.0",
-        "vue-fragment": "^1.5.1",
+        "vue-fragment": "^1.5.2",
         "vue-infinite-loading": "^2.4.5"
     }
 }
