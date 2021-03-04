@@ -99,11 +99,11 @@ class CheckPermissionAffiliation
 
     private function buildRecruitIds(): array
     {
-
         $recruiter_permission = 'can accept or deny applications';
 
-        if(!auth()->user()->can($recruiter_permission))
+        if (! auth()->user()->can($recruiter_permission)) {
             return [];
+        }
 
         return Application::whereIn('corporation_id', $this->buildAffiliatedIdsByPermissions([$recruiter_permission]))
             ->whereStatus('open')
@@ -113,7 +113,7 @@ class CheckPermissionAffiliation
                 ]),
             ])
             ->get()
-            ->map(fn($recruit) => $recruit->applicationable->characters
+            ->map(fn ($recruit) => $recruit->applicationable->characters
                 ? $recruit->applicationable->characters->pluck('character_id')
                 : $recruit->applicationable->character_id
             )
