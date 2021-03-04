@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Services\Sidebar;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
@@ -35,13 +34,11 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
-
     private array $sidebar;
 
     public function __construct(
         private ?User $user = null
-    )
-    {
+    ) {
         $this->user ??= auth()->user();
         $this->sidebar = config('package.sidebar');
     }
@@ -58,8 +55,8 @@ class SidebarEntries
                 : [
                     $category => [
                         'name' => $category,
-                        'entries' => $entries
-                    ]
+                        'entries' => $entries,
+                    ],
                 ];
         })->filter();
     }
@@ -75,26 +72,26 @@ class SidebarEntries
         }
     }
 
-    private function buildAvailableSidebarEntriesArray(string $category) : array
+    private function buildAvailableSidebarEntriesArray(string $category): array
     {
         $entries = Arr::get($this->sidebar, $category);
 
-        return collect($entries)->filter(function($entry) {
-
+        return collect($entries)->filter(function ($entry) {
             $permission = Arr::get($entry, 'permission');
             $character_role = Arr::get($entry, 'character_role');
 
             // if entry has no required permission show it to the user
-            if(is_null($permission))
+            if (is_null($permission)) {
                 return true;
+            }
 
             // if user has required permission show element
-            if($this->checkPermission($permission))
+            if ($this->checkPermission($permission)) {
                 return true;
+            }
 
             // if user does not have permission but got necessary character_role show element
             return is_string($character_role) ? $this->hasUserCharacterRole($character_role) : false;
-
         })->toArray();
     }
 
@@ -103,7 +100,6 @@ class SidebarEntries
     */
     private function hasUserCharacterRole(string $character_role): bool
     {
-
         return $this->user
             ->loadMissing('characters.roles')
             ->characters
