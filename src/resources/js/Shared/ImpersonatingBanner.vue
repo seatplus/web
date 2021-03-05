@@ -20,6 +20,7 @@
                             <div class="rounded-md shadow-sm">
                                 <inertia-link :href="$route('impersonate.stop')" class="flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500 focus:outline-none focus:ring transition ease-in-out duration-150">
                                     Stop
+                                    <p class="sm:hidden ml-0.5">impersonation</p>
                                 </inertia-link>
                             </div>
                         </div>

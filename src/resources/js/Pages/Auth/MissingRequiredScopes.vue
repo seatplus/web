@@ -17,7 +17,7 @@
                 <!--List-->
                 <div class="bg-white shadow overflow-hidden sm:rounded-md">
                     <ul>
-                        <li v-for="character in characters">
+                        <li v-for="character in characters" :key="character.character_id">
                             <!--TODO: use stepup route-->
                             <a :href="character.upgrade_url" class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
                                 <div class="flex items-center px-4 py-4 sm:px-6">
@@ -52,17 +52,19 @@
                 <!--EndList-->
             </div>
         </div>
+        <ImpersonatingBanner v-if="$page.props.user.data.impersonating" />
     </div>
 
 </template>
 
 <script>
-    import EveImage from "../../Shared/EveImage"
-    import Alerts from "../../Shared/Alerts"
-    import Notifications from "../../Shared/Notifications"
+    import EveImage from "@/Shared/EveImage"
+    import Alerts from "@/Shared/Alerts"
+    import Notifications from "@/Shared/Notifications"
+    import ImpersonatingBanner from "@/Shared/ImpersonatingBanner";
     export default {
         name: "MissingRequiredScopes",
-        components: {Notifications, Alerts, EveImage},
+        components: {ImpersonatingBanner, Notifications, Alerts, EveImage},
         props: {
             characters: {
                 required: true
