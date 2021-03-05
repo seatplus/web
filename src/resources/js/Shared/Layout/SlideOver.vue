@@ -32,7 +32,7 @@
                                             </slot>
                                         </h2>
                                         <div class="h-7 flex items-center">
-                                            <button @click="open = false" aria-label="Close panel" class="text-gray-400 hover:text-gray-500 transition ease-in-out duration-150">
+                                            <button @click="flipStatus" aria-label="Close panel" class="text-gray-400 hover:text-gray-500 transition ease-in-out duration-150">
                                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
@@ -81,7 +81,7 @@ export default {
     },
     computed: {
         open() {
-            return this.value ?? false
+            return this.value != null ? this.value : false
         }
     }
 }
