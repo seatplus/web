@@ -66,7 +66,7 @@
       },
       methods: {
           getMainName(user) {
-              return user.main_character.name ?? 'unknown'
+              return user.main_character.name != null ? user.main_character.name : 'unknown'
           },
           getCharacterNames(user) {
 
@@ -80,7 +80,7 @@
           },
           removeMember(member) {
 
-              this.members = _.remove(this.members, (member) => member.user_id !== member.user.id)
+              this.members = _.remove(this.members, (existing_member) => existing_member.user_id !== member.user.id)
           },
       },
       computed: {

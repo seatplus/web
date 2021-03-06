@@ -17,12 +17,11 @@
 
 <script>
   import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-  import EveImage from "@/Shared/EveImage"
   import Members from "./Members"
   import Affiliations from "./Affiliations"
   export default {
       name: "AutomaticRole",
-      components: {Affiliations, Members, EveImage, SearchCorpOrAlliance},
+      components: {Affiliations, Members, SearchCorpOrAlliance},
       props: {
           value: {}
       },

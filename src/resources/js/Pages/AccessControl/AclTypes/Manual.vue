@@ -12,13 +12,12 @@
 </template>
 
 <script>
-  import EveImage from "@/Shared/EveImage"
   import Members from "./Members"
   import Users from "./Users"
 
   export default {
       name: "Manual",
-      components: {Users, Members, EveImage},
+      components: {Users, Members},
       props: {
           value: {}
       },
