@@ -2,7 +2,7 @@
     <div :class="['bg-white sm:rounded-md', {'shadow' : !isEmpty(list)}]">
         <ListTransition :entries="list" :class="'divide-y divide-grey-200'">
             <div v-for="(entity, index) of list" :key="index" class="px-4 py-4 flex items-center justify-between sm:px-6 block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
-                <EveImage v-if="entity" :object="entity" :size="128" tailwind_class="h-12 w-12 rounded-full" show-name />
+                <EntityBlock :entity="entity" tailwind_class="h-12 w-12 rounded-full" />
 
                 <button  @click="removeEntity(entity)" :class="['text-red-500 hover:bg-red-100 focus:bg-red-100','inline-flex rounded-md p-1.5 focus:outline-none transition ease-in-out duration-150']">
                     <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -18,9 +18,10 @@
 <script>
   import ListTransition from "../../Shared/Transitions/ListTransition"
   import EveImage from "../../Shared/EveImage"
+  import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
   export default {
       name: "AffiliationList",
-      components: {EveImage, ListTransition},
+      components: {EntityBlock, EveImage, ListTransition},
       props: ['value'],
       data() {
           return {
