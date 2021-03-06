@@ -39,7 +39,7 @@ Route::prefix('recruitment')
         Route::delete('/application/user/', [ApplicationsController::class, 'pullUserApplication'])->name('delete.user.application');
 
         /* Senior HR */
-        Route::middleware(['permission:can open or close corporations for recruitment'])
+        Route::middleware(['permission:can open or close corporations for recruitment,director'])
             ->group(function () {
                 Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
                 Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.corporation.recruitment');
@@ -49,7 +49,7 @@ Route::prefix('recruitment')
             });
 
         /* Junior HR */
-        Route::middleware('permission:can open or close corporations for recruitment|can accept or deny applications')
+        Route::middleware('permission:can open or close corporations for recruitment|can accept or deny applications,director')
             ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
         Route::middleware('permission:can accept or deny applications')

@@ -25,11 +25,14 @@
  */
 
 return [
-    'superuser',
-    'view access control',
     'create,update and delete access control group',
     'manage access control group',
-    'recruiter',
+
+    'view member tracking',
     'view member compliance',
+    'recruiter',
+
+    'view access control',
+    'superuser',
     'manage manual locations',
 ];

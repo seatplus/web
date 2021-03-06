@@ -29,16 +29,28 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class CheckPermissionAffiliation
 {
+    private Collection $affiliated_ids;
+
+    public function __construct()
+    {
+        $this->affiliated_ids = collect();
+    }
+
     /**
+     * @param Request $request
      * @param Closure $next
-     * @param $permission
+     * @param string $permission
+     * @param string|null $character_role
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, string $permission)
+    public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
     {
         if (auth()->user()->can('superuser')) {
             return $next($request);
@@ -57,18 +69,32 @@ class CheckPermissionAffiliation
         ])->filter();
 
         if ($requested_id->isEmpty()) {
-            abort_unless($this->checkUserPermissions($permissions), 403, 'You do not have the necessary permission to perform this action.');
+            abort_unless($this->assertIfUserHasRequiredPermissionOrCharacterRole($permissions, $character_role), 403, 'You do not have the necessary permission to perform this action.');
 
             return $next($request);
         }
 
-        $affiliated_ids = $this->buildAffiliatedIdsByPermissions($permissions);
+        $this->buildAffiliatedIdsByPermissions($permissions);
 
-        $recruit_ids = $this->buildRecruitIds();
+        $this->buildRecruitIds();
 
-        abort_unless($requested_id->intersect([...$affiliated_ids, ...$recruit_ids])->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
+        if (is_string($character_role)) {
+            $this->buildAffiliatedIdsByCharacterRole($character_role);
+        }
+
+        abort_unless($requested_id->intersect($this->getAffiliatedIds()->toArray())->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
 
         return $next($request);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAffiliatedIds(): Collection
+    {
+        return $this->affiliated_ids
+            ->flatten()
+            ->unique();
     }
 
     private function checkUserPermissions(array $permissions): bool
@@ -82,21 +108,59 @@ class CheckPermissionAffiliation
         return false;
     }
 
-    private function buildAffiliatedIdsByPermissions(array $permissions): array
+    private function buildAffiliatedIdsByPermissions(array $permissions): void
     {
-        $ids = collect();
-
         foreach ($permissions as $permission) {
             $affiliatedIds = getAffiliatedIdsByPermission($permission);
 
-            $ids->push($affiliatedIds);
+            $this->affiliated_ids->push($affiliatedIds);
         }
-
-        return $ids->flatten()->unique()->toArray();
     }
 
-    private function buildRecruitIds(): array
+    private function buildRecruitIds(): void
     {
-        return GetRecruitIdsService::get();
+        $recruit_ids = GetRecruitIdsService::get();
+
+        $this->affiliated_ids->push($recruit_ids);
+    }
+
+    private function assertIfUserHasRequiredPermissionOrCharacterRole(array $permissions, ?string $character_role)
+    {
+        if ($this->checkUserPermissions($permissions)) {
+            return true;
+        }
+
+        if (is_null($character_role)) {
+            return false;
+        }
+
+        return $this->checkUserCharacterRoles($character_role);
+    }
+
+    private function checkUserCharacterRoles(?string $character_role): bool
+    {
+        if (is_null($character_role)) {
+            return false;
+        }
+
+        return empty($this->buildAffiliatedIdsByCharacterRole($character_role)) ? false : true;
+    }
+
+    private function buildAffiliatedIdsByCharacterRole(string $character_role): array
+    {
+        $affiliated_ids_from_character_role = User::with('characters.roles', 'characters.corporation')
+            ->find(auth()->user()->getAuthIdentifier())
+            ->characters
+            ->map(fn ($character) => $character->roles->hasRole('roles', 'Director') || $character->roles->hasRole('roles', Str::ucfirst($character_role))
+                ? $character->corporation->corporation_id
+                : false
+            )
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $this->affiliated_ids->push($affiliated_ids_from_character_role);
+
+        return $affiliated_ids_from_character_role;
     }
 }
