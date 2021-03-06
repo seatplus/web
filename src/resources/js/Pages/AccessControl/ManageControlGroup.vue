@@ -1,7 +1,7 @@
 <template>
     <Layout :active-sidebar-element="activeSidebarElement">
         <template v-slot:title>
-            <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
+            <PageHeader :breadcrumbs="breadcrumbs">
                 Manage {{ role.name }}
                 <template v-slot:primary>
                     <HeaderButton @click="store">
@@ -106,9 +106,9 @@
                                     </p>
                                 </div>
                                 <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
-                                    <inertia-link method="post" as="div" :href="store_url" :data="store_payload" class="flex cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50">
+                                    <button @click="store" class="flex w-full cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50">
                                         Save
-                                    </inertia-link>
+                                    </button>
                                 </div>
                                 <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-2">
                                     <button @click="changed = false" type="button" class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white">
@@ -134,17 +134,12 @@
 
 <script>
     import Layout from "../../Shared/Layout"
-    import EveImage from "../../Shared/EveImage"
     import PageHeader from "../../Shared/Layout/PageHeader"
     import HeaderButton from "../../Shared/Layout/HeaderButton"
-    import ListTransition from "../../Shared/Transitions/ListTransition"
-    import AffiliationList from "./AffiliationList"
     import Manual from "./AclTypes/Manual"
-    import InputGroup from "../../Shared/InputGroup"
     import AutomaticRole from "./AclTypes/AutomaticRole"
     import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup"
     import OptInControlGroup from "./AclTypes/OptInControlGroup"
-    import axios from "axios"
 
     export default {
         name      : "ManageControlGroup",
@@ -152,8 +147,7 @@
             OptInControlGroup,
             OnRequestControlGroup,
             AutomaticRole,
-            InputGroup,
-            Manual, AffiliationList, ListTransition, HeaderButton, PageHeader, Layout, EveImage},
+            Manual, HeaderButton, PageHeader, Layout},
         props: {
             role: {
                 required: true
@@ -167,7 +161,13 @@
                     affiliations: this.role.acl_affiliations,
                     moderators: this.role.moderators
                 },
-                store_url: this.$route('acl.manage', this.role.id)
+                store_url: this.$route('acl.manage', this.role.id),
+                breadcrumbs: [
+                    {
+                        name: 'Control Group',
+                        route: this.$route('acl.groups')
+                    }
+                ]
             }
         },
         methods: {
