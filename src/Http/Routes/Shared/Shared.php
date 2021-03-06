@@ -29,7 +29,6 @@ use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
 use Seatplus\Web\Http\Controllers\Shared\HelperController;
 use Seatplus\Web\Http\Controllers\Shared\ManualLocationController;
-use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 
 Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
 Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
