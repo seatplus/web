@@ -1,7 +1,7 @@
 <template>
     <Layout :active-sidebar-element="activeSidebarElement">
         <template v-slot:title>
-            <PageHeader :breadcrumbs="[{name: 'Control Group', route: 'acl.groups'}]">
+            <PageHeader :breadcrumbs="breadcrumbs">
                 Access Control Groups
                 <template v-slot:primary>
                     <HeaderButton @click="remove" :secondary="true">
@@ -74,11 +74,6 @@
 <script>
   import Layout from "../../Shared/Layout"
   import { Inertia } from '@inertiajs/inertia'
-  import List from "../../Shared/List"
-  import ListElement from "../../Shared/ListElement"
-  import EveImage from "../../Shared/EveImage"
-  import SeatPlusSelect from "../../Shared/SeatPlusSelect"
-  import AddAffiliations from "./AddAffiliations"
   import Affiliations from "./Affiliations"
   import PageHeader from "../../Shared/Layout/PageHeader"
   import HeaderButton from "../../Shared/Layout/HeaderButton"
@@ -86,13 +81,19 @@
       name: "EditGroup",
       components: {
           HeaderButton,
-          PageHeader, Affiliations, AddAffiliations, SeatPlusSelect, EveImage, ListElement, List, Layout},
+          PageHeader, Affiliations, Layout},
       data () {
           return {
               roleName: '',
               selectedPermissions: [],
               selectedAffiliations: this.affiliations,
-              isDirty: false
+              isDirty: false,
+              breadcrumbs: [
+                  {
+                      name: 'Control Group',
+                      route: this.$route('acl.groups')
+                  }
+              ]
           }
       },
       props: {
