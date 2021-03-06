@@ -108,8 +108,7 @@ class ComplianceLifeCycleTest extends TestCase
 
         $response = $this->actingAs($this->test_user)
             ->getJson(route('user.compliance', $this->secondary_character->corporation->corporation_id))
-            ->assertOk()
-        ;
+            ->assertOk();
 
         $response->assertJsonCount(1, 'data');
 
