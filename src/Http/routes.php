@@ -26,6 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\HomeController;
+use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 Route::middleware('web')
@@ -75,4 +76,8 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Shared/Shared.php';
                     });
             });
+
+        Route::middleware('auth')
+            ->get('/stop/impersonate', StopImpersonateController::class)
+            ->name('impersonate.stop');
     });
