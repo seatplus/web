@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Corporation\MemberCompliance\MemberComplianceController;
 
 Route::prefix('compliance')
-    ->middleware(['permission:view member compliance'])
+    ->middleware(['permission:view member compliance,director'])
     ->group(function () {
         Route::get('', [MemberComplianceController::class, 'index'])->name('corporation.member_compliance');
 

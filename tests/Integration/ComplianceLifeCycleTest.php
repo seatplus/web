@@ -13,6 +13,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
@@ -130,6 +131,43 @@ class ComplianceLifeCycleTest extends TestCase
             ->assertOk();
 
         $response->assertJsonCount(1, 'data');
+
+    }
+
+    /** @test */
+    public function director_user_without_permission_can_access_index()
+    {
+        // 1. non director can't access the compliance index
+        $non_director = Event::fakeFor( function() {
+            $user = User::factory()->create();
+
+            $roles = $user->characters->first()->roles;
+            $roles->roles = ['Contract_Manager'];
+            $roles->save();
+
+            return $user->refresh();
+        });
+
+        $this->actingAs($non_director)
+            ->get(route('corporation.member_compliance'))
+            ->assertForbidden();
+
+        // 2. director can access the compliance index
+
+        $director = Event::fakeFor( function() {
+            $user = User::factory()->create();
+
+            $roles = $user->characters->first()->roles;
+            $roles->roles = ['Director'];
+            $roles->save();
+
+            return $user->refresh();
+        });
+
+        $this->actingAs($director)
+            ->get(route('corporation.member_compliance'))
+            ->assertOk();
+
 
     }
 
