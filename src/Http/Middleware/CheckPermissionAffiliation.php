@@ -78,8 +78,9 @@ class CheckPermissionAffiliation
 
         $this->buildRecruitIds();
 
-        if(is_string($character_role))
+        if (is_string($character_role)) {
             $this->buildAffiliatedIdsByCharacterRole($character_role);
+        }
 
         abort_unless($requested_id->intersect($this->getAffiliatedIds()->toArray())->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
 
@@ -125,31 +126,32 @@ class CheckPermissionAffiliation
 
     private function assertIfUserHasRequiredPermissionOrCharacterRole(array $permissions, ?string $character_role)
     {
-
-        if($this->checkUserPermissions($permissions))
+        if ($this->checkUserPermissions($permissions)) {
             return true;
+        }
 
-        if(is_null($character_role))
+        if (is_null($character_role)) {
             return false;
+        }
 
         return $this->checkUserCharacterRoles($character_role);
     }
 
     private function checkUserCharacterRoles(?string $character_role): bool
     {
-        if(is_null($character_role))
+        if (is_null($character_role)) {
             return false;
+        }
 
         return empty($this->buildAffiliatedIdsByCharacterRole($character_role)) ? false : true;
     }
 
-    private function buildAffiliatedIdsByCharacterRole(string $character_role) : array
+    private function buildAffiliatedIdsByCharacterRole(string $character_role): array
     {
-
         $affiliated_ids_from_character_role = User::with('characters.roles', 'characters.corporation')
             ->find(auth()->user()->getAuthIdentifier())
             ->characters
-            ->map(fn($character) => $character->roles->hasRole('roles','Director') || $character->roles->hasRole('roles', Str::ucfirst($character_role))
+            ->map(fn ($character) => $character->roles->hasRole('roles', 'Director') || $character->roles->hasRole('roles', Str::ucfirst($character_role))
                 ? $character->corporation->corporation_id
                 : false
             )
