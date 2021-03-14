@@ -32,9 +32,9 @@
                         </thead>
                         <tbody>
                         <WalletTransactionRowComponent v-for="(entry, index) in transactions" :entry="entry" :key="entry.transaction_id" :even="index%2" />
-                        <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
+<!--                        <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
                             <div slot="no-more">all loaded</div>
-                        </infinite-loading>
+                        </infinite-loading>-->
                         </tbody>
                     </table>
                 </div>
@@ -49,14 +49,17 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import TableHeader from "@/Shared/Layout/Cards/Table/TableHeader";
 import DataHeader from "@/Shared/Layout/Cards/Table/DataHeader";
-import InfiniteLoading from "vue-infinite-loading";
+//TODO: Infinite Loading
+//import InfiniteLoading from "vue-infinite-loading";
 import WalletTransactionRowComponent from "./WalletTransactionRowComponent";
 
 export default {
     name: "WalletTransactionComponent",
     components: {
         WalletTransactionRowComponent,
-        DataHeader, TableHeader, EntityByIdBlock, CardWithHeader, InfiniteLoading},
+        DataHeader, TableHeader, EntityByIdBlock, CardWithHeader,
+        //InfiniteLoading
+    },
     props: {
         id: {
             required: true,

@@ -45,7 +45,7 @@ export default {
     },
     methods   : {
         openSlideOver() {
-            this.$eventBus.$emit('open-slideOver', 'enlistment');
+            //TODO this.$eventBus.$emit('open-slideOver', 'enlistment');
         },
     }
 }

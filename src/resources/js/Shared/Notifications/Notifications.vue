@@ -4,10 +4,10 @@
             <transition-group
                 tag="div"
                 :enter-active-class="notifications.length > 1 ? 'transform ease-out delay-300 duration-300 transition': 'transform ease-out duration-300 transition'"
-                enter-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
                 enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
                 leave-active-class="transition ease-in duration-500"
-                leave-class="opacity-100"
+                leave-from-class="opacity-100"
                 leave-to-class="opacity-0"
                 move-class="transition ease-in-out duration-500"
             >
@@ -42,13 +42,13 @@
             }
         },
         mounted() {
-            this.$eventBus.$on('notification', payload => {
+            /* TODO this.$eventBus.$on('notification', payload => {
                 const notification = payload.hasOwnProperty('id') ? payload : this.storeInLocalStorage(payload)
                 this.notifications.unshift(notification)
                 setTimeout(() => {
                     this.hideNotification(notification.id)
                 }, 5000)
-            })
+            })*/
         },
         methods : {
             hideNotification(id) {
@@ -86,7 +86,7 @@
 
                 const notifications = JSON.parse(localStorage.getItem('notifications'))
 
-                this.$eventBus.$emit('notification-indicator', notifications.length > 0)
+                //TODO this.$eventBus.$emit('notification-indicator', notifications.length > 0)
             }
         }
     }

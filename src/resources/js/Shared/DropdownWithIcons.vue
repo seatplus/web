@@ -15,10 +15,10 @@
         </div>
         <transition
             enter-active-class="transition ease-out duration-100"
-            enter-class="transform opacity-0 scale-95"
+            enter-from-class="transform opacity-0 scale-95"
             enter-to-class="transform opacity-100 scale-100"
             leave-active-class="transition ease-in duration-75"
-            leave-class="transform opacity-100 scale-100"
+            leave-from-class="transform opacity-100 scale-100"
             xleave-to-class="transform opacity-0 scale-95"
         >
             <div v-show="open" ref="dropdown" class="origin-top-right absolute z-10 rotate-0 right-0 mt-2 w-56 rounded-md shadow-lg ">

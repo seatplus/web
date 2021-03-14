@@ -49,7 +49,7 @@ export default {
     },
     methods: {
         openSlideOver() {
-            this.$eventBus.$emit('open-slideOver', 'update');
+            //TODO this.$eventBus.$emit('open-slideOver', 'update');
         }
     },
 }

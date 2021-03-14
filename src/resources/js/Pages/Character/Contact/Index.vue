@@ -55,7 +55,7 @@ export default {
     },
     methods: {
         openSlideOver(value) {
-            this.$eventBus.$emit('open-slideOver', value);
+            //TODO this.$eventBus.$emit('open-slideOver', value);
         },
     }
 }

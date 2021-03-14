@@ -46,9 +46,9 @@
                     </thead>
                     <tbody>
                     <MemberTrackingRow v-for="(member, index) in members" :member="member" :required_scopes="required_scopes" :key="member.character_id" :class="index%2 ? 'bg-gray-50' : 'bg-white'" />
-                    <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
+<!--                    <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
                         <div slot="no-more">all loaded</div>
-                    </infinite-loading>
+                    </infinite-loading>-->
                     </tbody>
                 </table>
             </div>
@@ -61,7 +61,8 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import TableHeader from "@/Shared/Layout/Cards/Table/TableHeader";
 import DataHeader from "@/Shared/Layout/Cards/Table/DataHeader";
-import InfiniteLoading from "vue-infinite-loading";
+//TODO: Infinite Loading
+//import InfiniteLoading from "vue-infinite-loading";
 import MemberTrackingRow from "./MemberTrackingRow";
 import MemberTrackingListElement from "./MemberTrackingListElement";
 
@@ -69,7 +70,9 @@ export default {
     name: "MemberTrackingComponent",
     components: {
         MemberTrackingListElement,
-        MemberTrackingRow, DataHeader, TableHeader, EntityBlock, CardWithHeader, InfiniteLoading},
+        MemberTrackingRow, DataHeader, TableHeader, EntityBlock, CardWithHeader,
+        //InfiniteLoading
+    },
     props: {
         corporation: {
             required: true,

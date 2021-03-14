@@ -24,9 +24,9 @@
             }
         },
         mounted() {
-            this.$eventBus.$on('notification-indicator', status => {
+            /*TODO this.$eventBus.$on('notification-indicator', status => {
                 this.status = status
-            })
+            })*/
 
             const notifications = JSON.parse(localStorage.getItem('notifications'))
 
@@ -45,7 +45,7 @@
                     if(index >0)
                         await new Promise(r => setTimeout(r, 100));
 
-                    this.$eventBus.$emit('notification', notification)
+                    // TODO this.$eventBus.$emit('notification', notification)
                 }
             }
         }

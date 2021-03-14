@@ -1,5 +1,6 @@
 <template>
     <div>
+<!--
         <VueAutosuggest
             v-model="query"
             :suggestions="filteredSuggestions"
@@ -26,6 +27,7 @@
             </template>
 
         </VueAutosuggest>
+-->
 
         <span v-for="selection in selections" :key="selection.id" class="inline-flex items-center py-0.5 pl-2 pr-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
             {{ selection.name }}
@@ -42,10 +44,10 @@
 </template>
 
 <script>
-import { VueAutosuggest } from "vue-autosuggest"
+// TODO import { VueAutosuggest } from "vue-autosuggest"
 export default {
     name: "Multiselect",
-    components: {VueAutosuggest},
+    components: {/*VueAutosuggest*/},
     props: {
         value: {
             required: true

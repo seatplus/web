@@ -34,18 +34,21 @@
         </li>
 
 
-        <InfiniteLoading @infinite="infiniteHandler" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
+<!--        <InfiniteLoading @infinite="infiniteHandler" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more"></div>
-        </InfiniteLoading>
+        </InfiniteLoading>-->
     </ul>
 </template>
 
 <script>
-import InfiniteLoading from "vue-infinite-loading"
+//TODO: Infinite Loading
+//import InfiniteLoading from "vue-infinite-loading"
 import EveImage from "@/Shared/EveImage"
 export default {
     name: "CorporationList",
-    components: {EveImage, InfiniteLoading},
+    components: {EveImage,
+        //InfiniteLoading
+    },
     data() {
         return {
             corporations: [],

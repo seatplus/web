@@ -14,5 +14,7 @@
 
 @inertia
 
+<div id="destination"></div>
+
 </body>
 </html>

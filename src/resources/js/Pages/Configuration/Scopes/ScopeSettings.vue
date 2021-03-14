@@ -197,7 +197,7 @@
             },
             selectedCharacterScopes(scopes) {
                 if( !_.includes(scopes, 'esi-characters.read_corporation_roles.v1') && this.selectedCorporationScopes.length > 0)
-                    this.$eventBus.$emit('role-removed')
+                    return//TODO this.$eventBus.$emit('role-removed')
             }
         },
         mounted() {

@@ -31,7 +31,7 @@
                     <div class="mt-2 text-sm text-red-600" id="ename-error" v-if="form.errors.name">{{ form.errors.name.find(Boolean) }}</div>
                 </div>
 
-                <VueAutosuggest
+<!--                <VueAutosuggest
                     v-model="query"
                     :suggestions="filteredSuggestions"
                     :input-props="{
@@ -56,14 +56,14 @@
                         </div>
                     </template>
 
-                </VueAutosuggest>
+                </VueAutosuggest>-->
                 <div class="mt-2 text-sm text-red-600" id="solar_system-error" v-if="form.errors.solar_system_id">{{ form.errors.solar_system_id.find(Boolean) }}</div>
             </div>
 
         </template>
         <template v-slot:buttons>
             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-              <button @click="submit()":disabled="form.processing" type="submit" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+              <button @click="submit()" :disabled="form.processing" type="submit" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                     Submit
                 </button>
             </span>
@@ -73,10 +73,10 @@
 
 <script>
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
-import { VueAutosuggest } from "vue-autosuggest"
+//TODO import { VueAutosuggest } from "vue-autosuggest"
 export default {
     name: "AddManualLocationModal",
-    components: {ModalWithFooter, VueAutosuggest},
+    components: {ModalWithFooter, /*VueAutosuggest*/},
     props: {
         value: {
             required: true,

@@ -45,9 +45,9 @@
       },
       methods: {
           emmitEvent() {
-              this.$eventBus.$emit('notification', {
+              /*TODO this.$eventBus.$emit('notification', {
                   type: 'success',
-              })
+              })*/
           },
           async getEnlistments() {
               axios.get(this.$route('list.open.enlistments'))

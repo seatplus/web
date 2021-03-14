@@ -175,9 +175,10 @@
             </div>
         </div>-->
 
-        <infinite-loading :identifier="infiniteId" @infinite="loadSuggestions" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
+<!--        TODO: Infinite Loading-->
+<!--        <infinite-loading :identifier="infiniteId" @infinite="loadSuggestions" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
             <div slot="no-more">all loaded</div>
-        </infinite-loading>
+        </infinite-loading>-->
 
     </Layout>
 
@@ -188,11 +189,12 @@
 <script>
 import Layout from "@/Shared/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
-import InfiniteLoading from "vue-infinite-loading"
 import ManualLocationComponent from "./ManualLocationComponent";
 export default {
     name: "ManualLocation",
-    components: {ManualLocationComponent, PageHeader, Layout, InfiniteLoading},
+    components: {ManualLocationComponent, PageHeader, Layout,
+        //InfiniteLoading
+    },
     data() {
         return {
             name: 'Manual Locations',

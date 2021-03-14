@@ -1,5 +1,5 @@
 <template>
-    <VueAutosuggest
+<!--    <VueAutosuggest
         v-model="query"
         :suggestions="filteredSuggestions"
         :input-props="{
@@ -24,11 +24,11 @@
             </div>
         </template>
 
-    </VueAutosuggest>
+    </VueAutosuggest>-->
 </template>
 
 <script>
-import { VueAutosuggest } from "vue-autosuggest"
+/* TODO import { VueAutosuggest } from "vue-autosuggest"*/
 export default {
     name: "Autosuggest",
     components: {VueAutosuggest},

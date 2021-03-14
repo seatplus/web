@@ -5,58 +5,57 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import Layout from "@/Shared/SidebarLayout/Layout";
+import { createApp, h } from 'vue'
+import { App, plugin } from '@inertiajs/inertia-vue3'
+import { InertiaProgress } from '@inertiajs/progress'
+import I18n from './vendor/I18n';
+
 require('./bootstrap');
 
-import Vue from 'vue';
-/*
-* Install bootstrap-vue components
-*/
-/*import BootstrapVue from 'bootstrap-vue' //Importing
-Vue.use(BootstrapVue); // Telling Vue to use BootstrapVue in whole application*/
-
-import { App, plugin } from '@inertiajs/inertia-vue';
-Vue.use(plugin); // Telling Vue to use InertiaApp in whole application
-
-import I18n from './vendor/I18n';
-window.I18n = I18n;
-Vue.prototype.$I18n = new I18n;
-
 // Create EventBus
-const eventBus = new Vue();
-Vue.prototype.$eventBus = eventBus;
+/*const eventBus = new Vue();
+Vue.prototype.$eventBus = eventBus;*/
 
-// Add route helper to vue
-Vue.prototype.$route = (...args) => route(...args);
+
 /*Vue.mixin({
   methods: {
     route: window.route
   }
 })*/
 
-import { InertiaProgress } from '@inertiajs/progress'
+InertiaProgress.init()
 
-InertiaProgress.init({
-    // The delay after which the progress bar will
-    // appear during navigation, in milliseconds.
-    delay: 250,
+const el = document.getElementById('app')
 
-    // The color of the progress bar.
-    color: '#29d',
+const app = createApp({
+    render: () => h(App, {
+        initialPage: JSON.parse(el.dataset.page),
+        resolveComponent: name => import(`@/Pages/${name}`)
+          //.then(module => module.default),
+          .then(({ default: page }) => {
+            if (page.layout === undefined) {
+              page.layout = Layout
+            }
+            return page
+          }),
+    })
+}).use(plugin)
 
-    // Whether to include the default NProgress styles.
-    includeCSS: true,
+// Add route helper to vue
+app.config.globalProperties.$route = (...args) => route(...args);
 
-    // Whether the NProgress spinner will be shown.
-    showSpinner: false,
-})
 
-const app = document.getElementById('app')
+//window.I18n = I18n;
+app.config.globalProperties.$I18n = new I18n;
 
-new Vue({
+app.mount(el)
+
+/*new Vue({
   render: h => h(App, {
     props: {
       initialPage: JSON.parse(app.dataset.page),
       resolveComponent: name => import(`@/Pages/${name}`).then(module => module.default),
     },
   }),
-}).$mount(app)
+}).$mount(app)*/
