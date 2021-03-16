@@ -4,6 +4,9 @@
   </HeaderButton>
   <teleport to="#destination">
     <SlideOver v-model:open="open">
+      <template #title>
+        Dispatch Update Job
+      </template>
       <DispatchUpdate />
     </SlideOver>
   </teleport>

@@ -1,17 +1,27 @@
 <template>
-    <div class="sm:flex">
-        <div v-if="ready" class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center">
-            <EveImage :object="entity" :size="256" :tailwind_class="image_class"/>
-        </div>
-        <div v-if="ready">
-            <h3 :class="name_class">
-                {{  name }}
-            </h3>
-            <p v-if="withSubText && (entity.corporation || entity.alliance)" class="text-sm text-gray-500 truncate">
-                {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
-            </p>
-        </div>
+  <div class="sm:flex">
+    <div
+      v-if="ready"
+      class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center"
+    >
+      <EveImage
+        :object="entity"
+        :size="256"
+        :tailwind_class="image_class"
+      />
     </div>
+    <div v-if="ready">
+      <h3 :class="name_class">
+        {{ name }}
+      </h3>
+      <p
+        v-if="hasSubtext"
+        class="text-sm text-gray-500 truncate"
+      >
+        {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
+      </p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -47,21 +57,6 @@ export default {
             ready: false
         }
     },
-    methods: {
-        hasAlliance() {
-            return _.has(this.entity, 'alliance')
-        },
-        getEntity() {
-            axios.get(this.$route('resolve.id', this.id))
-                .then((response) => {
-
-                    this.entity = response.data
-
-                    this.ready = true
-                })
-                .catch(error => console.log(error))
-        }
-    },
     computed: {
         corporationName() {
             return _.get(this.entity, 'corporation.name', '')
@@ -77,11 +72,36 @@ export default {
         },
         name_class() {
             return `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
+        },
+        hasSubtext() {
+
+            if(!this.withSubText)
+                return false;
+
+            if(this.entity.corporation || this.entity.alliance)
+                return true
+
+            return false
         }
     },
     created() {
 
         this.getEntity()
+    },
+    methods: {
+        hasAlliance() {
+            return _.has(this.entity, 'alliance')
+        },
+        getEntity() {
+            axios.get(this.$route('resolve.id', this.id))
+                .then((response) => {
+
+                    this.entity = response.data
+
+                    this.ready = true
+                })
+                .catch(error => console.log(error))
+        }
     }
 }
 </script>

@@ -49,7 +49,7 @@
 <script>
 import Menu from "@/Shared/Menu"
 import CharacterApplication from "./CharacterApplication"
-import EveImage from "../../Shared/EveImage"
+import EveImage from "@/Shared/EveImage"
 export default {
     name: "Enlistments",
     components: {EveImage, CharacterApplication, Menu},

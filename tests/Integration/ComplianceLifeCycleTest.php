@@ -197,13 +197,15 @@ class ComplianceLifeCycleTest extends TestCase
         $response = $this->actingAs($this->superuser)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "type" => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'user_id' => $this->test_user->id,
-                        'user' => $this->test_user
-                    ],
+                'acl' => [
+                    "type" => 'manual',
+                    'affiliations' => [],
+                    'members' => [
+                        [
+                            'user_id' => $this->test_user->id,
+                            'user' => $this->test_user
+                        ],
+                    ]
                 ]
             ])->assertOk();
 

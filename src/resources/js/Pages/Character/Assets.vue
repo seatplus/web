@@ -1,93 +1,93 @@
 <template>
+  <div class="space-y-3">
+    <teleport to="#head">
+      <title>{{ title(pageTitle) }}</title>
+    </teleport>
 
-  <PageHeader>
-    Character Assets
-    <template #primary>
-      <DispatchUpdateButton />
-    </template>
-    <template #secondary>
-      <CharacterSelectionButton />
-    </template>
-  </PageHeader>
+    <RequiredScopesWarning :dispatch_transfer_object="dispatch_transfer_object" />
 
-  <div>
+    <PageHeader>
+      {{ pageTitle }}
+      <template #primary>
+        <DispatchUpdateButton />
+      </template>
+      <template #secondary>
+        <CharacterSelectionButton />
+      </template>
+    </PageHeader>
 
-    <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
-      <div class="px-4 py-5 sm:p-6">
-        <div class="grid grid-cols-6 gap-5">
-          <div class="col-span-6 lg:col-span-2">
-            <label
-              for="search"
-              class="block text-sm font-medium leading-5 text-gray-700"
-            >Search</label>
-            <input
-              id="search"
-              v-model="params.search"
-              class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-            >
-          </div>
+    <div>
+      <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+          <div class="grid grid-cols-6 gap-5">
+            <div class="col-span-6 lg:col-span-2">
+              <label
+                for="search"
+                class="block text-sm font-medium leading-5 text-gray-700"
+              >Search</label>
+              <input
+                id="search"
+                v-model="params.search"
+                class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+              >
+            </div>
 
-          <div class="col-span-6 md:col-span-3 lg:col-span-2">
-            <!--                        <SelectComponent v-model="params.region" :options="regions">Region Filter</SelectComponent>-->
-            <!--            <Autosuggest
-                          v-model="params.regions"
-                          route="autosuggestion.region"
-                          label="Region"
-                          placeholder="search for region"
-                        />-->
-          </div>
+            <div class="col-span-6 md:col-span-3 lg:col-span-2">
+              <!--                        <SelectComponent v-model="params.region" :options="regions">Region Filter</SelectComponent>-->
+              <!--              <Autosuggest
+                route="autosuggestion.region"
+                label="Region"
+                placeholder="search for region"
+                @selected="selectRegion"
+              />-->
+              <Multiselect
+                v-model="params.regions"
+                route="autosuggestion.region"
+                label="Region"
+                placeholder="search for region"
+              />
+            </div>
 
-          <div class="col-span-6 md:col-span-3 lg:col-span-2">
-            <!--            <Autosuggest
-                          v-model="params.systems"
-                          route="autosuggestion.system"
-                          label="Solar System"
-                          placeholder="search for solar system"
-                        />-->
+            <div class="col-span-6 md:col-span-3 lg:col-span-2">
+              <Multiselect
+                v-model="params.systems"
+                route="autosuggestion.system"
+                label="Solar System"
+                placeholder="search for solar system"
+              />
+            </div>
           </div>
         </div>
       </div>
+
+      <AssetsComponent
+        :key="infiniteId"
+        :parameters="cleanParams"
+      />
     </div>
-
-    <AssetsComponent
-      :url="url"
-      @openManualLocationModal="openModal = true, modal_location_id = $event"
-      :key="url"
-    />
-
-    <!--    <template #modal>
-          <AddManualLocationModal
-            v-model="openModal"
-            :location_id="modal_location_id"
-          />
-        </template>-->
   </div>
 </template>
 
 <script>
-//import Layout from "../../Shared/Layout"
-import PageHeader from "../../Shared/Layout/PageHeader"
-import HeaderButton from "@/Shared/Layout/HeaderButton"
+import PageHeader from "@/Shared/Layout/PageHeader"
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
-import AddManualLocationModal from "../../Shared/Components/Assets/AddManualLocationModal";
-import LocationComponent from "@/Shared/Components/Assets/LocationComponent";
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
-import Layout from "@/Shared/SidebarLayout/Layout";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import Autosuggest from "@/Shared/Components/Autosuggest";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import Multiselect from "@/Shared/Components/Multiselect";
 
 export default {
   name: "Assets",
   components: {
+    Multiselect,
+    RequiredScopesWarning,
+    Autosuggest,
     DispatchUpdateButton,
     AssetsComponent,
-    LocationComponent,
-    //Autosuggest,
-    AddManualLocationModal,
     CharacterSelectionButton,
     PageHeader
-    //Layout
   },
-
   props: {
     dispatch_transfer_object: {
       required: true,
@@ -95,23 +95,19 @@ export default {
       default: () => {}
     },
   },
-  layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
   data() {
     return {
+      pageTitle: 'Character Assets',
+      infiniteId: +new Date(),
       params: {
         character_ids: this.selectedCharacterIds,
         search: null,
-        regions: null,
-        systems: null,
+        regions: [],
+        systems: [],
       },
-      openModal: false,
-      modal_location_id: 0
     }
   },
   computed: {
-    url() {
-      return this.$route('load.character.assets',this.cleanParams)
-    },
     cleanParams() {
       let params = this.params
 
@@ -120,10 +116,23 @@ export default {
       return params
     }
   },
+  watch: {
+    params: {
+      deep: true,
+      handler() {
+        this.infiniteId += 1
+      }
+    }
+  },
   methods: {
-    openSlideOver(value) {
-      //TODO this.$eventBus.$emit('open-slideOver', value);
+    selectRegion(selected_id) {
+      this.params.regions = selected_id
+      this.infiniteId++
     },
+    selectSystem(selected_id) {
+      this.params.systems = selected_id
+      this.infiniteId++
+    }
   }
 }
 </script>

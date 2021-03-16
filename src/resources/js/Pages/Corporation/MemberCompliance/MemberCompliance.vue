@@ -1,46 +1,49 @@
 <template>
-    <Layout page="Corporation" page-description="Member Compliance">
+  <teleport to="#head">
+    <title>{{ title(pageTitle) }}</title>
+  </teleport>
 
-        <template v-slot:title>
-            <PageHeader>
-                Corporation Member Compliance
-            </PageHeader>
+  <PageHeader>
+    {{ pageTitle }}
+  </PageHeader>
+
+  <div class="grid gap-6 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="col-span-2 space-y-6">
+      <CardWithHeader
+        v-for="corporation of corporations"
+        :key="corporation.corporation_id"
+      >
+        <template #header>
+          <EntityBlock :entity="corporation" />
         </template>
 
-        <div class="grid gap-6 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <div class="col-span-2 space-y-6" >
-                <CardWithHeader v-for="corporation of corporations" :key="corporation.corporation_id" >
-                    <template v-slot:header>
-                        <EntityBlock :entity="corporation" />
-<!--                        <div class="ml-4 mt-2 inline-flex items-center space-x-4 px-4 py-5 sm:px-6">
-                            <EveImage :object="corporation" />
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                {{ corporation.name }}
-                            </h3>
-                        </div>-->
-                    </template>
+        <CharacterCompliance
+          v-if="corporation.type !== 'user'"
+          :key="`${corporation.corporation_id}:${selectedModula}`"
+          :parameters="{corporation_id: corporation.corporation_id, filter: parameter}"
+        />
+        <UserCompliance
+          v-if="corporation.type === 'user'"
+          :key="`${corporation.corporation_id}:${selectedModula}`"
+          :parameters="{corporation_id: corporation.corporation_id, filter: parameter}"
+        />
+      </CardWithHeader>
+    </div>
 
-                    <CharacterCompliance v-if="corporation.type !== 'user'" :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
-                    <UserCompliance v-if="corporation.type === 'user'" :corporation_id="corporation.corporation_id" :query-param="queryParam"/>
-
-                </CardWithHeader>
-            </div>
-
-            <div class="col-span-3 md:col-span-2 lg:col-span-1">
-                <RadioListWithDescription v-model="selectedModula" :options="filterOptions" title="compliance" class="overflow-hidden shadow rounded-lg"/>
-            </div>
-        </div>
-
-
-    </Layout>
+    <div class="col-span-3 md:col-span-2 lg:col-span-1">
+      <RadioListWithDescription
+        v-model="selectedModula"
+        :options="filterOptions"
+        title="compliance"
+        class="overflow-hidden shadow rounded-lg"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import Layout from "@/Shared/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
-import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EveImage from "@/Shared/EveImage";
 import CharacterCompliance from "./CharacterCompliance";
 import UserCompliance from "./UserCompliance";
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
@@ -51,7 +54,7 @@ export default {
     components: {
         EntityBlock,
         RadioListWithDescription,
-        UserCompliance, CharacterCompliance, EveImage, CardWithHeader, HeaderButton, PageHeader, Layout},
+        UserCompliance, CharacterCompliance, CardWithHeader, PageHeader},
     props: {
         corporations: {
             required: true
@@ -59,6 +62,7 @@ export default {
     },
     data() {
         return {
+          pageTitle: 'Corporation Member Compliance',
             selectedModula: 0,
             queryParam: '',
             filterOptions: [
@@ -68,12 +72,27 @@ export default {
             ]
         }
     },
-    watch: {
-        selectedModula(newValue) {
+  computed: {
+      parameter() {
+        return this.queryParam === '' ? null : this.queryParam;
+      }
+  },
+  watch: {
+      selectedModula() {
 
-            this.queryParam = this.selectedModula === 1 ? 'renegades' : this.selectedModula === 2 ? 'loyalists' : ''
-        }
+          this.queryParam = this.selectedModula === 1 ? 'renegades' : this.selectedModula === 2 ? 'loyalists' : ''
+      }
+  },
+  methods: {
+    getCharacterComplianceUrl(corporation_id) {
+
+      return this.$route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
+    },
+    getUserComplianceUrl(corporation_id) {
+
+      return this.$route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
     }
+  }
 }
 </script>
 

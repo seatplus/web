@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import Layout from "@/Shared/Layout";
+import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";

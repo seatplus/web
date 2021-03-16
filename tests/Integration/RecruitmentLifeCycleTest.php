@@ -150,6 +150,8 @@ class RecruitmentLifeCycleTest extends TestCase
             ->get(route('corporation.recruitment'))
             ->assertForbidden();
 
+
+
         $this->givePermissionsToTestUser(['can open or close corporations for recruitment']);
 
         $this->actingAs($this->test_user->refresh())
@@ -394,13 +396,15 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->superuser)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "type" => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'user_id' => $recruiter->id,
-                        'user' => $recruiter
-                    ],
+                "acl" => [
+                    "type" => 'manual',
+                    'affiliations' => [],
+                    'members' => [
+                        [
+                            'user_id' => $recruiter->id,
+                            'user' => $recruiter
+                        ],
+                    ]
                 ]
             ])->assertOk();
 
@@ -469,13 +473,15 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->superuser)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "type" => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'user_id' => $this->test_user->id,
-                        'user' => $this->test_user
-                    ],
+                "acl" => [
+                    "type" => 'manual',
+                    'affiliations' => [],
+                    'members' => [
+                        [
+                            'user_id' => $this->test_user->id,
+                            'user' => $this->test_user
+                        ],
+                    ]
                 ]
             ])->assertOk();
 

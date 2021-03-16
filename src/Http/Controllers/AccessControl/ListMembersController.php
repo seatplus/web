@@ -38,7 +38,7 @@ class ListMembersController extends Controller
     {
         $role = Role::find($role_id);
 
-        abort_unless($role->isModerator(auth()->user()), 403);
+        abort_unless(auth()->user()->can('superuser') ||$role->isModerator(auth()->user()), 403);
 
         $users = User::query()
             ->join('acl_members', fn ($join) => (

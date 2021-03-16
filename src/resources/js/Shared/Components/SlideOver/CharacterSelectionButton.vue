@@ -2,7 +2,7 @@
   <span class="inline-block relative">
     <HeaderButton
       :secondary="true"
-      @click="openSlideOver()"
+      @click="openSlideOver"
     >
       Select Characters
     </HeaderButton>
@@ -13,7 +13,10 @@
   </span>
   <teleport to="#destination">
     <SlideOver v-model:open="open">
-      <CharacterSelection :url="url" />
+      <template #title>
+        Select characters
+      </template>
+      <CharacterSelection :permission="dispatch_transfer_object.permission" />
     </SlideOver>
   </teleport>
 </template>
@@ -30,9 +33,6 @@ export default {
             let character_ids = _.get(this.$route().params, 'character_ids')
 
             return !!character_ids
-        },
-        url() {
-          return this.$route('get.affiliated.characters', this.dispatch_transfer_object.permission)
         }
     },
   data() {

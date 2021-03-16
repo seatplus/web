@@ -11,12 +11,7 @@
             <CharacterSelection :dispatch_transfer_object="dispatch_transfer_object" />
         </SlideOver>-->
 
-    <SlideOver v-model="create_enlistment">
-      <template #title>
-        Create Enlistment
-      </template>
-      <CorporationList />
-    </SlideOver>
+
   </div>
 </template>
 

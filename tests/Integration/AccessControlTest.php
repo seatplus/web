@@ -8,6 +8,7 @@ use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -230,12 +231,86 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageMembers'));
+        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
 
         // List Members
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.members', ['role_id' => $role->id]))
             ->assertOk();
+    }
+
+    /** @test */
+    public function setup_on_request_group_and_save_twice()
+    {
+        // Create Role
+        $role = Role::create(['name' => 'test', 'type' => 'on-request']);
+
+        // Assing superuser to test_user
+        $this->assignPermissionToTestUser(['superuser']);
+
+        // create second user
+        $secondary_user = User::factory()->create();
+
+        // secondary user does not see control group in sidebar
+        $sidebar = (new SidebarEntries($secondary_user))->filter();
+
+        $this->assertNull(data_get($sidebar, 'Access Control.entries.*.route'));
+
+        // navigate to groups
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.groups'))
+            ->assertInertia( fn(Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+
+        // open manage control group
+        $this->actingAs($this->test_user)
+            ->get(route('acl.manage', $role->id))
+            ->assertInertia( fn(Assert $page) => $page
+                ->component('AccessControl/ManageControlGroup')
+                ->has('role', fn(Assert $page) => $page
+                    ->where('id', $role->id)
+                    ->has('acl', fn(Assert $page) => $page
+                        ->where('moderators', [])
+                        ->etc()
+                    )
+                    ->etc()
+                )
+            );
+
+        // assign secondary user as moderator
+        $this->actingAs($this->test_user)
+            ->followingRedirects()
+            ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+                "acl" => [
+                    "type" => 'on-request',
+                    'moderators' => [
+                        [
+                            'id' => $secondary_user->id
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->assertTrue($role->refresh()->moderators->isNotEmpty());
+
+        // check if secondary user is moderator
+        $this->assertTrue($role->refresh()->isModerator($secondary_user));
+
+        // reassure moderator does now see control group in sidebar
+        $sidebar = (new SidebarEntries($secondary_user))->filter();
+
+        $this->assertNotNull(data_get($sidebar, 'Access Control.entries.*.route'));
+
+        // Try moderating
+        $response = $this->actingAs($secondary_user)
+            ->get(route('manage.acl.members', ['role_id' => $role->id]))
+            ->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+
+        // List Members
+        $response = $this->actingAs($secondary_user)
+            ->get(route('acl.members', ['role_id' => $role->id]))
+            ->assertOk();
+
+
     }
 
     private function assignPermissionToTestUser(array $array)

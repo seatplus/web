@@ -57,14 +57,16 @@ class JoinControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'on-request',
-                'affiliations' => [
-                    [
-                        'category' => 'corporation',
-                        'id' => $this->test_character->corporation->corporation_id
-                    ]
-                ],
-                'members' => []
+                "acl" => [
+                    "type" => 'on-request',
+                    'affiliations' => [
+                        [
+                            'type' => 'corporation',
+                            'id' => $this->test_character->corporation->corporation_id
+                        ]
+                    ],
+                    'members' => []
+                ]
             ]);
 
         $this->assertFalse($this->role->refresh()->acl_affiliations->isEmpty());
@@ -96,14 +98,16 @@ class JoinControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'on-request',
-                'affiliations' => [
-                    [
-                        'category' => 'corporation',
-                        'id' => $this->test_character->corporation->corporation_id
-                    ]
-                ],
-                'members' => []
+                "acl" => [
+                    "type" => 'on-request',
+                    'affiliations' => [
+                        [
+                            'type' => 'corporation',
+                            'id' => $this->test_character->corporation->corporation_id
+                        ]
+                    ],
+                    'members' => []
+                ]
             ]);
 
         $this->assertFalse($this->role->refresh()->acl_affiliations->isEmpty());

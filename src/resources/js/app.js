@@ -29,22 +29,25 @@ InertiaProgress.init()
 const el = document.getElementById('app')
 
 const app = createApp({
-    render: () => h(App, {
-        initialPage: JSON.parse(el.dataset.page),
-        resolveComponent: name => import(`@/Pages/${name}`)
-          //.then(module => module.default),
-          .then(({ default: page }) => {
-            if (page.layout === undefined) {
-              page.layout = Layout
-            }
-            return page
-          }),
-    })
+  render: () => h(App, {
+      initialPage: JSON.parse(el.dataset.page),
+      resolveComponent: name => import(`@/Pages/${name}`)
+        //.then(module => module.default),
+        .then(({ default: page }) => {
+          if (page.layout === undefined) {
+            page.layout = Layout
+          }
+          return page
+        }),
+  })
 }).use(plugin)
+
+app.mixin({methods: {
+  title: title => `Seatplus - ${title}`,
+}})
 
 // Add route helper to vue
 app.config.globalProperties.$route = (...args) => route(...args);
-
 
 //window.I18n = I18n;
 app.config.globalProperties.$I18n = new I18n;

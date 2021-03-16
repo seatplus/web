@@ -1,6 +1,6 @@
 <template>
     <div>
-        <label :for="this.label" class="block text-sm font-medium leading-5 text-gray-700 capitalize">{{ this.label }}</label>
+        <label :for="label" class="block text-sm font-medium leading-5 text-gray-700 capitalize">{{ label }}</label>
         <slot class="border-red-300"></slot>
     </div>
 </template>

@@ -1,18 +1,23 @@
 <template>
-    <div class="px-4 py-5 sm:p-6">
-        <p class="text-base leading-6 text-gray-500">
-            This is the automatic control group settings. Users with characters in the selected affilites will gain access to the control group
-        </p>
+  <div class="px-4 py-5 sm:p-6">
+    <p class="text-base leading-6 text-gray-500">
+      This is the automatic control group settings. Users with characters in the selected affilites will gain access to the control group
+    </p>
 
-        <SearchCorpOrAlliance v-model="affiliations" class="mt-6">
-            Search for corporation or alliance that you wish to affiliate
-        </SearchCorpOrAlliance>
+    <SearchCorpOrAlliance
+      v-model="affiliations"
+      class="mt-6"
+    >
+      Search for corporation or alliance that you wish to affiliate
+    </SearchCorpOrAlliance>
 
-        <Affiliations v-model="this.affiliations" />
+    <Affiliations v-model="affiliations" />
 
-        <Members v-model="members" class="mt-6" />
-
-    </div>
+    <Members
+      v-model="members"
+      class="mt-6"
+    />
+  </div>
 </template>
 
 <script>
@@ -23,26 +28,30 @@
       name: "AutomaticRole",
       components: {Affiliations, Members, SearchCorpOrAlliance},
       props: {
-          value: {}
+          modelValue: {}
       },
+emits: ['update:modelValue'],
       data() {
           return {
-              affiliations: this.value.affiliations,
-              members: this.value.members
+              affiliations: this.modelValue.affiliations,
+              members: this.modelValue.members
           }
       },
       computed: {
           acl() {
-              return {
-                  affiliations: this.affiliations,
-                  members: this.members,
-                  moderators: []
-              }
+
+              let acl = this.modelValue
+
+              acl.affiliations = this.affiliations
+              acl.members = this.members
+              acl.moderators = []
+
+              return acl
           }
       },
       watch: {
           acl(newValue) {
-              this.$emit('input', newValue)
+              this.$emit('update:modelValue', newValue)
           }
       }
   }

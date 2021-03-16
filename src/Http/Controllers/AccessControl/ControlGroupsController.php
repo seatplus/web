@@ -30,6 +30,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Request\UpdateControlGroup;
 use Seatplus\Web\Services\ACL\SyncRoleAffiliations;
 use Seatplus\Web\Services\ACL\SyncRoleName;
@@ -61,11 +64,27 @@ class ControlGroupsController
             return array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
         };
 
+        $existing_affiliations = fn() => $role->affiliations
+            ->groupBy('type')
+            ->map(fn($type) => $type
+                ->map(fn($entity) => collect([
+                    'name' => $entity->affiliatable->name,
+                    'id' => $entity->affiliatable_id,
+                    'character_id' => $entity->affiliatable_type === CharacterInfo::class ? $entity->affiliatable_id : null,
+                    'corporation_id' => $entity->affiliatable_type === CorporationInfo::class ? $entity->affiliatable_id : null,
+                    'alliance_id' => $entity->affiliatable_type === AllianceInfo::class ? $entity->affiliatable_id: null
+                ])
+                    ->filter()
+                    ->toArray()
+                )
+            );
+
         return Inertia::render('AccessControl/EditGroup', [
             'role' => $role,
-            'affiliations' => $role->affiliations,
+            'existing_affiliations' => $existing_affiliations,
             'available_permissions' => $permissions,
             'permissions' => $role->permissions,
+            'activeSidebarElement' => route('acl.groups')
         ]);
     }
 

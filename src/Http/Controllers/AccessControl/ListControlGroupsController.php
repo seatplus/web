@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -48,6 +49,10 @@ class ListControlGroupsController extends Controller
                     ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph('affiliatable',
                         [CorporationInfo::class, AllianceInfo::class],
                         fn ($query) => $query->whereHas('characters', fn ($query) => $query->whereIn('character_infos.character_id', $character_ids))
+                    ))
+                    ->orWhereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
+                        [User::class],
+                        fn ($query) => $query->whereId(auth()->user()->getAuthIdentifier())
                     ))
             );
 

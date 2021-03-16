@@ -19,7 +19,7 @@
             <button
               type="button"
               class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              @click="openModal"
+              @click="openModal = true"
             >
               Add location information
             </button>
@@ -31,15 +31,22 @@
       <ItemList :items="location.assets" />
     </template>
   </WideLists>
+  <teleport to="#destination">
+    <AddManualLocationModal
+      v-model="openModal"
+      :location_id="location.location_id"
+    />
+  </teleport>
 </template>
 
 <script>
 import WideLists from "../../WideLists";
 import LocationName from "./LocationName";
 import ItemList from "./ItemList";
+import AddManualLocationModal from "./AddManualLocationModal";
 export default {
     name: "LocationComponent",
-    components: {ItemList, LocationName, WideLists},
+    components: {AddManualLocationModal, ItemList, LocationName, WideLists},
     props: {
         location: {
             required: true,
@@ -51,6 +58,11 @@ export default {
             default: 'character'
         }
     },
+  data() {
+      return {
+        openModal: false
+      }
+  },
     methods: {
         getLocationsVolume(location_assets) {
 
@@ -65,10 +77,6 @@ export default {
         getLocationsItemsCount(location_assets) {
 
             return _.size(location_assets)
-        },
-        openModal() {
-
-            this.$emit('open_modal', this.location.location_id)
         }
     }
 }

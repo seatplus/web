@@ -54,7 +54,7 @@
 
 <script>
 import CharacterApplication from "./CharacterApplication"
-import EveImage from "../../Shared/EveImage"
+import EveImage from "@/Shared/EveImage"
 export default {
     name: "Characters",
     components: {EveImage, CharacterApplication},

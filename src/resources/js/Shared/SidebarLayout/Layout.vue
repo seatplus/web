@@ -48,7 +48,7 @@
                         </div>-->
           </div>
           <div class="ml-4 flex items-center md:ml-6">
-            <NotificationsBell />
+<!--            <NotificationsBell />-->
             <div class="ml-3 relative">
               <!--User Menu-->
               <Menu />
@@ -61,16 +61,7 @@
         class="flex-1 relative z-0 overflow-y-auto py-6 focus:outline-none"
         tabindex="0"
       >
-        <Alerts />
-
         <Notifications class="sm:mt-16 z-40" />
-
-        <div
-          v-if="isMissingRequiredScopes()"
-          class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mb-3"
-        >
-          <RequiredScopesWarning :missing_characters_scopes="missing_characters_scopes" />
-        </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
           <slot />
@@ -93,45 +84,27 @@
         <ImpersonatingBanner v-if="$page.props.user.data.impersonating" />
       </main>
 
-      <transition leave-active-class="duration-300">
-        <slot name="modal" />
-      </transition>
-
-      <SlideOverComponent :dispatch_transfer_object="dispatch_transfer_object" />
-
-      <!--      <PortalTarget name="layout" />-->
-      <!--            <slot name="slideOver"></slot>-->
     </div>
   </div>
 </template>
 
 <script>
-    import RequiredScopesWarning from "./RequiredScopesWarning"
     import Menu from "@/Shared/Menu"
     import Notifications from "../Notifications/Notifications"
     import NotificationsBell from "./NotificationsBell"
-    import Alerts from "./Alerts"
     import ImpersonatingBanner from "./ImpersonatingBanner"
-    import SlideOverComponent from "@/Shared/Components/SlideOverComponent";
     import MobileMenu from "./MobileMenu";
-    import Sidebar from "./Sidebar";
     import DesktopSidebar from "./DesktopSidebar";
-    //import { PortalTarget } from 'portal-vue'
 
     export default {
         name: "Layout",
         components: {
           DesktopSidebar,
           MobileMenu,
-            SlideOverComponent,
             ImpersonatingBanner,
-            Alerts,
             NotificationsBell,
             Notifications,
-            Menu,
-            Sidebar,
-            RequiredScopesWarning,
-            //PortalTarget
+            Menu
         },
         props   : {
             page: {
@@ -143,17 +116,13 @@
                 type: String,
                 default: '',
                 required: false,
-            },
-            dispatch_transfer_object: {
-                type: Object,
-                required: false
             }
         },
         data() {
             return {
                 sidebarOpen: false,
                 menuOpen: false,
-                requiredScopes: this.dispatch_transfer_object ? this.dispatch_transfer_object.required_scopes : []
+
             }
         },
         computed: {

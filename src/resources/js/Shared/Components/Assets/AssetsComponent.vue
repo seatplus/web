@@ -5,7 +5,6 @@
                 v-for="location in groupedAssets"
                 :location="location"
                 :key="location.location_id"
-                @open_modal="openManualLocationModal"
                 :context="context"
             />
         </div>
@@ -15,8 +14,8 @@
 
 <script>
 import LocationComponent from "./LocationComponent";
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "../../Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 export default {
     name: "AssetsComponent",
@@ -24,9 +23,9 @@ export default {
         //InfiniteLoading
     },
     props: {
-        url: {
-            required: true,
-            type: String
+        parameters: {
+            type: Object,
+            required: true
         },
         context: {
             required: false,
@@ -36,8 +35,7 @@ export default {
     },
   setup(props) {
 
-    return useInfinityScrolling(props.url)
-
+    return useInfinityScrolling('load.character.assets', props.parameters)
   },
     data() {
         return {
@@ -49,9 +47,6 @@ export default {
         }
     },
     methods: {
-        openManualLocationModal(event) {
-            this.$emit('openManualLocationModal', event)
-        },
     },
     computed: {
         groupedAssets() {

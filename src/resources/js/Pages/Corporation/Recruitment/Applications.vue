@@ -1,57 +1,43 @@
 <template>
-    <div v-if="applications.length > 0">
-        <div class="pb-5 space-y-2">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Applications
-            </h3>
-            <p class="max-w-4xl text-sm leading-5 text-gray-500">Below you will find all open applications to review</p>
-        </div>
-        <div class="bg-white sm:rounded-md">
-
-            <UserApplications :applications="applications" />
-            <CharacterApplications :applications="applications" />
-
-        </div>
+  <div v-if="hasResults">
+    <div class="pb-5 space-y-2">
+      <h3 class="text-lg leading-6 font-medium text-gray-900">
+        Applications
+      </h3>
+      <p class="max-w-4xl text-sm leading-5 text-gray-500">
+        Below you will find all open applications to review
+      </p>
     </div>
+    <div class="bg-white sm:rounded-md">
+      <UserApplications :applications="result" />
+      <CharacterApplications :applications="result" />
+    </div>
+  </div>
+  <div ref="scrollComponent"></div>
 </template>
 
 <script>
-import axios from "axios"
-import EveImage from "@/Shared/EveImage";
-import Applicant from "./Applicant";
 import UserApplications from "./UserApplications";
 import CharacterApplications from "./CharacterApplications";
+import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 
 export default {
     name: "Applications",
-    components: {CharacterApplications, UserApplications, Applicant, EveImage},
+    components: {CharacterApplications, UserApplications},
     props: {
-        corporation_id: {
-            type: Number,
+        parameters: {
+            type: Object,
             required: true
-        }
+        },
     },
-    data() {
-        return {
-            applications: []
-        }
-    },
-    methods: {
-        async getInfo(route) {
-            return await axios.get(route)
-                .then((response) => {
-
-                    response.data.data.forEach(object => this.applications.push(object))
-
-                    if(response.data.links.next)
-                        this.getInfo(response.data.links.next)
-                })
-                .catch(error => console.log(error))
-        }
-    },
-    created() {
-        this.getInfo(this.$route('open.corporation.applications', this.corporation_id));
+  setup(props) {
+    return useInfinityScrolling('open.corporation.applications', props.parameters)
+  },
+  computed: {
+    hasResults() {
+      return this.result.length > 0;
     }
+  }
 }
 </script>
 

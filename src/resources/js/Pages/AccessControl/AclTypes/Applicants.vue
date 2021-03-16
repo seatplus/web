@@ -50,11 +50,12 @@
       name: "Applicants",
       components: {EveImage},
       props: {
-          value: {},
+          modelValue: {},
       },
+      emits: ['update:modelValue'],
       data() {
           return {
-              members: this.value
+              members: this.modelValue
           }
       },
       methods: {
@@ -102,9 +103,9 @@
       },
       watch: {
           members(value) {
-              this.$emit('input', value)
+              this.$emit('update:modelValue', value)
           },
-          value(value) {
+          modelValue(value) {
               this.members = value
           }
       }

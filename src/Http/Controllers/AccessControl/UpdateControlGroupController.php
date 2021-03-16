@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -47,11 +48,13 @@ class UpdateControlGroupController extends Controller
 
     public function __invoke(ControlGroupUpdate $control_group_update, int $role_id)
     {
+
         $control_group_update_data = new ControlGroupUpdateData([
             'role' => Role::findById($role_id),
-            'role_type' => $control_group_update->type,
-            'affiliations' => $control_group_update->affiliations,
-            'members' => $control_group_update->members,
+            'role_type' => Arr::get($control_group_update,'acl.type'),
+            'affiliations' => Arr::get($control_group_update,'acl.affiliations'),
+            'members' => Arr::get($control_group_update,'acl.members'),
+            'moderators' => Arr::get($control_group_update,'acl.moderators', [])
         ]);
 
         $this->updateType($control_group_update_data);

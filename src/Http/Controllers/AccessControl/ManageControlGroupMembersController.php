@@ -28,6 +28,8 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class ManageControlGroupMembersController
 {
@@ -38,8 +40,29 @@ class ManageControlGroupMembersController
                 'moderators.affiliatable.main_character', 'moderators.affiliatable.characters')
             ->first();
 
+        $mappedRole = [
+            'title' => $role->name,
+            'id' => $role->id,
+            'type' => $role->type,
+            'acl' => [
+                'affiliations' => $role->acl_affiliations->map(fn($affiliation) => [
+                    'id' => $affiliation->affiliatable_id,
+                    'type' => [
+                        CorporationInfo::class => 'corporation',
+                        AllianceInfo::class => 'alliance'
+                    ][$affiliation->affiliatable_type]
+                ]),
+                'moderators' => $role->moderators->map(fn($affiliation) => $affiliation->affiliatable),
+                'members' => $role->acl_members->map(function($member) {
+                    $member->id = $member->user_id;
+                    return $member;
+                })
+            ]
+        ];
+
         return Inertia::render('AccessControl/ManageControlGroup', [
-            'role' => $role,
+            'role' => $mappedRole,
+            'activeSidebarElement' => route('acl.groups')
         ]);
     }
 }

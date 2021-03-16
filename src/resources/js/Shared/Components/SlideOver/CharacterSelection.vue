@@ -24,14 +24,14 @@ export default {
   name: "CharacterSelection",
   components: {SelectionEntity},
   props: {
-    url: {
+    permission: {
       required: true,
       type: String
     }
   },
   setup(props) {
 
-    return useInfinityScrolling(props.url)
+    return useInfinityScrolling('get.affiliated.characters', props.permission)
   },
   data() {
     return {
