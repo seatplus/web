@@ -44,10 +44,10 @@
             },
         },
         mounted() {
-            this.$eventBus.$on('role-removed', () => {
+            /*TODO this.$eventBus.$on('role-removed', () => {
                 this.selected = []
                 this.$emit('corporation-scopes', this.selected)
-            })
+            })*/
         },
         watch: {
             selectedScopes() {

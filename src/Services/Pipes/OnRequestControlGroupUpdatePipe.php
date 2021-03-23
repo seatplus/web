@@ -51,38 +51,32 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
     private function handleModerators(ControlGroupUpdateData $data)
     {
+        $moderator_ids = data_get($data, 'moderators.*.id', []);
+
+        // Delete removed affiliations
+        $data->role
+            ->moderators()
+            ->whereNotIn('affiliatable_id', $moderator_ids)
+            ->delete();
 
         // First get the moderators
-        collect($data->affiliations)
-            ->whenNotEmpty(function ($affiliations) use ($data) {
+        collect($data->moderators)
+            ->whenNotEmpty(function ($moderators) use ($data) {
+                $existing_ids = $data
+                    ->role
+                    ->moderators
+                    ->map(fn ($affiliation) => $affiliation->affiliatable_id)
+                    ->toArray();
 
-                // Delete removed moderators
-                $affiliatable_ids = $affiliations
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'affiliatable_id'))
-                    // Only keep moderators
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
-                    ->map(fn ($affiliation) => $affiliation['affiliatable_id']);
-
-                $data->role
-                    ->moderators()
-                    ->whereNotIn('affiliatable_id', $affiliatable_ids)
-                    ->delete();
-
-                return $affiliations;
-            })
-            ->whenNotEmpty(function ($affiliations) use ($data) {
-
-                // add affiliations
-                $affiliations
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'user_id'))
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? Arr::get($affiliation, 'can_moderate') : false)
+                $moderators
+                    ->reject(fn ($moderator) => in_array($moderator['id'], $existing_ids))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
-                        'affiliatable_id'   => Arr::get($affiliation, 'user_id'),
+                        'affiliatable_id'   => Arr::get($affiliation, 'id'),
                         'affiliatable_type' => User::class,
                         'can_moderate'      => true,
                     ]));
 
-                return $affiliations;
+                return $moderators;
             })
             ->whenEmpty(fn ($affiliations) => $data->role->moderators()->delete());
     }

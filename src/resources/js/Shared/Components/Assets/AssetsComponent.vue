@@ -5,38 +5,27 @@
                 v-for="location in groupedAssets"
                 :location="location"
                 :key="location.location_id"
-                @open_modal="openManualLocationModal"
                 :context="context"
             />
         </div>
-
-        <infinite-loading :identifier="infiniteId" @infinite="loadAssets" spinner="waveDots" force-use-infinite-wrapper=".main.flex-1">
-            <div slot="no-more">all assets loaded</div>
-            <div slot="no-results">
-                <CardWithHeader>
-                    <template v-slot:header>
-                        <div class="flex">
-                            <div class="flex-none text-right text-sm text-gray-500">No assets available</div>
-                        </div>
-                    </template>
-                </CardWithHeader>
-            </div>
-        </infinite-loading>
+      <div ref="scrollComponent"></div>
     </div>
 </template>
 
 <script>
 import LocationComponent from "./LocationComponent";
-import InfiniteLoading from "vue-infinite-loading"
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "../../Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 export default {
     name: "AssetsComponent",
-    components: {EntityByIdBlock, CardWithHeader, LocationComponent, InfiniteLoading},
+    components: {EntityByIdBlock, CardWithHeader, LocationComponent,
+        //InfiniteLoading
+    },
     props: {
-        params: {
-            required: true,
-            type: Object
+        parameters: {
+            type: Object,
+            required: true
         },
         context: {
             required: false,
@@ -44,6 +33,10 @@ export default {
             default: 'character'
         }
     },
+  setup(props) {
+
+    return useInfinityScrolling('load.character.assets', props.parameters)
+  },
     data() {
         return {
             infiniteId: +new Date(),
@@ -54,41 +47,11 @@ export default {
         }
     },
     methods: {
-        openManualLocationModal(event) {
-            this.$emit('openManualLocationModal', event)
-        },
-        loadAssets($state) {
-            const self = this;
-
-            function getParams(params, loading_page) {
-                return {
-                    character_ids: params.character_ids,
-                    page: loading_page,
-                    regions: params.regions,
-                    search: params.search === "" ? null : params.search,
-                    systems: params.systems,
-                    withUnknownLocations: params.withUnknownLocations
-                };
-            }
-
-            let params = getParams(this.params, this.loading_page)
-
-            axios.get(this.$route('load.character.assets'), { params: params })
-                .then(response => {
-                    if(response.data.data.length) {
-                        self.loading_page += 1;
-                        self.assets_data.push(...response.data.data);
-                        $state.loaded();
-                    } else {
-                        $state.complete();
-                    }
-                });
-        },
     },
     computed: {
         groupedAssets() {
 
-            return  _.map(_.groupBy(this.assets_data, 'location_id'), (value, prop) => (
+            return  _.map(_.groupBy(this.result, 'location_id'), (value, prop) => (
                 {
                     location_id: _.toInteger(prop),
                     location: _.get(_.head(value), 'location.locatable.name'), //value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,

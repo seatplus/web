@@ -29,6 +29,7 @@ namespace Seatplus\Web\Services\Sidebar;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -76,7 +77,7 @@ class SidebarEntries
     {
         $entries = Arr::get($this->sidebar, $category);
 
-        return collect($entries)->filter(function ($entry) {
+        return collect($entries)->filter(function ($entry) use ($category) {
             $permission = Arr::get($entry, 'permission');
             $character_role = Arr::get($entry, 'character_role');
 
@@ -88,6 +89,18 @@ class SidebarEntries
             // if user has required permission show element
             if ($this->checkPermission($permission)) {
                 return true;
+            }
+
+            // Moderators of roles should see the access control link even without the permission
+            if ($category === 'Access Control') {
+                $roles = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
+                    [User::class],
+                    fn ($query) => $query->whereId($this->user->getAuthIdentifier())
+                ))->get();
+
+                if ($roles->isNotEmpty()) {
+                    return true;
+                }
             }
 
             // if user does not have permission but got necessary character_role show element

@@ -1,5 +1,5 @@
 <template>
-    <Fragment>
+<!--    <Fragment>
         <TableRow :class="even ? 'bg-gray-50' : 'bg-white'">
             <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
                 <Time :timestamp="entry.date"></Time>
@@ -7,7 +7,7 @@
             <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
                 {{ getTranslation(entry) }}
             </DataCell>
-            <!--<DataCell class="px-6 py-4 truncate whitespace-nowrap text-sm text-gray-500">
+            &lt;!&ndash;<DataCell class="px-6 py-4 truncate whitespace-nowrap text-sm text-gray-500">
                 {{ entry.description }}
             </DataCell>
             <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -15,7 +15,7 @@
             </DataCell>
             <DataCell class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ entry.second_party_id }}
-            </DataCell>-->
+            </DataCell>&ndash;&gt;
             <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
                 {{ entry.amount ? entry.amount.toLocaleString() : '' }}
             </DataCell>
@@ -38,19 +38,22 @@
                 <ExtendedWalletJournalRowComponent :entry="entry" />
             </DataCell>
         </TableRow>
-    </Fragment>
+    </Fragment>-->
 </template>
 
 <script>
 import TableRow from "@/Shared/Layout/Cards/Table/TableRow";
 import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
 import Time from "@/Shared/Time";
-import {Fragment} from "vue-fragment"
+//TODO Fragment
+//import {Fragment} from "vue-fragment"
 import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent";
 
 export default {
     name: "WalletJournalRowComponent",
-    components: {ExtendedWalletJournalRowComponent, Time, DataCell, TableRow, Fragment},
+    components: {ExtendedWalletJournalRowComponent, Time, DataCell, TableRow,
+        //Fragment
+    },
     props: {
         entry: {
             required: true

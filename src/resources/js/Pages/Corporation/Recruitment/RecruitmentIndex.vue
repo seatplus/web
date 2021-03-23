@@ -1,34 +1,48 @@
 <template>
-    <Layout page="Corporation" page-description="Recruitment">
+  <div class="space-y-3">
+    <teleport to="#head">
+      <title>{{ title(pageTitle) }}</title>
+    </teleport>
 
-        <template v-slot:title>
-            <PageHeader>
-                Corporation Recruitment
-                <template v-if="can_manage_recruitment" v-slot:primary>
-                    <HeaderButton @click="openSlideOver()">
-                        Open new enlistment
-                    </HeaderButton>
-                </template>
-            </PageHeader>
+    <PageHeader>
+      Corporation Recruitment
+      <template
+        v-if="can_manage_recruitment"
+        #primary
+      >
+        <HeaderButton @click="create_enlistment = true">
+          Open new enlistment
+        </HeaderButton>
+      </template>
+    </PageHeader>
+
+    <CorporationRecruitment
+      v-for="corporation in corporations"
+      :key="corporation.corporation_id"
+      :corporation="corporation"
+    />
+
+    <teleport to="#destination">
+      <SlideOver v-model:open="create_enlistment">
+        <template #title>
+          Create Enlistment
         </template>
-
-        <CorporationRecruitment v-for="corporation in corporations" :key="corporation.corporation_id" :corporation="corporation"></CorporationRecruitment>
-
-    </Layout>
-
+        <CorporationList :parameters="{permission: 'can open or close corporations for recruitment'}" />
+      </SlideOver>
+    </teleport>
+  </div>
 </template>
 
 <script>
-import Layout from "@/Shared/Layout"
 import PageHeader from "@/Shared/Layout/PageHeader"
 import HeaderButton from "@/Shared/Layout/HeaderButton"
-import SlideOver from "@/Shared/Layout/SlideOver"
-import CorporationList from "./CorporationList"
 import CorporationRecruitment from "./CorporationRecruitment"
+import SlideOver from "@/Shared/Layout/SlideOver";
+import CorporationList from "./CorporationList";
 
 export default {
-    components: {CorporationRecruitment, CorporationList, SlideOver, Layout, HeaderButton, PageHeader},
     name: "RecruitmentIndex",
+    components: {CorporationList, SlideOver, CorporationRecruitment, HeaderButton, PageHeader},
     props: {
         can_manage_recruitment: {
             required: true,
@@ -40,13 +54,9 @@ export default {
     },
     data() {
         return {
-            requiredScopes: this.dispatch_transfer_object ? this.dispatch_transfer_object.required_scopes : []
+          pageTitle: 'Corporation Recruitment',
+          create_enlistment: false
         }
-    },
-    methods   : {
-        openSlideOver() {
-            this.$eventBus.$emit('open-slideOver', 'enlistment');
-        },
     }
 }
 </script>

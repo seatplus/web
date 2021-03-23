@@ -1,35 +1,27 @@
 <template>
-<!--    TODO: create vue3 portal implementation-->
-    <div>
-
-        <SlideOver v-model="update_open">
+  <!--    TODO: create vue3 portal implementation-->
+  <div>
+    <!--        <SlideOver v-model="update_open">
             <template v-slot:title>Dispatch Update Job</template>
             <DispatchUpdate :dispatch_transfer_object="dispatch_transfer_object" />
-        </SlideOver>
+        </SlideOver>-->
 
-        <SlideOver v-model="select_character_open">
+    <!--        <SlideOver v-model="select_character_open">
             <template v-slot:title>Select characters</template>
             <CharacterSelection :dispatch_transfer_object="dispatch_transfer_object" />
-        </SlideOver>
+        </SlideOver>-->
 
-        <SlideOver v-model="create_enlistment">
-            <template v-slot:title>Create Enlistment</template>
-            <CorporationList/>
-        </SlideOver>
 
-    </div>
-
+  </div>
 </template>
 
 <script>
 import SlideOver from "@/Shared/Layout/SlideOver";
-import DispatchUpdate from "@/Shared/DispatchUpdate";
-import CharacterSelection from "@/Shared/Components/SlideOver/CharacterSelection";
 import CorporationList from "@/Pages/Corporation/Recruitment/CorporationList";
 
 export default {
     name: "SlideOverComponent",
-    components: {CorporationList, CharacterSelection, DispatchUpdate, SlideOver},
+    components: {CorporationList, SlideOver},
     props: {
         dispatch_transfer_object: {
             required: false,
@@ -42,7 +34,7 @@ export default {
         create_enlistment: false
     }),
     mounted() {
-        this.$eventBus.$on('open-slideOver', (payload) => {
+        /* TODO this.$eventBus.$on('open-slideOver', (payload) => {
             if(payload === 'update')
                 this.update_open = true
 
@@ -52,7 +44,7 @@ export default {
             if(payload === 'enlistment')
                 this.create_enlistment = true
 
-        })
+        })*/
     }
 }
 </script>

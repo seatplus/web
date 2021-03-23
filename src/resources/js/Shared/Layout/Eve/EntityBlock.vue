@@ -1,17 +1,24 @@
 <template>
-    <div class="flex items-center">
-        <div class="flex-shrink-0">
-            <EveImage :object="entity" :size="256" :tailwind_class="tailwind_class"/>
-        </div>
-        <div class="ml-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                {{  name }}
-            </h3>
-            <p v-if="entity.corporation || entity.alliance" class="text-sm text-gray-500 truncate">
-                {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
-            </p>
-        </div>
+  <div class="flex items-center">
+    <div class="flex-shrink-0">
+      <EveImage
+        :object="entity"
+        :size="256"
+        :tailwind_class="image_class"
+      />
     </div>
+    <div class="ml-4">
+      <h3 :class="name_class">
+        {{ name }}
+      </h3>
+      <p
+        v-if="entity.corporation || entity.alliance"
+        class="text-sm text-gray-500 truncate"
+      >
+        {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
+      </p>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -24,15 +31,15 @@ export default {
             required: true,
             type: Object
         },
-        tailwind_class: {
+        imageSize: {
             required: false,
-            type: String,
-            default: 'h-12 w-12 rounded-full'
-        }
-    },
-    methods: {
-        hasAlliance() {
-            return _.has(this.entity, 'alliance.name')
+            default: 12,
+            type: Number
+        },
+        nameFontSize: {
+            required: false,
+            default: 'lg',
+            type: String
         }
     },
     computed: {
@@ -44,6 +51,17 @@ export default {
         },
         name() {
             return _.get(this.entity, 'name', 'missing name')
+        },
+        image_class() {
+            return `h-${this.imageSize} w-${this.imageSize} rounded-full`
+        },
+        name_class() {
+            return `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
+        }
+    },
+    methods: {
+        hasAlliance() {
+            return _.has(this.entity, 'alliance.name')
         }
     }
 }

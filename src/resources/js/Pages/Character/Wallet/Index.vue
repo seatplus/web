@@ -1,45 +1,49 @@
 <template>
-    <Layout page="Character Wallets" :dispatch_transfer_object="dispatch_transfer_object">
+  <div class="space-y-3">
+    <teleport to="#head">
+      <title>{{ title(pageTitle) }}</title>
+    </teleport>
 
-        <template v-slot:title>
-            <PageHeader>
-                Character Wallets
-                <template v-slot:primary>
-                    <HeaderButton @click="openSlideOver('update')">
-                        Update
-                    </HeaderButton>
-                </template>
-                <template v-slot:secondary>
-                    <CharacterSelectionButton />
-                </template>
+    <RequiredScopesWarning :dispatch_transfer_object="dispatch_transfer_object" />
 
-            </PageHeader>
-        </template>
+    <PageHeader>
+      {{ pageTitle }}
+      <template #primary>
+        <DispatchUpdateButton />
+      </template>
+      <template #secondary>
+        <CharacterSelectionButton />
+      </template>
+    </PageHeader>
 
-        <div class="space-y-4">
-            <WalletComponent :id="character_id" v-for="character_id of character_ids" :key="character_id" />
-        </div>
 
-    </Layout>
+    <div class="space-y-4">
+      <WalletComponent
+        v-for="character_id of character_ids"
+        :id="character_id"
+        :key="character_id"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import Layout from "@/Shared/Layout";
-import SlideOver from "@/Shared/Layout/SlideOver";
-import DispatchUpdate from "@/Shared/DispatchUpdate";
-import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
-import ListTransition from "@/Shared/Transitions/ListTransition";
+import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
-import HeaderButton from "@/Shared/Layout/HeaderButton";
 import WalletComponent from "./WalletComponent";
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 
 export default {
     name: "Index",
     components: {
+      RequiredScopesWarning,
+      DispatchUpdateButton,
         CharacterSelectionButton,
         WalletComponent,
-        HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
+        PageHeader
+    },
     props: {
         dispatch_transfer_object: {
             required: true,
@@ -50,19 +54,21 @@ export default {
             type: Array
         }
     },
+  layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
     data() {
         return {
+          pageTitle: 'Character Wallets',
             entities: [],
             ready: false
         }
     },
-    methods: {
-        openSlideOver(value) {
-            this.$eventBus.$emit('open-slideOver', value);
-        },
-    },
     created: function () {
 
+    },
+    methods: {
+        openSlideOver(value) {
+            //TODO this.$eventBus.$emit('open-slideOver', value);
+        },
     }
 }
 </script>

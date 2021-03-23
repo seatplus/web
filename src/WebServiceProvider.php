@@ -34,6 +34,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Http\Middleware\CheckACLPermission;
 use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
@@ -91,10 +92,12 @@ class WebServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/public/img' => public_path('img'),
             __DIR__ . '/resources/js' => resource_path('js'),
-            __DIR__ . '/resources/sass' => resource_path('sass'),
+            //  __DIR__ . '/resources/sass' => resource_path('sass'),
+            __DIR__ . '/resources/css' => resource_path('css'),
             $this->getPackageJsonFile() => base_path('package.json'),
             $this->getPackageLockJsonFile() => base_path('package-lock.json'),
             $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
+            //$this->getPackagePostCssConfig() => base_path('postcss.config.js'),
         ], 'web');
     }
 
@@ -119,6 +122,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Add permission Middelware
         $router->aliasMiddleware('permission', CheckPermissionAffiliation::class);
+
+        // Add acl-permission Middelware
+        $router->aliasMiddleware('acl-permission', CheckACLPermission::class);
     }
 
     private function register_services()
@@ -139,6 +145,11 @@ class WebServiceProvider extends ServiceProvider
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tailwind.config.js';
     }
+
+    /*private function getPackagePostCssConfig()
+    {
+      return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'postcss.config.js';
+    }*/
 
     private function mergeConfigurations()
     {

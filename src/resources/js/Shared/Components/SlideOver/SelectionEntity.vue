@@ -1,19 +1,32 @@
 <template>
-    <li @click="toggle" class="px-6 py-5 relative cursor-pointer">
-
-        <div class="group flex justify-between items-center space-x-2">
-            <div class="-m-1 p-1 block">
-                <span class="absolute inset-0 group-hover:bg-gray-50"></span>
-                <EntityBlock :entity="entity" class="flex-1 flex items-center min-w-0 relative" />
-            </div>
-            <div class="relative inline-block text-left">
-                <svg v-if="isSelected" class="h-8 w-8 text-green-400" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-            </div>
-        </div>
-
-    </li>
+  <li
+    class="px-6 py-5 relative cursor-pointer"
+    @click="toggle"
+  >
+    <div class="group flex justify-between items-center space-x-2">
+      <div class="-m-1 p-1 block">
+        <span class="absolute inset-0 group-hover:bg-gray-50" />
+        <EntityBlock
+          :entity="entity"
+          class="flex-1 flex items-center min-w-0 relative"
+        />
+      </div>
+      <div class="relative inline-block text-left">
+        <svg
+          v-if="isSelected"
+          class="h-8 w-8 text-green-400"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+  </li>
 </template>
 
 <script>
@@ -26,15 +39,21 @@ export default {
             type: Object,
             required: true
         },
-        value: {
-            type: Array
+        modelValue: {
+          type: Array,
+          default: () => []
+        }
+    },
+    computed: {
+        isSelected() {
+            return this.modelValue.includes(this.entity.id)
         }
     },
     methods: {
         toggle() {
 
             const entity = this.entity
-            let selected = this.value
+            let selected = this.modelValue
             let index = selected.indexOf(entity.id)
 
 
@@ -44,12 +63,7 @@ export default {
                 selected.push(entity.id)
             }
 
-            this.$emit('input', selected)
-        }
-    },
-    computed: {
-        isSelected() {
-            return this.value.includes(this.entity.id)
+            this.$emit('update:modelValue', selected)
         }
     }
 }

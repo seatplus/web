@@ -42,37 +42,37 @@
 
                 <transition
                     enter-active-class="duration-150 ease-out"
-                    enter-class="opacity-0 scale-95"
+                    enter-from-class="opacity-0 scale-95"
                     enter-to-class="opacity-100 scale-100"
                     leave-active-class="duration-100 ease-in"
-                    leave-class="opacity-100 scale-100"
+                    leave-from-class="opacity-100 scale-100"
                     leave-to-class="opacity-0 scale-95"
                 >
-                    <Portal to="layout">
+<!--                    <Portal to="layout">
                     <div v-show="open" ref="listboxCollabsible" class="absolute mt-1 w-full rounded-md bg-white shadow-lg">
                         <ul tabindex="-1" role="listbox" aria-labelledby="listbox-label" class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                            <!--
+                            &lt;!&ndash;
                               Select option, manage highlight styles based on mouseenter/mouseleave and keyboard navigation.
 
                               Highlighted: "text-white bg-indigo-600", Not Highlighted: "text-gray-900"
-                            -->
+                            &ndash;&gt;
                             <li v-for="(option, index) in options" :key="option.value"
                                 :id="'listbox-item-' + index"
                                 @click="select(option)"
                                 role="option"
                                 class="text-gray-900 hover:text-white hover:bg-indigo-600 cursor-default select-none relative py-2 pl-8 pr-4">
-                                <!-- Selected: "font-semibold", Not Selected: "font-normal" -->
+                                &lt;!&ndash; Selected: "font-semibold", Not Selected: "font-normal" &ndash;&gt;
                                 <span :class="[isSelected(option) ? 'font-semibold' : 'font-normal', 'block truncate']">
                                     {{ option.text }}
                                 </span>
 
-                                <!--
+                                &lt;!&ndash;
                                   Checkmark, only display for selected option.
 
                                   Highlighted: "text-white", Not Highlighted: "text-indigo-600"
-                                -->
+                                &ndash;&gt;
                                 <span v-show="isSelected(option)" class="absolute inset-y-0 left-0 flex items-center pl-1.5">
-                                    <!-- Heroicon name: check -->
+                                    &lt;!&ndash; Heroicon name: check &ndash;&gt;
                                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                     </svg>
@@ -81,7 +81,7 @@
 
                         </ul>
                     </div>
-                    </Portal>
+                    </Portal>-->
                 </transition>
         </div>
     </div>
@@ -90,11 +90,11 @@
 
 <script>
 import {createPopper} from '@popperjs/core'
-import {Portal} from 'portal-vue'
+/*TODO import {Portal} from 'portal-vue'*/
 
 export default {
     name: "SelectComponent",
-    components: {Portal},
+    components: {/*Portal*/},
     props: {
         value: {
             required: true

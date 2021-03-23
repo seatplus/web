@@ -58,33 +58,24 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 
     public function handleAffiliations(ControlGroupUpdateData $data)
     {
+        $affiliatable_ids = data_get($data, 'affiliations.*.id', []);
+
+        // Delete removed affiliations
+        $data->role
+            ->acl_affiliations()
+            ->whereNotIn('affiliatable_id', $affiliatable_ids)
+            ->delete();
+
         // First get the affiliations to delete
         collect($data->affiliations)
             ->whenNotEmpty(function ($affiliations) use ($data) {
+                $existing_ids = $data->role->acl_affiliations->map(fn ($affiliation) => $affiliation->affiliatable_id);
 
-                // Delete removed affiliations
-                $affiliatable_ids = $affiliations
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'affiliatable_id'))
-                    // Remove Moderators
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? ! Arr::get($affiliation, 'can_moderate') : true)
-                    ->map(fn ($affiliation) => $affiliation['affiliatable_id']);
-
-                $data->role
-                    ->acl_affiliations()
-                    ->whereNotIn('affiliatable_id', $affiliatable_ids)
-                    ->delete();
-
-                return $affiliations;
-            })
-            ->whenNotEmpty(function ($affiliations) use ($data) {
-
-                // add affiliations
-                $affiliations
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'id'))
-                    ->filter(fn ($affiliation) => Arr::has($affiliation, 'can_moderate') ? ! Arr::get($affiliation, 'can_moderate') : true)
+                collect($data->affiliations)
+                    ->reject(fn ($affiliation) => in_array($affiliation['id'], $existing_ids->toArray()))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id' => $affiliation['id'],
-                        'affiliatable_type' => $affiliation['category'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
+                        'affiliatable_type' => $affiliation['type'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
                     ]));
 
                 return $affiliations;

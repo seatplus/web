@@ -1,43 +1,39 @@
 <template>
+ <div>
+   <teleport to="#head">
+     <title>{{ title(object.name) }}</title>
+   </teleport>
+   <PageHeader :breadcrumbs="breadcrumbs">
+     <div class="flex items-center">
+       <div class="flex-shrink-0">
+         <EveImage
+           :object="object"
+           :size="256"
+           tailwind_class="h-12 w-12 rounded-full"
+         />
+       </div>
+       <div class="ml-4">
+         <h3 class="text-lg leading-6 font-medium text-gray-900">
+           {{ object.name }}
+         </h3>
+       </div>
+     </div>
+   </PageHeader>
 
-    <Layout page="Item Details">
-
-        <template v-slot:title>
-            <PageHeader :breadcrumbs="breadcrumbs">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <EveImage :object="object" :size="256" tailwind_class="h-12 w-12 rounded-full"/>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            {{  object.name }}
-                        </h3>
-                        <!-- <p v-if="entity.corporation || entity.alliance" class="text-sm text-gray-500 truncate">
-                             {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
-                         </p>-->
-                    </div>
-                </div>
-            </PageHeader>
-        </template>
-
-        <ItemLayout :items="object.content"></ItemLayout>
-
-    </Layout>
+   <ItemLayout :items="object.content" />
+ </div>
 </template>
 
 <script>
-import Layout from "@/Shared/Layout"
+import Layout from "@/Shared/SidebarLayout/Layout";
 import EveImage from "@/Shared/EveImage"
-import WideLists from "@/Shared/WideLists"
-import WideListElement from "@/Shared/WideListElement"
 import PageHeader from "@/Shared/Layout/PageHeader";
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import ItemLayout from "@/Shared/Components/ItemLayout";
 
 export default {
     name: "ItemDetails",
-    components : {ItemLayout, CardWithHeader, PageHeader, Layout, EveImage, WideLists, WideListElement},
-    props: {
+    components : {ItemLayout, PageHeader, EveImage},
+  props: {
         item: {
             type    : Object,
             required: true

@@ -10,10 +10,10 @@
         </div>
         <transition
             enter-active-class="duration-150 ease-out"
-            enter-class="opacity-0 scale-95"
+            enter-from-class="opacity-0 scale-95"
             enter-to-class="opacity-100 scale-100"
             leave-active-class="duration-100 ease-in"
-            leave-class="opacity-100 scale-100"
+            leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-95"
         >
             <div v-show="menuOpen" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg">

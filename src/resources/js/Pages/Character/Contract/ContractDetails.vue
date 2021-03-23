@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import Layout from "@/Shared/Layout";
+import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import ContractRowComponent from "@/Shared/Components/Contracts/ContractRowComponent";
 import WideListElement from "@/Shared/WideListElement";

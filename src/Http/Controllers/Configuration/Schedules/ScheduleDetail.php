@@ -37,6 +37,7 @@ class ScheduleDetail extends Controller
         return Inertia::render('Configuration/Schedules/SchedulesDetails', [
             'schedule' => Schedules::find($schedule_id),
             'cron' => config('web.cronExpressions'),
+            'activeSidebarElement' => route('server.settings'),
         ]);
     }
 }

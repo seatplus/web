@@ -1,33 +1,77 @@
 <template>
-    <div :class="['grid grid-cols-1 gap-6 mt-6 sm:mt-5', {'sm:grid-cols-2': gotSecondColumn}]" >
-        <div class="space-y-4">
-
-            <LocationSlot name="Highslots" :items="items" :slots="highslots" />
-            <LocationSlot name="Midslots" :items="items" :slots="midslots" />
-            <LocationSlot name="Lowslots" :items="items" :slots="lowslots" />
-            <LocationSlot name="Rigslots" :items="items" :slots="rigslots" />
-            <LocationSlot name="Subsystems" :items="items" :slots="subsystems" />
-
-        </div>
-        <div class="space-y-4" v-if="gotSecondColumn">
-            <LocationSlot name="Fighter Tubes" :items="items" :slots="fighter_tubes" />
-            <LocationSlot name="Fleet Hangar" :items="items" :slots="fleet_hangar" />
-            <LocationSlot name="Ship Hangar" :items="items" :slots="ship_hangar" />
-        </div>
-        <div class="space-y-4 col-span-1 md:col-span-2">
-            <LocationSlot name="Specialized Hold" :items="items" :slots="specialized" />
-            <LocationSlot name="Drone/Fighter Bay" :items="items" :slots="dronebay" />
-            <LocationSlot name="Cargo" :items="items" :slots="everything_else" />
-        </div>
+  <div :class="['grid grid-cols-1 gap-6 mt-6 sm:mt-5', {'sm:grid-cols-2': gotSecondColumn}]">
+    <div class="space-y-4">
+      <LocationSlot
+        name="Highslots"
+        :items="items"
+        :slots="highslots"
+      />
+      <LocationSlot
+        name="Midslots"
+        :items="items"
+        :slots="midslots"
+      />
+      <LocationSlot
+        name="Lowslots"
+        :items="items"
+        :slots="lowslots"
+      />
+      <LocationSlot
+        name="Rigslots"
+        :items="items"
+        :slots="rigslots"
+      />
+      <LocationSlot
+        name="Subsystems"
+        :items="items"
+        :slots="subsystems"
+      />
     </div>
+    <div
+      v-if="gotSecondColumn"
+      class="space-y-4"
+    >
+      <LocationSlot
+        name="Fighter Tubes"
+        :items="items"
+        :slots="fighter_tubes"
+      />
+      <LocationSlot
+        name="Fleet Hangar"
+        :items="items"
+        :slots="fleet_hangar"
+      />
+      <LocationSlot
+        name="Ship Hangar"
+        :items="items"
+        :slots="ship_hangar"
+      />
+    </div>
+    <div class="space-y-4 col-span-1 md:col-span-2">
+      <LocationSlot
+        name="Specialized Hold"
+        :items="items"
+        :slots="specialized"
+      />
+      <LocationSlot
+        name="Drone/Fighter Bay"
+        :items="items"
+        :slots="dronebay"
+      />
+      <LocationSlot
+        name="Cargo"
+        :items="items"
+        :slots="everything_else"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
 import LocationSlot from "./LocationSlot";
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 export default {
     name: "ItemLayout",
-    components: {CardWithHeader, LocationSlot},
+    components: {LocationSlot},
     props: {
         items: {
             type: Array,

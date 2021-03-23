@@ -1,51 +1,46 @@
 <template>
-    <Layout page="Character Contracts" :dispatch_transfer_object="dispatch_transfer_object">
+  <div class="space-y-3">
+    <teleport to="#head">
+      <title>{{ title(pageTitle) }}</title>
+    </teleport>
 
-        <template v-slot:title>
-            <PageHeader>
-                Character Contracts
-                <template v-slot:primary>
-                    <HeaderButton @click="openSlideOver('update')">
-                        Update
-                    </HeaderButton>
-                </template>
-                <template v-slot:secondary>
-                    <CharacterSelectionButton />
-                </template>
+    <RequiredScopesWarning :dispatch_transfer_object="dispatch_transfer_object" />
 
-            </PageHeader>
-        </template>
+    <PageHeader>
+      {{ pageTitle }}
+      <template #primary>
+        <DispatchUpdateButton />
+      </template>
+      <template #secondary>
+        <CharacterSelectionButton />
+      </template>
+    </PageHeader>
 
-        <div class="space-y-4">
-            <ContractComponent :id="character.character_id" v-for="character in characters" :key="character.character_id" />
-        </div>
-
-        <template v-slot:slideOver>
-            <SlideOver>
-                <template v-slot:title>Dispatch Update Job</template>
-                <DispatchUpdate :dispatch_transfer_object="dispatch_transfer_object" />
-            </SlideOver>
-        </template>
-    </Layout>
+    <div class="space-y-4">
+      <ContractComponent
+        v-for="character in characters"
+        :id="character.character_id"
+        :key="character.character_id"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
-import Layout from "@/Shared/Layout";
-import SlideOver from "@/Shared/Layout/SlideOver";
-import DispatchUpdate from "@/Shared/DispatchUpdate";
-import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
-import ListTransition from "@/Shared/Transitions/ListTransition";
 import PageHeader from "@/Shared/Layout/PageHeader";
-import HeaderButton from "@/Shared/Layout/HeaderButton";
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 
 export default {
     name: "Index",
     components: {
+      DispatchUpdateButton,
+      RequiredScopesWarning,
         ContractComponent,
         CharacterSelectionButton,
-        HeaderButton, PageHeader, ListTransition, CharacterContactPanel, DispatchUpdate, SlideOver, Layout},
+        PageHeader},
     props: {
         dispatch_transfer_object: {
             required: true,
@@ -56,11 +51,16 @@ export default {
             type: Array
         }
     },
-    methods: {
-        openSlideOver(value) {
-            this.$eventBus.$emit('open-slideOver', value);
-        }
-    },
+  data() {
+      return {
+        pageTitle: 'Character Contracts'
+      }
+  },
+  methods: {
+    getUrl(character_id) {
+      return this.$route('character.contracts.details', character_id)
+    }
+  }
 }
 </script>
 

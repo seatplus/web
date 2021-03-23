@@ -42,9 +42,11 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'automatic',
-                'affiliations' => [],
-                'members' => []
+                "acl" => [
+                    "type" => 'automatic',
+                    'affiliations' => [],
+                    'members' => []
+                ]
             ]);
 
         $this->assertEquals('automatic', $this->role->fresh()->type);
@@ -62,13 +64,15 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'user_id' => $this->test_user->id,
-                        'user' => $this->test_user
-                    ],
+                "acl" => [
+                    "type" => 'manual',
+                    'affiliations' => [],
+                    'members' => [
+                        [
+                            'user_id' => $this->test_user->id,
+                            'user' => $this->test_user
+                        ],
+                    ]
                 ]
             ]);
 
@@ -89,9 +93,11 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'manual',
-                'affiliations' => [],
-                'members' => []
+                "acl" => [
+                    "type" => 'manual',
+                    'affiliations' => [],
+                    'members' => []
+                ]
             ]);
 
         $this->assertFalse($this->test_user->refresh()->hasRole($this->role));
@@ -110,14 +116,16 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'automatic',
-                'affiliations' => [
-                    [
-                        'category' => 'corporation',
-                        'id' => CorporationInfo::factory()->make()->corporation_id
-                    ]
-                ],
-                'members' => []
+                "acl" => [
+                    "type" => 'automatic',
+                    'affiliations' => [
+                        [
+                            'type' => 'corporation',
+                            'id' => CorporationInfo::factory()->make()->corporation_id
+                        ]
+                    ],
+                    'members' => []
+                ]
             ]);
 
         $this->assertFalse($this->role->refresh()->acl_affiliations->isEmpty());
@@ -143,9 +151,11 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'automatic',
-                'affiliations' => [],
-                'members' => []
+               "acl" => [
+                   "type" => 'automatic',
+                   'affiliations' => [],
+                   'members' => []
+               ]
             ]);
 
         $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
@@ -164,14 +174,14 @@ class UpdateControlGroupTest extends TestCase
         $response = $this->actingAs($this->test_user)
             ->followingRedirects()
             ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'on-request',
-                'affiliations' => [
-                    [
-                        'can_moderate' => true,
-                        'user_id' => $this->test_user->id
+                "acl" => [
+                    "type" => 'on-request',
+                    'moderators' => [
+                        [
+                            'id' => $this->test_user->id
+                        ]
                     ]
-                ],
-                'members' => []
+                ]
             ]);
 
         // Test if test user is moderator
@@ -180,20 +190,6 @@ class UpdateControlGroupTest extends TestCase
 
         // assert that no affiliations has been created
         $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
-
-        // now let's update again but this time no moderator
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "type" => 'on-request',
-                'affiliations' => [],
-                'members' => []
-            ]);
-
-        // Test if test user is moderator
-        $this->assertFalse($this->role->refresh()->moderators->isNotEmpty());
-        $this->assertFalse($this->role->refresh()->isModerator($this->test_user));
-
 
     }
 

@@ -51,7 +51,7 @@ Route::middleware(['permission:create or update or delete access control group']
     Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
 });
 
-Route::middleware(['permission:manage access control group'])->group(function () {
+Route::middleware(['permission:manage access control group|create or update or delete access control group'])->group(function () {
     Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
     Route::post('/manage_control_group/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
 

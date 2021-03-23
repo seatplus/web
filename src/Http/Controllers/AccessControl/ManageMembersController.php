@@ -38,7 +38,7 @@ class ManageMembersController extends Controller
 
         abort_unless($role->isModerator(auth()->user()), 403);
 
-        return Inertia::render('AccessControl/ManageMembers', [
+        return Inertia::render('AccessControl/ModerateMembers', [
             'role' => $role,
         ]);
     }

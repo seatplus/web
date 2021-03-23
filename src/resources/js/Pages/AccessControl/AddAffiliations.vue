@@ -31,7 +31,7 @@
 </template>
 
 <script>
-    import SeatPlusSelect from "../../Shared/SeatPlusSelect"
+    import SeatPlusSelect from "@/Shared/SeatPlusSelect"
     export default {
         name: "AddAffiliations",
         components: {SeatPlusSelect},

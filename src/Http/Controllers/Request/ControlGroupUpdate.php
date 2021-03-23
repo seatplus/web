@@ -31,16 +31,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class ControlGroupUpdate extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return auth()->user()->can('manage access control group');
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -48,9 +38,10 @@ class ControlGroupUpdate extends FormRequest
     public function rules()
     {
         return [
-            'type' => ['required', 'string'],
-            'affiliations' => ['array'],
-            'members' => ['array'],
+            'acl.type' => ['required', 'string'],
+            'acl.affiliations' => ['array'],
+            'acl.members' => ['array'],
+            'acl.moderators' => ['array'],
         ];
     }
 }

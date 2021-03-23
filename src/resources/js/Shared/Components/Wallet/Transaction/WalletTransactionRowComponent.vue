@@ -1,5 +1,5 @@
 <template>
-    <Fragment>
+<!--    <Fragment>
         <TableRow :class="even ? 'bg-gray-50' : 'bg-white'">
             <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
                 <Time :timestamp="entry.date"></Time>
@@ -41,20 +41,20 @@
                 <ExtendedWalletTransactionRowComponent :entry="entry" />
             </DataCell>
         </TableRow>
-    </Fragment>
+    </Fragment>-->
 </template>
 
 <script>
 import TableRow from "@/Shared/Layout/Cards/Table/TableRow";
 import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
-import {Fragment} from "vue-fragment"
+/*TODO import {Fragment} from "vue-fragment"*/
 import EveImage from "@/Shared/EveImage";
 import Time from "@/Shared/Time";
 import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent";
 
 export default {
     name: "WalletTransactionRowComponent",
-    components: {ExtendedWalletTransactionRowComponent, Time, EveImage, DataCell, TableRow, Fragment},
+    components: {ExtendedWalletTransactionRowComponent, Time, EveImage, DataCell, TableRow, /*Fragment*/},
     props: {
         entry: {
             required: true

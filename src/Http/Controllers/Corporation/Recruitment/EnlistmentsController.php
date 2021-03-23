@@ -60,6 +60,7 @@ class EnlistmentsController extends Controller
         $enlistment = Enlistment::with('systems')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Watchlist/Index', [
+            'activeSidebarElement' => route('corporation.recruitment'),
             'corporation_id' => $corporation_id,
             'watched_systems' => $enlistment->systems->map(function ($system) {
                 $system->id = $system->system_id;
