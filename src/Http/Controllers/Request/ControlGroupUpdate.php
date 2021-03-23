@@ -51,7 +51,7 @@ class ControlGroupUpdate extends FormRequest
             'acl.type' => ['required', 'string'],
             'acl.affiliations' => ['array'],
             'acl.members' => ['array'],
-            'acl.moderators' => [ 'array'],
+            'acl.moderators' => ['array'],
         ];
     }
 }

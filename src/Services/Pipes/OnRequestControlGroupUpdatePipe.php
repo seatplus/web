@@ -51,7 +51,6 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
     private function handleModerators(ControlGroupUpdateData $data)
     {
-
         $moderator_ids = data_get($data, 'moderators.*.id', []);
 
         // Delete removed affiliations
@@ -63,15 +62,14 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         // First get the moderators
         collect($data->moderators)
             ->whenNotEmpty(function ($moderators) use ($data) {
-
                 $existing_ids = $data
                     ->role
                     ->moderators
-                    ->map(fn($affiliation) => $affiliation->affiliatable_id)
+                    ->map(fn ($affiliation) => $affiliation->affiliatable_id)
                     ->toArray();
 
                 $moderators
-                    ->reject(fn($moderator) => in_array($moderator['id'], $existing_ids))
+                    ->reject(fn ($moderator) => in_array($moderator['id'], $existing_ids))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id'   => Arr::get($affiliation, 'id'),
                         'affiliatable_type' => User::class,

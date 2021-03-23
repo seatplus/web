@@ -29,15 +29,11 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class CheckACLPermission
 {
-
     /**
      * @param Request $request
      * @param Closure $next
@@ -60,7 +56,7 @@ class CheckACLPermission
 
         $requested_id = Arr::get($url_parameters, 'role_id');
 
-        if(!$requested_id) {
+        if (! $requested_id) {
             abort_unless($moderated_role_ids->isNotEmpty(), 403, 'You do not have the necessary permission to perform this action.');
 
             return $next($request);
