@@ -64,15 +64,15 @@ class ControlGroupsController
             return array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
         };
 
-        $existing_affiliations = fn() => $role->affiliations
+        $existing_affiliations = fn () => $role->affiliations
             ->groupBy('type')
-            ->map(fn($type) => $type
-                ->map(fn($entity) => collect([
+            ->map(fn ($type) => $type
+                ->map(fn ($entity) => collect([
                     'name' => $entity->affiliatable->name,
                     'id' => $entity->affiliatable_id,
                     'character_id' => $entity->affiliatable_type === CharacterInfo::class ? $entity->affiliatable_id : null,
                     'corporation_id' => $entity->affiliatable_type === CorporationInfo::class ? $entity->affiliatable_id : null,
-                    'alliance_id' => $entity->affiliatable_type === AllianceInfo::class ? $entity->affiliatable_id: null
+                    'alliance_id' => $entity->affiliatable_type === AllianceInfo::class ? $entity->affiliatable_id : null,
                 ])
                     ->filter()
                     ->toArray()
@@ -84,7 +84,7 @@ class ControlGroupsController
             'existing_affiliations' => $existing_affiliations,
             'available_permissions' => $permissions,
             'permissions' => $role->permissions,
-            'activeSidebarElement' => route('acl.groups')
+            'activeSidebarElement' => route('acl.groups'),
         ]);
     }
 

@@ -92,20 +92,20 @@ class SidebarEntries
             }
 
             // Moderators of roles should see the access control link even without the permission
-            if($category === "Access Control") {
+            if ($category === 'Access Control') {
                 $roles = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
                     [User::class],
                     fn ($query) => $query->whereId($this->user->getAuthIdentifier())
                 ))->get();
 
-                if($roles->isNotEmpty())
+                if ($roles->isNotEmpty()) {
                     return true;
+                }
             }
 
             // if user does not have permission but got necessary character_role show element
             return is_string($character_role) ? $this->hasUserCharacterRole($character_role) : false;
         })->toArray();
-
     }
 
     /*
