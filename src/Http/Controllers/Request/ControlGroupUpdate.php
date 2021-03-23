@@ -30,7 +30,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ControlGroupUpdate extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -42,7 +41,7 @@ class ControlGroupUpdate extends FormRequest
             'acl.type' => ['required', 'string'],
             'acl.affiliations' => ['array'],
             'acl.members' => ['array'],
-            'acl.moderators' => [ 'array'],
+            'acl.moderators' => ['array'],
         ];
     }
 }

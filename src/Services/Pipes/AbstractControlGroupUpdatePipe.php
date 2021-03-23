@@ -58,7 +58,6 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 
     public function handleAffiliations(ControlGroupUpdateData $data)
     {
-
         $affiliatable_ids = data_get($data, 'affiliations.*.id', []);
 
         // Delete removed affiliations
@@ -67,15 +66,13 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
             ->whereNotIn('affiliatable_id', $affiliatable_ids)
             ->delete();
 
-
         // First get the affiliations to delete
         collect($data->affiliations)
             ->whenNotEmpty(function ($affiliations) use ($data) {
-
-                $existing_ids = $data->role->acl_affiliations->map(fn($affiliation) => $affiliation->affiliatable_id);
+                $existing_ids = $data->role->acl_affiliations->map(fn ($affiliation) => $affiliation->affiliatable_id);
 
                 collect($data->affiliations)
-                    ->reject(fn($affiliation) => in_array($affiliation['id'], $existing_ids->toArray()))
+                    ->reject(fn ($affiliation) => in_array($affiliation['id'], $existing_ids->toArray()))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id' => $affiliation['id'],
                         'affiliatable_type' => $affiliation['type'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
