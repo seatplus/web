@@ -8,6 +8,7 @@ use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
@@ -47,10 +48,35 @@ class AccessControlTest extends TestCase
 
         $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.edit', ['role_id' => $role->id]));
+        $this->actingAs($this->test_user)
+            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+                "allowed" => [
+                    [
+                        "character_id" => $this->test_character->character_id,
+                        "id" => $this->test_character->character_id,
+                        "name" => $this->test_character->name
+                    ],
+                ],
+                "roleName" => $role->name,
+            ])
+            ->assertRedirect();
 
-        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/EditGroup'));
+
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.edit', ['role_id' => $role->id]))
+            ->assertInertia( fn (Assert $page) => $page
+                ->component('AccessControl/EditGroup')
+                ->has('existing_affiliations', fn(Assert $page) => $page
+                    ->has('allowed', 1,  fn(Assert $page) => $page
+                        ->where('id', (string) $this->test_character->character_id)
+                        ->etc()
+                    )
+
+
+                )
+            );
+
     }
 
     /** @test */
