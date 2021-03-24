@@ -90,6 +90,7 @@ class ApplicationsController extends Controller
                 'systems' => $enlistment->systems?->pluck('system_id'),
                 'regions' => $enlistment->regions?->pluck('region_id'),
             ],
+            'dispatch_transfer_object' => route('corporation.recruitment'),
         ]);
     }
 
