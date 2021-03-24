@@ -42,28 +42,29 @@
 </template>
 
 <script>
-  export default {
-      name: "SeatPlusSelect",
-      props: ['modelValue', 'id'],
-      data() {
-          return {
-              selection: this.modelValue
-          }
-      },
-      computed: {
-          error() {
-              return _.get(this.$page, `props.errors[${this.id}][0]`)
-          }
-      },
-      watch: {
-          selection(newValue) {
-              this.$emit('update:modelValue', newValue)
-          },
-          modelValue(newValue) {
-              this.selection = newValue
-          }
-      },
-  }
+export default {
+    name: "SeatPlusSelect",
+    props: ['modelValue', 'id'],
+    emits: ['update:modelValue'],
+    data() {
+        return {
+            selection: this.modelValue
+        }
+    },
+    computed: {
+        error() {
+            return _.get(this.$page, `props.errors[${this.id}][0]`)
+        }
+    },
+    watch: {
+        selection(newValue) {
+            this.$emit('update:modelValue', newValue)
+        },
+        modelValue(newValue) {
+            this.selection = newValue
+        }
+    },
+}
 </script>
 
 <style scoped>

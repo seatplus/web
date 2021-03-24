@@ -11,7 +11,42 @@
         </div>
       </div>
     </template>
-    <div class="">
+    <div class="relative max-h-96 overflow-y-auto">
+      <div class="hidden sm:grid sm:grid-cols-12 sm:gap-x-0 sm:gap-y-0.5 grid-flow-row z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-500">
+        <div class="px-6 sm:px-3 py-1 col-span-2">
+          Date
+        </div>
+        <div class="px-6 sm:px-3 py-1 col-span-2">
+          Type
+        </div>
+        <div class="px-6 sm:px-3 py-1 col-span-3">
+          Amount
+        </div>
+        <div class="px-6 sm:px-3 py-1 col-span-3">
+          Balance
+        </div>
+        <div class="px-6 sm:px-3 py-1 col-span-2">
+          <span class="sr-only">Expand</span>
+        </div>
+      </div>
+
+      <ul class="relative z-0 divide-y divide-gray-200">
+        <InfiniteLoadingHelper
+          route="character.wallet_journal.detail"
+          :params="id"
+          @result="(result) => assets_data = result"
+        >
+          <WalletJournalRowComponent
+            v-for="(entry, index) in assets_data"
+            :key="entry.id"
+            :entry="entry"
+            :even="index%2"
+          />
+        </InfiniteLoadingHelper>
+      </ul>
+
+    </div>
+<!--    <div class="">
       <div class="flex flex-col max-h-96">
         <div class="flex-grow overflow-y-auto overflow-x-hidden">
           <table class="relative table-fixed w-full">
@@ -35,20 +70,27 @@
               </TableHeader>
             </thead>
             <tbody>
-              <WalletJournalRowComponent
-                v-for="(entry, index) in assets_data"
-                :key="entry.id"
-                :entry="entry"
-                :even="index%2"
-              />
-              <!--                        <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
+              <InfiniteLoadingHelper
+                route="character.wallet_journal.detail"
+                :params="id"
+                @result="(result) => assets_data = result"
+              >
+                <WalletJournalRowComponent
+                  v-for="(entry, index) in assets_data"
+                  :key="entry.id"
+                  :entry="entry"
+                  :even="index%2"
+                />
+              </InfiniteLoadingHelper>
+
+              &lt;!&ndash;                        <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
                             <div slot="no-more">all loaded</div>
-                        </infinite-loading>-->
+                        </infinite-loading>&ndash;&gt;
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </div>-->
   </CardWithHeader>
 </template>
 
@@ -60,10 +102,12 @@ import DataHeader from "@/Shared/Layout/Cards/Table/DataHeader";
 //import InfiniteLoading from "vue-infinite-loading";
 import WalletJournalRowComponent from "./WalletJournalRowComponent";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper";
 
 export default {
     name: "WalletJournalComponent",
     components: {
+        InfiniteLoadingHelper,
         EntityByIdBlock,
         WalletJournalRowComponent,
         DataHeader, TableHeader,

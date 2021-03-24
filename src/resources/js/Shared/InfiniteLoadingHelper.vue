@@ -23,7 +23,7 @@ export default {
             required: false
         }
     },
-emits: ['result'],
+    emits: ['result'],
     setup(props) {
 
         return useInfinityScrolling(props.route, props.params)
