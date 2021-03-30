@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Esi\Jobs\Universe\ResolveUniverseSystemsBySystemIdAction;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
