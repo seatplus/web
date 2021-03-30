@@ -26,8 +26,8 @@
 
 namespace Seatplus\Web\Services;
 
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class GetNamesFromIdsService
@@ -62,7 +62,7 @@ class GetNamesFromIdsService
             'request_body' => [...$ids_to_resolve->toArray()],
         ]);
 
-        $esi_results = (new RetrieveEsiDataAction)->execute($container);
+        $esi_results = RetrieveEsiData::execute($container);
 
         return collect($esi_results)->each(fn ($esi_result) => cache([sprintf('name:%s', $esi_result->id) => $esi_result], now()->addDay()))
             ->merge($this->result);

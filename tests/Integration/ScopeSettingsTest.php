@@ -4,10 +4,12 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\Assert;
 use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Esi\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
@@ -84,14 +86,16 @@ class ScopeSettingsTest extends TestCase
      */
     public function one_can_delete_sso_setting()
     {
-        $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
+        /*$mock = Mockery::mock('overload:' . CorporationInfoAction::class);
         $mock->shouldReceive('execute')
             ->once()
-            ->andReturn(null);
+            ->andReturn(null);*/
 
         $this->assertDatabaseMissing('sso_scopes',[
             'morphable_id' => 1184675423
         ]);
+
+        Bus::fake();
 
         $response = $this->actingAs($this->test_user)
             ->post(route('create.scopes'),
@@ -110,6 +114,8 @@ class ScopeSettingsTest extends TestCase
                     'type' => 'default'
                 ]
             );
+
+        Bus::assertDispatched(CorporationInfoJob::class);
 
         $this->assertDatabaseHas('sso_scopes',[
             'morphable_id' => 1184675423

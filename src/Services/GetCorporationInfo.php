@@ -26,7 +26,7 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class GetCorporationInfo
@@ -40,6 +40,6 @@ class GetCorporationInfo
             'path_values' => ['corporation_id' => $corporation_id],
         ]);
 
-        return (new RetrieveEsiDataAction)->execute($corporation_info_container);
+        return RetrieveEsiData::execute($corporation_info_container);
     }
 }

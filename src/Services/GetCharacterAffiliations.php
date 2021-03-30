@@ -26,8 +26,8 @@
 
 namespace Seatplus\Web\Services;
 
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class GetCharacterAffiliations
@@ -41,7 +41,7 @@ class GetCharacterAffiliations
             'request_body' => $character_ids,
         ]);
 
-        $character_affiliations = (new RetrieveEsiDataAction)->execute($character_affiliation_container);
+        $character_affiliations = RetrieveEsiData::execute($character_affiliation_container);
 
         return collect($character_affiliations);
     }

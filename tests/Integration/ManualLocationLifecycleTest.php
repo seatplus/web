@@ -3,14 +3,12 @@
 
 namespace Seatplus\Web\Tests\Integration;
 
-
+use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Eveapi\Actions\Jobs\Universe\ResolveUniverseSystemsBySystemIdAction;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
-use Seatplus\Eveapi\Models\Universe\Structure;
 use Seatplus\Web\Models\ManualLocation;
 use Seatplus\Web\Tests\TestCase;
 
@@ -40,10 +38,10 @@ class ManualLocationLifecycleTest extends TestCase
     /** @test */
     public function one_can_submit_suggestion()
     {
-        $manual_loaction = ManualLocation::factory()->make();
 
-        $mock = \Mockery::mock('overload:' . ResolveUniverseSystemsBySystemIdAction::class);
-        $mock->shouldReceive('execute')->with($manual_loaction->solar_system_id);
+        Bus::fake();
+
+        $manual_loaction = ManualLocation::factory()->make();
 
         $response = $this->actingAs($this->test_user)
             ->post(route('post.manual_location'), [
@@ -51,6 +49,8 @@ class ManualLocationLifecycleTest extends TestCase
                 'location_id' => $manual_loaction->location_id,
                 'solar_system_id' => $manual_loaction->solar_system_id
             ])->assertRedirect();
+
+        Bus::dispatchedAfterResponse(ResolveUniverseSystemBySystemIdJob::class);
     }
 
     /** @test */
@@ -60,7 +60,7 @@ class ManualLocationLifecycleTest extends TestCase
             'user_id' => $this->test_user->id
         ]);
 
-        $this->actingAs($this->test_user)
+        $response = $this->actingAs($this->test_user)
             ->get(route('get.manual_location', $manual_loaction->location_id))
             ->assertOk()
             ->assertJson(['name' => $manual_loaction->name]);

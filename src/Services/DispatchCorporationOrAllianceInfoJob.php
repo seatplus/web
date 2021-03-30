@@ -26,8 +26,9 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Actions\Jobs\Alliance\AllianceInfoAction;
-use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Containers\JobContainer;
+use Seatplus\Eveapi\Jobs\Alliances\AllianceInfoJob;
+use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 
 class DispatchCorporationOrAllianceInfoJob
@@ -39,11 +40,13 @@ class DispatchCorporationOrAllianceInfoJob
 
     private function handleAllianceInfo(int $entity_id)
     {
-        (new AllianceInfoAction)->execute($entity_id);
+        $job_container = new JobContainer(['alliance_id' => $entity_id]);
+        AllianceInfoJob::dispatchNow($job_container);
     }
 
     private function handleCorporationInfo(int $entity_id)
     {
-        (new CorporationInfoAction)->execute($entity_id);
+        $job_container = new JobContainer(['corporation_id' => $entity_id]);
+        CorporationInfoJob::dispatchNow($job_container);
     }
 }

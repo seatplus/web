@@ -26,24 +26,21 @@
 
 namespace Seatplus\Web\Services\SsoSettings;
 
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class SearchCorporationOrAlliance
 {
-    /**
-     * @var \Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction
-     */
-    private RetrieveEsiDataAction $retrieve_esi_data_action;
+    private RetrieveEsiData $retrieve_esi_data_action;
 
     public function __construct(/**
      * @var string
      */
     private string $searchParam)
     {
-        $this->retrieve_esi_data_action = new RetrieveEsiDataAction;
+        $this->retrieve_esi_data_action = new RetrieveEsiData;
     }
 
     public function search(): string

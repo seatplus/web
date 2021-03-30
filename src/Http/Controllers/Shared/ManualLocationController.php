@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Actions\Jobs\Universe\ResolveUniverseSystemsBySystemIdAction;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -109,7 +108,7 @@ class ManualLocationController extends Controller
         ]);
 
         // First create solar_system_entry
-        $system = (new ResolveUniverseSystemsBySystemIdAction)->execute($validated['solar_system_id']);
+        ResolveUniverseSystemBySystemIdJob::dispatchAfterResponse($validated['solar_system_id']);
 
         $location = ManualLocation::create([
             'location_id' => $validated['location_id'],
@@ -129,8 +128,6 @@ class ManualLocationController extends Controller
             return;
         }
 
-        $job = new ResolveUniverseSystemBySystemIdJob;
-
-        $entries->each(fn ($manual_location) => dispatch($job->setSystemId($manual_location->solar_system_id))->onQueue('low'));
+        $entries->each(fn ($manual_location) => ResolveUniverseSystemBySystemIdJob::dispatch($manual_location->solar_system_id)->onQueue('low'));
     }
 }
