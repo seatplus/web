@@ -40,7 +40,6 @@ class DispatchCorporationOrAllianceInfoJob
 
     private function handleAllianceInfo(int $entity_id)
     {
-
         $job_container = new JobContainer(['alliance_id' => $entity_id]);
         AllianceInfoJob::dispatchNow($job_container);
     }

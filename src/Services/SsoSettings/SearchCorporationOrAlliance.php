@@ -29,12 +29,10 @@ namespace Seatplus\Web\Services\SsoSettings;
 use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Seatplus\Eveapi\Esi\Eseye\RetrieveEsiDataAction;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class SearchCorporationOrAlliance
 {
-
     private RetrieveEsiData $retrieve_esi_data_action;
 
     public function __construct(/**
