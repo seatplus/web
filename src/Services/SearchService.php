@@ -26,7 +26,7 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction;
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class SearchService
@@ -43,7 +43,7 @@ class SearchService
             ],
         ]);
 
-        $result = (new RetrieveEsiDataAction)->execute($container);
+        $result = RetrieveEsiData::execute($container);
 
         return $result->$category ?? [];
     }

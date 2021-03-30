@@ -40,7 +40,7 @@ class HelperController extends Controller
 {
     public function ids()
     {
-        $result = (new GetNamesFromIdsService())->execute(request()->all());
+        $result = (new GetNamesFromIdsService)->execute(request()->all());
 
         return $result->toJson();
     }

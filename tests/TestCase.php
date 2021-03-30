@@ -15,11 +15,14 @@ use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
+use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    use MockRetrieveEsiDataAction;
+
     protected User $test_user;
 
     protected $test_character;

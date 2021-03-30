@@ -4,9 +4,10 @@
 namespace Seatplus\Web\Tests\Unit\Services\SsoSettings;
 
 
+use Illuminate\Support\Facades\Bus;
 use Mockery;
-use Seatplus\Eveapi\Actions\Jobs\Alliance\AllianceInfoAction;
-use Seatplus\Eveapi\Actions\Jobs\Corporation\CorporationInfoAction;
+use Seatplus\Eveapi\Jobs\Alliances\AllianceInfoJob;
+use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
@@ -16,10 +17,12 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
     /** @test */
     public function it_calls_alliance_info_action()
     {
-         $mock = Mockery::mock('overload:' . AllianceInfoAction::class);
+         /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);
          $mock->shouldReceive('execute')
             ->once()
-            ->andReturn(null);
+            ->andReturn(null);*/
+
+        Bus::fake();
 
         $request = [
             'selectedEntities' => [
@@ -38,6 +41,8 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
         ];
 
         (new UpdateOrCreateSsoSettings($request))->execute();
+
+        Bus::assertDispatched(AllianceInfoJob::class);
     }
 
     /**
@@ -47,10 +52,7 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
      */
     public function it_calls_corporation_info_action()
     {
-        $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn(null);
+       Bus::fake();
 
         $request = [
             'selectedEntities' => [
@@ -71,6 +73,8 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
 
         (new UpdateOrCreateSsoSettings($request))->execute();
 
+        Bus::assertDispatched(CorporationInfoJob::class);
+
         $this->assertCount(3, SsoScopes::where('morphable_id', 1184675423)->first()->selected_scopes);
     }
 
@@ -81,10 +85,7 @@ class UpdateOrCreateSsoSettingsTest extends TestCase
      */
     public function it_creates_sso_settings()
     {
-        $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn(null);
+        Bus::fake();
 
         $request = [
             'selectedEntities' => [

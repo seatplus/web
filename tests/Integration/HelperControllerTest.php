@@ -196,17 +196,4 @@ class HelperControllerTest extends TestCase
 
     }
 
-    private function mockRetrieveEsiDataAction(array $body) : void
-    {
-
-        $data = json_encode($body);
-
-        $response = new EsiResponse($data, [], 'now', 200);
-
-        $mock = Mockery::mock('overload:Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction');
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn($response);
-    }
-
 }

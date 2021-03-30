@@ -4,6 +4,7 @@
 namespace Seatplus\Web\Tests\Unit\Services;
 
 
+use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Faker\Generator;
 use Mockery;
 use Seat\Eseye\Containers\EsiResponse;
@@ -140,13 +141,21 @@ class GetEntityFromIdTest extends TestCase
             'faction_id' => null
         ];
 
-        $this->mockRetrieveEsiDataAction([
+        $body = [
             array_merge($esi_mock_return_data, [
                 'id' => $character->character_id,
                 'name' => $character->name,
                 'category' => 'character'
             ])
-        ]);
+        ];
+
+        $data = json_encode($body);
+
+        $response = new EsiResponse($data, [], 'now', 200);
+
+        RetrieveEsiData::shouldReceive('execute')
+            ->twice()
+            ->andReturn($response);
 
 
         $expected_result = [
@@ -166,18 +175,5 @@ class GetEntityFromIdTest extends TestCase
         $result = $service->execute();
 
         $this->assertEquals($expected_result, $result);
-    }
-
-    private function mockRetrieveEsiDataAction(array $body) : void
-    {
-
-        $data = json_encode($body);
-
-        $response = new EsiResponse($data, [], 'now', 200);
-
-        $mock = Mockery::mock('overload:Seatplus\Eveapi\Actions\Eseye\RetrieveEsiDataAction');
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn($response);
     }
 }
