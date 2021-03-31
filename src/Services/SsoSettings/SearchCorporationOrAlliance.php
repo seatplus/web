@@ -26,7 +26,7 @@
 
 namespace Seatplus\Web\Services\SsoSettings;
 
-use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;

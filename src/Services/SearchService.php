@@ -26,7 +26,7 @@
 
 namespace Seatplus\Web\Services;
 
-use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 
 class SearchService
