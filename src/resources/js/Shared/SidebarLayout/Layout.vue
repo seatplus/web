@@ -63,7 +63,7 @@
       >
         <Notifications class="sm:mt-16 z-40" />
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
           <slot />
         </div>
 
