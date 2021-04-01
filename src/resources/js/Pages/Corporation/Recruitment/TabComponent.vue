@@ -66,9 +66,11 @@
       <AssetsComponent
         :parameters="unknown_asset_params"
         context="recruitment"
+        :compact="true"
       />
       <AssetsComponent
         :parameters="asset_params"
+        :compact="true"
       />
     </div>
     <div
