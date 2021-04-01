@@ -32,8 +32,10 @@ use Laravel\Horizon\Contracts\JobRepository;
 use Seatplus\Eveapi\Http\Resources\AssetResource;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\Asset;
+use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Models\Asset\Asset as WebAssetAlias;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class AssetsController extends Controller
@@ -54,6 +56,47 @@ class AssetsController extends Controller
             'filters' => $filters,
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
         ]);
+    }
+
+    public function getLocations(Request $request)
+    {
+        $query = WebAssetAlias::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
+            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
+            ->select('location_id')
+            ->groupBy('location_id')
+            ->orderBy('location_id', 'asc');
+
+        if ($request->has('regions')) {
+            $query = $query->inRegion($request->query('regions'));
+        }
+
+        if ($request->has('systems')) {
+            $query = $query->inSystems($request->query('systems'));
+        }
+
+        if ($request->has('search')) {
+            $query = $query->search($request->query('search'));
+        }
+
+        if ($request->has('withUnknownLocations')) {
+            $query = $query->withUnknownLocations();
+        }
+
+        return AssetResource::collection(
+            $query->paginate(3)
+        );
+    }
+
+    public function loadLocation(int $location_id)
+    {
+        $query = Asset::with('assetable', 'type', 'type.group', 'content')
+            ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->where('location_id', $location_id);
+
+        return AssetResource::collection(
+            $query->paginate()
+        );
     }
 
     public function details(int $item_id)

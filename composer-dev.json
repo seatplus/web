@@ -40,19 +40,18 @@
         "laravel/socialite": "^5.0",
         "seatplus/eveapi": "*",
         "seatplus/auth": "*",
-        "inertiajs/inertia-laravel": "^0.3.5",
+        "inertiajs/inertia-laravel": "^0.4.0",
         "tightenco/ziggy": "^1.0.4",
         "spatie/laravel-permission": "^4.0",
         "spatie/data-transfer-object": "^2.2",
         "conedevelopment/i18n": "^1.1",
-        "doctrine/dbal": "^2.12"
+        "doctrine/dbal": "^3.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.10",
         "nunomaduro/collision": "^5.3",
         "spatie/phpunit-watcher": "^1.11",
         "laravel/legacy-factories": "^1.0",
-        "claudiodekker/inertia-laravel-testing": "^2.2",
         "rector/rector": "^0.9.2",
         "brianium/paratest": "^6.2"
     },

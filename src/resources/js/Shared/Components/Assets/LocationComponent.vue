@@ -8,27 +8,31 @@
               <LocationName :location="location" />
             </h3>
             <p class="mt-1 text-sm text-gray-500">
-              {{ getLocationsVolume(location.assets) }} volume and {{ getLocationsItemsCount(location.assets) }}
-              items
+              {{ `${volume} volume and ${numberOfItems} items` }}
             </p>
           </div>
-          <div
-            v-if="!location.location && context !== 'recruitment'"
-            class="ml-4 mt-4 flex-shrink-0"
-          >
-            <button
-              type="button"
-              class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              @click="openModal = true"
+          <div class="inline-flex items-baseline space-x-2">
+            <div
+              v-if="!location.location && context !== 'recruitment' && !(location.location_id === 2004)"
+              class="ml-4 mt-4 flex-shrink-0"
             >
-              Add location information
-            </button>
+              <button
+                type="button"
+                class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                @click="openModal = true"
+              >
+                Add location information
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </template>
     <template #elements>
-      <ItemList :items="location.assets" />
+      <ItemList
+        :items="results"
+        :compact="compact"
+      />
     </template>
   </WideLists>
   <teleport to="#destination">
@@ -44,6 +48,8 @@ import WideLists from "../../WideLists";
 import LocationName from "./LocationName";
 import ItemList from "./ItemList";
 import AddManualLocationModal from "./AddManualLocationModal";
+import {useLoadCompleteResource} from "../../../Functions/useLoadCompleteResource";
+import ListTransition from "../../Transitions/ListTransition";
 export default {
     name: "LocationComponent",
     components: {AddManualLocationModal, ItemList, LocationName, WideLists},
@@ -56,27 +62,33 @@ export default {
             required: false,
             type: String,
             default: 'character'
+        },
+        compact: {
+            required: false,
+            default: false,
+            type: Boolean
         }
     },
-  data() {
-      return {
-        openModal: false
-      }
-  },
-    methods: {
-        getLocationsVolume(location_assets) {
+    setup(props) {
 
-            function volume(object) {
-                return object.type.volume ? object.quantity * object.type.volume : 0;
-            }
+        return useLoadCompleteResource('location.assets', props.location.location_id )
+    },
+    data() {
+        return {
+            openModal: false
+        }
+    },
+    computed: {
+        volume() {
+
+            let sum = _.sumBy(this.results, (object) => _.get(object , 'type.volume', 0) * _.get(object, 'quantity', 0))
 
             const  { prefix } = require('metric-prefix')
 
-            return prefix(_.sum(_.map(location_assets,volume)), { precision: 3, unit: 'm³'})
+            return prefix(sum, { precision: 3, unit: 'm³'})
         },
-        getLocationsItemsCount(location_assets) {
-
-            return _.size(location_assets)
+        numberOfItems() {
+            return _.size(this.results)
         }
     }
 }

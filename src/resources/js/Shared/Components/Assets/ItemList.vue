@@ -1,7 +1,12 @@
 <template>
   <div class="divide-y divide-gray-200">
+    <CompactAssetListComponent
+      v-if="compact"
+      :items="uniqueItems"
+    />
     <WideListElement
       v-for="asset in uniqueItems"
+      v-else
       :key="asset.item_id"
       :url="url(asset)"
     >
@@ -20,6 +25,7 @@
           </span>
         </span>
         <EveImage
+          v-if="hasOwnerPicture"
           :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'"
           :object="asset.owner"
           :size="128"
@@ -96,14 +102,34 @@
   import EveImage from "../../EveImage"
   import { prefix } from 'metric-prefix'
   import WideListElement from "@/Shared//WideListElement";
+  import CompactAssetListComponent from "./CompactAssetListComponent";
 
   export default {
     name: "ItemList",
-        components: {WideListElement, EveImage},
-        props: ['items'],
+        components: {CompactAssetListComponent, WideListElement, EveImage},
+        props: {
+            compact: {
+                required: true,
+                default: false,
+                type: Boolean
+            },
+            items: {
+                required: true,
+                type: Array
+            }
+        },
         computed: {
             uniqueItems() {
                 return _.uniqBy(this.items, 'item_id')
+            },
+            hasOwnerPicture() {
+
+                let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
+
+                if (_.size(selectedCharacterIds) > 1)
+                    return true
+
+                return !selectedCharacterIds && this.$page.props.user.data.characters.length > 1;
             }
         },
         methods: {

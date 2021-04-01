@@ -34,31 +34,5 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAssetsController
 {
-    public function __invoke(Request $request)
-    {
-        $query = Asset::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->orderBy('location_id', 'asc');
 
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
-
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
-
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
-
-        if ($request->has('withUnknownLocations')) {
-            $query = $query->withUnknownLocations();
-        }
-
-        return AssetResource::collection(
-            $query->paginate()
-        );
-    }
 }

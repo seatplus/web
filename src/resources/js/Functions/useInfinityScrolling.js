@@ -54,7 +54,7 @@ export function useInfinityScrolling(routeName, params) {
     })
 
     onUnmounted(() => {
-        //observer.disconnect()
+        observer.disconnect()
     })
 
     return {
