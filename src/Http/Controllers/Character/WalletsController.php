@@ -53,6 +53,22 @@ class WalletsController extends Controller
             ->paginate();
     }
 
+    public function balance(int $character_id)
+    {
+        $date_part = WalletJournal::query()
+            ->whereBetween('date', [now(), now()->subDays(request()->get('days', 30))])
+            ->orderByDesc('date')
+            ->select(['date as x','balance as y']);
+
+        return WalletJournal::query()
+            ->limit(90)
+            ->orderByDesc('date')
+            ->union($date_part)
+            ->where('wallet_journable_id', $character_id)
+            ->select(['date as x','balance as y'])
+            ->paginate();
+    }
+
     public function transaction(int $character_id)
     {
         return WalletTransaction::where('wallet_transactionable_id', $character_id)
