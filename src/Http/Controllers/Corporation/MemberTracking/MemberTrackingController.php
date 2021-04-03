@@ -37,8 +37,7 @@ class MemberTrackingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Corporation/MemberTracking', [
-            'required_scopes' => config('eveapi.scopes.character.contacts'),
+        return Inertia::render('Corporation/MemberTracking/MemberTracking', [
             'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
             'corporations' => $this->getAffiliatedCorporations(),
         ]);
@@ -76,8 +75,21 @@ class MemberTrackingController extends Controller
     private function getAffiliatedCorporations()
     {
         return CorporationInfo::whereIn('corporation_id', getAffiliatedIdsByPermission($this->getPermission()))
-            ->with('alliance')
+            ->with('alliance','ssoScopes','alliance.ssoScopes')
             ->has('members')
-            ->get();
+            ->get()
+            ->map(function($corporation) {
+
+                $sso_scopes = collect([
+                    'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
+                    'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
+                ])->flatten(1)->filter();
+
+                return [
+                    'corporation_id' => $corporation->corporation_id,
+                    'name' => $corporation->name,
+                    'required_scopes' => $sso_scopes->unique()->toArray()
+                ];
+            });
     }
 }

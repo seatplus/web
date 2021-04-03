@@ -21,7 +21,7 @@
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader"
-import MemberTrackingComponent from "./MemberTracking/MemberTrackingComponent";
+import MemberTrackingComponent from "./MemberTrackingComponent";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 
