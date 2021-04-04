@@ -75,11 +75,10 @@ class MemberTrackingController extends Controller
     private function getAffiliatedCorporations()
     {
         return CorporationInfo::whereIn('corporation_id', getAffiliatedIdsByPermission($this->getPermission()))
-            ->with('alliance','ssoScopes','alliance.ssoScopes')
+            ->with('alliance', 'ssoScopes', 'alliance.ssoScopes')
             ->has('members')
             ->get()
-            ->map(function($corporation) {
-
+            ->map(function ($corporation) {
                 $sso_scopes = collect([
                     'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
                     'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
@@ -88,7 +87,7 @@ class MemberTrackingController extends Controller
                 return [
                     'corporation_id' => $corporation->corporation_id,
                     'name' => $corporation->name,
-                    'required_scopes' => $sso_scopes->unique()->toArray()
+                    'required_scopes' => $sso_scopes->unique()->toArray(),
                 ];
             });
     }
