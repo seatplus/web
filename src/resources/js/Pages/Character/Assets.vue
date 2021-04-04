@@ -56,6 +56,34 @@
                 placeholder="search for solar system"
               />
             </div>
+
+            <div class="col-span-6 md:col-span-3 lg:col-span-2">
+              <div class="w-full max-w-xs">
+                <SwitchGroup
+                  as="div"
+                  class="flex items-center space-x-4"
+                >
+                  <SwitchLabel>Compact view</SwitchLabel>
+
+                  <Switch
+                    v-slot="{ checked }"
+                    v-model="switchValue"
+                    as="button"
+                    class="relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
+                    :class="switchValue ? 'bg-indigo-600' : 'bg-gray-200'"
+                  >
+                    <span
+                      class="inline-block w-5 h-5 transition duration-200 ease-in-out transform bg-white rounded-full"
+                      :class="{ 'translate-x-5': checked, 'translate-x-0': !checked }"
+                    />
+                  </Switch>
+                </SwitchGroup>
+              </div>
+            </div>
+
+            <div class="col-span-6 md:col-span-3 lg:col-span-4">
+              <SelectedEntity />
+            </div>
           </div>
         </div>
       </div>
@@ -63,6 +91,7 @@
       <AssetsComponent
         :key="infiniteId"
         :parameters="cleanParams"
+        :compact="switchValue"
       />
     </div>
   </div>
@@ -73,67 +102,79 @@ import PageHeader from "@/Shared/Layout/PageHeader"
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import Autosuggest from "@/Shared/Components/Autosuggest";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 import Multiselect from "@/Shared/Components/Multiselect";
+import { ref } from 'vue'
+import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
+import SelectedEntity from "../../Shared/Components/SelectedEntity";
 
 export default {
-  name: "Assets",
-  components: {
-    Multiselect,
-    RequiredScopesWarning,
-    Autosuggest,
-    DispatchUpdateButton,
-    AssetsComponent,
-    CharacterSelectionButton,
-    PageHeader
-  },
-  props: {
-    dispatch_transfer_object: {
-      required: true,
-      type: Object,
-      default: () => {}
+    name: "Assets",
+    components: {
+        SelectedEntity,
+        Multiselect,
+        RequiredScopesWarning,
+        DispatchUpdateButton,
+        AssetsComponent,
+        CharacterSelectionButton,
+        PageHeader,
+        Switch,
+        SwitchGroup,
+        SwitchLabel
     },
-  },
-  data() {
-    return {
-      pageTitle: 'Character Assets',
-      infiniteId: +new Date(),
-      params: {
-        character_ids: this.selectedCharacterIds,
-        search: null,
-        regions: [],
-        systems: [],
-      },
-    }
-  },
-  computed: {
-    cleanParams() {
-      let params = this.params
-
-      params.search = params.search === "" ? null : params.search
-
-      return params
-    }
-  },
-  watch: {
-    params: {
-      deep: true,
-      handler() {
-        this.infiniteId += 1
-      }
-    }
-  },
-  methods: {
-    selectRegion(selected_id) {
-      this.params.regions = selected_id
-      this.infiniteId++
+    props: {
+        dispatch_transfer_object: {
+            required: true,
+            type: Object,
+            default: () => {}
+        },
     },
-    selectSystem(selected_id) {
-      this.params.systems = selected_id
-      this.infiniteId++
+    setup() {
+        const switchValue = ref(false)
+
+        return {
+            switchValue,
+        }
+    },
+    data() {
+        return {
+            pageTitle: 'Character Assets',
+            infiniteId: +new Date(),
+            params: {
+                character_ids: this.selectedCharacterIds,
+                search: null,
+                regions: [],
+                systems: [],
+            },
+        }
+    },
+    computed: {
+        cleanParams() {
+            let params = this.params
+
+            params.search = params.search === "" ? null : params.search
+
+            return params
+        }
+    },
+    watch: {
+        params: {
+            deep: true,
+            handler() {
+                this.infiniteId += 1
+            }
+        }
+    },
+    methods: {
+        selectRegion(selected_id) {
+            this.params.regions = selected_id
+            this.infiniteId++
+        },
+        selectSystem(selected_id) {
+            this.params.systems = selected_id
+            this.infiniteId++
+        }
     }
-  }
 }
 </script>
 

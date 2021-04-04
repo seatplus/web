@@ -1,0 +1,100 @@
+<template>
+  <CardWithHeader>
+    <template #header>
+      <div class="flex">
+        <EntityByIdBlock
+          :id="id"
+          class="flex-grow"
+        />
+        <div class="flex-none text-right text-sm text-gray-500">
+          Balance
+        </div>
+      </div>
+    </template>
+    <div class="relative max-h-48 overflow-y-auto">
+      <LineChart
+        v-if="isComplete"
+        class="p-2"
+        :chart-data="chartData"
+        :chart-options="chartOptions"
+        :style="{height: '12rem', position: 'relative'}"
+      />
+    </div>
+  </CardWithHeader>
+</template>
+
+<script>
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
+import LineChart from "@/Shared/Charts/LineChart";
+
+export default {
+    name: "WalletJournalBalanceChart",
+    components: {
+        LineChart,
+        EntityByIdBlock,
+        CardWithHeader
+    },
+    props: {
+        id: {
+            required: true,
+            type: Number
+        },
+        division: {
+            required: false,
+            type: Number
+        }
+    },
+    setup(props) {
+        return useLoadCompleteResource('character.balance', {character_id: props.id})
+    },
+    data() {
+        return {
+            chartOptions: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        distribution: 'linear'
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(value, index, values) {
+                                return 'ISK ' + value.toLocaleString();
+                            }
+                        }
+                    }],
+                }
+            }
+        }
+    },
+    computed: {
+        chartData() {
+
+            return {
+                labels: _.map(this.results, (result) => result.x),
+                datasets: [{
+                    label: 'ISK',
+                    data: _.map(this.results, (result) => result.y),
+                    borderWidth: 3,
+                    fill: false,
+                    borderColor: '#4f46e5'
+                }]
+            }
+        }
+    },
+    created() {
+        this.infiniteId += 1;
+    }
+}
+</script>
+
+<style scoped>
+
+</style>

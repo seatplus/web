@@ -26,8 +26,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Character\AssetsController;
-use Seatplus\Web\Http\Controllers\Character\GetAssetsController;
 
 Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::get('/assets/list', GetAssetsController::class)->name('load.character.assets');
+Route::get('/assets/list', [AssetsController::class, 'getLocations'])->name('load.character.assets');
+Route::get('/assets/{location_id}', [AssetsController::class, 'loadLocation'])->name('location.assets');
 Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');

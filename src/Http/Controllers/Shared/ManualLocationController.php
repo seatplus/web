@@ -78,6 +78,10 @@ class ManualLocationController extends Controller
 
     public function getLocation(int $location_id)
     {
+        if ($location_id === 2004) {
+            return collect(['name' => 'Asset Safety']);
+        }
+
         $this->getMissingSystem($location_id);
 
         $entries = ManualLocation::with('system')->where('location_id', $location_id)

@@ -1,8 +1,13 @@
 <template>
   <ul class="divide-y divide-gray-200 overflow-y-auto">
-    <li
+    <DispatchableEntry
       v-for="(entity, index) of entities"
-      :key="index"
+      :key="`dispatchable entry ${index}`"
+      :entry="entity"
+      />
+<!--    <li
+      v-for="(entity, index) of entities"
+      :key="`${index} and ${infiniteId}`"
       :class="['px-6 py-5 relative', {'cursor-pointer': entity.batch === 'ready'}]"
       @click="dispatchJob(entity)"
     >
@@ -82,47 +87,53 @@
           </svg>
         </div>
       </div>
-    </li>
+    </li>-->
   </ul>
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
-import Time from "@/Shared/Time"
+
+import DispatchableEntry from "./DispatchableEntry";
 
 export default {
-  name: "DispatchUpdate",
-  components: {Time, EveImage},
-  data() {
-    return {
-      job_name: this.$page.props.dispatch_transfer_object.manual_job,
-      dispatch_transfer_object: this.$page.props.dispatch_transfer_object,
-      entities: []
-    }
-  },
-  created() {
-    this.getEntities();
-  },
-  methods: {
-    dispatchJob(entity) {
-
-      if(entity.batch !== 'ready')
-        return
-
-      axios.post(this.$route('dispatch.job', {
-        character_id: entity.character_id,
-        corporation_id: entity.corporation_id,
-      }), {
-        dispatch_transfer_object: this.dispatch_transfer_object
-      })
-
-      setTimeout(() => this.getEntities(), 100)
-
+    name: "DispatchUpdate",
+    components: {DispatchableEntry},
+    data() {
+        return {
+            job_name: this.$page.props.dispatch_transfer_object.manual_job,
+            dispatch_transfer_object: this.$page.props.dispatch_transfer_object,
+            entities: [],
+            infiniteId: new Date()
+        }
     },
-    async getEntities() {
-      axios.post(this.$route('manual_job.entities'), this.dispatch_transfer_object).then((response) => this.entities = response.data)
+    created() {
+        this.getEntities();
+    },
+    methods: {
+        dispatchJob(entity) {
+
+            if(entity.batch !== 'ready')
+                return
+
+            axios.post(this.$route('dispatch.job', {
+                character_id: entity.character_id,
+                corporation_id: entity.corporation_id,
+            }), {
+                dispatch_transfer_object: this.dispatch_transfer_object
+            })
+
+            setTimeout(() => this.getEntities(), 100)
+
+
+        },
+        async getEntities() {
+            axios.post(this.$route('manual_job.entities'), this.dispatch_transfer_object)
+                .then((response) => {
+                    this.entities = response.data
+                    this.infiniteId++
+                })
+        }
     }
-  }
 }
 </script>
 

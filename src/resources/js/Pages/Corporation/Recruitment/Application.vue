@@ -15,38 +15,12 @@
 
 
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <li class="col-span-2 max-h-screen overflow-auto">
-        <div class="space-y-4">
-          <AssetsComponent
-            :params="unknown_asset_params"
-            context="recruitment"
-          />
-          <AssetsComponent
-            :params="asset_params"
-          />
-          <ContractComponent
-            v-for="character in recruit.characters"
-            :id="character.character_id"
-            :key="`contract.component:${character.character_id}`"
-          />
-          <WalletJournalComponent
-            v-for="character in recruit.characters"
-            :id="character.character_id"
-            :key="'wallet.journal:' + character.character_id"
-          />
-          <WalletTransactionComponent
-            v-for="character in recruit.characters"
-            :id="character.character_id"
-            :key="'wallet.transaction:' + character.character_id"
-          />
-          <CharacterContactPanel
-            v-for="character in recruit.characters"
-            :key="'character.contact:' + character.character_id"
-            :character="character"
-            :corporation_id="target_corporation.corporation_id"
-            :alliance_id="target_corporation.alliance_id"
-          />
-        </div>
+      <li class="col-span-2">
+        <TabComponent
+          :recruit="recruit"
+          :watchlist="watchlist"
+          :target-corporation="target_corporation"
+        />
       </li>
 
       <li class="col-span-1">
@@ -193,21 +167,15 @@
 import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
-import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
-import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
-import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
-import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
-import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
+import TabComponent from "./TabComponent";
 
 
 export default {
-    name: "UserApplication",
+    name: "Application",
     components: {
-        ContractComponent,
-        AssetsComponent,
-        WalletJournalComponent,
-        WalletTransactionComponent,
-        CharacterContactPanel, HeaderButton, PageHeader
+        TabComponent,
+        HeaderButton,
+        PageHeader
     },
     layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
     props: {
@@ -241,19 +209,7 @@ export default {
         characters() {
             return _.map(this.recruit.characters, (character) => character.name ).join(', ')
         },
-        asset_params() {
-            return {
-                character_ids: _.map(this.recruit.characters, character => character.character_id),
-                regions: this.watchlist.regions,
-                systems: this.watchlist.systems
-            }
-        },
-        unknown_asset_params() {
-            return {
-                character_ids: _.map(this.recruit.characters, character => character.character_id),
-                withUnknownLocations: true
-            }
-        }
+
     },
     methods: {
         impersonate() {

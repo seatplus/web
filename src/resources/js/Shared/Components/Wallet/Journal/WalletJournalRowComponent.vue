@@ -111,17 +111,13 @@
 </template>
 
 <script>
-import TableRow from "@/Shared/Layout/Cards/Table/TableRow";
-import DataCell from "@/Shared/Layout/Cards/Table/DataCell";
 import Time from "@/Shared/Time";
-//TODO Fragment
-//import {Fragment} from "vue-fragment"
 import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent";
 
 export default {
     name: "WalletJournalRowComponent",
-    components: {ExtendedWalletJournalRowComponent, Time, DataCell, TableRow,
-        //Fragment
+    components: {
+        ExtendedWalletJournalRowComponent, Time
     },
     props: {
         entry: {

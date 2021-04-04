@@ -26,9 +26,9 @@
 
 namespace Seatplus\Web\Services;
 
-use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class GetNamesFromIdsService
 {

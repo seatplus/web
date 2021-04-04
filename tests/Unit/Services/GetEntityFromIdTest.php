@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Unit\Services;
 
 
-use Facades\Seatplus\Eveapi\Services\Esi\RetrieveEsiData;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Faker\Generator;
 use Mockery;
 use Seat\Eseye\Containers\EsiResponse;

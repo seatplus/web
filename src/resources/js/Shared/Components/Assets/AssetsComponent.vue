@@ -1,15 +1,16 @@
 <template>
-    <div>
-        <div class="space-y-2 sm:space-y-6">
-            <LocationComponent
-                v-for="location in groupedAssets"
-                :location="location"
-                :key="location.location_id"
-                :context="context"
-            />
-        </div>
-      <div ref="scrollComponent"></div>
+  <div>
+    <div class="space-y-2 sm:space-y-6">
+      <LocationComponent
+        v-for="location in result"
+        :key="location.location_id"
+        :location="location"
+        :context="context"
+        :compact="compact"
+      />
     </div>
+    <div ref="scrollComponent"></div>
+  </div>
 </template>
 
 <script>
@@ -19,7 +20,7 @@ import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 export default {
     name: "AssetsComponent",
-    components: {EntityByIdBlock, CardWithHeader, LocationComponent,
+    components: { LocationComponent,
         //InfiniteLoading
     },
     props: {
@@ -31,17 +32,19 @@ export default {
             required: false,
             type: String,
             default: 'character'
+        },
+        compact: {
+            required: false,
+            default: false,
+            type: Boolean
         }
     },
-  setup(props) {
+    setup(props) {
 
-    return useInfinityScrolling('load.character.assets', props.parameters)
-  },
+        return useInfinityScrolling('load.character.assets', props.parameters)
+    },
     data() {
         return {
-            infiniteId: +new Date(),
-            assets_data: [],
-            loading_page: 1,
             openModal: false,
             modal_location_id: 0
         }
@@ -49,22 +52,22 @@ export default {
     methods: {
     },
     computed: {
-        groupedAssets() {
+        /* groupedAssets: function () {
 
-            return  _.map(_.groupBy(this.result, 'location_id'), (value, prop) => (
-                {
-                    location_id: _.toInteger(prop),
-                    location: _.get(_.head(value), 'location.locatable.name'), //value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,
-                    assets: _.map(value, function(asset) {
+             return _.map(_.groupBy(this.result, 'location_id'), (value, prop) => (
+                 {
+                     location_id: _.toInteger(prop),
+                     location: _.get(_.head(value), 'location.locatable.name'), //value[0].location ? value[0].location.locatable.name : 'Unknown Structure (' + _.toInteger(prop) +')' ,
+                     assets: _.map(value, function (asset) {
 
-                        asset.type =  asset.type ?? { type_id: asset.type_id, name: '', group: { name: '' }}
-                        asset.type.group = asset.type.group ?? { name: '' }
+                         asset.type = asset.type ?? {type_id: asset.type_id, name: '', group: {name: ''}}
+                         asset.type.group = asset.type.group ?? {name: ''}
 
-                        return asset
-                    }),
-                }
-            ))
-        },
+                         return asset
+                     }),
+                 }
+             ))
+         },*/
         selectedCharacterIds() {
 
             let character_ids = _.get(this.$route().params, 'character_ids')
