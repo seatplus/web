@@ -26,9 +26,9 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class GetCharacterAffiliations
 {
