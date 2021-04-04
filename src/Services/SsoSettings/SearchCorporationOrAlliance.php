@@ -26,10 +26,10 @@
 
 namespace Seatplus\Web\Services\SsoSettings;
 
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class SearchCorporationOrAlliance
 {

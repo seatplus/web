@@ -26,8 +26,8 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class GetCorporationInfo
 {
