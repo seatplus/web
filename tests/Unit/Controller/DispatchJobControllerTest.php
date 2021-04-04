@@ -77,7 +77,7 @@ class DispatchJobControllerTest extends TestCase
                 [
                     'character_id' => $this->test_character->character_id,
                     'name' => $this->test_character->name,
-                    'batch' => 'ready'
+                    'batch' => ['state' =>'ready']
                 ]
             ]);
     }
