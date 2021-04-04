@@ -58,14 +58,14 @@ class WalletsController extends Controller
         $date_part = WalletJournal::query()
             ->whereBetween('date', [now(), now()->subDays(request()->get('days', 30))])
             ->orderByDesc('date')
-            ->select(['date as x','balance as y']);
+            ->select(['date as x', 'balance as y']);
 
         return WalletJournal::query()
             ->limit(90)
             ->orderByDesc('date')
             ->union($date_part)
             ->where('wallet_journable_id', $character_id)
-            ->select(['date as x','balance as y'])
+            ->select(['date as x', 'balance as y'])
             ->paginate();
     }
 

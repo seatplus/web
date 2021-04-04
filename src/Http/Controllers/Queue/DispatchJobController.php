@@ -85,10 +85,10 @@ class DispatchJobController extends Controller
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->when($required_corporation_role, function($tokens) use ($validated_data) {
+            ->when($required_corporation_role, function ($tokens) use ($validated_data) {
                 return $tokens
-                    ->filter(fn($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
-                    ->unique(fn($token) => $token->corporation_id);
+                    ->filter(fn ($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
+                    ->unique(fn ($token) => $token->corporation_id);
             })
             ->map(fn ($token) => collect([
                 'character_id' => $required_corporation_role ? null : $token->character_id,
@@ -121,7 +121,7 @@ class DispatchJobController extends Controller
     {
         if (is_null($batch_id)) {
             return [
-                'state' => 'ready'
+                'state' => 'ready',
             ];
         }
 
@@ -131,7 +131,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'failures',
                 'time' => $batch->finishedAt,
-                'batch_id' => $batch_id
+                'batch_id' => $batch_id,
             ];
         }
 
@@ -139,7 +139,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'finished',
                 'time' => $batch->finishedAt,
-                'batch_id' => $batch_id
+                'batch_id' => $batch_id,
             ];
         }
 
@@ -147,7 +147,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'pending',
                 'time' => $batch->createdAt,
-                'batch_id' => $batch_id
+                'batch_id' => $batch_id,
             ];
         }
 
