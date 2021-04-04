@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Services;
 
-
 use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;

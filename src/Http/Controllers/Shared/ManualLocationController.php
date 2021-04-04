@@ -78,8 +78,9 @@ class ManualLocationController extends Controller
 
     public function getLocation(int $location_id)
     {
-        if($location_id === 2004)
+        if ($location_id === 2004) {
             return collect(['name' => 'Asset Safety']);
+        }
 
         $this->getMissingSystem($location_id);
 
