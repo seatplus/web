@@ -70,7 +70,7 @@ class DispatchJobController extends Controller
 
     public function getEntities(Request $request)
     {
-        $request->validate([
+        $validated_data = $request->validate([
             'manual_job' => ['required', fn ($attribute, $value, $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute . ' is invalid.')],
             'permission' => ['required'],
             'required_scopes' => ['required', 'array'],
@@ -79,17 +79,23 @@ class DispatchJobController extends Controller
 
         $affiliated_ids = getAffiliatedIdsByPermission($request->get('permission'), $request->get('required_corporation_role') ?? '');
 
-        // only handle character as of now
-        // TODO introduce service to find character or corporation
+        $required_corporation_role = Arr::get($validated_data, 'required_corporation_role');
+
         return RefreshToken::whereIn('character_id', $affiliated_ids)
-            ->with('character')
+            ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->map(fn ($token) => [
-                'character_id' => $token->character_id,
-                'name' => $token->character->name,
-                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $token->character_id))),
-            ])
+            ->when($required_corporation_role, function($tokens) use ($validated_data) {
+                return $tokens
+                    ->filter(fn($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
+                    ->unique(fn($token) => $token->corporation_id);
+            })
+            ->map(fn ($token) => collect([
+                'character_id' => $required_corporation_role ? null : $token->character_id,
+                'corporation_id' => $required_corporation_role ? $token->corporation_id : null,
+                'name' => $required_corporation_role ? $token->corporation->name : $token->character->name,
+                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $required_corporation_role ? $token->corporation_id : $token->character_id))),
+            ])->filter()->toArray())
             ->toJson();
     }
 
@@ -111,10 +117,12 @@ class DispatchJobController extends Controller
         return sprintf('%s:%s', $job_name, $id);
     }
 
-    private function getBatchStatus(?string $batch_id)
+    public function getBatchStatus(?string $batch_id)
     {
         if (is_null($batch_id)) {
-            return 'ready';
+            return [
+                'state' => 'ready'
+            ];
         }
 
         $batch = Bus::findBatch($batch_id);
@@ -123,6 +131,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'failures',
                 'time' => $batch->finishedAt,
+                'batch_id' => $batch_id
             ];
         }
 
@@ -130,6 +139,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'finished',
                 'time' => $batch->finishedAt,
+                'batch_id' => $batch_id
             ];
         }
 
@@ -137,6 +147,7 @@ class DispatchJobController extends Controller
             return [
                 'state' =>'pending',
                 'time' => $batch->createdAt,
+                'batch_id' => $batch_id
             ];
         }
 

@@ -34,5 +34,6 @@ Route::get('status', [
 ]);
 
 Route::post('manual_job/entities', [DispatchJobController::class, 'getEntities'])->name('manual_job.entities');
+Route::get('{batch_id}/status', [DispatchJobController::class, 'getBatchStatus'])->name('get.batch_status');
 
 Route::post('job', [DispatchJobController::class, 'dispatch'])->name('dispatch.job');
