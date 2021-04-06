@@ -24,7 +24,9 @@
               <label
                 for="search"
                 class="block text-sm font-medium leading-5 text-gray-700"
-              >Search</label>
+              >
+                Search
+              </label>
               <input
                 id="search"
                 v-model="params.search"
@@ -33,13 +35,6 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <!--                        <SelectComponent v-model="params.region" :options="regions">Region Filter</SelectComponent>-->
-              <!--              <Autosuggest
-                route="autosuggestion.region"
-                label="Region"
-                placeholder="search for region"
-                @selected="selectRegion"
-              />-->
               <Multiselect
                 v-model="params.regions"
                 route="autosuggestion.region"
@@ -153,8 +148,23 @@ export default {
             let params = this.params
 
             params.search = params.search === "" ? null : params.search
+            params.character_ids = this.selectedCharacterIds
 
             return params
+        },
+        selectedCharacterIds() {
+
+            let character_ids = _.get(this.$route().params, 'character_ids')
+
+            if(!character_ids)
+                return []
+
+            return  _.map(character_ids, (id) => parseInt(id))
+        },
+        newUrl() {
+            let route = this.$route().current()
+
+            return this.$route(route, this.cleanParams)
         }
     },
     watch: {
@@ -165,16 +175,6 @@ export default {
             }
         }
     },
-    methods: {
-        selectRegion(selected_id) {
-            this.params.regions = selected_id
-            this.infiniteId++
-        },
-        selectSystem(selected_id) {
-            this.params.systems = selected_id
-            this.infiniteId++
-        }
-    }
 }
 </script>
 

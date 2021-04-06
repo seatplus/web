@@ -48,8 +48,9 @@ import WideLists from "../../WideLists";
 import LocationName from "./LocationName";
 import ItemList from "./ItemList";
 import AddManualLocationModal from "./AddManualLocationModal";
-import {useLoadCompleteResource} from "../../../Functions/useLoadCompleteResource";
-import ListTransition from "../../Transitions/ListTransition";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
+import {onBeforeMount, ref} from "vue";
+
 export default {
     name: "LocationComponent",
     components: {AddManualLocationModal, ItemList, LocationName, WideLists},
@@ -67,11 +68,17 @@ export default {
             required: false,
             default: false,
             type: Boolean
+        },
+        queryParameters: {
+            required: true,
+            type: Object
         }
     },
     setup(props) {
 
-        return useLoadCompleteResource('location.assets', props.location.location_id )
+        let enrichedQueryParameters = _.merge({ location_id: props.location.location_id }, props.queryParameters)
+
+        return useLoadCompleteResource('location.assets', enrichedQueryParameters )
     },
     data() {
         return {

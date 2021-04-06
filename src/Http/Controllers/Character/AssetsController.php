@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Horizon\Contracts\JobRepository;
@@ -93,6 +94,10 @@ class AssetsController extends Controller
         $query = Asset::with('assetable', 'type', 'type.group', 'content')
             ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
+
+        if (request()->has('search')) {
+            $query = $query->search(request()->query('search'));
+        }
 
         return AssetResource::collection(
             $query->paginate()
