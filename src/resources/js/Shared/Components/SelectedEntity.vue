@@ -27,7 +27,7 @@ export default {
         selectedIds() {
             let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
 
-            return selectedCharacterIds
+            return _.map(selectedCharacterIds, (id) => parseInt(id))
         }
     }
 }

@@ -70,6 +70,7 @@
       />
       <AssetsComponent
         :parameters="asset_params"
+        context="recruitment"
         :compact="true"
       />
     </div>

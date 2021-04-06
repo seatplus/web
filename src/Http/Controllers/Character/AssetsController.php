@@ -94,6 +94,10 @@ class AssetsController extends Controller
             ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
 
+        if (request()->has('search')) {
+            $query = $query->search(request()->query('search'));
+        }
+
         return AssetResource::collection(
             $query->paginate()
         );

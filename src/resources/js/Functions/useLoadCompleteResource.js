@@ -1,9 +1,10 @@
 import {onBeforeMount, ref} from "vue";
 import route from 'ziggy'
+import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
 
 export function useLoadCompleteResource(routeName, params) {
 
-    const url = ref(route(routeName,params))
+    const url = ref(route(routeName,useHydrateQueryParameters(params)))
     const results = ref([])
     const page = ref(1)
 
