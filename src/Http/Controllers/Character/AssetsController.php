@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Laravel\Horizon\Contracts\JobRepository;
