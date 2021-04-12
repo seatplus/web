@@ -30,7 +30,7 @@
 <script>
 import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
-import WalletComponent from "./WalletComponent";
+import WalletComponent from "../../../Shared/Components/Wallet/WalletComponent";
 import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";

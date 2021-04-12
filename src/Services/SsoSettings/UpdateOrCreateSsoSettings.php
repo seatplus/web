@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services\SsoSettings;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -44,13 +45,13 @@ class UpdateOrCreateSsoSettings
 
     private string $type;
 
-    public function __construct(/**
-     * @var array
-     */
-    private array $request)
+    public function __construct(
+        private array $request
+    )
     {
-        $this->selected_scopes = collect(Arr::get($this->request, 'selectedScopes'))
-            ->map(fn ($scope) => explode(',', $scope))->flatten(1);
+
+        $this->buildSelectedScopes();
+
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
         $this->type = Arr::get($this->request, 'type');
     }
@@ -61,8 +62,8 @@ class UpdateOrCreateSsoSettings
             if ($this->type === 'global') {
                 SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
             }
-        }, function ($collection) {
-            $collection->each(function ($entity) {
+        }, fn($collection) => $collection
+            ->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
                 $category = Arr::get($entity, 'category');
 
@@ -73,11 +74,33 @@ class UpdateOrCreateSsoSettings
                 SsoScopes::updateOrCreate([
                     'morphable_id' => $entity_id,
                 ], [
-                    'selected_scopes' => $this->selected_scopes,
+                    'selected_scopes' => $this->selected_scopes->unique(),
                     'morphable_type' => $morphable_type,
                     'type' => $this->type,
                 ]);
+            })
+        );
+    }
+
+    private function buildSelectedScopes(): void
+    {
+        $this->selected_scopes = collect();
+
+        collect(Arr::get($this->request, 'selectedScopes'))
+            ->flatMap(fn ($scope) => explode(',', $scope))
+            ->each(function ($scope) {
+
+                // If it is a corporation scope, we need to know the characters role
+                if(Str::of($scope)->contains('corporation')) {
+                    $this->selected_scopes->push('esi-characters.read_corporation_roles.v1');
+                }
+
+                $this->selected_scopes->push($scope);
             });
-        });
+
+        If(Arr::hasAny($this->selected_scopes->unique()->toArray(), ['esi-wallet.read_corporation_wallets.v1'])) {
+            $this->selected_scopes->push('esi-corporations.read_divisions.v1');
+        }
+
     }
 }

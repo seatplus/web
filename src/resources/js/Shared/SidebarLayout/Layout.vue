@@ -102,7 +102,6 @@
           DesktopSidebar,
           MobileMenu,
             ImpersonatingBanner,
-            NotificationsBell,
             Notifications,
             Menu
         },

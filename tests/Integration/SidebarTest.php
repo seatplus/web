@@ -7,6 +7,7 @@ namespace Seatplus\Web\Tests\Integration;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 
@@ -18,6 +19,7 @@ class SidebarTest extends TestCase
         parent::setUp();
 
         //Permission::findOrCreate('superuser');
+        $this->test_character->roles()->update(['roles' => ['']]);
         $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
     }
 
@@ -92,5 +94,52 @@ class SidebarTest extends TestCase
 
         $this->assertTrue(isset($sidebar['corporation']));
     }
+
+    /** @test */
+    public function userWithAccountantRoleCanSeeCorporationWallet()
+    {
+
+        $this->actingAs($this->test_user);
+
+        // First check that wallets are not visable
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
+
+        // Now give user necessairy role
+        $this->test_character->roles()->update(['roles' => ['Accountant']]);
+
+        $this->assertTrue($this->test_character->refresh()->roles->hasRole('roles', 'Accountant'));
+        $this->assertFalse($this->test_character->roles->hasRole('roles', 'Director'));
+
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
+    }
+
+    /** @test */
+    public function userWithDirectorRoleCanSeeCorporationWallet()
+    {
+
+        $this->actingAs($this->test_user);
+
+        // First check that wallets are not visable
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertFalse($this->test_character->refresh()->roles->hasRole('roles', 'Director'));
+
+        $this->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
+
+        // Now give user necessairy role
+        $this->test_character->roles()->update(['roles' => ['Director']]);
+
+        $this->assertTrue($this->test_character->refresh()->roles->hasRole('roles', 'Director'));
+
+        $sidebar = (new SidebarEntries)->filter();
+
+        $this->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
+    }
+
+
 
 }
