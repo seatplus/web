@@ -60,20 +60,26 @@ class AssetsController extends Controller
 
     public function getLocations(Request $request)
     {
-        $query = WebAssetAlias::with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
+        $query = WebAssetAlias::query()
+            ->with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->select('location_id')
             ->groupBy('location_id')
-            ->orderBy('location_id', 'asc');
+            ->orderBy('location_id', 'asc')
+            ->when($request->hasAny(['regions', 'systems']), function($query) use ($request) {
 
-        if ($request->has('regions')) {
-            $query = $query->inRegion($request->query('regions'));
-        }
+                $query->where(function ($query) use ($request) {
+                    if ($request->has('regions')) {
+                        $query->inRegion($request->query('regions'));
+                    }
 
-        if ($request->has('systems')) {
-            $query = $query->inSystems($request->query('systems'));
-        }
+                    if ($request->has('systems')) {
+                        $query->inSystems($request->query('systems'));
+                    }
+                });
+            });
+
 
         if ($request->has('search')) {
             $query = $query->search($request->query('search'));
