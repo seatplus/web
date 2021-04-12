@@ -67,8 +67,7 @@ class AssetsController extends Controller
             ->select('location_id')
             ->groupBy('location_id')
             ->orderBy('location_id', 'asc')
-            ->when($request->hasAny(['regions', 'systems']), function($query) use ($request) {
-
+            ->when($request->hasAny(['regions', 'systems']), function ($query) use ($request) {
                 $query->where(function ($query) use ($request) {
                     if ($request->has('regions')) {
                         $query->inRegion($request->query('regions'));
@@ -79,7 +78,6 @@ class AssetsController extends Controller
                     }
                 });
             });
-
 
         if ($request->has('search')) {
             $query = $query->search($request->query('search'));

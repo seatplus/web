@@ -27,11 +27,9 @@
 namespace Seatplus\Web\Services\Sidebar;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\HasCharacterNecessaryRole;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
