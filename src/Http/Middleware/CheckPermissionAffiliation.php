@@ -32,7 +32,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\GetRecruitIdsService;
+use Seatplus\Web\Services\HasCharacterNecessaryRole;
 
 class CheckPermissionAffiliation
 {
@@ -151,7 +153,7 @@ class CheckPermissionAffiliation
         $affiliated_ids_from_character_role = User::with('characters.roles', 'characters.corporation')
             ->find(auth()->user()->getAuthIdentifier())
             ->characters
-            ->map(fn ($character) => $character->roles->hasRole('roles', 'Director') || $character->roles->hasRole('roles', Str::ucfirst($character_role))
+            ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
                 ? $character->corporation->corporation_id
                 : false
             )

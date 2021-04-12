@@ -31,6 +31,8 @@ use Illuminate\Support\Str;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Services\HasCharacterNecessaryRole;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
@@ -116,7 +118,7 @@ class SidebarEntries
         return $this->user
             ->loadMissing('characters.roles')
             ->characters
-            ->map(fn ($character) => $character->roles->hasRole('roles', Str::ucfirst($character_role)))
+            ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role))
             ->filter()
             ->isNotEmpty();
     }
