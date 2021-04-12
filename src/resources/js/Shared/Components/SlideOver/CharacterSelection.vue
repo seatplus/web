@@ -9,9 +9,6 @@
       v-model="selected_character_ids"
       :entity="character"
     />
-    <!--        <infinite-loading :identifier="infiniteId" @infinite="loadEntries" spinner="waveDots" >
-            <div slot="no-more">all loaded</div>
-        </infinite-loading>-->
   </ul>
   <div ref="scrollComponent"></div>
 </template>
