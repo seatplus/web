@@ -28,7 +28,7 @@
         "php": "^8.0",
         "laravel/framework": "^8.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^0.8.2",
+        "seatplus/eveapi": "^0.8.4",
         "seatplus/auth": "^0.8.0",
         "inertiajs/inertia-laravel": "^0.4.0",
         "tightenco/ziggy": "^1.0.4",
@@ -53,6 +53,7 @@
         }
     },
     "scripts": {
-        "watch": "vendor/bin/phpunit-watcher watch"
+        "watch": "vendor/bin/phpunit-watcher watch",
+        "parallel": "vendor/bin/testbench package:test --parallel --no-coverage"
     }
 }

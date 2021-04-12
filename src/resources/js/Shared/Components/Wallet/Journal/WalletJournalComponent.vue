@@ -32,8 +32,8 @@
 
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
-          route="character.wallet_journal.detail"
-          :params="id"
+          :route="route"
+          :params="routeParameters"
           @result="(result) => assets_data = result"
         >
           <WalletJournalRowComponent
@@ -44,7 +44,6 @@
           />
         </InfiniteLoadingHelper>
       </ul>
-
     </div>
   </CardWithHeader>
 </template>
@@ -70,38 +69,31 @@ export default {
         },
         division: {
             required: false,
-            type: Number
+            type: Object,
+            default: () => {}
         }
     },
     data() {
         return {
             infiniteId: +new Date(),
-            assets_data: [],
-            page: 1,
+            assets_data: []
+        }
+    },
+    computed: {
+        route() {
+            return this.division? 'corporation.wallet_journal.detail' : 'character.wallet_journal.detail'
+        },
+        routeParameters() {
+            return this.division ? {
+                corporation_id: this.id,
+                division_id: this.division.division_id
+            } : {
+                character_id: this.id
+            }
         }
     },
     created() {
         this.infiniteId += 1;
-    },
-    methods: {
-        loadEntries($state) {
-            const self = this;
-
-            axios.get(this.$route('character.wallet_journal.detail', this.id), {
-                params: {
-                    page: this.page,
-                },
-            }).then(response => {
-
-                if(response.data.data.length) {
-                    self.page += 1;
-                    self.assets_data.push(...response.data.data);
-                    $state.loaded();
-                } else {
-                    $state.complete();
-                }
-            });
-        },
     }
 }
 </script>

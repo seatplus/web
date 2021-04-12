@@ -12,6 +12,14 @@ use Spatie\Permission\PermissionRegistrar;
 class CorporationMemberTrackingTest extends  TestCase
 {
 
+    public function setUp(): void
+    {
+
+        parent::setUp();
+
+        $this->test_character->roles()->update(['roles' => ['']]);
+    }
+
     /** @test */
     public function hasDispatchableJob()
     {

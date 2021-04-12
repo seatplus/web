@@ -24,18 +24,27 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
+namespace Seatplus\Web\Services;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
-    'corporation.wallet' => CorporationWalletHydrateBatch::class,
-];
+use Illuminate\Support\Str;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+
+class HasCharacterNecessaryRole
+{
+    public static function check(CharacterInfo $character, string | array $roles): bool
+    {
+        if ($character->roles->hasRole('roles', 'Director')) {
+            return true;
+        }
+
+        $character_roles = is_string($roles) ? explode('|', $roles) : $roles;
+
+        foreach ($character_roles as $role) {
+            if ($character->roles->hasRole('roles', Str::ucfirst($role))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

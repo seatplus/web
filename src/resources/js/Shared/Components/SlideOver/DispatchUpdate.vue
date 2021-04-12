@@ -98,15 +98,19 @@ import DispatchableEntry from "./DispatchableEntry";
 export default {
     name: "DispatchUpdate",
     components: {DispatchableEntry},
-    data() {
+    data: function () {
         return {
-            job_name: this.$page.props.dispatch_transfer_object.manual_job,
-            dispatch_transfer_object: this.$page.props.dispatch_transfer_object,
+            //job_name: this.$page.props.dispatch_transfer_object.manual_job,
+            //dispatch_transfer_object: this.$page.props.dispatch_transfer_object,
             entities: [],
             infiniteId: new Date()
         }
     },
     created() {
+
+        /*if(!this.dispatch_transfer_object)
+            this.dispatch_transfer_object = this.$page.props.dispatchTransferObject*/
+
         this.getEntities();
     },
     methods: {
@@ -132,6 +136,14 @@ export default {
                     this.entities = response.data
                     this.infiniteId++
                 })
+        }
+    },
+    computed: {
+        dispatch_transfer_object() {
+            return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
+        },
+        job_name() {
+            return _.get(this.dispatch_transfer_object, 'manual_job')
         }
     }
 }

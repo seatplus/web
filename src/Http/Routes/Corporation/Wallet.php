@@ -24,18 +24,19 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+use Seatplus\Web\Http\Controllers\Corporation\Wallet\CorporationWalletController;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
-    'corporation.wallet' => CorporationWalletHydrateBatch::class,
-];
+Route::prefix('wallet')
+    ->middleware([
+        sprintf('permission:%s,%s',
+            config('eveapi.permissions.' . WalletJournal::class),
+            'Accountant|Junior_Accountant'
+        ),
+    ])
+    ->group(function () {
+        Route::get('', [CorporationWalletController::class, 'index'])->name('corporation.wallet');
+        Route::get('/{corporation_id}/journal/{division_id}', [CorporationWalletController::class, 'journal'])->name('corporation.wallet_journal.detail');
+        Route::get('/{corporation_id}/balance/{division_id}', [CorporationWalletController::class, 'balance'])->name('corporation.balance');
+        Route::get('/{corporation_id}/transaction/{division_id}', [CorporationWalletController::class, 'transaction'])->name('corporation.wallet_transaction.detail');
+    });
