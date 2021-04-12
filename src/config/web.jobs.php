@@ -37,5 +37,5 @@ return [
     'assets' => CharacterAssetsHydrateBatch::class,
     'wallet' => WalletHydrateBatch::class,
     'contract' => ContractHydrateBatch::class,
-    'corporation.wallet' => CorporationWalletHydrateBatch::class
+    'corporation.wallet' => CorporationWalletHydrateBatch::class,
 ];

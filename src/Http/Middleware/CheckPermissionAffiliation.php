@@ -30,9 +30,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\HasCharacterNecessaryRole;
 

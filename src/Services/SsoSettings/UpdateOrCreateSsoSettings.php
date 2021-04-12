@@ -47,9 +47,7 @@ class UpdateOrCreateSsoSettings
 
     public function __construct(
         private array $request
-    )
-    {
-
+    ) {
         $this->buildSelectedScopes();
 
         $this->entities = collect(Arr::get($this->request, 'selectedEntities'));
@@ -62,7 +60,7 @@ class UpdateOrCreateSsoSettings
             if ($this->type === 'global') {
                 SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
             }
-        }, fn($collection) => $collection
+        }, fn ($collection) => $collection
             ->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
                 $category = Arr::get($entity, 'category');
@@ -91,16 +89,15 @@ class UpdateOrCreateSsoSettings
             ->each(function ($scope) {
 
                 // If it is a corporation scope, we need to know the characters role
-                if(Str::of($scope)->contains('corporation')) {
+                if (Str::of($scope)->contains('corporation')) {
                     $this->selected_scopes->push('esi-characters.read_corporation_roles.v1');
                 }
 
                 $this->selected_scopes->push($scope);
             });
 
-        If(Arr::hasAny($this->selected_scopes->unique()->toArray(), ['esi-wallet.read_corporation_wallets.v1'])) {
+        if (Arr::hasAny($this->selected_scopes->unique()->toArray(), ['esi-wallet.read_corporation_wallets.v1'])) {
             $this->selected_scopes->push('esi-corporations.read_divisions.v1');
         }
-
     }
 }
