@@ -29,7 +29,6 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CharacterInfoRessource;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCharactersController extends Controller
