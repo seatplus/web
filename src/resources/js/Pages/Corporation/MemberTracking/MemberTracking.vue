@@ -10,6 +10,9 @@
     <template #primary>
       <DispatchUpdateButton />
     </template>
+    <template #secondary>
+      <EntitySelectionButton type="corporation"/>
+    </template>
   </PageHeader>
 
   <MemberTrackingComponent
@@ -24,10 +27,12 @@ import PageHeader from "@/Shared/Layout/PageHeader"
 import MemberTrackingComponent from "./MemberTrackingComponent";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 
 export default {
     name: "MemberTracking",
     components: {
+        EntitySelectionButton,
       RequiredScopesWarning,
       DispatchUpdateButton,
       MemberTrackingComponent, PageHeader},

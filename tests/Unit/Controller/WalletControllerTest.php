@@ -87,4 +87,15 @@ class WalletControllerTest extends TestCase
 
         $this->assertCount(1, data_get($response->original->toArray(), 'data'));
     }
+
+    /** @test */
+    public function oneCanCallCorporationWalletEndpoint()
+    {
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('corporation.wallet', [
+                'corporation_ids' => [$this->test_character->corporation->corporation_id]
+            ]))
+            ->assertOk();
+    }
 }

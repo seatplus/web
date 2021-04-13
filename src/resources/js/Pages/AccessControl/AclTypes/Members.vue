@@ -8,23 +8,23 @@
     <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
       <li
         v-for="member in filteredMembers"
-        :key="member.user.id"
+        :key="member.id"
         class="col-span-1 bg-white rounded-lg shadow"
       >
         <div class="w-full flex items-center justify-between p-6 space-x-6">
           <div class="flex-1 truncate">
             <div class="flex items-center space-x-3">
               <h3 class="text-gray-900 text-sm leading-5 font-medium truncate">
-                {{ getMainName(member.user) }}
+                {{ getMainName(member) }}
               </h3>
               <span :class="[{'text-teal-800 bg-teal-100': member.status === 'member'}, {'text-yellow-800 bg-yellow-100': member.status === 'paused'}, 'flex-shrink-0 inline-block px-2 py-0.5  text-xs leading-4 font-medium  rounded-full capitalize']"> {{ member.status }} </span>
             </div>
             <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
-              {{ getCharacterNames(member.user) }}
+              {{ getCharacterNames(member) }}
             </p>
           </div>
           <EveImage
-            :object="member.user.main_character"
+            :object="getMain(member)"
             :size="256"
             tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
           />
@@ -98,16 +98,16 @@ export default {
         }
     },
     methods: {
-        getMainName(user) {
-            return user.main_character.name != null ? user.main_character.name : 'unknown'
+        getMainName(member) {
+
+            return _.get(this.getMain(member), 'name')
         },
-        getCharacterNames(user) {
+        getMain(member) {
+            return member.user ? _.get(member, 'user.main_character') : _.get(member, 'main_character')
+        },
+        getCharacterNames(member) {
 
-            let characters = _.remove(user.characters, function (character) {
-                return character.character_id === user.main_character_id
-            })
-                .map((character) => character.name)
-
+            let characters = _.map(_.get(member, 'user.characters', []), character => character.name)
 
             return _.shuffle(characters).join(', ')
         },

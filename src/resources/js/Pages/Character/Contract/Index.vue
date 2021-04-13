@@ -12,7 +12,7 @@
         <DispatchUpdateButton />
       </template>
       <template #secondary>
-        <CharacterSelectionButton />
+        <EntitySelectionButton />
       </template>
     </PageHeader>
 
@@ -28,7 +28,7 @@
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader";
-import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
@@ -39,7 +39,7 @@ export default {
       DispatchUpdateButton,
       RequiredScopesWarning,
         ContractComponent,
-        CharacterSelectionButton,
+        EntitySelectionButton,
         PageHeader},
     props: {
         dispatch_transfer_object: {

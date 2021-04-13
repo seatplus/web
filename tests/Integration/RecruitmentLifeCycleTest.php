@@ -146,11 +146,12 @@ class RecruitmentLifeCycleTest extends TestCase
     /** @test */
     public function senior_hr_sees_recruitment_component()
     {
+
+        $this->assertFalse($this->test_user->can('superuser'));
+
         $response = $this->actingAs($this->test_user)
             ->get(route('corporation.recruitment'))
             ->assertForbidden();
-
-
 
         $this->givePermissionsToTestUser(['can open or close corporations for recruitment']);
 
@@ -401,7 +402,7 @@ class RecruitmentLifeCycleTest extends TestCase
                     'affiliations' => [],
                     'members' => [
                         [
-                            'user_id' => $recruiter->id,
+                            'id' => $recruiter->id,
                             'user' => $recruiter
                         ],
                     ]
@@ -478,7 +479,7 @@ class RecruitmentLifeCycleTest extends TestCase
                     'affiliations' => [],
                     'members' => [
                         [
-                            'user_id' => $this->test_user->id,
+                            'id' => $this->test_user->id,
                             'user' => $this->test_user
                         ],
                     ]

@@ -69,7 +69,7 @@ class UpdateControlGroupTest extends TestCase
                     'affiliations' => [],
                     'members' => [
                         [
-                            'user_id' => $this->test_user->id,
+                            'id' => $this->test_user->id,
                             'user' => $this->test_user
                         ],
                     ]

@@ -86,7 +86,7 @@ return [
         ],
         [
             'name' => 'Recruitment',
-            'permission' => 'recruiter',
+            'permission' => 'can open or close corporations for recruitment|can accept or deny applications',
             'character_role' => 'director',
             'route' => 'corporation.recruitment',
             'viewbox' => '0 0 24 24',

@@ -31,7 +31,7 @@ use Seatplus\Web\Http\Controllers\Shared\HelperController;
 use Seatplus\Web\Http\Controllers\Shared\ManualLocationController;
 
 Route::get('affiliated/characters/{permission}', GetAffiliatedCharactersController::class)->name('get.affiliated.characters');
-Route::get('affiliated/corporations/{permission}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
+Route::get('affiliated/corporations/{permission}/{corporation_role?}', GetAffiliatedCorporationsController::class)->name('get.affiliated.corporations');
 
 Route::post('resolve/ids', [HelperController::class, 'ids'])->name('resolve.ids');
 Route::post('resolve/character_affiliations', [HelperController::class, 'characterAffiliations'])->name('resolve.character_affiliation');

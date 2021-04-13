@@ -29,16 +29,18 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CharacterInfoRessource;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCharactersController extends Controller
 {
     public function __invoke(string $permission)
     {
-        $query = CharacterInfo::whereIn('character_id', getAffiliatedIdsByPermission($permission))
+        $ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])
+            ->unique();
+
+        $query = CharacterInfo::whereIn('character_id', $ids)
             ->with('corporation', 'alliance')
             ->has($permission);
-
-        // TODO Change this to use relationship has('permission') where permission must be the name of the relation
 
         return CharacterInfoRessource::collection($query->paginate());
     }

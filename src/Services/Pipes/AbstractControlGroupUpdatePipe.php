@@ -50,10 +50,10 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
         $current_member_ids = $data->role->fresh()->members()->pluck('user_id');
 
         collect($data->members)
-            ->reject(fn ($member) => in_array($member['user_id'], $current_member_ids->toArray()))
+            ->reject(fn ($member) => in_array(Arr::get($member, 'id'), $current_member_ids->toArray()))
             // remove members on waitlist or paused
             ->reject(fn ($member) => Arr::has($member, 'status') ? $member['status'] !== 'member' : false)
-            ->each(fn ($member) => $data->role->activateMember(User::find($member['user_id'])));
+            ->each(fn ($member) => $data->role->activateMember(User::find(Arr::get($member, 'id'))));
     }
 
     public function handleAffiliations(ControlGroupUpdateData $data)

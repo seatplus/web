@@ -74,7 +74,11 @@ class MemberTrackingController extends Controller
 
     private function getAffiliatedCorporations()
     {
-        return CorporationInfo::whereIn('corporation_id', getAffiliatedIdsByPermission($this->getPermission()))
+        $ids = request()->has('corporation_ids')
+            ? request()->get('corporation_ids')
+            : auth()->user()->characters->map(fn ($character) => $character->corporation->corporation_id)->toArray();
+
+        return CorporationInfo::whereIn('corporation_id', collect($ids)->intersect(getAffiliatedIdsByPermission($this->getPermission())))
             ->with('alliance', 'ssoScopes', 'alliance.ssoScopes')
             ->has('members')
             ->get()

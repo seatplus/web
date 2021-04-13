@@ -12,7 +12,7 @@
         <DispatchUpdateButton />
       </template>
       <template #secondary>
-        <CharacterSelectionButton />
+        <EntitySelectionButton />
       </template>
     </PageHeader>
 
@@ -31,7 +31,7 @@
 import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import WalletComponent from "../../../Shared/Components/Wallet/WalletComponent";
-import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 
@@ -40,7 +40,7 @@ export default {
     components: {
       RequiredScopesWarning,
       DispatchUpdateButton,
-        CharacterSelectionButton,
+        EntitySelectionButton,
         WalletComponent,
         PageHeader
     },

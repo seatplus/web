@@ -31,6 +31,7 @@ use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class CorporationWalletController extends Controller
 {
@@ -94,7 +95,13 @@ class CorporationWalletController extends Controller
 
     private function getAffiliatedCorporateWalletDivisions()
     {
-        return CorporationDivision::whereIn('corporation_id', getAffiliatedIdsByPermission($this->getPermission()))
+        $ids = GetAffiliatedIdsService::make()
+            ->setPermission($this->getPermission())
+            ->setRequestFlavour('corporation')
+            ->setRequiredCorporationRole(data_get($this->buildDispatchTransferObject(), 'required_corporation_role'))
+            ->get();
+
+        return CorporationDivision::whereIn('corporation_id', $ids)
             ->where('division_type', 'wallet')
             ->get();
     }

@@ -29,13 +29,21 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-    public function __invoke(string $permission)
+    public function __invoke(string $permission, string $corporation_role = '')
     {
-        $query = CorporationInfo::with('alliance')->whereIn('corporation_id', getAffiliatedIdsByPermission($permission));
+        $ids = collect([...getAffiliatedIdsByPermission($permission, $corporation_role), ...GetRecruitIdsService::get()])
+            ->unique();
 
-        return CorporationInfoRessource::collection($query->paginate());
+        $query = CorporationInfo::with('alliance')
+            ->whereIn('corporation_id', $ids)
+            ->has($permission);
+
+        return CorporationInfoRessource::collection(
+            $query->paginate()
+        );
     }
 }

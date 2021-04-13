@@ -78,17 +78,21 @@ class SidebarEntries
         $entries = Arr::get($this->sidebar, $category);
 
         return collect($entries)->filter(function ($entry) use ($category) {
-            $permission = Arr::get($entry, 'permission');
+            $permission_string = Arr::get($entry, 'permission');
             $character_role = Arr::get($entry, 'character_role');
 
             // if entry has no required permission show it to the user
-            if (is_null($permission)) {
+            if (is_null($permission_string)) {
                 return true;
             }
 
-            // if user has required permission show element
-            if ($this->checkPermission($permission)) {
-                return true;
+            $permissions = explode('|', $permission_string);
+
+            foreach ($permissions as $permission) {
+                // if user has required permission show element
+                if ($this->checkPermission($permission)) {
+                    return true;
+                }
             }
 
             // Moderators of roles should see the access control link even without the permission
