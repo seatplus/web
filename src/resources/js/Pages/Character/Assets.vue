@@ -12,7 +12,7 @@
         <DispatchUpdateButton />
       </template>
       <template #secondary>
-        <CharacterSelectionButton />
+        <EntitySelectionButton />
       </template>
     </PageHeader>
 
@@ -94,7 +94,7 @@
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader"
-import CharacterSelectionButton from "@/Shared/Components/SlideOver/CharacterSelectionButton";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
@@ -111,7 +111,7 @@ export default {
         RequiredScopesWarning,
         DispatchUpdateButton,
         AssetsComponent,
-        CharacterSelectionButton,
+        EntitySelectionButton,
         PageHeader,
         Switch,
         SwitchGroup,

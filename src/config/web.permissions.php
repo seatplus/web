@@ -30,7 +30,6 @@ return [
 
     'view member tracking',
     'view member compliance',
-    'recruiter',
 
     'view access control',
     'superuser',

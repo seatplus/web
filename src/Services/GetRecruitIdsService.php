@@ -53,6 +53,7 @@ class GetRecruitIdsService
                 : $recruit->applicationable->character_id
             )
             ->flatten()
+            ->unique()
             ->toArray();
     }
 }

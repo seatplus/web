@@ -40,10 +40,11 @@ export default {
             required: true
         },
         modelValue: {
-          type: Array,
-          default: () => []
+            type: Array,
+            default: () => []
         }
     },
+    emits: ['update:modelValue'],
     computed: {
         isSelected() {
             return this.modelValue.includes(this.entity.id)

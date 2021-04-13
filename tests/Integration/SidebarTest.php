@@ -10,6 +10,7 @@ use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
+use Spatie\Permission\PermissionRegistrar;
 
 class SidebarTest extends TestCase
 {
@@ -20,7 +21,7 @@ class SidebarTest extends TestCase
 
         //Permission::findOrCreate('superuser');
         $this->test_character->roles()->update(['roles' => ['']]);
-        $this->app->make(\Spatie\Permission\PermissionRegistrar::class)->registerPermissions();
+        $this->app->make(PermissionRegistrar::class)->registerPermissions();
     }
 
     /** @test */

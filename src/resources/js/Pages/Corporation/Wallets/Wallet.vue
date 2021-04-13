@@ -10,6 +10,9 @@
     <template #primary>
       <DispatchUpdateButton />
     </template>
+    <template #secondary>
+      <EntitySelectionButton type="corporation"/>
+    </template>
   </PageHeader>
 
   <div class="space-y-4">
@@ -28,10 +31,11 @@ import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning"
 import PageHeader from "@/Shared/Layout/PageHeader";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import WalletComponent from "@/Shared/Components/Wallet/WalletComponent";
+import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
 
 export default {
     name: "Wallet",
-    components: {WalletComponent, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
+    components: {EntitySelectionButton, WalletComponent, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
     props: {
         corporationDivisions: {
             type: Array,

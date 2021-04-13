@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d76dd87422b213fc6a78506f6c7c7cb",
+    "content-hash": "9ab58069341348e1dbf2196ed204958b",
     "packages": [
         {
             "name": "brick/math",
@@ -1168,16 +1168,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.36.2",
+            "version": "v8.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "0debd8ad6b5aa1f61ccc73910adf049af4ca0444"
+                "reference": "cf4082973abc796ec285190f0603380021f6d26f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/0debd8ad6b5aa1f61ccc73910adf049af4ca0444",
-                "reference": "0debd8ad6b5aa1f61ccc73910adf049af4ca0444",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/cf4082973abc796ec285190f0603380021f6d26f",
+                "reference": "cf4082973abc796ec285190f0603380021f6d26f",
                 "shasum": ""
             },
             "require": {
@@ -1332,7 +1332,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-04-07T12:37:22+00:00"
+            "time": "2021-04-13T13:49:49+00:00"
         },
         {
             "name": "laravel/horizon",
@@ -2649,16 +2649,16 @@
         },
         {
             "name": "seatplus/auth",
-            "version": "0.8.0",
+            "version": "0.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/auth.git",
-                "reference": "b4544e28c8f7b9c968fb04898ed2f52694aa67f5"
+                "reference": "2f572368b5f6c7e9aa3d1a4511ff019c09aaf2c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/auth/zipball/b4544e28c8f7b9c968fb04898ed2f52694aa67f5",
-                "reference": "b4544e28c8f7b9c968fb04898ed2f52694aa67f5",
+                "url": "https://api.github.com/repos/seatplus/auth/zipball/2f572368b5f6c7e9aa3d1a4511ff019c09aaf2c4",
+                "reference": "2f572368b5f6c7e9aa3d1a4511ff019c09aaf2c4",
                 "shasum": ""
             },
             "require": {
@@ -2666,13 +2666,14 @@
                 "laravel/socialite": "^5.0",
                 "php": "^8.0",
                 "seatplus/eseye": "^3.0",
-                "seatplus/eveapi": "^0.8.0",
+                "seatplus/eveapi": "^0.8.5",
                 "spatie/laravel-permission": "^4.0"
             },
             "require-dev": {
+                "brianium/paratest": "^6.2",
                 "laravel/legacy-factories": "^1.0",
-                "orchestra/testbench": "^6.0",
-                "phpunit/phpunit": "^9.3",
+                "nunomaduro/collision": "^5.3",
+                "orchestra/testbench": "^6.10",
                 "spatie/phpunit-watcher": "^1.11"
             },
             "type": "seatplus-package",
@@ -2704,9 +2705,9 @@
             "description": "SeAT plus package that handles authentication agnostic to SeAT plus usage as pure API or Web",
             "support": {
                 "issues": "https://github.com/seatplus/auth/issues",
-                "source": "https://github.com/seatplus/auth/tree/0.8.0"
+                "source": "https://github.com/seatplus/auth/tree/0.8.1"
             },
-            "time": "2021-03-30T12:52:41+00:00"
+            "time": "2021-04-13T13:23:06+00:00"
         },
         {
             "name": "seatplus/eseye",
@@ -2763,16 +2764,16 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.8.4",
+            "version": "0.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "8bb2775a8e01bea80f2ca76c9b9740acc88a4c32"
+                "reference": "1c4388c6429dffc9dd5b69414e9507e33d9fcbab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/8bb2775a8e01bea80f2ca76c9b9740acc88a4c32",
-                "reference": "8bb2775a8e01bea80f2ca76c9b9740acc88a4c32",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/1c4388c6429dffc9dd5b69414e9507e33d9fcbab",
+                "reference": "1c4388c6429dffc9dd5b69414e9507e33d9fcbab",
                 "shasum": ""
             },
             "require": {
@@ -2824,9 +2825,9 @@
             "description": "API for receiving information from esi",
             "support": {
                 "issues": "https://github.com/seatplus/eveapi/issues",
-                "source": "https://github.com/seatplus/eveapi/tree/0.8.4"
+                "source": "https://github.com/seatplus/eveapi/tree/0.8.5"
             },
-            "time": "2021-04-12T08:24:02+00:00"
+            "time": "2021-04-12T15:14:35+00:00"
         },
         {
             "name": "spatie/data-transfer-object",
@@ -6623,62 +6624,6 @@
                 }
             ],
             "time": "2021-03-07T12:30:00+00:00"
-        },
-        {
-            "name": "laravel/legacy-factories",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/legacy-factories.git",
-                "reference": "5e3fe2fd5fda64e20ea5c74c831a7346294e902a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/legacy-factories/zipball/5e3fe2fd5fda64e20ea5c74c831a7346294e902a",
-                "reference": "5e3fe2fd5fda64e20ea5c74c831a7346294e902a",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/macroable": "^8.0",
-                "php": "^7.3|^8.0",
-                "symfony/finder": "^3.4|^4.0|^5.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "Illuminate\\Database\\Eloquent\\LegacyFactoryServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "files": [
-                    "helpers.php"
-                ],
-                "psr-4": {
-                    "Illuminate\\Database\\Eloquent\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
-                }
-            ],
-            "description": "The legacy version of the Laravel Eloquent factories.",
-            "homepage": "http://laravel.com",
-            "support": {
-                "issues": "https://github.com/laravel/framework/issues",
-                "source": "https://github.com/laravel/framework"
-            },
-            "time": "2020-10-27T14:25:32+00:00"
         },
         {
             "name": "mockery/mockery",
