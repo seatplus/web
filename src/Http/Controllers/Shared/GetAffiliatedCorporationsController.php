@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Http\Request;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
