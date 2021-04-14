@@ -61,7 +61,7 @@ class AssetTest extends TestCase
 
         //dd($response->exception->getMessage());
 
-        $response->assertInertia( fn (Assert $page) => $page->has('filters'));
+        $response->assertInertia( fn (Assert $page) => $page->has('dispatchTransferObject'));
     }
 
     /** @test */

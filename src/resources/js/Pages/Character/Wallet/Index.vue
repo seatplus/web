@@ -4,7 +4,7 @@
       <title>{{ title(pageTitle) }}</title>
     </teleport>
 
-    <RequiredScopesWarning :dispatch_transfer_object="dispatch_transfer_object" />
+    <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
     <PageHeader>
       {{ pageTitle }}
@@ -45,7 +45,7 @@ export default {
         PageHeader
     },
     props: {
-        dispatch_transfer_object: {
+        dispatchTransferObject: {
             required: true,
             type: Object
         },

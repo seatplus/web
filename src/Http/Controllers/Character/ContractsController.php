@@ -26,22 +26,29 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class ContractsController extends Controller
 {
     public function index()
     {
-        $ids = $this->getAffiliatedIds(Contract::class);
+        $dispatchTransferObject = CreateDispatchTransferObject::new()
+            ->create(Contract::class);
+
+        $ids = GetAffiliatedIdsService::make()
+            ->viaDispatchTransferObject($dispatchTransferObject)
+            ->setRequestFlavour('character')
+            ->get();
 
         $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation', 'character.alliance')->get();
 
         return inertia('Character/Contract/Index', [
-            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
+            'dispatchTransferObject' => $dispatchTransferObject,
             'characters' => $characters,
         ]);
     }
@@ -64,15 +71,5 @@ class ContractsController extends Controller
             'contract' => $query->first(),
             'activeSidebarElement' => route('character.contracts'),
         ]);
-    }
-
-    private function buildDispatchTransferObject(): object
-    {
-        return (object) [
-            'manual_job' => array_search(ContractHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . Contract::class),
-            'required_scopes' => config('eveapi.scopes.character.contracts'),
-            'required_corporation_role' => '',
-        ];
     }
 }

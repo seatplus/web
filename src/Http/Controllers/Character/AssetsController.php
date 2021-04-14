@@ -28,33 +28,19 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Laravel\Horizon\Contracts\JobRepository;
-use Seatplus\Eveapi\Http\Resources\AssetResource;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
-use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Models\Asset\Asset as WebAssetAlias;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class AssetsController extends Controller
 {
-    public function __construct(
-        /**
-         * @var \Laravel\Horizon\Contracts\JobRepository
-         */
-        private JobRepository $jobs
-    ) {
-    }
-
-    public function index(Request $request)
+    public function index()
     {
-        $filters = fn () => ['regions' => Region::all()];
-
         return Inertia::render('Character/Assets', [
-            'filters' => $filters,
-            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
+            'dispatchTransferObject' => CreateDispatchTransferObject::new()->create(EveApiAsset::class),
         ]);
     }
 
@@ -94,8 +80,8 @@ class AssetsController extends Controller
 
     public function loadLocation(int $location_id)
     {
-        $query = Asset::with('assetable', 'type', 'type.group', 'content')
-            ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+        $query = EveApiAsset::with('assetable', 'type', 'type.group', 'content')
+            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
 
         if (request()->has('search')) {
@@ -109,8 +95,8 @@ class AssetsController extends Controller
 
     public function details(int $item_id)
     {
-        $query = Asset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->affiliated([...getAffiliatedIdsByClass(Asset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+        $query = EveApiAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
+            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('item_id', $item_id);
 
         $item = AssetResource::collection($query->get());
@@ -118,15 +104,5 @@ class AssetsController extends Controller
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,
         ]);
-    }
-
-    private function buildDispatchTransferObject(): object
-    {
-        return (object) [
-            'manual_job' => array_search(CharacterAssetsHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . Asset::class),
-            'required_scopes' => config('eveapi.scopes.character.assets'),
-            'required_corporation_role' => '',
-        ];
     }
 }

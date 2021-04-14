@@ -26,23 +26,30 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContactResource;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class ContactsController extends Controller
 {
     public function index()
     {
-        $ids = $this->getAffiliatedIds(Contact::class);
+        $dispatchTransferObject = CreateDispatchTransferObject::new()
+            ->create(Contact::class);
+
+        $ids = GetAffiliatedIdsService::make()
+            ->viaDispatchTransferObject($dispatchTransferObject)
+            ->setRequestFlavour('character')
+            ->get();
 
         $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
 
         return inertia('Character/Contact/Index', [
-            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
+            'dispatchTransferObject' => $dispatchTransferObject,
             'characters' => $characters,
         ]);
     }
@@ -69,15 +76,5 @@ class ContactsController extends Controller
         )->additional(['meta' => [
             'entity_id' => $id,
         ]]);
-    }
-
-    private function buildDispatchTransferObject(): object
-    {
-        return (object) [
-            'manual_job' => array_search(ContactHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . Contact::class),
-            'required_scopes' => config('eveapi.scopes.character.contacts'),
-            'required_corporation_role' => '',
-        ];
     }
 }

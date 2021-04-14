@@ -26,20 +26,24 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class CorporationWalletController extends Controller
 {
     public function index()
     {
+        $dispatchTransferObject = CreateDispatchTransferObject::new()
+            ->setIsCharacter(false)
+            ->create(WalletJournal::class);
+
         return inertia('Corporation/Wallets/Wallet', [
-            'dispatchTransferObject' => $this->buildDispatchTransferObject(),
-            'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions(),
+            'dispatchTransferObject' => $dispatchTransferObject,
+            'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
         ]);
     }
 
@@ -78,27 +82,11 @@ class CorporationWalletController extends Controller
             ->paginate();
     }
 
-    private function buildDispatchTransferObject(): object
-    {
-        return (object) [
-            'manual_job' => array_search(CorporationWalletHydrateBatch::class, config('web.jobs')),
-            'permission' => $this->getPermission(),
-            'required_scopes' => [...config('eveapi.scopes.corporation.wallet'), 'esi-characters.read_corporation_roles.v1'],
-            'required_corporation_role' => 'Accountant|Junior_Accountant',
-        ];
-    }
-
-    private function getPermission(): string
-    {
-        return config('eveapi.permissions.' . WalletJournal::class);
-    }
-
-    private function getAffiliatedCorporateWalletDivisions()
+    private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject)
     {
         $ids = GetAffiliatedIdsService::make()
-            ->setPermission($this->getPermission())
+            ->viaDispatchTransferObject($dispatchTransferObject)
             ->setRequestFlavour('corporation')
-            ->setRequiredCorporationRole(data_get($this->buildDispatchTransferObject(), 'required_corporation_role'))
             ->get();
 
         return CorporationDivision::whereIn('corporation_id', $ids)

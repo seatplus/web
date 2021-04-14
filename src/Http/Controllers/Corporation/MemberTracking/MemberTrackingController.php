@@ -27,19 +27,24 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\MemberTrackingResource;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class MemberTrackingController extends Controller
 {
     public function index()
     {
+        $dispatchTransferObject = CreateDispatchTransferObject::new()
+            ->setIsCharacter(false)
+            ->create(CorporationMemberTracking::class);
+
         return Inertia::render('Corporation/MemberTracking/MemberTracking', [
-            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'corporations' => $this->getAffiliatedCorporations(),
+            'dispatchTransferObject' => $dispatchTransferObject,
+            'corporations' => $this->getAffiliatedCorporations($dispatchTransferObject),
         ]);
     }
 
@@ -57,28 +62,14 @@ class MemberTrackingController extends Controller
         return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
     }
 
-    private function buildDispatchTransferObject(): object
+    private function getAffiliatedCorporations(object $dispatchTransferObject)
     {
-        return (object) [
-            'manual_job' => array_search(CorporationMemberTrackingHydrateBatch::class, config('web.jobs')),
-            'permission' => $this->getPermission(),
-            'required_scopes' => [...config('eveapi.scopes.corporation.membertracking'), 'esi-characters.read_corporation_roles.v1'],
-            'required_corporation_role' => 'Director',
-        ];
-    }
+        $ids = GetAffiliatedIdsService::make()
+            ->viaDispatchTransferObject($dispatchTransferObject)
+            ->setRequestFlavour('corporation')
+            ->get();
 
-    private function getPermission(): string
-    {
-        return config('eveapi.permissions.' . CorporationMemberTracking::class);
-    }
-
-    private function getAffiliatedCorporations()
-    {
-        $ids = request()->has('corporation_ids')
-            ? request()->get('corporation_ids')
-            : auth()->user()->characters->map(fn ($character) => $character->corporation->corporation_id)->toArray();
-
-        return CorporationInfo::whereIn('corporation_id', collect($ids)->intersect(getAffiliatedIdsByPermission($this->getPermission())))
+        return CorporationInfo::whereIn('corporation_id', $ids)
             ->with('alliance', 'ssoScopes', 'alliance.ssoScopes')
             ->has('members')
             ->get()
