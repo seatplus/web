@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
@@ -38,7 +37,6 @@ class CorporationWalletController extends Controller
 {
     public function index()
     {
-
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->setIsCharacter(false)
             ->create(WalletJournal::class);
