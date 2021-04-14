@@ -90,6 +90,14 @@ class GetAffiliatedIdsService
         return collect($ids)->intersect([...$this->getAffiliatedIds(), ...GetRecruitIdsService::get()]);
     }
 
+    public function viaDispatchTransferObject(object $dispatchTransferObject): GetAffiliatedIdsService
+    {
+        $this->permission = data_get($dispatchTransferObject, 'permission');
+        $this->required_corporation_role = data_get($dispatchTransferObject, 'required_corporation_role');
+
+        return $this;
+    }
+
     private function getOwnedIds(): array
     {
         return match ($this->getRequestParameter()) {

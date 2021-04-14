@@ -4,7 +4,7 @@
       <title>{{ title(pageTitle) }}</title>
     </teleport>
 
-    <RequiredScopesWarning :dispatch_transfer_object="dispatch_transfer_object" />
+    <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
     <PageHeader>
       {{ pageTitle }}
@@ -43,7 +43,7 @@ export default {
       EntitySelectionButton, PageHeader, CharacterContactPanel,},
   layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
   props: {
-    dispatch_transfer_object: {
+      dispatchTransferObject: {
       required: true,
       type: Object
     },

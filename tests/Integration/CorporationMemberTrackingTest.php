@@ -42,7 +42,7 @@ class CorporationMemberTrackingTest extends  TestCase
             ->get(route('corporation.member_tracking'))
             ->assertOk();
 
-        $response->assertInertia( fn (Assert $page) => $page->has('dispatch_transfer_object'));
+        $response->assertInertia( fn (Assert $page) => $page->has('dispatchTransferObject'));
     }
 
 }

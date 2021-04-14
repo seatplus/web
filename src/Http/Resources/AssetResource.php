@@ -27,7 +27,7 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Eveapi\Http\Resources\Type as TypeResource;
+use Seatplus\Web\Http\Resources\Universe\TypeResource;
 
 class AssetResource extends JsonResource
 {

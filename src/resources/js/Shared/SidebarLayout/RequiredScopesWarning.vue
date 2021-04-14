@@ -60,14 +60,14 @@ export default {
       EveImage
     },
     props: {
-      dispatch_transfer_object: {
+        dispatchTransferObject: {
         type: Object,
         required: true
       }
     },
   data() {
     return {
-      requiredScopes: this.dispatch_transfer_object ? this.dispatch_transfer_object.required_scopes : [],
+      requiredScopes: _.get(this.dispatchTransferObject, 'required_scopes', []),
       characters: this.$page.props.user.data.characters
     }
   },

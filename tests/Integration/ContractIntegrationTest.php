@@ -34,7 +34,7 @@ class ContractIntegrationTest extends TestCase
 
         $response->assertInertia( fn (Assert $page) => $page
             ->component('Character/Contract/Index')
-            ->has('dispatch_transfer_object')
+            ->has('dispatchTransferObject')
         );
     }
 

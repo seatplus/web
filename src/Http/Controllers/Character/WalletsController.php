@@ -30,18 +30,23 @@ use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class WalletsController extends Controller
 {
     public function index()
     {
-        $ids = request()->has('character_ids')
-            ? request()->get('character_ids')
-            : auth()->user()->characters->pluck('character_id')->toArray();
+        $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
+
+        $ids = GetAffiliatedIdsService::make()
+            ->viaDispatchTransferObject($dispatchTransferObject)
+            ->setRequestFlavour('character')
+            ->get();
 
         return inertia('Character/Wallet/Index', [
-            'dispatch_transfer_object' => $this->buildDispatchTransferObject(),
-            'character_ids' => collect($ids)->map(fn ($id) => (int) $id),
+            'dispatchTransferObject' => $dispatchTransferObject,
+            'character_ids' => $ids,
         ]);
     }
 
@@ -75,15 +80,5 @@ class WalletsController extends Controller
             ->with('type', 'location')
             ->orderByDesc('date')
             ->paginate();
-    }
-
-    private function buildDispatchTransferObject(): object
-    {
-        return (object) [
-            'manual_job' => array_search(WalletHydrateBatch::class, config('web.jobs')),
-            'permission' => config('eveapi.permissions.' . WalletJournal::class),
-            'required_scopes' => config('eveapi.scopes.character.wallet'),
-            'required_corporation_role' => '',
-        ];
     }
 }

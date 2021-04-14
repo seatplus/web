@@ -34,7 +34,7 @@ class WalletControllerTest extends TestCase
 
         $response->assertInertia( fn (Assert $page) => $page
             ->component('Character/Wallet/Index')
-            ->has('dispatch_transfer_object')
+            ->has('dispatchTransferObject')
         );
     }
 
