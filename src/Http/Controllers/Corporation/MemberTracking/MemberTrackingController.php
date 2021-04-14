@@ -27,10 +27,8 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\MemberTrackingResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
@@ -40,7 +38,6 @@ class MemberTrackingController extends Controller
 {
     public function index()
     {
-
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->setIsCharacter(false)
             ->create(CorporationMemberTracking::class);
@@ -67,12 +64,10 @@ class MemberTrackingController extends Controller
 
     private function getAffiliatedCorporations(object $dispatchTransferObject)
     {
-
         $ids = GetAffiliatedIdsService::make()
             ->viaDispatchTransferObject($dispatchTransferObject)
             ->setRequestFlavour('corporation')
             ->get();
-
 
         return CorporationInfo::whereIn('corporation_id', $ids)
             ->with('alliance', 'ssoScopes', 'alliance.ssoScopes')

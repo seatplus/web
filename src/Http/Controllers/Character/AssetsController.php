@@ -37,10 +37,8 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class AssetsController extends Controller
 {
-
     public function index()
     {
-
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => CreateDispatchTransferObject::new()->create(EveApiAsset::class),
         ]);
