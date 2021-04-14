@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;

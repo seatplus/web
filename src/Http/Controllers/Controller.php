@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class Controller extends BaseController
 {
