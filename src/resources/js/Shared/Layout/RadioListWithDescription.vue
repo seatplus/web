@@ -1,102 +1,90 @@
 <template>
-  <fieldset>
-    <legend class="sr-only">
-      {{ title }}
-    </legend>
-
-    <div
-      ref="radiogroup"
-      class="bg-white rounded-md -space-y-px"
-    >
-      <div
-        v-for="(option, index) in options"
-        :key="index"
-        :class="[active === index ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200', { 'rounded-tl-md rounded-tr-md': index === 0, 'rounded-bl-md rounded-br-md': index === options.length-1}]"
-        class="relative border p-4 flex cursor-pointer"
-        @click="select(index)"
+  <RadioGroup v-model="selected">
+    <RadioGroupLabel class="sr-only">
+      Privacy setting
+    </RadioGroupLabel>
+    <div class="bg-white rounded-md -space-y-px">
+      <RadioGroupOption
+        v-for="(setting, settingIdx) in options"
+        :key="setting.title"
+        v-slot="{ checked, active }"
+        as="template"
+        :value="setting"
       >
-        <div class="flex items-center h-5">
-          <input
-            :id="title +'-settings-option-' + index"
-            name="privacy_setting"
-            type="radio"
-            class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out cursor-pointer"
-            :checked="active === index"
-            @keydown.space="select(index)"
-            @keydown.arrow-up="onArrowUp(index)"
-            @keydown.arrow-down="onArrowDown(index)"
+        <div :class="[settingIdx === 0 ? 'rounded-tl-md rounded-tr-md' : '', settingIdx === options.length - 1 ? 'rounded-bl-md rounded-br-md' : '', checked ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200', 'relative border p-4 flex cursor-pointer focus:outline-none']">
+          <span
+            :class="[checked ? 'bg-indigo-600 border-transparent' : 'bg-white border-gray-300', active ? 'ring-2 ring-offset-2 ring-indigo-500' : '', 'h-4 w-4 mt-0.5 cursor-pointer rounded-full border flex items-center justify-center flex-shrink-0']"
+            aria-hidden="true"
           >
+            <span class="rounded-full bg-white w-1.5 h-1.5" />
+          </span>
+          <div class="ml-3 flex flex-col">
+            <RadioGroupLabel
+              as="span"
+              :class="[checked ? 'text-indigo-900' : 'text-gray-900', 'block text-sm font-medium capitalize']"
+            >
+              {{ setting.title }}
+            </RadioGroupLabel>
+            <RadioGroupDescription
+              as="span"
+              :class="[checked ? 'text-indigo-700' : 'text-gray-500', 'block text-sm']"
+            >
+              {{ setting.description }}
+            </RadioGroupDescription>
+          </div>
         </div>
-        <label
-          :for="title +'-settings-option-' + index"
-          class="ml-3 flex flex-col cursor-pointer"
-        >
-          <span
-            :class="{ 'text-indigo-900': active === index, 'text-gray-900': !(active === index) }"
-            class="block text-sm leading-5 font-medium capitalize"
-          >
-            {{ option.title }}
-          </span>
-          <span
-            :class="{ 'text-indigo-700': active === index, 'text-gray-500': !(active === index) }"
-            class="block text-sm leading-5"
-          >
-            {{ option.description }}
-          </span>
-        </label>
-      </div>
+      </RadioGroupOption>
     </div>
-  </fieldset>
+  </RadioGroup>
 </template>
 
 <script>
+import {ref, watch} from 'vue'
+import { RadioGroup, RadioGroupDescription, RadioGroupLabel, RadioGroupOption } from '@headlessui/vue'
+
 export default {
-  name: "RadioListWithDescription",
-  props: {
-    title: {
-      type: String,
-      default: 'Default'
+    name: "RadioListWithDescription",
+    components: {
+        RadioGroup,
+        RadioGroupDescription,
+        RadioGroupLabel,
+        RadioGroupOption,
     },
-    options: {
-      type: Array,
-      default: () => [
-        {title: 'Title', description: 'description'},
-        {title: 'Title1', description: 'description'},
-        {title: 'Title2', description: 'description'}
-      ]
+    props: {
+        title: {
+            type: String,
+            default: 'Default'
+        },
+        options: {
+            type: Array,
+            default: () => [
+                {title: 'Title', description: 'description'},
+                {title: 'Title1', description: 'description'},
+                {title: 'Title2', description: 'description'}
+            ]
+        },
+        modelValue: {
+            type: Number,
+            default: 0
+        }
     },
-    modelValue: {
-      type: Number,
-      default: 0
-    }
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      active: this.modelValue
-    }
-  },
-  computed: {
-    id() {
-      return _.get(this.options[this.active], 'id', this.active)
-    }
-  },
-  watch: {
-    active() {
-      this.$emit('update:modelValue', this.id)
-    }
-  },
-  methods: {
-    select(num1) {
-      this.active = num1
+    emits: ['update:modelValue'],
+    setup(props, {emit}) {
+        const selected = ref(props.options[props.modelValue])
+
+        watch(selected, (newValue) => {
+            emit('update:modelValue', props.options.indexOf(newValue))
+        })
+
+        return {
+            selected,
+        }
     },
-    onArrowUp(num1) {
-      this.active = num1--
+    watch: {
+        active() {
+            this.$emit('update:modelValue', this.id)
+        }
     },
-    onArrowDown(num1) {
-      this.active = num1++
-    }
-  }
 }
 </script>
 

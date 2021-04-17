@@ -8,7 +8,7 @@
     <PageHeader>
       {{creationMode ? 'Create ': 'Edit '}} Scope Setting
       <template v-slot:primary>
-        <inertia-link :href="$route('create.scopes')" method="post" as="button" :data ="{selectedScopes: selectedScopes, selectedEntities: selectedEntities, type: type}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
+        <inertia-link :href="$route('create.scopes')" method="post" as="button" :data ="{selectedScopes: selected_scopes, selectedEntities: selectedEntities, type: type}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
           Save
         </inertia-link>
       </template>
@@ -44,49 +44,28 @@
               <div class="px-4 py-5">
                 <!-- Content goes here -->
                 <CharacterScopes
-                        :scopes="available_scopes.character"
-                        :selected-scopes="selectedCharacterScopes"
-                        @scopes="selectedCharacterScopes = $event"
+                  :scopes="available_scopes.character"
+                  v-model:selected-scopes="selected_scopes"
+                  :key="`character ${scopesAsString}`"
                 />
               </div>
               <div class="px-4 py-5">
                 <!-- Content goes here -->
                 <CorporationScopes
-                        :scopes="available_scopes.corporation"
-                        :selected-scopes="selectedCorporationScopes"
-                        @corporation-scopes="selectedCorporationScopes = $event"/>
+                  :scopes="available_scopes.corporation"
+                  v-model:selected-scopes="selected_scopes"
+                  :key="`corporation ${scopesAsString}`"
+                />
               </div>
             </div>
             <p v-if=selectedScopesError class="text-sm text-red-600"> {{ selectedScopesError }} </p>
             <p v-if=selectedEntitiesError class="text-sm text-red-600">{{ selectedEntitiesError }}</p>
           </div>
         </div>
-        <!--<div class="bg-gray-50 px-4 py-4 sm:px-6 text-right">
-            &lt;!&ndash; Content goes here &ndash;&gt;
-            <span class="flex-1 flex justify-between">
-            &lt;!&ndash;<inertia-link v-if="this.entity.morphable_id" :href="$route('delete.settings.scopes', entity.morphable_id)" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition duration-150 ease-in-out">
-                Delete
-            </inertia-link>
-
-            <inertia-link v-if="isGlobal && !creationMode" :href="$route('delete.global.scopes')" method="delete" class="text-right inline-flex rounded-md shadow-sm justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition duration-150 ease-in-out">
-                Delete
-            </inertia-link>
-
-            <inertia-link v-if="isGlobal" :href="$route('create.global.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes }" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                Save
-            </inertia-link>
-
-            <inertia-link v-else :href="$route('create.scopes')" method="post" :data ="{ selectedScopes: this.selectedScopes, selectedEntities: this.selectedEntities}" class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                Save
-            </inertia-link>&ndash;&gt;
-        </span>
-            &lt;!&ndash; We use less vertical padding on card footers at all sizes than on headers or body sections &ndash;&gt;
-        </div>-->
       </div>
       <div class="col-span-3 md:col-span-2 lg:col-span-1">
         <RadioListWithDescription v-model="selectedModula" :options="options" :title="'Scope'" class="overflow-hidden shadow rounded-lg"/>
       </div>
-
 
     </div>
 
@@ -126,42 +105,29 @@ export default {
     },
     data() {
         return {
-            pageTitle: `${this.creationMode ? 'Create ': 'Edit '} + 'Scope Settings`,
             selectedEntities: [],
-            selectedCharacterScopes: [],
-            selectedCorporationScopes: [],
+            selected_scopes: _.toArray(_.get(this.entity, 'selected_scopes', {})),
             creationMode: route().current() === 'view.create.scopes',
             selectedModula: 0
         }
     },
     methods: {
-        setSelectedEntities(newVal) {
-            this.selectedEntities = newVal
-        },
         post() {
 
             const url = this.route('create.scopes');
 
             const data = {
                 selectedScopes: this.selectedScopes,
-                selectedEntities: this.selectedEntities ?? {
+                selectedEntities: this.selectedEntities != null ? this.selectedEntities : {
                     id: 'id',
                     category: 'category',
                 }
             }
 
             return this.$inertia.post(url, data)
-        },
-        flatSelectedScopesFlavour(flavour, selectedScopes) {
-            let flat_scopes = _.map(this.available_scopes[flavour], value => _.toString(value));
-
-            return _.intersection(flat_scopes, selectedScopes)
-        },
+        }
     },
     computed: {
-        selectedScopes() {
-            return _.union(this.selectedCharacterScopes, this.selectedCorporationScopes, this.available_scopes.minimum)
-        },
         object() {
 
             if(_.isUndefined(this.entity.morphable))
@@ -189,39 +155,28 @@ export default {
         },
         selectedEntitiesError() {
             return _.get(this.$page, 'props.errors.selectedEntities[0]')
-        }
-    },
-    watch: {
-        entity(entity) {
-            console.log(entity)
-            if (_.isUndefined(entity.selected_scopes))
-                return
-
-            this.selectedCorporationScopes = [1]
-
         },
-        selectedCorporationScopes(newVal, oldVal) {
-            if(oldVal.length === 0 && newVal.length > 0 && !_.includes(this.selectedCharacterScopes, 'esi-characters.read_corporation_roles.v1'))
-                this.selectedCharacterScopes.push('esi-characters.read_corporation_roles.v1')
+        scopesAsString() {
+            return _.toString(this.selected_scopes)
         },
-        selectedCharacterScopes(scopes) {
-            if( !_.includes(scopes, 'esi-characters.read_corporation_roles.v1') && this.selectedCorporationScopes.length > 0)
-                return//TODO this.$eventBus.$emit('role-removed')
-        }
+        pageTitle() {
+
+            let mode = this.creationMode ? 'Create' : 'Edit'
+
+            return `${mode} Scope Settings`
+        },
     },
     mounted() {
         if (_.isUndefined(this.entity.selected_scopes))
             return
 
-        this.selectedCorporationScopes = this.flatSelectedScopesFlavour('corporation',this.entity.selected_scopes)
-        this.selectedCharacterScopes = this.flatSelectedScopesFlavour('character',this.entity.selected_scopes)
         this.selectedEntities = [{
             id: this.entity.morphable_id,
             category: this.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
         }]
     },
-    created() {
-        this.selectedModula = this.creationMode ? 0 :  _.findIndex(this.options, {'title': this.entity?.type});
+    created: function () {
+        this.selectedModula = this.creationMode ? 0 : _.findIndex(this.options, {'title': this.entity?.type});
     }
 }
 </script>
