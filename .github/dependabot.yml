@@ -1,0 +1,155 @@
+version: 2
+updates:
+- package-ecosystem: composer
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: laravel/framework
+    versions:
+    - 8.27.0
+    - 8.28.1
+    - 8.29.0
+    - 8.30.1
+    - 8.31.0
+    - 8.32.1
+    - 8.33.1
+    - 8.34.0
+    - 8.35.1
+    - 8.36.1
+    - 8.36.2
+    - 8.38.0
+    - 8.39.0
+  - dependency-name: rector/rector
+    versions:
+    - 0.10.1
+    - 0.10.11
+    - 0.10.2
+    - 0.10.3
+    - 0.10.4
+    - 0.10.6
+    - 0.10.9
+    - 0.9.18
+    - 0.9.19
+    - 0.9.20
+    - 0.9.21
+    - 0.9.26
+    - 0.9.28
+    - 0.9.29
+    - 0.9.30
+    - 0.9.31
+    - 0.9.33
+  - dependency-name: seatplus/eveapi
+    versions:
+    - 0.6.3
+    - 0.6.6
+    - 0.6.7
+    - 0.6.8
+    - 0.6.9
+    - 0.8.2
+    - 0.8.3
+    - 0.8.5
+  - dependency-name: nunomaduro/collision
+    versions:
+    - 5.4.0
+  - dependency-name: orchestra/testbench
+    versions:
+    - 6.11.0
+    - 6.12.0
+    - 6.12.1
+    - 6.13.0
+    - 6.14.0
+    - 6.15.0
+    - 6.16.0
+    - 6.17.0
+  - dependency-name: laravel/socialite
+    versions:
+    - 5.2.0
+    - 5.2.1
+    - 5.2.3
+  - dependency-name: spatie/laravel-permission
+    versions:
+    - 4.0.1
+  - dependency-name: spatie/phpunit-watcher
+    versions:
+    - 1.23.2
+  - dependency-name: spatie/data-transfer-object
+    versions:
+    - 2.8.1
+    - 2.8.2
+    - 2.8.3
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: chart.js
+    versions:
+    - 3.0.2
+    - 3.1.0
+    - 3.1.1
+  - dependency-name: "@headlessui/vue"
+    versions:
+    - 1.0.0
+  - dependency-name: "@tailwindcss/forms"
+    versions:
+    - 0.3.0
+    - 0.3.2
+  - dependency-name: tailwindcss
+    versions:
+    - 2.0.3
+    - 2.0.4
+  - dependency-name: eslint
+    versions:
+    - 7.21.0
+    - 7.22.0
+  - dependency-name: postcss
+    versions:
+    - 8.2.7
+    - 8.2.8
+  - dependency-name: acorn
+    versions:
+    - 8.0.5
+    - 8.1.0
+  - dependency-name: "@popperjs/core"
+    versions:
+    - 2.9.0
+    - 2.9.1
+  - dependency-name: autoprefixer
+    versions:
+    - 10.2.4
+    - 10.2.5
+  - dependency-name: vue-fragment
+    versions:
+    - 1.5.2
+  - dependency-name: "@inertiajs/inertia"
+    versions:
+    - 0.8.5
+  - dependency-name: lodash
+    versions:
+    - 4.17.21
+  - dependency-name: eslint-plugin-vue
+    versions:
+    - 7.5.0
+    - 7.6.0
+    - 7.7.0
+  - dependency-name: "@inertiajs/inertia-vue"
+    versions:
+    - 0.5.5
+  - dependency-name: "@tailwindcss/typography"
+    versions:
+    - 0.4.0
+  - dependency-name: laravel-mix
+    versions:
+    - 6.0.11
+  - dependency-name: mocha
+    versions:
+    - 7.0.0
+  - dependency-name: sass-loader
+    versions:
+    - 10.1.1
+  - dependency-name: mochapack
+    versions:
+    - 2.0.6
