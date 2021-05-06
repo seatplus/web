@@ -113,14 +113,14 @@ class HelperController extends Controller
 
     public function getMarketsPrices()
     {
-
-        if($prices = cache('market_prices'))
+        if ($prices = cache('market_prices')) {
             return $prices->toJson();
+        }
 
         $container = new EsiRequestContainer([
             'method' => 'get',
             'version' => 'v1',
-            'endpoint' => '/markets/prices/'
+            'endpoint' => '/markets/prices/',
         ]);
 
         $esi_results = RetrieveEsiData::execute($container);
