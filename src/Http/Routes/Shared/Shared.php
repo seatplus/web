@@ -46,3 +46,4 @@ Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestio
 Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');
 
 Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
+Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');

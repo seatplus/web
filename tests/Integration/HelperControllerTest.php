@@ -3,10 +3,10 @@
 
 namespace Seatplus\Web\Tests\Integration;
 
-
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Facades\Http;
 use Mockery;
-use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\GetNamesFromIdsService;
@@ -192,8 +192,41 @@ class HelperControllerTest extends TestCase
             ->assertOk()
             ->assertJson($expected_response);
 
+    }
 
+    /** @test */
+    public function oneCanGetMarketPrices()
+    {
 
+        $container = new EsiRequestContainer([
+            'method' => 'get',
+            'version' => 'v1',
+            'endpoint' => '/markets/prices/'
+        ]);
+
+        $this->mockRetrieveEsiDataAction([
+            (object) [
+                "adjusted_price"=> 0,
+                "average_price" => 31214609.93,
+                "type_id" => 43691
+            ],
+            (object) [ "adjusted_price"=> 1005248.1289154688,
+                "average_price"=> 1002393.46,
+                "type_id"=> 32772
+            ],
+            (object) [ "adjusted_price"=> 111879.41656101559,
+                "average_price"=> 104750.07,
+                "type_id"=> 32774
+            ]
+        ]);
+
+        $this->assertNull(cache('market_prices'));
+
+        $result = $this->actingAs($this->test_user)
+            ->get(route('get.markets.prices'))
+            ->assertOk();
+
+        $this->assertNotNull(cache('market_prices'));
     }
 
 }

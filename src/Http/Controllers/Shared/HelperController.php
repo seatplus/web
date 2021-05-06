@@ -27,8 +27,10 @@
 namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Support\Facades\Http;
+use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
@@ -107,5 +109,26 @@ class HelperController extends Controller
     public function getResourceVariants(string $resource_type, int $resource_id)
     {
         return Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
+    }
+
+    public function getMarketsPrices()
+    {
+
+        if($prices = cache('market_prices'))
+            return $prices->toJson();
+
+        $container = new EsiRequestContainer([
+            'method' => 'get',
+            'version' => 'v1',
+            'endpoint' => '/markets/prices/'
+        ]);
+
+        $esi_results = RetrieveEsiData::execute($container);
+
+        $prices = collect($esi_results);
+
+        cache(['market_prices' => $prices], now()->addDay());
+
+        return $prices->toJson();
     }
 }
