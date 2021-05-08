@@ -6,11 +6,13 @@ namespace Seatplus\Web\Tests\Integration;
 
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Tests\TestCase;
@@ -164,6 +166,14 @@ class RecruitmentLifeCycleTest extends TestCase
     /** @test */
     public function junior_hr_sees_recruitment_component()
     {
+
+        if($this->test_user->can('superuser')) {
+            $this->test_user->removeRole('superuser');
+
+            // now re-register all the roles and permissions
+            $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        }
+
         $response = $this->actingAs($this->test_user)
             ->get(route('corporation.recruitment'))
             ->assertForbidden();
@@ -460,11 +470,11 @@ class RecruitmentLifeCycleTest extends TestCase
         $response = $this->actingAs($this->superuser)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
                 "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
-                $affiliation => [
+                'affiliations' => [
                     [
-                        "corporation_id" => $this->test_character->corporation->corporation_id,
                         "id" => $this->test_character->corporation->corporation_id,
-                        "name" => $this->test_character->corporation->name
+                        "category" => 'corporation',
+                        "type" => $affiliation
                     ],
                 ],
             ]);

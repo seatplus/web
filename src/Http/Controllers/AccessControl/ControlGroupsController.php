@@ -27,7 +27,10 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -37,6 +40,7 @@ use Seatplus\Web\Http\Controllers\Request\UpdateControlGroup;
 use Seatplus\Web\Services\ACL\SyncRoleAffiliations;
 use Seatplus\Web\Services\ACL\SyncRoleName;
 use Seatplus\Web\Services\ACL\SyncRolePermissions;
+use Seatplus\Web\Services\SearchService;
 
 class ControlGroupsController
 {
@@ -64,25 +68,16 @@ class ControlGroupsController
             return array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
         };
 
-        $existing_affiliations = fn () => $role->affiliations
-            ->groupBy('type')
-            ->map(fn ($type) => $type
-                ->map(fn ($entity) => collect([
-                    'name' => $entity->affiliatable->name,
-                    'id' => $entity->affiliatable_id,
-                    'character_id' => $entity->affiliatable_type === CharacterInfo::class ? $entity->affiliatable_id : null,
-                    'corporation_id' => $entity->affiliatable_type === CorporationInfo::class ? $entity->affiliatable_id : null,
-                    'alliance_id' => $entity->affiliatable_type === AllianceInfo::class ? $entity->affiliatable_id : null,
-                ])
-                    ->filter()
-                    ->toArray()
-                )
-            );
+        $existing_affiliations = fn () => $role->affiliations->map(fn ($affiliation) => [
+            'id' => $affiliation->affiliatable_id,
+            'category' => $affiliation->affiliatable_type,
+            'type' => $affiliation->type,
+        ]);
 
         return Inertia::render('AccessControl/EditGroup', [
             'role' => $role,
-            'existing_affiliations' => $existing_affiliations,
-            'available_permissions' => $permissions,
+            'affiliations' => $existing_affiliations,
+            'available-permissions' => $permissions,
             'permissions' => $role->permissions,
             'activeSidebarElement' => route('acl.groups'),
         ]);
@@ -105,5 +100,47 @@ class ControlGroupsController
         return redirect()
             ->action([ControlGroupsController::class, 'edit'], $role_id)
             ->with('success', 'Access control group updated');
+    }
+
+    public function search()
+    {
+        $query = request()->get('query');
+
+        $result = $query ? (new SearchService)->execute(['character', 'corporation', 'alliance'], $query) : $this->getFirstSelection();
+
+        return $this->paginate(
+            collect($result)
+                ->flatMap(fn ($result, $category) => collect($result)
+                    ->map(fn ($res) => [
+                        'id' => $res,
+                        'category' => $category,
+                    ]))
+        );
+    }
+
+    private function paginate(array | Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
+    {
+        $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
+
+        $items = $items instanceof Collection ? $items : Collection::make($items);
+
+        return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
+    }
+
+    private function getFirstSelection(): array
+    {
+        $alliance_ids = AllianceInfo::query()->take(15)->inRandomOrder()->pluck('alliance_id');
+        $corporation_ids = CorporationInfo::query()->take(15)->inRandomOrder()->pluck('corporation_id');
+        $character_ids = CharacterInfo::query()->take(15)->inRandomOrder()->pluck('character_id');
+
+        $ids = collect([...$alliance_ids, ...$corporation_ids, ...$character_ids])
+            ->shuffle()
+            ->take(15);
+
+        return [
+            'alliance' => $alliance_ids->intersect($ids)->toArray(),
+            'corporation' => $corporation_ids->intersect($ids)->toArray(),
+            'character' => $character_ids->intersect($ids)->toArray(),
+        ];
     }
 }

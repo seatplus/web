@@ -53,27 +53,29 @@ class SyncRoleAffiliations
 
     public function sync(array $validated_data)
     {
-        foreach (['allowed', 'inverse', 'forbidden'] as $type) {
-            if (Arr::has($validated_data, $type) && $validated_data[$type]) {
-                $this->addToTarget($type, $validated_data[$type]);
-            }
+        if (Arr::has($validated_data, 'affiliations')) {
+            collect(data_get($validated_data, 'affiliations', []))
+                ->each(fn ($affiliation) => $this
+                    ->target_affiliations
+                    ->push(Affiliation::firstOrCreate([
+                        'role_id' => $this->role->id,
+                        'affiliatable_id' => data_get($affiliation, 'id'),
+                        'affiliatable_type' => $this->getAffiliatableType($affiliation),
+                        'type' => data_get($affiliation, 'type'),
+                    ]))
+                );
         }
 
         $this->removeUnassignedAffiliations();
     }
 
-    private function addToTarget(string $type, array $affiliations)
+    private function getAffiliatableType(array $affiliation): string
     {
-        foreach ($affiliations as $affiliation) {
-            $this->target_affiliations->push(
-                Affiliation::firstOrCreate([
-                    'role_id' => $this->role->id,
-                    'affiliatable_id' => $affiliation['id'],
-                    'affiliatable_type' => $this->getAffiliatableType($affiliation),
-                    'type' => $type,
-                ])
-            );
-        }
+        return match (data_get($affiliation, 'category')) {
+            'character' => CharacterInfo::class,
+            'corporation' => CorporationInfo::class,
+            'alliance' => AllianceInfo::class,
+        };
     }
 
     private function removeUnassignedAffiliations()
@@ -87,12 +89,5 @@ class SyncRoleAffiliations
                 'type' => $affiliation->type,
             ])->delete();
         });
-    }
-
-    private function getAffiliatableType($affiliation)
-    {
-        return Arr::has($affiliation, 'character_id')
-            ? CharacterInfo::class
-            : (Arr::has($affiliation, 'corporation_id') ? CorporationInfo::class : AllianceInfo::class);
     }
 }

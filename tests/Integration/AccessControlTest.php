@@ -50,31 +50,22 @@ class AccessControlTest extends TestCase
 
         $this->actingAs($this->test_user)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "allowed" => [
+                "affiliations" => [
                     [
-                        "character_id" => $this->test_character->character_id,
+                        "category" => 'character',
                         "id" => $this->test_character->character_id,
-                        "name" => $this->test_character->name
+                        "type" => "allowed"
                     ],
                 ],
                 "roleName" => $role->name,
             ])
             ->assertRedirect();
 
-
-
         $response = $this->actingAs($this->test_user)
             ->get(route('acl.edit', ['role_id' => $role->id]))
             ->assertInertia( fn (Assert $page) => $page
                 ->component('AccessControl/EditGroup')
-                ->has('existing_affiliations', fn(Assert $page) => $page
-                    ->has('allowed', 1,  fn(Assert $page) => $page
-                        ->where('id', (string) $this->test_character->character_id)
-                        ->etc()
-                    )
-
-
-                )
+                ->has('affiliations', 1)
             );
 
     }
@@ -171,11 +162,11 @@ class AccessControlTest extends TestCase
         // Adding Affiliation
         $response = $this->actingAs($this->test_user)
             ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "allowed" => [
+                "affiliations" => [
                     [
-                        "character_id" => 95725047,
+                        "category" => 'character',
                         "id" => 95725047,
-                        "name" => "Herpaderp Aldent"
+                        "type" => "allowed"
                     ],
                 ],
                 "roleName" => $name,
@@ -335,6 +326,42 @@ class AccessControlTest extends TestCase
         $response = $this->actingAs($secondary_user)
             ->get(route('acl.members', ['role_id' => $role->id]))
             ->assertOk();
+
+
+    }
+
+    /** @test */
+    public function searchForCharacter()
+    {
+        // Assing superuser to test_user
+        $this->assignPermissionToTestUser(['superuser']);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.search.affiliatable'))
+            ->assertOk();
+
+        $response->assertJsonFragment([
+            'id' => $this->test_character->character_id,
+            'category' => 'character'
+        ]);
+
+        // now search with query-string
+        $this->mockRetrieveEsiDataAction([
+            'character' => [
+                $this->test_character->character_id
+            ]
+        ]);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.search.affiliatable', [
+                'query' => $this->test_character->name
+            ]))
+            ->assertOk();
+
+        $response->assertJsonFragment([
+            'id' => $this->test_character->character_id,
+            'category' => 'character'
+        ]);
 
 
     }
