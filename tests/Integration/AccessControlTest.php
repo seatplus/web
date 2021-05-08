@@ -330,6 +330,42 @@ class AccessControlTest extends TestCase
 
     }
 
+    /** @test */
+    public function searchForCharacter()
+    {
+        // Assing superuser to test_user
+        $this->assignPermissionToTestUser(['superuser']);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.search.affiliatable'))
+            ->assertOk();
+
+        $response->assertJsonFragment([
+            'id' => $this->test_character->character_id,
+            'category' => 'character'
+        ]);
+
+        // now search with query-string
+        $this->mockRetrieveEsiDataAction([
+            'character' => [
+                $this->test_character->character_id
+            ]
+        ]);
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('acl.search.affiliatable', [
+                'query' => $this->test_character->name
+            ]))
+            ->assertOk();
+
+        $response->assertJsonFragment([
+            'id' => $this->test_character->character_id,
+            'category' => 'character'
+        ]);
+
+
+    }
+
     private function assignPermissionToTestUser(array $array)
     {
         foreach ($array as $string) {

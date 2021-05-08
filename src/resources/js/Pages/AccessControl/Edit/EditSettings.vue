@@ -169,15 +169,6 @@ export default {
             return _.chain(entities.value)
                 .filter(entity => !_.includes(affiliatedIds, entity.id))
                 .value()
-
-            /*let entities = _.filter(this.entities, (entity) => !_.includes(affiliatedIds, entity.id))
-
-            if(_.isNull(this.search))
-                return this.sortByName(entities)
-
-            let term = this.search
-
-            return this.sortByName(_.filter(entities, (entity) => entity.name.toUpperCase().includes(term.toUpperCase())))*/
         })
 
        const addAffiliation = function (type, entity) {
