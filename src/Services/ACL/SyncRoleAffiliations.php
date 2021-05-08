@@ -53,10 +53,9 @@ class SyncRoleAffiliations
 
     public function sync(array $validated_data)
     {
-
         if (Arr::has($validated_data, 'affiliations')) {
             collect(data_get($validated_data, 'affiliations', []))
-                ->each(fn($affiliation) => $this
+                ->each(fn ($affiliation) => $this
                     ->target_affiliations
                     ->push(Affiliation::firstOrCreate([
                         'role_id' => $this->role->id,
@@ -70,7 +69,7 @@ class SyncRoleAffiliations
         $this->removeUnassignedAffiliations();
     }
 
-    private function getAffiliatableType(array $affiliation) : string
+    private function getAffiliatableType(array $affiliation): string
     {
         return match (data_get($affiliation, 'category')) {
             'character' => CharacterInfo::class,

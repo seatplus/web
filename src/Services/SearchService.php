@@ -31,7 +31,7 @@ use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class SearchService
 {
-    public function execute(string|array $category, string $query): array
+    public function execute(string | array $category, string $query): array
     {
         $category_string = is_string($category) ? $category : implode(',', $category);
 

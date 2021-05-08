@@ -68,10 +68,10 @@ class ControlGroupsController
             return array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
         };
 
-        $existing_affiliations = fn () => $role->affiliations->map(fn($affiliation) => [
+        $existing_affiliations = fn () => $role->affiliations->map(fn ($affiliation) => [
             'id' => $affiliation->affiliatable_id,
             'category' => $affiliation->affiliatable_type,
-            'type' => $affiliation->type
+            'type' => $affiliation->type,
         ]);
 
         return Inertia::render('AccessControl/EditGroup', [
@@ -104,33 +104,30 @@ class ControlGroupsController
 
     public function search()
     {
-
         $query = request()->get('query');
 
-        $result = $query ? (new SearchService)->execute(['character', 'corporation','alliance'], $query) : $this->getFirstSelection();
+        $result = $query ? (new SearchService)->execute(['character', 'corporation', 'alliance'], $query) : $this->getFirstSelection();
 
         return $this->paginate(
             collect($result)
-                ->flatMap(fn($result, $category) => collect($result)
-                    ->map(fn($res) => [
+                ->flatMap(fn ($result, $category) => collect($result)
+                    ->map(fn ($res) => [
                         'id' => $res,
-                        'category' => $category
+                        'category' => $category,
                     ]))
         );
     }
 
-    private function paginate(array|Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
+    private function paginate(array | Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
     {
-
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
 
         $items = $items instanceof Collection ? $items : Collection::make($items);
 
         return new LengthAwarePaginator($items->forPage($page, $perPage), $items->count(), $perPage, $page, $options);
-
     }
 
-    private function getFirstSelection() : array
+    private function getFirstSelection(): array
     {
         $alliance_ids = AllianceInfo::query()->take(15)->inRandomOrder()->pluck('alliance_id');
         $corporation_ids = CorporationInfo::query()->take(15)->inRandomOrder()->pluck('corporation_id');
@@ -145,6 +142,5 @@ class ControlGroupsController
             'corporation' => $corporation_ids->intersect($ids)->toArray(),
             'character' => $character_ids->intersect($ids)->toArray(),
         ];
-
     }
 }
