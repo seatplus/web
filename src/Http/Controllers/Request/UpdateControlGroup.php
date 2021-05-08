@@ -49,15 +49,7 @@ class UpdateControlGroup extends FormRequest
     {
         return [
             'permissions.*.name' => 'string',
-            'allowed.*.character_id' => 'integer',
-            'allowed.*.corporation_id' => 'integer',
-            'allowed.*.alliance_id' => 'integer',
-            'inverse.*.character_id' => 'integer',
-            'inverse.*.corporation_id' => 'integer',
-            'inverse.*.alliance_id' => 'integer',
-            'forbidden.*.character_id' => 'integer',
-            'forbidden.*.corporation_id' => 'integer',
-            'forbidden.*.alliance_id' => 'integer',
+            'affiliations' => 'array',
             'roleName' => 'string',
         ];
     }

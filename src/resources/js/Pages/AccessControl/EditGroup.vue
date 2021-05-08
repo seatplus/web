@@ -35,13 +35,9 @@
                 Access control group name
               </label>
               <div class="mt-1 sm:mt-0 sm:col-span-2">
-                <div class="max-w-xs rounded-md shadow-sm">
-                  <input
-                    id="roleName"
-                    v-model="form.roleName"
-                    class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                    :placeholder="form.roleName"
-                  >
+                <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <input v-model="form.roleName" :placeholder="form.roleName" type="text" id="roleName"
+                         class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md" />
                 </div>
               </div>
             </div>
@@ -59,7 +55,7 @@
                   class="sm:grid sm:grid-cols-2 sm:gap-4"
                 >
                   <div
-                    v-for="permission in available_permissions"
+                    v-for="permission in availablePermissions"
                     :key="permission"
                   >
                     <label class="inline-flex items-center">
@@ -73,7 +69,6 @@
                     </label>
                   </div>
                 </div>
-                <!--<Permissions id="permissions" v-model="selectedPermissions" :available-permissions="available_permissions" />-->
               </div>
             </div>
           </div>
@@ -81,138 +76,92 @@
       </div>
     </div>
 
-    <EditSettings
-      v-model:allowed="form.allowed"
-      v-model:inverse="form.inverse"
-      v-model:forbidden="form.forbidden"
-      :existing-affiliations="existing_affiliations"
-    />
+    <EditSettings v-model:affiliations="selectedAffiliations" />
   </div>
 </template>
 
 <script>
-  import { Inertia } from '@inertiajs/inertia'
-  import PageHeader from "@/Shared/Layout/PageHeader"
-  import HeaderButton from "@/Shared/Layout/HeaderButton"
-  import Layout from "@/Shared/SidebarLayout/Layout";
-  import EditSettings from "./Edit/EditSettings";
-  import {useForm} from "@inertiajs/inertia-vue3/src";
-  export default {
+import PageHeader from "@/Shared/Layout/PageHeader"
+import HeaderButton from "@/Shared/Layout/HeaderButton"
+import Layout from "@/Shared/SidebarLayout/Layout";
+import EditSettings from "./Edit/EditSettings";
+import {useForm} from "@inertiajs/inertia-vue3/src";
+import {ref} from "vue";
+import route from 'ziggy'
+export default {
     name: "EditGroup",
     components: {
-      EditSettings,
-      HeaderButton,
-      PageHeader
+        EditSettings,
+        HeaderButton,
+        PageHeader
     },
     layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
-      props: {
-          role: {
-              type: Object,
-              required: true
-          },
-        existing_affiliations: {
-              type: Object,
-              required: true
-          },
-          permissions: {
-              type: Array,
-              required: true
-          },
-          available_permissions: {
-              type: Array,
-              required: true
-          },
+    props: {
+        role: {
+            type: Object,
+            required: true
+        },
+        affiliations: {
+            type: Object,
+            required: true
+        },
+        permissions: {
+            type: Array,
+            required: true
+        },
+        availablePermissions: {
+            type: Array,
+            required: true
+        },
         activeSidebarElement: {
             type: String,
-          required: true
+            required: true
         }
-      },
+    },
     setup(props) {
 
-      const form = useForm({
-        roleName: props.role.name,
-        permissions: _.map(props.permissions, (permission) => permission.name),
-        allowed: props.existing_affiliations.allowed ?? [],
-        inverse: props.existing_affiliations.inverse ?? [],
-        forbidden: props.existing_affiliations.forbidden ?? [],
-      })
+        const selectedAffiliations = ref(props.affiliations)
 
-      return { form }
+
+        const form = useForm({
+            roleName: props.role.name,
+            permissions: _.map(props.permissions, (permission) => permission.name)
+        })
+
+        const store = function () {
+
+            return form.value
+                .transform((data) => ({
+                    ...data,
+                    affiliations: selectedAffiliations.value,
+            })).post(route('acl.update', props.role.id))
+
+        }
+
+        const remove = function () {
+
+            this.$inertia.delete(this.$route('acl.delete', this.role.id), {
+                replace: false,
+                preserveState: false,
+                preserveScroll: false,
+                only: [],
+            })
+        }
+
+        return {
+            form,
+            selectedAffiliations,
+            store,
+            breadcrumbs: [
+                {
+                    name: 'Control Group',
+                    route: route('acl.groups')
+                }
+            ],
+            remove
+        }
     },
-      data () {
-          return {
-              isDirty: false,
-            selectedAffiliations: this.affiliations,
-              breadcrumbs: [
-                  {
-                      name: 'Control Group',
-                      route: this.$route('acl.groups')
-                  }
-              ]
-          }
-      },
-      mounted: function () {
-
-          _.each(this.permissions, permission =>
-              this.form.permissions.push(permission.name)
-          )
-      },
-      methods: {
-          getOptions() {
-              return {
-                  characters: this.available_characters,
-                  corporations: this.available_corporations,
-                  alliances: this.available_alliances
-              }
-          },
-          getPermissionOptions: function () {
-              let permissionOption = []
-
-              _.each(this.available_permissions, permission => permissionOption.push({name: permission}))
-
-              return permissionOption;
-          },
-          store() {
-
-            return this.form.post(window.location.href)
-          },
-          findCharacterName: function (character_id) {
-
-              let character = _.find(this.available_characters, function (available_character) {
-                  return available_character.character_id === character_id
-              })
-
-              return character.name
-          },
-          buildAffiliatedCharacterIds: function () {
-
-              _.forEach(this.affiliations, affiliation => this.buildAffiliatedEntries(affiliation.type,{
-                  character_id: affiliation.character_id,
-                  name: this.findCharacterName(affiliation.character_id)
-              }))
-          },
-          buildAffiliatedEntries: function (type, data) {
-              if(type === 'allowed')
-                  this.allowed.push(data)
-              else if(type === 'inverse')
-                  this.inverse.push(data)
-              else if(type === 'forbidden')
-                  this.forbidden.push(data)
-          },
-          setIsDirty: function () {
-              this.isDirty = true
-          },
-          remove() {
-
-              this.$inertia.delete(this.$route('acl.delete', this.role.id), {
-                  replace: false,
-                  preserveState: false,
-                  preserveScroll: false,
-                  only: [],
-              })
-          }
-      },
-  }
+}
 </script>
 
 <style scoped>

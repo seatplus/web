@@ -31,20 +31,22 @@ use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class SearchService
 {
-    public function execute(string $category, string $query): array
+    public function execute(string|array $category, string $query): array
     {
+        $category_string = is_string($category) ? $category : implode(',', $category);
+
         $container = new EsiRequestContainer([
             'method' => 'get',
             'version' => 'v2',
             'endpoint' => '/search/',
             'query_string' => [
-                'categories' => $category,
+                'categories' => $category_string,
                 'search' => $query,
             ],
         ]);
 
         $result = RetrieveEsiData::execute($container);
 
-        return $result->$category ?? [];
+        return is_string($category) ? ($result->$category ?? []) : collect($result)->toArray();
     }
 }

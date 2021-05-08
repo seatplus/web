@@ -55,6 +55,14 @@ class ComplianceLifeCycleTest extends TestCase
     /** @test */
     public function user_without_permission_fails_to_see_compliance()
     {
+
+        if($this->test_user->can('superuser')) {
+            $this->test_user->removeRole('superuser');
+
+            // now re-register all the roles and permissions
+            $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        }
+
         $response = $this->actingAs($this->secondary_user)
             ->get(route('corporation.member_compliance'))
             ->assertForbidden();
@@ -64,6 +72,13 @@ class ComplianceLifeCycleTest extends TestCase
     /** @test */
     public function user_with_permission_sees_component()
     {
+        if($this->test_user->can('superuser')) {
+            $this->test_user->removeRole('superuser');
+
+            // now re-register all the roles and permissions
+            $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        }
+
         $response = $this->actingAs($this->test_user)
             ->get(route('corporation.member_compliance'))
             ->assertForbidden();

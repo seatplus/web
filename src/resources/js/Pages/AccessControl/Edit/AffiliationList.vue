@@ -1,5 +1,5 @@
 <template>
-  <div :class="['bg-white sm:rounded-md', {'shadow' : !isEmpty(list)}]">
+  <div :class="['bg-white sm:rounded-md', {'shadow' : !isEmpty}]">
     <ListTransition
       :entries="list"
       :class="'divide-y divide-grey-200'"
@@ -9,10 +9,7 @@
         :key="index"
         class="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
       >
-        <EntityBlock
-          :entity="entity"
-          tailwind_class="h-12 w-12 rounded-full"
-        />
+        <EntityByIdBlock :id="entity.id" />
 
         <button
           :class="['text-red-500 hover:bg-red-100 focus:bg-red-100','inline-flex rounded-md p-1.5 focus:outline-none transition ease-in-out duration-150']"
@@ -37,38 +34,44 @@
 
 <script>
 import ListTransition from "@/Shared/Transitions/ListTransition"
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import {computed} from "vue";
+import EntityByIdBlock from "../../../Shared/Layout/Eve/EntityByIdBlock";
 export default {
-  name: "AffiliationList",
-  components: {EntityBlock, ListTransition},
-  props: {
-    modelValue: {
-      type: Array,
-      default: () => []
-    }
-  },
-  emits: ['update:modelValue'],
-  data() {
-    return {
-      list: this.modelValue
-    }
-  },
-  watch: {
-    list(newValue) {
-      this.$emit('update:modelValue', newValue)
+    name: "AffiliationList",
+    components: {EntityByIdBlock, ListTransition},
+    props: {
+        modelValue: {
+            type: Array,
+            default: () => []
+        },
+        type: {
+            type: String,
+            required: true
+        }
     },
-    value(newValue) {
-      this.list = newValue
-    }
-  },
-  methods: {
-    isEmpty(array) {
-      return _.isEmpty(array)
+    emits: ['update:modelValue'],
+    setup(props, {emit}) {
+        const list = computed( () => filterAffiliations(props.modelValue, props.type))
+        const isEmpty = computed(() => _.isEmpty(list.value))
+
+        function filterAffiliations (affiliations, type) {
+            return _.filter(affiliations, {type: type})
+        }
+
+        const removeEntity = function (entity) {
+            emit('update:modelValue', _.filter(props.modelValue, (entry) => entry !== entity))
+        }
+
+        return {
+            isEmpty,
+            list,
+            removeEntity
+        }
     },
-    removeEntity(entity) {
-      this.list = _.filter(this.list, (entry) => entry !== entity)
-    }
-  },
+    methods: {
+
+
+    },
 }
 </script>
 
