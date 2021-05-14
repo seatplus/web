@@ -95,13 +95,13 @@ class EnlistmentsController extends Controller
 
         collect($system_ids)
             ->diff(System::whereIn('system_id', $system_ids)->select('system_id')->pluck('system_id'))
-            ->each( fn($system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
+            ->each(fn ($system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
 
         $enlistment->regions()->sync($region_ids);
 
         collect($region_ids)
             ->diff(Region::whereIn('region_id', $region_ids)->select('region_id')->pluck('region_id'))
-            ->each( fn($region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
+            ->each(fn ($region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
 
         return back()->with('success', 'updated');
     }

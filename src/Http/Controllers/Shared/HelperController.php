@@ -26,12 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
@@ -92,12 +89,11 @@ class HelperController extends Controller
 
         $system_ids = (new SearchService)->execute('solar_system', $query);
 
-        return (new GetNamesFromIdsService)->execute(array_slice($system_ids,0,15));
+        return (new GetNamesFromIdsService)->execute(array_slice($system_ids, 0, 15));
     }
 
     public function regions()
     {
-
         $query = request()->get('search');
 
         if (Str::length($query) < 3) {
@@ -106,7 +102,7 @@ class HelperController extends Controller
 
         $region_ids = (new SearchService)->execute('region', $query);
 
-        return (new GetNamesFromIdsService)->execute(array_slice($region_ids,0,15));
+        return (new GetNamesFromIdsService)->execute(array_slice($region_ids, 0, 15));
     }
 
     public function getResourceVariants(string $resource_type, int $resource_id)
