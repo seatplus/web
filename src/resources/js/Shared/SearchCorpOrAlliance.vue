@@ -1,9 +1,6 @@
 <template>
   <div>
-    <!--TODO: create a list and let user select the propper entry right now its good enough-->
-    <!--<input type="text" v-model="corpOrAlliance.name" @input="performSearch">-->
     <!--TODO: add warning if search is less then 3 characters long-->
-
     <div>
       <label
         for="search"
@@ -27,8 +24,8 @@
           </svg>
         </div>
         <input
-          v-model="query"
           id="search"
+          v-model="query"
           type="text"
           name="search"
           :class="[error ? 'focus:ring-red-500 focus:border-red-500 border-red-300' : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',' block w-full pl-10 sm:text-sm rounded-md']"
@@ -43,7 +40,7 @@
       </p>
     </div>
 
-    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5 max-h-96 overflow-auto">
       <li
         v-for="entity of entities"
         :key="entity.id"
