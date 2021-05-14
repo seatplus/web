@@ -1,9 +1,6 @@
 <template>
   <div>
-    <!--TODO: create a list and let user select the propper entry right now its good enough-->
-    <!--<input type="text" v-model="corpOrAlliance.name" @input="performSearch">-->
     <!--TODO: add warning if search is less then 3 characters long-->
-
     <div>
       <label
         for="search"
@@ -27,8 +24,8 @@
           </svg>
         </div>
         <input
-          v-model="search"
           id="search"
+          v-model="query"
           type="text"
           name="search"
           :class="[error ? 'focus:ring-red-500 focus:border-red-500 border-red-300' : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',' block w-full pl-10 sm:text-sm rounded-md']"
@@ -43,17 +40,17 @@
       </p>
     </div>
 
-    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5">
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6 sm:mt-5 max-h-96 overflow-auto">
       <li
-        v-for="entity of corpOrAlliances"
+        v-for="entity of entities"
         :key="entity.id"
         class="col-span-1 bg-white rounded-lg shadow"
         :class="{'bg-green-50' : isSelected(entity)}"
         @click="flipSelect(entity)"
       >
         <div class="w-full flex items-center justify-between p-6 space-x-6">
-          <EntityBlock
-            :entity="entity"
+          <EntityByIdBlock
+            :id="entity.id"
             :image-size="10"
             name-font-size="sm"
           />
@@ -65,78 +62,94 @@
 
 <script>
 import axios from 'axios';
-import EntityBlock from "./Layout/Eve/EntityBlock";
+import EntityByIdBlock from "./Layout/Eve/EntityByIdBlock";
+import {ref, watch} from "vue";
+import route from "ziggy";
+import {usePage} from "@inertiajs/inertia-vue3";
 
 export default {
     name: "SearchCorpOrAlliance",
-    components: {EntityBlock},
-    props: ['modelValue'],
+    components: {EntityByIdBlock},
+    props: {
+        modelValue: {
+            type: Array,
+            default: () => []
+        }
+    },
     emits: ['update:modelValue'],
-    data() {
-        return {
-            corpOrAlliances: [],
-            search: '',
-            selected: this.modelValue,
-            error: this.$page.props.errors.selectedEntities
-        }
-    },
-    computed: {
-        selectedIds() {
-            return _.map(this.selected, (entity) => entity.id)
-        }
-    },
-    watch: {
-        selected(newValue) {
-            this.$emit('update:modelValue', newValue)
-        },
-        search() {
-            if (this.search.length < 3)
-                return
+    setup(props, { emit }) {
 
-            axios
-                .get(this.$route('search.alliance.corporation', this.search))
+        const selected = ref(props.modelValue)
+        const entities = ref([])
+        const isLoading = ref(false)
+        const query = ref('')
+        const error = ref(usePage().props.value.errors.selectedEntities)
+
+        const isSelected = function(entity) {
+
+            return !!_.find(selected.value, {id: entity.id})
+            //return selected.value.includes(entity_id)
+        }
+
+        watch(query, () => {
+            search()
+        })
+
+        const search = _.debounce(async () => {
+            if (query.value.length < 3 || isLoading.value) {
+                entities.value = []
+                return
+            }
+
+            isLoading.value = true
+
+            await axios
+                .get(route('search.alliance.corporation', query.value))
                 .then(results => {
 
-                    this.corpOrAlliances = _.map(results.data, (result) => {
-
-                        let object = {
-                            id: result.id,
-                            name: result.name,
-                            type: result.category
+                    let alliance_ids = _.map(_.get(results.data, 'alliance', []), (entity_id) => {
+                        return {
+                            id: entity_id,
+                            type: 'alliance'
                         }
-
-                        if(result.type === 'corporation') {
-                            object.corporation_id = result.id
-                        } else {
-                            object.alliance_id= result.id
-                        }
-
-                        return object
-
                     })
+
+                    let corporation_ids = _.map(_.get(results.data, 'corporation', []), (entity_id) => {
+                        return {
+                            id: entity_id,
+                            type: 'corporation'
+                        }
+                    })
+
+                    entities.value = [...alliance_ids, ...corporation_ids]
 
                 })
                 .catch(error => {
                     console.log(error);
                 })
+
+            isLoading.value = false
+        }, 250)
+
+        const flipSelect = (entity) => {
+
+            if(isSelected(entity.id)) {
+                selected.value = _.remove(this.selected, (select) => select.id !== entity.id)
+            } else {
+                selected.value.push(entity)
+            }
+
+            emit('update:modelValue', selected.value)
         }
-    },
-    methods: {
-        flipSelect(entity) {
 
-            let index = this.selectedIds.indexOf(entity.id)
-
-            if(index >= 0)
-                return this.removeSelected(entity)
-
-            this.selected.push(entity)
-        },
-        isSelected(entity) {
-            return this.selected.includes(entity)
-        },
-        removeSelected(entity) {
-            this.selected = _.remove(this.selected, (select) => select.id !== entity.id)
+        return {
+            isSelected,
+            query,
+            flipSelect,
+            error,
+            entities
         }
+
     }
 }
 </script>
