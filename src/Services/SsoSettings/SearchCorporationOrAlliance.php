@@ -27,12 +27,10 @@
 namespace Seatplus\Web\Services\SsoSettings;
 
 use Illuminate\Support\Str;
-use Seatplus\Web\Services\PaginateCollectionService;
 use Seatplus\Web\Services\SearchService;
 
 class SearchCorporationOrAlliance
 {
-
     public function __construct(/**
      * @var string
      */
