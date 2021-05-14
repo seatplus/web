@@ -174,6 +174,13 @@ class RecruitmentLifeCycleTest extends TestCase
             $this->app->make(PermissionRegistrar::class)->registerPermissions();
         }
 
+        if($this->test_user->can('can accept or deny applications')) {
+            $this->test_user->removeRole('can accept or deny applications');
+
+            // now re-register all the roles and permissions
+            $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        }
+
         $response = $this->actingAs($this->test_user)
             ->get(route('corporation.recruitment'))
             ->assertForbidden();
