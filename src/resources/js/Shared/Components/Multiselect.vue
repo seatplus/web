@@ -38,13 +38,12 @@
 </template>
 
 <script>
-// TODO import { VueAutosuggest } from "vue-autosuggest"
 import Autosuggest from "@/Shared/Components/Autosuggest";
 export default {
   name: "Multiselect",
   components: {
     Autosuggest
-    /*VueAutosuggest*/},
+    },
   props: {
     modelValue: {
       required: true
@@ -84,9 +83,8 @@ export default {
       this.update()
     },
     update() {
-      let ids = _.map( this.selections, (object) => object.id)
 
-      this.$emit('update:modelValue', ids)
+      this.$emit('update:modelValue', this.selections)
       this.uniqueID++
     }
   }

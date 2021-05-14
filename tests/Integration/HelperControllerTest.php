@@ -134,6 +134,8 @@ class HelperControllerTest extends TestCase
     /** @test */
     public function oneCanSearchExistingSystems()
     {
+
+
         $system = System::factory()->create([
             'name' => 'jita'
         ]);
@@ -142,13 +144,29 @@ class HelperControllerTest extends TestCase
 
         $result = $this->actingAs($this->test_user)
             ->get(route('autosuggestion.system', ['search' => '']))
-            ->assertOk();
+            ->assertForbidden();
 
-        $this->assertCount(5, $result->original);
+        RetrieveEsiData::shouldReceive('execute')
+            ->twice()
+            ->andReturn(
+                $this->mockEsiResponse([
+                    'solar_system' => [
+                        $system->system_id
+                    ]
+                ]),
+                $this->mockEsiResponse([
+                    [
+                        'id' => $system->system_id,
+                        'name' => $system->name,
+                        'category' => 'solar_system'
+                    ]
+                ])
+            );
 
         $result = $this->actingAs($this->test_user)
             ->get(route('autosuggestion.system', ['search' =>'jit']))
             ->assertOk();
+
 
         $this->assertCount(1, $result->original);
     }
@@ -156,7 +174,7 @@ class HelperControllerTest extends TestCase
     /** @test */
     public function oneCanSearchExistingRegion()
     {
-        Region::factory()->create([
+        $region = Region::factory()->create([
             'name' => 'Delve'
         ]);
 
@@ -164,9 +182,24 @@ class HelperControllerTest extends TestCase
 
         $result = $this->actingAs($this->test_user)
             ->get(route('autosuggestion.region', ['search' => '']))
-            ->assertOk();
+            ->assertForbidden();
 
-        $this->assertCount(5, $result->original);
+        RetrieveEsiData::shouldReceive('execute')
+            ->twice()
+            ->andReturn(
+                $this->mockEsiResponse([
+                    'region' => [
+                        $region->region_id
+                    ]
+                ]),
+                $this->mockEsiResponse([
+                    [
+                        'id' => $region->region_id,
+                        'name' => $region->name,
+                        'category' => 'region'
+                    ]
+                ])
+            );
 
         $result = $this->actingAs($this->test_user)
             ->get(route('autosuggestion.region', ['search' =>'Del']))
