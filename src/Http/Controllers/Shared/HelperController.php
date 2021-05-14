@@ -26,7 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
@@ -82,28 +84,29 @@ class HelperController extends Controller
 
     public function systems()
     {
-        $query = System::query();
+        $query = request()->get('search');
 
-        $request = request()->get('search');
-
-        if ($request) {
-            $query->where('name', 'like', '%' . $request . '%');
+        if (Str::length($query) < 3) {
+            return response('the minimum length of 3 is not met', 403);
         }
 
-        return $query->limit(15)->get()->map(fn ($system) => ['id' => $system->system_id, 'name' => $system->name]);
+        $system_ids = (new SearchService)->execute('solar_system', $query);
+
+        return (new GetNamesFromIdsService)->execute(array_slice($system_ids,0,15));
     }
 
     public function regions()
     {
-        $query = Region::query();
 
-        $request = request()->get('search');
+        $query = request()->get('search');
 
-        if ($request) {
-            $query->where('name', 'like', '%' . $request . '%');
+        if (Str::length($query) < 3) {
+            return response('the minimum length of 3 is not met', 403);
         }
 
-        return $query->limit(15)->get()->map(fn ($region) => ['id' => $region->region_id, 'name' => $region->name]);
+        $region_ids = (new SearchService)->execute('region', $query);
+
+        return (new GetNamesFromIdsService)->execute(array_slice($region_ids,0,15));
     }
 
     public function getResourceVariants(string $resource_type, int $resource_id)

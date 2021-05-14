@@ -27,6 +27,10 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Http\Request;
+use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseRegionByRegionIdJob;
+use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateOpenRecruitmentRequest;
 use Seatplus\Web\Models\Recruitment\Enlistment;
@@ -57,7 +61,7 @@ class EnlistmentsController extends Controller
 
     public function watchlist(int $corporation_id)
     {
-        $enlistment = Enlistment::with('systems')->find($corporation_id);
+        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Watchlist/Index', [
             'activeSidebarElement' => route('corporation.recruitment'),
@@ -82,13 +86,22 @@ class EnlistmentsController extends Controller
             'regions' => ['array'],
         ]);
 
-        $system_ids = data_get($validated_data, 'systems.*.id');
-        $region_ids = data_get($validated_data, 'regions.*.id');
+        $system_ids = data_get($validated_data, 'systems.*.id', []);
+        $region_ids = data_get($validated_data, 'regions.*.id', []);
 
         $enlistment = Enlistment::find($corporation_id);
 
         $enlistment->systems()->sync($system_ids);
+
+        collect($system_ids)
+            ->diff(System::whereIn('system_id', $system_ids)->select('system_id')->pluck('system_id'))
+            ->each( fn($system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
+
         $enlistment->regions()->sync($region_ids);
+
+        collect($region_ids)
+            ->diff(Region::whereIn('region_id', $region_ids)->select('region_id')->pluck('region_id'))
+            ->each( fn($region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
 
         return back()->with('success', 'updated');
     }

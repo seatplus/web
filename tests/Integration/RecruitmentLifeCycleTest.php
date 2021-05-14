@@ -342,7 +342,7 @@ class RecruitmentLifeCycleTest extends TestCase
         $system =  System::factory()->create();
 
         // watchlist system
-        $this->actingAs($this->test_user->refresh())
+        $response = $this->actingAs($this->test_user->refresh())
             ->followingRedirects()
             ->post(route('update.watchlist', $this->test_character->corporation->corporation_id), [
                 'systems' => [
@@ -359,6 +359,7 @@ class RecruitmentLifeCycleTest extends TestCase
                 )
                 ->has('watched_regions', 0)
             );
+
 
         // add region
         $region = Region::factory()->create();
