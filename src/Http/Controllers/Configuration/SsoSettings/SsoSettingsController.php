@@ -51,7 +51,7 @@ class SsoSettingsController extends Controller
         ]);
     }
 
-    public function searchAllianceCorporations($searchParam): string
+    public function searchAllianceCorporations($searchParam): array
     {
         return (new SearchCorporationOrAlliance($searchParam))->search();
     }
