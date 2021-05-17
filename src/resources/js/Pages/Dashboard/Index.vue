@@ -33,7 +33,7 @@
 
   export default {
       name: "Index",
-      components: {Characters, Enlistments, PageHeader, Layout},
+      components: {Characters, Enlistments, PageHeader},
     layout: Layout,
       props: {
           characters: {
