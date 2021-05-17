@@ -12,48 +12,24 @@
           name="tabs"
           class="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
         >
-          <option>Assets</option>
-
-          <option>Contracts</option>
-
-          <option>Wallets</option>
-
-          <option>Contacts</option>
+          <option
+            v-for="tab in tabs"
+            :key="tab"
+          >
+            {{ tab }}
+          </option>
         </select>
       </div>
       <div class="hidden sm:block">
         <div class="flex space-x-4">
-          <!-- Current: "bg-indigo-100 text-indigo-700", Default: "text-gray-500 hover:text-gray-700" -->
           <div
+            v-for="tab in tabs"
+            :key="tab"
             class="px-3 py-2 font-medium text-sm rounded-md cursor-pointer"
-            :class="isActive('Assets') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
-            @click="active_element = 'Assets'"
+            :class="isActive(tab) ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
+            @click="active_element = tab"
           >
-            Assets
-          </div>
-
-          <div
-            class="px-3 py-2 font-medium text-sm rounded-md cursor-pointer"
-            :class="isActive('Contracts') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
-            @click="active_element = 'Contracts'"
-          >
-            Contracts
-          </div>
-
-          <div
-            class="px-3 py-2 font-medium text-sm rounded-md cursor-pointer"
-            :class="isActive('Wallets') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
-            @click="active_element = 'Wallets'"
-          >
-            Wallets
-          </div>
-
-          <div
-            class="px-3 py-2 font-medium text-sm rounded-md cursor-pointer"
-            :class="isActive('Contacts') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'"
-            @click="active_element = 'Contacts'"
-          >
-            Contacts
+            {{ tab }}
           </div>
         </div>
       </div>
@@ -116,6 +92,16 @@
         :alliance_id="targetCorporation.alliance_id"
       />
     </div>
+    <div
+      v-if="isActive('Corporation History')"
+      class="space-y-4"
+    >
+      <CorporationHistoryComponent
+        v-for="character in recruit.characters"
+        :key="'corporation.history:' + character.character_id"
+        :character="character"
+      />
+    </div>
   </div>
 </template>
 
@@ -126,10 +112,14 @@ import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJou
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
+import CorporationHistoryComponent from "../../../Shared/Components/Character/CorporationHistoryComponent";
+
+const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History']
 
 export default {
     name: "TabComponent",
     components: {
+        CorporationHistoryComponent,
         WalletJournalBalanceChart, ContractComponent,
         AssetsComponent,
         WalletJournalComponent,
@@ -148,10 +138,15 @@ export default {
             required: true
         }
     },
+    setup() {
+        return {
+            tabs
+        }
+    },
     data() {
         return {
             active_element: 'Assets',
-            
+
         }
     },
     computed: {
