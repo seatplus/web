@@ -27,7 +27,6 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contracts\Contract;
-use Seatplus\Web\Http\Controllers\Character\ContractsController;
 use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
 
 Route::prefix('corporation_history')
