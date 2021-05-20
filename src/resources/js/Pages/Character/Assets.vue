@@ -147,10 +147,12 @@ export default {
         cleanParams() {
             let params = this.params
 
-            params.search = params.search === "" ? null : params.search
-            params.character_ids = this.selectedCharacterIds
-
-            return params
+            return {
+                search: params.search === "" ? null : params.search,
+                character_ids: this.selectedCharacterIds,
+                regions: _.map(params.regions, 'id'),
+                systems: _.map(params.systems, 'id')
+            }
         },
         selectedCharacterIds() {
 
@@ -160,11 +162,6 @@ export default {
                 return []
 
             return  _.map(character_ids, (id) => parseInt(id))
-        },
-        newUrl() {
-            let route = this.$route().current()
-
-            return this.$route(route, this.cleanParams)
         }
     },
     watch: {
