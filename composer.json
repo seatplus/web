@@ -1,16 +1,16 @@
 {
-  "name": "seatplus/web",
-  "description": "Web frontend of seatplus",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Felix Huber",
-      "email": "felix.a.huber@gmx.net"
-    }
-  ],
-  "autoload": {
-    "psr-4": {
-      "Seatplus\\Web\\": "src/"
+    "name": "seatplus/web",
+    "description": "Web frontend of seatplus",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Felix Huber",
+            "email": "felix.a.huber@gmx.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Seatplus\\Web\\": "src/"
 
     },
     "files": [
@@ -28,8 +28,8 @@
     "php": "^8.0",
     "laravel/framework": "^8.0",
     "laravel/socialite": "^5.0",
-    "seatplus/eveapi": "^0.8.8",
-    "seatplus/auth": "^0.8.1",
+    "seatplus/eveapi": "^0.8.9",
+    "seatplus/auth": "^0.8.3",
     "inertiajs/inertia-laravel": "^0.4.0",
     "tightenco/ziggy": "^1.0.4",
     "spatie/laravel-permission": "^4.0",

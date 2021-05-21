@@ -33,7 +33,7 @@ class UserSettingsTest extends TestCase
         $this->assertNotEquals($this->test_user->main_character, $secondary_character->character);
 
         $this->actingAs($this->test_user)
-            ->json('POST', route('update.main_character'), [
+            ->json('POST', route('change.main_character'), [
                 "character_id" => $secondary_character->character_id,
             ]);
 
