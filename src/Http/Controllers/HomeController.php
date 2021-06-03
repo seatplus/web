@@ -39,17 +39,16 @@ class HomeController extends Controller
 {
     public function home()
     {
-
         return Inertia::render('Dashboard/Index', [
             'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
                 ->addSelect([
                     'balance' => WalletJournal::select('balance')
                         ->whereColumn('wallet_journable_id', 'character_infos.character_id')
                         ->orderByDesc('date')
-                        ->limit(1)
+                        ->limit(1),
                 ])
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
-                ->get()
+                ->get(),
         ]);
     }
 
@@ -63,12 +62,12 @@ class HomeController extends Controller
         return Application::with([
             'applicationable' => fn (MorphTo $morph_to) => $morph_to
                 ->constrain([
-                    User::class => fn(Builder $query) => $query->where('id', auth()->user()->getAuthIdentifier()),
-                    CharacterInfo::class => fn(Builder $query) => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id'))
+                    User::class => fn (Builder $query) => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    CharacterInfo::class => fn (Builder $query) => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
                 ])
                 ->morphWith([
-                User::class => ['characters'],
-            ]),
+                    User::class => ['characters'],
+                ]),
         ])->whereCorporationId($corporation_id)
             ->paginate();
     }
