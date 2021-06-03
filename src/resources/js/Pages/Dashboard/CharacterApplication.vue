@@ -1,125 +1,115 @@
 <template>
-  <button
-    ref="menu"
-    class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
-    @click="toggleMenu"
-  >
-    <svg
-      class="w-5 h-5 text-gray-400"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-      <path
-        fill-rule="evenodd"
-        d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-        clip-rule="evenodd"
-      />
-    </svg>
-    <span class="ml-3">Apply</span>
-  </button>
-  <!--<div>
-            <button @click="toggleMenu" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring">
-                <EveImage tailwind_class="h-8 w-8 rounded-full" :object="$page.user.data.main_character"  test :size="256" />
-            </button>
-        </div>-->
-  <div
-    v-if="menuOpen"
-    class="fixed inset-0 transition-opacity"
-  >
-    <div
-      class="absolute inset-0 bg-transparent"
-      @click="toggleMenu"
-    />
+  <div class="mb-4">
+    This corporation accepts recruits on a character level. This means every character must apply individually and a possible set of required scopes is only applied to the enlisted characters of yours.
   </div>
-  <transition
-    enter-active-class="duration-150 ease-out"
-    enter-from-class="opacity-0 scale-95"
-    enter-to-class="opacity-100 scale-100"
-    leave-active-class="duration-100 ease-in"
-    leave-from-class="opacity-100 scale-100"
-    leave-to-class="opacity-0 scale-95"
-  >
-    <div
-      v-show="menuOpen"
-      ref="list"
-      class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg"
+  <ul class="border border-gray-200 rounded-md divide-y divide-gray-200">
+    <li
+      v-for="character in ownedCharacters"
+      :key="character.character_id"
+      class="pl-3 pr-4 py-3 flex items-center justify-between text-sm"
     >
-      <div class="py-1 rounded-md bg-white ring-1 ring-black ring-opacity-5">
-        <inertia-link
-          v-for="enlistment in enlistments"
-          :key="enlistment.corporation_id"
-          method="post"
-          :href="$route('post.application')"
-          :data="{corporation_id: enlistment.corporation_id, character_id: character_id}"
-          :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150 text-left'"
-        >
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <EveImage
-                tailwind_class="h-8 w-8 rounded-full"
-                :size="256"
-                :object="enlistment.corporation"
-              />
-            </div>
-            <div class="ml-4">
-              <h3 class="text-sm leading-6 font-medium text-gray-900">
-                {{ enlistment.corporation.name }}
-              </h3>
-              <p class="text-xs leading-5 text-gray-500">
-                {{ enlistment.corporation.alliance ? enlistment.corporation.alliance.name : '' }}
-              </p>
-            </div>
-          </div>
-        </inertia-link>
+      <div class="flex-1 flex items-center">
+        <EveImage
+          :object="character"
+          :size="256"
+          tailwind_class="h-5 w-5 rounded-full"
+        />
+        <span class="ml-2 flex-1 truncate">
+          {{ character.name }}
+        </span>
       </div>
-    </div>
-  </transition>
+      <div class="ml-4 flex-shrink-0">
+        <button
+          v-if="hasApplied(character.character_id)"
+          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red focus:border-red-700"
+          @click="remove(character.character_id)"
+        >
+          <UserRemoveIcon
+            class="-ml-0.5 mr-1 h-4 w-4"
+            aria-hidden="true"
+          />
+          Remove Application
+        </button>
+        <button
+          v-else
+          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          @click="apply(character.character_id)"
+        >
+          <UserAddIcon
+            class="-ml-0.5 mr-1 h-4 w-4"
+            aria-hidden="true"
+          />
+          Apply
+        </button>
+      </div>
+    </li>
+  </ul>
 </template>
 
 <script>
 import EveImage from "@/Shared/EveImage"
-import {createPopper} from '@popperjs/core'
-// TODO: Fragment
-//import { Fragment } from 'vue-fragment'
+import {computed, ref} from "vue";
+import {usePage} from "@inertiajs/inertia-vue3";
+import { Inertia } from '@inertiajs/inertia'
+import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
+import route from 'ziggy'
 
 export default {
     name: "CharacterApplication",
-    components: {EveImage,
-        //Fragment
-    },
+    components: {EveImage, UserAddIcon, UserRemoveIcon},
     props: {
-        enlistments: {
-            type: Array
+        enlistment: {
+            type: Object,
+            required: true
         },
-        character_id: {
-            type: Number
+        applicationResults: {
+            type: Array,
+            required: true
         }
     },
-    data() {
+    setup(props) {
+
+        const applications = ref(props.applicationResults)
+
+        const ownedCharacters = computed(() => usePage().props.value.user.data.characters)
+        const applicants = computed(() => {
+
+            if(!hasApplications.value || props.enlistment.type !== 'character')
+                return []
+
+            return _.map(applications.value, (application) => _.get(application, 'applicationable')) //applicationResults.results.value
+
+        })
+        const hasApplications = computed(() =>  !!applications.value) //applicationResults.results.value
+        
+        const hasApplied = (character_id) =>  _.findIndex(applicants.value, {character_id: character_id}) > -1
+
+        const apply = (character_id) => Inertia.post(route('post.application'), {
+            corporation_id: props.enlistment.corporation_id,
+            character_id: character_id
+        }, {
+            onSuccess: () => applications.value.push({
+                applicationable: {
+                    character_id: character_id
+                }
+            }),
+            preserveState: true
+        })
+
+        const remove = (character_id) => Inertia.delete(route('delete.character.application', character_id), {
+            preserveState: true,
+            onSuccess: () => _.remove(applications.value, function (application) {
+                return _.isEqual(application.applicationable.character_id, character_id)
+            })
+        })
+
+        
         return {
-            menuOpen: false
+            hasApplied,
+            ownedCharacters,
+            apply,
+            remove
         }
-    },
-    created() {
-
-    },
-    methods: {
-        toggleMenu() {
-            this.menuOpen = ! this.menuOpen;
-
-            if(this.menuOpen)
-                createPopper(this.$refs.menu, this.$refs.list, {
-                modifiers: [
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, 8],
-                        },
-                    },
-                ]
-            });
-        },
     }
 }
 </script>

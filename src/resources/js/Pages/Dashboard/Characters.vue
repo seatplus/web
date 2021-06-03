@@ -1,63 +1,76 @@
 <template>
-    <div class="pb-5 border-b border-gray-200 space-y-2">
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-            Characters
-        </h3>
-        <p class="max-w-4xl text-sm leading-5 text-gray-500">Below you find all characters you have added to this seatplus instance</p>
-        <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <li v-for="character in characters" :key="character.character_id" class="col-span-1 bg-white rounded-lg shadow">
-                <div class="w-full flex items-center justify-between p-6 space-x-6">
-                    <div class="flex-1 truncate">
-                        <div class="flex items-center space-x-3">
-                            <h3 class="text-gray-900 text-sm leading-5 font-medium truncate">{{ character.name }}</h3>
-                            <span class="flex-shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full">{{ character.corporation.name }} {{ character.alliance ? ` - ${character.alliance.name}` : ''}} </span>
-                        </div>
-                        <!--<p class="mt-1 text-gray-500 text-sm leading-5 truncate">TODO: relevant infos here </p>-->
-                    </div>
-                    <EveImage tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0" :object="character" :size="256" />
-                    <!--<img class="" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=4&amp;w=256&amp;h=256&amp;q=60" alt="">-->
-                </div>
-                <div class="border-t border-gray-200" v-if="hasOpenEnlistments">
-                    <div class="-mt-px flex">
-                        <div class="-ml-px w-0 flex-1 flex">
-                            <inertia-link :href="$route('delete.character.application', character.character_id)" method="delete" v-if="character.application" class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-red-700 font-medium border border-transparent rounded-bl-lg hover:text-red-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
-                                <svg class="w-5 h-5 text-red-700" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="ml-3">Remove Application</span>
-                            </inertia-link>
-                            <CharacterApplication v-else :enlistments="enlistments" :character_id="character.character_id"/>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li class="col-span-1 bg-white rounded-lg shadow flex flex-wrap content-center">
-                <a :href="$route('auth.eve')" type="button" class="py-4 inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-sm text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <!-- Heroicon name: solid/user-add -->
-                    <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
-                    </svg>
-                    Add characters
-                </a>
-<!--                <div class="w-full flex items-center justify-center p-6 space-x-6">
-                    <svg class="max-h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                    <div>Test</div>
-                </div>-->
-            </li>
-
-        </ul>
-    </div>
+  <div class="pb-5 border-b border-gray-200 space-y-2">
+    <h3 class="text-lg leading-6 font-medium text-gray-900">
+      Characters
+    </h3>
+    <p class="max-w-4xl text-sm leading-5 text-gray-500">
+      Below you find all characters you have added to this seatplus instance
+    </p>
+    <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <li
+        v-for="character in characters"
+        :key="character.character_id"
+      >
+        <LeftAligned>
+          <template #header>
+            <EntityBlock :entity="character" />
+          </template>
+          <LeftAlignedData v-if="character.balance">
+            <template #title>
+              Balance
+            </template>
+            <template #description>
+              ISK {{ character.balance.toLocaleString() }}
+            </template>
+          </LeftAlignedData>
+          <LeftAlignedData>
+            <template #title>
+              Created
+            </template>
+            <template #description>
+              <Time :timestamp="character.birthday" />
+            </template>
+          </LeftAlignedData>
+        </LeftAligned>
+      </li>
+      <li class="col-span-1 bg-white rounded-lg shadow flex flex-wrap content-center">
+        <a
+          :href="$route('auth.eve')"
+          type="button"
+          class="py-4 inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-sm text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <!-- Heroicon name: solid/user-add -->
+          <svg
+            class="-ml-1 mr-3 h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+          </svg>
+          Add characters
+        </a>
+        <!--                <div class="w-full flex items-center justify-center p-6 space-x-6">
+                            <svg class="max-h-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            <div>Test</div>
+                        </div>-->
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
 import CharacterApplication from "./CharacterApplication"
 import EveImage from "@/Shared/EveImage"
+import LeftAligned from "../../Shared/Layout/DataDisplay/LeftAligned";
+import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
+import LeftAlignedData from "../../Shared/Layout/DataDisplay/LeftAlignedData";
+import Time from "../../Shared/Time";
 export default {
     name: "Characters",
-    components: {EveImage, CharacterApplication},
+    components: {Time, LeftAlignedData, EntityBlock, LeftAligned, EveImage, CharacterApplication},
     props: {
         characters: {
             type: Array
