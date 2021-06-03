@@ -37,11 +37,6 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class EnlistmentsController extends Controller
 {
-    public function index()
-    {
-        return Enlistment::with('corporation', 'corporation.alliance')->get()->toJson();
-    }
-
     public function create(CreateOpenRecruitmentRequest $request)
     {
         $enlistment = Enlistment::updateOrCreate(

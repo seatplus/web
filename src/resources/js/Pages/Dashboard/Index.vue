@@ -10,73 +10,38 @@
 
     <Characters
       :characters="characters"
-      :enlistments="characterEnlistments"
       class="mb-4"
     />
 
-    <Enlistments
-      v-if="hasCorporationEnlistments"
-      :enlistments="corporationEnlistments"
-      :application="user_application"
-      class="mb-4"
-    />
-
+    <Enlistments :key="timestamp" />
   </div>
 </template>
 
 <script>
-  import Layout from "@/Shared/SidebarLayout/Layout";
-  import axios from 'axios';
-  import PageHeader from "@/Shared/Layout/PageHeader"
-  import Enlistments from "./Enlistments"
-  import Characters from "./Characters"
+import Layout from "@/Shared/SidebarLayout/Layout";
+import PageHeader from "@/Shared/Layout/PageHeader"
+import Enlistments from "./Enlistments"
+import Characters from "./Characters"
 
-  export default {
-      name: "Index",
-      components: {Characters, Enlistments, PageHeader},
+export default {
+    name: "Index",
+    components: {Characters, Enlistments, PageHeader},
     layout: Layout,
-      props: {
-          characters: {
-              type: Array
-          },
-          user_application: {
-              required: true
-          }
-      },
-      data() {
-          return {
-              enlistments: [],
-            pageTitle: 'Home'
-          }
-      },
-      computed: {
-          characterEnlistments() {
-              return _.filter(this.enlistments, (enlistment) => enlistment.type === 'character')
-          },
-          corporationEnlistments() {
+    props: {
+        characters: {
+            type: Array
+        },
+    },
+    setup() {
 
-              return _.filter(this.enlistments, (enlistment) => enlistment.type === 'user')
-          },
-          hasCorporationEnlistments() {
-              return ! _.isEmpty(this.corporationEnlistments)
-          }
-      },
-      created() {
-          this.getEnlistments()
-      },
-      methods: {
-          emmitEvent() {
-              /*TODO this.$eventBus.$emit('notification', {
-                  type: 'success',
-              })*/
-          },
-          async getEnlistments() {
-              axios.get(this.$route('list.open.enlistments'))
-                  .then((result) => this.enlistments.push(...result.data))
-          },
+        const timestamp = +new Date();
 
-      }
-  }
+        return {
+            pageTitle: 'Home',
+            timestamp
+        }
+    },
+}
 </script>
 
 <style scoped>

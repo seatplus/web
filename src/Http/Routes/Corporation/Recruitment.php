@@ -33,7 +33,6 @@ use Seatplus\Web\Http\Middleware\CheckUserAffiliationForApplication;
 
 Route::prefix('recruitment')
     ->group(function () {
-        Route::get('/list', [EnlistmentsController::class, 'index'])->name('list.open.enlistments');
         Route::post('/apply', [ApplicationsController::class, 'apply'])->name('post.application');
         Route::delete('/application/character/{character_id}', [ApplicationsController::class, 'pullCharacterApplication'])->name('delete.character.application');
         Route::delete('/application/user/', [ApplicationsController::class, 'pullUserApplication'])->name('delete.user.application');

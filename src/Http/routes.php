@@ -34,6 +34,8 @@ Route::middleware('web')
         Route::middleware(['auth', CheckRequiredScopes::class])
             ->group(function () {
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
+                Route::get('/enlistments', [HomeController::class, 'getEnlistments'])->name('list.open.enlistments');
+                Route::get('/applications/{corporation_id}/related', [HomeController::class, 'getOwnApplications'])->name('list.existing.applications');
 
                 Route::prefix('queue')
                     ->group(function () {

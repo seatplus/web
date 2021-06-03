@@ -26,10 +26,14 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
 {
@@ -37,12 +41,34 @@ class HomeController extends Controller
     {
         return Inertia::render('Dashboard/Index', [
             'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
+                ->addSelect([
+                    'balance' => WalletJournal::select('balance')
+                        ->whereColumn('wallet_journable_id', 'character_infos.character_id')
+                        ->orderByDesc('date')
+                        ->limit(1),
+                ])
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
-            'user_application' => collect(auth()->user()->application)->whenNotEmpty(fn ($application) => [
-                'is_user' => Arr::get($application, 'applicationable_type') === User::class,
-                'corporation_id' => Arr::get($application, 'corporation_id'),
-            ]),
         ]);
+    }
+
+    public function getEnlistments()
+    {
+        return Enlistment::with('corporation', 'corporation.alliance')->paginate();
+    }
+
+    public function getOwnApplications(int $corporation_id)
+    {
+        return Application::with([
+            'applicationable' => fn (MorphTo $morph_to) => $morph_to
+                ->constrain([
+                    User::class => fn (Builder $query) => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    CharacterInfo::class => fn (Builder $query) => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
+                ])
+                ->morphWith([
+                    User::class => ['characters'],
+                ]),
+        ])->whereCorporationId($corporation_id)
+            ->paginate();
     }
 }

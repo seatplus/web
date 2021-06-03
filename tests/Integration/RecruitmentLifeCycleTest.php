@@ -4,9 +4,9 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
+use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
-use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -94,11 +94,14 @@ class RecruitmentLifeCycleTest extends TestCase
 
         $response = $this->actingAs($this->secondary_user)
             ->get(route('list.open.enlistments'))
-            ->assertJson([
-                [
-                    'corporation_id' => $this->test_character->corporation->corporation_id
-                ]
-            ]);
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has('data.0', fn($json) => $json
+                    ->where('corporation_id', (string) $this->test_character->corporation->corporation_id)
+                    ->etc()
+                )
+                ->etc()
+            );
     }
 
     /** @test */
@@ -133,10 +136,31 @@ class RecruitmentLifeCycleTest extends TestCase
 
         $this->assertNull($this->secondary_user->refresh()->application);
 
+        // first check that existing applications does not exist
+        $this->actingAs($this->secondary_user)
+            ->get(route('list.existing.applications', $this->test_character->corporation->corporation_id)) //'corporation_id' => $this->test_character->corporation->corporation_id
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->has('data', 0)
+                ->etc()
+            );
+
         $this->applySecondary();
 
         $this->assertNotNull($this->secondary_user->refresh()->application);
         $this->assertTrue($this->secondary_user->refresh()->application instanceof Application);
+
+        // then check that existing applications does exist
+        $this->actingAs($this->secondary_user)
+            ->get(route('list.existing.applications', $this->test_character->corporation->corporation_id)) //'corporation_id' => $this->test_character->corporation->corporation_id
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->has('data', 1)
+                ->has('data.0', fn($json) => $json
+                    ->where('applicationable_id', (string) $this->secondary_user->id)
+                    ->where('corporation_id',  $this->test_character->corporation->corporation_id)
+                    ->etc()
+                )
+                ->etc()
+            );
 
         // pull application
         $response = $this->actingAs($this->secondary_user)
