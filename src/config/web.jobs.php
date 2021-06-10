@@ -27,6 +27,7 @@
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
@@ -38,4 +39,5 @@ return [
     'wallet' => WalletHydrateBatch::class,
     'contract' => ContractHydrateBatch::class,
     'corporation.wallet' => CorporationWalletHydrateBatch::class,
+    'skills' => SkillsHydrateBatch::class
 ];

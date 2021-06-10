@@ -102,6 +102,16 @@
         :character="character"
       />
     </div>
+    <div
+      v-if="isActive('Skills')"
+      class="space-y-4"
+    >
+      <SkillsComponent
+        v-for="character in recruit.characters"
+        :key="'character.skills:' + character.character_id"
+        :character-id="character.character_id"
+      />
+    </div>
   </div>
 </template>
 
@@ -113,12 +123,14 @@ import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
 import CorporationHistoryComponent from "../../../Shared/Components/Character/CorporationHistoryComponent";
+import SkillsComponent from "../../../Shared/Components/Skills/SkillsComponent";
 
-const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History']
+const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills']
 
 export default {
     name: "TabComponent",
     components: {
+        SkillsComponent,
         CorporationHistoryComponent,
         WalletJournalBalanceChart, ContractComponent,
         AssetsComponent,

@@ -59,6 +59,7 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Character/Wallet.php';
                         include __DIR__ . '/Routes/Character/Contract.php';
                         include __DIR__ . '/Routes/Character/CorporationHistory.php';
+                        include __DIR__ . '/Routes/Character/Skills.php';
                     });
 
                 Route::prefix('corporation')

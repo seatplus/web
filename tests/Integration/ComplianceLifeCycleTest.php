@@ -4,7 +4,7 @@
 namespace Seatplus\Web\Tests\Integration;
 
 
-use App\Http\Middleware\VerifyCsrfToken;
+use Seatplus\Eveapi\Models\Skills\Http\Middleware\VerifyCsrfToken;
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
