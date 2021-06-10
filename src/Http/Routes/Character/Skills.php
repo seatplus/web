@@ -24,20 +24,17 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Eveapi\Models\Skills\Skill;
+use Seatplus\Web\Http\Controllers\Character\SkillsController;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
-    'corporation.wallet' => CorporationWalletHydrateBatch::class,
-    'skills' => SkillsHydrateBatch::class,
-];
+Route::prefix('skills')
+    ->group(function () {
+        Route::get('', [SkillsController::class, 'index'])->name('character.skills');
+
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Skill::class)))
+            ->group(function () {
+                Route::get('/{character_id}/skills', [SkillsController::class, 'skills'])->name('get.character.skills');
+                Route::get('/{character_id}/skillqueue', [SkillsController::class, 'skillQueue'])->name('get.character.skill.queue');
+            });
+    });
