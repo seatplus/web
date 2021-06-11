@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -62,6 +63,11 @@ class SkillsController extends Controller
         return SkillQueue::query()
             ->with('type.group')
             ->where('character_id', $character_id)
+            ->where(fn(Builder $query) => $query
+                ->where('finish_date', '>=', now())
+                ->orWhereNull('finish_date')
+            )
+            ->orderBy('queue_position','asc')
             ->paginate();
     }
 }
