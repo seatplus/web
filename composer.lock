@@ -2803,16 +2803,16 @@
         },
         {
             "name": "seatplus/eveapi",
-            "version": "0.8.10",
+            "version": "0.8.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/seatplus/eveapi.git",
-                "reference": "2f27a8ba673736552a98ddfff3cc2ba61f7cbb0a"
+                "reference": "8e287501c6b8d2319f6baf2b7f48071f0233be44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/2f27a8ba673736552a98ddfff3cc2ba61f7cbb0a",
-                "reference": "2f27a8ba673736552a98ddfff3cc2ba61f7cbb0a",
+                "url": "https://api.github.com/repos/seatplus/eveapi/zipball/8e287501c6b8d2319f6baf2b7f48071f0233be44",
+                "reference": "8e287501c6b8d2319f6baf2b7f48071f0233be44",
                 "shasum": ""
             },
             "require": {
@@ -2864,9 +2864,9 @@
             "description": "API for receiving information from esi",
             "support": {
                 "issues": "https://github.com/seatplus/eveapi/issues",
-                "source": "https://github.com/seatplus/eveapi/tree/0.8.10"
+                "source": "https://github.com/seatplus/eveapi/tree/0.8.11"
             },
-            "time": "2021-06-10T11:13:17+00:00"
+            "time": "2021-06-10T20:54:54+00:00"
         },
         {
             "name": "spatie/data-transfer-object",
@@ -12042,5 +12042,5 @@
         "php": "^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.1.0"
 }
