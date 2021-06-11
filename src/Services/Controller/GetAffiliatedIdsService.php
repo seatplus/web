@@ -89,7 +89,7 @@ class GetAffiliatedIdsService
 
         return collect($ids)
             ->intersect([...$this->getAffiliatedIds(), ...GetRecruitIdsService::get()])
-            ->map(fn($id) => (int) $id);
+            ->map(fn ($id) => (int) $id);
     }
 
     public function viaDispatchTransferObject(object $dispatchTransferObject): GetAffiliatedIdsService
