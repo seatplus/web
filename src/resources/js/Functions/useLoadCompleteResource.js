@@ -1,4 +1,4 @@
-import {onBeforeMount, ref} from "vue";
+import { onBeforeMount, ref} from "vue";
 import route from 'ziggy'
 import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
 
@@ -6,48 +6,39 @@ export function useLoadCompleteResource(routeName, params) {
 
     const url = ref(route(routeName,useHydrateQueryParameters(params)))
     const results = ref([])
-    const page = ref(1)
-
-    const isInitialRequestLoading = ref(true)
-    const isLoading = ref(false)
-    const isComplete = ref(false)
 
     const fetchData = async () => {
 
-        if(isLoading.value || isComplete.value)
-            return
+        let last_page = 1
 
-        isLoading.value = true
-
-        await axios.get(url.value, {
-            params: {
-                page: page.value,
-            },
-        })
+        await axios.get(url.value, { params: { page: 1 }})
             .then(response => {
+
+                last_page = response.data.last_page
+
                 if (response.data.data.length) {
-                    page.value += 1;
                     results.value.push(...response.data.data);
-                    isLoading.value = false
-                    fetchData()
-                }
-                else {
-                    isComplete.value = true
                 }
             })
             .catch(error => console.log(error))
-            //.finally(await fetchData());
+
+        const axiosrequests = []
+
+        for(let i=2; i<= last_page; i++) {
+            axiosrequests.push(axios.get(url.value, {params: {page: i}}))
+        }
+
+        await axios.all(axiosrequests)
+            .then(response => response.forEach(element => results.value.push(...element.data.data)))
+            .catch(error => console.log(error))
+
     }
 
     onBeforeMount(async () => {
         await fetchData()
-        isInitialRequestLoading.value = false
     })
 
     return {
         results,
-        isLoading,
-        isComplete,
-        isInitialRequestLoading
     }
 }

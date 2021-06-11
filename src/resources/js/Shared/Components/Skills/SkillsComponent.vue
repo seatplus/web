@@ -20,7 +20,7 @@
       <SkillQueue :character-id="characterId" />
     </div>
     <div class="col-span-2 space-y-4">
-      <skills :character-id="characterId" />
+      <Skills :character-id="characterId" />
     </div>
   </div>
 </template>
