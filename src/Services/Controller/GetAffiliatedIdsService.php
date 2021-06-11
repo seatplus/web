@@ -87,7 +87,9 @@ class GetAffiliatedIdsService
             ? request()->get($this->getRequestParameter())
             : $this->getOwnedIds();
 
-        return collect($ids)->intersect([...$this->getAffiliatedIds(), ...GetRecruitIdsService::get()]);
+        return collect($ids)
+            ->intersect([...$this->getAffiliatedIds(), ...GetRecruitIdsService::get()])
+            ->map(fn($id) => (int) $id);
     }
 
     public function viaDispatchTransferObject(object $dispatchTransferObject): GetAffiliatedIdsService
