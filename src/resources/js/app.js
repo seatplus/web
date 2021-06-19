@@ -10,6 +10,7 @@ import { createApp, h } from 'vue'
 import { App, plugin } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 import I18n from './vendor/I18n';
+import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout";
 
 require('./bootstrap');
 
@@ -35,7 +36,7 @@ const app = createApp({
         //.then(module => module.default),
         .then(({ default: page }) => {
           if (page.layout === undefined) {
-            page.layout = Layout
+            page.layout = SingleColumnLayout
           }
           return page
         }),

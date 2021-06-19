@@ -11,22 +11,22 @@
         <div class="flex justify-between">
           <span>{{ sumSkillpoints(skills) }} total skillpoints</span>
           <div class="flex space-x-1.5">
-            <class class="flex">
+            <div class="flex">
               <div class="flex-shrink-0 self-center">
                 <StarIcon class="h-4 w-4" />
               </div>
               <span>
                 active
               </span>
-            </class>
-            <class class="flex">
+            </div>
+            <div class="flex">
               <div class="flex-shrink-0 self-center">
                 <StarIconOutline class="h-4 w-4" />
               </div>
               <span>
                 trained
               </span>
-            </class>
+            </div>
           </div>
         </div>
       </template>
@@ -56,7 +56,6 @@
         </template>
       </LeftAlignedData>
     </LeftAligned>
-    {{ skill }}
   </div>
 </template>
 

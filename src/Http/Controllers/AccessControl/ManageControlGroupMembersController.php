@@ -63,7 +63,7 @@ class ManageControlGroupMembersController
 
         return Inertia::render('AccessControl/ManageControlGroup', [
             'role' => $mappedRole,
-            'activeSidebarElement' => route('acl.groups'),
+            'activeSidebarElement' => 'acl.groups',
         ]);
     }
 }

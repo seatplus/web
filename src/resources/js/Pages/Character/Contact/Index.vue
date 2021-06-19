@@ -29,34 +29,32 @@
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
 import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 export default {
-  name: "Index",
-  components: {
-    RequiredScopesWarning,
-    DispatchUpdateButton,
-      EntitySelectionButton, PageHeader, CharacterContactPanel,},
-  layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
-  props: {
-      dispatchTransferObject: {
-      required: true,
-      type: Object
+    name: "Index",
+    components: {
+        RequiredScopesWarning,
+        DispatchUpdateButton,
+        EntitySelectionButton, PageHeader, CharacterContactPanel,},
+    props: {
+        dispatchTransferObject: {
+            required: true,
+            type: Object
+        },
+        characters: {
+            required: true,
+            type: Array
+        }
     },
-    characters: {
-      required: true,
-      type: Array
+    data() {
+        return {
+            pageTitle: 'Character Contacts',
+        }
     }
-  },
-  data() {
-    return {
-      pageTitle: 'Character Contacts',
-    }
-  }
 }
 </script>
 

@@ -46,7 +46,9 @@ class ControlGroupsController
 {
     public function index()
     {
-        return Inertia::render('AccessControl/ControlGroupsIndex');
+        return Inertia::render('AccessControl/ControlGroupsIndex', [
+            'activeSidebarElement' => 'acl.groups'
+        ]);
     }
 
     public function create(Request $request)
@@ -79,7 +81,7 @@ class ControlGroupsController
             'affiliations' => $existing_affiliations,
             'available-permissions' => $permissions,
             'permissions' => $role->permissions,
-            'activeSidebarElement' => route('acl.groups'),
+            'activeSidebarElement' => 'acl.groups',
         ]);
     }
 

@@ -30,9 +30,11 @@ import PageHeader from "@/Shared/Layout/PageHeader";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import SkillsComponent from "../../../Shared/Components/Skills/SkillsComponent";
+import SingleColumnLayout from "../../../Shared/SidebarLayout/SingleColumnLayout";
 export default {
     name: "Index",
     components: {SkillsComponent, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
+    layout: SingleColumnLayout,
     props: {
         dispatchTransferObject: {
             required: true,
