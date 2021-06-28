@@ -60,7 +60,6 @@ class CheckPermissionAffiliation
         ]);
 
         if (auth()->user()->can('superuser')) {
-
             $this->appendValidatedIds($request->request, collect($validated_data)->flatten());
 
             return $next($request);
@@ -182,7 +181,6 @@ class CheckPermissionAffiliation
 
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
-
         $bag->add(['validated_ids' =>  $validated_ids->all()]);
     }
 }

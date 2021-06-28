@@ -47,7 +47,7 @@ class ControlGroupsController
     public function index()
     {
         return Inertia::render('AccessControl/ControlGroupsIndex', [
-            'activeSidebarElement' => 'acl.groups'
+            'activeSidebarElement' => 'acl.groups',
         ]);
     }
 

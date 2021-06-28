@@ -37,7 +37,7 @@ class SchedulesIndex extends Controller
         return Inertia::render('Configuration/Schedules/SchedulesIndex', [
             'schedules' => Schedules::all(),
             'expressions' => config('web.cronExpressions'),
-            'activeSidebarElement' => 'server.settings'
+            'activeSidebarElement' => 'server.settings',
         ]);
     }
 }

@@ -52,19 +52,18 @@ class MailsController extends Controller
 
     public function mailHeaders(Request $request)
     {
-
         $validated_data = $request->validate([
-            'validated_ids' => ['required', 'array']
+            'validated_ids' => ['required', 'array'],
         ]);
 
         $validated_ids = data_get($validated_data, 'validated_ids');
 
         return Mail::query()
             ->select('id', 'from', 'subject', 'timestamp')
-            ->whereHas('recipients', fn(Builder $query) => $query->whereHasMorph(
+            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn(Builder $query) => $query->whereIn('character_id', $validated_ids)
+                fn (Builder $query) => $query->whereIn('character_id', $validated_ids)
             ))
             ->orderByDesc('timestamp')
             ->paginate();
@@ -76,23 +75,22 @@ class MailsController extends Controller
 
         $mail = Mail::query()
             ->with(['recipients', 'labels'])
-            ->whereHas('recipients', fn(Builder $query) => $query->whereHasMorph(
+            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn(Builder $query) => $query->whereIn('character_id', $affiliated_ids)
+                fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids)
             ))
             ->firstWhere('id', $mail_id);
 
-        return $mail ? EveMailService::make($mail)->getThreads(): [];
-
+        return $mail ? EveMailService::make($mail)->getThreads() : [];
     }
 
-    private function getDispatchTransferObject() : object
+    private function getDispatchTransferObject(): object
     {
         return CreateDispatchTransferObject::new()->create(Mail::class);
     }
 
-    private function getAffiliatedIds(object $dispatchTransferObject) : Collection
+    private function getAffiliatedIds(object $dispatchTransferObject): Collection
     {
         return GetAffiliatedIdsService::make()
             ->viaDispatchTransferObject($dispatchTransferObject)
