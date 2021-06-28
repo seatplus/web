@@ -5,9 +5,13 @@ namespace Seatplus\Web\Tests\Integration;
 
 
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\Fluent\AssertableJson;
+use Inertia\Testing\Assert;
 use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Eveapi\Models\Mail\MailLabel;
+use Seatplus\Eveapi\Models\Mail\MailMailLabel;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Services\Mails\EveMailService;
@@ -16,6 +20,16 @@ use Spatie\Permission\PermissionRegistrar;
 
 class MailsIntegrationTest extends TestCase
 {
+    /** @test */
+    public function see_component()
+    {
+
+        $response = $this->actingAs($this->test_user)
+            ->get(route('character.mails'));
+
+        $response->assertInertia( fn (Assert $page) => $page->component('Character/Mail/Index'));
+    }
+
     /** @test */
     public function getMailHeadersOfSecondaryUser()
     {
@@ -48,6 +62,20 @@ class MailsIntegrationTest extends TestCase
             'receivable_type' => CharacterInfo::class,
         ]));
 
+        $mail_label = MailLabel::create([
+            'label_id' => 1,
+            'character_id' => $this->test_character->character_id,
+            'color' => '#ffff01',
+            'name' => 'label_name',
+            'unread_count' => 0
+        ]);
+
+        MailMailLabel::create([
+            'mail_id' => $mail->id,
+            'label_id' => $mail_label->label_id,
+            'character_id' => $this->test_character->character_id
+        ]);
+
 
         //Prepare ESI Response of GetIdsFromNamesService
         $data = [
@@ -76,10 +104,8 @@ class MailsIntegrationTest extends TestCase
             ->once()
             ->andReturn($response);
 
-        $eve_mail = EveMailService::make($mail->refresh())->getThreads();
-
-        $this->assertCount(4, $eve_mail);
-
-
+        $this->actingAs($this->test_user)
+            ->get(route('get.mail', $mail->id))
+            ->assertJson(fn(AssertableJson $json) => $json->count(4));
     }
 }
