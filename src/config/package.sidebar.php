@@ -36,22 +36,22 @@ return [
         [
             'name' => 'Assets',
             'route' => 'character.assets',
-            'icon' => 'ArchiveIcon'
+            'icon' => 'ArchiveIcon',
         ],
         [
             'name' => 'Contacts',
             'route' => 'character.contacts',
-            'icon' => 'UsersIcon'
+            'icon' => 'UsersIcon',
         ],
         [
             'name' => 'Wallets',
             'route' => 'character.wallets',
-            'icon' => 'CashIcon'
+            'icon' => 'CashIcon',
         ],
         [
             'name' => 'Contracts',
             'route' => 'character.contracts',
-            'icon' => 'PencilAltIcon'
+            'icon' => 'PencilAltIcon',
         ],
         [
             'name' => 'Skills',
@@ -65,28 +65,28 @@ return [
             'permission' => 'wallets',
             'character_role' => 'Accountant|Junior_Accountant',
             'route' => 'corporation.wallet',
-            'icon' => 'CashIcon'
+            'icon' => 'CashIcon',
         ],
         [
             'name' => 'Member Tracking',
             'permission' => 'view member tracking',
             'character_role' => 'director',
             'route' => 'corporation.member_tracking',
-            'icon' => 'BadgeCheckIcon'
+            'icon' => 'BadgeCheckIcon',
         ],
         [
             'name' => 'Member Compliance',
             'permission' => 'view member compliance',
             'character_role' => 'director',
             'route' => 'corporation.member_compliance',
-            'icon' => 'ShieldCheckIcon'
+            'icon' => 'ShieldCheckIcon',
         ],
         [
             'name' => 'Recruitment',
             'permission' => 'can open or close corporations for recruitment|can accept or deny applications',
             'character_role' => 'director',
             'route' => 'corporation.recruitment',
-            'icon' => 'ClipboardCheckIcon'
+            'icon' => 'ClipboardCheckIcon',
         ],
     ],
     'Access Control' => [
@@ -94,7 +94,7 @@ return [
             'name' => 'Control Group',
             'permission' => 'view access control',
             'route' => 'acl.groups',
-            'icon' => 'UserGroupIcon'
+            'icon' => 'UserGroupIcon',
         ],
     ],
     'settings' => [
@@ -102,13 +102,13 @@ return [
             'name'  => 'Server Settings',
             'permission' => 'superuser',
             'route' => 'server.settings',
-            'icon' => 'CogIcon'
+            'icon' => 'CogIcon',
         ],
         [
             'name'  => 'Manual Locations',
             'permission' => 'manage manual locations',
             'route' => 'manage.manual_locations',
-            'icon' => 'LocationMarkerIcon'
+            'icon' => 'LocationMarkerIcon',
         ],
     ],
 ];
