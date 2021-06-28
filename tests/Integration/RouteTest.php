@@ -27,7 +27,7 @@ class RouteTest extends TestCase
     }
 
     /** @test */
-    public function it_allowes_superuser_on_protected_access_control_routes()
+    public function it_allows_superuser_on_protected_access_control_routes()
     {
         $permission = Permission::findOrCreate('superuser');
 

@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Inertia\ServiceProvider as InertiaServiceProviderAlias;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use phpDocumentor\Reflection\Types\Callable_;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;

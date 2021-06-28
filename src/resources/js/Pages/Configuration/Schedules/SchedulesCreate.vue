@@ -79,7 +79,6 @@
                 required: true
             }
         },
-        layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
         data() {
             return {
                 expression: '',

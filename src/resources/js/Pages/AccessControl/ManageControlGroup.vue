@@ -227,7 +227,6 @@ export default {
         OnRequestControlGroup,
         AutomaticRole,
         Manual, HeaderButton, PageHeader},
-    layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
     props: {
         role: {
             required: true

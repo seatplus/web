@@ -193,7 +193,6 @@
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import ContractRowComponent from "@/Shared/Components/Contracts/ContractRowComponent";
 import WideListElement from "@/Shared/WideListElement";
@@ -202,8 +201,7 @@ import WideLists from "@/Shared/WideLists";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 export default {
     name: "ContractDetails",
-    components: {CardWithHeader, WideLists, EveImage, WideListElement, ContractRowComponent, PageHeader, Layout},
-    layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
+    components: {CardWithHeader, WideLists, EveImage, WideListElement, ContractRowComponent, PageHeader},
     props: {
         contract: {
             required: true,

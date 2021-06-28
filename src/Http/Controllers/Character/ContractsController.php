@@ -69,7 +69,7 @@ class ContractsController extends Controller
 
         return inertia('Character/Contract/ContractDetails', [
             'contract' => $query->first(),
-            'activeSidebarElement' => route('character.contracts'),
+            'activeSidebarElement' => 'character.contracts',
         ]);
     }
 }

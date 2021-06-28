@@ -112,6 +112,14 @@
         :character-id="character.character_id"
       />
     </div>
+    <div
+      v-if="isActive('Mails')"
+    >
+      <MailList
+        :character-ids="characterIds"
+        :recruitment-view="true"
+      />
+    </div>
   </div>
 </template>
 
@@ -122,14 +130,16 @@ import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJou
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
-import CorporationHistoryComponent from "../../../Shared/Components/Character/CorporationHistoryComponent";
-import SkillsComponent from "../../../Shared/Components/Skills/SkillsComponent";
+import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
+import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
+import MailList from "@/Shared/Components/Mails/MailList";
 
-const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills']
+const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
 
 export default {
     name: "TabComponent",
     components: {
+        MailList,
         SkillsComponent,
         CorporationHistoryComponent,
         WalletJournalBalanceChart, ContractComponent,
@@ -174,6 +184,9 @@ export default {
                 character_ids: _.map(this.recruit.characters, character => character.character_id),
                 withUnknownLocations: true
             }
+        },
+        characterIds() {
+            return _.map(this.recruit.characters, character => character.character_id)
         }
     },
     methods: {

@@ -24,26 +24,20 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
+use Illuminate\Support\Facades\Route;
+use Seatplus\Eveapi\Models\Skills\Skill;
+use Seatplus\Web\Http\Controllers\Character\MailsController;
+use Seatplus\Web\Http\Controllers\Character\SkillsController;
 
-use Inertia\Inertia;
-use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
+Route::prefix('mails')
+    ->group(callback: function () {
+        Route::get('', [MailsController::class, 'index'])->name('character.mails');
+        Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
 
-class OverviewController extends Controller
-{
-    public function __invoke()
-    {
-        $available_scopes = config('eveapi.scopes');
-
-        $sso_scopes_entries = function () {
-            return (new GetSsoScopeEntries)->execute();
-        };
-
-        return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
-            'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
-            'activeSidebarElement' => 'server.settings',
-        ]);
-    }
-}
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Skill::class)))
+            ->group(function () {
+                Route::get('/headers/', [MailsController::class, 'mailHeaders'])->name('get.mail.headers');
+                /*Route::get('/{character_id}/skills', [SkillsController::class, 'skills'])->name('get.character.skills');
+                Route::get('/{character_id}/skillqueue', [SkillsController::class, 'skillQueue'])->name('get.character.skill.queue');*/
+            });
+    });

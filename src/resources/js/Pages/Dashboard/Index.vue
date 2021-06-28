@@ -26,7 +26,6 @@ import Characters from "./Characters"
 export default {
     name: "Index",
     components: {Characters, Enlistments, PageHeader},
-    layout: Layout,
     props: {
         characters: {
             type: Array
