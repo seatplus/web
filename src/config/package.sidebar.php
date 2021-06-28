@@ -56,7 +56,12 @@ return [
         [
             'name' => 'Skills',
             'route' => 'character.skills',
-            'symbol' => 'AcademicCapIcon',
+            'icon' => 'AcademicCapIcon',
+        ],
+        [
+            'name' => 'Mails',
+            'route' => 'character.mails',
+            'icon' => 'InboxIcon',
         ],
     ],
     'corporation' => [
