@@ -33,6 +33,7 @@ use Illuminate\Support\Collection;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\HasCharacterNecessaryRole;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class CheckPermissionAffiliation
 {
@@ -52,7 +53,16 @@ class CheckPermissionAffiliation
      */
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
     {
+        $validated_data = $request->validate([
+            'character_ids' => ['sometimes', 'array'],
+            'corporation_ids' => ['sometimes', 'array'],
+            'alliance_ids' => ['sometimes', 'array'],
+        ]);
+
         if (auth()->user()->can('superuser')) {
+
+            $this->appendValidatedIds($request->request, collect($validated_data)->flatten());
+
             return $next($request);
         }
 
@@ -68,7 +78,9 @@ class CheckPermissionAffiliation
             Arr::get($url_parameters, 'alliance_id'),
         ])->filter();
 
-        if ($requested_id->isEmpty()) {
+        $requested_ids = collect($validated_data)->merge($requested_id)->flatten();
+
+        if ($requested_ids->isEmpty()) {
             abort_unless($this->assertIfUserHasRequiredPermissionOrCharacterRole($permissions, $character_role), 403, 'You do not have the necessary permission to perform this action.');
 
             return $next($request);
@@ -82,7 +94,11 @@ class CheckPermissionAffiliation
             $this->buildAffiliatedIdsByCharacterRole($character_role);
         }
 
-        abort_unless($requested_id->intersect($this->getAffiliatedIds()->toArray())->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
+        $validated_ids = $requested_ids->intersect($this->getAffiliatedIds()->toArray());
+
+        abort_unless($validated_ids->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
+
+        $this->appendValidatedIds($request->request, $validated_ids);
 
         return $next($request);
     }
@@ -162,5 +178,11 @@ class CheckPermissionAffiliation
         $this->affiliated_ids->push($affiliated_ids_from_character_role);
 
         return $affiliated_ids_from_character_role;
+    }
+
+    private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
+    {
+
+        $bag->add(['validated_ids' =>  $validated_ids->all()]);
     }
 }

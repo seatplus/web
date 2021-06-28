@@ -35,6 +35,7 @@ use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
@@ -86,6 +87,12 @@ class CreateDispatchTransferObject
                 'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
                 'permission' => $this->getPermission(Skill::class),
                 'required_scopes' => $this->getRequiredScopes('skills'),
+                'required_corporation_role' => '',
+            ],
+            Mail::class => [
+                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
+                'permission' => $this->getPermission(Mail::class),
+                'required_scopes' => $this->getRequiredScopes('mails'),
                 'required_corporation_role' => '',
             ]
         };

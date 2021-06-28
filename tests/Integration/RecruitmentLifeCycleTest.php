@@ -467,9 +467,10 @@ class RecruitmentLifeCycleTest extends TestCase
             ->assertOk();
 
         // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
-        $this->actingAs($recruiter)
+        $response = $this->actingAs($recruiter)
             ->get(route('character.wallet_journal.detail', $this->secondary_character->character_id))
             ->assertOk();
+
 
         // Any other character should be forbidden
         $this->actingAs($recruiter)

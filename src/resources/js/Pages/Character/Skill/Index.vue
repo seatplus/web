@@ -34,7 +34,6 @@ import SingleColumnLayout from "../../../Shared/SidebarLayout/SingleColumnLayout
 export default {
     name: "Index",
     components: {SkillsComponent, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
-    layout: SingleColumnLayout,
     props: {
         dispatchTransferObject: {
             required: true,

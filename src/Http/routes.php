@@ -60,6 +60,7 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Character/Contract.php';
                         include __DIR__ . '/Routes/Character/CorporationHistory.php';
                         include __DIR__ . '/Routes/Character/Skills.php';
+                        include __DIR__ . '/Routes/Character/Mails.php';
                     });
 
                 Route::prefix('corporation')

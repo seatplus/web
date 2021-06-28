@@ -237,7 +237,8 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col w-0 flex-1 overflow-hidden">
+    <!--    flex w-0 flex-1 overflow-hidden -->
+    <div class="flex flex-col md:flex-row min-w-0 flex-1 overflow-hidden">
       <div class="md:hidden">
         <div class="flex items-center justify-between bg-gray-800 border-b border-gray-200 px-4 py-1.5">
           <div>

@@ -42,6 +42,7 @@ class GetRecruitmentIndexController extends Controller
         return Inertia::render('Corporation/Recruitment/RecruitmentIndex', [
             'can_manage_recruitment' => $can_manage_recruitment,
             'corporations' => $this->getCorporations(),
+            'activeSidebarElement' => 'corporation.recruitment'
         ]);
     }
 
