@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services\Controller;
 
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\MailsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
@@ -90,7 +91,7 @@ class CreateDispatchTransferObject
                 'required_corporation_role' => '',
             ],
             Mail::class => [
-                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
+                'manual_job' => $this->getManualJob(MailsHydrateBatch::class),
                 'permission' => $this->getPermission(Mail::class),
                 'required_scopes' => $this->getRequiredScopes('mails'),
                 'required_corporation_role' => '',
