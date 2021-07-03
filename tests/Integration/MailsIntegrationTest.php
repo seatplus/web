@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
 use Seat\Eseye\Containers\EsiResponse;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailLabel;
@@ -56,25 +57,13 @@ class MailsIntegrationTest extends TestCase
             'body' => $body
         ]);
 
+        $secondary_charcter = Event::fakeFor( fn() => CharacterInfo::factory()->create());
+
         $mail_receipient = Event::fakeFor( fn() =>  MailRecipients::factory()->create([
             'mail_id' => $mail->id,
-            'receivable_id' => $this->test_character->character_id,
+            'receivable_id' => $secondary_charcter->character_id,
             'receivable_type' => CharacterInfo::class,
         ]));
-
-        $mail_label = MailLabel::create([
-            'label_id' => 1,
-            'character_id' => $this->test_character->character_id,
-            'color' => '#ffff01',
-            'name' => 'label_name',
-            'unread_count' => 0
-        ]);
-
-        MailMailLabel::create([
-            'mail_id' => $mail->id,
-            'label_id' => $mail_label->label_id,
-            'character_id' => $this->test_character->character_id
-        ]);
 
 
         //Prepare ESI Response of GetIdsFromNamesService
@@ -103,6 +92,17 @@ class MailsIntegrationTest extends TestCase
         RetrieveEsiData::shouldReceive('execute')
             ->once()
             ->andReturn($response);
+
+        // Give user superuser
+        $permission = Permission::findOrCreate('superuser');
+
+        $this->test_user->givePermissionTo($permission);
+
+        // now re-register all the roles and permissions
+        $this->app->make(PermissionRegistrar::class)->registerPermissions();
+
+        $this->assertTrue($this->test_user->can('superuser'));
+        $this->assertCount(1, Mail::all());
 
         $this->actingAs($this->test_user)
             ->get(route('get.mail', $mail->id))
