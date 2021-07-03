@@ -34,7 +34,7 @@ use Seatplus\Web\Services\GetIdsFromNamesService;
 
 class EveMailService
 {
-    private \Illuminate\Support\Collection $namesToResolve;
+    private Collection $namesToResolve;
 
     public function __construct(private Mail $mail)
     {
@@ -73,7 +73,6 @@ class EveMailService
             'from' => ['id' => $this->mail->from],
             'recipients' => $this->mail->recipients->map(fn ($recipient) => ['id' => $recipient->receivable_id]),
             'timestamp' => carbon($this->mail->timestamp),
-            'labels' => $this->mapLabels($this->mail->labels),
             'subject' => $this->mail->subject,
             'body' => $mail,
         ];
@@ -123,40 +122,9 @@ class EveMailService
 
         $mail['recipients'] = collect($mail['recipients'])
             ->map(fn (string $recipient) => (array) $resolved_names->firstWhere('name', $recipient))
+            ->filter()
             ->toArray();
 
         return $mail;
-    }
-
-    private function mapLabels(Collection $collection)
-    {
-        return $collection->map(fn ($label) => [
-            'name' => $label->name,
-            'color' => $label->color,
-        ]);
-    }
-
-    private function mapColors(string $hexcode): string
-    {
-        return match ($hexcode) {
-            '#0000fe' => 'bg-indigo-100 text-indigo-800',
-            '#006634'  => 'bg-emerald-100 text-emerald-800',
-            '#0099ff' => 'bg-blue-100 text-blue-800',
-            '#00ff33' => 'bg-lime-100 text-lime-800',
-            '#01ffff' => 'bg-sky-100 text-sky-800',
-            '#349800' => 'bg-green-100 text-green-800',
-            '#660066' => 'bg-fuchsia-100 text-fuchsia-800',
-            '#666666', 'default' => 'bg-gray-100 text-gray-800',
-            '#999999' => 'bg-warmGray-100 text-warmGray-800',
-            '#99ffff' => 'bg-cyan-100 text-cyan-800',
-            '#9a0000' => 'bg-rose-100 text-rose-800',
-            '#ccff9a' => 'bg-teal-100 text-teal-800',
-            '#e6e6e6' => 'bg-coolGray-100 text-coolGray-800',
-            '#fe0000' => 'bg-red-100 text-red-800',
-            '#ff6600' => 'bg-orange-100 text-orange-800',
-            '#ffff01' => 'bg-yellow-100 text-yellow-800',
-            '#ffffcd' => 'bg-trueGray-100 text-trueGray-800',
-            '#ffffff' => 'bg-blueGray-100 text-blueGray-800'
-        };
     }
 }

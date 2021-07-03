@@ -34,6 +34,7 @@ use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
+use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\Mails\EveMailService;
 
 class MailsController extends Controller
@@ -71,14 +72,15 @@ class MailsController extends Controller
 
     public function getMail(int $mail_id)
     {
-        $affiliated_ids = $this->getAffiliatedIds($this->getDispatchTransferObject());
+        $permission = data_get($this->getDispatchTransferObject(), 'permission');
+        $affiliated_ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])->unique();
 
         $mail = Mail::query()
-            ->with(['recipients', 'labels'])
+            ->with(['recipients'])
             ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids)
+                fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids->toArray())
             ))
             ->firstWhere('id', $mail_id);
 

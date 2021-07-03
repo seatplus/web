@@ -19,26 +19,32 @@
         </PageHeader>
 
         <div class="block lg:hidden">
-          <MailList
+          <MobileMailList
             v-model:selectedId="selectedId"
             :character-ids="characterIds"
           />
         </div>
 
-        <MailRepresentation
-          v-if="selectedId"
-          :key="selectedId"
-          :mail-id="selectedId"
-        />
+        <div class="hidden md:block space-y-3">
+          <MailRepresentation
+            v-if="selectedId"
+            :key="selectedId"
+            :mail-id="selectedId"
+          />
+        </div>
       </div>
     </div>
     <template #aside>
-      <div class="absolute inset-0 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
+      <DesktopMailList
+        v-model:selectedId="selectedId"
+        :character-ids="characterIds"
+      />
+      <!--      <div class="absolute inset-0 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
         <MailList
           v-model:selectedId="selectedId"
           :character-ids="characterIds"
         />
-      </div>
+      </div>-->
     </template>
   </MultiColumnLayout>
 </template>
@@ -49,14 +55,16 @@ import PageHeader from "../../../Shared/Layout/PageHeader";
 import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
 import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
 import MultiColumnLayout from "../../../Shared/SidebarLayout/MultiColumnLayout";
-import MailList from "../../../Shared/Components/Mails/MailList";
 import {ref} from "vue";
 import MailRepresentation from "../../../Shared/Components/Mails/MailRepresentation";
+import DesktopMailList from "../../../Shared/Components/Mails/DesktopMailList";
+import MobileMailList from "../../../Shared/Components/Mails/MobileMailList";
 export default {
     name: "Index",
     components: {
+        MobileMailList,
+        DesktopMailList,
         MailRepresentation,
-        MailList,
         MultiColumnLayout, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
     layout: null,
     props: {

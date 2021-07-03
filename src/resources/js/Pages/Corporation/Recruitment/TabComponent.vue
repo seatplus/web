@@ -115,9 +115,8 @@
     <div
       v-if="isActive('Mails')"
     >
-      <MailList
+      <MobileMailList
         :character-ids="characterIds"
-        :recruitment-view="true"
       />
     </div>
   </div>
@@ -132,14 +131,14 @@ import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
 import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
-import MailList from "@/Shared/Components/Mails/MailList";
+import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 
 const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
 
 export default {
     name: "TabComponent",
     components: {
-        MailList,
+        MobileMailList,
         SkillsComponent,
         CorporationHistoryComponent,
         WalletJournalBalanceChart, ContractComponent,
