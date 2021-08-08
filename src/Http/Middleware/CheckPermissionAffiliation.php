@@ -38,10 +38,12 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class CheckPermissionAffiliation
 {
     private Collection $affiliated_ids;
+    private User $user;
 
     public function __construct()
     {
         $this->affiliated_ids = collect();
+        $this->user = User::find(auth()->user()->getAuthIdentifier());
     }
 
     /**
@@ -59,7 +61,7 @@ class CheckPermissionAffiliation
             'alliance_ids' => ['sometimes', 'array'],
         ]);
 
-        if (auth()->user()->can('superuser')) {
+        if ($this->user->can('superuser')) {
             $this->appendValidatedIds($request->request, collect($validated_data)->flatten());
 
             return $next($request);
@@ -115,7 +117,7 @@ class CheckPermissionAffiliation
     private function checkUserPermissions(array $permissions): bool
     {
         foreach ($permissions as $permission) {
-            if (auth()->user()->can($permission)) {
+            if ($this->user->can($permission)) {
                 return true;
             }
         }
@@ -163,8 +165,8 @@ class CheckPermissionAffiliation
 
     private function buildAffiliatedIdsByCharacterRole(string $character_role): array
     {
-        $affiliated_ids_from_character_role = User::with('characters.roles', 'characters.corporation')
-            ->find(auth()->user()->getAuthIdentifier())
+        $affiliated_ids_from_character_role = $this->user
+            ->load(['characters.roles', 'characters.corporation'])
             ->characters
             ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
                 ? $character->corporation->corporation_id
