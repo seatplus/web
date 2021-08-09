@@ -43,7 +43,6 @@ class CheckPermissionAffiliation
     public function __construct()
     {
         $this->affiliated_ids = collect();
-        $this->user = User::find(auth()->user()->getAuthIdentifier());
     }
 
     /**
@@ -61,7 +60,9 @@ class CheckPermissionAffiliation
             'alliance_ids' => ['sometimes', 'array'],
         ]);
 
-        if ($this->user->can('superuser')) {
+        $this->setUser();
+
+        if ($this->getUser()->can('superuser')) {
             $this->appendValidatedIds($request->request, collect($validated_data)->flatten());
 
             return $next($request);
@@ -117,7 +118,7 @@ class CheckPermissionAffiliation
     private function checkUserPermissions(array $permissions): bool
     {
         foreach ($permissions as $permission) {
-            if ($this->user->can($permission)) {
+            if ($this->getUser()->can($permission)) {
                 return true;
             }
         }
@@ -165,7 +166,7 @@ class CheckPermissionAffiliation
 
     private function buildAffiliatedIdsByCharacterRole(string $character_role): array
     {
-        $affiliated_ids_from_character_role = $this->user
+        $affiliated_ids_from_character_role = $this->getUser()
             ->load(['characters.roles', 'characters.corporation'])
             ->characters
             ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
@@ -184,5 +185,15 @@ class CheckPermissionAffiliation
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
         $bag->add(['validated_ids' =>  $validated_ids->all()]);
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(): void
+    {
+        $this->user = User::find(auth()->user()->getAuthIdentifier());
     }
 }
