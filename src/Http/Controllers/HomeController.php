@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
@@ -59,16 +58,16 @@ class HomeController extends Controller
 
     public function getOwnApplications(int $corporation_id)
     {
-        return Application::with([
-            'applicationable' => fn (MorphTo $morph_to) => $morph_to
-                ->constrain([
-                    User::class => fn (Builder $query) => $query->where('id', auth()->user()->getAuthIdentifier()),
-                    CharacterInfo::class => fn (Builder $query) => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
-                ])
-                ->morphWith([
-                    User::class => ['characters'],
-                ]),
-        ])->whereCorporationId($corporation_id)
+        return Application::whereHasMorph(
+            'applicationable',
+            [User::class, CharacterInfo::class],
+            function (Builder $query, $type) {
+                match ($type) {
+                    User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
+                };
+            }
+        )->whereCorporationId($corporation_id)
             ->paginate();
     }
 }
