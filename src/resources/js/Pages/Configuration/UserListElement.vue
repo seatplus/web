@@ -27,10 +27,7 @@
         v-if="characters.length > 0"
         class="px-4 py-4 sm:px-6 truncate text-gray-500 leading-5 text-sm"
       >
-        Characters: <span
-          v-for="character in characters"
-          :key="character.character_id"
-        > {{ character.name }} </span>
+        Characters: {{ characterNames }}
       </div>
     </div>
   </li>
@@ -54,6 +51,9 @@ export default {
     computed: {
         characters() {
             return _.reject(this.user.characters, (character)  => _.isEqual(character.character_id, this.user.main_character.character_id))
+        },
+        characterNames() {
+            return _.join(_.map(this.characters, (character) => character.name), ', ')
         }
     }
 }
