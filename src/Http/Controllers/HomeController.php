@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
@@ -63,7 +62,6 @@ class HomeController extends Controller
             'applicationable',
             [User::class, CharacterInfo::class],
             function (Builder $query, $type) {
-
                 match ($type) {
                     User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
                     CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
