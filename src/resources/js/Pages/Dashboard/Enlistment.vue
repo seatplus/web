@@ -3,7 +3,7 @@
     class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 cursor-pointer  hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
     @click="openModal = true"
   >
-    <div class="relative -mr-px w-0 flex-1 inline-flex items-center justify-between py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+    <div class="relative -mr-px w-0 flex-1 inline-flex items-center justify-between py-4 text-sm leading-5 text-gray-700 font-medium transition ease-in-out duration-150">
       <EntityBlock :entity="enlistment.corporation" />
       <span
         v-if="hasApplications"
