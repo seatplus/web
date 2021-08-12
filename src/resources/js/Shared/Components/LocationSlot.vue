@@ -72,6 +72,7 @@
 
           <template #navigation>
             <svg
+              v-if="hasContent(asset.content)"
               :class="[{'text-gray-400' : hasContent(asset.content), 'text-transparent' : !hasContent(asset.content)},'h-5 w-5']"
               fill="currentColor"
               viewBox="0 0 20 20"

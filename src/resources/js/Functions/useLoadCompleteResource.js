@@ -14,7 +14,7 @@ export function useLoadCompleteResource(routeName, params) {
         await axios.get(url.value, { params: { page: 1 }})
             .then(response => {
 
-                last_page = response.data.last_page
+                last_page = _.get(response, 'data.last_page', _.get(response, 'data.meta.last_page'))
 
                 if (response.data.data.length) {
                     results.value.push(...response.data.data);
