@@ -1,31 +1,30 @@
 <template>
- <div>
-   <teleport to="#head">
-     <title>{{ title(object.name) }}</title>
-   </teleport>
-   <PageHeader :breadcrumbs="breadcrumbs">
-     <div class="flex items-center">
-       <div class="flex-shrink-0">
-         <EveImage
-           :object="object"
-           :size="256"
-           tailwind_class="h-12 w-12 rounded-full"
-         />
-       </div>
-       <div class="ml-4">
-         <h3 class="text-lg leading-6 font-medium text-gray-900">
-           {{ object.name }}
-         </h3>
-       </div>
-     </div>
-   </PageHeader>
+  <div>
+    <teleport to="#head">
+      <title>{{ title(object.name) }}</title>
+    </teleport>
+    <PageHeader :breadcrumbs="breadcrumbs">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <EveImage
+            :object="object"
+            :size="256"
+            tailwind_class="h-12 w-12 rounded-full"
+          />
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            {{ object.name }}
+          </h3>
+        </div>
+      </div>
+    </PageHeader>
 
-   <ItemLayout :items="object.content" />
- </div>
+    <ItemLayout :items="object.content" />
+  </div>
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
 import EveImage from "@/Shared/EveImage"
 import PageHeader from "@/Shared/Layout/PageHeader";
 import ItemLayout from "@/Shared/Components/ItemLayout";
@@ -33,7 +32,7 @@ import ItemLayout from "@/Shared/Components/ItemLayout";
 export default {
     name: "ItemDetails",
     components : {ItemLayout, PageHeader, EveImage},
-  props: {
+    props: {
         item: {
             type    : Object,
             required: true

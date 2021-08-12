@@ -96,7 +96,7 @@ class AssetsController extends Controller
     public function details(int $item_id)
     {
         $query = EveApiAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->whereIn('assetable_id', [...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()])
             ->where('item_id', $item_id);
 
         $item = AssetResource::collection($query->get());
