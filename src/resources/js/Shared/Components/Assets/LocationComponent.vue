@@ -49,7 +49,6 @@ import LocationName from "./LocationName";
 import ItemList from "./ItemList";
 import AddManualLocationModal from "./AddManualLocationModal";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {onBeforeMount, ref} from "vue";
 
 export default {
     name: "LocationComponent",
