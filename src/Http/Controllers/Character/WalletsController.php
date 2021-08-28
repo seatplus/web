@@ -26,6 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -59,6 +62,16 @@ class WalletsController extends Controller
 
     public function balance(int $character_id)
     {
+
+        $balance_part = Balance::query()
+            ->whereHasMorph(
+                'balanceable',
+                CharacterInfo::class,
+                fn(Builder $query) => $query->where('character_id', $character_id)
+            )
+            ->limit(1)
+            ->select(['updated_at as x', 'balance as y']);
+
         $date_part = WalletJournal::query()
             ->whereBetween('date', [now(), now()->subDays(request()->get('days', 30))])
             ->orderByDesc('date')
@@ -68,6 +81,7 @@ class WalletsController extends Controller
             ->limit(90)
             ->orderByDesc('date')
             ->union($date_part)
+            ->union($balance_part)
             ->where('wallet_journable_id', $character_id)
             ->select(['date as x', 'balance as y'])
             ->paginate();
