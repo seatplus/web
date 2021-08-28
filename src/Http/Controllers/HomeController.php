@@ -31,7 +31,6 @@ use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
