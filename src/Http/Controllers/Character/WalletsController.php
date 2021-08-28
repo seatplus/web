@@ -62,12 +62,11 @@ class WalletsController extends Controller
 
     public function balance(int $character_id)
     {
-
         $balance_part = Balance::query()
             ->whereHasMorph(
                 'balanceable',
                 CharacterInfo::class,
-                fn(Builder $query) => $query->where('character_id', $character_id)
+                fn (Builder $query) => $query->where('character_id', $character_id)
             )
             ->limit(1)
             ->select(['updated_at as x', 'balance as y']);
