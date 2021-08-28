@@ -31,7 +31,6 @@ use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
@@ -39,13 +38,7 @@ class HomeController extends Controller
     public function home()
     {
         return Inertia::render('Dashboard/Index', [
-            'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
-                ->addSelect([
-                    'balance' => WalletJournal::select('balance')
-                        ->whereColumn('wallet_journable_id', 'character_infos.character_id')
-                        ->orderByDesc('date')
-                        ->limit(1),
-                ])
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
         ]);
