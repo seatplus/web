@@ -40,6 +40,7 @@
     "require-dev": {
         "orchestra/testbench": "^6.10",
         "nunomaduro/collision": "^5.3",
+        "phpunit/phpunit": "^9.5",
         "spatie/phpunit-watcher": "^1.11",
         "rector/rector": "^0.9.2",
         "brianium/paratest": "^6.2"
