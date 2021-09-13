@@ -31,7 +31,7 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HasCharacterNecessaryRole
 {
-    public static function check(CharacterInfo $character, string | array $roles): bool
+    public static function check(CharacterInfo $character, string|array $roles): bool
     {
         if ($character->roles->hasRole('roles', 'Director')) {
             return true;
