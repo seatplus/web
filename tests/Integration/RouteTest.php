@@ -2,9 +2,7 @@
 
 
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
-
 
 it('protects configurations routes', function () {
     $response = test()->actingAs(test()->test_user)

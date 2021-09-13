@@ -4,8 +4,6 @@
 use Illuminate\Support\Facades\Event;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Web\Http\Resources\Universe\GroupResource;
-use Seatplus\Web\Tests\TestCase;
-
 
 test('correct data is returned in response', function () {
     $group = Event::fakeFor(fn () => Group::factory()->create());

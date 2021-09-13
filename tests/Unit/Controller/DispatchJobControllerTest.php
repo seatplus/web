@@ -1,19 +1,9 @@
 <?php
 
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
-use Seatplus\Eveapi\Services\DispatchIndividualUpdate;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
-use Seatplus\Web\Tests\TestCase;
-use Spatie\Permission\PermissionRegistrar;
-
 
 beforeEach(function () {
     test()->dispatch_transfer_object = [

@@ -1,7 +1,6 @@
 <?php
 
 
-use Seatplus\Web\Tests\TestCase;
 
 
 test('invoke', function () {

@@ -4,9 +4,7 @@
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
-
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');

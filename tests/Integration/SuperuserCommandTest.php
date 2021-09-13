@@ -6,8 +6,6 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Web\Tests\TestCase;
-
 
 beforeEach(function () {
     // this assures that we have a user->characters relationship

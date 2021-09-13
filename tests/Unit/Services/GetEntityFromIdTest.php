@@ -2,16 +2,11 @@
 
 
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use Faker\Generator;
 use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\GetEntityFromId;
-use Seatplus\Web\Services\GetNamesFromIdsService;
-use Seatplus\Web\Tests\TestCase;
-
 
 test('happy path', function () {
     $character = CharacterInfo::factory()->create();

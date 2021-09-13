@@ -2,10 +2,7 @@
 
 
 use Inertia\Testing\Assert;
-use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
-use Seatplus\Web\Tests\TestCase;
-
 
 test('see component', function () {
 

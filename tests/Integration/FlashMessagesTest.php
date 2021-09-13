@@ -3,8 +3,6 @@
 
 use Inertia\Testing\Assert;
 use Inertia\Inertia;
-use Seatplus\Web\Tests\TestCase;
-
 
 beforeEach(function () {
     Inertia::share([

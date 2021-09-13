@@ -2,9 +2,7 @@
 
 
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
-
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');

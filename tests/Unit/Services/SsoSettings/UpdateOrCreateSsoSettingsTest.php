@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Bus;
 use Seatplus\Eveapi\Jobs\Alliances\AllianceInfoJob;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Tests\TestCase;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
-
 
 it('calls alliance info action', function () {
      /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);

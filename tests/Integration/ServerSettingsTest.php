@@ -5,9 +5,7 @@ use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
-
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');

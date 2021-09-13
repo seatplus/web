@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Http;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\GetNamesFromIdsService;
-use Seatplus\Web\Tests\TestCase;
-
 
 it('stores resolved id to cache', function () {
 

@@ -1,9 +1,7 @@
 <?php
 
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
-
 
 test('if post cache clear clears cache', function () {
 

@@ -8,8 +8,6 @@ use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Web\Models\ManualLocation;
-use Seatplus\Web\Tests\TestCase;
-
 
 beforeEach(function () {
     Queue::fake();

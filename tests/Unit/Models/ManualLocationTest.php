@@ -3,8 +3,6 @@
 
 use Illuminate\Support\Facades\Event;
 use Seatplus\Web\Models\ManualLocation;
-use Seatplus\Web\Tests\TestCase;
-
 
 test('manual location has location relationship', function () {
 

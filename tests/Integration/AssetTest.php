@@ -6,8 +6,6 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Web\Models\Asset\Asset;
-use Seatplus\Web\Tests\TestCase;
-
 
 test('is protected by authentication', function () {
 
