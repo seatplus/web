@@ -1,63 +1,51 @@
 <?php
 
 
-namespace Seatplus\Web\Tests;
-
 use Inertia\Testing\Assert;
 
-class WebIndexTest extends TestCase
-{
+uses(TestCase::class);
 
-    /** @test */
-    public function redirectsToLoginIfUnauthorized()
-    {
-        $response = $this->get('/home');
+test('redirects to login if unauthorized', function () {
+    $response = test()->get('/home');
 
-        $response->assertRedirect('auth/login');
-    }
+    $response->assertRedirect('auth/login');
+});
 
-    /** @test */
-    public function redirectsToLoginVueComponentIfUnauthorized()
-    {
-        // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-        //$this->app->instance('path.public', __DIR__ .'/../src/public');
+test('redirects to login vue component if unauthorized', function () {
+    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
+    //test()->app->instance('path.public', __DIR__ .'/../src/public');
 
-        $response = $this->followingRedirects()
-            ->get('/home');
+    $response = test()->followingRedirects()
+        ->get('/home');
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Auth/Login'));
-    }
+    $response->assertInertia( fn (Assert $page) => $page->component('Auth/Login'));
+});
 
-    /** @test */
-    public function redirectsToHomeIfAuthorized()
-    {
-        // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-        $this->app->instance('path.public', __DIR__ .'/../src/public');
+test('redirects to home if authorized', function () {
+    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
+    test()->app->instance('path.public', __DIR__ .'/../src/public');
 
-        $response = $this->actingAs($this->test_user)
-            ->get('/home');
+    $response = test()->actingAs(test()->test_user)
+        ->get('/home');
 
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Dashboard/Index'));
+    $response->assertInertia( fn (Assert $page) => $page->component('Dashboard/Index'));
 
-        $this->assertAuthenticatedAs($this->test_user);
-        $this->assertTrue(auth()->check());
-    }
+    test()->assertAuthenticatedAs(test()->test_user);
+    test()->assertTrue(auth()->check());
+});
 
-    /** @test */
-    public function logoutIfAuthorized()
-    {
-        // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-        $this->app->instance('path.public', __DIR__ .'/../src/public');
+test('logout if authorized', function () {
+    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
+    test()->app->instance('path.public', __DIR__ .'/../src/public');
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->get(route('auth.logout'));
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->get(route('auth.logout'));
 
-        //$response->assertRedirect('auth/login');
-        //$response->assertViewIs('web::auth.login');
+    //$response->assertRedirect('auth/login');
+    //$response->assertViewIs('web::auth.login');
 
-        $this->assertFalse(auth()->check());
+    test()->assertFalse(auth()->check());
 
-    }
-}
+});

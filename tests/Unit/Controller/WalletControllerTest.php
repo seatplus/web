@@ -1,101 +1,81 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Controller;
-
-
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class WalletControllerTest extends TestCase
-{
-    public function setUp(): void
-    {
+uses(TestCase::class);
 
-        parent::setUp();
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        $permission = Permission::findOrCreate('superuser');
+    test()->test_user->givePermissionTo($permission);
 
-        $this->test_user->givePermissionTo($permission);
+    // now re-register all the roles and permissions
+    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+test('has dispatchable job', function () {
 
-    /** @test */
-    public function hasDispatchableJob()
-    {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.wallets'));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.wallets'));
+    $response->assertInertia( fn (Assert $page) => $page
+        ->component('Character/Wallet/Index')
+        ->has('dispatchTransferObject')
+    );
+});
 
-        $response->assertInertia( fn (Assert $page) => $page
-            ->component('Character/Wallet/Index')
-            ->has('dispatchTransferObject')
-        );
-    }
+test('one can call journal endpoint', function () {
 
-    /** @test */
-    public function oneCanCallJournalEndpoint()
-    {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.wallet_journal.detail', test()->test_character->character_id))
+        ->assertOk();
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.wallet_journal.detail', $this->test_character->character_id))
-            ->assertOk();
-    }
+test('one can call transaction endpoint', function () {
 
-    /** @test */
-    public function oneCanCallTransactionEndpoint()
-    {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.wallet_transaction.detail', test()->test_character->character_id))
+        ->assertOk();
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.wallet_transaction.detail', $this->test_character->character_id))
-            ->assertOk();
-    }
+test('on get ballance records from last30 days', function () {
+    WalletJournal::factory()->count(1)->create([
+        'wallet_journable_id' => test()->test_character->character_id,
+        'date' => now()->subDays(29)
+    ]);
 
-    /** @test */
-    public function onGetBallanceRecordsFromLast30Days()
-    {
-        WalletJournal::factory()->count(1)->create([
-            'wallet_journable_id' => $this->test_character->character_id,
-            'date' => now()->subDays(29)
-        ]);
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.balance', test()->test_character->character_id));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.balance', $this->test_character->character_id));
+    $response->assertOk();
 
-        $response->assertOk();
+    test()->assertCount(1, data_get($response->original->toArray(), 'data'));
+});
 
-        $this->assertCount(1, data_get($response->original->toArray(), 'data'));
-    }
+test('on get ballance records from before30 days', function () {
+    WalletJournal::factory()->count(1)->create([
+        'wallet_journable_id' => test()->test_character->character_id,
+        'date' => now()->subDays(33)
+    ]);
 
-    /** @test */
-    public function onGetBallanceRecordsFromBefore30Days()
-    {
-        WalletJournal::factory()->count(1)->create([
-            'wallet_journable_id' => $this->test_character->character_id,
-            'date' => now()->subDays(33)
-        ]);
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.balance', test()->test_character->character_id));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.balance', $this->test_character->character_id));
+    $response->assertOk();
 
-        $response->assertOk();
+    test()->assertCount(1, data_get($response->original->toArray(), 'data'));
+});
 
-        $this->assertCount(1, data_get($response->original->toArray(), 'data'));
-    }
+test('one can call corporation wallet endpoint', function () {
 
-    /** @test */
-    public function oneCanCallCorporationWalletEndpoint()
-    {
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('corporation.wallet', [
-                'corporation_ids' => [$this->test_character->corporation->corporation_id]
-            ]))
-            ->assertOk();
-    }
-}
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('corporation.wallet', [
+            'corporation_ids' => [test()->test_character->corporation->corporation_id]
+        ]))
+        ->assertOk();
+});

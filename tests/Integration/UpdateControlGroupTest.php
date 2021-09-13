@@ -1,9 +1,6 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -11,198 +8,178 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class UpdateControlGroupTest extends TestCase
-{
+uses(TestCase::class);
 
-    private Role $role;
+beforeEach(function () {
+    Queue::fake();
 
-    public function setUp(): void
-    {
+    $role = Role::create(['name' => 'test']);
+    test()->role = Role::findById($role->id);
+});
 
-        parent::setUp();
+test('on can update role type', function () {
 
-        Queue::fake();
+    //dd(test()->test_user->hasRole('test'));
 
-        $role = Role::create(['name' => 'test']);
-        $this->role = Role::findById($role->id);
-    }
+    test()->assertFalse(test()->test_user->hasRole('test'));
 
-    /** @test */
-    public function on_can_update_role_type()
-    {
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-        //dd($this->test_user->hasRole('test'));
+    test()->assertEquals('manual', test()->role->type);
 
-        $this->assertFalse($this->test_user->hasRole('test'));
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $this->assertEquals('manual', $this->role->type);
-
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "acl" => [
-                    "type" => 'automatic',
-                    'affiliations' => [],
-                    'members' => []
-                ]
-            ]);
-
-        $this->assertEquals('automatic', $this->role->fresh()->type);
-    }
-
-    /** @test */
-    public function manual_control_group_adds_member()
-    {
-        $this->assertFalse($this->test_user->hasRole('test'));
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $this->assertEquals('manual', $this->role->type);
-
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "acl" => [
-                    "type" => 'manual',
-                    'affiliations' => [],
-                    'members' => [
-                        [
-                            'id' => $this->test_user->id,
-                            'user' => $this->test_user
-                        ],
-                    ]
-                ]
-            ]);
-
-        $this->assertTrue($this->test_user->refresh()->hasRole($this->role));
-    }
-
-    /** @test */
-    public function manual_control_group_removes_member()
-    {
-        $this->role->activateMember($this->test_user);
-
-        $this->assertTrue($this->test_user->refresh()->hasRole($this->role));
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $this->assertEquals('manual', $this->role->type);
-
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "acl" => [
-                    "type" => 'manual',
-                    'affiliations' => [],
-                    'members' => []
-                ]
-            ]);
-
-        $this->assertFalse($this->test_user->refresh()->hasRole($this->role));
-    }
-
-    /** @test */
-    public function automatic_control_group_adds_affiliation()
-    {
-
-        $this->assertTrue($this->role->acl_affiliations->isEmpty());
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $this->assertEquals('manual', $this->role->type);
-
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "acl" => [
-                    "type" => 'automatic',
-                    'affiliations' => [
-                        [
-                            'type' => 'corporation',
-                            'id' => CorporationInfo::factory()->make()->corporation_id
-                        ]
-                    ],
-                    'members' => []
-                ]
-            ]);
-
-        $this->assertFalse($this->role->refresh()->acl_affiliations->isEmpty());
-    }
-
-    /** @test */
-    public function automatic_control_group_removes_affiliation()
-    {
-
-        $this->assertTrue($this->role->acl_affiliations->isEmpty());
-
-        $this->role->acl_affiliations()->create([
-        'affiliatable_id' => CorporationInfo::factory()->make()->corporation_id,
-        'affiliatable_type' => CorporationInfo::class
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+            "acl" => [
+                "type" => 'automatic',
+                'affiliations' => [],
+                'members' => []
+            ]
         ]);
 
-        $this->assertFalse($this->role->refresh() ->acl_affiliations->isEmpty());
+    test()->assertEquals('automatic', test()->role->fresh()->type);
+});
 
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
+test('manual control group adds member', function () {
+    test()->assertFalse(test()->test_user->hasRole('test'));
 
-        $this->assertEquals('manual', $this->role->type);
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-               "acl" => [
-                   "type" => 'automatic',
-                   'affiliations' => [],
-                   'members' => []
-               ]
-            ]);
+    test()->assertEquals('manual', test()->role->type);
 
-        $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+            "acl" => [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => [
+                    [
+                        'id' => test()->test_user->id,
+                        'user' => test()->test_user
+                    ],
+                ]
+            ]
+        ]);
 
-    /** @test */
-    public function on_request_control_group_adds_and_removes_moderators()
-    {
+    test()->assertTrue(test()->test_user->refresh()->hasRole(test()->role));
+});
 
-        $this->assertTrue($this->role->moderators->isEmpty());
+test('manual control group removes member', function () {
+    test()->role->activateMember(test()->test_user);
 
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
+    test()->assertTrue(test()->test_user->refresh()->hasRole(test()->role));
 
-        $this->assertEquals('manual', $this->role->type);
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $this->role->id]), [
-                "acl" => [
-                    "type" => 'on-request',
-                    'moderators' => [
-                        [
-                            'id' => $this->test_user->id
-                        ]
+    test()->assertEquals('manual', test()->role->type);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+            "acl" => [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => []
+            ]
+        ]);
+
+    test()->assertFalse(test()->test_user->refresh()->hasRole(test()->role));
+});
+
+test('automatic control group adds affiliation', function () {
+
+    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
+
+    test()->assertEquals('manual', test()->role->type);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+            "acl" => [
+                "type" => 'automatic',
+                'affiliations' => [
+                    [
+                        'type' => 'corporation',
+                        'id' => CorporationInfo::factory()->make()->corporation_id
+                    ]
+                ],
+                'members' => []
+            ]
+        ]);
+
+    test()->assertFalse(test()->role->refresh()->acl_affiliations->isEmpty());
+});
+
+test('automatic control group removes affiliation', function () {
+
+    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+
+    test()->role->acl_affiliations()->create([
+    'affiliatable_id' => CorporationInfo::factory()->make()->corporation_id,
+    'affiliatable_type' => CorporationInfo::class
+    ]);
+
+    test()->assertFalse(test()->role->refresh() ->acl_affiliations->isEmpty());
+
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
+
+    test()->assertEquals('manual', test()->role->type);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+           "acl" => [
+               "type" => 'automatic',
+               'affiliations' => [],
+               'members' => []
+           ]
+        ]);
+
+    test()->assertTrue(test()->role->refresh()->acl_affiliations->isEmpty());
+});
+
+test('on request control group adds and removes moderators', function () {
+
+    test()->assertTrue(test()->role->moderators->isEmpty());
+
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
+
+    test()->assertEquals('manual', test()->role->type);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
+            "acl" => [
+                "type" => 'on-request',
+                'moderators' => [
+                    [
+                        'id' => test()->test_user->id
                     ]
                 ]
-            ]);
+            ]
+        ]);
 
-        // Test if test user is moderator
-        $this->assertTrue($this->role->refresh()->moderators->isNotEmpty());
-        $this->assertTrue($this->role->refresh()->isModerator($this->test_user));
+    // Test if test user is moderator
+    test()->assertTrue(test()->role->refresh()->moderators->isNotEmpty());
+    test()->assertTrue(test()->role->refresh()->isModerator(test()->test_user));
 
-        // assert that no affiliations has been created
-        $this->assertTrue($this->role->refresh()->acl_affiliations->isEmpty());
+    // assert that no affiliations has been created
+    test()->assertTrue(test()->role->refresh()->acl_affiliations->isEmpty());
 
+});
+
+// Helpers
+function assignPermissionToTestUser(array $array)
+{
+    foreach ($array as $string) {
+        $permission = Permission::findOrCreate($string);
+
+        test()->test_user->givePermissionTo($permission);
     }
 
-    private function assignPermissionToTestUser(array $array)
-    {
-        foreach ($array as $string) {
-            $permission = Permission::findOrCreate($string);
-
-            $this->test_user->givePermissionTo($permission);
-        }
-
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
+    // now re-register all the roles and permissions
+    test()->app->make(PermissionRegistrar::class)->registerPermissions();
 }

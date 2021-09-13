@@ -1,9 +1,6 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -11,65 +8,51 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class ServerSettingsTest extends TestCase
-{
-    public function setUp(): void
-    {
+uses(TestCase::class);
 
-        parent::setUp();
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        $permission = Permission::findOrCreate('superuser');
+    test()->test_user->givePermissionTo($permission);
 
-        $this->test_user->givePermissionTo($permission);
+    // now re-register all the roles and permissions
+    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+it('has users list', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('server.settings'));
 
-    /** @test */
-    public function it_has_users_list()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('server.settings'));
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserList'));
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserList'));
-    }
+it('has server scopes', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('settings.scopes'));
 
-    /** @test */
-    public function it_has_server_scopes()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('settings.scopes'));
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
+});
 
-    }
+test('one can impersionate', function () {
+    $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
 
-    /** @test */
-    public function one_can_impersionate()
-    {
-        $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('impersonate.start', $user_two->id));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('impersonate.start', $user_two->id));
+    test()->assertAuthenticatedAs($user_two);
+});
 
-        $this->assertAuthenticatedAs($user_two);
-    }
+test('one can stop impersionate', function () {
+    $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
 
-    /** @test */
-    public function one_can_stop_impersionate()
-    {
-        $user_two = Event::fakeFor(fn() => User::factory()->create()) ;
+   test()->actingAs(test()->test_user)
+        ->get(route('impersonate.start', $user_two->id));
 
-       $this->actingAs($this->test_user)
-            ->get(route('impersonate.start', $user_two->id));
+    test()->assertAuthenticatedAs($user_two);
 
-        $this->assertAuthenticatedAs($user_two);
+    test()->actingAs($user_two)
+        ->get(route('impersonate.stop'));
 
-        $this->actingAs($user_two)
-            ->get(route('impersonate.stop'));
-
-        $this->assertAuthenticatedAs($this->test_user);
-    }
-
-}
+    test()->assertAuthenticatedAs(test()->test_user);
+});

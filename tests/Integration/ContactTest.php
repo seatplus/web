@@ -1,41 +1,30 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Tests\TestCase;
 
-class ContactTest extends TestCase
-{
+uses(TestCase::class);
 
+test('see component', function () {
 
-    /** @test */
-    public function see_component()
-    {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.contacts'));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.contacts'));
+    $response->assertInertia( fn (Assert $page) => $page->component('Character/Contact/Index'));
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Character/Contact/Index'));
-    }
+it('has details', function () {
 
-    /** @test */
-    public function it_has_details()
-    {
+    test()->test_character->contacts()->create(Contact::factory()->make()->toArray());
 
-        $this->test_character->contacts()->create(Contact::factory()->make()->toArray());
+    $contact = test()->test_character->contacts->first();
 
-        $contact = $this->test_character->contacts->first();
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.contacts.detail', test()->test_character->character_id));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.contacts.detail', $this->test_character->character_id));
+    $response->assertOk();
 
-        $response->assertOk();
-
-    }
-
-}
+});

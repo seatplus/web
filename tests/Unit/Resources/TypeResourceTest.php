@@ -1,26 +1,20 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Resources;
-
-
 use Illuminate\Support\Facades\Event;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;
 use Seatplus\Web\Tests\TestCase;
 
-class TypeResourceTest extends TestCase
-{
-    /** @test */
-    public function testCorrectDataIsReturnedInResponse()
-    {
+uses(TestCase::class);
 
-        $type = Event::fakeFor(fn () => Type::factory()->create());
+test('correct data is returned in response', function () {
 
-        $resource = (new TypeResource($type));
+    $type = Event::fakeFor(fn () => Type::factory()->create());
 
-        $this->assertTrue($resource instanceof TypeResource);
-        $this->assertEquals($type->name, $resource->name);
+    $resource = (new TypeResource($type));
 
-    }
-}
+    test()->assertTrue($resource instanceof TypeResource);
+    test()->assertEquals($type->name, $resource->name);
+
+});

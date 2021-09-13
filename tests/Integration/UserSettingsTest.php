@@ -1,44 +1,35 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
 
-class UserSettingsTest extends TestCase
-{
-    /** @test */
-    public function it_has_user_settings()
-    {
+uses(TestCase::class);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('user.settings'));
+it('has user settings', function () {
 
-        //$response->assertInertia('Configuration/UserSettings');
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserSettings'));
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('user.settings'));
 
-    /** @test */
-    public function one_can_update_main_character()
-    {
-        $secondary_character = Event::fakeFor(fn() => CharacterUser::factory()->make());
+    //$response->assertInertia('Configuration/UserSettings');
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/UserSettings'));
+});
 
-        $this->test_user->character_users()->save($secondary_character);
+test('one can update main character', function () {
+    $secondary_character = Event::fakeFor(fn() => CharacterUser::factory()->make());
 
-        $this->assertNotEquals($this->test_user->main_character, $secondary_character->character);
+    test()->test_user->character_users()->save($secondary_character);
 
-        $this->actingAs($this->test_user)
-            ->json('POST', route('change.main_character'), [
-                "character_id" => $secondary_character->character_id,
-            ]);
+    test()->assertNotEquals(test()->test_user->main_character, $secondary_character->character);
 
-        $this->assertEquals($this->test_user->refresh()->main_character, $secondary_character->character);
+    test()->actingAs(test()->test_user)
+        ->json('POST', route('change.main_character'), [
+            "character_id" => $secondary_character->character_id,
+        ]);
 
-    }
+    test()->assertEquals(test()->test_user->refresh()->main_character, $secondary_character->character);
 
-}
+});

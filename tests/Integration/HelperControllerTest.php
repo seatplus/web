@@ -1,8 +1,6 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Facades\Http;
@@ -12,254 +10,238 @@ use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Tests\TestCase;
 
-class HelperControllerTest extends TestCase
-{
+uses(TestCase::class);
 
-    /** @test */
-    public function itStoresResolvedIdToCache() {
+it('stores resolved id to cache', function () {
 
-       $id = $this->test_character->character_id;
+   $id = test()->test_character->character_id;
 
-       $esi_mock_return_data = [
-           'id' => $id,
-           'name' => $this->test_character->name,
-           'category' => 'character'
-       ];
+   $esi_mock_return_data = [
+       'id' => $id,
+       'name' => test()->test_character->name,
+       'category' => 'character'
+   ];
 
-       $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+   test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
-       $result = $this->actingAs($this->test_user)
-           ->post(route('resolve.ids'), [$id]);
+   $result = test()->actingAs(test()->test_user)
+       ->post(route('resolve.ids'), [$id]);
 
-       $result->assertJson([
-           $esi_mock_return_data
-       ]);
+   $result->assertJson([
+       $esi_mock_return_data
+   ]);
 
-       $cache_value = cache(sprintf('name:%s', $id));
-       $this->assertEquals($this->test_character->name, $cache_value->name);
-    }
+   $cache_value = cache(sprintf('name:%s', $id));
+   test()->assertEquals(test()->test_character->name, $cache_value->name);
+});
 
-    /** @test */
-    public function itReturnsCachedValueForResolvedIds() {
+it('returns cached value for resolved ids', function () {
 
-        $id = $this->test_character->character_id;
+    $id = test()->test_character->character_id;
 
-        $cached_value = [
-            'id' => $id,
-            'name' => $this->test_character->name,
-            'category' => 'character'
-        ];
+    $cached_value = [
+        'id' => $id,
+        'name' => test()->test_character->name,
+        'category' => 'character'
+    ];
 
-        cache([sprintf('name:%s', $id) => $cached_value], now()->addSeconds(2));
+    cache([sprintf('name:%s', $id) => $cached_value], now()->addSeconds(2));
 
-        $result = $this->actingAs($this->test_user)
-            ->post(route('resolve.ids'), [$id]);
+    $result = test()->actingAs(test()->test_user)
+        ->post(route('resolve.ids'), [$id]);
 
-        $result->assertJson([
-            $cached_value
-        ]);
-    }
+    $result->assertJson([
+        $cached_value
+    ]);
+});
 
-    /** @test */
-    public function itResolvesCharacterAffiliation() {
+it('resolves character affiliation', function () {
 
-        $id = $this->test_character->character_id;
+    $id = test()->test_character->character_id;
 
-        $esi_mock_return_data = [
-            'alliance_id' => 123,
-            'character_id' => 456,
-            'corporation_id' => 789,
-            'faction_id' => null
-        ];
+    $esi_mock_return_data = [
+        'alliance_id' => 123,
+        'character_id' => 456,
+        'corporation_id' => 789,
+        'faction_id' => null
+    ];
 
-        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
-        $result = $this->actingAs($this->test_user)
-            ->post(route('resolve.character_affiliation'), [$id]);
+    $result = test()->actingAs(test()->test_user)
+        ->post(route('resolve.character_affiliation'), [$id]);
 
-        $result->assertJson([
-            $esi_mock_return_data
-        ]);
-    }
+    $result->assertJson([
+        $esi_mock_return_data
+    ]);
+});
 
-    /** @test */
-    public function itResolvesCorporationInfo() {
+it('resolves corporation info', function () {
 
-        $id = $this->test_character->corporation->corporation_id;
+    $id = test()->test_character->corporation->corporation_id;
 
-        $esi_mock_return_data = $this->test_character->corporation->toArray();
+    $esi_mock_return_data = test()->test_character->corporation->toArray();
 
-        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('resolve.corporation_info', $id));
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('resolve.corporation_info', $id));
 
-        $result->assertJson([
-            $esi_mock_return_data
-        ]);
-    }
+    $result->assertJson([
+        $esi_mock_return_data
+    ]);
+});
 
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function oneCanSearchForSolarSystems() {
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
+test('one can search for solar systems', function () {
 
-        $system = System::factory()->make([
-            'name' => 'test'
-        ]);
+    $system = System::factory()->make([
+        'name' => 'test'
+    ]);
 
-        $esi_mock_return_data = [
-            'solar_system' => [$system->system_id],
-        ];
+    $esi_mock_return_data = [
+        'solar_system' => [$system->system_id],
+    ];
 
-        $this->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
-        // Mock GetNamesFromIdsService - we don't test that it's tested otherwise
-        $mock = Mockery::mock('overload:' . GetNamesFromIdsService::class);
-        $mock->shouldReceive([$system->system_id])
-            ->andReturn([
-                'category' => 'solar_system',
-                'id' => $system->system_id,
-                'faction_id' => $system->name
-            ]);
-
-        $result = $this->actingAs($this->test_user)
-            ->get(route('resolve.solar_system', 'tes'))
-            ->assertOk();
-
-    }
-
-    /** @test */
-    public function oneCanSearchExistingSystems()
-    {
-
-
-        $system = System::factory()->create([
-            'name' => 'jita'
+    // Mock GetNamesFromIdsService - we don't test that it's tested otherwise
+    $mock = Mockery::mock('overload:' . GetNamesFromIdsService::class);
+    $mock->shouldReceive([$system->system_id])
+        ->andReturn([
+            'category' => 'solar_system',
+            'id' => $system->system_id,
+            'faction_id' => $system->name
         ]);
 
-        System::factory()->count(4)->create();
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('resolve.solar_system', 'tes'))
+        ->assertOk();
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('autosuggestion.system', ['search' => '']))
-            ->assertForbidden();
+});
 
-        RetrieveEsiData::shouldReceive('execute')
-            ->twice()
-            ->andReturn(
-                $this->mockEsiResponse([
-                    'solar_system' => [
-                        $system->system_id
-                    ]
-                ]),
-                $this->mockEsiResponse([
-                    [
-                        'id' => $system->system_id,
-                        'name' => $system->name,
-                        'category' => 'solar_system'
-                    ]
-                ])
-            );
-
-        $result = $this->actingAs($this->test_user)
-            ->get(route('autosuggestion.system', ['search' =>'jit']))
-            ->assertOk();
+test('one can search existing systems', function () {
 
 
-        $this->assertCount(1, $result->original);
-    }
+    $system = System::factory()->create([
+        'name' => 'jita'
+    ]);
 
-    /** @test */
-    public function oneCanSearchExistingRegion()
-    {
-        $region = Region::factory()->create([
-            'name' => 'Delve'
-        ]);
+    System::factory()->count(4)->create();
 
-        Region::factory()->count(4)->create();
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('autosuggestion.system', ['search' => '']))
+        ->assertForbidden();
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('autosuggestion.region', ['search' => '']))
-            ->assertForbidden();
+    RetrieveEsiData::shouldReceive('execute')
+        ->twice()
+        ->andReturn(
+            test()->mockEsiResponse([
+                'solar_system' => [
+                    $system->system_id
+                ]
+            ]),
+            test()->mockEsiResponse([
+                [
+                    'id' => $system->system_id,
+                    'name' => $system->name,
+                    'category' => 'solar_system'
+                ]
+            ])
+        );
 
-        RetrieveEsiData::shouldReceive('execute')
-            ->twice()
-            ->andReturn(
-                $this->mockEsiResponse([
-                    'region' => [
-                        $region->region_id
-                    ]
-                ]),
-                $this->mockEsiResponse([
-                    [
-                        'id' => $region->region_id,
-                        'name' => $region->name,
-                        'category' => 'region'
-                    ]
-                ])
-            );
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('autosuggestion.system', ['search' =>'jit']))
+        ->assertOk();
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('autosuggestion.region', ['search' =>'Del']))
-            ->assertOk();
 
-        $this->assertCount(1, $result->original);
-    }
+    test()->assertCount(1, $result->original);
+});
 
-    /** @test  */
-    public function onCanGetResourceVariants()
-    {
-        Http::fake();
+test('one can search existing region', function () {
+    $region = Region::factory()->create([
+        'name' => 'Delve'
+    ]);
 
-        $expected_response = ["render", "icon"];
+    Region::factory()->count(4)->create();
 
-        Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('autosuggestion.region', ['search' => '']))
+        ->assertForbidden();
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('get.resource.variants', [
-                'resource_type' => 'types',
-                'resource_id' => 587
-            ]))
-            ->assertOk()
-            ->assertJson($expected_response);
+    RetrieveEsiData::shouldReceive('execute')
+        ->twice()
+        ->andReturn(
+            test()->mockEsiResponse([
+                'region' => [
+                    $region->region_id
+                ]
+            ]),
+            test()->mockEsiResponse([
+                [
+                    'id' => $region->region_id,
+                    'name' => $region->name,
+                    'category' => 'region'
+                ]
+            ])
+        );
 
-    }
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('autosuggestion.region', ['search' =>'Del']))
+        ->assertOk();
 
-    /** @test */
-    public function oneCanGetMarketPrices()
-    {
+    test()->assertCount(1, $result->original);
+});
 
-        $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v1',
-            'endpoint' => '/markets/prices/'
-        ]);
+test('on can get resource variants', function () {
+    Http::fake();
 
-        $this->mockRetrieveEsiDataAction([
-            (object) [
-                "adjusted_price"=> 0,
-                "average_price" => 31214609.93,
-                "type_id" => 43691
-            ],
-            (object) [ "adjusted_price"=> 1005248.1289154688,
-                "average_price"=> 1002393.46,
-                "type_id"=> 32772
-            ],
-            (object) [ "adjusted_price"=> 111879.41656101559,
-                "average_price"=> 104750.07,
-                "type_id"=> 32774
-            ]
-        ]);
+    $expected_response = ["render", "icon"];
 
-        $this->assertNull(cache('market_prices'));
+    Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
 
-        $result = $this->actingAs($this->test_user)
-            ->get(route('get.markets.prices'))
-            ->assertOk();
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('get.resource.variants', [
+            'resource_type' => 'types',
+            'resource_id' => 587
+        ]))
+        ->assertOk()
+        ->assertJson($expected_response);
 
-        $this->assertNotNull(cache('market_prices'));
-    }
+});
 
-}
+test('one can get market prices', function () {
+
+    $container = new EsiRequestContainer([
+        'method' => 'get',
+        'version' => 'v1',
+        'endpoint' => '/markets/prices/'
+    ]);
+
+    test()->mockRetrieveEsiDataAction([
+        (object) [
+            "adjusted_price"=> 0,
+            "average_price" => 31214609.93,
+            "type_id" => 43691
+        ],
+        (object) [ "adjusted_price"=> 1005248.1289154688,
+            "average_price"=> 1002393.46,
+            "type_id"=> 32772
+        ],
+        (object) [ "adjusted_price"=> 111879.41656101559,
+            "average_price"=> 104750.07,
+            "type_id"=> 32774
+        ]
+    ]);
+
+    test()->assertNull(cache('market_prices'));
+
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('get.markets.prices'))
+        ->assertOk();
+
+    test()->assertNotNull(cache('market_prices'));
+});

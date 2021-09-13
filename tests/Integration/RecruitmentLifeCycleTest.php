@@ -1,9 +1,6 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
@@ -18,537 +15,501 @@ use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class RecruitmentLifeCycleTest extends TestCase
-{
-    private User $secondary_user;
-    private CharacterInfo $secondary_character;
-    private User $superuser;
+uses(TestCase::class);
 
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+    test()->secondary_user = Event::fakeFor(function () {
+        return User::factory()->create();
+    });
 
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->secondary_user = Event::fakeFor(function () {
-            return User::factory()->create();
-        });
+    /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+    test()->superuser = Event::fakeFor(function () {
+        $user = User::factory()->create();
 
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->superuser = Event::fakeFor(function () {
-            $user = User::factory()->create();
+        $permission = Permission::findOrCreate('superuser');
 
-            $permission = Permission::findOrCreate('superuser');
+        $user->givePermissionTo($permission);
 
-            $user->givePermissionTo($permission);
+        // now re-register all the roles and permissions
+        test()->app->make(PermissionRegistrar::class)->registerPermissions();
 
-            // now re-register all the roles and permissions
-            $this->app->make(PermissionRegistrar::class)->registerPermissions();
+        return $user;
+    });
 
-            return $user;
-        });
+    test()->secondary_character = test()->secondary_user->characters->first();
+});
 
-        $this->secondary_character = $this->secondary_user->characters->first();
-    }
+test('user without permission fails to create enlistment', function () {
 
-    /** @test */
-    public function user_without_permission_fails_to_create_enlistment()
-    {
+    $response = test()->actingAs(test()->test_user)
+        ->post(route('create.corporation.recruitment'), [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'type' => 'user'
+        ])->assertForbidden();
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->post(route('create.corporation.recruitment'), [
-                'corporation_id' => $this->secondary_character->corporation->corporation_id,
-                'type' => 'user'
-            ])->assertForbidden();
-    }
+test('user with permission and affiliations succeeds to create enlistment', function () {
 
-    /** @test */
-    public function user_with_permission_and_affiliations_succeeds_to_create_enlistment()
-    {
+    createEnlistment();
+});
 
-        $this->createEnlistment();
-    }
+test('user with permission and affiliations can delete enlistment', function () {
 
-    /** @test */
-    public function user_with_permission_and_affiliations_can_delete_enlistment()
-    {
+    createEnlistment();
 
-        $this->createEnlistment();
+    test()->assertDatabaseHas('enlistments',[
+        'corporation_id' => test()->test_character->corporation->corporation_id,
+    ]);
 
-        $this->assertDatabaseHas('enlistments',[
-            'corporation_id' => $this->test_character->corporation->corporation_id,
-        ]);
+    test()->actingAs(test()->test_user)
+        ->delete(route('delete.corporation.recruitment', ['corporation_id' =>  test()->test_character->corporation->corporation_id]));
 
-        $this->actingAs($this->test_user)
-            ->delete(route('delete.corporation.recruitment', ['corporation_id' =>  $this->test_character->corporation->corporation_id]));
+    test()->assertDatabaseMissing('enlistments',[
+        'corporation_id' => test()->test_character->corporation->corporation_id,
+    ]);
+});
 
-        $this->assertDatabaseMissing('enlistments',[
-            'corporation_id' => $this->test_character->corporation->corporation_id,
-        ]);
-    }
+test('secondary user can see enlistment', function () {
 
-    /** @test */
-    public function secondary_user_can_see_enlistment()
-    {
+    createEnlistment();
 
-        $this->createEnlistment();
-
-        $response = $this->actingAs($this->secondary_user)
-            ->get(route('list.open.enlistments'))
-            ->assertJson(fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has('data.0', fn($json) => $json
-                    ->where('corporation_id', (string) $this->test_character->corporation->corporation_id)
-                    ->etc()
-                )
+    $response = test()->actingAs(test()->secondary_user)
+        ->get(route('list.open.enlistments'))
+        ->assertJson(fn (AssertableJson $json) => $json
+            ->has('data', 1)
+            ->has('data.0', fn($json) => $json
+                ->where('corporation_id', (string) test()->test_character->corporation->corporation_id)
                 ->etc()
-            );
-    }
+            )
+            ->etc()
+        );
+});
 
-    /** @test */
-    public function secondary_user_can_apply_as_character()
-    {
+test('secondary user can apply as character', function () {
 
-        $this->createEnlistment('character');
+    createEnlistment('character');
 
-        $this->assertNull($this->secondary_character->refresh()->application);
+    test()->assertNull(test()->secondary_character->refresh()->application);
 
-        $response = $this->actingAs($this->secondary_user)
-            ->post(route('post.application'), [
-                'corporation_id' => $this->test_character->corporation->corporation_id,
-                'character_id' => $this->secondary_character->character_id
-            ]);
+    $response = test()->actingAs(test()->secondary_user)
+        ->post(route('post.application'), [
+            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'character_id' => test()->secondary_character->character_id
+        ]);
 
-        $this->assertNotNull($this->secondary_character->refresh()->application);
-        $this->assertTrue($this->secondary_character->refresh()->application instanceof Application);
+    test()->assertNotNull(test()->secondary_character->refresh()->application);
+    test()->assertTrue(test()->secondary_character->refresh()->application instanceof Application);
 
-        // Pull application
-        $response = $this->actingAs($this->secondary_user)
-            ->delete(route('delete.character.application', $this->secondary_character->character_id));
+    // Pull application
+    $response = test()->actingAs(test()->secondary_user)
+        ->delete(route('delete.character.application', test()->secondary_character->character_id));
 
-        $this->assertNull($this->secondary_character->refresh()->application);
-    }
+    test()->assertNull(test()->secondary_character->refresh()->application);
+});
 
-    /** @test */
-    public function secondary_user_can_apply_as_user()
-    {
+test('secondary user can apply as user', function () {
 
-        $this->createEnlistment('user');
+    createEnlistment('user');
 
-        $this->assertNull($this->secondary_user->refresh()->application);
+    test()->assertNull(test()->secondary_user->refresh()->application);
 
-        // first check that existing applications does not exist
-        $this->actingAs($this->secondary_user)
-            ->get(route('list.existing.applications', $this->test_character->corporation->corporation_id)) //'corporation_id' => $this->test_character->corporation->corporation_id
-            ->assertJson(fn (AssertableJson $json) => $json
-                ->has('data', 0)
+    // first check that existing applications does not exist
+    test()->actingAs(test()->secondary_user)
+        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) //'corporation_id' => test()->test_character->corporation->corporation_id
+        ->assertJson(fn (AssertableJson $json) => $json
+            ->has('data', 0)
+            ->etc()
+        );
+
+    applySecondary();
+
+    test()->assertNotNull(test()->secondary_user->refresh()->application);
+    test()->assertTrue(test()->secondary_user->refresh()->application instanceof Application);
+
+    // then check that existing applications does exist
+    test()->actingAs(test()->secondary_user)
+        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) //'corporation_id' => test()->test_character->corporation->corporation_id
+        ->assertJson(fn (AssertableJson $json) => $json
+            ->has('data', 1)
+            ->has('data.0', fn($json) => $json
+                ->where('applicationable_id', (string) test()->secondary_user->id)
+                ->where('corporation_id',  test()->test_character->corporation->corporation_id)
                 ->etc()
-            );
+            )
+            ->etc()
+        );
 
-        $this->applySecondary();
+    // pull application
+    $response = test()->actingAs(test()->secondary_user)
+        ->delete(route('delete.user.application'));
 
-        $this->assertNotNull($this->secondary_user->refresh()->application);
-        $this->assertTrue($this->secondary_user->refresh()->application instanceof Application);
+    test()->assertNull(test()->secondary_user->refresh()->application);
+});
 
-        // then check that existing applications does exist
-        $this->actingAs($this->secondary_user)
-            ->get(route('list.existing.applications', $this->test_character->corporation->corporation_id)) //'corporation_id' => $this->test_character->corporation->corporation_id
-            ->assertJson(fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has('data.0', fn($json) => $json
-                    ->where('applicationable_id', (string) $this->secondary_user->id)
-                    ->where('corporation_id',  $this->test_character->corporation->corporation_id)
-                    ->etc()
-                )
+test('senior hr sees recruitment component', function () {
+
+    test()->assertFalse(test()->test_user->can('superuser'));
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('corporation.recruitment'))
+        ->assertForbidden();
+
+    test()->givePermissionsToTestUser(['can open or close corporations for recruitment']);
+
+    test()->actingAs(test()->test_user->refresh())
+        ->get(route('corporation.recruitment'))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+});
+
+test('junior hr sees recruitment component', function () {
+
+    if(test()->test_user->can('superuser')) {
+        test()->test_user->removeRole('superuser');
+
+        // now re-register all the roles and permissions
+        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    }
+
+    if(test()->test_user->can('can accept or deny applications')) {
+        test()->test_user->removeRole('can accept or deny applications');
+
+        // now re-register all the roles and permissions
+        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    }
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('corporation.recruitment'))
+        ->assertForbidden();
+
+    test()->givePermissionsToTestUser(['can accept or deny applications']);
+
+    $response = test()->actingAs(test()->test_user->refresh())
+        ->get(route('corporation.recruitment'))
+        ->assertOk();
+
+    $response->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+});
+
+test('junior hr handles open user applications', function () {
+    createEnlistment();
+
+    test()->test_user = test()->test_user->refresh();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(0, 'data');
+
+    applySecondary();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(1, 'data');
+
+    // open application
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('user.application', ['recruit' => test()->secondary_user->id]))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+
+
+    // Impersonate
+
+    test()->actingAs(test()->test_user)
+        ->get(route('impersonate.recruit', ['recruit' => test()->secondary_user->id]))
+        ->assertRedirect(route('home'))
+        ->assertSessionHas('impersonation_origin', test()->test_user);
+
+    // Stop Impersonate
+
+    test()->actingAs(test()->secondary_user)
+        ->withSession(['impersonation_origin' => test()->test_user, 'route' => route('home')])
+        ->get(route('impersonate.stop'))
+        ->assertRedirect(route('home'))
+        ->assertSessionMissing(['impersonation_origin', 'route']);
+
+    // submit review
+
+    test()->assertDatabaseHas('applications', [
+        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_type' => User::class,
+        'status' => 'open'
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->post(route('review.user.application', ['recruit' => test()->secondary_user->id]), [
+            'decision' => 'rejected',
+            'explanation' => 'Some reason'
+        ])
+        ->assertRedirect(route('corporation.recruitment'));
+
+    test()->assertDatabaseHas('applications', [
+        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_type' => User::class,
+        'status' => 'rejected'
+    ]);
+
+    test()->assertNull(test()->secondary_user->refresh()->application);
+
+});
+
+test('junior hr handles open character applications', function () {
+    createEnlistment();
+
+    test()->test_user = test()->test_user->refresh();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(0, 'data');
+
+    applySecondary(false);
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(1, 'data');
+
+    // open application
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.application', ['character_id' => test()->secondary_character->character_id]))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+
+    // submit review
+
+    test()->assertDatabaseHas('applications', [
+        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_type' => CharacterInfo::class,
+        'status' => 'open'
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->post(route('review.character.application', ['character_id' => test()->secondary_character->character_id]), [
+            'decision' => 'rejected',
+            'explanation' => 'Some reason'
+        ])
+        ->assertRedirect(route('corporation.recruitment'));
+
+    test()->assertDatabaseHas('applications', [
+        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_type' => CharacterInfo::class,
+        'status' => 'rejected'
+    ]);
+
+    test()->assertNull(test()->secondary_character->refresh()->application);
+
+});
+
+test('junior h r can see shitlist', function () {
+    createEnlistment();
+
+    test()->test_user = test()->test_user->refresh();
+
+    // Create SSO Setting
+
+    // Give Test User required scope
+
+    // Test that test user is not on shitlist
+    test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(0, 'data');
+
+    applySecondary();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertJsonCount(1, 'data');
+});
+
+test('senior h r can setup watchlist', function () {
+    createEnlistment();
+
+    test()->actingAs(test()->test_user->refresh())
+        ->get(route('get.watchlist', test()->test_character->corporation->corporation_id))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched_systems', 0)
+            ->has('watched_regions', 0)
+        );
+
+    // create system
+    $system =  System::factory()->create();
+
+    // watchlist system
+    $response = test()->actingAs(test()->test_user->refresh())
+        ->followingRedirects()
+        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
+            'systems' => [
+                (object) [
+                    'id' => $system->system_id
+                ]
+            ]
+        ])
+        ->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched_systems', 1, fn(Assert $page) => $page
+                ->where('id', $system->system_id)
                 ->etc()
-            );
-
-        // pull application
-        $response = $this->actingAs($this->secondary_user)
-            ->delete(route('delete.user.application'));
-
-        $this->assertNull($this->secondary_user->refresh()->application);
-    }
-
-    /** @test */
-    public function senior_hr_sees_recruitment_component()
-    {
-
-        $this->assertFalse($this->test_user->can('superuser'));
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('corporation.recruitment'))
-            ->assertForbidden();
-
-        $this->givePermissionsToTestUser(['can open or close corporations for recruitment']);
-
-        $this->actingAs($this->test_user->refresh())
-            ->get(route('corporation.recruitment'))
-            ->assertOk()
-            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
-    }
-
-    /** @test */
-    public function junior_hr_sees_recruitment_component()
-    {
-
-        if($this->test_user->can('superuser')) {
-            $this->test_user->removeRole('superuser');
-
-            // now re-register all the roles and permissions
-            $this->app->make(PermissionRegistrar::class)->registerPermissions();
-        }
-
-        if($this->test_user->can('can accept or deny applications')) {
-            $this->test_user->removeRole('can accept or deny applications');
-
-            // now re-register all the roles and permissions
-            $this->app->make(PermissionRegistrar::class)->registerPermissions();
-        }
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('corporation.recruitment'))
-            ->assertForbidden();
-
-        $this->givePermissionsToTestUser(['can accept or deny applications']);
-
-        $response = $this->actingAs($this->test_user->refresh())
-            ->get(route('corporation.recruitment'))
-            ->assertOk();
-
-        $response->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
-    }
-
-    /** @test */
-    public function junior_hr_handles_open_user_applications()
-    {
-        $this->createEnlistment();
-
-        $this->test_user = $this->test_user->refresh();
-
-        $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(0, 'data');
-
-        $this->applySecondary();
-
-        $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(1, 'data');
-
-        // open application
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('user.application', ['recruit' => $this->secondary_user->id]))
-            ->assertOk()
-            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+            )
+            ->has('watched_regions', 0)
+        );
 
 
-        // Impersonate
-
-        $this->actingAs($this->test_user)
-            ->get(route('impersonate.recruit', ['recruit' => $this->secondary_user->id]))
-            ->assertRedirect(route('home'))
-            ->assertSessionHas('impersonation_origin', $this->test_user);
-
-        // Stop Impersonate
-
-        $this->actingAs($this->secondary_user)
-            ->withSession(['impersonation_origin' => $this->test_user, 'route' => route('home')])
-            ->get(route('impersonate.stop'))
-            ->assertRedirect(route('home'))
-            ->assertSessionMissing(['impersonation_origin', 'route']);
-
-        // submit review
-
-        $this->assertDatabaseHas('applications', [
-            'applicationable_id' => $this->secondary_user->id,
-            'applicationable_type' => User::class,
-            'status' => 'open'
-        ]);
-
-        $this->actingAs($this->test_user)
-            ->post(route('review.user.application', ['recruit' => $this->secondary_user->id]), [
-                'decision' => 'rejected',
-                'explanation' => 'Some reason'
-            ])
-            ->assertRedirect(route('corporation.recruitment'));
-
-        $this->assertDatabaseHas('applications', [
-            'applicationable_id' => $this->secondary_user->id,
-            'applicationable_type' => User::class,
-            'status' => 'rejected'
-        ]);
-
-        $this->assertNull($this->secondary_user->refresh()->application);
-
-    }
-
-    /** @test */
-    public function junior_hr_handles_open_character_applications()
-    {
-        $this->createEnlistment();
-
-        $this->test_user = $this->test_user->refresh();
-
-        $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(0, 'data');
-
-        $this->applySecondary(false);
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(1, 'data');
-
-        // open application
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.application', ['character_id' => $this->secondary_character->character_id]))
-            ->assertOk()
-            ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
-
-        // submit review
-
-        $this->assertDatabaseHas('applications', [
-            'applicationable_id' => $this->secondary_character->character_id,
-            'applicationable_type' => CharacterInfo::class,
-            'status' => 'open'
-        ]);
-
-        $this->actingAs($this->test_user)
-            ->post(route('review.character.application', ['character_id' => $this->secondary_character->character_id]), [
-                'decision' => 'rejected',
-                'explanation' => 'Some reason'
-            ])
-            ->assertRedirect(route('corporation.recruitment'));
-
-        $this->assertDatabaseHas('applications', [
-            'applicationable_id' => $this->secondary_character->character_id,
-            'applicationable_type' => CharacterInfo::class,
-            'status' => 'rejected'
-        ]);
-
-        $this->assertNull($this->secondary_character->refresh()->application);
-
-    }
-
-    /** @test */
-    public function juniorHR_can_see_shitlist()
-    {
-        $this->createEnlistment();
-
-        $this->test_user = $this->test_user->refresh();
-
-        // Create SSO Setting
-
-        // Give Test User required scope
-
-        // Test that test user is not on shitlist
-        $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(0, 'data');
-
-        $this->applySecondary();
-
-        $this->actingAs($this->test_user)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertJsonCount(1, 'data');
-    }
-
-    /** @test */
-    public function seniorHR_can_setup_watchlist()
-    {
-        $this->createEnlistment();
-
-        $this->actingAs($this->test_user->refresh())
-            ->get(route('get.watchlist', $this->test_character->corporation->corporation_id))
-            ->assertOk()
-            ->assertInertia( fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Watchlist/Index')
-                ->has('watched_systems', 0)
-                ->has('watched_regions', 0)
-            );
-
-        // create system
-        $system =  System::factory()->create();
-
-        // watchlist system
-        $response = $this->actingAs($this->test_user->refresh())
-            ->followingRedirects()
-            ->post(route('update.watchlist', $this->test_character->corporation->corporation_id), [
-                'systems' => [
-                    (object) [
-                        'id' => $system->system_id
-                    ]
+    // add region
+    $region = Region::factory()->create();
+    test()->actingAs(test()->test_user->refresh())
+        ->followingRedirects()
+        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
+            'systems' => [
+                (object) [
+                    'id' => $system->system_id
                 ]
-            ])
-            ->assertInertia( fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Watchlist/Index')
-                ->has('watched_systems', 1, fn(Assert $page) => $page
-                    ->where('id', $system->system_id)
-                    ->etc()
-                )
-                ->has('watched_regions', 0)
-            );
-
-
-        // add region
-        $region = Region::factory()->create();
-        $this->actingAs($this->test_user->refresh())
-            ->followingRedirects()
-            ->post(route('update.watchlist', $this->test_character->corporation->corporation_id), [
-                'systems' => [
-                    (object) [
-                        'id' => $system->system_id
-                    ]
-                ],
-                'regions' => [
-                    (object) [
-                        'id' => $region->region_id
-                    ]
+            ],
+            'regions' => [
+                (object) [
+                    'id' => $region->region_id
                 ]
-            ])
-            ->assertInertia( fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Watchlist/Index')
-                ->has('watched_systems', 1, fn(Assert $page) => $page
-                    ->where('id', $system->system_id)
-                    ->etc()
-                )
-                ->has('watched_regions', 1, fn(Assert $page) => $page
-                    ->where('id', $region->region_id)
-                    ->etc()
-                )
-            );
+            ]
+        ])
+        ->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched_systems', 1, fn(Assert $page) => $page
+                ->where('id', $system->system_id)
+                ->etc()
+            )
+            ->has('watched_regions', 1, fn(Assert $page) => $page
+                ->where('id', $region->region_id)
+                ->etc()
+            )
+        );
 
-    }
+});
 
-    /** @test */
-    public function RecruiterCanSeeCorporationApplications()
-    {
-        // Create Enlistment
-        $this->createEnlistment('character');
+test('recruiter can see corporation applications', function () {
+    // Create Enlistment
+    createEnlistment('character');
 
-        // create Senior Recruiter user
+    // create Senior Recruiter user
 
-        $recruiter = Event::fakeFor(fn() =>User::factory()->create());
+    $recruiter = Event::fakeFor(fn() =>User::factory()->create());
 
-        // give user roles
+    // give user roles
 
-        $role = Role::findByName('test');
+    $role = Role::findByName('test');
 
-        $response = $this->actingAs($this->superuser)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "acl" => [
-                    "type" => 'manual',
-                    'affiliations' => [],
-                    'members' => [
-                        [
-                            'id' => $recruiter->id,
-                            'user' => $recruiter
-                        ],
-                    ]
-                ]
-            ])->assertOk();
-
-        $this->assertTrue($recruiter->refresh()->hasRole($role));
-
-        // get list with open appliactions
-        $response = $this->actingAs($recruiter)
-            ->get(route('open.corporation.applications', $this->test_character->corporation->corporation_id))
-            ->assertOk();
-
-        // Apply with secondary user
-        $this->applySecondary(false);
-
-        // Get the test_users Applicaton // /character_application/{character_id}
-        $response = $this->actingAs($recruiter)
-            ->get(route('character.application', $this->secondary_character->character_id))
-            ->assertOk();
-
-        // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
-        $response = $this->actingAs($recruiter)
-            ->get(route('character.wallet_journal.detail', $this->secondary_character->character_id))
-            ->assertOk();
-
-
-        // Any other character should be forbidden
-        $this->actingAs($recruiter)
-            ->get(route('character.wallet_journal.detail', $this->secondary_character->character_id+1))
-            ->assertForbidden();
-
-    }
-
-    private function applySecondary(bool $user = true)
-    {
-
-        $payload = $user
-            ? ['corporation_id' => $this->test_character->corporation->corporation_id]
-            : ['corporation_id' => $this->test_character->corporation->corporation_id, 'character_id' => $this->secondary_character->character_id];
-
-        $this->actingAs($this->secondary_user)
-            ->post(route('post.application'), $payload);
-    }
-
-    private function createEnlistment($type = 'user',string $affiliation = 'allowed')
-    {
-        // create role
-        $this->actingAs($this->superuser)
-            ->followingRedirects()
-            ->json('POST', route('acl.create'), ['name' => 'test']);
-
-        // affiliate secondary user to role
-        $role = Role::findByName('test');
-
-        $response = $this->actingAs($this->superuser)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
-                'affiliations' => [
+    $response = test()->actingAs(test()->superuser)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+            "acl" => [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => [
                     [
-                        "id" => $this->test_character->corporation->corporation_id,
-                        "category" => 'corporation',
-                        "type" => $affiliation
+                        'id' => $recruiter->id,
+                        'user' => $recruiter
                     ],
-                ],
-            ]);
-
-        // give test user the role
-
-        $response = $this->actingAs($this->superuser)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "acl" => [
-                    "type" => 'manual',
-                    'affiliations' => [],
-                    'members' => [
-                        [
-                            'id' => $this->test_user->id,
-                            'user' => $this->test_user
-                        ],
-                    ]
                 ]
-            ])->assertOk();
+            ]
+        ])->assertOk();
 
-        $this->assertTrue($this->test_user->refresh()->hasRole($role));
+    test()->assertTrue($recruiter->refresh()->hasRole($role));
 
-        // Create Enlistment
+    // get list with open appliactions
+    $response = test()->actingAs($recruiter)
+        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertOk();
 
-        $this->assertDatabaseMissing('enlistments',[
-            'corporation_id' => $this->test_character->corporation->corporation_id,
+    // Apply with secondary user
+    applySecondary(false);
+
+    // Get the test_users Applicaton // /character_application/{character_id}
+    $response = test()->actingAs($recruiter)
+        ->get(route('character.application', test()->secondary_character->character_id))
+        ->assertOk();
+
+    // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
+    $response = test()->actingAs($recruiter)
+        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id))
+        ->assertOk();
+
+
+    // Any other character should be forbidden
+    test()->actingAs($recruiter)
+        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id+1))
+        ->assertForbidden();
+
+});
+
+// Helpers
+function applySecondary(bool $user = true)
+{
+
+    $payload = $user
+        ? ['corporation_id' => test()->test_character->corporation->corporation_id]
+        : ['corporation_id' => test()->test_character->corporation->corporation_id, 'character_id' => test()->secondary_character->character_id];
+
+    test()->actingAs(test()->secondary_user)
+        ->post(route('post.application'), $payload);
+}
+
+function createEnlistment($type = 'user',string $affiliation = 'allowed')
+{
+    // create role
+    test()->actingAs(test()->superuser)
+        ->followingRedirects()
+        ->json('POST', route('acl.create'), ['name' => 'test']);
+
+    // affiliate secondary user to role
+    $role = Role::findByName('test');
+
+    $response = test()->actingAs(test()->superuser)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
+            'affiliations' => [
+                [
+                    "id" => test()->test_character->corporation->corporation_id,
+                    "category" => 'corporation',
+                    "type" => $affiliation
+                ],
+            ],
         ]);
 
-        // Create Enlistment as test user
-        $response = $this->actingAs($this->test_user)
-            ->post(route('create.corporation.recruitment'), [
-                'corporation_id' => $this->test_character->corporation->corporation_id,
-                'type' => $type
-            ]);
+    // give test user the role
 
-        $this->assertDatabaseHas('enlistments',[
-            'corporation_id' => $this->test_character->corporation->corporation_id,
+    $response = test()->actingAs(test()->superuser)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+            "acl" => [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => [
+                    [
+                        'id' => test()->test_user->id,
+                        'user' => test()->test_user
+                    ],
+                ]
+            ]
+        ])->assertOk();
+
+    test()->assertTrue(test()->test_user->refresh()->hasRole($role));
+
+    // Create Enlistment
+
+    test()->assertDatabaseMissing('enlistments',[
+        'corporation_id' => test()->test_character->corporation->corporation_id,
+    ]);
+
+    // Create Enlistment as test user
+    $response = test()->actingAs(test()->test_user)
+        ->post(route('create.corporation.recruitment'), [
+            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'type' => $type
         ]);
-    }
 
-
-
+    test()->assertDatabaseHas('enlistments',[
+        'corporation_id' => test()->test_character->corporation->corporation_id,
+    ]);
 }

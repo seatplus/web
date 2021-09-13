@@ -1,44 +1,33 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class RouteTest extends TestCase
-{
-    /** @test */
-    public function it_protects_configurations_routes()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('server.settings'))
-            ->assertForbidden();
-    }
+uses(TestCase::class);
 
-    /** @test */
-    public function it_protects_access_control_routes()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.groups'))
-            ->assertForbidden();
-    }
+it('protects configurations routes', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('server.settings'))
+        ->assertForbidden();
+});
 
-    /** @test */
-    public function it_allows_superuser_on_protected_access_control_routes()
-    {
-        $permission = Permission::findOrCreate('superuser');
+it('protects access control routes', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertForbidden();
+});
 
-        $this->test_user->givePermissionTo($permission);
+it('allows superuser on protected access control routes', function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
+    test()->test_user->givePermissionTo($permission);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.groups'))
-            ->assertOk();
-    }
+    // now re-register all the roles and permissions
+    test()->app->make(PermissionRegistrar::class)->registerPermissions();
 
-}
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertOk();
+});

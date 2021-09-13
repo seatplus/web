@@ -1,66 +1,51 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
 use Inertia\Testing\Assert;
 use Inertia\Inertia;
 use Seatplus\Web\Tests\TestCase;
 
-class FlashMessagesTest extends TestCase
-{
+uses(TestCase::class);
 
-    public function setUp(): void
-    {
-       parent::setUp();
+beforeEach(function () {
+    Inertia::share([
+        'flash' => function () {
+            return [
+                'success' => session()->pull('success'),
+                'info' => session()->pull('info'),
+                'warning' => session()->pull('warning'),
+                'error' => session()->pull('error'),
+            ];
+        },
+    ]);
+});
 
-        Inertia::share([
-            'flash' => function () {
-                return [
-                    'success' => session()->pull('success'),
-                    'info' => session()->pull('info'),
-                    'warning' => session()->pull('warning'),
-                    'error' => session()->pull('error'),
-                ];
-            },
-        ]);
-    }
+test('see success flash messages', function () {
+    $response = test()->withSession(['success','SuccessFlashMessage'])
+        ->get('auth/login');
 
-    /** @test */
-    public function seeSuccessFlashMessages()
-    {
-        $response = $this->withSession(['success','SuccessFlashMessage'])
-            ->get('auth/login');
+    $response->assertInertia( fn (Assert $page) => $page->has('flash.success'));
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->has('flash.success'));
-    }
+test('see error flash messages', function () {
+    $response = test()->withSession(['error','ErrorFlashMessage'])
+        ->get('auth/login');
 
-    /** @test */
-    public function seeErrorFlashMessages()
-    {
-        $response = $this->withSession(['error','ErrorFlashMessage'])
-            ->get('auth/login');
+    $response->assertInertia( fn (Assert $page) => $page->has('flash.error'));
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->has('flash.error'));
-    }
+test('see warning flash messages', function () {
+    $response = test()->withSession(['warning','WarningFlashMessage'])
+        ->get('auth/login');
 
-    /** @test */
-    public function seeWarningFlashMessages()
-    {
-        $response = $this->withSession(['warning','WarningFlashMessage'])
-            ->get('auth/login');
+    $response->assertInertia( fn (Assert $page) => $page->has('flash.warning'));
 
-        $response->assertInertia( fn (Assert $page) => $page->has('flash.warning'));
+});
 
-    }
+test('see info flash messages', function () {
+    $response = test()->withSession(['info','InfoFlashMessage'])
+        ->get('auth/login');
 
-    /** @test */
-    public function seeInfoFlashMessages()
-    {
-        $response = $this->withSession(['info','InfoFlashMessage'])
-            ->get('auth/login');
+    $response->assertInertia( fn (Assert $page) => $page->has('flash.info'));
 
-        $response->assertInertia( fn (Assert $page) => $page->has('flash.info'));
-
-    }
-}
+});
