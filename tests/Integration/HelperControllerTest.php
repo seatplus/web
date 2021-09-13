@@ -31,7 +31,7 @@ it('stores resolved id to cache', function () {
    ]);
 
    $cache_value = cache(sprintf('name:%s', $id));
-   test()->assertEquals(test()->test_character->name, $cache_value->name);
+   expect($cache_value->name)->toEqual(test()->test_character->name);
 });
 
 it('returns cached value for resolved ids', function () {
@@ -157,7 +157,7 @@ test('one can search existing systems', function () {
         ->assertOk();
 
 
-    test()->assertCount(1, $result->original);
+    expect($result->original)->toHaveCount(1);
 });
 
 test('one can search existing region', function () {
@@ -192,7 +192,7 @@ test('one can search existing region', function () {
         ->get(route('autosuggestion.region', ['search' =>'Del']))
         ->assertOk();
 
-    test()->assertCount(1, $result->original);
+    expect($result->original)->toHaveCount(1);
 });
 
 test('on can get resource variants', function () {
@@ -236,7 +236,7 @@ test('one can get market prices', function () {
         ]
     ]);
 
-    test()->assertNull(cache('market_prices'));
+    expect(cache('market_prices'))->toBeNull();
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('get.markets.prices'))

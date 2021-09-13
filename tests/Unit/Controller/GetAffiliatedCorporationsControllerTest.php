@@ -34,5 +34,5 @@ it('get affiliated corporations', function () {
 
     $response->assertOk();
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 });

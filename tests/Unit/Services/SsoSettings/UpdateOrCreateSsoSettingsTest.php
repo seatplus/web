@@ -67,7 +67,7 @@ it('calls corporation info action', function () {
 
     Bus::assertDispatched(CorporationInfoJob::class);
 
-    test()->assertCount(3, SsoScopes::where('morphable_id', 1184675423)->first()->selected_scopes);
+    expect(SsoScopes::where('morphable_id', 1184675423)->first()->selected_scopes)->toHaveCount(3);
 });
 
 /**

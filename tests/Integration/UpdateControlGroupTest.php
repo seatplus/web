@@ -21,11 +21,11 @@ test('on can update role type', function () {
 
     //dd(test()->test_user->hasRole('test'));
 
-    test()->assertFalse(test()->test_user->hasRole('test'));
+    expect(test()->test_user->hasRole('test'))->toBeFalse();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -37,15 +37,15 @@ test('on can update role type', function () {
             ]
         ]);
 
-    test()->assertEquals('automatic', test()->role->fresh()->type);
+    expect(test()->role->fresh()->type)->toEqual('automatic');
 });
 
 test('manual control group adds member', function () {
-    test()->assertFalse(test()->test_user->hasRole('test'));
+    expect(test()->test_user->hasRole('test'))->toBeFalse();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -62,17 +62,17 @@ test('manual control group adds member', function () {
             ]
         ]);
 
-    test()->assertTrue(test()->test_user->refresh()->hasRole(test()->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 });
 
 test('manual control group removes member', function () {
     test()->role->activateMember(test()->test_user);
 
-    test()->assertTrue(test()->test_user->refresh()->hasRole(test()->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -84,16 +84,16 @@ test('manual control group removes member', function () {
             ]
         ]);
 
-    test()->assertFalse(test()->test_user->refresh()->hasRole(test()->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
 test('automatic control group adds affiliation', function () {
 
-    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+    expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -110,12 +110,12 @@ test('automatic control group adds affiliation', function () {
             ]
         ]);
 
-    test()->assertFalse(test()->role->refresh()->acl_affiliations->isEmpty());
+    expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeFalse();
 });
 
 test('automatic control group removes affiliation', function () {
 
-    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+    expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     test()->role->acl_affiliations()->create([
     'affiliatable_id' => CorporationInfo::factory()->make()->corporation_id,
@@ -126,7 +126,7 @@ test('automatic control group removes affiliation', function () {
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -138,16 +138,16 @@ test('automatic control group removes affiliation', function () {
            ]
         ]);
 
-    test()->assertTrue(test()->role->refresh()->acl_affiliations->isEmpty());
+    expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeTrue();
 });
 
 test('on request control group adds and removes moderators', function () {
 
-    test()->assertTrue(test()->role->moderators->isEmpty());
+    expect(test()->role->moderators->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -163,11 +163,11 @@ test('on request control group adds and removes moderators', function () {
         ]);
 
     // Test if test user is moderator
-    test()->assertTrue(test()->role->refresh()->moderators->isNotEmpty());
-    test()->assertTrue(test()->role->refresh()->isModerator(test()->test_user));
+    expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
+    expect(test()->role->refresh()->isModerator(test()->test_user))->toBeTrue();
 
     // assert that no affiliations has been created
-    test()->assertTrue(test()->role->refresh()->acl_affiliations->isEmpty());
+    expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeTrue();
 
 });
 

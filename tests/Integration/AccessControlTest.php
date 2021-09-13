@@ -246,7 +246,7 @@ test('setup on request group and save twice', function () {
     // secondary user does not see control group in sidebar
     $sidebar = (new SidebarEntries($secondary_user))->filter();
 
-    test()->assertNull(data_get($sidebar, 'Access Control.entries.*.route'));
+    expect(data_get($sidebar, 'Access Control.entries.*.route'))->toBeNull();
 
     // navigate to groups
     $response = test()->actingAs(test()->test_user)
@@ -282,10 +282,10 @@ test('setup on request group and save twice', function () {
             ]
         ]);
 
-    test()->assertTrue($role->refresh()->moderators->isNotEmpty());
+    expect($role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
     // check if secondary user is moderator
-    test()->assertTrue($role->refresh()->isModerator($secondary_user));
+    expect($role->refresh()->isModerator($secondary_user))->toBeTrue();
 
     // reassure moderator does now see control group in sidebar
     $sidebar = (new SidebarEntries($secondary_user))->filter();

@@ -32,7 +32,7 @@ test('redirects to home if authorized', function () {
     $response->assertInertia( fn (Assert $page) => $page->component('Dashboard/Index'));
 
     test()->assertAuthenticatedAs(test()->test_user);
-    test()->assertTrue(auth()->check());
+    expect(auth()->check())->toBeTrue();
 });
 
 test('logout if authorized', function () {
@@ -46,6 +46,6 @@ test('logout if authorized', function () {
     //$response->assertRedirect('auth/login');
     //$response->assertViewIs('web::auth.login');
 
-    test()->assertFalse(auth()->check());
+    expect(auth()->check())->toBeFalse();
 
 });

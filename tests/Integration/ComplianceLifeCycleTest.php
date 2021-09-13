@@ -203,14 +203,14 @@ function createScopeSetting($type = 'default')
             ]
         ])->assertOk();
 
-    test()->assertTrue(test()->test_user->refresh()->hasRole($role));
+    expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 
-    test()->assertEmpty(SsoScopes::all());
+    expect(SsoScopes::all())->toBeEmpty();
 
     // Create sso scope
 
     // Make sure secondary character is missing the required scope
-    test()->assertFalse(in_array('esi-assets.read_assets.v1', test()->secondary_character->refresh_token->scopes));
+    expect(in_array('esi-assets.read_assets.v1', test()->secondary_character->refresh_token->scopes))->toBeFalse();
 
     // create scope setting
 
@@ -241,7 +241,7 @@ function createScopeSetting($type = 'default')
             ]
         )->assertOk();*/
 
-    test()->assertCount(1, SsoScopes::all());
+    expect(SsoScopes::all())->toHaveCount(1);
 
 }
 

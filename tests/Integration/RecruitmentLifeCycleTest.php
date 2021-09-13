@@ -90,7 +90,7 @@ test('secondary user can apply as character', function () {
 
     createEnlistment('character');
 
-    test()->assertNull(test()->secondary_character->refresh()->application);
+    expect(test()->secondary_character->refresh()->application)->toBeNull();
 
     $response = test()->actingAs(test()->secondary_user)
         ->post(route('post.application'), [
@@ -99,20 +99,20 @@ test('secondary user can apply as character', function () {
         ]);
 
     test()->assertNotNull(test()->secondary_character->refresh()->application);
-    test()->assertTrue(test()->secondary_character->refresh()->application instanceof Application);
+    expect(test()->secondary_character->refresh()->application instanceof Application)->toBeTrue();
 
     // Pull application
     $response = test()->actingAs(test()->secondary_user)
         ->delete(route('delete.character.application', test()->secondary_character->character_id));
 
-    test()->assertNull(test()->secondary_character->refresh()->application);
+    expect(test()->secondary_character->refresh()->application)->toBeNull();
 });
 
 test('secondary user can apply as user', function () {
 
     createEnlistment('user');
 
-    test()->assertNull(test()->secondary_user->refresh()->application);
+    expect(test()->secondary_user->refresh()->application)->toBeNull();
 
     // first check that existing applications does not exist
     test()->actingAs(test()->secondary_user)
@@ -125,7 +125,7 @@ test('secondary user can apply as user', function () {
     applySecondary();
 
     test()->assertNotNull(test()->secondary_user->refresh()->application);
-    test()->assertTrue(test()->secondary_user->refresh()->application instanceof Application);
+    expect(test()->secondary_user->refresh()->application instanceof Application)->toBeTrue();
 
     // then check that existing applications does exist
     test()->actingAs(test()->secondary_user)
@@ -144,12 +144,12 @@ test('secondary user can apply as user', function () {
     $response = test()->actingAs(test()->secondary_user)
         ->delete(route('delete.user.application'));
 
-    test()->assertNull(test()->secondary_user->refresh()->application);
+    expect(test()->secondary_user->refresh()->application)->toBeNull();
 });
 
 test('senior hr sees recruitment component', function () {
 
-    test()->assertFalse(test()->test_user->can('superuser'));
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.recruitment'))
@@ -251,7 +251,7 @@ test('junior hr handles open user applications', function () {
         'status' => 'rejected'
     ]);
 
-    test()->assertNull(test()->secondary_user->refresh()->application);
+    expect(test()->secondary_user->refresh()->application)->toBeNull();
 
 });
 
@@ -298,7 +298,7 @@ test('junior hr handles open character applications', function () {
         'status' => 'rejected'
     ]);
 
-    test()->assertNull(test()->secondary_character->refresh()->application);
+    expect(test()->secondary_character->refresh()->application)->toBeNull();
 
 });
 
@@ -415,7 +415,7 @@ test('recruiter can see corporation applications', function () {
             ]
         ])->assertOk();
 
-    test()->assertTrue($recruiter->refresh()->hasRole($role));
+    expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
     // get list with open appliactions
     $response = test()->actingAs($recruiter)
@@ -494,7 +494,7 @@ function createEnlistment($type = 'user',string $affiliation = 'allowed')
             ]
         ])->assertOk();
 
-    test()->assertTrue(test()->test_user->refresh()->hasRole($role));
+    expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 
     // Create Enlistment
 

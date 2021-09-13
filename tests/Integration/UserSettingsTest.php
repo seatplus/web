@@ -30,6 +30,6 @@ test('one can update main character', function () {
             "character_id" => $secondary_character->character_id,
         ]);
 
-    test()->assertEquals(test()->test_user->refresh()->main_character, $secondary_character->character);
+    expect($secondary_character->character)->toEqual(test()->test_user->refresh()->main_character);
 
 });

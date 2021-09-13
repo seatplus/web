@@ -32,15 +32,15 @@ test('happy path', function () {
     ];
 
     $cache_key =  sprintf('entityById:%s', $character_affiliation->character_id);
-    test()->assertNull(cache($cache_key));
+    expect(cache($cache_key))->toBeNull();
 
     $service = new GetEntityFromId($character_affiliation->character_id);
 
     $result = $service->execute();
 
-    test()->assertEquals($expected_result, $result);
+    expect($result)->toEqual($expected_result);
 
-    test()->assertEquals($expected_result, cache($cache_key));
+    expect(cache($cache_key))->toEqual($expected_result);
 });
 
 test('happy path without alliance', function () {
@@ -64,7 +64,7 @@ test('happy path without alliance', function () {
 
     $result = $service->execute();
 
-    test()->assertEquals($expected_result, $result);
+    expect($result)->toEqual($expected_result);
 });
 
 test('happy path via corporation id', function () {
@@ -85,7 +85,7 @@ test('happy path via corporation id', function () {
 
     $result = $service->execute();
 
-    test()->assertEquals($expected_result, $result);
+    expect($result)->toEqual($expected_result);
 });
 
 test('happy path via alliance id', function () {
@@ -104,7 +104,7 @@ test('happy path via alliance id', function () {
 
     $result = $service->execute();
 
-    test()->assertEquals($expected_result, $result);
+    expect($result)->toEqual($expected_result);
 });
 
 test('unknown character id', function () {
@@ -160,5 +160,5 @@ test('unknown character id', function () {
 
     $result = $service->execute();
 
-    test()->assertEquals($expected_result, $result);
+    expect($result)->toEqual($expected_result);
 });

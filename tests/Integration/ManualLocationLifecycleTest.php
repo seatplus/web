@@ -96,7 +96,7 @@ test('admin can accept suggestion', function () {
         ->assertOk();
 
     // check that there are 5 suggestions
-    test()->assertCount(5,json_decode($response->content())->data);
+    expect(json_decode($response->content())->data)->toHaveCount(5);
 
     // Make sure there is no suggestion in universe_locations
     test()->assertNull(Location::firstWhere(['location_id' =>12345]));
@@ -116,7 +116,7 @@ test('admin can accept suggestion', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.manuel_locations.suggestions'))
         ->assertOk();
-    test()->assertCount(1,json_decode($response->content())->data);
+    expect(json_decode($response->content())->data)->toHaveCount(1);
 
 });
 
@@ -176,8 +176,8 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         ->assertOk();
 
     // check that there are no suggestions
-    test()->assertCount(0,json_decode($response->content())->data);
-    test()->assertEmpty(ManualLocation::all());
+    expect(json_decode($response->content())->data)->toHaveCount(0);
+    expect(ManualLocation::all())->toBeEmpty();
 
 });
 

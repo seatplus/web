@@ -39,7 +39,7 @@ it('dispatches job', function () {
 
     $cache_key = sprintf('%s:%s', $dispatch_transfer_object['manual_job'], $character_id);
 
-    test()->assertNull(cache($cache_key));
+    expect(cache($cache_key))->toBeNull();
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('dispatch.job'),[

@@ -13,6 +13,6 @@ test('correct data is returned in response', function () {
 
     $resource = (new GroupResource($group));
 
-    test()->assertTrue($resource instanceof GroupResource);
-    test()->assertEquals($group->name, $resource->name);
+    expect($resource instanceof GroupResource)->toBeTrue();
+    expect($resource->name)->toEqual($group->name);
 });

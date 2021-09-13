@@ -23,7 +23,7 @@ test('user without superuser does not see access control', function () {
 
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertFalse(isset($sidebar['Access Control']));
+    expect(isset($sidebar['Access Control']))->toBeFalse();
 });
 
 test('user with superuser does see access control', function () {
@@ -34,7 +34,7 @@ test('user with superuser does see access control', function () {
 
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertTrue(isset($sidebar['Access Control']));
+    expect(isset($sidebar['Access Control']))->toBeTrue();
 });
 
 test('user with view access control does see access control', function () {
@@ -47,7 +47,7 @@ test('user with view access control does see access control', function () {
 
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertTrue(isset($sidebar['Access Control']));
+    expect(isset($sidebar['Access Control']))->toBeTrue();
 });
 
 test('user without view access control does see access control', function () {
@@ -60,8 +60,8 @@ test('user without view access control does see access control', function () {
 
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertFalse(test()->test_user->can('view access control'));
-    test()->assertFalse(isset($sidebar['Access Control']));
+    expect(test()->test_user->can('view access control'))->toBeFalse();
+    expect(isset($sidebar['Access Control']))->toBeFalse();
 });
 
 test('user with director role can see membertracking', function () {
@@ -72,11 +72,11 @@ test('user with director role can see membertracking', function () {
     $character_role->roles = ['Director'];
     $character_role->save();
 
-    test()->assertTrue($character_role->hasRole('roles', 'Director'));
+    expect($character_role->hasRole('roles', 'Director'))->toBeTrue();
 
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertTrue(isset($sidebar['corporation']));
+    expect(isset($sidebar['corporation']))->toBeTrue();
 });
 
 test('user with accountant role can see corporation wallet', function () {
@@ -91,8 +91,8 @@ test('user with accountant role can see corporation wallet', function () {
     // Now give user necessairy role
     test()->test_character->roles()->update(['roles' => ['Accountant']]);
 
-    test()->assertTrue(test()->test_character->refresh()->roles->hasRole('roles', 'Accountant'));
-    test()->assertFalse(test()->test_character->roles->hasRole('roles', 'Director'));
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Accountant'))->toBeTrue();
+    expect(test()->test_character->roles->hasRole('roles', 'Director'))->toBeFalse();
 
     $sidebar = (new SidebarEntries)->filter();
 
@@ -106,14 +106,14 @@ test('user with director role can see corporation wallet', function () {
     // First check that wallets are not visable
     $sidebar = (new SidebarEntries)->filter();
 
-    test()->assertFalse(test()->test_character->refresh()->roles->hasRole('roles', 'Director'));
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeFalse();
 
     test()->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
 
     // Now give user necessairy role
     test()->test_character->roles()->update(['roles' => ['Director']]);
 
-    test()->assertTrue(test()->test_character->refresh()->roles->hasRole('roles', 'Director'));
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeTrue();
 
     $sidebar = (new SidebarEntries)->filter();
 

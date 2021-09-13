@@ -17,7 +17,7 @@ test('if post cache clear clears cache', function () {
 
     cache(['key' => 'value'], now()->addCenturies(1));
 
-    test()->assertEquals('value', cache('key'));
+    expect(cache('key'))->toEqual('value');
 
     $permission = Permission::findOrCreate('superuser');
 

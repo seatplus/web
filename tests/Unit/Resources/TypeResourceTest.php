@@ -14,7 +14,7 @@ test('correct data is returned in response', function () {
 
     $resource = (new TypeResource($type));
 
-    test()->assertTrue($resource instanceof TypeResource);
-    test()->assertEquals($type->name, $resource->name);
+    expect($resource instanceof TypeResource)->toBeTrue();
+    expect($resource->name)->toEqual($type->name);
 
 });

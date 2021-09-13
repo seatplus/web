@@ -92,8 +92,8 @@ test('get mail body test', function () {
     // now re-register all the roles and permissions
     test()->app->make(PermissionRegistrar::class)->registerPermissions();
 
-    test()->assertTrue(test()->test_user->can('superuser'));
-    test()->assertCount(1, Mail::all());
+    expect(test()->test_user->can('superuser'))->toBeTrue();
+    expect(Mail::all())->toHaveCount(1);
 
     test()->actingAs(test()->test_user)
         ->get(route('get.mail', $mail->id))

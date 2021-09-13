@@ -44,14 +44,14 @@ it('creates role', function () {
 });
 
 it('assigns super user to user', function () {
-    test()->assertFalse(test()->test_user->can('superuser'));
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
         ->expectsQuestion('Who should be superadmin?',test()->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 
-    test()->assertTrue(test()->test_user->refresh()->can('superuser'));
+    expect(test()->test_user->refresh()->can('superuser'))->toBeTrue();
 });
 
 test('a second super user can not be assigned', function () {
@@ -67,5 +67,5 @@ test('a second super user can not be assigned', function () {
         ->expectsOutput('Superuser has already been assigned, ask any of the following users to help you out:')
         ->assertExitCode(0);
 
-    test()->assertTrue(test()->test_user->refresh()->can('superuser'));
+    expect(test()->test_user->refresh()->can('superuser'))->toBeTrue();
 });

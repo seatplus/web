@@ -80,7 +80,7 @@ test('load asset in system', function () {
         ->get(route('load.character.assets'))
         ->assertOk();
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
@@ -88,14 +88,14 @@ test('load asset in system', function () {
             'systems' => $system->system_id
         ]));
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
             'systems' => [$system->system_id]
         ]));
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
@@ -103,7 +103,7 @@ test('load asset in system', function () {
             'systems' => $system->system_id+1
         ]));
 
-    test()->assertCount(0, $response->original);
+    expect($response->original)->toHaveCount(0);
 });
 
 test('load asset in region', function () {
@@ -122,7 +122,7 @@ test('load asset in region', function () {
         ->get(route('load.character.assets'))
         ->assertOk();
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
@@ -130,14 +130,14 @@ test('load asset in region', function () {
             'regions' => $region->region_id
         ]));
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
             'regions' => [$region->region_id]
         ]));
 
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
@@ -145,7 +145,7 @@ test('load asset in region', function () {
             'systems' => $region->region_id+1
         ]));
 
-    test()->assertCount(0, $response->original);
+    expect($response->original)->toHaveCount(0);
 });
 
 test('load asset in unknown location', function () {
@@ -168,15 +168,15 @@ test('load asset in unknown location', function () {
             'location_flag' => 'Hangar'
         ]);
 
-    test()->assertNull($asset->location);
-    test()->assertNull($asset->manual_location);
+    expect($asset->location)->toBeNull();
+    expect($asset->manual_location)->toBeNull();
 
     // 3. call normally
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets'));
 
     // 4. expect 2 assets
-    test()->assertCount(2, $response->original);
+    expect($response->original)->toHaveCount(2);
 
     // 5. call only unknown locations
     $response = test()->actingAs(test()->test_user)
@@ -185,7 +185,7 @@ test('load asset in unknown location', function () {
         ]));
 
     // 6. expect only one
-    test()->assertCount(1, $response->original);
+    expect($response->original)->toHaveCount(1);
 
     // call with unknown locations
 });

@@ -117,7 +117,7 @@ test('one can delete sso setting', function () {
 
 test('one can create and delete global sso setting', function () {
 
-    test()->assertNull(setting('global_sso_scopes'));
+    expect(setting('global_sso_scopes'))->toBeNull();
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.scopes'),

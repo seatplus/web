@@ -37,7 +37,7 @@ test('user can leave himself', function () {
     // Second make test character member
     test()->role->activateMember(test()->test_user);
 
-    test()->assertTrue(test()->test_user->hasRole(test()->role));
+    expect(test()->test_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
 
@@ -47,7 +47,7 @@ test('user can leave himself', function () {
             'role_id' => test()->role->id
         ]));
 
-    test()->assertFalse(test()->test_user->refresh()->hasRole(test()->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
 test('user can kick other user as superuser', function () {
@@ -61,12 +61,12 @@ test('user can kick other user as superuser', function () {
     // Second make secondary character member
     test()->role->activateMember(test()->secondary_user);
 
-    test()->assertFalse(test()->test_user->hasRole(test()->role));
-    test()->assertTrue(test()->secondary_user->hasRole(test()->role));
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'superuser']);
 
-    test()->assertTrue(test()->test_user->can('superuser'));
+    expect(test()->test_user->can('superuser'))->toBeTrue();
 
     $response = test()->actingAs(test()->test_user)
         ->delete(route('acl.leave', [
@@ -74,7 +74,7 @@ test('user can kick other user as superuser', function () {
             'role_id' => test()->role->id
         ]));
 
-    test()->assertFalse(test()->secondary_user->refresh()->hasRole(test()->role));
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
 test('user can kick other user as moderator', function () {
@@ -87,22 +87,22 @@ test('user can kick other user as moderator', function () {
 
     // Second make secondary character member
     test()->role->activateMember(test()->secondary_user);
-    test()->assertTrue(test()->secondary_user->hasRole(test()->role));
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     // Thirdly make primary character moderator
-    test()->assertTrue(test()->role->moderators->isEmpty());
+    expect(test()->role->moderators->isEmpty())->toBeTrue();
     test()->role->moderators()->create([
         'affiliatable_id' => test()->test_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
         'can_moderate' => true
     ]);
-    test()->assertTrue(test()->role->refresh()->moderators->isNotEmpty());
+    expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
     // Apparently a moderator does not need to be member
-    test()->assertFalse(test()->test_user->hasRole(test()->role));
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
 
     assignPermissionToTestUser(['view access control']);
-    test()->assertFalse(test()->test_user->can('superuser'));
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
         ->delete(route('acl.leave', [
@@ -110,7 +110,7 @@ test('user can kick other user as moderator', function () {
             'role_id' => test()->role->id
         ]));
 
-    test()->assertFalse(test()->secondary_user->refresh()->hasRole(test()->role));
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
 test('user can not kick other user as vanilla user', function () {
@@ -123,10 +123,10 @@ test('user can not kick other user as vanilla user', function () {
 
     // Second make secondary character member
     test()->role->activateMember(test()->secondary_user);
-    test()->assertTrue(test()->secondary_user->hasRole(test()->role));
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
-    test()->assertFalse(test()->test_user->can('superuser'));
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
         ->delete(route('acl.leave', [
@@ -134,9 +134,9 @@ test('user can not kick other user as vanilla user', function () {
             'role_id' => test()->role->id
         ]));
 
-    test()->assertEquals(403, $response->getStatusCode());
+    expect($response->getStatusCode())->toEqual(403);
 
-    test()->assertTrue(test()->secondary_user->refresh()->hasRole(test()->role));
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeTrue();
 });
 
 // Helpers

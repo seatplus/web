@@ -35,11 +35,11 @@ beforeEach(function () {
 test('user can join waitlist', function () {
 
 
-    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+    expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -56,9 +56,9 @@ test('user can join waitlist', function () {
             ]
         ]);
 
-    test()->assertFalse(test()->role->refresh()->acl_affiliations->isEmpty());
+    expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeFalse();
 
-    test()->assertFalse(test()->test_user->hasRole(test()->role));
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.join'), [
@@ -67,18 +67,18 @@ test('user can join waitlist', function () {
         ]);
 
 
-    test()->assertFalse(test()->test_user->hasRole(test()->role));
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
 
-    test()->assertEquals(test()->test_user->id, test()->role->acl_members()->whereStatus('waitlist')->first()->user_id);
+    expect(test()->role->acl_members()->whereStatus('waitlist')->first()->user_id)->toEqual(test()->test_user->id);
 });
 
 test('superuser can join immediately', function () {
 
-    test()->assertTrue(test()->role->acl_affiliations->isEmpty());
+    expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['superuser']);
 
-    test()->assertEquals('manual', test()->role->type);
+    expect(test()->role->type)->toEqual('manual');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -95,9 +95,9 @@ test('superuser can join immediately', function () {
             ]
         ]);
 
-    test()->assertFalse(test()->role->refresh()->acl_affiliations->isEmpty());
+    expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeFalse();
 
-    test()->assertFalse(test()->test_user->roles->isNotEmpty());
+    expect(test()->test_user->roles->isNotEmpty())->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.join'), [
@@ -106,9 +106,9 @@ test('superuser can join immediately', function () {
         ]);
 
 
-    test()->assertTrue(test()->test_user->refresh()->hasRole(test()->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 
-    test()->assertEquals(test()->test_user->id, test()->role->members()->first()->user_id);
+    expect(test()->role->members()->first()->user_id)->toEqual(test()->test_user->id);
 
 });
 

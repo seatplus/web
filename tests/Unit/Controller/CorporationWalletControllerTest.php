@@ -64,7 +64,7 @@ test('on get ballance records from last30 days', function () {
 
     $response->assertOk();
 
-    test()->assertCount(1, data_get($response->original->toArray(), 'data'));
+    expect(data_get($response->original->toArray(), 'data'))->toHaveCount(1);
 });
 
 test('on get ballance records from before30 days', function () {
@@ -82,5 +82,5 @@ test('on get ballance records from before30 days', function () {
 
     $response->assertOk();
 
-    test()->assertCount(1, data_get($response->original->toArray(), 'data'));
+    expect(data_get($response->original->toArray(), 'data'))->toHaveCount(1);
 });
