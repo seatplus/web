@@ -10,7 +10,6 @@ use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 it('has control groups', function () {
 

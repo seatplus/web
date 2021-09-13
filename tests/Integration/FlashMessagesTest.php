@@ -5,7 +5,6 @@ use Inertia\Testing\Assert;
 use Inertia\Inertia;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     Inertia::share([

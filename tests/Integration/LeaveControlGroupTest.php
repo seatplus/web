@@ -12,7 +12,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     Queue::fake();

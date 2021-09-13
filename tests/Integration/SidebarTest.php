@@ -9,7 +9,6 @@ use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     //Permission::findOrCreate('superuser');

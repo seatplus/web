@@ -9,7 +9,6 @@ use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 it('stores resolved id to cache', function () {
 

@@ -14,7 +14,6 @@ use Seatplus\Web\Jobs\ManualDispatchedJob;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     test()->dispatch_transfer_object = [

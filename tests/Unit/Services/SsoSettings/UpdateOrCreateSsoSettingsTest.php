@@ -8,7 +8,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
-uses(TestCase::class);
 
 it('calls alliance info action', function () {
      /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);

@@ -10,7 +10,6 @@ use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Web\Models\ManualLocation;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     Queue::fake();

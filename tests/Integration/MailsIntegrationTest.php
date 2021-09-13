@@ -16,7 +16,6 @@ use Seatplus\Web\Services\Mails\EveMailService;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 test('see component', function () {
 

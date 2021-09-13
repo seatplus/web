@@ -8,7 +8,6 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     // this assures that we have a user->characters relationship

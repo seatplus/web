@@ -12,7 +12,6 @@ use Seatplus\Web\Services\GetEntityFromId;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 test('happy path', function () {
     $character = CharacterInfo::factory()->create();

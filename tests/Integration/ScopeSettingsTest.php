@@ -10,7 +10,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-uses(TestCase::class);
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');

@@ -6,7 +6,6 @@ use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 test('correct data is returned in response', function () {
 

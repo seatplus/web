@@ -8,7 +8,6 @@ use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Web\Models\Asset\Asset;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 test('is protected by authentication', function () {
 

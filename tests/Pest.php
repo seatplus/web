@@ -1,5 +1,8 @@
 <?php
 
+uses(\Seatplus\Web\Tests\TestCase::class)->in('Integration');
+uses(\Seatplus\Web\Tests\TestCase::class)->in('Unit');
+
 /*
 |--------------------------------------------------------------------------
 | Test Case

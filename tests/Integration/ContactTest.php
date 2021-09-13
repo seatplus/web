@@ -6,7 +6,6 @@ use Seatplus\Eveapi\Models\Assets\CharacterAsset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 test('see component', function () {
 

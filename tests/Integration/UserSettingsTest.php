@@ -7,7 +7,6 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Web\Tests\TestCase;
 
-uses(TestCase::class);
 
 it('has user settings', function () {
 
