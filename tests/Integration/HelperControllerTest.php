@@ -4,7 +4,6 @@
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Facades\Http;
-use Mockery;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\GetNamesFromIdsService;

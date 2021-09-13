@@ -3,7 +3,6 @@
 
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Faker\Generator;
-use Mockery;
 use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;

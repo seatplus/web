@@ -3,7 +3,6 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
-use Mockery;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;

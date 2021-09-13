@@ -2,7 +2,6 @@
 
 
 use Illuminate\Support\Facades\Bus;
-use Mockery;
 use Seatplus\Eveapi\Jobs\Alliances\AllianceInfoJob;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
