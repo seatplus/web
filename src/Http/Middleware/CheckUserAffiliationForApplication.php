@@ -34,7 +34,7 @@ use Seatplus\Eveapi\Models\Application;
 class CheckUserAffiliationForApplication
 {
     /**
-     * @param Closure $next
+     * @param  Closure  $next
      * @param $permission
      * @return mixed
      */
