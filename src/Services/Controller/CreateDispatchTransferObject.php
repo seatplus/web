@@ -104,7 +104,7 @@ class CreateDispatchTransferObject
     }
 
     /**
-     * @param bool $isCharacter
+     * @param  bool  $isCharacter
      * @return CreateDispatchTransferObject
      */
     public function setIsCharacter(bool $isCharacter): CreateDispatchTransferObject
