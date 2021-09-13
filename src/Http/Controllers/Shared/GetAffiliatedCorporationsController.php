@@ -40,7 +40,7 @@ class GetAffiliatedCorporationsController extends Controller
 
         $query = CorporationInfo::with('alliance')
             ->whereIn('corporation_id', $ids)
-            ->has($permission);
+            ->when(method_exists(CorporationInfo::class, $permission), fn ($query) => $query->has($permission));
 
         return CorporationInfoRessource::collection(
             $query->paginate()

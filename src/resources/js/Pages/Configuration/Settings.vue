@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-3">
-
     <HorizonStats class="mb-3" />
     <Commands class="mb-3" />
 
@@ -78,7 +77,6 @@ export default {
             navTabs: []
         }
     },
-    layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
     watch: {
         navTabs(Tabs) {
             _.each(Tabs, navTab => {

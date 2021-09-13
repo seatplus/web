@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-5 sm:p-6">
+  <div class="px-4 py-5 sm:p-6 space-y-4">
     <p class="text-base leading-6 text-gray-500">
       This is the automatic control group settings. Users with characters in the selected affilites will gain access to the control group
     </p>

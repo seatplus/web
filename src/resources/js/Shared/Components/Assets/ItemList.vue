@@ -76,6 +76,7 @@
 
       <template #navigation>
         <inertia-link
+          v-if="asset.content[0]"
           :href="$route('character.item', asset.item_id)"
           preserve-state
           preserve-scroll

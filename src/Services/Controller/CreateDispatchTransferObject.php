@@ -28,13 +28,16 @@ namespace Seatplus\Web\Services\Controller;
 
 use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\MailsHydrateBatch;
+use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
 class CreateDispatchTransferObject
@@ -52,7 +55,7 @@ class CreateDispatchTransferObject
     {
         return (object) match ($class) {
             Contract::class => [
-                'manual_job' => $this->getManualJob(ContractHydrateBatch::class),
+                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
                 'permission' => $this->getPermission(Contract::class),
                 'required_scopes' => $this->getRequiredScopes('contracts'),
                 'required_corporation_role' => $this->isCharacter() ? '' : '',
@@ -80,6 +83,18 @@ class CreateDispatchTransferObject
                 'permission' => $this->getPermission(CorporationMemberTracking::class),
                 'required_scopes' => $this->getRequiredScopes('membertracking'),
                 'required_corporation_role' => 'Director',
+            ],
+            Skill::class => [
+                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
+                'permission' => $this->getPermission(Skill::class),
+                'required_scopes' => $this->getRequiredScopes('skills'),
+                'required_corporation_role' => '',
+            ],
+            Mail::class => [
+                'manual_job' => $this->getManualJob(MailsHydrateBatch::class),
+                'permission' => $this->getPermission(Mail::class),
+                'required_scopes' => $this->getRequiredScopes('mails'),
+                'required_corporation_role' => '',
             ]
         };
     }

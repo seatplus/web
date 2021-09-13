@@ -164,11 +164,9 @@
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import TabComponent from "./TabComponent";
-
 
 export default {
     name: "Application",
@@ -177,7 +175,6 @@ export default {
         HeaderButton,
         PageHeader
     },
-    layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
     props: {
         recruit: {
             required: true,
@@ -191,7 +188,7 @@ export default {
             required: true,
             type: Object
         },
-        dispatch_transfer_object: {
+        activeSidebarElement: {
             required: true,
             type: String
         }

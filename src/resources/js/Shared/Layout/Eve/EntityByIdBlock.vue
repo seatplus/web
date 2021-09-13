@@ -1,7 +1,10 @@
 <template>
-  <div class="sm:flex">
+  <div 
+    ref="entityByIdBlockComponent"
+    class="sm:flex"
+  >
     <div
-      v-if="ready"
+      v-if="isReady"
       class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center"
     >
       <EveImage
@@ -10,7 +13,7 @@
         :tailwind_class="image_class"
       />
     </div>
-    <div v-if="ready">
+    <div v-if="isReady">
       <h3 :class="name_class">
         {{ name }}
       </h3>
@@ -18,7 +21,7 @@
         v-if="hasSubtext"
         class="text-sm text-gray-500 truncate"
       >
-        {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
+        {{ subText }}
       </p>
     </div>
   </div>
@@ -27,6 +30,9 @@
 <script>
 import EveImage from "@/Shared/EveImage";
 import axios from "axios";
+import {onMounted, onUnmounted, ref} from "vue";
+import route from 'ziggy'
+
 export default {
     name: "EntityByIdBlock",
     components: {EveImage},
@@ -51,18 +57,51 @@ export default {
             type: String
         }
     },
-    data() {
-        return {
-            entity: null,
-            ready: false
+    setup(props) {
+        const entityByIdBlockComponent = ref(null)
+        const isReady = ref(false)
+        const entity = ref(null)
+
+        const getEntity = async () => {
+            await axios.get(route('resolve.id', props.id))
+                .then((response) => {
+
+                    entity.value = response.data
+
+                   isReady.value = true
+                })
+                .catch(error => console.log(error))
         }
+
+        const observer = new IntersectionObserver(function(entries) {
+            if(entries[0].isIntersecting === true) {
+                if(isReady.value)
+                    return
+
+                getEntity()
+            }
+        }, { threshold: [1] });
+
+        onMounted(() => {
+
+            observer.observe(entityByIdBlockComponent.value);
+
+        })
+
+        onUnmounted(() => {
+            observer.disconnect()
+        })
+        
+        return {
+            entityByIdBlockComponent,
+            entity,
+            isReady
+        }
+
     },
     computed: {
-        corporationName() {
-            return _.get(this.entity, 'corporation.name', '')
-        },
-        allianceName() {
-            return _.get(this.entity, 'alliance.name', '')
+        subText() {
+            return [_.get(this.entity, 'corporation.name'), _.get(this.entity, 'alliance.name')].filter( Boolean ).join(' | ')
         },
         name() {
             return _.get(this.entity, 'name', 'missing name')
@@ -78,29 +117,7 @@ export default {
             if(!this.withSubText)
                 return false;
 
-            if(this.entity.corporation || this.entity.alliance)
-                return true
-
-            return false
-        }
-    },
-    created() {
-
-        this.getEntity()
-    },
-    methods: {
-        hasAlliance() {
-            return _.has(this.entity, 'alliance')
-        },
-        getEntity() {
-            axios.get(this.$route('resolve.id', this.id))
-                .then((response) => {
-
-                    this.entity = response.data
-
-                    this.ready = true
-                })
-                .catch(error => console.log(error))
+            return !!(this.subText);
         }
     }
 }

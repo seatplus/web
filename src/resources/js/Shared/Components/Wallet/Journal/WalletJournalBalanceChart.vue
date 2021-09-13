@@ -13,7 +13,7 @@
     </template>
     <div class="relative max-h-48 overflow-y-auto">
       <LineChart
-        v-if="isComplete"
+        v-if="results.length > 0"
         class="p-2"
         :chart-data="chartData"
         :chart-options="chartOptions"

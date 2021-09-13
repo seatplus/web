@@ -54,7 +54,6 @@ export default {
             type: Array
         }
     },
-  layout: (h, page) => h(Layout, { dispatch_transfer_object: page.props.dispatch_transfer_object }, [page]),
     data() {
         return {
           pageTitle: 'Character Wallets',

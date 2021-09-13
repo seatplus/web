@@ -52,9 +52,10 @@
 import EveImage from "@/Shared/EveImage"
 import Time from "@/Shared/Time"
 import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/outline"
-import {onBeforeMount, onUnmounted, ref, watch} from "vue";
+import {computed, onBeforeMount, onUnmounted, ref, watch} from "vue";
 import axios from "axios";
 import route from 'ziggy'
+import {usePage} from "@inertiajs/inertia-vue3";
 
 export default {
     name: "DispatchableEntry",
@@ -69,6 +70,11 @@ export default {
         const status = ref(_.get(props.entry, 'batch.state'))
         const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
         const updateStatus = ref()
+        const dispatch_transfer_object = computed(() => usePage().props.value.dispatchTransferObject)
+        const url = computed(() => route('dispatch.job', {
+            character_id: props.entry.character_id,
+            corporation_id: props.entry.corporation_id,
+        }))
 
         function getStatus() {
             axios
@@ -93,36 +99,21 @@ export default {
                 clearInterval(updateStatus.value)
         })
 
+        const dispatchJob = async () => await axios.post(url.value, {dispatch_transfer_object: dispatch_transfer_object.value})
+            .then(response => {
+                status.value = 'pending'
+                batch_id.value = response.data
+
+                getStatus()
+            })
+            .catch(error => console.log(error))
+
         return {
             status,
             batch_id,
-        }
-
-    },
-    data() {
-        return {
-            form: this.$inertia.form({
-
-            }),
-
-        }
-    },
-    computed: {
-        url() {
-            return this.$route('dispatch.job', {
-                character_id: this.entry.character_id,
-                corporation_id: this.entry.corporation_id,
-            })
-        },
-    },
-    methods: {
-        dispatchJob() {
-            axios.post(this.url, {dispatch_transfer_object: this.$page.props.dispatch_transfer_object})
-                .then(response => {
-                    this.status = 'pending'
-                    this.batch_id = response.data
-                })
-                .catch(error => console.log(error))
+            dispatch_transfer_object,
+            url,
+            dispatchJob
         }
     }
 }

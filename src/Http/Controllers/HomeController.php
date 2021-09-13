@@ -26,23 +26,41 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
 {
     public function home()
     {
         return Inertia::render('Dashboard/Index', [
-            'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
-            'user_application' => collect(auth()->user()->application)->whenNotEmpty(fn ($application) => [
-                'is_user' => Arr::get($application, 'applicationable_type') === User::class,
-                'corporation_id' => Arr::get($application, 'corporation_id'),
-            ]),
         ]);
+    }
+
+    public function getEnlistments()
+    {
+        return Enlistment::with('corporation', 'corporation.alliance')->paginate();
+    }
+
+    public function getOwnApplications(int $corporation_id)
+    {
+        return Application::whereHasMorph(
+            'applicationable',
+            [User::class, CharacterInfo::class],
+            function (Builder $query, $type) {
+                match ($type) {
+                    User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
+                };
+            }
+        )->whereCorporationId($corporation_id)
+            ->paginate();
     }
 }

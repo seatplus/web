@@ -36,8 +36,13 @@
               </label>
               <div class="mt-1 sm:mt-0 sm:col-span-2">
                 <div class="mt-1 sm:mt-0 sm:col-span-2">
-                  <input v-model="form.roleName" :placeholder="form.roleName" type="text" id="roleName"
-                         class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md" />
+                  <input
+                    id="roleName"
+                    v-model="form.roleName"
+                    :placeholder="form.roleName"
+                    type="text"
+                    class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                  >
                 </div>
               </div>
             </div>
@@ -95,7 +100,6 @@ export default {
         HeaderButton,
         PageHeader
     },
-    layout: (h, page) => h(Layout, { activeSidebarElement: page.props.activeSidebarElement }, [page]),
     props: {
         role: {
             type: Object,

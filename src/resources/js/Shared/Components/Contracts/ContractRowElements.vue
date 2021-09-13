@@ -40,8 +40,9 @@
       <label class="block text-sm font-medium text-gray-700 sm:hidden">
         Contract Type
       </label>
-      {{ contract.type }}
-
+      <span>
+        {{ contract.type }} {{ contract.items > 0 ? '(click to expand)' : '' }}
+      </span>
       <p
         v-if="contract.type !== 'courier'"
         class="flex items-center text-sm text-gray-500"
@@ -124,7 +125,6 @@
         </svg>
         {{ contract.status }}
       </p>
-
       <p
         v-if="contract.reward > 0"
         class="flex items-center text-sm text-gray-500"
@@ -179,7 +179,6 @@
         </svg>
         Price {{ contract.price.toLocaleString() }}
       </p>
-
       <p
         v-if="contract.volume > 0"
         class="flex items-center text-sm text-gray-500"
@@ -220,10 +219,10 @@ export default {
     },
     computed: {
         startLocation() {
-            return _.get(this.contract, 'start_location.name', 'unknown')
+            return _.get(this.contract, 'start_location.name', _.get(this.contract, 'start_location.locatable.name', 'unknown'))
         },
         endLocation() {
-            return _.get(this.contract, 'end_location.name', 'unknown')
+            return _.get(this.contract, 'end_location.name', _.get(this.contract, 'end_location.locatable.name', 'unknown'))
         }
     },
 }

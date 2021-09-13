@@ -12,9 +12,7 @@ trait MockRetrieveEsiDataAction
     public function mockRetrieveEsiDataAction(array $body) : void
     {
 
-        $data = json_encode($body);
-
-        $response = new EsiResponse($data, [], 'now', 200);
+        $response = $this->mockEsiResponse($body);
 
         RetrieveEsiData::shouldReceive('execute')
             ->once()
@@ -25,6 +23,13 @@ trait MockRetrieveEsiDataAction
     public function assertRetrieveEsiDataIsNotCalled() : void
     {
         RetrieveEsiData::shouldReceive('execute')->never();
+    }
+
+    public function mockEsiResponse(array $body) : EsiResponse
+    {
+        $data = json_encode($body);
+
+        return new EsiResponse($data, [], 'now', 200);
     }
 
 }

@@ -37,20 +37,4 @@ class UserSettingsController
             'user' => UserRessource::make(auth()->user()),
         ]);
     }
-
-    public function update_main_character()
-    {
-        $user = auth()->user();
-
-        request()->validate([
-            'character_id' => 'required|integer',
-        ]);
-
-        //TODO only accept character_ids that are within the users characters
-
-        $user->main_character_id = request()->input('character_id');
-        $user->save();
-
-        return redirect()->action([UserSettingsController::class, 'index'])->with('success', 'Main character updated');
-    }
 }

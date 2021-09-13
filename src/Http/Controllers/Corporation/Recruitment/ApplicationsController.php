@@ -90,7 +90,7 @@ class ApplicationsController extends Controller
                 'systems' => $enlistment->systems?->pluck('system_id'),
                 'regions' => $enlistment->regions?->pluck('region_id'),
             ],
-            'dispatchTransferObject' => route('corporation.recruitment'),
+            'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
 
@@ -128,6 +128,7 @@ class ApplicationsController extends Controller
                 'systems' => $enlistment->systems?->pluck('system_id'),
                 'regions' => $enlistment->regions?->pluck('region_id'),
             ],
+            'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
 
