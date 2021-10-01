@@ -4,7 +4,6 @@
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\Esi\Jobs\Corporation\CorporationInfoAction;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Spatie\Permission\PermissionRegistrar;
@@ -15,7 +14,7 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions();
 });
 
 it('has scope settings', function () {
@@ -31,23 +30,25 @@ it('has scope settings', function () {
  * @preserveGlobalState disabled
  */
 test('one can create sso setting', function () {
-    $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-    $mock->shouldReceive('execute')
-        ->once()
-        ->andReturn(null);
+    
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
-    test()->assertDatabaseMissing('sso_scopes',[
-        'morphable_id' => 1184675423
-    ]);
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+        json_encode($corporation->attributesToArray()), [], 11, 200);
 
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+        ->andReturn($response);
+
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->toBeNull();
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.scopes'),
             [
                 'selectedEntities' => [
                     [
-                        'corporation_id' => 1184675423,
-                        'id' =>1184675423,
+                        'corporation_id' => $corporation->corporation_id,
+                        'id' =>$corporation->corporation_id,
                         'name' => "Amok.",
                         'category' => 'corporation'
                     ],
@@ -59,9 +60,10 @@ test('one can create sso setting', function () {
             ]
         );
 
-    test()->assertDatabaseHas('sso_scopes',[
-        'morphable_id' => 1184675423
-    ]);
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->not()->toBeNull()
+        ->toBeInstanceOf(SsoScopes::class);
+
 });
 
 /**
@@ -69,14 +71,17 @@ test('one can create sso setting', function () {
  * @preserveGlobalState disabled
  */
 test('one can delete sso setting', function () {
-    /*$mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-    $mock->shouldReceive('execute')
-        ->once()
-        ->andReturn(null);*/
 
-    test()->assertDatabaseMissing('sso_scopes',[
-        'morphable_id' => 1184675423
-    ]);
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
+
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+        json_encode($corporation->attributesToArray()), [], 11, 200);
+
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+        ->andReturn($response);
+
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->toBeNull();
 
     Bus::fake();
 
@@ -85,8 +90,8 @@ test('one can delete sso setting', function () {
             [
                 'selectedEntities' => [
                     [
-                        'corporation_id' => 1184675423,
-                        'id' =>1184675423,
+                        'corporation_id' => $corporation->corporation_id,
+                        'id' =>$corporation->corporation_id,
                         'name' => "Amok.",
                         'category' => 'corporation'
                     ],
@@ -100,16 +105,19 @@ test('one can delete sso setting', function () {
 
     Bus::assertDispatched(CorporationInfoJob::class);
 
-    test()->assertDatabaseHas('sso_scopes',[
-        'morphable_id' => 1184675423
-    ]);
+    /*\Pest\Laravel\assertDatabaseHas('sso_scopes',[
+        'morphable_id' => $corporation->corporation_id
+    ]);*/
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->not()->toBeNull()
+        ->toBeInstanceOf(SsoScopes::class);
 
     $response = test()->actingAs(test()->test_user)
-        ->delete(route('delete.scopes', 1184675423));
+        ->delete(route('delete.scopes', $corporation->corporation_id));
 
-    test()->assertDatabaseMissing('sso_scopes',[
-        'morphable_id' => 1184675423
-    ]);
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())->toBeNull();
+
+
 });
 
 test('one can create and delete global sso setting', function () {

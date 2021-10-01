@@ -14,6 +14,7 @@ use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
@@ -24,9 +25,9 @@ abstract class TestCase extends OrchestraTestCase
 {
     use MockRetrieveEsiDataAction;
 
-    protected User $test_user;
+    public User $test_user;
 
-    protected $test_character;
+    public CharacterInfo $test_character;
 
     protected function setUp(): void
     {

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
@@ -169,14 +170,3 @@ test('on request control group adds and removes moderators', function () {
 });
 
 // Helpers
-function assignPermissionToTestUser(array $array)
-{
-    foreach ($array as $string) {
-        $permission = Permission::findOrCreate($string);
-
-        test()->test_user->givePermissionTo($permission);
-    }
-
-    // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
-}

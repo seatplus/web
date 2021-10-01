@@ -132,16 +132,3 @@ test('user can not kick other user as vanilla user', function () {
 
     expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeTrue();
 });
-
-// Helpers
-function assignPermissionToTestUser(array $array)
-{
-    foreach ($array as $string) {
-        $permission = Permission::findOrCreate($string);
-
-        test()->test_user->givePermissionTo($permission);
-    }
-
-    // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
-}

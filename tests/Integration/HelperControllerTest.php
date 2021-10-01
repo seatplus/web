@@ -104,14 +104,14 @@ test('one can search for solar systems', function () {
 
     test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
-    // Mock GetNamesFromIdsService - we don't test that it's tested otherwise
-    $mock = Mockery::mock('overload:' . GetNamesFromIdsService::class);
-    $mock->shouldReceive([$system->system_id])
-        ->andReturn([
+    // as mocking is difficult we will set the cached result
+    cache([
+        sprintf('name:%s', $system->system_id) => [
             'category' => 'solar_system',
             'id' => $system->system_id,
             'faction_id' => $system->name
-        ]);
+        ]
+    ]);
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('resolve.solar_system', 'tes'))

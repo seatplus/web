@@ -39,7 +39,7 @@ it('has asset prop', function () {
     ]);
 
     // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    //test()->app->instance('path.public', __DIR__ .'/../../src/public');
+    //app()->instance('path.public', __DIR__ .'/../../src/public');
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.assets'));

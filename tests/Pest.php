@@ -1,7 +1,9 @@
 <?php
 
-uses(\Seatplus\Web\Tests\TestCase::class)->in('Integration');
-uses(\Seatplus\Web\Tests\TestCase::class)->in('Unit');
+use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Eveapi\Models\RefreshToken;
+use Seatplus\Web\Tests\TestCase;
+use Spatie\Permission\PermissionRegistrar;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +17,8 @@ uses(\Seatplus\Web\Tests\TestCase::class)->in('Unit');
 */
 
 /** @link https://pestphp.com/docs/underlying-test-case */
+uses(TestCase::class)->in('Integration', 'Unit');
+//uses(TestCase::class)->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +45,26 @@ uses(\Seatplus\Web\Tests\TestCase::class)->in('Unit');
 */
 
 /** @link https://pestphp.com/docs/helpers */
+function assignPermissionToTestUser(array $array)
+{
+    foreach ($array as $string) {
+        $permission = Permission::findOrCreate($string);
+
+        test()->test_user->givePermissionTo($permission);
+    }
+
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+}
+
+function updateRefreshTokenWithScopes(\Seatplus\Eveapi\Models\RefreshToken $refreshToken, array $scopes): RefreshToken
+{
+    $helper_token = RefreshToken::factory()->scopes($scopes)->make([
+        'character_id' => $refreshToken->character_id
+    ]);
+
+    $refreshToken->token = $helper_token->token;
+    $refreshToken->save();
+
+    return $refreshToken;
+}

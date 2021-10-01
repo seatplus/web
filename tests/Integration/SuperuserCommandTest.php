@@ -22,7 +22,7 @@ it('accepts legal user id', function () {
 });
 
 it('does not accepts illegal user id', function () {
-    test()->assertDatabaseMissing('users', ['id' => test()->test_user->id + 1]);
+    \Pest\Laravel\assertDatabaseMissing('users', ['id' => test()->test_user->id + 1]);
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
         ->expectsQuestion('Who should be superadmin?',test()->test_user->id + 1)
@@ -30,14 +30,14 @@ it('does not accepts illegal user id', function () {
 });
 
 it('creates role', function () {
-    test()->assertDatabaseMissing('roles', ['name' => 'Superuser']);
+    \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'Superuser']);
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
         ->expectsQuestion('Who should be superadmin?',test()->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 
-    test()->assertDatabaseHas('roles', ['name' => 'Superuser']);
+    \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'Superuser']);
 });
 
 it('assigns super user to user', function () {

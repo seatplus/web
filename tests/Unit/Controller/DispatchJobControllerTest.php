@@ -41,9 +41,7 @@ it('dispatches job', function () {
 
 test('one get dispatchable entities', function () {
 
-    $refresh_token = test()->test_character->refresh_token;
-    $refresh_token->scopes = test()->dispatch_transfer_object['required_scopes'];
-    $refresh_token->save();
+    updateRefreshTokenWithScopes(test()->test_character->refresh_token, test()->dispatch_transfer_object['required_scopes']);
 
     $response = test()->actingAs(test()->test_user)
         ->postJson(route('manual_job.entities'), test()->dispatch_transfer_object);

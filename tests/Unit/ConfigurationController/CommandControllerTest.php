@@ -9,7 +9,7 @@ test('if post cache clear clears cache', function () {
     $route = route('cache.clear');
 
     // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    test()->app->instance('path.public', __DIR__ .'/../src/public');
+    app()->instance('path.public', __DIR__ .'/../src/public');
 
 
     cache(['key' => 'value'], now()->addCenturies(1));
@@ -21,7 +21,7 @@ test('if post cache clear clears cache', function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions();
 
     $response = test()->actingAs(test()->test_user)
         ->post($route)->assertOk();

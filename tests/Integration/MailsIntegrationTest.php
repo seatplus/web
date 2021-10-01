@@ -4,8 +4,8 @@
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
-use Seat\Eseye\Containers\EsiResponse;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
@@ -26,7 +26,7 @@ test('get mail headers of secondary user', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions();
     }
 
     $response = test()->actingAs(test()->test_user)
@@ -84,7 +84,7 @@ test('get mail body test', function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions();
 
     expect(test()->test_user->can('superuser'))->toBeTrue();
     expect(Mail::all())->toHaveCount(1);

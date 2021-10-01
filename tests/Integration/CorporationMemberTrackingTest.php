@@ -22,7 +22,7 @@ test('has dispatchable job', function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions();
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()

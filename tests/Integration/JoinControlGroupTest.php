@@ -109,14 +109,3 @@ test('superuser can join immediately', function () {
 });
 
 // Helpers
-function assignPermissionToTestUser(array $array)
-{
-    foreach ($array as $string) {
-        $permission = Permission::findOrCreate($string);
-
-        test()->test_user->givePermissionTo($permission);
-    }
-
-    // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
-}

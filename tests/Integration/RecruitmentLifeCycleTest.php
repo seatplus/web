@@ -28,7 +28,7 @@ beforeEach(function () {
         $user->givePermissionTo($permission);
 
         // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions();
 
         return $user;
     });
@@ -54,14 +54,14 @@ test('user with permission and affiliations can delete enlistment', function () 
 
     createEnlistment();
 
-    test()->assertDatabaseHas('enlistments',[
+    $this->assertDatabaseHas('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 
     test()->actingAs(test()->test_user)
         ->delete(route('delete.corporation.recruitment', ['corporation_id' =>  test()->test_character->corporation->corporation_id]));
 
-    test()->assertDatabaseMissing('enlistments',[
+    $this->assertDatabaseMissing('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 });
@@ -151,7 +151,7 @@ test('senior hr sees recruitment component', function () {
         ->get(route('corporation.recruitment'))
         ->assertForbidden();
 
-    test()->givePermissionsToTestUser(['can open or close corporations for recruitment']);
+    assignPermissionToTestUser(['can open or close corporations for recruitment']);
 
     test()->actingAs(test()->test_user->refresh())
         ->get(route('corporation.recruitment'))
@@ -161,31 +161,23 @@ test('senior hr sees recruitment component', function () {
 
 test('junior hr sees recruitment component', function () {
 
-    if(test()->test_user->can('superuser')) {
-        test()->test_user->removeRole('superuser');
+    // First remove all roles from the user
+    test()->test_user->syncRoles([]);
+    expect(test()->test_user->roles)->toBeEmpty();
 
-        // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
-    if(test()->test_user->can('can accept or deny applications')) {
-        test()->test_user->removeRole('can accept or deny applications');
-
-        // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    // Remove all Permissions
+    test()->test_user->syncPermissions([]);
+    expect(test()->test_user->permissions)->toBeEmpty();
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.recruitment'))
         ->assertForbidden();
 
-    test()->givePermissionsToTestUser(['can accept or deny applications']);
+    assignPermissionToTestUser(['can accept or deny applications']);
 
-    $response = test()->actingAs(test()->test_user->refresh())
-        ->get(route('corporation.recruitment'))
-        ->assertOk();
-
-    $response->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+    expect(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
 });
 
 test('junior hr handles open user applications', function () {
@@ -228,7 +220,7 @@ test('junior hr handles open user applications', function () {
 
     // submit review
 
-    test()->assertDatabaseHas('applications', [
+    \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_user->id,
         'applicationable_type' => User::class,
         'status' => 'open'
@@ -241,7 +233,7 @@ test('junior hr handles open user applications', function () {
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
-    test()->assertDatabaseHas('applications', [
+    \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_user->id,
         'applicationable_type' => User::class,
         'status' => 'rejected'
@@ -275,7 +267,7 @@ test('junior hr handles open character applications', function () {
 
     // submit review
 
-    test()->assertDatabaseHas('applications', [
+    \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
         'status' => 'open'
@@ -288,7 +280,7 @@ test('junior hr handles open character applications', function () {
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
-    test()->assertDatabaseHas('applications', [
+    \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
         'status' => 'rejected'
@@ -494,7 +486,7 @@ function createEnlistment($type = 'user',string $affiliation = 'allowed')
 
     // Create Enlistment
 
-    test()->assertDatabaseMissing('enlistments',[
+    \Pest\Laravel\assertDatabaseMissing('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 
@@ -505,7 +497,7 @@ function createEnlistment($type = 'user',string $affiliation = 'allowed')
             'type' => $type
         ]);
 
-    test()->assertDatabaseHas('enlistments',[
+    \Pest\Laravel\assertDatabaseHas('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 }

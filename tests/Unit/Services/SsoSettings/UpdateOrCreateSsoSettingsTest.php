@@ -90,13 +90,13 @@ it('creates sso settings', function () {
         'type' => 'default'
     ];
 
-    test()->assertDatabaseMissing('sso_scopes', [
+    \Pest\Laravel\assertDatabaseMissing('sso_scopes', [
         'morphable_id' => 1184675423
     ]);
 
     (new UpdateOrCreateSsoSettings($request))->execute();
 
-    test()->assertDatabaseHas('sso_scopes', [
+    \Pest\Laravel\assertDatabaseHas('sso_scopes', [
         'morphable_id' => 1184675423
     ]);
 });

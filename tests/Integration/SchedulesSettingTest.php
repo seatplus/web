@@ -12,7 +12,7 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions();
 });
 
 it('has scope settings', function () {
@@ -28,7 +28,7 @@ test('one can create a schedule', function () {
 
     $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesCreate'));
 
-    test()->assertDatabaseMissing('schedules', ['job' => 'test-job']);
+    \Pest\Laravel\assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -39,7 +39,7 @@ test('one can create a schedule', function () {
 
     $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
 
-    test()->assertDatabaseHas('schedules', ['job' => 'test-job']);
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
 });
 
 test('one can view schedule details', function () {
@@ -48,7 +48,7 @@ test('one can view schedule details', function () {
         'expression' => 'test-expression'
     ]);
 
-    test()->assertDatabaseHas('schedules', ['job' => 'test-job']);
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('schedules.details', $schedule->id));
@@ -62,13 +62,13 @@ test('one can delete schedule', function () {
         'expression' => 'test-expression'
     ]);
 
-    test()->assertDatabaseHas('schedules', ['job' => 'test-job']);
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->delete(route('schedules.delete', $schedule->id));
 
-    test()->assertDatabaseMissing('schedules', ['job' => 'test-job']);
+    \Pest\Laravel\assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
     $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
 });

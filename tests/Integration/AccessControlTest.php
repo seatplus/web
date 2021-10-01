@@ -61,7 +61,7 @@ it('create control groups', function () {
 
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-    test()->assertDatabaseMissing('roles',[
+    \Pest\Laravel\assertDatabaseMissing('roles',[
         'name' => 'test'
     ]);
 
@@ -69,7 +69,7 @@ it('create control groups', function () {
         ->followingRedirects()
         ->json('POST', route('acl.create'), ['name' => 'test']);
 
-    test()->assertDatabaseHas('roles',[
+    \Pest\Laravel\assertDatabaseHas('roles',[
         'name' => 'test'
     ]);
 });
@@ -78,7 +78,7 @@ it('deletes control group', function () {
 
     $role = Role::create(['name' => 'test']);
 
-    test()->assertDatabaseHas('roles',[
+    \Pest\Laravel\assertDatabaseHas('roles',[
         'name' => 'test'
     ]);
 
@@ -88,7 +88,7 @@ it('deletes control group', function () {
         ->followingRedirects()
         ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
 
-    test()->assertDatabaseMissing('roles',[
+    \Pest\Laravel\assertDatabaseMissing('roles',[
         'name' => 'test'
     ]);
 
@@ -98,7 +98,7 @@ it('updates permissions', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    test()->assertDatabaseMissing('permissions',[
+    \Pest\Laravel\assertDatabaseMissing('permissions',[
         'name' => 'character.assets'
     ]);
 
@@ -110,7 +110,7 @@ it('updates permissions', function () {
             "permissions" => ["character.assets", "superuser"]
         ]);
 
-    test()->assertDatabaseHas('permissions',[
+    \Pest\Laravel\assertDatabaseHas('permissions',[
         'name' => 'character.assets'
     ]);
 
@@ -122,7 +122,7 @@ it('updates permissions', function () {
             "permissions" => ["superuser"]
         ]);
 
-    test()->assertDatabaseMissing('role_has_permissions',[
+    \Pest\Laravel\assertDatabaseMissing('role_has_permissions',[
         'permission_id' => $permission->id,
         'role_id' => $role->id
     ]);
@@ -132,7 +132,7 @@ it('updates affiliations', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    test()->assertDatabaseMissing('affiliations',[
+    \Pest\Laravel\assertDatabaseMissing('affiliations',[
         'role_id' => $role->id
     ]);
 
@@ -151,7 +151,7 @@ it('updates affiliations', function () {
             "roleName" => $name,
         ]);
 
-    test()->assertDatabaseHas('affiliations',[
+    \Pest\Laravel\assertDatabaseHas('affiliations',[
         'role_id' => $role->id,
         'affiliatable_id' => 95725047
     ]);
@@ -163,7 +163,7 @@ it('updates affiliations', function () {
             "roleName" => $name,
         ]);
 
-    test()->assertDatabaseMissing('affiliations',[
+    \Pest\Laravel\assertDatabaseMissing('affiliations',[
         'role_id' => $role->id,
         'affiliatable_id' => 95725047
     ]);
@@ -173,7 +173,7 @@ it('updates name', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    test()->assertDatabaseHas('roles',[
+    \Pest\Laravel\assertDatabaseHas('roles',[
         'name' => $name
     ]);
 
@@ -191,7 +191,7 @@ it('updates name', function () {
             "roleName" => 'someOtherName',
         ]);
 
-    test()->assertDatabaseMissing('roles',[
+    \Pest\Laravel\assertDatabaseMissing('roles',[
         'name' => $name
     ]);
 });
@@ -336,14 +336,4 @@ test('search for character', function () {
 });
 
 // Helpers
-function assignPermissionToTestUser(array $array)
-{
-    foreach ($array as $string) {
-        $permission = Permission::findOrCreate($string);
 
-        test()->test_user->givePermissionTo($permission);
-    }
-
-    // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
-}

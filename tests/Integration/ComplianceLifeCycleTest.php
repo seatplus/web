@@ -26,7 +26,7 @@ beforeEach(function () {
         $user->givePermissionTo($permission);
 
         // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions();
 
         return $user;
     });
@@ -40,7 +40,7 @@ test('user without permission fails to see compliance', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions();
     }
 
     $response = test()->actingAs(test()->secondary_user)
@@ -54,14 +54,14 @@ test('user with permission sees component', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        test()->app->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions();
     }
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.member_compliance'))
         ->assertForbidden();
 
-    givePermissionsToTestUser(['view member compliance']);
+    assignPermissionToTestUser(['view member compliance']);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.member_compliance'))
@@ -235,17 +235,4 @@ function createScopeSetting($type = 'default')
 
     expect(SsoScopes::all())->toHaveCount(1);
 
-}
-
-function givePermissionsToTestUser(array $array)
-{
-
-    foreach ($array as $string) {
-        $permission = Permission::findOrCreate($string);
-
-        test()->test_user->givePermissionTo($permission);
-    }
-
-    // now re-register all the roles and permissions
-    test()->app->make(PermissionRegistrar::class)->registerPermissions();
 }
