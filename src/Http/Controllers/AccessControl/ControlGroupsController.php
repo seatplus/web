@@ -120,7 +120,7 @@ class ControlGroupsController
         );
     }
 
-    private function paginate(array | Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
+    private function paginate(array|Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
 

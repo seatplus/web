@@ -1,177 +1,134 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class LeaveControlGroupTest extends TestCase
-{
+beforeEach(function () {
+    Queue::fake();
 
-    private Role $role;
+    $role = Role::create(['name' => 'test', 'type' => 'on-request']);
+    test()->role = Role::find($role->id);
 
-    private CharacterInfo $secondary_character;
+    test()->secondary_user = User::factory()->create();
+    test()->secondary_character = test()->secondary_user->characters->first();
 
-    private User $secondary_user;
+});
 
-    public function setUp(): void
-    {
+test('user can leave himself', function () {
 
-        parent::setUp();
-
-        Queue::fake();
-
-        $role = Role::create(['name' => 'test', 'type' => 'on-request']);
-        $this->role = Role::find($role->id);
-
-        $this->secondary_user = User::factory()->create();
-        $this->secondary_character = $this->secondary_user->characters->first();
-
-    }
+    // First create affiliation
+    test()->role->acl_affiliations()->create([
+        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+    ]);
 
 
-    /** @test */
-    public function user_can_leave_himself()
-    {
+    // Second make test character member
+    test()->role->activateMember(test()->test_user);
 
-        // First create affiliation
-        $this->role->acl_affiliations()->create([
-            'affiliatable_id' => $this->test_character->character_id,
-            'affiliatable_type' => CharacterInfo::class,
-        ]);
+    expect(test()->test_user->hasRole(test()->role))->toBeTrue();
 
+    assignPermissionToTestUser(['view access control']);
 
-        // Second make test character member
-        $this->role->activateMember($this->test_user);
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [
+            'user_id' => test()->test_user->id,
+            'role_id' => test()->role->id
+        ]));
 
-        $this->assertTrue($this->test_user->hasRole($this->role));
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
+});
 
-        $this->assignPermissionToTestUser(['view access control']);
+test('user can kick other user as superuser', function () {
 
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('acl.leave', [
-                'user_id' => $this->test_user->id,
-                'role_id' => $this->role->id
-            ]));
+    // First create affiliation
+    test()->role->acl_affiliations()->create([
+        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+    ]);
 
-        $this->assertFalse($this->test_user->refresh()->hasRole($this->role));
-    }
+    // Second make secondary character member
+    test()->role->activateMember(test()->secondary_user);
 
-    /** @test */
-    public function user_can_kick_other_user_as_superuser()
-    {
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
-        // First create affiliation
-        $this->role->acl_affiliations()->create([
-            'affiliatable_id' => $this->secondary_character->character_id,
-            'affiliatable_type' => CharacterInfo::class,
-        ]);
+    assignPermissionToTestUser(['view access control', 'superuser']);
 
-        // Second make secondary character member
-        $this->role->activateMember($this->secondary_user);
+    expect(test()->test_user->can('superuser'))->toBeTrue();
 
-        $this->assertFalse($this->test_user->hasRole($this->role));
-        $this->assertTrue($this->secondary_user->hasRole($this->role));
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [
+            'user_id' => test()->secondary_user->id,
+            'role_id' => test()->role->id
+        ]));
 
-        $this->assignPermissionToTestUser(['view access control', 'superuser']);
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
+});
 
-        $this->assertTrue($this->test_user->can('superuser'));
+test('user can kick other user as moderator', function () {
 
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('acl.leave', [
-                'user_id' => $this->secondary_user->id,
-                'role_id' => $this->role->id
-            ]));
+    // First create affiliation
+    test()->role->acl_affiliations()->create([
+        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+    ]);
 
-        $this->assertFalse($this->secondary_user->refresh()->hasRole($this->role));
-    }
+    // Second make secondary character member
+    test()->role->activateMember(test()->secondary_user);
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
-    /** @test */
-    public function user_can_kick_other_user_as_moderator()
-    {
+    // Thirdly make primary character moderator
+    expect(test()->role->moderators->isEmpty())->toBeTrue();
+    test()->role->moderators()->create([
+        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+        'can_moderate' => true
+    ]);
+    expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
-        // First create affiliation
-        $this->role->acl_affiliations()->create([
-            'affiliatable_id' => $this->secondary_character->character_id,
-            'affiliatable_type' => CharacterInfo::class,
-        ]);
+    // Apparently a moderator does not need to be member
+    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
 
-        // Second make secondary character member
-        $this->role->activateMember($this->secondary_user);
-        $this->assertTrue($this->secondary_user->hasRole($this->role));
+    assignPermissionToTestUser(['view access control']);
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
-        // Thirdly make primary character moderator
-        $this->assertTrue($this->role->moderators->isEmpty());
-        $this->role->moderators()->create([
-            'affiliatable_id' => $this->test_character->character_id,
-            'affiliatable_type' => CharacterInfo::class,
-            'can_moderate' => true
-        ]);
-        $this->assertTrue($this->role->refresh()->moderators->isNotEmpty());
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [
+            'user_id' => test()->secondary_user->id,
+            'role_id' => test()->role->id
+        ]));
 
-        // Apparently a moderator does not need to be member
-        $this->assertFalse($this->test_user->hasRole($this->role));
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
+});
 
-        $this->assignPermissionToTestUser(['view access control']);
-        $this->assertFalse($this->test_user->can('superuser'));
+test('user can not kick other user as vanilla user', function () {
 
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('acl.leave', [
-                'user_id' => $this->secondary_user->id,
-                'role_id' => $this->role->id
-            ]));
+    // First create affiliation
+    test()->role->acl_affiliations()->create([
+        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+    ]);
 
-        $this->assertFalse($this->secondary_user->refresh()->hasRole($this->role));
-    }
+    // Second make secondary character member
+    test()->role->activateMember(test()->secondary_user);
+    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
-    /** @test */
-    public function user_can_not_kick_other_user_as_vanilla_user()
-    {
+    assignPermissionToTestUser(['view access control']);
+    expect(test()->test_user->can('superuser'))->toBeFalse();
 
-        // First create affiliation
-        $this->role->acl_affiliations()->create([
-            'affiliatable_id' => $this->secondary_character->character_id,
-            'affiliatable_type' => CharacterInfo::class,
-        ]);
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [
+            'user_id' => test()->secondary_user->id,
+            'role_id' => test()->role->id
+        ]));
 
-        // Second make secondary character member
-        $this->role->activateMember($this->secondary_user);
-        $this->assertTrue($this->secondary_user->hasRole($this->role));
+    expect($response->getStatusCode())->toEqual(403);
 
-        $this->assignPermissionToTestUser(['view access control']);
-        $this->assertFalse($this->test_user->can('superuser'));
-
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('acl.leave', [
-                'user_id' => $this->secondary_user->id,
-                'role_id' => $this->role->id
-            ]));
-
-        $this->assertEquals(403, $response->getStatusCode());
-
-        $this->assertTrue($this->secondary_user->refresh()->hasRole($this->role));
-    }
-
-    private function assignPermissionToTestUser(array $array)
-    {
-        foreach ($array as $string) {
-            $permission = Permission::findOrCreate($string);
-
-            $this->test_user->givePermissionTo($permission);
-        }
-
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
-}
+    expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeTrue();
+});

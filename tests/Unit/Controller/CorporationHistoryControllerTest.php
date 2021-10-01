@@ -1,35 +1,21 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Controller;
-
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class CorporationHistoryControllerTest extends TestCase
-{
-    public function setUp(): void
-    {
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        parent::setUp();
+    test()->test_user->givePermissionTo($permission);
 
-        $permission = Permission::findOrCreate('superuser');
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        $this->test_user->givePermissionTo($permission);
+test('one can corporation history endpoint', function () {
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
-    /** @test */
-    public function oneCanCorporationHistoryEndpoint()
-    {
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('corporation.history', $this->test_character->character_id))
-            ->assertOk();
-    }
-
-
-}
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('corporation.history', test()->test_character->character_id))
+        ->assertOk();
+});

@@ -4,8 +4,8 @@
 namespace Seatplus\Web\Tests\Traits;
 
 
+use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use Seat\Eseye\Containers\EsiResponse;
 
 trait MockRetrieveEsiDataAction
 {

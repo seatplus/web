@@ -1,62 +1,42 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\Models\Contracts\ContractItem;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class SkillsIntegrationTest extends TestCase
-{
-    public function setUp(): void
-    {
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        parent::setUp();
+    test()->test_user->givePermissionTo($permission);
 
-        $permission = Permission::findOrCreate('superuser');
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        $this->test_user->givePermissionTo($permission);
+test('has dispatchable job', function () {
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('character.skills'));
 
-    /** @test */
-    public function hasDispatchableJob()
-    {
+    $response->assertInertia( fn (Assert $page) => $page
+        ->component('Character/Skill/Index')
+        ->has('dispatchTransferObject')
+    );
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('character.skills'));
+test('one get skills per character', function () {
 
-        $response->assertInertia( fn (Assert $page) => $page
-            ->component('Character/Skill/Index')
-            ->has('dispatchTransferObject')
-        );
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('get.character.skills', test()->test_character->character_id))
+        ->assertOk();
 
-    /** @test */
-    public function oneGetSkillsPerCharacter()
-    {
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('get.character.skills', $this->test_character->character_id))
-            ->assertOk();
+test('one get skill queue per character', function () {
 
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('get.character.skill.queue', test()->test_character->character_id))
+        ->assertOk();
 
-    /** @test */
-    public function oneGetSkillQueuePerCharacter()
-    {
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('get.character.skill.queue', $this->test_character->character_id))
-            ->assertOk();
-
-    }
-
-
-}
+});

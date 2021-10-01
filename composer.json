@@ -11,7 +11,6 @@
     "autoload": {
         "psr-4": {
             "Seatplus\\Web\\": "src/"
-
         },
         "files": [
             "./src/Helpers/helpers.php"
@@ -28,22 +27,24 @@
         "php": "^8.0",
         "laravel/framework": "^8.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^0.8.7",
-        "seatplus/auth": "^0.8.1",
+        "seatplus/eveapi": "^0.9.3",
+        "seatplus/auth": "^0.9.1",
         "inertiajs/inertia-laravel": "^0.4.0",
         "tightenco/ziggy": "^1.0.4",
         "spatie/laravel-permission": "^4.0",
-        "spatie/data-transfer-object": "^2.2",
+        "spatie/data-transfer-object": "^3.7",
         "conedevelopment/i18n": "^1.1",
         "doctrine/dbal": "^3.0"
     },
     "require-dev": {
         "orchestra/testbench": "^6.10",
         "nunomaduro/collision": "^5.3",
-        "phpunit/phpunit": "^9.5",
         "spatie/phpunit-watcher": "^1.11",
         "rector/rector": "^0.9.2",
-        "brianium/paratest": "^6.2"
+        "brianium/paratest": "^6.2",
+        "pestphp/pest": "^1.20",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "pestphp/pest-plugin-parallel": "^0.3.1"
     },
     "extra": {
         "laravel": {
@@ -53,7 +54,8 @@
         }
     },
     "scripts": {
-        "watch": "vendor/bin/phpunit-watcher watch",
-        "parallel": "vendor/bin/testbench package:test --parallel --no-coverage"
+      "test": "vendor/bin/pest",
+      "test-coverage": "XDEBUG_MODE=coverage ./vendor/bin/pest --coverage",
+      "parallel": "vendor/bin/testbench package:test --parallel --no-coverage"
     }
 }

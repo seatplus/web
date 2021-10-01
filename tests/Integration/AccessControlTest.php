@@ -1,381 +1,339 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class AccessControlTest extends TestCase
-{
-    /** @test */
-    public function it_has_control_groups()
-    {
+it('has control groups', function () {
 
-        $this->assignPermissionToTestUser(['view access control']);
+    assignPermissionToTestUser(['view access control']);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.groups'));
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'));
 
-        $response->assertOk();
+    $response->assertOk();
 
-        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
-    }
+    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+});
 
-    /** @test */
-    public function it_has_list_control_groups()
-    {
-        $role = Role::create(['name' => 'test']);
+it('has list control groups', function () {
+    $role = Role::create(['name' => 'test']);
 
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('get.acl'))
-            ->assertOk();
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('get.acl'))
+        ->assertOk();
+});
 
-    /** @test */
-    public function it_has_edit_control_groups()
-    {
-        $role = Role::create(['name' => 'test']);
+it('has edit control groups', function () {
+    $role = Role::create(['name' => 'test']);
 
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-        $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "affiliations" => [
-                    [
-                        "category" => 'character',
-                        "id" => $this->test_character->character_id,
-                        "type" => "allowed"
-                    ],
+    test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "affiliations" => [
+                [
+                    "category" => 'character',
+                    "id" => test()->test_character->character_id,
+                    "type" => "allowed"
                 ],
-                "roleName" => $role->name,
-            ])
-            ->assertRedirect();
+            ],
+            "roleName" => $role->name,
+        ])
+        ->assertRedirect();
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.edit', ['role_id' => $role->id]))
-            ->assertInertia( fn (Assert $page) => $page
-                ->component('AccessControl/EditGroup')
-                ->has('affiliations', 1)
-            );
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.edit', ['role_id' => $role->id]))
+        ->assertInertia( fn (Assert $page) => $page
+            ->component('AccessControl/EditGroup')
+            ->has('affiliations', 1)
+        );
 
-    }
+});
 
-    /** @test */
-    public function it_create_control_groups()
-    {
+it('create control groups', function () {
 
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-        $this->assertDatabaseMissing('roles',[
-            'name' => 'test'
+    \Pest\Laravel\assertDatabaseMissing('roles',[
+        'name' => 'test'
+    ]);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('acl.create'), ['name' => 'test']);
+
+    \Pest\Laravel\assertDatabaseHas('roles',[
+        'name' => 'test'
+    ]);
+});
+
+it('deletes control group', function () {
+
+    $role = Role::create(['name' => 'test']);
+
+    \Pest\Laravel\assertDatabaseHas('roles',[
+        'name' => 'test'
+    ]);
+
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
+
+    \Pest\Laravel\assertDatabaseMissing('roles',[
+        'name' => 'test'
+    ]);
+
+});
+
+it('updates permissions', function () {
+    $name = 'update permissions';
+    $role = Role::create(['name' => $name]);
+
+    \Pest\Laravel\assertDatabaseMissing('permissions',[
+        'name' => 'character.assets'
+    ]);
+
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+
+    $response = test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "roleName" => $name,
+            "permissions" => ["character.assets", "superuser"]
         ]);
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('acl.create'), ['name' => 'test']);
+    \Pest\Laravel\assertDatabaseHas('permissions',[
+        'name' => 'character.assets'
+    ]);
 
-        $this->assertDatabaseHas('roles',[
-            'name' => 'test'
-        ]);
-    }
+    $permission = Permission::findByName("character.assets");
 
-    /** @test */
-    public function it_deletes_control_group()
-    {
-
-        $role = Role::create(['name' => 'test']);
-
-        $this->assertDatabaseHas('roles',[
-            'name' => 'test'
+    test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "roleName" => $name,
+            "permissions" => ["superuser"]
         ]);
 
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    \Pest\Laravel\assertDatabaseMissing('role_has_permissions',[
+        'permission_id' => $permission->id,
+        'role_id' => $role->id
+    ]);
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
+it('updates affiliations', function () {
+    $name = 'update permissions';
+    $role = Role::create(['name' => $name]);
 
-        $this->assertDatabaseMissing('roles',[
-            'name' => 'test'
-        ]);
+    \Pest\Laravel\assertDatabaseMissing('affiliations',[
+        'role_id' => $role->id
+    ]);
 
-    }
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-    /** @test */
-    public function it_updates_permissions()
-    {
-        $name = 'update permissions';
-        $role = Role::create(['name' => $name]);
-
-        $this->assertDatabaseMissing('permissions',[
-            'name' => 'character.assets'
-        ]);
-
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
-
-        $response = $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "roleName" => $name,
-                "permissions" => ["character.assets", "superuser"]
-            ]);
-
-        $this->assertDatabaseHas('permissions',[
-            'name' => 'character.assets'
-        ]);
-
-        $permission = Permission::findByName("character.assets");
-
-        $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "roleName" => $name,
-                "permissions" => ["superuser"]
-            ]);
-
-        $this->assertDatabaseMissing('role_has_permissions',[
-            'permission_id' => $permission->id,
-            'role_id' => $role->id
-        ]);
-    }
-
-    /** @test */
-    public function it_updates_affiliations()
-    {
-        $name = 'update permissions';
-        $role = Role::create(['name' => $name]);
-
-        $this->assertDatabaseMissing('affiliations',[
-            'role_id' => $role->id
-        ]);
-
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
-
-        // Adding Affiliation
-        $response = $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "affiliations" => [
-                    [
-                        "category" => 'character',
-                        "id" => 95725047,
-                        "type" => "allowed"
-                    ],
+    // Adding Affiliation
+    $response = test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "affiliations" => [
+                [
+                    "category" => 'character',
+                    "id" => 95725047,
+                    "type" => "allowed"
                 ],
-                "roleName" => $name,
-            ]);
-
-        $this->assertDatabaseHas('affiliations',[
-            'role_id' => $role->id,
-            'affiliatable_id' => 95725047
+            ],
+            "roleName" => $name,
         ]);
 
-        // Delete Affiliation
-        $response = $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "allowed" => [],
-                "roleName" => $name,
-            ]);
+    \Pest\Laravel\assertDatabaseHas('affiliations',[
+        'role_id' => $role->id,
+        'affiliatable_id' => 95725047
+    ]);
 
-        $this->assertDatabaseMissing('affiliations',[
-            'role_id' => $role->id,
-            'affiliatable_id' => 95725047
-        ]);
-    }
-
-    /** @test */
-    public function it_updates_name()
-    {
-        $name = 'update permissions';
-        $role = Role::create(['name' => $name]);
-
-        $this->assertDatabaseHas('roles',[
-            'name' => $name
+    // Delete Affiliation
+    $response = test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "allowed" => [],
+            "roleName" => $name,
         ]);
 
-        $this->assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    \Pest\Laravel\assertDatabaseMissing('affiliations',[
+        'role_id' => $role->id,
+        'affiliatable_id' => 95725047
+    ]);
+});
 
-        $response = $this->actingAs($this->test_user)
-            ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-                "allowed" => [
-                    [
-                        "character_id" => 95725047,
-                        "id" => 95725047,
-                        "name" => "Herpaderp Aldent"
-                    ],
+it('updates name', function () {
+    $name = 'update permissions';
+    $role = Role::create(['name' => $name]);
+
+    \Pest\Laravel\assertDatabaseHas('roles',[
+        'name' => $name
+    ]);
+
+    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+
+    $response = test()->actingAs(test()->test_user)
+        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
+            "allowed" => [
+                [
+                    "character_id" => 95725047,
+                    "id" => 95725047,
+                    "name" => "Herpaderp Aldent"
                 ],
-                "roleName" => 'someOtherName',
-            ]);
-
-        $this->assertDatabaseMissing('roles',[
-            'name' => $name
-        ]);
-    }
-
-    /** @test */
-    public function one_can_manage_control_group_members()
-    {
-        $role = Role::create(['name' => 'test']);
-
-        $this->assignPermissionToTestUser(['view access control', 'manage access control group']);
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.manage', ['role_id' => $role->id]));
-
-        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageControlGroup'));
-    }
-
-    /** @test */
-    public function moderator_can_manage_applications()
-    {
-        $role = Role::create(['name' => 'test', 'type' => 'on-request']);
-
-        $this->assignPermissionToTestUser(['view access control']);
-
-        $role->acl_affiliations()->create([
-            'affiliatable_id' => $this->test_user->id,
-            'affiliatable_type' => User::class,
-            'can_moderate' => true
+            ],
+            "roleName" => 'someOtherName',
         ]);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('manage.acl.members', ['role_id' => $role->id]));
+    \Pest\Laravel\assertDatabaseMissing('roles',[
+        'name' => $name
+    ]);
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+test('one can manage control group members', function () {
+    $role = Role::create(['name' => 'test']);
 
-        // List Members
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.members', ['role_id' => $role->id]))
-            ->assertOk();
-    }
+    assignPermissionToTestUser(['view access control', 'manage access control group']);
 
-    /** @test */
-    public function setup_on_request_group_and_save_twice()
-    {
-        // Create Role
-        $role = Role::create(['name' => 'test', 'type' => 'on-request']);
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.manage', ['role_id' => $role->id]));
 
-        // Assing superuser to test_user
-        $this->assignPermissionToTestUser(['superuser']);
+    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageControlGroup'));
+});
 
-        // create second user
-        $secondary_user = User::factory()->create();
+test('moderator can manage applications', function () {
+    $role = Role::create(['name' => 'test', 'type' => 'on-request']);
 
-        // secondary user does not see control group in sidebar
-        $sidebar = (new SidebarEntries($secondary_user))->filter();
+    assignPermissionToTestUser(['view access control']);
 
-        $this->assertNull(data_get($sidebar, 'Access Control.entries.*.route'));
+    $role->acl_affiliations()->create([
+        'affiliatable_id' => test()->test_user->id,
+        'affiliatable_type' => User::class,
+        'can_moderate' => true
+    ]);
 
-        // navigate to groups
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.groups'))
-            ->assertInertia( fn(Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-        // open manage control group
-        $this->actingAs($this->test_user)
-            ->get(route('acl.manage', $role->id))
-            ->assertInertia( fn(Assert $page) => $page
-                ->component('AccessControl/ManageControlGroup')
-                ->has('role', fn(Assert $page) => $page
-                    ->where('id', $role->id)
-                    ->has('acl', fn(Assert $page) => $page
-                        ->where('moderators', [])
-                        ->etc()
-                    )
+    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+
+    // List Members
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.members', ['role_id' => $role->id]))
+        ->assertOk();
+});
+
+test('setup on request group and save twice', function () {
+    // Create Role
+    $role = Role::create(['name' => 'test', 'type' => 'on-request']);
+
+    // Assing superuser to test_user
+    assignPermissionToTestUser(['superuser']);
+
+    // create second user
+    $secondary_user = User::factory()->create();
+
+    // secondary user does not see control group in sidebar
+    $sidebar = (new SidebarEntries($secondary_user))->filter();
+
+    expect(data_get($sidebar, 'Access Control.entries.*.route'))->toBeNull();
+
+    // navigate to groups
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertInertia( fn(Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+
+    // open manage control group
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.manage', $role->id))
+        ->assertInertia( fn(Assert $page) => $page
+            ->component('AccessControl/ManageControlGroup')
+            ->has('role', fn(Assert $page) => $page
+                ->where('id', $role->id)
+                ->has('acl', fn(Assert $page) => $page
+                    ->where('moderators', [])
                     ->etc()
                 )
-            );
+                ->etc()
+            )
+        );
 
-        // assign secondary user as moderator
-        $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-                "acl" => [
-                    "type" => 'on-request',
-                    'moderators' => [
-                        [
-                            'id' => $secondary_user->id
-                        ]
+    // assign secondary user as moderator
+    test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+            "acl" => [
+                "type" => 'on-request',
+                'moderators' => [
+                    [
+                        'id' => $secondary_user->id
                     ]
                 ]
-            ]);
-
-        $this->assertTrue($role->refresh()->moderators->isNotEmpty());
-
-        // check if secondary user is moderator
-        $this->assertTrue($role->refresh()->isModerator($secondary_user));
-
-        // reassure moderator does now see control group in sidebar
-        $sidebar = (new SidebarEntries($secondary_user))->filter();
-
-        $this->assertNotNull(data_get($sidebar, 'Access Control.entries.*.route'));
-
-        // Try moderating
-        $response = $this->actingAs($secondary_user)
-            ->get(route('manage.acl.members', ['role_id' => $role->id]))
-            ->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
-
-        // List Members
-        $response = $this->actingAs($secondary_user)
-            ->get(route('acl.members', ['role_id' => $role->id]))
-            ->assertOk();
-
-
-    }
-
-    /** @test */
-    public function searchForCharacter()
-    {
-        // Assing superuser to test_user
-        $this->assignPermissionToTestUser(['superuser']);
-
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.search.affiliatable'))
-            ->assertOk();
-
-        $response->assertJsonFragment([
-            'id' => $this->test_character->character_id,
-            'category' => 'character'
-        ]);
-
-        // now search with query-string
-        $this->mockRetrieveEsiDataAction([
-            'character' => [
-                $this->test_character->character_id
             ]
         ]);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('acl.search.affiliatable', [
-                'query' => $this->test_character->name
-            ]))
-            ->assertOk();
+    expect($role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
-        $response->assertJsonFragment([
-            'id' => $this->test_character->character_id,
-            'category' => 'character'
-        ]);
+    // check if secondary user is moderator
+    expect($role->refresh()->isModerator($secondary_user))->toBeTrue();
+
+    // reassure moderator does now see control group in sidebar
+    $sidebar = (new SidebarEntries($secondary_user))->filter();
+
+    test()->assertNotNull(data_get($sidebar, 'Access Control.entries.*.route'));
+
+    // Try moderating
+    $response = test()->actingAs($secondary_user)
+        ->get(route('manage.acl.members', ['role_id' => $role->id]))
+        ->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+
+    // List Members
+    $response = test()->actingAs($secondary_user)
+        ->get(route('acl.members', ['role_id' => $role->id]))
+        ->assertOk();
 
 
-    }
+});
 
-    private function assignPermissionToTestUser(array $array)
-    {
-        foreach ($array as $string) {
-            $permission = Permission::findOrCreate($string);
+test('search for character', function () {
+    // Assing superuser to test_user
+    assignPermissionToTestUser(['superuser']);
 
-            $this->test_user->givePermissionTo($permission);
-        }
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.search.affiliatable'))
+        ->assertOk();
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    $response->assertJsonFragment([
+        'id' => test()->test_character->character_id,
+        'category' => 'character'
+    ]);
 
-}
+    // now search with query-string
+    test()->mockRetrieveEsiDataAction([
+        'character' => [
+            test()->test_character->character_id
+        ]
+    ]);
+
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('acl.search.affiliatable', [
+            'query' => test()->test_character->name
+        ]))
+        ->assertOk();
+
+    $response->assertJsonFragment([
+        'id' => test()->test_character->character_id,
+        'category' => 'character'
+    ]);
+
+
+});
+
+// Helpers
+
