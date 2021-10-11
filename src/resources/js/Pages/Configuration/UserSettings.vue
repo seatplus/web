@@ -122,12 +122,13 @@
       </div>
     </div>
 
-    <button
-      type="button"
+    <Link
+      :href="$route('auth.logout')"
+      as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     >
-      Button text
-    </button>
+      Logout
+    </Link>
   </div>
 </template>
 
@@ -137,11 +138,12 @@
     import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
     import {computed, ref, watch} from "vue";
     import {useForm} from "@inertiajs/inertia-vue3";
-    import route from 'ziggy'
+    import route from 'ziggy';
+    import { Link } from '@inertiajs/inertia-vue3'
 
     export default {
         name: "UserSettings",
-        components: {EntityBlock, SelectComponent, PageHeader},
+        components: {EntityBlock, SelectComponent, PageHeader, Link},
         props: {
             user: {
                 type: Object,
@@ -170,7 +172,7 @@
             })
 
             watch(selected, () =>  {
-                form.value.transform(() => ({
+                form.transform(() => ({
                     character_id: selected.value.character_id
                 }))
                 .post(route('change.main_character'))
