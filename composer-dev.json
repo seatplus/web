@@ -23,16 +23,6 @@
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "repositories": [
-    {
-      "type": "path",
-      "url": "../eveapi"
-    },
-    {
-      "type": "path",
-      "url": "../auth"
-    }
-  ],
   "require": {
     "php": "^8.0",
     "laravel/framework": "^8.0",

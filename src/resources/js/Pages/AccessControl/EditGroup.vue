@@ -134,8 +134,7 @@ export default {
 
         const store = function () {
 
-            return form.value
-                .transform((data) => ({
+            return form.transform((data) => ({
                     ...data,
                     affiliations: selectedAffiliations.value,
             })).post(route('acl.update', props.role.id))

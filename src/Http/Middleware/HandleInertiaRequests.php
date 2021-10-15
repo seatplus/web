@@ -79,7 +79,7 @@ class HandleInertiaRequests extends Middleware
             'user' => function () {
                 return auth()->guest() ? '' : UserRessource::make(
                     User::with('main_character', 'characters', 'characters.refresh_token')
-                        ->where('id', auth()->user()->id)
+                        ->where('id', auth()->user()->getAuthIdentifier())
                         ->first()
                 );
             },
