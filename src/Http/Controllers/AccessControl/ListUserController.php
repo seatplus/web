@@ -34,12 +34,11 @@ class ListUserController extends Controller
 {
     public function __invoke()
     {
-
         $name_lookup = request()->get('name');
 
         return User::with('main_character', 'characters')
-            ->when(request()->has('name'), fn(Builder $query) => $query
-                ->whereHas('characters', fn(Builder $query) => $query
+            ->when(request()->has('name'), fn (Builder $query) => $query
+                ->whereHas('characters', fn (Builder $query) => $query
                     ->where('name', 'like', "%${name_lookup}%")
                 )
             )
