@@ -43,7 +43,7 @@ class SearchCorporationOrAlliance
         // if search parameter is to short esi will not respond
         if (Str::length($this->searchParam) < 3) {
             // return an empty json response string
-            return collect()->toJson();
+            return collect()->toArray();
         }
 
         return (new SearchService)->execute(['alliance', 'corporation'], $this->searchParam);

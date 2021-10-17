@@ -39,7 +39,7 @@ class SearchService
             'method' => 'get',
             'version' => 'v2',
             'endpoint' => '/search/',
-            'query_string' => [
+            'query_parameters' => [
                 'categories' => $category_string,
                 'search' => $query,
             ],
