@@ -75,9 +75,19 @@ class ApplicationRessource extends JsonResource
 
     private function buildCharacterArray(CharacterInfo $character)
     {
-        // Get user level required scopes
-        $user_scopes = $this->applicationable instanceof User ? BuildUserLevelRequiredScopes::get($this->applicationable) : [];
+        $user = ! $this->applicationable instanceof User
+            ? null
+            : $this->applicationable->loadMissing('characters.alliance.ssoScopes',
+                'characters.corporation.ssoScopes',
+                'characters.application.corporation.ssoScopes',
+                'characters.application.corporation.alliance.ssoScopes',
+                'characters.refresh_token',
+                'application.corporation.ssoScopes',
+                'application.corporation.alliance.ssoScopes');
 
-        return BuildCharacterScopesArray::get($character, $user_scopes);
+        // Get user level required scopes
+        $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];
+
+        return BuildCharacterScopesArray::get($character, $user_scopes, $user);
     }
 }
