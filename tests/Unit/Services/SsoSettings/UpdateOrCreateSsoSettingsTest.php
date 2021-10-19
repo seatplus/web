@@ -49,7 +49,7 @@ it('calls corporation info action', function () {
                 'corporation_id' => 1184675423,
                 'id' =>1184675423,
                 'name' => "Amok.",
-                'category' => 'corporation'
+                'type' => 'corporation'
             ],
 
         ],

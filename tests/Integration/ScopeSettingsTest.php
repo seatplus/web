@@ -50,7 +50,7 @@ test('one can create sso setting', function () {
                         'corporation_id' => $corporation->corporation_id,
                         'id' =>$corporation->corporation_id,
                         'name' => "Amok.",
-                        'category' => 'corporation'
+                        'type' => 'corporation'
                     ],
                 ],
                 'selectedScopes' => [
@@ -93,7 +93,7 @@ test('one can delete sso setting', function () {
                         'corporation_id' => $corporation->corporation_id,
                         'id' =>$corporation->corporation_id,
                         'name' => "Amok.",
-                        'category' => 'corporation'
+                        'type' => 'corporation'
                     ],
                 ],
                 'selectedScopes' => [
