@@ -85,7 +85,6 @@ class ApplicationRessource extends JsonResource
                 'application.corporation.ssoScopes',
                 'application.corporation.alliance.ssoScopes');
 
-
         // Get user level required scopes
         $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];
 
