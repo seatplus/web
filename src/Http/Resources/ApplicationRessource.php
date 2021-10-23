@@ -88,6 +88,9 @@ class ApplicationRessource extends JsonResource
         // Get user level required scopes
         $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];
 
-        return BuildCharacterScopesArray::get($character, $user_scopes, $user);
+        return BuildCharacterScopesArray::make()
+            ->setCharacter($character)
+            ->setUserScopes($user_scopes)
+            ->get();
     }
 }

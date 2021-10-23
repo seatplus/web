@@ -32,7 +32,6 @@ Route::prefix('compliance')
     ->group(function () {
         Route::get('', [MemberComplianceController::class, 'index'])->name('corporation.member_compliance');
 
-        Route::get('/{corporation_id}/character', [MemberComplianceController::class, 'getCharacterCompliance'])->name('character.compliance');
-        Route::get('/{corporation_id}/user', [MemberComplianceController::class, 'getUserCompliance'])->name('user.compliance');
-        Route::get('/{corporation_id}/user/missing_characters', [MemberComplianceController::class, 'getMissingCharacters'])->name('missing.characters.compliance');
+        Route::get('/{corporation_id}/{type}', [MemberComplianceController::class, 'getCorporationCompliance'])
+            ->name('corporation.compliance');
     });

@@ -3,6 +3,7 @@
 
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -70,22 +71,37 @@ test('user with permission sees component', function () {
     $response->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/MemberCompliance'));
 });
 
-test('user with permission sees character compliance', function () {
+test('user with permission sees default compliance', function () {
     createScopeSetting();
 
     test()->withoutMiddleware();
 
     $response = test()->actingAs(test()->test_user)
-        ->getJson(route('character.compliance', test()->secondary_character->corporation->corporation_id))
+        ->getJson(route('corporation.compliance', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'type' => 'default'
+        ]))
         ->assertOk();
 
     $response->assertJsonCount(1, 'data');
 
+});
+
+it('is possible to search for a character', function () {
+    createScopeSetting();
+
+    test()->withoutMiddleware();
+
     $response = test()->actingAs(test()->test_user)
-        ->getJson(route('user.compliance', test()->secondary_character->corporation->corporation_id))
+        ->getJson(route('corporation.compliance', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'type' => 'default',
+            'search' => substr(test()->secondary_character->name, 5)
+        ]))
         ->assertOk();
 
-    $response->assertJsonCount(0, 'data');
+    $response->assertJsonCount(1, 'data');
+
 });
 
 test('user with permission sees user compliance', function () {
@@ -94,29 +110,29 @@ test('user with permission sees user compliance', function () {
     test()->withoutMiddleware();
 
     $response = test()->actingAs(test()->test_user)
-        ->getJson(route('user.compliance', test()->secondary_character->corporation->corporation_id))
-        ->assertOk();
+        ->getJson(route('corporation.compliance', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'type' => 'user'
+        ]));
 
     $response->assertJsonCount(1, 'data');
 
-    $response = test()->actingAs(test()->test_user)
-        ->getJson(route('character.compliance', test()->secondary_character->corporation->corporation_id))
-        ->assertOk();
+    expect(test()->test_user->characters)->toHaveCount(1);
 
-    $response->assertJsonCount(0, 'data');
+    $response->assertJsonFragment(['count_total' => 1]);
 
-    $character_without_user = CharacterInfo::factory()->create();
+    CharacterUser::query()->where('character_id', test()->secondary_character->character_id)
+        ->update(['user_id' => test()->test_user->id]);
 
-    $character_affiliation = $character_without_user->character_affiliation;
-    $character_affiliation->corporation_id = test()->secondary_character->corporation->corporation_id;
-    $character_affiliation->alliance_id = test()->secondary_character->alliance?->alliance_id;
-    $character_affiliation->save();
+    expect(test()->test_user->refresh()->characters)->toHaveCount(2);
 
     $response = test()->actingAs(test()->test_user)
-        ->getJson(route('missing.characters.compliance', test()->secondary_character->corporation->corporation_id))
-        ->assertOk();
+        ->getJson(route('corporation.compliance', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'type' => 'user'
+        ]));
 
-    $response->assertJsonCount(1, 'data');
+    $response->assertJsonFragment(['count_total' => 2]);
 
 });
 
