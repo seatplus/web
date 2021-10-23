@@ -1,25 +1,33 @@
 <template>
   <ul
     ref="scrollComponent"
-    class="divide-y divide-gray-200 overflow-y-auto border-t"
+    class="relative z-0 divide-y divide-gray-200 overflow-y-auto border-t"
   >
-    <SelectionEntity
-      v-for="character in result"
-      :key="character.character_id"
-      v-model="selected_ids"
-      :entity="character"
-    />
+    <InfiniteLoadingHelper
+      :key="Object.values(params).join(',')"
+      :route="route"
+      :params="params"
+      @result="(results) => entities = results"
+    >
+      <SelectionEntity
+        v-for="character in entities"
+        :key="character.character_id"
+        v-model="selected_ids"
+        :entity="character"
+      />
+    </InfiniteLoadingHelper>
   </ul>
-  <div ref="scrollComponent"></div>
+  <div ref="scrollComponent" />
 </template>
 
 <script>
 import SelectionEntity from "./SelectionEntity";
-import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import {computed, ref, watch} from "vue";
 
 export default {
     name: "EntitySelection",
-    components: {SelectionEntity},
+    components: {InfiniteLoadingHelper, SelectionEntity},
     props: {
         dispatchTransferObject: {
             required: true,
@@ -28,20 +36,32 @@ export default {
         type: {
             type: String,
             default: () => 'character'
+        },
+        search: {
+            type: String,
+            default: ''
         }
     },
     setup(props) {
 
-        let url = props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations'
+        const entities = ref([])
+        const params = ref(props.type === 'character'
+            ? { permission: props.dispatchTransferObject.permission }
+            : { permission: props.dispatchTransferObject.permission, corporation_role: props.dispatchTransferObject.required_corporation_role}
+        )
 
-        if(props.type === 'character') {
-            return useInfinityScrolling(url, props.dispatchTransferObject.permission)
-        }
+        const search = computed(() => props.search)
+        const route = computed( () => props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations')
 
-        return useInfinityScrolling(url, {
-            permission: props.dispatchTransferObject.permission,
-            corporation_role: props.dispatchTransferObject.required_corporation_role
+        watch(search,(newValue) => {
+            newValue.length >= 3 ? params.value.search = newValue : delete params.value.search
         })
+
+        return {
+            route,
+            params,
+            entities
+        }
     },
     data() {
         return {

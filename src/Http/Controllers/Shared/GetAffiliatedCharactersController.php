@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CharacterInfoRessource;
@@ -38,8 +39,11 @@ class GetAffiliatedCharactersController extends Controller
         $ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])
             ->unique();
 
+        $search_query = request()->get('search');
+
         $query = CharacterInfo::whereIn('character_id', $ids)
             ->with('corporation', 'alliance')
+            ->when($search_query, fn(Builder $query) => $query->where('name', 'like', "%${search_query}%"))
             ->has($permission);
 
         return CharacterInfoRessource::collection($query->paginate());

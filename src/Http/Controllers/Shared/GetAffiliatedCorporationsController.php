@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
@@ -38,8 +39,11 @@ class GetAffiliatedCorporationsController extends Controller
         $ids = collect([...getAffiliatedIdsByPermission($permission, $corporation_role), ...GetRecruitIdsService::get()])
             ->unique();
 
+        $search_query = request()->get('search');
+
         $query = CorporationInfo::with('alliance')
             ->whereIn('corporation_id', $ids)
+            ->when($search_query, fn(Builder $query) => $query->where('name', 'like', "%${search_query}%"))
             ->when(method_exists(CorporationInfo::class, $permission), fn ($query) => $query->has($permission));
 
         return CorporationInfoRessource::collection(
