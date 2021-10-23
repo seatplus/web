@@ -43,7 +43,7 @@ class GetAffiliatedCharactersController extends Controller
 
         $query = CharacterInfo::whereIn('character_id', $ids)
             ->with('corporation', 'alliance')
-            ->when($search_query, fn(Builder $query) => $query->where('name', 'like', "%${search_query}%"))
+            ->when($search_query, fn (Builder $query) => $query->where('name', 'like', "%${search_query}%"))
             ->has($permission);
 
         return CharacterInfoRessource::collection($query->paginate());
