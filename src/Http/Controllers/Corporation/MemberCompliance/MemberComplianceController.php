@@ -56,22 +56,21 @@ class MemberComplianceController
         $search = request()->get('search');
 
         $users = User::query()
-            ->when($search, fn(Builder $query) => $query->whereHas('characters', fn(Builder $query) => $query->where('character_infos.name', 'like', "%${search}%")))
-            ->whereHas('characters.corporation', fn(Builder $query) => $query
+            ->when($search, fn (Builder $query) => $query->whereHas('characters', fn (Builder $query) => $query->where('character_infos.name', 'like', "%${search}%")))
+            ->whereHas('characters.corporation', fn (Builder $query) => $query
                 ->where('corporation_infos.corporation_id', $corporation_id))
             ->with([
-                'characters' => fn($query) => $query->select('character_infos.character_id', 'character_infos.name')
-                    ->when($isCharacterType, fn($query) => $query->whereHas('corporation', fn(Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
                 'main_character',
                 'characters.corporation.ssoScopes',
                 'characters.application.corporation.ssoScopes',
                 'characters.application.corporation.alliance.ssoScopes',
                 'characters.refresh_token',
                 'application.corporation.ssoScopes',
-                'application.corporation.alliance.ssoScopes'
+                'application.corporation.alliance.ssoScopes',
             ]);
 
         return CorporationComplianceResource::collection($users->paginate());
-
     }
 }
