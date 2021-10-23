@@ -26,7 +26,8 @@ it('get affiliated corporations', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.affiliated.corporations', [
             'permission' => 'wallet_journals',
-            'corporation_role' => 'Accountant|Junior_Accountant'
+            'corporation_role' => 'Accountant|Junior_Accountant',
+            'search' => substr(test()->test_character->corporation->name, 5)
         ]));
 
     $response->assertOk();
