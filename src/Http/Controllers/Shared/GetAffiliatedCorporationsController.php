@@ -43,7 +43,7 @@ class GetAffiliatedCorporationsController extends Controller
 
         $query = CorporationInfo::with('alliance')
             ->whereIn('corporation_id', $ids)
-            ->when($search_query, fn(Builder $query) => $query->where('name', 'like', "%${search_query}%"))
+            ->when($search_query, fn (Builder $query) => $query->where('name', 'like', "%${search_query}%"))
             ->when(method_exists(CorporationInfo::class, $permission), fn ($query) => $query->has($permission));
 
         return CorporationInfoRessource::collection(
