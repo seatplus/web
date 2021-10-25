@@ -10,10 +10,10 @@
         <!--        <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />-->
         <div
           class="absolute bottom-0 right-0 flex items-center justify-center h-3 w-3 ring-2 ring-white rounded-full"
-          :class="character.missing_scopes.length > 0 ? 'bg-red-400' : 'bg-green-400'"
+          :class="hasMissing > 0 ? 'bg-red-400' : 'bg-green-400'"
         >
           <XIcon
-            v-if="character.missing_scopes.length > 0"
+            v-if="hasMissing > 0"
             class="h-2 w-2 text-red-900"
           />
           <CheckIcon
@@ -35,6 +35,7 @@
 <script>
 import EveImage from "@/Shared/EveImage";
 import { XIcon, CheckIcon } from '@heroicons/vue/outline'
+import {computed} from "vue";
 export default {
     name: "CharacterComplianceElement",
     components: {EveImage, XIcon, CheckIcon },
@@ -44,6 +45,17 @@ export default {
             type: Object
         }
     },
+    setup(props) {
+        const hasMissing = computed(() => {
+            let missingScopes = _.isObject(props.character.missing_scopes) ? Object.values(props.character.missing_scopes) : props.character.missing_scopes
+
+            return missingScopes.length > 0
+        })
+
+        return {
+            hasMissing
+        }
+    }
 
 }
 </script>
