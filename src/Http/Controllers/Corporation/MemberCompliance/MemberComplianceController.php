@@ -64,6 +64,7 @@ class MemberComplianceController
                     ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
                 'main_character',
                 'characters.corporation.ssoScopes',
+                'characters.alliance.ssoScopes',
                 'characters.application.corporation.ssoScopes',
                 'characters.application.corporation.alliance.ssoScopes',
                 'characters.refresh_token',

@@ -1,4 +1,4 @@
-import { onBeforeMount, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, ref} from "vue";
 import route from 'ziggy'
 import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
 
@@ -6,6 +6,8 @@ export function useLoadCompleteResource(routeName, params) {
 
     const url = ref(route(routeName,useHydrateQueryParameters(params)))
     const results = ref([])
+
+    const axiosCancelSource = ref(null);
 
     const fetchData = async () => {
 
@@ -28,11 +30,17 @@ export function useLoadCompleteResource(routeName, params) {
             axiosrequests.push(axios.get(url.value, {params: {page: i}}))
         }
 
-        await axios.all(axiosrequests)
+        axiosCancelSource.value = axios.CancelToken.source()
+
+        await axios.all(axiosrequests, {
+            cancelToken: axiosCancelSource.value.token
+        })
             .then(response => response.forEach(element => results.value.push(...element.data.data)))
             .catch(error => console.log(error))
 
     }
+
+    onBeforeUnmount(() => axiosCancelSource.value.cancel('Axios request canceled.'))
 
     onBeforeMount(async () => {
         await fetchData()

@@ -35,19 +35,19 @@
       </div>
 
       <ul class="relative z-0">
-        <InfiniteLoadingHelper
+        <CompleteLoadingHelper
           :key="Object.values(urlParams).join(',')"
           route="corporation.compliance"
           :params="urlParams"
-          @result="(results) => rawUsers = results"
+          @results="(results) => rawUsers = results"
         >
           <MemberComplianceListElement
             v-for="(user, index) in users"
             :key="user.id"
             :user="user"
-            :even="index%2"
+            :even="index%2 === 0"
           />
-        </InfiniteLoadingHelper>
+        </CompleteLoadingHelper>
       </ul>
     </div>
   </CardWithHeader>
@@ -58,12 +58,12 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import { SearchIcon } from '@heroicons/vue/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement";
-import InfiniteLoadingHelper from "../../../Shared/InfiniteLoadingHelper";
 import {computed, ref, watch} from "vue";
+import CompleteLoadingHelper from "../../../Shared/Layout/CompleteLoadingHelper";
 export default {
     name: "ComplianceComponent",
     components: {
-        InfiniteLoadingHelper,
+        CompleteLoadingHelper,
         MemberComplianceListElement,
         EntityBlock, CardWithHeader, SearchIcon},
     props: {
