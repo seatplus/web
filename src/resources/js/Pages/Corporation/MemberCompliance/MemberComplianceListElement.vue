@@ -48,7 +48,13 @@ export default {
     setup(props) {
         const characters = computed(() => _.sortBy(props.user.characters, ['name']))
 
-        const nonCompliantCharacters = computed(() => _.filter(characters.value, (character) => character.missing_scopes.length > 0))
+        const nonCompliantCharacters = computed(() => _.filter(characters.value, (character) => {
+
+            let missingScopes = _.isObject(character.missing_scopes) ? Object.values(character.missing_scopes) : character.missing_scopes
+
+            return missingScopes.length >0
+        }))
+
         const compliantCharacters = computed(() => _.filter(characters.value, (character) => character.missing_scopes.length === 0))
 
         return {
