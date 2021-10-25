@@ -16,7 +16,7 @@
       <label class="block text-sm font-medium text-gray-700 sm:hidden">
         Main Character
       </label>
-      <div class="flex space-x-2">
+      <div class="flex gap-x-2 flex-wrap">
         <CharacterComplianceElement
           v-for="character in [...nonCompliantCharacters, ...compliantCharacters]"
           :key="character.character_id"
