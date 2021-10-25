@@ -36,6 +36,7 @@
 
       <ul class="relative z-0">
         <CompleteLoadingHelper
+          :key="Object.values(urlParams).join(',')"
           route="corporation.compliance"
           :params="urlParams"
           @results="(results) => rawUsers = results"
