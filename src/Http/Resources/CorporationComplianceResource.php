@@ -36,7 +36,7 @@ class CorporationComplianceResource extends JsonResource
         $characters = $this->characters->map(fn ($character) => [
             'character_id' => $character->character_id,
             'name' => $character->name,
-            'missing_scopes' => $this->getMissingScopes($character),
+            'missing_scopes' => array_values($this->getMissingScopes($character)),
         ]);
 
         return [
