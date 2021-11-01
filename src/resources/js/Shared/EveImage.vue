@@ -57,6 +57,7 @@ import route from 'ziggy'
             const isReady = ref(false)
             const resourceVariant = ref(null)
             const eveImageComponent = ref(null)
+            const source = axios.CancelToken.source()
 
             const getImageVariant = async () => {
                 if ('character_id' in props.object)
@@ -68,7 +69,9 @@ import route from 'ziggy'
                 await axios.get(route('get.resource.variants', {
                     resource_type: resourceType.value,
                     resource_id: resourceId.value
-                })).then(result => {
+                }), {
+                    cancelToken: source.token
+                }).then(result => {
 
                     function getVariant() {
                         if(props.bpo && _.has(_.invert(result.data), 'bp'))
@@ -136,6 +139,7 @@ import route from 'ziggy'
 
             onUnmounted(() => {
                 observer.disconnect()
+                source.cancel()
             })
 
             return {
