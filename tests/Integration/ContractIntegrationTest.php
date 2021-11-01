@@ -37,7 +37,7 @@ test('one get contracts per character', function () {
 test('one can call transaction endpoint', function () {
 
     $contract_item = ContractItem::factory()->count(5)->create([
-        'contract_id' => 1234
+        'contract_id' => \Seatplus\Eveapi\Models\Contracts\Contract::factory()
     ]);
 
     $response = test()->actingAs(test()->test_user)
