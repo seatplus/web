@@ -55,11 +55,13 @@ test('one get own suggestion', function () {
 test('one get suggestion of other user', function () {
     ManualLocation::factory()->count(5)->create([
         'location_id' => 12345,
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
         'created_at' => carbon()->subDay()
     ]);
 
     $manual_loaction = ManualLocation::factory()->create([
         'location_id' => 12345,
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->actingAs(test()->test_user)
@@ -71,11 +73,13 @@ test('one get suggestion of other user', function () {
 test('admin can accept suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
         'created_at' => carbon()->subDay()
     ]);
 
     $manual_location = ManualLocation::factory()->create([
         'location_id' => 12345,
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->givePermissionsToTestUser(['manage manual locations']);
@@ -120,10 +124,12 @@ test('admin can accept suggestion', function () {
 test('one get accepted suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
         'created_at' => carbon()->subDay()
     ]);
 
     $manual_location = ManualLocation::factory()->create([
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
         'location_id' => 12345,
     ]);
 
@@ -153,7 +159,9 @@ test('one get accepted suggestion', function () {
 
 test('if location is resolved via jobs delete manual suggestions', function () {
 
-    $manual_location = ManualLocation::factory()->create();
+    $manual_location = ManualLocation::factory()->create([
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
+    ]);
 
     $station = Station::factory()->create([
         'station_id' => $manual_location->location_id

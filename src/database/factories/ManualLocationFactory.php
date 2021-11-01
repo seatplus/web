@@ -27,6 +27,7 @@
 namespace Seatplus\Web\database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Models\ManualLocation;
 
 class ManualLocationFactory extends Factory
@@ -37,7 +38,7 @@ class ManualLocationFactory extends Factory
     {
         return [
             'location_id' => $this->faker->numberBetween(0, 10000),
-            'user_id' => $this->faker->randomNumber(),
+            'user_id' => User::factory(),
             'name' => $this->faker->name,
             'solar_system_id' => $this->faker->numberBetween(60000000, 64000000),
         ];

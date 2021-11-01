@@ -84,7 +84,11 @@ test('user with accountant role can see corporation wallet', function () {
     test()->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
 
     // Now give user necessairy role
-    test()->test_character->roles()->update(['roles' => ['Accountant']]);
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Accountant']
+    ]);
 
     expect(test()->test_character->refresh()->roles->hasRole('roles', 'Accountant'))->toBeTrue();
     expect(test()->test_character->roles->hasRole('roles', 'Director'))->toBeFalse();
@@ -106,7 +110,11 @@ test('user with director role can see corporation wallet', function () {
     test()->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
 
     // Now give user necessairy role
-    test()->test_character->roles()->update(['roles' => ['Director']]);
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Director']
+    ]);
 
     expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeTrue();
 

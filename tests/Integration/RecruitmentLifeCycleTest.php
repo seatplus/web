@@ -75,7 +75,7 @@ test('secondary user can see enlistment', function () {
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
             ->has('data.0', fn($json) => $json
-                ->where('corporation_id', (string) test()->test_character->corporation->corporation_id)
+                ->where('corporation_id', test()->test_character->corporation->corporation_id)
                 ->etc()
             )
             ->etc()
@@ -129,7 +129,7 @@ test('secondary user can apply as user', function () {
         ->assertJson(fn (AssertableJson $json) => $json
             ->has('data', 1)
             ->has('data.0', fn($json) => $json
-                ->where('applicationable_id', (string) test()->secondary_user->id)
+                ->where('applicationable_id', test()->secondary_user->id)
                 ->where('corporation_id',  test()->test_character->corporation->corporation_id)
                 ->etc()
             )

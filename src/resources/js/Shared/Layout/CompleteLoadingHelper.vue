@@ -53,8 +53,8 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {computed, onMounted, ref} from "vue";
+import { useLoadCompleteResource } from "@/Functions/useLoadCompleteResource";
+import { computed, onMounted } from "vue";
 import { TransitionRoot } from '@headlessui/vue'
 
 export default {

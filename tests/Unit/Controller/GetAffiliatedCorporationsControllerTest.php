@@ -16,14 +16,26 @@ beforeEach(function () {
 });
 
 it('get affiliated corporations', function () {
-    test()->test_character->roles()->update(['roles' => ['Director']]);
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Director']
+    ]);
+
+    expect(test()->test_character->roles)
+        ->hasRole('roles', 'Director')->toBeTrue()
+        ->hasRole('roles', 'Accountant')->toBeTrue();
 
     WalletJournal::factory()->count(5)->create([
         'wallet_journable_type' => CorporationInfo::class,
         'wallet_journable_id' => test()->test_character->corporation->corporation_id
     ]);
 
-    $response = test()->actingAs(test()->test_user)
+    expect(CorporationInfo::find(test()->test_character->corporation->corporation_id))
+        ->not()->toBeNull()
+        ->wallet_journals->toHaveCount(5);
+
+    $response = test()->actingAs(test()->test_user->refresh())
         ->get(route('get.affiliated.corporations', [
             'permission' => 'wallet_journals',
             'corporation_role' => 'Accountant|Junior_Accountant',

@@ -1,4 +1,4 @@
-import {onBeforeMount, onMounted, onUnmounted, ref} from "vue";
+import {nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import route from 'ziggy'
 
 export function useInfinityScrolling(routeName, params) {
@@ -11,6 +11,8 @@ export function useInfinityScrolling(routeName, params) {
     const isLoading = ref(false)
     const isComplete = ref(false)
 
+    const source = axios.CancelToken.source()
+
     const fetchData = async () => {
 
         if(isLoading.value || isComplete.value)
@@ -19,6 +21,7 @@ export function useInfinityScrolling(routeName, params) {
         isLoading.value = true
 
         await axios.get(url.value, {
+            cancelToken: source.token,
             params: {
                 page: page.value,
             },
@@ -49,12 +52,11 @@ export function useInfinityScrolling(routeName, params) {
         isInitialRequestLoading.value = false
     })
 
-    onMounted(() => {
-        observer.observe(scrollComponent.value);
-    })
+    watch(scrollComponent, (newValue) => observer.observe(newValue))
 
     onUnmounted(() => {
         observer.disconnect()
+        source.cancel()
     })
 
     return {

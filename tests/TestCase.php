@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Inertia;
@@ -15,6 +16,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Schedules;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
@@ -24,6 +26,7 @@ use Spatie\Permission\PermissionRegistrar;
 abstract class TestCase extends OrchestraTestCase
 {
     use MockRetrieveEsiDataAction;
+    use LazilyRefreshDatabase;
 
     public User $test_user;
 
@@ -91,7 +94,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         // Path to our migrations to load
         //$this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->artisan('migrate', ['--database' => 'testbench']);
+        $this->artisan('migrate');
     }
 
     /**
@@ -103,14 +106,11 @@ abstract class TestCase extends OrchestraTestCase
     protected function getEnvironmentSetUp($app)
     {
         // Use memory SQLite, cleans it self up
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
-        ]);
+        $app['config']->set('database.default', 'mysql');
+
 
         config(['app.debug' => true]);
+        config(['activitylog.table_name' => 'activity_log']);
 
         $app['router']->aliasMiddleware('auth', Authenticate::class);
 
