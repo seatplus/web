@@ -78,6 +78,7 @@ class Handler extends ExceptionHandler
 
         if (! app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
             return Inertia::render('Error', ['status' => $response->status()])
+                ->rootView('web::app')
                 ->toResponse($request)
                 ->setStatusCode($response->status());
         } elseif ($response->status() === 419) {
