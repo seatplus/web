@@ -57,7 +57,8 @@ import route from 'ziggy'
             const isReady = ref(false)
             const resourceVariant = ref(null)
             const eveImageComponent = ref(null)
-            const source = axios.CancelToken.source()
+            const CancelToken = axios.CancelToken;
+            let cancel;
 
             const getImageVariant = async () => {
                 if ('character_id' in props.object)
@@ -70,7 +71,10 @@ import route from 'ziggy'
                     resource_type: resourceType.value,
                     resource_id: resourceId.value
                 }), {
-                    cancelToken: source.token
+                    cancelToken: new CancelToken(function executor(c) {
+                        // An executor function receives a cancel function as a parameter
+                        cancel = c;
+                    })
                 }).then(result => {
 
                     function getVariant() {
@@ -138,8 +142,11 @@ import route from 'ziggy'
             })
 
             onUnmounted(() => {
+                if(_.isFunction(cancel)) {
+                    cancel('image unmounted')
+                }
                 observer.disconnect()
-                source.cancel()
+
             })
 
             return {

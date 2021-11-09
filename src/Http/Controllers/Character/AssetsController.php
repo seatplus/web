@@ -47,7 +47,7 @@ class AssetsController extends Controller
     public function getLocations(Request $request)
     {
         $query = WebAssetAlias::query()
-            ->with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
+            ->with('location')
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->select('location_id')
