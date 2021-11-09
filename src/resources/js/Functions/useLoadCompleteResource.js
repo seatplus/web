@@ -7,7 +7,8 @@ export function useLoadCompleteResource(routeName, params) {
     const url = ref(route(routeName,useHydrateQueryParameters(params)))
     const results = ref([])
 
-    const axiosCancelSource = ref(null);
+    const CancelToken = axios.CancelToken;
+    let cancel;
 
     const fetchData = async () => {
 
@@ -30,17 +31,23 @@ export function useLoadCompleteResource(routeName, params) {
             axiosrequests.push(axios.get(url.value, {params: {page: i}}))
         }
 
-        axiosCancelSource.value = axios.CancelToken.source()
-
         await axios.all(axiosrequests, {
-            cancelToken: axiosCancelSource.value.token
+            cancelToken: new CancelToken(function executor(c) {
+                // An executor function receives a cancel function as a parameter
+                cancel = c;
+            })
         })
             .then(response => response.forEach(element => results.value.push(...element.data.data)))
             .catch(error => console.log(error))
 
     }
 
-    onBeforeUnmount(() => axiosCancelSource.value.cancel('Axios request canceled.'))
+    onBeforeUnmount(() => {
+        if (_.isFunction(cancel)) {
+            cancel('Load complete resource request canceled.')
+        }
+    })
+
 
     onBeforeMount(async () => {
         await fetchData()
