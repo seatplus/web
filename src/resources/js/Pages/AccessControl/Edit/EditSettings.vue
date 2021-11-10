@@ -1,16 +1,23 @@
 <template>
   <div>
     <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
-      <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
+      <div class="px-4 py-5 sm:px-6">
         <!-- Content goes here -->
-        <h3 class="text-lg leading-6 font-medium text-gray-900">
-          Settings List
-        </h3>
+        <div class="md:flex md:items-center md:justify-between">
+          <h3 class="mt-2 text-xl leading-7 font-semibold text-gray-900">
+            Settings List
+          </h3>
+          <div class="flex flex-shrink-0 items-center space-x-2">
+            <span class="text-sm font-medium text-gray-900">Affiliate everything</span>
+            <SimpleToggle v-model="affiliateEverything" />
+          </div>
+        </div>
+
         <p class="mt-1 text-sm leading-5 text-gray-500">
           Setup the access group and define what anyone in this group should be able to achieve for which asset. F.e. if this is your recruiter access contol group you would define f.e. that a recruiter should have access to assets of characters in any but (inverse) a specific corporation. Note: you will be able to assign the access control group to users in another step.
         </p>
       </div>
-      <div>
+      <div v-show="!affiliateEverything">
         <div class="w-full flex md:ml-0 px-6">
           <label
             for="search_field"
@@ -86,7 +93,10 @@
       </div>
     </div>
 
-    <div class="mb-3 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none">
+    <div
+      v-show="!affiliateEverything"
+      class="mb-3 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none"
+    >
       <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
         <div class="flex-1 bg-white flex flex-col justify-between">
           <div class="flex-1 p-6 ">
@@ -94,10 +104,13 @@
               Allowed
             </h3>
             <p class="mt-3 text-base leading-6 text-gray-500">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
+              List of allowed entities and their predecessors. For example a selected corporation will allow access to corporation and all its members.
             </p>
           </div>
-          <AffiliationList v-model="affiliationsValue" type="allowed"  />
+          <AffiliationList
+            v-model="affiliationsValue"
+            type="allowed"
+          />
         </div>
       </div>
       <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
@@ -107,10 +120,13 @@
               Inverse
             </h3>
             <p class="mt-3 text-base leading-6 text-gray-500">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
+              List of inverse entities and their predecessors. For example a selected alliance will allow access to all but the listed alliance, its corporations and all its members.
             </p>
           </div>
-          <AffiliationList v-model="affiliationsValue"  type="inverse"/>
+          <AffiliationList
+            v-model="affiliationsValue"
+            type="inverse"
+          />
         </div>
       </div>
       <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
@@ -120,10 +136,13 @@
               Forbidden
             </h3>
             <p class="mt-3 text-base leading-6 text-gray-500">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto accusantium praesentium eius, ut atque fuga culpa, similique sequi cum eos quis dolorum.
+              No matter what, selected entities and its predecessors will never be able to be accessed.
             </p>
           </div>
-          <AffiliationList v-model="affiliationsValue"  type="forbidden"/>
+          <AffiliationList
+            v-model="affiliationsValue"
+            type="forbidden"
+          />
         </div>
       </div>
     </div>
@@ -137,10 +156,11 @@ import AffiliationList from "./AffiliationList"
 import {computed, onBeforeMount, ref, watch} from "vue";
 import route from 'ziggy'
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import SimpleToggle from "../../../Shared/SimpleToggle";
 
 export default {
     name: "EditSettings",
-    components: {EntityByIdBlock, AffiliationList, ListTransition},
+    components: {SimpleToggle, EntityByIdBlock, AffiliationList, ListTransition},
     props: {
         affiliations: {
             type: Array,
@@ -152,6 +172,7 @@ export default {
         const entities = ref([])
         const query = ref('')
         const affiliationsValue = ref(props.affiliations)
+        const affiliateEverything = ref(!!_.find(props.affiliations, {'id' : 1000001}))
 
         const fetchData = _.debounce(async () => {
             await axios.get(route('acl.search.affiliatable', { query: query.value.length > 2 ? query.value : '' }))
@@ -186,8 +207,13 @@ export default {
 
         })
 
-        watch(affiliationsValue, (newValue) => {
-            emit('update:affiliations', newValue)
+        watch([affiliationsValue, affiliateEverything], (newAffiliationsValue, affiliateEverythingValue) => {
+
+            emit('update:affiliations', !affiliateEverythingValue ? newAffiliationsValue : [{
+                id: 1000001,
+                category: "corporation",
+                type: "inverse",
+            }])
         })
 
         onBeforeMount(() => {
@@ -199,7 +225,8 @@ export default {
             entities,
             query,
             addAffiliation,
-            affiliationsValue
+            affiliationsValue,
+            affiliateEverything
         }
 
     },
@@ -208,23 +235,12 @@ export default {
             search: null
         }
     },
-    computed: {
-
-        assignedEntityIds() {
-            return _.map([...this.allowedValue, ...this.inverseValue, ...this.forbiddenValue], (entity) => entity.id)
-        }
-    },
     watch: {
         entities() {
             let affiliations = ['allowed', 'inverse', 'forbidden']
 
             _.each(affiliations, (affiliation) => this[affiliation] = this.getAffiliatedEntities(affiliation))
         }
-    },
-    mounted() {
-        let routes = ['get.character_info', 'get.corporation_info', 'get.alliance_info']
-
-        //_.each(routes, (route) => this.getInfo(this.$route(route)).then(info => this.pushInfo(info)))
     },
     methods: {
         getInfo: async function (url, info = []) {
@@ -241,15 +257,6 @@ export default {
                 })
                 .catch(error => console.log(error))
         },
-        pushInfo(info) {
-            _.each(info, (entity) => {
-
-                _.has(entity,'alliance_id') ? entity.id = entity.alliance_id
-                    : (_.has(entity,'corporation_id') ? entity.id = entity.corporation_id : entity.id = entity.character_id)
-
-                this.entities.push(entity)
-            })
-        },
         getAffiliatedEntities(type) {
             let filtered_affiliations =  _.filter(this.existingAfffiliations, (affiliation) => {return _.isEqual(affiliation.type, type)})
 
@@ -261,12 +268,6 @@ export default {
         isEmpty(array) {
             return _.isEmpty(array)
         },
-        sortByName(entities) {
-            return _.sortBy(entities, (entity) => entity.name)
-        },
-        getType(entity) {
-            return entity.character_id ? 'Character' : (entity.corporation_id ? 'Corporation' : 'Alliance')
-        }
     }
 }
 </script>
