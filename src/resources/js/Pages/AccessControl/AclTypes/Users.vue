@@ -30,13 +30,14 @@
         type="search"
       >
     </div>
-    <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
-      <InfiniteLoadingHelper
-        :key="index"
-        route="list.users"
-        :params="{name: search}"
-        @result="(results) => users = results"
-      >
+
+    <InfiniteLoadingHelper
+      :key="index"
+      route="list.users"
+      :params="{name: search}"
+      @result="(results) => users = results"
+    >
+      <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
         <li
           v-for="user of filteredUsers"
           :key="user.id"
@@ -88,14 +89,13 @@
             </div>
           </div>
         </li>
-      </InfiniteLoadingHelper>
-    </ul>
+      </ul>
+    </InfiniteLoadingHelper>
   </div>
 </template>
 
 <script>
 import EveImage from "@/Shared/EveImage"
-import axios from "axios"
 import InfiniteLoadingHelper from "../../../Shared/InfiniteLoadingHelper";
 
 export default {
@@ -154,11 +154,7 @@ export default {
         },
         getCharacterNames(user) {
 
-            let characters = _.remove(user.characters, function (character) {
-                return character.character_id === user.main_character_id
-            })
-                .map((character) => character.name)
-
+            let characters = _.map(user.characters, character => character.name)
 
             return _.shuffle(characters).join(', ')
         },
