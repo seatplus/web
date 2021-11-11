@@ -1,32 +1,24 @@
 <template>
-  <TransitionRoot
-    :show="shouldShow"
-    enter="transition-opacity duration-75"
-    enter-from="opacity-0"
-    enter-to="opacity-100"
-    leave="transition-opacity duration-150"
-    leave-from="opacity-100"
-    leave-to="opacity-0"
+  <slot />
+  <div
+    v-show="isComplete"
+    class="relative block w-full text-center"
   >
-    <slot>
-      <div class="relative block w-full text-center">
-        <span
-          v-if="noResults"
-          class="block text-sm font-medium text-gray-900"
-        >
-          no entries loaded
-        </span>
-        <span
-          v-else
-          class="block text-sm font-medium text-gray-900"
-        >
-          no more entries
-        </span>
-      </div>
-    </slot>
-  </TransitionRoot>
+    <span
+      v-if="noResults"
+      class="block text-sm font-medium text-gray-900"
+    >
+      no entries loaded
+    </span>
+    <span
+      v-else
+      class="block text-sm font-medium text-gray-900"
+    >
+      no more entries
+    </span>
+  </div>
   <TransitionRoot
-    :show="!shouldShow"
+    :show="showLoadingIndicator"
     appear
     enter="transition-opacity duration-75"
     enter-from="opacity-0"
@@ -97,8 +89,9 @@ export default {
 
         const results = useInfinityScrolling(props.route, props.params);
 
-        const shouldShow = computed(() => !results.isLoading.value || results.isComplete.value)
         const noResults = computed(() => results.isComplete.value && results.result.value.length === 0)
+        const isComplete = computed(() => results.isComplete.value)
+        const showLoadingIndicator = computed(() => results.isLoading.value)
 
         onMounted(() => {
             emit('result', results.result.value)
@@ -106,9 +99,10 @@ export default {
 
         return {
             results,
-            shouldShow,
             noResults,
-            scrollComponent: results.scrollComponent
+            isComplete,
+            scrollComponent: results.scrollComponent,
+            showLoadingIndicator
         }
     }
 }
