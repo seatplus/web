@@ -25,8 +25,6 @@
       </div>
     </slot>
   </TransitionRoot>
-
-  <div ref="scrollComponent" />
   <TransitionRoot
     :show="!shouldShow"
     appear
@@ -65,12 +63,14 @@
       </span>
     </div>
   </TransitionRoot>
+
+  <div ref="scrollComponent" />
 </template>
 
 <script>
 import { useInfinityScrolling } from "@/Functions/useInfinityScrolling";
 import { TransitionRoot } from '@headlessui/vue'
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted} from "vue";
 
 export default {
     name: "InfiniteLoadingHelper",
@@ -107,7 +107,8 @@ export default {
         return {
             results,
             shouldShow,
-            noResults
+            noResults,
+            scrollComponent: results.scrollComponent
         }
     }
 }

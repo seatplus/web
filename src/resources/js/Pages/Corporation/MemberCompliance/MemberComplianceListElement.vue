@@ -37,7 +37,7 @@
       <div class="flex gap-x-2 flex-wrap">
         <Button
           button-size="xs"
-          :href="$route('corporation.review.user', {corporation_id: 98534270, user: 1})"
+          :href="$route('corporation.review.user', {'corporation_id': corporationId, 'user': user.id})"
         >
           Review
         </Button>
@@ -64,6 +64,14 @@ export default {
         user: {
             required: true,
             type: Object
+        },
+        corporationId: {
+            required: true,
+            type: Number
+        },
+        canReview: {
+            required: true,
+            type: Boolean
         }
     },
     setup(props) {
@@ -77,13 +85,12 @@ export default {
         }))
 
         const compliantCharacters = computed(() => _.filter(characters.value, (character) => character.missing_scopes.length === 0))
-        const canReview = computed(() => usePage().props.value.canReview)
+        //const canReview = computed(() => usePage().props.value.canReview)
 
         return {
             characters,
             nonCompliantCharacters,
-            compliantCharacters,
-            canReview
+            compliantCharacters
         }
     }
 }
