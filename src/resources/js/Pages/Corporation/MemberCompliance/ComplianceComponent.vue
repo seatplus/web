@@ -29,8 +29,17 @@
         <div class="px-3 py-1 col-span-3">
           Main Character
         </div>
-        <div class="px-3 py-1 col-span-9">
+        <div
+          class="px-3 py-1"
+          :class="canReview ? 'col-span-8' : 'col-span-9'"
+        >
           Characters
+        </div>
+        <div
+          v-if="canReview"
+          class="px-3 py-1 col-span-1"
+        >
+          Review
         </div>
       </div>
 
@@ -59,7 +68,7 @@ import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import { SearchIcon } from '@heroicons/vue/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement";
 import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "../../../Shared/Layout/CompleteLoadingHelper";
+import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper";
 export default {
     name: "ComplianceComponent",
     components: {
@@ -74,6 +83,11 @@ export default {
         queryParam: {
             type: String,
             required: true
+        },
+        canReview: {
+            type: Boolean,
+            required: true,
+            default: false
         }
     },
     setup(props) {
@@ -96,6 +110,7 @@ export default {
 
             return rawUsers.value
         })
+        //const canReview = computed(() => usePage().props.value.canReview)
 
         watch(search,(newValue) => {
             newValue.length >= 3 ? urlParams.value.search = newValue : delete urlParams.value.search

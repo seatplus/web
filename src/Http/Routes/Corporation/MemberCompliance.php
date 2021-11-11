@@ -34,4 +34,8 @@ Route::prefix('compliance')
 
         Route::get('/{corporation_id}/{type}', [MemberComplianceController::class, 'getCorporationCompliance'])
             ->name('corporation.compliance');
+
+        Route::get('{corporation_id}/review/{user}', [MemberComplianceController::class, 'reviewUser'])
+            ->middleware('permission:member compliance: review user')
+            ->name('corporation.review.user');
     });

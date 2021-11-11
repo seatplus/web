@@ -31,6 +31,8 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
+use Seatplus\Web\Models\Recruitment\Enlistment;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class MemberComplianceController
 {
@@ -47,6 +49,7 @@ class MemberComplianceController
 
         return inertia('Corporation/MemberCompliance/MemberCompliance', [
             'corporations' => $affiliated_corporations,
+            'canReview' => auth()->user()->can('member compliance: review user')
         ]);
     }
 
@@ -73,5 +76,30 @@ class MemberComplianceController
             ]);
 
         return CorporationComplianceResource::collection($users->paginate());
+    }
+
+    public function reviewUser(int $corporation_id, User $user)
+    {
+        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->pluck('type')->first();
+        $isCharacterType = $type === 'default';
+
+        $member = $user
+            ->loadMissing([
+                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'main_character',
+        ]);
+
+        $enlistment = Enlistment::with('systems', 'regions')
+            ->find($corporation_id);
+
+        return inertia('Corporation/MemberCompliance/ReviewUser', [
+            'member' => $member,
+            'targetCorporation' => CorporationInfo::find($corporation_id),
+            'watchlist' => [
+                'systems' => $enlistment?->systems?->pluck('system_id'),
+                'regions' => $enlistment?->regions?->pluck('region_id'),
+            ]
+        ]);
     }
 }
