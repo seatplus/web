@@ -1,4 +1,4 @@
-import {nextTick, onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
+import {onBeforeMount,  onUnmounted, ref, watch} from "vue";
 import route from 'ziggy'
 
 export function useInfinityScrolling(routeName, params) {
