@@ -33,6 +33,7 @@ export function useInfinityScrolling(routeName, params) {
                 isLoading.value = false
             } else {
                 isComplete.value = true
+                isLoading.value = false
             }
         }).catch(error => console.log(error));
     }
