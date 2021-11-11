@@ -32,7 +32,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
 use Seatplus\Web\Models\Recruitment\Enlistment;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class MemberComplianceController
 {
@@ -49,7 +48,7 @@ class MemberComplianceController
 
         return inertia('Corporation/MemberCompliance/MemberCompliance', [
             'corporations' => $affiliated_corporations,
-            'canReview' => auth()->user()->can('member compliance: review user')
+            'canReview' => auth()->user()->can('member compliance: review user'),
         ]);
     }
 
@@ -88,7 +87,7 @@ class MemberComplianceController
                 'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
                     ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
                 'main_character',
-        ]);
+            ]);
 
         $enlistment = Enlistment::with('systems', 'regions')
             ->find($corporation_id);
@@ -99,7 +98,7 @@ class MemberComplianceController
             'watchlist' => [
                 'systems' => $enlistment?->systems?->pluck('system_id'),
                 'regions' => $enlistment?->regions?->pluck('region_id'),
-            ]
+            ],
         ]);
     }
 }
