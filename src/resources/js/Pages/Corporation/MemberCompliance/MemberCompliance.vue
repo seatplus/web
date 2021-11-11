@@ -16,6 +16,7 @@
       :key="corporation.corporation_id"
       :corporation="corporation"
       :query-param="queryParam"
+      :can-review="canReview"
     />
   </div>
 </template>
@@ -33,7 +34,12 @@ export default {
         PageHeader},
     props: {
         corporations: {
-            required: true
+            required: true,
+            type: Array
+        },
+        canReview: {
+            required: true,
+            type: Boolean
         }
     },
     data() {

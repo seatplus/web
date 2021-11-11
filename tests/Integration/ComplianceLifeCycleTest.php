@@ -7,7 +7,6 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Spatie\Permission\PermissionRegistrar;
@@ -105,7 +104,7 @@ it('is possible to search for a character', function () {
 });
 
 test('user with permission sees user compliance', function () {
-    createScopeSetting('user');
+    createScopeSetting(['view member compliance'], 'user');
 
     test()->withoutMiddleware();
 
@@ -168,11 +167,45 @@ test('director user without permission can access index', function () {
         ->get(route('corporation.member_compliance'))
         ->assertOk();
 
+});
+
+it('enables superuser to review corporation member', function () {
+    createScopeSetting();
+
+    expect(test()->superuser)
+        ->can('superuser')->toBeTrue();
+
+    $response = test()->actingAs(test()->superuser)
+        ->getJson(route('corporation.review.user', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'user' => test()->test_user->id
+        ]))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
+
+
+});
+
+it('enables with review permission to review corporation member', function () {
+    createScopeSetting(['view member compliance', 'member compliance: review user']);
+
+    expect(test()->test_user)
+        ->can('superuser')->toBeFalse()
+        ->can('member compliance: review user')->toBeTrue()
+        ->can('view member compliance')->toBeTrue();
+
+    $response = test()->actingAs(test()->test_user)
+        ->getJson(route('corporation.review.user', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'user' => test()->test_user->id
+        ]))
+        ->assertOk()
+        ->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 
 });
 
 // Helpers
-function createScopeSetting($type = 'default')
+function createScopeSetting(array $permissons = [], $type = 'default')
 {
     // create role
     test()->actingAs(test()->superuser)
@@ -182,17 +215,21 @@ function createScopeSetting($type = 'default')
     // affiliate secondary user to role
     $role = Role::findByName('test');
 
-    $response = test()->actingAs(test()->superuser)
+    test()->actingAs(test()->superuser)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
-            "allowed" => [
+            "affiliations" => [
                 [
-                    "corporation_id" => test()->secondary_character->corporation->corporation_id,
+                    "category" => 'corporation',
                     "id" => test()->secondary_character->corporation->corporation_id,
-                    "name" => test()->secondary_character->corporation->name
+                    "type" => "allowed"
                 ],
             ],
-        ]);
+            'permissions' => $permissons,
+            "roleName" => $role->name,
+        ])
+        ->assertRedirect();
+
+    expect($role->affiliated_ids)->toContain(test()->secondary_character->corporation->corporation_id);
 
     // give test user the role
 
@@ -229,25 +266,6 @@ function createScopeSetting($type = 'default')
         'morphable_type' =>  CorporationInfo::class,
         'type' => $type
     ]);
-
-   /* $response = test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->post(route('create.scopes'),
-            [
-                'selectedEntities' => [
-                    [
-                        "corporation_id" => test()->secondary_character->corporation->corporation_id,
-                        "id" => test()->secondary_character->corporation->corporation_id,
-                        "name" => test()->secondary_character->corporation->name,
-                        'category' => 'corporation'
-                    ],
-                ],
-                'selectedScopes' => [
-                    "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
-                ],
-                'type' => $type
-            ]
-        )->assertOk();*/
 
     expect(SsoScopes::all())->toHaveCount(1);
 
