@@ -72,11 +72,16 @@ export default {
             type: Object,
             default: () => new Object()
         },
+        formData: {
+            required: false,
+            type: Object,
+            default: () => new Object()
+        }
     },
     emits: ['results'],
     setup(props, {emit}) {
 
-        const results = useLoadCompleteResource(props.route, props.params)
+        const results = useLoadCompleteResource(props.route, props.params, props.formData)
 
         const values = computed(() => results.results.value)
         const shouldShow = computed(() => values.value.length > 0)

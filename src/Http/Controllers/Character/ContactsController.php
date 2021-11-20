@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\ContactsRequest;
 use Seatplus\Web\Http\Resources\ContactResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
@@ -54,27 +55,16 @@ class ContactsController extends Controller
         ]);
     }
 
-    public function detail(int $id)
+    public function getContacts(int $character_id, ContactsRequest $request)
     {
-        $affiliated_ids = CharacterAffiliation::whereIn('character_id', [...getAffiliatedIdsByClass(Contact::class), ...GetRecruitIdsService::get()])
-            ->cursor()
-            ->map(fn ($affiliation) => [$affiliation->character_id, $affiliation->corporation_id, $affiliation->alliance_id])
-            ->flatten()
-            ->unique()
-            ->toArray();
-
-        abort_unless(in_array($id, $affiliated_ids),
-            403,
-            'You seem not to be affiliated to the requested id, if you seeing this error in recruiting,' .
-            'this either means the alliance or corporation contact details are not present');
+        $validated = $request->validated();
 
         $query = Contact::with('labels')
-            ->where('contactable_id', $id);
+            ->where('contactable_id', $character_id)
+            ->withStandings($validated['corporation_id'], data_get($validated, 'alliance_id'));
 
         return ContactResource::collection(
             $query->paginate()
-        )->additional(['meta' => [
-            'entity_id' => $id,
-        ]]);
+        );
     }
 }

@@ -30,7 +30,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContactResource extends JsonResource
 {
-    private array $character_affiliation = [];
 
     /**
      * Transform the resource into an array.
@@ -47,7 +46,8 @@ class ContactResource extends JsonResource
             'is_watched' => $this->is_watched,
             'standing' => $this->standing,
             'labels' => $this->labels,
-            'affiliation' => $this->affiliations,
+            'corporation_standing' => $this->corporation_standing,
+            'alliance_standing' => $this->alliance_standing,
         ];
     }
 }

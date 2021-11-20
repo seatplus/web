@@ -17,7 +17,7 @@
     </PageHeader>
 
     <div class="space-y-4">
-      <CharacterContactPanel
+      <CharacterContactsComponent
         v-for="character_affiliation in characters"
         :key="character_affiliation.character_id"
         :character="character_affiliation.character"
@@ -29,17 +29,18 @@
 </template>
 
 <script>
-import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
 export default {
     name: "Index",
     components: {
+        CharacterContactsComponent,
         RequiredScopesWarning,
         DispatchUpdateButton,
-        EntitySelectionButton, PageHeader, CharacterContactPanel,},
+        EntitySelectionButton, PageHeader},
     props: {
         dispatchTransferObject: {
             required: true,
