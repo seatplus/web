@@ -27,16 +27,11 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Validator;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
-use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class ContactsRequest extends FormRequest
 {
-    private CharacterAffiliation $affiliation;
-    private array $affiliated_ids;
+
 
     /**
      * Determine if the user is authorized to make this request.
@@ -55,14 +50,11 @@ class ContactsRequest extends FormRequest
      */
     public function rules()
     {
-        $character_id = request()->route()->parameter('character_id');
-
-        $this->affiliation = CharacterAffiliation::firstWhere('character_id', $character_id);
 
         return [
             'corporation_id' => [
                 'required',
-                'integer'
+                'integer',
             ],
             'alliance_id' => [
                 'sometimes',
@@ -74,26 +66,5 @@ class ContactsRequest extends FormRequest
                     }
                 }],
         ];
-    }
-
-    public function withValidator(Validator $validator)
-    {
-        $validator->after(function (Validator $validator) {
-            if (!$this->has('corporation_id')) {
-                $this->merge([
-                    'corporation_id' => $this->affiliation->corporation_id,
-                    'alliance_id' => $this->affiliation->alliance_id,
-                ]);
-            }
-        });
-    }
-
-    private function getAffiliatedIds()
-    {
-        if(!isset($this->affiliated_ids)) {
-            $this->affiliated_ids = [...getAffiliatedIdsByClass(Contact::class), ...GetRecruitIdsService::get()];
-        }
-
-        return $this->affiliated_ids;
     }
 }
