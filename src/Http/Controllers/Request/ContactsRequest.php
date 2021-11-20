@@ -62,24 +62,24 @@ class ContactsRequest extends FormRequest
         return [
             'corporation_id' => [
                 'required',
-                'integer'
+                'integer',
             ],
             'alliance_id' => [
                 'sometimes',
                 'required',
                 'integer',
-                function($attribute, $value, $fail) {
-                    if($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
+                function ($attribute, $value, $fail) {
+                    if ($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
                         $fail("The provided ${attribute} does not match the corporations ${attribute}");
                     }
-                }],
+                }, ],
         ];
     }
 
     public function withValidator(Validator $validator)
     {
         $validator->after(function (Validator $validator) {
-            if (!$this->has('corporation_id')) {
+            if (! $this->has('corporation_id')) {
                 $this->merge([
                     'corporation_id' => $this->affiliation->corporation_id,
                     'alliance_id' => $this->affiliation->alliance_id,
@@ -90,7 +90,7 @@ class ContactsRequest extends FormRequest
 
     private function getAffiliatedIds()
     {
-        if(!isset($this->affiliated_ids)) {
+        if (! isset($this->affiliated_ids)) {
             $this->affiliated_ids = [...getAffiliatedIdsByClass(Contact::class), ...GetRecruitIdsService::get()];
         }
 

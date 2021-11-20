@@ -30,7 +30,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ContactResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
