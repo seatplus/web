@@ -19,7 +19,7 @@
       </h3>
       <p
         v-if="hasSubtext"
-        class="text-sm text-gray-500 truncate"
+        :class="sub_text_class"
       >
         {{ subText }}
       </p>
@@ -118,6 +118,24 @@ export default {
                 return false;
 
             return !!(this.subText);
+        },
+        sub_text_class() {
+
+            let size = ''
+            switch (this.nameFontSize) {
+                case 'xs':
+                case 'sm':
+                case 'text-base':
+                    size = 'xs';
+                    break;
+                case 'lg':
+                    size = 'sm';
+                    break;
+                default:
+                    size = 'sm';
+            }
+
+            return `text-${size} text-gray-500 truncate`
         }
     }
 }
