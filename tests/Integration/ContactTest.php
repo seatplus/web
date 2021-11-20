@@ -19,7 +19,9 @@ it('has details', function () {
     $contact = test()->test_character->contacts->first();
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('character.contacts.detail', test()->test_character->character_id));
+        ->post(route('character.contacts.detail', test()->test_character->character_id), [
+            'corporation_id' => test()->test_character->corporation->corporation_id
+        ]);
 
     $response->assertOk();
 

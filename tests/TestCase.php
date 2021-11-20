@@ -10,18 +10,17 @@ use Inertia\Inertia;
 use Inertia\ServiceProvider as InertiaServiceProviderAlias;
 use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
-use phpDocumentor\Reflection\Types\Callable_;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Schedules;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
+use Staudenmeir\LaravelCte\DatabaseServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
@@ -81,6 +80,7 @@ abstract class TestCase extends OrchestraTestCase
         return [
             WebServiceProvider::class,
             EveapiServiceProvider::class,
+            DatabaseServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
             InertiaServiceProviderAlias::class

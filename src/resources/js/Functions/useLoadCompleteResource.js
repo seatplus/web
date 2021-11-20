@@ -1,11 +1,14 @@
-import {onBeforeMount, onBeforeUnmount, ref} from "vue";
+import {computed, onBeforeMount, onBeforeUnmount, ref} from "vue";
 import route from 'ziggy'
 import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
 
-export function useLoadCompleteResource(routeName, params) {
+export function useLoadCompleteResource(routeName, params, formData = {}) {
 
     const url = ref(route(routeName,useHydrateQueryParameters(params)))
     const results = ref([])
+
+    const method = computed(() => _.isEmpty(formData) ? 'get' : 'post')
+    const cleanFormData = computed(() => _.omitBy(formData, _.isNil))
 
     const CancelToken = axios.CancelToken;
     let cancel;
@@ -14,7 +17,12 @@ export function useLoadCompleteResource(routeName, params) {
 
         let last_page = 1
 
-        await axios.get(url.value, { params: { page: 1 }})
+        await axios.request({
+            method: method.value,
+            url: url.value,
+            params: { page: 1 },
+            data: cleanFormData.value
+        })
             .then(response => {
 
                 last_page = _.get(response, 'data.last_page', _.get(response, 'data.meta.last_page'))
@@ -28,7 +36,12 @@ export function useLoadCompleteResource(routeName, params) {
         const axiosrequests = []
 
         for(let i=2; i<= last_page; i++) {
-            axiosrequests.push(axios.get(url.value, {params: {page: i}}))
+            axiosrequests.push(axios.request({
+                method: method.value,
+                url: url.value,
+                params: { page: i },
+                data: cleanFormData.value
+            }))
         }
 
         await axios.all(axiosrequests, {
