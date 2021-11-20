@@ -31,8 +31,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class ContactsRequest extends FormRequest
 {
-
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -50,7 +48,6 @@ class ContactsRequest extends FormRequest
      */
     public function rules()
     {
-
         return [
             'corporation_id' => [
                 'required',
@@ -60,11 +57,11 @@ class ContactsRequest extends FormRequest
                 'sometimes',
                 'required',
                 'integer',
-                function($attribute, $value, $fail) {
-                    if($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
+                function ($attribute, $value, $fail) {
+                    if ($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
                         $fail("The provided ${attribute} does not match the corporations ${attribute}");
                     }
-                }],
+                }, ],
         ];
     }
 }

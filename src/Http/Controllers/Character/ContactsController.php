@@ -33,7 +33,6 @@ use Seatplus\Web\Http\Controllers\Request\ContactsRequest;
 use Seatplus\Web\Http\Resources\ContactResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class ContactsController extends Controller
 {
