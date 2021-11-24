@@ -28,8 +28,11 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -84,7 +87,7 @@ class ApplicationsController extends Controller
         $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit->loadMissing('main_character', 'characters'),
+            'recruit' => $recruit->loadMissing('main_character', 'characters', 'characters.batch_update'),
             'target_corporation' => $recruit->application->corporation,
             'watchlist' => [
                 'systems' => $enlistment->systems?->pluck('system_id'),
@@ -111,7 +114,7 @@ class ApplicationsController extends Controller
 
     public function getCharacterApplication(int $character_id)
     {
-        $character = CharacterInfo::with('application')->find($character_id);
+        $character = CharacterInfo::with('application', 'batch_update')->find($character_id);
 
         $recruit = collect([
             'main_character' => $character,
@@ -145,5 +148,24 @@ class ApplicationsController extends Controller
         ]);
 
         return redirect()->route('corporation.recruitment')->with('success', sprintf('Character %s', $request->get('decision')));
+    }
+
+    public function dispatchBatchUpdate(int $character_id)
+    {
+        $refresh_token = RefreshToken::find($character_id);
+
+        abort_if(is_null($refresh_token),500, 'refresh_token could not be found');
+
+        UpdateCharacter::dispatchAfterResponse($refresh_token);
+
+        return response('success');
+    }
+
+    public function getBatchUpdate(int $character_id)
+    {
+        return BatchUpdate::query()
+            ->where('batchable_id', $character_id)
+            ->first()
+            ->toJson();
     }
 }

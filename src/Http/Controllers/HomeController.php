@@ -38,7 +38,7 @@ class HomeController extends Controller
     public function home()
     {
         return Inertia::render('Dashboard/Index', [
-            'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance')
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance', 'batch_update')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
         ]);

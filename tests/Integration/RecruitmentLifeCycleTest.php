@@ -431,6 +431,37 @@ test('recruiter can see corporation applications', function () {
 
 });
 
+test('junior hr can dispatch update batch and get status', function () {
+
+    createEnlistment();
+
+    test()->test_user = test()->test_user->refresh();
+
+    applySecondary(false);
+
+    //Check if secondary has applied
+
+    \Pest\Laravel\assertDatabaseHas('applications', [
+        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_type' => CharacterInfo::class,
+        'status' => 'open'
+    ]);
+
+    expect(\Seatplus\Eveapi\Models\BatchUpdate::all())->toHaveCount(0);
+
+    // first dispatch a update batch
+    test()->actingAs(test()->test_user)
+        ->post(route('dispatch.batch_update', test()->secondary_character->character_id))
+        ->assertOk();
+
+    expect(\Seatplus\Eveapi\Models\BatchUpdate::all())->toHaveCount(1);
+
+    // then get update job information
+    test()->actingAs(test()->test_user)
+        ->get(route('get.batch_update', test()->secondary_character->character_id))
+        ->assertJsonFragment(['batchable_id' => test()->secondary_character->character_id]);
+});
+
 // Helpers
 function applySecondary(bool $user = true)
 {
