@@ -154,7 +154,7 @@ class ApplicationsController extends Controller
     {
         $refresh_token = RefreshToken::find($character_id);
 
-        abort_if(is_null($refresh_token),500, 'refresh_token could not be found');
+        abort_if(is_null($refresh_token), 500, 'refresh_token could not be found');
 
         UpdateCharacter::dispatchAfterResponse($refresh_token);
 
