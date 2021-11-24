@@ -31,6 +31,14 @@
               <Time :timestamp="character.birthday" />
             </template>
           </LeftAlignedData>
+          <LeftAlignedData v-if="character.batch_update">
+            <template #title>
+              Last update
+            </template>
+            <template #description>
+              <Time :timestamp="character.batch_update.finished_at" />
+            </template>
+          </LeftAlignedData>
         </LeftAligned>
       </li>
       <li class="col-span-1 bg-white rounded-lg shadow flex flex-wrap content-center">

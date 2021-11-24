@@ -53,6 +53,11 @@
               <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
                 Remember to invite them in game as well.
               </p>
+              <UpdateCharacterComponent
+                v-for="character in recruit.characters"
+                :key="character.character_id"
+                :character="character"
+              />
               <!--Decision-->
               <div class="mt-6 sm:mt-5 sm:border-t sm:border-gray-200 sm:pt-5">
                 <div
@@ -167,10 +172,18 @@
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import TabComponent from "./TabComponent";
+import LeftAlignedData from "../../../Shared/Layout/DataDisplay/LeftAlignedData";
+import Time from "../../../Shared/Time";
+import Button from "../../../Shared/Layout/Button";
+import UpdateCharacterComponent from "./UpdateCharacterComponent";
 
 export default {
     name: "Application",
     components: {
+        UpdateCharacterComponent,
+        Button,
+        Time,
+        LeftAlignedData,
         TabComponent,
         HeaderButton,
         PageHeader

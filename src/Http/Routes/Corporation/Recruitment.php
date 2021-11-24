@@ -58,6 +58,9 @@ Route::prefix('recruitment')
 
                 Route::get('/character_application/{character_id}', [ApplicationsController::class, 'getCharacterApplication'])->name('character.application');
                 Route::post('/character_application/{character_id}', [ApplicationsController::class, 'reviewCharacterApplication'])->name('review.character.application');
+
+                Route::get('/update/{character_id}', [ApplicationsController::class, 'getBatchUpdate'])->name('get.batch_update');
+                Route::post('/update/{character_id}', [ApplicationsController::class, 'dispatchBatchUpdate'])->name('dispatch.batch_update');
             });
 
         /* User Applications */
