@@ -1,6 +1,7 @@
 <?php
 
 
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
@@ -8,6 +9,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
@@ -447,14 +449,20 @@ test('junior hr can dispatch update batch and get status', function () {
         'status' => 'open'
     ]);
 
-    expect(\Seatplus\Eveapi\Models\BatchUpdate::all())->toHaveCount(0);
+    Queue::fake();
+    Queue::assertNothingPushed();
 
     // first dispatch a update batch
     test()->actingAs(test()->test_user)
         ->post(route('dispatch.batch_update', test()->secondary_character->character_id))
         ->assertOk();
 
-    expect(\Seatplus\Eveapi\Models\BatchUpdate::all())->toHaveCount(1);
+    Queue::assertPushedOn('high', \Seatplus\Eveapi\Jobs\Seatplus\Batch\CharacterBatchJob::class);
+
+     BatchUpdate::firstOrCreate([
+         'batchable_id' => test()->secondary_character->character_id,
+         'batchable_type' => CharacterInfo::class,
+     ]);
 
     // then get update job information
     test()->actingAs(test()->test_user)
