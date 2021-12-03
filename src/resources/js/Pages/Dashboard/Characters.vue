@@ -33,10 +33,17 @@
           </LeftAlignedData>
           <LeftAlignedData v-if="character.batch_update">
             <template #title>
-              Last update
+              {{ character.batch_update.finished_at ? 'Last update' : 'Update started at' }}
             </template>
             <template #description>
-              <Time :timestamp="character.batch_update.finished_at" />
+              <Time
+                v-if="character.batch_update.finished_at"
+                :timestamp="character.batch_update.finished_at"
+              />
+              <Time
+                v-else
+                :timestamp="character.batch_update.started_at"
+              />
             </template>
           </LeftAlignedData>
         </LeftAligned>
