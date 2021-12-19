@@ -67,7 +67,7 @@ class ContractsController extends Controller
             ->whereContractId($contract_id)
             ->with('items', 'items.type', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
 
-        if(request()->header('X-Modal', false)) {
+        if (request()->header('X-Modal', false)) {
             return $query->get()->toJson();
         }
 
