@@ -102,12 +102,14 @@ export default {
 
         const contacts = computed(() => {
 
+            let unsortedContacts = contacts_raw.value
+
             if(selected_filter.value === 'wofaction') {
-                return _.filter(contacts_raw.value, {contact_type: 'faction'})
+                unsortedContacts = _.filter(contacts_raw.value, {contact_type: 'faction'})
             }
 
             if(selected_filter.value === 'standing') {
-                return  _.filter(contacts_raw.value, (contact) => {
+                unsortedContacts =  _.filter(contacts_raw.value, (contact) => {
                     if(_.isNil(contact.corporation_standing) && _.isNil(contact.alliance_standing)) {
                         return false
                     }
@@ -126,7 +128,10 @@ export default {
                 })
             }
 
-            return contacts_raw.value
+            return _.chain(unsortedContacts)
+                .sortBy(['standing', 'corporation_standing', 'alliance_standing'])
+                .reverse()
+                .value()
         })
 
         return {
