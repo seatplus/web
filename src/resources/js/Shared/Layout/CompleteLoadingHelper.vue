@@ -8,7 +8,9 @@
     leave-from="opacity-100"
     leave-to="opacity-0"
   >
-    <slot />
+    <slot>
+      <span class="flex justify-center text-sm">no entries </span>
+    </slot>
   </TransitionRoot>
 
   <TransitionRoot
@@ -84,7 +86,7 @@ export default {
         const results = useLoadCompleteResource(props.route, props.params, props.formData)
 
         const values = computed(() => results.results.value)
-        const shouldShow = computed(() => values.value.length > 0)
+        const shouldShow = computed(() => results.isComplete.value )
 
         onMounted(() => {
             emit('results', results.results.value)
