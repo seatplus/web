@@ -31,8 +31,11 @@ use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseRegionByRegionIdJob;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\UpdateWatchlistAction;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateOpenRecruitmentRequest;
+use Seatplus\Web\Http\Controllers\Request\UpdateWatchlistRequest;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class EnlistmentsController extends Controller
@@ -54,49 +57,18 @@ class EnlistmentsController extends Controller
         return back()->with('success', 'corporation is closed for recruitment');
     }
 
-    public function watchlist(int $corporation_id)
+    public function watchlist(int $corporation_id, WatchedArrayAction $action)
     {
-        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
-
         return inertia('Corporation/Recruitment/Watchlist/Index', [
             'activeSidebarElement' => 'corporation.recruitment',
-            'corporation_id' => $corporation_id,
-            'watched_systems' => $enlistment->systems->map(function ($system) {
-                $system->id = $system->system_id;
-
-                return $system;
-            }) ?? [],
-            'watched_regions' => $enlistment->regions->map(function ($region) {
-                $region->id = $region->region_id;
-
-                return $region;
-            }) ?? [],
+            'corporationId' => $corporation_id,
+            'watched' => $action->execute($corporation_id),
         ]);
     }
 
-    public function updateWatchlist(int $corporation_id, Request $request)
+    public function updateWatchlist(int $corporation_id, UpdateWatchlistRequest $request, UpdateWatchlistAction $action)
     {
-        $validated_data = $request->validate([
-            'systems' => ['array'],
-            'regions' => ['array'],
-        ]);
-
-        $system_ids = data_get($validated_data, 'systems.*.id', []);
-        $region_ids = data_get($validated_data, 'regions.*.id', []);
-
-        $enlistment = Enlistment::find($corporation_id);
-
-        $enlistment->systems()->sync($system_ids);
-
-        collect($system_ids)
-            ->diff(System::whereIn('system_id', $system_ids)->select('system_id')->pluck('system_id'))
-            ->each(fn ($system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
-
-        $enlistment->regions()->sync($region_ids);
-
-        collect($region_ids)
-            ->diff(Region::whereIn('region_id', $region_ids)->select('region_id')->pluck('region_id'))
-            ->each(fn ($region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
+        $action->execute($corporation_id, $request->validated());
 
         return back()->with('success', 'updated');
     }
