@@ -7,41 +7,23 @@
       :placeholder="placeholder"
       @selectedObject="onSelected"
     />
-
-    <span
+    <DismissibleButton
       v-for="selection in selections"
+      :id="selection.id"
       :key="selection.id"
-      class="inline-flex items-center py-0.5 pl-2 pr-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"
-    >
-      {{ selection.name }}
-      <button
-        type="button"
-        class="flex-shrink-0 ml-0.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
-        @click="removeEntry(selection.id)"
-      >
-        <span class="sr-only">Remove {{ selection.name }}</span>
-        <svg
-          class="h-2 w-2"
-          stroke="currentColor"
-          fill="none"
-          viewBox="0 0 8 8"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-width="1.5"
-            d="M1 1l6 6m0-6L1 7"
-          />
-        </svg>
-      </button>
-    </span>
+      :name="selection.name"
+      @remove="removeEntry"
+    />
   </div>
 </template>
 
 <script>
 import Autosuggest from "@/Shared/Components/Autosuggest";
+import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton";
 export default {
   name: "Multiselect",
   components: {
+      DismissibleButton,
     Autosuggest
     },
   props: {
@@ -90,7 +72,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>
