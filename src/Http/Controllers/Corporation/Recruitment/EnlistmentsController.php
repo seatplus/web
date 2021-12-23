@@ -26,11 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
-use Illuminate\Http\Request;
-use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseRegionByRegionIdJob;
-use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\UpdateWatchlistAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;

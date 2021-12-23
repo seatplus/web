@@ -39,15 +39,9 @@
       v-if="isActive('Assets')"
       class="space-y-4"
     >
-      <AssetsComponent
-        :parameters="unknown_asset_params"
-        context="recruitment"
-        :compact="true"
-      />
-      <AssetsComponent
-        :parameters="asset_params"
-        context="recruitment"
-        :compact="true"
+      <AssetTab
+        :character-ids="characterIds"
+        :watchlist="watchlist"
       />
     </div>
     <div
@@ -132,12 +126,16 @@ import CorporationHistoryComponent from "@/Shared/Components/Character/Corporati
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
 import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
+import AssetTab from "@/Pages/Corporation/Recruitment/Tabs/AssetTab";
 
 const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
 
 export default {
     name: "TabComponent",
     components: {
+        AssetTab,
+        BarWithUnderline,
         CharacterContactsComponent,
         MobileMailList,
         SkillsComponent,
@@ -175,8 +173,6 @@ export default {
         asset_params() {
             return {
                 character_ids: _.map(this.recruit.characters, character => character.character_id),
-                regions: this.watchlist.regions,
-                systems: this.watchlist.systems
             }
         },
         unknown_asset_params() {

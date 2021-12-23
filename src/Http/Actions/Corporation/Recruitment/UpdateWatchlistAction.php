@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Actions\Corporation\Recruitment;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseRegionByRegionIdJob;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Category;
@@ -67,7 +68,14 @@ class UpdateWatchlistAction
         }
 
         collect(data_get($this->validatedData, 'items', []))
-            ->groupBy('watchable_type')
+            ->groupBy('watchable_type')->pipe(function(Collection $collection) {
+                foreach ([Type::class, Group::class, Category::class] as $key) {
+                    if (!$collection->has($key)) {
+                        $collection = $collection->mergeRecursive([$key => []]);
+                    }
+                }
+                return $collection;
+            })
             ->each(fn($items, $category) => match($category) {
                 Type::class => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
                 Group::class => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
