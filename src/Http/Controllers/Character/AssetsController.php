@@ -55,7 +55,7 @@ class AssetsController extends Controller
             ->groupBy('location_id')
             ->orderBy('location_id', 'asc');
 
-        $request->whenHas('search', fn($term) => $query->search($term));
+        $request->whenHas('search', fn ($term) => $query->search($term));
 
         $this->handleWatchlist($query, $request);
 
@@ -74,7 +74,7 @@ class AssetsController extends Controller
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
 
-        $request->whenHas('search', fn($term) => $query->search($term));
+        $request->whenHas('search', fn ($term) => $query->search($term));
 
         $this->handleWatchlist($query, $request);
 
@@ -96,18 +96,18 @@ class AssetsController extends Controller
         ]);
     }
 
-    private function handleWatchlist(Builder | \Illuminate\Database\Query\Builder $query, Request $request)
+    private function handleWatchlist(Builder|\Illuminate\Database\Query\Builder $query, Request $request)
     {
         $query->where(function ($query) use ($request) {
-            $query->where(function ($query) use ($request){
-                $request->whenHas('systems', fn($system_ids) => $query->orWhere(fn($query) => $query->inSystems($system_ids)));
-                $request->whenHas('regions', fn($region_ids) => $query->orWhere(fn($query) => $query->inRegion($region_ids)));
+            $query->where(function ($query) use ($request) {
+                $request->whenHas('systems', fn ($system_ids) => $query->orWhere(fn ($query) => $query->inSystems($system_ids)));
+                $request->whenHas('regions', fn ($region_ids) => $query->orWhere(fn ($query) => $query->inRegion($region_ids)));
             })
-                ->orWhere(fn(Builder $query) => $query
-                    ->when($request->hasAny(['types', 'groups', 'categories']), fn($query) => $query->where(function ($query) use ($request) {
-                        $request->whenHas('types', fn($type_ids) => $query->orWhere(fn($query) => $query->ofTypes($type_ids)));
-                        $request->whenHas('groups', fn($group_ids) => $query->orWhere(fn($query) => $query->ofGroups($group_ids)));
-                        $request->whenHas('categories', fn($category_ids) => $query->orWhere(fn($query) => $query->ofCategories($category_ids)));
+                ->orWhere(fn (Builder $query) => $query
+                    ->when($request->hasAny(['types', 'groups', 'categories']), fn ($query) => $query->where(function ($query) use ($request) {
+                        $request->whenHas('types', fn ($type_ids) => $query->orWhere(fn ($query) => $query->ofTypes($type_ids)));
+                        $request->whenHas('groups', fn ($group_ids) => $query->orWhere(fn ($query) => $query->ofGroups($group_ids)));
+                        $request->whenHas('categories', fn ($category_ids) => $query->orWhere(fn ($query) => $query->ofCategories($category_ids)));
                     }))
                 );
         });
