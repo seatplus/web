@@ -30,10 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
-use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class MemberComplianceController
 {
