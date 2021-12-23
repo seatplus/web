@@ -30,6 +30,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
@@ -77,7 +79,7 @@ class MemberComplianceController
         return CorporationComplianceResource::collection($users->paginate());
     }
 
-    public function reviewUser(int $corporation_id, User $user)
+    public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action)
     {
         $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->pluck('type')->first();
         $isCharacterType = $type === 'default';
@@ -89,16 +91,10 @@ class MemberComplianceController
                 'main_character',
             ]);
 
-        $enlistment = Enlistment::with('systems', 'regions')
-            ->find($corporation_id);
-
         return inertia('Corporation/MemberCompliance/ReviewUser', [
             'member' => $member,
             'targetCorporation' => CorporationInfo::find($corporation_id),
-            'watchlist' => [
-                'systems' => $enlistment?->systems?->pluck('system_id'),
-                'regions' => $enlistment?->regions?->pluck('region_id'),
-            ],
+            'watchlist' => $action->execute($corporation_id),
         ]);
     }
 }
