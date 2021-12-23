@@ -44,6 +44,7 @@ Route::post('/location/', [ManualLocationController::class, 'create'])->name('po
 
 Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestion.system');
 Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');
+Route::get('typesOrGroupOrCategories', [HelperController::class, 'typesOrGroupsOrCategories'])->name('autosuggestion.typesOrGroupOrCategories');
 
 Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
 Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');

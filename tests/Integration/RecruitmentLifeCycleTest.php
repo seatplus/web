@@ -11,8 +11,11 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Eveapi\Models\Universe\Type;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
@@ -313,7 +316,7 @@ test('junior h r can see shitlist', function () {
         ->assertJsonCount(1, 'data');
 });
 
-test('senior h r can setup watchlist', function () {
+test('senior hr can setup watchlist', function () {
     createEnlistment();
 
     test()->actingAs(test()->test_user->refresh())
@@ -321,8 +324,12 @@ test('senior h r can setup watchlist', function () {
         ->assertOk()
         ->assertInertia( fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Watchlist/Index')
-            ->has('watched_systems', 0)
-            ->has('watched_regions', 0)
+            ->has('watched', fn(Assert $prop) => $prop
+                ->has('systems', 0)
+                ->has('regions', 0)
+                ->has('items', 0)
+            )
+
         );
 
     // create system
@@ -340,11 +347,11 @@ test('senior h r can setup watchlist', function () {
         ])
         ->assertInertia( fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Watchlist/Index')
-            ->has('watched_systems', 1, fn(Assert $page) => $page
-                ->where('id', $system->system_id)
+            ->has('watched', fn(Assert $prop) => $prop
+                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
                 ->etc()
             )
-            ->has('watched_regions', 0)
+            ->etc()
         );
 
 
@@ -366,14 +373,83 @@ test('senior h r can setup watchlist', function () {
         ])
         ->assertInertia( fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Watchlist/Index')
-            ->has('watched_systems', 1, fn(Assert $page) => $page
-                ->where('id', $system->system_id)
+            ->has('watched', fn(Assert $prop) => $prop
+                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
+                ->has('regions', 1, fn(Assert $prop) => $prop->where('id', $region->region_id)->etc())
                 ->etc()
             )
-            ->has('watched_regions', 1, fn(Assert $page) => $page
-                ->where('id', $region->region_id)
+            ->etc()
+        );
+
+    // add type and don't submit new system or region,
+    $group = Group::factory()->create(['category_id' => Category::factory()]);
+    $type = Type::factory()->create(['group_id' => $group]);
+    test()->actingAs(test()->test_user->refresh())
+        ->followingRedirects()
+        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
+            'items' => [
+                [
+                    // only watchable_id and type is required
+                    'watchable_id' => $type->type_id,
+                    'watchable_type' => Type::class
+                ]
+            ],
+        ])->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched', fn(Assert $prop) => $prop
+                // we expect no change for watchlisted systems and regions
+                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
+                ->has('regions', 1, fn(Assert $prop) => $prop->where('id', $region->region_id)->etc())
+                ->has('items', 1, fn(Assert $prop) => $prop->where('watchable_id', $type->type_id)->etc())
                 ->etc()
             )
+            ->etc()
+        );
+
+    test()->actingAs(test()->test_user->refresh())
+        ->followingRedirects()
+        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
+            'items' => [
+                [
+                    // only watchable_id and type is required
+                    'watchable_id' => $type->group_id,
+                    'watchable_type' => Group::class
+                ]
+            ],
+        ])->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched', fn(Assert $prop) => $prop
+                // we expect no change for watchlisted systems and regions
+                // however we expect the type previously set to be removed
+                ->has('items', 1, fn(Assert $prop) => $prop->where('watchable_id', $type->group_id)->etc())
+                ->etc()
+            )
+            ->etc()
+        );
+
+    test()->actingAs(test()->test_user->refresh())
+        ->followingRedirects()
+        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
+            'items' => [
+                [
+                    // only watchable_id and type is required
+                    'watchable_id' => $type->group_id,
+                    'watchable_type' => Group::class
+                ],
+                [
+                    // only watchable_id and type is required
+                    'watchable_id' => $type->group->category_id,
+                    'watchable_type' => Category::class
+                ],
+            ],
+        ])->assertInertia( fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->has('watched', fn(Assert $prop) => $prop
+                // we expect no change for watchlisted systems and regions
+                ->has('items', 2)
+                ->etc()
+            )
+            ->etc()
         );
 
 });

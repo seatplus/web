@@ -92,6 +92,9 @@ class ApplicationsController extends Controller
             'watchlist' => [
                 'systems' => $enlistment->systems?->pluck('system_id'),
                 'regions' => $enlistment->regions?->pluck('region_id'),
+                'types' => $enlistment->types?->pluck('type_id'),
+                'groups' => $enlistment->groups?->pluck('group_id'),
+                'categories' => $enlistment->categories?->pluck('category_id'),
             ],
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
@@ -130,6 +133,9 @@ class ApplicationsController extends Controller
             'watchlist' => [
                 'systems' => $enlistment->systems?->pluck('system_id'),
                 'regions' => $enlistment->regions?->pluck('region_id'),
+                'types' => $enlistment->types?->pluck('type_id'),
+                'groups' => $enlistment->groups?->pluck('group_id'),
+                'categories' => $enlistment->categories?->pluck('category_id'),
             ],
             'activeSidebarElement' => 'corporation.recruitment',
         ]);

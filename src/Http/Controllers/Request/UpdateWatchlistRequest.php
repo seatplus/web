@@ -24,39 +24,43 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Models\Recruitment;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-use Seatplus\Eveapi\Models\Recruitment\Enlistments;
-use Seatplus\Eveapi\Models\Universe\Category;
-use Seatplus\Eveapi\Models\Universe\Group;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
-use Seatplus\Eveapi\Models\Universe\Type;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
-class Enlistment extends Enlistments
+class UpdateWatchlistRequest extends FormRequest
 {
-    public function systems()
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
     {
-        return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');
+        return true;
     }
 
-    public function regions()
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules()
     {
-        return $this->morphedByMany(Region::class, 'watchlistable', null, 'corporation_id');
-    }
-
-    public function types()
-    {
-        return $this->morphedByMany(Type::class, 'watchlistable', null, 'corporation_id');
-    }
-
-    public function groups()
-    {
-        return $this->morphedByMany(Group::class, 'watchlistable', null, 'corporation_id');
-    }
-
-    public function categories()
-    {
-        return $this->morphedByMany(Category::class, 'watchlistable', null, 'corporation_id');
+        return [
+            'systems' => ['array'],
+            'regions' => ['array'],
+            'items' => [
+                'array',
+                function ($attribute, $items_array, $fail) {
+                    foreach ($items_array as $item) {
+                        if (! Arr::has($item, ['watchable_id', 'watchable_type'])) {
+                            $fail('The ' . $attribute . ' is invalid. Missing watchable_id and/or watchable_type');
+                        }
+                    }
+                },
+            ],
+        ];
     }
 }
