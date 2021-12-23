@@ -39,7 +39,6 @@ use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
-use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class ApplicationsController extends Controller
 {
@@ -89,7 +88,7 @@ class ApplicationsController extends Controller
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->loadMissing('main_character', 'characters', 'characters.batch_update'),
             'target_corporation' => $recruit->application->corporation,
-            'watchlist' => $action->execute($corporation_id) ,
+            'watchlist' => $action->execute($corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
