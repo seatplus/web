@@ -139,13 +139,13 @@ class HelperController extends Controller
             ->union($typeQuery)
             ->limit(15)
             ->get()
-            ->map(fn($entry) => [
+            ->map(fn ($entry) => [
                 'id' => intval(match ($entry->category) {
-                        'type' => 1,
+                    'type' => 1,
                         'group' => 2,
                         'category' => 3,
-                    } . $entry->id),
-                'name' => sprintf('%s (%s)',$entry->name, $entry->category),
+                } . $entry->id),
+                'name' => sprintf('%s (%s)', $entry->name, $entry->category),
                 'watchable_id' => intval($entry->id),
                 'watchable_type' => match ($entry->category) {
                     'type' => Type::class,
@@ -153,7 +153,6 @@ class HelperController extends Controller
                     'category' => Category::class,
                 },
             ]);
-
     }
 
     public function getResourceVariants(string $resource_type, int $resource_id)
