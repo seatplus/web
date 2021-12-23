@@ -34,11 +34,11 @@ use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\GetOwnedIds;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
-use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class ApplicationsController extends Controller
 {
@@ -81,21 +81,14 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getUserApplication(User $recruit)
+    public function getUserApplication(User $recruit, WatchlistArrayAction $action)
     {
         $corporation_id = $recruit->application->corporation->corporation_id;
-        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->loadMissing('main_character', 'characters', 'characters.batch_update'),
             'target_corporation' => $recruit->application->corporation,
-            'watchlist' => [
-                'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id'),
-                'types' => $enlistment->types?->pluck('type_id'),
-                'groups' => $enlistment->groups?->pluck('group_id'),
-                'categories' => $enlistment->categories?->pluck('category_id'),
-            ],
+            'watchlist' => $action->execute($corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
@@ -115,7 +108,7 @@ class ApplicationsController extends Controller
         return redirect()->route('corporation.recruitment')->with('success', sprintf('User %s', $request->get('decision')));
     }
 
-    public function getCharacterApplication(int $character_id)
+    public function getCharacterApplication(int $character_id, WatchlistArrayAction $action)
     {
         $character = CharacterInfo::with('application', 'batch_update')->find($character_id);
 
@@ -125,18 +118,11 @@ class ApplicationsController extends Controller
         ]);
 
         $corporation_id = $character->application->corporation->corporation_id;
-        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit,
             'target_corporation' => $character->application->corporation,
-            'watchlist' => [
-                'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id'),
-                'types' => $enlistment->types?->pluck('type_id'),
-                'groups' => $enlistment->groups?->pluck('group_id'),
-                'categories' => $enlistment->categories?->pluck('category_id'),
-            ],
+            'watchlist' => $action->execute($corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
