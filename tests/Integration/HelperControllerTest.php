@@ -2,6 +2,9 @@
 
 
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
+use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Facades\Http;
 use Seatplus\Eveapi\Models\Universe\Region;
@@ -240,4 +243,28 @@ test('one can get market prices', function () {
         ->assertOk();
 
     test()->assertNotNull(cache('market_prices'));
+});
+
+it('has auttosuggest for types, groups and categories', function (){
+
+    $type = Type::factory()->create([
+        'name' => 'TypeName',
+        'group_id' => Group::factory()->create([
+            'name' => 'GroupName',
+            'category_id' => Category::factory()->create([
+                'name' => 'CategoryName'
+            ]),
+        ])
+    ]);
+
+    $terms = ['Typ', 'Grou', 'Cate'];
+
+    foreach ($terms as $term) {
+        $result = test()->actingAs(test()->test_user)
+            ->get(route('autosuggestion.typesOrGroupOrCategories', ['search' => $term]))
+            ->assertOk();
+
+        expect($result->original)->toHaveCount(1);
+    }
+
 });
