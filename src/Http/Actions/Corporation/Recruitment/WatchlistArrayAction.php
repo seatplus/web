@@ -10,6 +10,10 @@ class WatchlistArrayAction
     {
         $enlistment = Enlistment::with('systems', 'regions', 'types', 'groups', 'categories')->find($corporation_id);
 
+        if(is_null($enlistment)) {
+            return [];
+        }
+
         return [
             'systems' => $enlistment->systems?->pluck('system_id'),
             'regions' => $enlistment->regions?->pluck('region_id'),
