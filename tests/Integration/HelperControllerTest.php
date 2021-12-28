@@ -205,11 +205,8 @@ test('one can get resource variants via http and cache', function () {
     $expected_response = ["render", "icon"];
 
     Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
-    Cache::shouldReceive('get')
-        ->twice()
-        ->with($url)
-        ->andReturns(null, $expected_response);
-    Cache::shouldReceive('put')->once();
+
+    expect(cache($url))->toBeNull();
 
     // first time miss cache
     $result = test()->actingAs(test()->test_user)
@@ -220,14 +217,7 @@ test('one can get resource variants via http and cache', function () {
         ->assertOk()
         ->assertJson($expected_response);
 
-    // second time hit cache
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('get.resource.variants', [
-            'resource_type' => $resource_type,
-            'resource_id' => $resource_id
-        ]))
-        ->assertOk()
-        ->assertJson($expected_response);
+    expect(cache($url))->not()->toBeNull();
 
 });
 
