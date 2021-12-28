@@ -1,7 +1,11 @@
 <?php
 
 
+use Illuminate\Support\Facades\Cache;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
+use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Illuminate\Support\Facades\Http;
 use Seatplus\Eveapi\Models\Universe\Region;
@@ -192,17 +196,35 @@ test('one can search existing region', function () {
     expect($result->original)->toHaveCount(1);
 });
 
-test('on can get resource variants', function () {
+test('one can get resource variants via http and cache', function () {
     Http::fake();
 
+    $resource_type = 'types';
+    $resource_id = 587;
+    $url = "https://images.evetech.net/${resource_type}/${resource_id}";
     $expected_response = ["render", "icon"];
 
     Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
+    Cache::shouldReceive('get')
+        ->twice()
+        ->with($url)
+        ->andReturns(null, $expected_response);
+    Cache::shouldReceive('put')->once();
 
+    // first time miss cache
     $result = test()->actingAs(test()->test_user)
         ->get(route('get.resource.variants', [
-            'resource_type' => 'types',
-            'resource_id' => 587
+            'resource_type' => $resource_type,
+            'resource_id' => $resource_id
+        ]))
+        ->assertOk()
+        ->assertJson($expected_response);
+
+    // second time hit cache
+    $result = test()->actingAs(test()->test_user)
+        ->get(route('get.resource.variants', [
+            'resource_type' => $resource_type,
+            'resource_id' => $resource_id
         ]))
         ->assertOk()
         ->assertJson($expected_response);
@@ -240,4 +262,28 @@ test('one can get market prices', function () {
         ->assertOk();
 
     test()->assertNotNull(cache('market_prices'));
+});
+
+it('has auttosuggest for types, groups and categories', function (){
+
+    $type = Type::factory()->create([
+        'name' => 'TypeName',
+        'group_id' => Group::factory()->create([
+            'name' => 'GroupName',
+            'category_id' => Category::factory()->create([
+                'name' => 'CategoryName'
+            ]),
+        ])
+    ]);
+
+    $terms = ['Typ', 'Grou', 'Cate'];
+
+    foreach ($terms as $term) {
+        $result = test()->actingAs(test()->test_user)
+            ->get(route('autosuggestion.typesOrGroupOrCategories', ['search' => $term]))
+            ->assertOk();
+
+        expect($result->original)->toHaveCount(1);
+    }
+
 });

@@ -198,8 +198,7 @@ it('enables with review permission to review corporation member', function () {
         ->getJson(route('corporation.review.user', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
             'user' => test()->test_user->id
-        ]))
-        ->assertOk()
+        ]))->assertOk()
         ->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 
 });

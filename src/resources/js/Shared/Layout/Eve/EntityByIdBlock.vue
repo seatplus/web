@@ -78,7 +78,9 @@ export default {
                 if(isReady.value)
                     return
 
-                getEntity()
+                if(props.id >0) {
+                    getEntity()
+                }
             }
         }, { threshold: [1] });
 

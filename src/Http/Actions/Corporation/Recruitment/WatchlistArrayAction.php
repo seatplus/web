@@ -24,39 +24,26 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Models\Recruitment;
+namespace Seatplus\Web\Http\Actions\Corporation\Recruitment;
 
-use Seatplus\Eveapi\Models\Recruitment\Enlistments;
-use Seatplus\Eveapi\Models\Universe\Category;
-use Seatplus\Eveapi\Models\Universe\Group;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
-use Seatplus\Eveapi\Models\Universe\Type;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
-class Enlistment extends Enlistments
+class WatchlistArrayAction
 {
-    public function systems()
+    public function execute($corporation_id): array
     {
-        return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');
-    }
+        $enlistment = Enlistment::with('systems', 'regions', 'types', 'groups', 'categories')->find($corporation_id);
 
-    public function regions()
-    {
-        return $this->morphedByMany(Region::class, 'watchlistable', null, 'corporation_id');
-    }
+        if (is_null($enlistment)) {
+            return [];
+        }
 
-    public function types()
-    {
-        return $this->morphedByMany(Type::class, 'watchlistable', null, 'corporation_id');
-    }
-
-    public function groups()
-    {
-        return $this->morphedByMany(Group::class, 'watchlistable', null, 'corporation_id');
-    }
-
-    public function categories()
-    {
-        return $this->morphedByMany(Category::class, 'watchlistable', null, 'corporation_id');
+        return [
+            'systems' => $enlistment->systems?->pluck('system_id'),
+            'regions' => $enlistment->regions?->pluck('region_id'),
+            'types' => $enlistment->types?->pluck('type_id'),
+            'groups' => $enlistment->groups?->pluck('group_id'),
+            'categories' => $enlistment->categories?->pluck('category_id'),
+        ];
     }
 }

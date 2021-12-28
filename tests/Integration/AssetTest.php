@@ -3,8 +3,11 @@
 
 use Inertia\Testing\Assert;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
+use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Models\Asset\Asset;
 
 test('is protected by authentication', function () {
@@ -188,4 +191,55 @@ test('load asset in unknown location', function () {
     expect($response->original)->toHaveCount(1);
 
     // call with unknown locations
+});
+
+test('load asset on watchlist', function () {
+
+    // Prepare
+    $asset = Asset::factory()
+        ->count(2)
+        ->create([
+            'assetable_id' => test()->test_character->character_id,
+            'location_flag' => 'Hangar'
+        ])->first();
+
+
+    $content = Asset::factory()
+        ->create([
+            'location_id' => $asset->item_id,
+            'location_flag' => 'Cargo',
+            'type_id' => Type::factory()->create([
+                'group_id' => Group::factory()->create(['category_id' => Category::factory()])
+            ])
+        ]);
+
+
+
+    // Act
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('load.character.assets'));
+
+    // we expect a total of 3 assets
+    expect(Asset::all())->toHaveCount(3);
+    // only two should be in the result
+    expect($response->original)->toHaveCount(2);
+
+    $tests = [
+        ['types' => [$content->type_id]],
+        ['groups' => [$content->type->group_id]],
+        ['categories' => [$content->type->group->category_id]],
+    ];
+
+    foreach ($tests as $test) {
+        $watchlist_response = test()->actingAs(test()->test_user)
+            ->get(route('load.character.assets', $test));
+
+        expect($watchlist_response->original)->toHaveCount(1);
+
+        $watchlist_location_response = test()->actingAs(test()->test_user)
+            ->get(route('location.assets', $asset->location_id, $test));
+
+        expect($watchlist_location_response->original)->toHaveCount(1);
+    }
+
 });
