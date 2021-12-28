@@ -143,7 +143,7 @@ export default {
 
         const remove = function () {
 
-            this.$inertia.delete(this.$route('acl.delete', this.role.id), {
+            this.$inertia.delete(route('acl.delete', props.role.id), {
                 replace: false,
                 preserveState: false,
                 preserveScroll: false,
