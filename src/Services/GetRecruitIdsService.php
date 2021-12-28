@@ -45,8 +45,8 @@ class GetRecruitIdsService
 
         $recruit_ids = cache($cache_key);
 
-        if(!$recruit_ids) {
-            $recruit_ids =  Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
+        if (! $recruit_ids) {
+            $recruit_ids = Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
                 ->whereStatus('open')
                 ->with([
                     'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
