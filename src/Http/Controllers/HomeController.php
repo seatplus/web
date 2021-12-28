@@ -59,6 +59,8 @@ class HomeController extends Controller
                     User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
                     CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
                 };
+
+                $query->where('status', 'open');
             }
         )->whereCorporationId($corporation_id)
             ->paginate();

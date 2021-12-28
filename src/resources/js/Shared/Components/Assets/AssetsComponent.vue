@@ -23,7 +23,7 @@
 <script>
 import LocationComponent from "./LocationComponent";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import {ref, watch} from "vue";
+import { ref, watch } from "vue";
 export default {
     name: "AssetsComponent",
     components: {
