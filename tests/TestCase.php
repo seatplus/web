@@ -126,17 +126,4 @@ abstract class TestCase extends OrchestraTestCase
         ));
     }
 
-    protected function givePermissionsToTestUser(array $array)
-    {
-
-        foreach ($array as $string) {
-            $permission = Permission::findOrCreate($string);
-
-            $this->test_user->givePermissionTo($permission);
-        }
-
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
 }

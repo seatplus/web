@@ -82,7 +82,7 @@ test('admin can accept suggestion', function () {
         'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
-    test()->givePermissionsToTestUser(['manage manual locations']);
+    test()->assignPermissionToTestUser(['manage manual locations']);
 
     // first visit Manage view
     $response = test()->actingAs(test()->test_user)
@@ -133,7 +133,7 @@ test('one get accepted suggestion', function () {
         'location_id' => 12345,
     ]);
 
-    test()->givePermissionsToTestUser(['manage manual locations']);
+    test()->assignPermissionToTestUser(['manage manual locations']);
 
     // Make sure there is no suggestion in universe_locations
     test()->assertNull(Location::firstWhere(['location_id' =>12345]));
@@ -173,7 +173,7 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         'locatable_type' => Station::class
     ]);
 
-    test()->givePermissionsToTestUser(['manage manual locations']);
+    test()->assignPermissionToTestUser(['manage manual locations']);
 
     // load suggestions
     $response = test()->actingAs(test()->test_user)
