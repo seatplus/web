@@ -45,9 +45,11 @@ uses(TestCase::class)->in('Integration', 'Unit');
 */
 
 /** @link https://pestphp.com/docs/helpers */
-function assignPermissionToTestUser(array $array)
+function assignPermissionToTestUser(array|string $permission_strings)
 {
-    foreach ($array as $string) {
+    $permission_strings = is_array($permission_strings) ? $permission_strings : [$permission_strings];
+
+    foreach ($permission_strings as $string) {
         $permission = Permission::findOrCreate($string);
 
         test()->test_user->givePermissionTo($permission);

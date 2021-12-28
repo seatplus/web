@@ -157,7 +157,19 @@ class HelperController extends Controller
 
     public function getResourceVariants(string $resource_type, int $resource_id)
     {
-        return Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
+
+        $url = "https://images.evetech.net/${resource_type}/${resource_id}";
+
+        $image_variants = cache($url);
+
+        if(! $image_variants) {
+            $image_variants = Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
+
+            //Cache::put($url, $image_variants, now()->addDay());
+            cache([$url => $image_variants], now()->addDay());
+        }
+
+        return $image_variants;
     }
 
     public function getMarketsPrices()
