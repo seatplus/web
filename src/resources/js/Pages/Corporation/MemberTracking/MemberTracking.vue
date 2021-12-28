@@ -1,25 +1,27 @@
 <template>
-  <teleport to="#head">
-    <title>{{ title(pageTitle) }}</title>
-  </teleport>
+  <div class="space-y-3">
+    <teleport to="#head">
+      <title>{{ title(pageTitle) }}</title>
+    </teleport>
 
-  <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
+    <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
-  <PageHeader>
-    {{ pageTitle }}
-    <template #primary>
-      <DispatchUpdateButton />
-    </template>
-    <template #secondary>
-      <EntitySelectionButton type="corporation"/>
-    </template>
-  </PageHeader>
+    <PageHeader>
+      {{ pageTitle }}
+      <template #primary>
+        <DispatchUpdateButton />
+      </template>
+      <template #secondary>
+        <EntitySelectionButton type="corporation" />
+      </template>
+    </PageHeader>
 
-  <MemberTrackingComponent
-    v-for="corporation in corporations"
-    :key="corporation.corporation_id"
-    :corporation="corporation"
-  />
+    <MemberTrackingComponent
+      v-for="corporation in corporations"
+      :key="corporation.corporation_id"
+      :corporation="corporation"
+    />
+  </div>
 </template>
 
 <script>

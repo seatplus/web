@@ -1,24 +1,12 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Models;
-
-
 use Illuminate\Support\Facades\Event;
 use Seatplus\Web\Models\ManualLocation;
-use Seatplus\Web\Tests\TestCase;
 
-class ManualLocationTest extends TestCase
-{
-    /** @test */
-    public function manual_location_has_location_relationship()
-    {
+test('manual location has location relationship', function () {
 
-        $manual_location = Event::fakeFor( fn() => ManualLocation::factory()->create());
+    $manual_location = Event::fakeFor( fn() => ManualLocation::factory()->create());
 
-        $this->assertNotNull($manual_location);
-    }
-
-
-
-}
+    test()->assertNotNull($manual_location);
+});

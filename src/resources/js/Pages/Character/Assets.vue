@@ -29,14 +29,14 @@
               </label>
               <input
                 id="search"
-                v-model="params.search"
+                v-model="search"
                 class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
               >
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
               <Multiselect
-                v-model="params.regions"
+                v-model="regions"
                 route="autosuggestion.region"
                 label="Region"
                 placeholder="search for region"
@@ -45,7 +45,7 @@
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
               <Multiselect
-                v-model="params.systems"
+                v-model="systems"
                 route="autosuggestion.system"
                 label="Solar System"
                 placeholder="search for solar system"
@@ -84,7 +84,6 @@
       </div>
 
       <AssetsComponent
-        :key="infiniteId"
         :parameters="cleanParams"
         :compact="switchValue"
       />
@@ -99,9 +98,10 @@ import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
 import Multiselect from "@/Shared/Components/Multiselect";
-import { ref } from 'vue'
+import {computed, ref, watch} from 'vue'
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "../../Shared/Components/SelectedEntity";
+import route from 'ziggy'
 
 export default {
     name: "Assets",
@@ -126,52 +126,49 @@ export default {
     },
     setup() {
         const switchValue = ref(false)
+        const infiniteId = ref(+new Date())
+        const search = ref(null)
+        const regions = ref([])
+        const systems = ref([])
 
-        return {
-            switchValue,
-        }
-    },
-    data() {
-        return {
-            pageTitle: 'Character Assets',
-            infiniteId: +new Date(),
-            params: {
-                character_ids: this.selectedCharacterIds,
-                search: null,
-                regions: [],
-                systems: [],
-            },
-        }
-    },
-    computed: {
-        cleanParams() {
-            let params = this.params
-
-            return {
-                search: params.search === "" ? null : params.search,
-                character_ids: this.selectedCharacterIds,
-                regions: _.map(params.regions, 'id'),
-                systems: _.map(params.systems, 'id')
-            }
-        },
-        selectedCharacterIds() {
-
-            let character_ids = _.get(this.$route().params, 'character_ids')
+        const selectedCharacterIds = computed(() => {
+            let character_ids = _.get(route().params, 'character_ids')
 
             if(!character_ids)
                 return []
 
             return  _.map(character_ids, (id) => parseInt(id))
-        }
-    },
-    watch: {
-        params: {
-            deep: true,
-            handler() {
-                this.infiniteId += 1
+        })
+
+        const cleanParams = computed(() => {
+            return {
+                search: search.value === "" ? null : search.value,
+                character_ids: selectedCharacterIds.value,
+                regions: _.map(regions.value, 'id'),
+                systems: _.map(systems.value, 'id')
             }
+        })
+
+        const debounceInfiniteId = _.debounce(() => infiniteId.value++, 250)
+
+        watch(() => search.value, (newValue) => {
+            if(_.size(newValue)>=3) {
+                debounceInfiniteId()
+            }
+        })
+
+        watch([regions.value, systems.value], () => infiniteId.value++)
+
+        return {
+            infiniteId,
+            search,
+            regions,
+            systems,
+            switchValue,
+            cleanParams,
+            pageTitle: 'Character Assets',
         }
-    },
+    }
 }
 </script>
 

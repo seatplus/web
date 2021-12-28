@@ -24,25 +24,44 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Http\Controllers\Request;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Foundation\Http\FormRequest;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
-class UserComplianceResource extends JsonResource
+class ContactsRequest extends FormRequest
 {
     /**
-     * Transform the resource into an array.
+     * Determine if the user is authorized to make this request.
      *
-     * @param  \Illuminate\Http\Request
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
      * @return array
      */
-    public function toArray($request)
+    public function rules()
     {
-        $characters = collect(CharacterComplianceResource::collection($this->characters))->filter();
-
-        return $characters->isEmpty() ? [] : [
-            'main_character' => $this->main_character,
-            'characters' => $characters,
+        return [
+            'corporation_id' => [
+                'required',
+                'integer',
+            ],
+            'alliance_id' => [
+                'sometimes',
+                'required',
+                'integer',
+                function ($attribute, $value, $fail) {
+                    if ($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
+                        $fail("The provided ${attribute} does not match the corporations ${attribute}");
+                    }
+                }, ],
         ];
     }
 }

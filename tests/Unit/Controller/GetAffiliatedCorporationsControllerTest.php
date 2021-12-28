@@ -1,48 +1,48 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Controller;
-
-
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class GetAffiliatedCorporationsControllerTest extends TestCase
-{
-    protected function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    $permission = Permission::findOrCreate('can accept or deny applications');
 
-        $permission = Permission::findOrCreate('can accept or deny applications');
+    test()->test_user->givePermissionTo($permission);
 
-        $this->test_user->givePermissionTo($permission);
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+it('get affiliated corporations', function () {
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Director']
+    ]);
 
-    /** @test */
-    public function itGetAffiliatedCorporations()
-    {
-        $this->test_character->roles()->update(['roles' => ['Director']]);
+    expect(test()->test_character->roles)
+        ->hasRole('roles', 'Director')->toBeTrue()
+        ->hasRole('roles', 'Accountant')->toBeTrue();
 
-        WalletJournal::factory()->count(5)->create([
-            'wallet_journable_type' => CorporationInfo::class,
-            'wallet_journable_id' => $this->test_character->corporation->corporation_id
-        ]);
+    WalletJournal::factory()->count(5)->create([
+        'wallet_journable_type' => CorporationInfo::class,
+        'wallet_journable_id' => test()->test_character->corporation->corporation_id
+    ]);
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('get.affiliated.corporations', [
-                'permission' => 'wallet_journals',
-                'corporation_role' => 'Accountant|Junior_Accountant'
-            ]));
+    expect(CorporationInfo::find(test()->test_character->corporation->corporation_id))
+        ->not()->toBeNull()
+        ->wallet_journals->toHaveCount(5);
 
-        $response->assertOk();
+    $response = test()->actingAs(test()->test_user->refresh())
+        ->get(route('get.affiliated.corporations', [
+            'permission' => 'wallet_journals',
+            'corporation_role' => 'Accountant|Junior_Accountant',
+            'search' => substr(test()->test_character->corporation->name, 5)
+        ]));
 
-        $this->assertCount(1, $response->original);
-    }
+    $response->assertOk();
 
-}
+    expect($response->original)->toHaveCount(1);
+});

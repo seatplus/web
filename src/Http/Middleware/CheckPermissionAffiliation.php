@@ -38,6 +38,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class CheckPermissionAffiliation
 {
     private Collection $affiliated_ids;
+    private User $user;
 
     public function __construct()
     {
@@ -45,10 +46,10 @@ class CheckPermissionAffiliation
     }
 
     /**
-     * @param Request $request
-     * @param Closure $next
-     * @param string $permission
-     * @param string|null $character_role
+     * @param  Request  $request
+     * @param  Closure  $next
+     * @param  string  $permission
+     * @param  string|null  $character_role
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
@@ -59,7 +60,9 @@ class CheckPermissionAffiliation
             'alliance_ids' => ['sometimes', 'array'],
         ]);
 
-        if (auth()->user()->can('superuser')) {
+        $this->setUser();
+
+        if ($this->getUser()->can('superuser')) {
             $this->appendValidatedIds($request->request, collect($validated_data)->flatten());
 
             return $next($request);
@@ -115,7 +118,7 @@ class CheckPermissionAffiliation
     private function checkUserPermissions(array $permissions): bool
     {
         foreach ($permissions as $permission) {
-            if (auth()->user()->can($permission)) {
+            if ($this->getUser()->can($permission)) {
                 return true;
             }
         }
@@ -163,8 +166,8 @@ class CheckPermissionAffiliation
 
     private function buildAffiliatedIdsByCharacterRole(string $character_role): array
     {
-        $affiliated_ids_from_character_role = User::with('characters.roles', 'characters.corporation')
-            ->find(auth()->user()->getAuthIdentifier())
+        $affiliated_ids_from_character_role = $this->getUser()
+            ->load(['characters.roles', 'characters.corporation'])
             ->characters
             ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
                 ? $character->corporation->corporation_id
@@ -182,5 +185,15 @@ class CheckPermissionAffiliation
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
         $bag->add(['validated_ids' =>  $validated_ids->all()]);
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(): void
+    {
+        $this->user = User::find(auth()->user()->getAuthIdentifier());
     }
 }

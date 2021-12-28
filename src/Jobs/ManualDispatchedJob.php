@@ -35,7 +35,7 @@ class ManualDispatchedJob
     private string $name = 'manual job';
 
     /**
-     * @param array $jobs
+     * @param  array  $jobs
      * @return ManualDispatchedJob
      */
     public function setJobs(array $jobs): ManualDispatchedJob
@@ -59,7 +59,7 @@ class ManualDispatchedJob
     }
 
     /**
-     * @param string $name
+     * @param  string  $name
      * @return ManualDispatchedJob
      */
     public function setName(string $name): ManualDispatchedJob

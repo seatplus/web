@@ -49,7 +49,7 @@ class UserRessource extends JsonResource
                         'name' => $character->name,
                         'corporation' => $character->corporation,
                         'alliance' => $character->alliance,
-                        'scopes' => $character->refresh_token->scopes,
+                        'scopes' => $character->refresh_token?->scopes,
                     ];
                 }),
             'impersonating' => $this->when(session('impersonation_origin'), true),

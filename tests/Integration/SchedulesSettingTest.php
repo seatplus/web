@@ -1,94 +1,74 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Schedules;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class SchedulesSettingTest extends TestCase
-{
-    public function setUp(): void
-    {
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        parent::setUp();
+    test()->test_user->givePermissionTo($permission);
 
-        $permission = Permission::findOrCreate('superuser');
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        $this->test_user->givePermissionTo($permission);
+it('has scope settings', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('schedules.index'));
 
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
+});
 
-    /** @test */
-    public function it_has_scope_settings()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('schedules.index'));
+test('one can create a schedule', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('schedules.create'));
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
-    }
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesCreate'));
 
-    /** @test */
-    public function one_can_create_a_schedule()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('schedules.create'));
+    \Pest\Laravel\assertDatabaseMissing('schedules', ['job' => 'test-job']);
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesCreate'));
-
-        $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
-
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->postJson(route('schedules.updateOrCreate'), [
-                'job' => 'test-job',
-                'expression' => 'test-expression'
-            ]);
-
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
-
-        $this->assertDatabaseHas('schedules', ['job' => 'test-job']);
-    }
-
-    /** @test */
-    public function one_can_view_schedule_details()
-    {
-        $schedule = Schedules::create([
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->postJson(route('schedules.updateOrCreate'), [
             'job' => 'test-job',
             'expression' => 'test-expression'
         ]);
 
-        $this->assertDatabaseHas('schedules', ['job' => 'test-job']);
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
 
-        $response = $this->actingAs($this->test_user)
-            ->get(route('schedules.details', $schedule->id));
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
+});
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesDetails'));
-    }
+test('one can view schedule details', function () {
+    $schedule = Schedules::create([
+        'job' => 'test-job',
+        'expression' => 'test-expression'
+    ]);
 
-    /** @test */
-    public function one_can_delete_schedule()
-    {
-        $schedule = Schedules::create([
-            'job' => 'test-job',
-            'expression' => 'test-expression'
-        ]);
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
 
-        $this->assertDatabaseHas('schedules', ['job' => 'test-job']);
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('schedules.details', $schedule->id));
 
-        $response = $this->actingAs($this->test_user)
-            ->followingRedirects()
-            ->delete(route('schedules.delete', $schedule->id));
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesDetails'));
+});
 
-        $this->assertDatabaseMissing('schedules', ['job' => 'test-job']);
+test('one can delete schedule', function () {
+    $schedule = Schedules::create([
+        'job' => 'test-job',
+        'expression' => 'test-expression'
+    ]);
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
-    }
+    \Pest\Laravel\assertDatabaseHas('schedules', ['job' => 'test-job']);
 
-}
+    $response = test()->actingAs(test()->test_user)
+        ->followingRedirects()
+        ->delete(route('schedules.delete', $schedule->id));
+
+    \Pest\Laravel\assertDatabaseMissing('schedules', ['job' => 'test-job']);
+
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Schedules/SchedulesIndex'));
+});

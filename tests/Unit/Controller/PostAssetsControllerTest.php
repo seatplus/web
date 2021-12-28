@@ -1,22 +1,12 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Unit\Controller;
 
 
-use Seatplus\Web\Tests\TestCase;
+test('invoke', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('load.character.assets'));
 
-class PostAssetsControllerTest extends TestCase
-{
+    $response->assertOk();
 
-    /** @test */
-    public function invoke()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('load.character.assets'));
-
-        $response->assertOk();
-
-    }
-
-}
+});

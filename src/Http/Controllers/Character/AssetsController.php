@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
@@ -47,27 +48,16 @@ class AssetsController extends Controller
     public function getLocations(Request $request)
     {
         $query = WebAssetAlias::query()
-            ->with('location', 'location.locatable', 'assetable', 'type', 'type.group', 'content')
+            ->with('location')
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->select('location_id')
             ->groupBy('location_id')
-            ->orderBy('location_id', 'asc')
-            ->when($request->hasAny(['regions', 'systems']), function ($query) use ($request) {
-                $query->where(function ($query) use ($request) {
-                    if ($request->has('regions')) {
-                        $query->inRegion($request->query('regions'));
-                    }
+            ->orderBy('location_id', 'asc');
 
-                    if ($request->has('systems')) {
-                        $query->inSystems($request->query('systems'));
-                    }
-                });
-            });
+        $request->whenHas('search', fn ($term) => $query->search($term));
 
-        if ($request->has('search')) {
-            $query = $query->search($request->query('search'));
-        }
+        $this->handleWatchlist($query, $request);
 
         if ($request->has('withUnknownLocations')) {
             $query = $query->withUnknownLocations();
@@ -78,15 +68,15 @@ class AssetsController extends Controller
         );
     }
 
-    public function loadLocation(int $location_id)
+    public function loadLocation(int $location_id, Request $request)
     {
         $query = EveApiAsset::with('assetable', 'type', 'type.group', 'content')
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
 
-        if (request()->has('search')) {
-            $query = $query->search(request()->query('search'));
-        }
+        $request->whenHas('search', fn ($term) => $query->search($term));
+
+        $this->handleWatchlist($query, $request);
 
         return AssetResource::collection(
             $query->paginate()
@@ -96,7 +86,7 @@ class AssetsController extends Controller
     public function details(int $item_id)
     {
         $query = EveApiAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->whereIn('assetable_id', [...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()])
             ->where('item_id', $item_id);
 
         $item = AssetResource::collection($query->get());
@@ -104,5 +94,22 @@ class AssetsController extends Controller
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,
         ]);
+    }
+
+    private function handleWatchlist(Builder|\Illuminate\Database\Query\Builder $query, Request $request)
+    {
+        $query->where(function ($query) use ($request) {
+            $query->where(function ($query) use ($request) {
+                $request->whenHas('systems', fn ($system_ids) => $query->orWhere(fn ($query) => $query->inSystems($system_ids)));
+                $request->whenHas('regions', fn ($region_ids) => $query->orWhere(fn ($query) => $query->inRegion($region_ids)));
+            })
+                ->orWhere(fn (Builder $query) => $query
+                    ->when($request->hasAny(['types', 'groups', 'categories']), fn ($query) => $query->where(function ($query) use ($request) {
+                        $request->whenHas('types', fn ($type_ids) => $query->orWhere(fn ($query) => $query->ofTypes($type_ids)));
+                        $request->whenHas('groups', fn ($group_ids) => $query->orWhere(fn ($query) => $query->ofGroups($group_ids)));
+                        $request->whenHas('categories', fn ($category_ids) => $query->orWhere(fn ($query) => $query->ofCategories($category_ids)));
+                    }))
+                );
+        });
     }
 }

@@ -16,10 +16,31 @@
       <template #title>
         Select {{ type }}
       </template>
-      <EntitySelection
-        :dispatch-transfer-object="dispatchTransferObject"
-        :type="type"
-      />
+      <div class="relative overflow-y-auto">
+        <div class="z-10 sticky top-0">
+          <div class="ml-3 mb-3 relative rounded-md bg-white shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <SearchIcon
+                class="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            </div>
+            <input
+              id="search"
+              v-model="search"
+              type="search"
+              name="search"
+              class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+              :placeholder="`${type} name`"
+            >
+          </div>
+        </div>
+        <EntitySelection
+          :dispatch-transfer-object="dispatchTransferObject"
+          :type="type"
+          :search="search"
+        />
+      </div>
     </SlideOver>
   </teleport>
 </template>
@@ -28,9 +49,11 @@
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import SlideOver from "../../Layout/SlideOver";
 import EntitySelection from "./EntitySelection";
+import { SearchIcon } from '@heroicons/vue/solid';
+
 export default {
     name: "EntitySelectionButton",
-    components: {EntitySelection, SlideOver, HeaderButton},
+    components: {EntitySelection, SlideOver, HeaderButton, SearchIcon},
     props: {
         type: {
             type: String,
@@ -39,7 +62,8 @@ export default {
     },
     data() {
         return {
-            open: false
+            open: false,
+            search: ''
         }
     },
     computed: {

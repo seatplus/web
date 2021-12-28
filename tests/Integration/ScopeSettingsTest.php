@@ -1,154 +1,141 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\Assert;
-use Mockery;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\Esi\Jobs\Corporation\CorporationInfoAction;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class ScopeSettingsTest extends TestCase
-{
-    public function setUp(): void
-    {
+beforeEach(function () {
+    $permission = Permission::findOrCreate('superuser');
 
-        parent::setUp();
+    test()->test_user->givePermissionTo($permission);
 
-        $permission = Permission::findOrCreate('superuser');
+    // now re-register all the roles and permissions
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        $this->test_user->givePermissionTo($permission);
-
-        // now re-register all the roles and permissions
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
-
-    /** @test */
-    public function it_has_scope_settings()
-    {
-        $response = $this->actingAs($this->test_user)
-            ->get(route('settings.scopes'));
+it('has scope settings', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('settings.scopes'));
 
 
-        $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
-    }
+    $response->assertInertia( fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
+});
 
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function one_can_create_sso_setting()
-    {
-        $mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn(null);
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
+test('one can create sso setting', function () {
+    
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
-        $this->assertDatabaseMissing('sso_scopes',[
-            'morphable_id' => 1184675423
-        ]);
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+        json_encode($corporation->attributesToArray()), [], 11, 200);
 
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+        ->andReturn($response);
 
-        $response = $this->actingAs($this->test_user)
-            ->post(route('create.scopes'),
-                [
-                    'selectedEntities' => [
-                        [
-                            'corporation_id' => 1184675423,
-                            'id' =>1184675423,
-                            'name' => "Amok.",
-                            'category' => 'corporation'
-                        ],
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->toBeNull();
+
+    $response = test()->actingAs(test()->test_user)
+        ->post(route('create.scopes'),
+            [
+                'selectedEntities' => [
+                    [
+                        'corporation_id' => $corporation->corporation_id,
+                        'id' =>$corporation->corporation_id,
+                        'name' => "Amok.",
+                        'type' => 'corporation'
                     ],
-                    'selectedScopes' => [
-                        "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+                ],
+                'selectedScopes' => [
+                    "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+                ],
+                'type' => 'default'
+            ]
+        );
+
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->not()->toBeNull()
+        ->toBeInstanceOf(SsoScopes::class);
+
+});
+
+/**
+ * @runInSeparateProcess
+ * @preserveGlobalState disabled
+ */
+test('one can delete sso setting', function () {
+
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
+
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+        json_encode($corporation->attributesToArray()), [], 11, 200);
+
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+        ->andReturn($response);
+
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->toBeNull();
+
+    Bus::fake();
+
+    $response = test()->actingAs(test()->test_user)
+        ->post(route('create.scopes'),
+            [
+                'selectedEntities' => [
+                    [
+                        'corporation_id' => $corporation->corporation_id,
+                        'id' =>$corporation->corporation_id,
+                        'name' => "Amok.",
+                        'type' => 'corporation'
                     ],
-                    'type' => 'default'
-                ]
-            );
+                ],
+                'selectedScopes' => [
+                    "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
+                ],
+                'type' => 'default'
+            ]
+        );
 
-        $this->assertDatabaseHas('sso_scopes',[
-            'morphable_id' => 1184675423
-        ]);
-    }
+    Bus::assertDispatched(CorporationInfoJob::class);
 
-    /**
-     * @test
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
-     */
-    public function one_can_delete_sso_setting()
-    {
-        /*$mock = Mockery::mock('overload:' . CorporationInfoAction::class);
-        $mock->shouldReceive('execute')
-            ->once()
-            ->andReturn(null);*/
+    /*\Pest\Laravel\assertDatabaseHas('sso_scopes',[
+        'morphable_id' => $corporation->corporation_id
+    ]);*/
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
+        ->not()->toBeNull()
+        ->toBeInstanceOf(SsoScopes::class);
 
-        $this->assertDatabaseMissing('sso_scopes',[
-            'morphable_id' => 1184675423
-        ]);
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('delete.scopes', $corporation->corporation_id));
 
-        Bus::fake();
+    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())->toBeNull();
 
-        $response = $this->actingAs($this->test_user)
-            ->post(route('create.scopes'),
-                [
-                    'selectedEntities' => [
-                        [
-                            'corporation_id' => 1184675423,
-                            'id' =>1184675423,
-                            'name' => "Amok.",
-                            'category' => 'corporation'
-                        ],
-                    ],
-                    'selectedScopes' => [
-                        "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
-                    ],
-                    'type' => 'default'
-                ]
-            );
 
-        Bus::assertDispatched(CorporationInfoJob::class);
+});
 
-        $this->assertDatabaseHas('sso_scopes',[
-            'morphable_id' => 1184675423
-        ]);
+test('one can create and delete global sso setting', function () {
 
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('delete.scopes', 1184675423));
+    expect(setting('global_sso_scopes'))->toBeNull();
 
-        $this->assertDatabaseMissing('sso_scopes',[
-            'morphable_id' => 1184675423
-        ]);
-    }
+    $response = test()->actingAs(test()->test_user)
+        ->post(route('create.scopes'),
+            [
+                'selectedScopes' => [
+                    "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
+                ],
+                'type' => 'global'
+            ]
+        );
 
-    /** @test */
-    public function one_can_create_and_delete_global_sso_setting()
-    {
+    test()->assertNotNull(SsoScopes::global()->first());
 
-        $this->assertNull(setting('global_sso_scopes'));
-
-        $response = $this->actingAs($this->test_user)
-            ->post(route('create.scopes'),
-                [
-                    'selectedScopes' => [
-                        "esi-assets.read_assets.v1,esi-universe.read_structures.v1"
-                    ],
-                    'type' => 'global'
-                ]
-            );
-
-        $this->assertNotNull(SsoScopes::global()->first());
-
-        $response = $this->actingAs($this->test_user)
-            ->delete(route('delete.scopes', null));
-    }
-
-}
+    $response = test()->actingAs(test()->test_user)
+        ->delete(route('delete.scopes', null));
+});

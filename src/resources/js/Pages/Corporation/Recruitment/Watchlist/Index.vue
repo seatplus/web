@@ -33,6 +33,7 @@
         </div>
       </div>
 
+
       <template #button>
         <button
           :disabled="form.processing"
@@ -44,55 +45,51 @@
         </button>
       </template>
     </TwoColumnCardWithSubmitAction>
+    <ItemsWatchlist
+      :corporation-id="corporationId"
+      :items="watched.items"
+    />
   </div>
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
 import PageHeader from "@/Shared/Layout/PageHeader";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import Autosuggest from "@/Shared/Components/Autosuggest";
 import Multiselect from "@/Shared/Components/Multiselect";
+import ItemsWatchlist from "@/Pages/Corporation/Recruitment/Watchlist/ItemsWatchlist";
 
 export default {
-  name: "Index",
-  components: {Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
-  props: {
-    corporation_id: {
-      required: true,
-      type: Number
-    },
-    watched_systems: {
-      required: true,
-      type: Array
-    },
-    watched_regions: {
-      required: true,
-      type: Array
-    },
-  },
-  data() {
-    return {
-      breadcrumbs: [
-        {
-          name: 'Corporation Recruitment',
-          route: this.$route('corporation.recruitment')
+    name: "Index",
+    components: {ItemsWatchlist, Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
+    props: {
+        corporationId: {
+            required: true,
+            type: Number
+        },
+        watched: {
+            required: true,
+            type: Object
         }
-      ],
-      form: this.$inertia.form({
-        systems: this.watched_systems,
-        regions: this.watched_regions
-      }),
+    },
+    data() {
+        return {
+            breadcrumbs: [
+                {
+                    name: 'Corporation Recruitment',
+                    route: this.$route('corporation.recruitment')
+                }
+            ],
+            form: this.$inertia.form({
+                systems: this.watched.systems,
+                regions: this.watched.regions
+            }),
+        }
+    },
+    methods: {
+        submit() {
+            this.$inertia.post(this.$route('update.watchlist', this.corporationId), this.form)
+        }
     }
-  },
-  watch: {
-    selected_system:Autosuggest.vue
-  },
-  methods: {
-    submit() {
-      this.$inertia.post(this.$route('update.watchlist', this.corporation_id), this.form)
-    }
-  }
 }
 </script>
 

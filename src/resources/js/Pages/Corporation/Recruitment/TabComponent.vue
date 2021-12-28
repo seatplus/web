@@ -39,15 +39,9 @@
       v-if="isActive('Assets')"
       class="space-y-4"
     >
-      <AssetsComponent
-        :parameters="unknown_asset_params"
-        context="recruitment"
-        :compact="true"
-      />
-      <AssetsComponent
-        :parameters="asset_params"
-        context="recruitment"
-        :compact="true"
+      <AssetTab
+        :character-ids="characterIds"
+        :watchlist="watchlist"
       />
     </div>
     <div
@@ -84,7 +78,7 @@
       v-if="isActive('Contacts')"
       class="space-y-4"
     >
-      <CharacterContactPanel
+      <CharacterContactsComponent
         v-for="character in recruit.characters"
         :key="'character.contact:' + character.character_id"
         :character="character"
@@ -123,7 +117,6 @@
 </template>
 
 <script>
-import CharacterContactPanel from "@/Shared/Components/CharacterContactPanel";
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
@@ -132,19 +125,25 @@ import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/Wallet
 import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
 import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
+import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
+import AssetTab from "@/Pages/Corporation/Recruitment/Tabs/AssetTab";
 
 const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
 
 export default {
     name: "TabComponent",
     components: {
+        AssetTab,
+        BarWithUnderline,
+        CharacterContactsComponent,
         MobileMailList,
         SkillsComponent,
         CorporationHistoryComponent,
         WalletJournalBalanceChart, ContractComponent,
         AssetsComponent,
         WalletJournalComponent,
-        WalletTransactionComponent, CharacterContactPanel},
+        WalletTransactionComponent},
     props: {
         recruit: {
             type: Object,
@@ -174,8 +173,6 @@ export default {
         asset_params() {
             return {
                 character_ids: _.map(this.recruit.characters, character => character.character_id),
-                regions: this.watchlist.regions,
-                systems: this.watchlist.systems
             }
         },
         unknown_asset_params() {

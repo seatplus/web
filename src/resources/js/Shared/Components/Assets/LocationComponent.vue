@@ -29,10 +29,18 @@
       </div>
     </template>
     <template #elements>
-      <ItemList
-        :items="results"
-        :compact="compact"
-      />
+      <CompleteLoadingHelper
+        :key="Object.values(enrichedQueryParameters).join(',')"
+        route="location.assets"
+        :params="enrichedQueryParameters"
+        @results="(results) => rawResults = results"
+      >
+        <ItemList
+          :key="items.length"
+          :items="items"
+          :compact="compact"
+        />
+      </CompleteLoadingHelper>
     </template>
   </WideLists>
   <teleport to="#destination">
@@ -48,12 +56,13 @@ import WideLists from "../../WideLists";
 import LocationName from "./LocationName";
 import ItemList from "./ItemList";
 import AddManualLocationModal from "./AddManualLocationModal";
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {onBeforeMount, ref} from "vue";
+import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper";
+import {computed, ref} from "vue";
+import {prefix} from "metric-prefix";
 
 export default {
     name: "LocationComponent",
-    components: {AddManualLocationModal, ItemList, LocationName, WideLists},
+    components: {CompleteLoadingHelper, AddManualLocationModal, ItemList, LocationName, WideLists},
     props: {
         location: {
             required: true,
@@ -76,28 +85,33 @@ export default {
     },
     setup(props) {
 
-        let enrichedQueryParameters = _.merge({ location_id: props.location.location_id }, props.queryParameters)
+        const enrichedQueryParameters = _.merge({ location_id: props.location.location_id }, props.queryParameters)
+        const rawResults = ref([])
 
-        return useLoadCompleteResource('location.assets', enrichedQueryParameters )
+        const volume = computed(() => {
+            let sum = _.sumBy(rawResults.value, (object) => _.get(object , 'type.volume', 0) * _.get(object, 'quantity', 0))
+
+            return prefix(sum, { precision: 3, unit: 'm³'})
+        })
+
+        const numberOfItems = computed(() => _.size(rawResults.value))
+
+        const items = computed(() => rawResults.value)
+
+
+        return {
+            enrichedQueryParameters,
+            rawResults,
+            volume,
+            items,
+            numberOfItems
+        }
     },
     data() {
         return {
             openModal: false
         }
     },
-    computed: {
-        volume() {
-
-            let sum = _.sumBy(this.results, (object) => _.get(object , 'type.volume', 0) * _.get(object, 'quantity', 0))
-
-            const  { prefix } = require('metric-prefix')
-
-            return prefix(sum, { precision: 3, unit: 'm³'})
-        },
-        numberOfItems() {
-            return _.size(this.results)
-        }
-    }
 }
 </script>
 

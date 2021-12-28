@@ -63,9 +63,13 @@ class ContractsController extends Controller
 
     public function getContractDetails(int $character_id, int $contract_id)
     {
-        $query = Contract::whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
+        $query = Contract::query()->whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
             ->whereContractId($contract_id)
             ->with('items', 'items.type', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
+
+        if (request()->header('X-Modal', false)) {
+            return $query->get()->toJson();
+        }
 
         return inertia('Character/Contract/ContractDetails', [
             'contract' => $query->first(),

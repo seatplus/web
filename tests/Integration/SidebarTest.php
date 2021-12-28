@@ -1,146 +1,124 @@
 <?php
 
 
-namespace Seatplus\Web\Tests\Integration;
-
-
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterRole;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Seatplus\Web\Tests\TestCase;
 use Spatie\Permission\PermissionRegistrar;
 
-class SidebarTest extends TestCase
-{
-    public function setUp(): void
-    {
+beforeEach(function () {
+    //Permission::findOrCreate('superuser');
+    test()->test_character->roles()->update(['roles' => ['']]);
+    app()->make(PermissionRegistrar::class)->registerPermissions();
+});
 
-        parent::setUp();
+test('user without superuser does not see access control', function () {
 
-        //Permission::findOrCreate('superuser');
-        $this->test_character->roles()->update(['roles' => ['']]);
-        $this->app->make(PermissionRegistrar::class)->registerPermissions();
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function user_without_superuser_does_not_see_access_control()
-    {
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->actingAs($this->test_user);
+    expect(isset($sidebar['Access Control']))->toBeFalse();
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user with superuser does see access control', function () {
 
-        $this->assertFalse(isset($sidebar['Access Control']));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function user_with_superuser_does_see_access_control()
-    {
+    test()->test_user->givePermissionTo('superuser');
 
-        $this->actingAs($this->test_user);
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->test_user->givePermissionTo('superuser');
+    expect(isset($sidebar['Access Control']))->toBeTrue();
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user with view access control does see access control', function () {
 
-        $this->assertTrue(isset($sidebar['Access Control']));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function user_with_view_access_control_does_see_access_control()
-    {
+    Permission::create(['name' => 'view access control']);
 
-        $this->actingAs($this->test_user);
+    test()->test_user->givePermissionTo('view access control');
 
-        Permission::create(['name' => 'view access control']);
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->test_user->givePermissionTo('view access control');
+    expect(isset($sidebar['Access Control']))->toBeTrue();
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user without view access control does see access control', function () {
 
-        $this->assertTrue(isset($sidebar['Access Control']));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function user_without_view_access_control_does_see_access_control()
-    {
+    Permission::create(['name' => 'view access control']);
 
-        $this->actingAs($this->test_user);
+    //test()->test_user->givePermissionTo('view access control');
 
-        Permission::create(['name' => 'view access control']);
+    $sidebar = (new SidebarEntries)->filter();
 
-        //$this->test_user->givePermissionTo('view access control');
+    expect(test()->test_user->can('view access control'))->toBeFalse();
+    expect(isset($sidebar['Access Control']))->toBeFalse();
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user with director role can see membertracking', function () {
 
-        $this->assertFalse($this->test_user->can('view access control'));
-        $this->assertFalse(isset($sidebar['Access Control']));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function user_with_director_role_can_see_membertracking()
-    {
+    $character_role = test()->test_character->roles;
+    $character_role->roles = ['Director'];
+    $character_role->save();
 
-        $this->actingAs($this->test_user);
+    expect($character_role->hasRole('roles', 'Director'))->toBeTrue();
 
-        $character_role = $this->test_character->roles;
-        $character_role->roles = ['Director'];
-        $character_role->save();
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertTrue($character_role->hasRole('roles', 'Director'));
+    expect(isset($sidebar['corporation']))->toBeTrue();
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user with accountant role can see corporation wallet', function () {
 
-        $this->assertTrue(isset($sidebar['corporation']));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function userWithAccountantRoleCanSeeCorporationWallet()
-    {
+    // First check that wallets are not visable
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->actingAs($this->test_user);
+    test()->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
 
-        // First check that wallets are not visable
-        $sidebar = (new SidebarEntries)->filter();
+    // Now give user necessairy role
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Accountant']
+    ]);
 
-        $this->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Accountant'))->toBeTrue();
+    expect(test()->test_character->roles->hasRole('roles', 'Director'))->toBeFalse();
 
-        // Now give user necessairy role
-        $this->test_character->roles()->update(['roles' => ['Accountant']]);
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertTrue($this->test_character->refresh()->roles->hasRole('roles', 'Accountant'));
-        $this->assertFalse($this->test_character->roles->hasRole('roles', 'Director'));
+    test()->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
+});
 
-        $sidebar = (new SidebarEntries)->filter();
+test('user with director role can see corporation wallet', function () {
 
-        $this->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
-    }
+    test()->actingAs(test()->test_user);
 
-    /** @test */
-    public function userWithDirectorRoleCanSeeCorporationWallet()
-    {
+    // First check that wallets are not visable
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->actingAs($this->test_user);
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeFalse();
 
-        // First check that wallets are not visable
-        $sidebar = (new SidebarEntries)->filter();
+    test()->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
 
-        $this->assertFalse($this->test_character->refresh()->roles->hasRole('roles', 'Director'));
+    // Now give user necessairy role
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+        'character_id' => test()->test_character->character_id
+    ], [
+        'roles' => ['Director']
+    ]);
 
-        $this->assertFalse(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name', [])));
+    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeTrue();
 
-        // Now give user necessairy role
-        $this->test_character->roles()->update(['roles' => ['Director']]);
+    $sidebar = (new SidebarEntries)->filter();
 
-        $this->assertTrue($this->test_character->refresh()->roles->hasRole('roles', 'Director'));
-
-        $sidebar = (new SidebarEntries)->filter();
-
-        $this->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
-    }
-
-
-
-}
+    test()->assertTrue(in_array('Wallets', data_get($sidebar,'corporation.entries.*.name')));
+});

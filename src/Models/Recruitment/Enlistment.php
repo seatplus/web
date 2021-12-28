@@ -27,8 +27,11 @@
 namespace Seatplus\Web\Models\Recruitment;
 
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Eveapi\Models\Universe\Type;
 
 class Enlistment extends Enlistments
 {
@@ -40,5 +43,20 @@ class Enlistment extends Enlistments
     public function regions()
     {
         return $this->morphedByMany(Region::class, 'watchlistable', null, 'corporation_id');
+    }
+
+    public function types()
+    {
+        return $this->morphedByMany(Type::class, 'watchlistable', null, 'corporation_id');
+    }
+
+    public function groups()
+    {
+        return $this->morphedByMany(Group::class, 'watchlistable', null, 'corporation_id');
+    }
+
+    public function categories()
+    {
+        return $this->morphedByMany(Category::class, 'watchlistable', null, 'corporation_id');
     }
 }

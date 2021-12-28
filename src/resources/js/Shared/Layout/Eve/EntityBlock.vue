@@ -15,7 +15,7 @@
         v-if="entity.corporation || entity.alliance"
         class="text-sm text-gray-500 truncate"
       >
-        {{ corporationName }}  {{ hasAlliance() ? '| ' + allianceName : '' }}
+        {{ subText }}
       </p>
     </div>
   </div>
@@ -43,12 +43,6 @@ export default {
         }
     },
     computed: {
-        corporationName() {
-            return _.get(this.entity, 'corporation.name', '')
-        },
-        allianceName() {
-            return _.get(this.entity, 'alliance.name', '')
-        },
         name() {
             return _.get(this.entity, 'name', 'missing name')
         },
@@ -57,6 +51,15 @@ export default {
         },
         name_class() {
             return `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
+        },
+        subText() {
+
+            let names = _.compact([
+                _.get(this.entity, 'corporation.name'),
+                _.get(this.entity, 'alliance.name')
+            ])
+
+            return _.join(names, ' | ')
         }
     },
     methods: {

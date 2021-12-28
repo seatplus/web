@@ -41,12 +41,12 @@ class DispatchCorporationOrAllianceInfoJob
     private function handleAllianceInfo(int $entity_id)
     {
         $job_container = new JobContainer(['alliance_id' => $entity_id]);
-        AllianceInfoJob::dispatchNow($job_container);
+        AllianceInfoJob::dispatchSync($job_container);
     }
 
     private function handleCorporationInfo(int $entity_id)
     {
         $job_container = new JobContainer(['corporation_id' => $entity_id]);
-        CorporationInfoJob::dispatchNow($job_container);
+        CorporationInfoJob::dispatchSync($job_container);
     }
 }

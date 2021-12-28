@@ -1,26 +1,33 @@
 <template>
   <div>
-    <div class="space-y-2 sm:space-y-6">
-      <LocationComponent
-        v-for="location in result"
-        :key="location.location_id"
-        :location="location"
-        :context="context"
-        :compact="compact"
-        :query-parameters="parameters"
-      />
-    </div>
-    <div ref="scrollComponent"></div>
+    <InfiniteLoadingHelper
+      :key="loadingHelperKey"
+      :params="parameters"
+      route="load.character.assets"
+      @result="(results) => locations = results"
+    >
+      <div class="space-y-2 sm:space-y-6">
+        <LocationComponent
+          v-for="location in locations"
+          :key="location.location_id"
+          :query-parameters="parameters"
+          :location="location"
+          :context="context"
+          :compact="compact"
+        />
+      </div>
+    </InfiniteLoadingHelper>
   </div>
 </template>
 
 <script>
 import LocationComponent from "./LocationComponent";
-import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import { ref, watch } from "vue";
 export default {
     name: "AssetsComponent",
-    components: { LocationComponent,
-        //InfiniteLoading
+    components: {
+        InfiniteLoadingHelper, LocationComponent,
     },
     props: {
         parameters: {
@@ -40,7 +47,17 @@ export default {
     },
     setup(props) {
 
-        return useInfinityScrolling('load.character.assets', props.parameters)
+        const locations = ref([])
+        const loadingHelperKey = ref(+new Date() )
+
+        const debounce = _.debounce(() => loadingHelperKey.value++ , 350)
+
+        watch(() => props.parameters, () => debounce())
+
+        return {
+            locations,
+            loadingHelperKey
+        }
     },
     data() {
         return {

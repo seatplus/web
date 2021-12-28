@@ -27,12 +27,10 @@
 namespace Seatplus\Web\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Inertia\Inertia;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
@@ -40,13 +38,7 @@ class HomeController extends Controller
     public function home()
     {
         return Inertia::render('Dashboard/Index', [
-            'characters' => CharacterInfo::with('corporation', 'alliance', 'application')
-                ->addSelect([
-                    'balance' => WalletJournal::select('balance')
-                        ->whereColumn('wallet_journable_id', 'character_infos.character_id')
-                        ->orderByDesc('date')
-                        ->limit(1),
-                ])
+            'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance', 'batch_update')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
         ]);
@@ -59,16 +51,18 @@ class HomeController extends Controller
 
     public function getOwnApplications(int $corporation_id)
     {
-        return Application::with([
-            'applicationable' => fn (MorphTo $morph_to) => $morph_to
-                ->constrain([
-                    User::class => fn (Builder $query) => $query->where('id', auth()->user()->getAuthIdentifier()),
-                    CharacterInfo::class => fn (Builder $query) => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
-                ])
-                ->morphWith([
-                    User::class => ['characters'],
-                ]),
-        ])->whereCorporationId($corporation_id)
+        return Application::whereHasMorph(
+            'applicationable',
+            [User::class, CharacterInfo::class],
+            function (Builder $query, $type) {
+                match ($type) {
+                    User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
+                };
+
+                $query->where('status', 'open');
+            }
+        )->whereCorporationId($corporation_id)
             ->paginate();
     }
 }

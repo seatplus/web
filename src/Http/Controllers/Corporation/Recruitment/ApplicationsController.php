@@ -28,14 +28,17 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\GetOwnedIds;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
-use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class ApplicationsController extends Controller
 {
@@ -78,18 +81,14 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getUserApplication(User $recruit)
+    public function getUserApplication(User $recruit, WatchlistArrayAction $action)
     {
         $corporation_id = $recruit->application->corporation->corporation_id;
-        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit->loadMissing('main_character', 'characters'),
+            'recruit' => $recruit->loadMissing('main_character', 'characters', 'characters.batch_update'),
             'target_corporation' => $recruit->application->corporation,
-            'watchlist' => [
-                'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id'),
-            ],
+            'watchlist' => $action->execute($corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
@@ -109,9 +108,9 @@ class ApplicationsController extends Controller
         return redirect()->route('corporation.recruitment')->with('success', sprintf('User %s', $request->get('decision')));
     }
 
-    public function getCharacterApplication(int $character_id)
+    public function getCharacterApplication(int $character_id, WatchlistArrayAction $action)
     {
-        $character = CharacterInfo::with('application')->find($character_id);
+        $character = CharacterInfo::with('application', 'batch_update')->find($character_id);
 
         $recruit = collect([
             'main_character' => $character,
@@ -119,15 +118,11 @@ class ApplicationsController extends Controller
         ]);
 
         $corporation_id = $character->application->corporation->corporation_id;
-        $enlistment = Enlistment::with('systems', 'regions')->find($corporation_id);
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit,
             'target_corporation' => $character->application->corporation,
-            'watchlist' => [
-                'systems' => $enlistment->systems?->pluck('system_id'),
-                'regions' => $enlistment->regions?->pluck('region_id'),
-            ],
+            'watchlist' => $action->execute($corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
@@ -145,5 +140,24 @@ class ApplicationsController extends Controller
         ]);
 
         return redirect()->route('corporation.recruitment')->with('success', sprintf('Character %s', $request->get('decision')));
+    }
+
+    public function dispatchBatchUpdate(int $character_id)
+    {
+        $refresh_token = RefreshToken::find($character_id);
+
+        abort_if(is_null($refresh_token), 500, 'refresh_token could not be found');
+
+        UpdateCharacter::dispatchAfterResponse($refresh_token);
+
+        return response('success');
+    }
+
+    public function getBatchUpdate(int $character_id)
+    {
+        return BatchUpdate::query()
+            ->where('batchable_id', $character_id)
+            ->first()
+            ->toJson();
     }
 }

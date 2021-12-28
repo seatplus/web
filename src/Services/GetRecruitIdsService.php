@@ -40,20 +40,31 @@ class GetRecruitIdsService
             return [];
         }
 
-        return Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
-            ->whereStatus('open')
-            ->with([
-                'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
-                    User::class => ['characters'],
-                ]),
-            ])
-            ->get()
-            ->map(fn ($recruit) => $recruit->applicationable->characters
-                ? $recruit->applicationable->characters->pluck('character_id')
-                : $recruit->applicationable->character_id
-            )
-            ->flatten()
-            ->unique()
-            ->toArray();
+        $user_id = auth()->user()->getAuthIdentifier();
+        $cache_key = "${recruiter_permission}:${user_id}";
+
+        $recruit_ids = cache($cache_key);
+
+        if (! $recruit_ids) {
+            $recruit_ids = Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
+                ->whereStatus('open')
+                ->with([
+                    'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
+                        User::class => ['characters'],
+                    ]),
+                ])
+                ->get()
+                ->map(fn ($recruit) => $recruit->applicationable->characters
+                    ? $recruit->applicationable->characters->pluck('character_id')
+                    : $recruit->applicationable->character_id
+                )
+                ->flatten()
+                ->unique()
+                ->toArray();
+
+            cache([$cache_key => $recruit_ids], now()->addMinutes(15));
+        }
+
+        return $recruit_ids;
     }
 }

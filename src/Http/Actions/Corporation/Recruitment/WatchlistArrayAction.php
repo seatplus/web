@@ -24,30 +24,26 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Http\Actions\Corporation\Recruitment;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Auth\Services\BuildCharacterScopesArray;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
-class CharacterComplianceResource extends JsonResource
+class WatchlistArrayAction
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function execute($corporation_id): array
     {
-        $filter = $request->query('filter', false);
+        $enlistment = Enlistment::with('systems', 'regions', 'types', 'groups', 'categories')->find($corporation_id);
 
-        $character_scopes_array = BuildCharacterScopesArray::get(CharacterInfo::find($this->character_id));
+        if (is_null($enlistment)) {
+            return [];
+        }
 
-        return $filter
-            ? $filter === 'renegades'
-                ? (empty(collect($character_scopes_array)->get('missing_scopes')) ? [] : $character_scopes_array)
-                : (! empty(collect($character_scopes_array)->get('missing_scopes')) ? [] : $character_scopes_array)
-            : $character_scopes_array;
+        return [
+            'systems' => $enlistment->systems?->pluck('system_id'),
+            'regions' => $enlistment->regions?->pluck('region_id'),
+            'types' => $enlistment->types?->pluck('type_id'),
+            'groups' => $enlistment->groups?->pluck('group_id'),
+            'categories' => $enlistment->categories?->pluck('category_id'),
+        ];
     }
 }

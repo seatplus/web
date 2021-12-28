@@ -134,8 +134,7 @@ export default {
 
         const store = function () {
 
-            return form.value
-                .transform((data) => ({
+            return form.transform((data) => ({
                     ...data,
                     affiliations: selectedAffiliations.value,
             })).post(route('acl.update', props.role.id))
@@ -144,7 +143,7 @@ export default {
 
         const remove = function () {
 
-            this.$inertia.delete(this.$route('acl.delete', this.role.id), {
+            this.$inertia.delete(route('acl.delete', props.role.id), {
                 replace: false,
                 preserveState: false,
                 preserveScroll: false,

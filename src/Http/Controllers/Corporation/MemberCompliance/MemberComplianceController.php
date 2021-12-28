@@ -28,11 +28,10 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberCompliance;
 
 use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Web\Http\Resources\CharacterComplianceResource;
-use Seatplus\Web\Http\Resources\UserComplianceResource;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
+use Seatplus\Web\Http\Resources\CorporationComplianceResource;
 
 class MemberComplianceController
 {
@@ -49,50 +48,51 @@ class MemberComplianceController
 
         return inertia('Corporation/MemberCompliance/MemberCompliance', [
             'corporations' => $affiliated_corporations,
+            'canReview' => auth()->user()->can('member compliance: review user'),
         ]);
     }
 
-    public function getCharacterCompliance(int $corporation_id)
+    public function getCorporationCompliance(int $corporation_id, string $type)
     {
-        $members = CharacterInfo::whereHas('corporation', fn (Builder $query) => $query
-            ->where('corporation_infos.corporation_id', $corporation_id)
-            ->whereHas('ssoScopes', fn (Builder $query) => $query->whereType('default'))
-        );
+        $isCharacterType = $type === 'default';
+        $search = request()->get('search');
 
-        return CharacterComplianceResource::collection($members->paginate());
+        $users = User::query()
+            ->when($search, fn (Builder $query) => $query->whereHas('characters', fn (Builder $query) => $query->where('character_infos.name', 'like', "%${search}%")))
+            ->whereHas('characters.corporation', fn (Builder $query) => $query
+                ->where('corporation_infos.corporation_id', $corporation_id))
+            ->with([
+                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'main_character',
+                'characters.corporation.ssoScopes',
+                'characters.alliance.ssoScopes',
+                'characters.application.corporation.ssoScopes',
+                'characters.application.corporation.alliance.ssoScopes',
+                'characters.refresh_token',
+                'application.corporation.ssoScopes',
+                'application.corporation.alliance.ssoScopes',
+            ]);
+
+        return CorporationComplianceResource::collection($users->paginate());
     }
 
-    public function getUserCompliance(int $corporation_id)
+    public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action)
     {
-        $users = $this->getUsersBuilder($corporation_id);
+        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->pluck('type')->first();
+        $isCharacterType = $type === 'default';
 
-        return UserComplianceResource::collection($users->paginate());
-    }
+        $member = $user
+            ->loadMissing([
+                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'main_character',
+            ]);
 
-    public function getMissingCharacters(int $corporation_id)
-    {
-        $users = $this->getUsersBuilder($corporation_id);
-
-        $known_ids = $users->cursor()
-            ->map(fn ($user) => $user->characters)
-            ->map(fn ($character) => $character->pluck('character_id'))
-            ->flatten()
-            ->unique()
-            ->all();
-
-        $members = CharacterInfo::whereHas('corporation', fn (Builder $query) => $query
-            ->where('corporation_infos.corporation_id', $corporation_id)
-            ->whereHas('ssoScopes', fn (Builder $query) => $query->whereType('user')))
-            ->whereNotIn('character_id', $known_ids);
-
-        return CharacterComplianceResource::collection($members->paginate());
-    }
-
-    private function getUsersBuilder(int $corporation_id): Builder
-    {
-        return User::whereHas('characters.corporation', fn (Builder $query) => $query
-            ->where('corporation_infos.corporation_id', $corporation_id)
-            ->whereHas('ssoScopes', fn (Builder $query) => $query->whereType('user'))
-        );
+        return inertia('Corporation/MemberCompliance/ReviewUser', [
+            'member' => $member,
+            'targetCorporation' => CorporationInfo::find($corporation_id),
+            'watchlist' => $action->execute($corporation_id),
+        ]);
     }
 }

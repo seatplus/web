@@ -20,7 +20,7 @@
               Balance
             </template>
             <template #description>
-              ISK {{ character.balance.toLocaleString() }}
+              ISK {{ character.balance.balance.toLocaleString() }}
             </template>
           </LeftAlignedData>
           <LeftAlignedData>
@@ -29,6 +29,21 @@
             </template>
             <template #description>
               <Time :timestamp="character.birthday" />
+            </template>
+          </LeftAlignedData>
+          <LeftAlignedData v-if="character.batch_update">
+            <template #title>
+              {{ character.batch_update.finished_at ? 'Last update' : 'Update started at' }}
+            </template>
+            <template #description>
+              <Time
+                v-if="character.batch_update.finished_at"
+                :timestamp="character.batch_update.finished_at"
+              />
+              <Time
+                v-else
+                :timestamp="character.batch_update.started_at"
+              />
             </template>
           </LeftAlignedData>
         </LeftAligned>
@@ -62,15 +77,13 @@
 </template>
 
 <script>
-import CharacterApplication from "./CharacterApplication"
-import EveImage from "@/Shared/EveImage"
 import LeftAligned from "../../Shared/Layout/DataDisplay/LeftAligned";
 import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
 import LeftAlignedData from "../../Shared/Layout/DataDisplay/LeftAlignedData";
 import Time from "../../Shared/Time";
 export default {
     name: "Characters",
-    components: {Time, LeftAlignedData, EntityBlock, LeftAligned, EveImage, CharacterApplication},
+    components: {Time, LeftAlignedData, EntityBlock, LeftAligned},
     props: {
         characters: {
             type: Array

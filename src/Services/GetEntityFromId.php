@@ -152,20 +152,20 @@ class GetEntityFromId
     {
         $unknown_ids = collect();
 
-        if (is_null($character_affiliation->character) && $character_affiliation->character_id !== $this->id) {
+        if (is_null($character_affiliation->character)) {
             $unknown_ids->push($character_affiliation->character_id);
         }
 
-        if (is_null($character_affiliation->corporation) && $character_affiliation->corporation_id !== $this->id) {
+        if (is_null($character_affiliation->corporation)) {
             $unknown_ids->push($character_affiliation->corporation_id);
         }
 
-        if (is_null($character_affiliation->alliance) && $character_affiliation->alliance_id !== $this->id) {
+        if (is_null($character_affiliation->alliance)) {
             $unknown_ids->push($character_affiliation->alliance_id);
         }
 
         if ($unknown_ids->isNotEmpty()) {
-            $this->convertIdsToNames($unknown_ids->toArray());
+            $this->convertIdsToNames($unknown_ids->filter()->unique()->toArray());
         }
     }
 
