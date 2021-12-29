@@ -21,7 +21,7 @@ it('calls alliance info action', function () {
                 'alliance_id' => 1354830081,
                 'id' =>1354830081,
                 'name' => "Goonswarm Federation",
-                'category' => 'alliance'
+                'type' => 'alliance'
             ]
         ],
         'selectedScopes' => [
@@ -80,7 +80,7 @@ it('creates sso settings', function () {
                 'corporation_id' => 1184675423,
                 'id' =>1184675423,
                 'name' => "Amok.",
-                'category' => 'corporation'
+                'type' => 'corporation'
             ],
         ],
         'selectedScopes' => [

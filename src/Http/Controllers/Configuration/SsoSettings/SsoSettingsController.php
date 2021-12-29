@@ -58,9 +58,6 @@ class SsoSettingsController extends Controller
 
     public function index(?int $entity_id = null)
     {
-
-        //$entity = SsoScopes::where('morphable_id', $entity_id)->with('morphable')->first();
-
         $available_scopes = config('eveapi.scopes');
 
         return Inertia::render('Configuration/Scopes/ScopeSettings', [
