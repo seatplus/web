@@ -65,7 +65,10 @@ class UpdateOrCreateSsoSettings
                 $entity_id = Arr::get($entity, 'id');
                 $category = Arr::get($entity, 'type');
 
-                $morphable_type = $category === 'corporation' ? CorporationInfo::class : AllianceInfo::class;
+                $morphable_type = match ($category) {
+                    'corporation' => CorporationInfo::class,
+                    'alliance' => AllianceInfo::class,
+                };
 
                 (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
