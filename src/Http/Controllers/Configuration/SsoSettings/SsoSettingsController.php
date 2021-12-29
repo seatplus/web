@@ -58,7 +58,6 @@ class SsoSettingsController extends Controller
 
     public function index(?int $entity_id = null)
     {
-
         $available_scopes = config('eveapi.scopes');
 
         return Inertia::render('Configuration/Scopes/ScopeSettings', [
