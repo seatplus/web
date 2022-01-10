@@ -70,7 +70,7 @@ class AssetsController extends Controller
 
     public function loadLocation(int $location_id, Request $request)
     {
-        $query = EveApiAsset::with('assetable', 'type', 'type.group', 'content')
+        $query = EveApiAsset::with(['assetable', 'type', 'type.group', 'content'])
             ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
 
