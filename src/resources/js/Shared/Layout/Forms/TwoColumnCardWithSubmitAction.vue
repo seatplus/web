@@ -36,6 +36,7 @@
 
     <!--     border -->
     <div
+      v-show="withBottomBorder"
       class="hidden sm:block"
       aria-hidden="true"
     >
@@ -51,10 +52,15 @@ export default {
     name: "TwoColumnCardWithSubmitAction",
     props: {
         index: {
-            required: true,
+            required: false,
             type: Number,
             default: 0
         },
+        withBottomBorder: {
+            required: false,
+            type: Boolean,
+            default: true
+        }
     },
 }
 </script>

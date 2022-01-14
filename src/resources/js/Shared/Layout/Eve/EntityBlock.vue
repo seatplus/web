@@ -40,6 +40,11 @@ export default {
             required: false,
             default: 'lg',
             type: String
+        },
+        nameClass: {
+            required: false,
+            type: String,
+            default: ''
         }
     },
     computed: {
@@ -50,7 +55,7 @@ export default {
             return `h-${this.imageSize} w-${this.imageSize} rounded-full`
         },
         name_class() {
-            return `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
+            return this.nameClass ? this.nameClass : `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
         },
         subText() {
 

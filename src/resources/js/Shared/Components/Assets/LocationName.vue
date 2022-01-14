@@ -1,7 +1,7 @@
 <template>
-    <span>
-        <span v-if="system"> {{ system }} - </span> {{ name }}
-    </span>
+  <span>
+    <span v-if="system"> {{ system }} - </span> {{ name }}
+  </span>
 </template>
 
 <script>
@@ -18,13 +18,6 @@ export default {
             result: {}
         }
     },
-    created() {
-        if(_.isNull(this.location.location))
-            axios.get(this.$route('get.manual_location', this.location.location_id))
-                .then((result) => {
-                        this.result = result.data
-                })
-    },
     computed: {
         name() {
             return this.location.location != null ? _.get(this.location, 'location.locatable.name') : _.get(this.result, 'name', 'loading ...')
@@ -32,6 +25,13 @@ export default {
         system() {
             return _.get(this.result, 'system.name',)
         }
+    },
+    created() {
+        if(_.isNull(this.location.location))
+            axios.get(this.$route('get.manual_location', this.location.location_id))
+                .then((result) => {
+                        this.result = result.data
+                })
     }
 }
 </script>

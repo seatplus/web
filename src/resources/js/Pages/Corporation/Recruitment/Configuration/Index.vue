@@ -1,16 +1,33 @@
 <template>
   <div>
     <PageHeader :breadcrumbs="breadcrumbs">
-      Corporation Watchlist
+      Corporation Enlistment
+      <template #primary>
+        <!--TODO: Create Delete Button with confirmation dialog-->
+        <span class="shadow-sm rounded-md">
+          <Button
+            :href="$route('delete.enlistment', enlistment.corporation_id)"
+            method="delete"
+          >
+            Delete
+          </Button>
+        </span>
+      </template>
     </PageHeader>
+
+    <EnlistmentConfig
+      class="pt-6 sm:pt-10"
+      :with-bottom-border="true"
+      :enlistment="enlistment"
+    />
 
     <TwoColumnCardWithSubmitAction :index="0">
       <template #title>
-        Filter
+        Region or System Filter
       </template>
 
       <template #description>
-        Please setup your watchlist filter. Items, contracts within the selected regions, systems etc. will show up during recruitment
+        Please setup your region or system filter. Items, contracts within the selected regions, systems etc. will show up during recruitment
       </template>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -46,7 +63,7 @@
       </template>
     </TwoColumnCardWithSubmitAction>
     <ItemsWatchlist
-      :corporation-id="corporationId"
+      :corporation-id="enlistment.corporation_id"
       :items="watched.items"
     />
   </div>
@@ -56,17 +73,19 @@
 import PageHeader from "@/Shared/Layout/PageHeader";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
 import Multiselect from "@/Shared/Components/Multiselect";
-import ItemsWatchlist from "@/Pages/Corporation/Recruitment/Watchlist/ItemsWatchlist";
+import ItemsWatchlist from "@/Pages/Corporation/Recruitment/Configuration/ItemsWatchlist";
+import EnlistmentConfig from "@/Pages/Corporation/Recruitment/Configuration/EnlistmentConfig";
+import Button from "@/Shared/Layout/Button";
 
 export default {
     name: "Index",
-    components: {ItemsWatchlist, Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
+    components: {Button, EnlistmentConfig, ItemsWatchlist, Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
     props: {
-        corporationId: {
-            required: true,
-            type: Number
-        },
         watched: {
+            required: true,
+            type: Object
+        },
+        enlistment: {
             required: true,
             type: Object
         }

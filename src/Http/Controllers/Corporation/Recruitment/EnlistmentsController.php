@@ -37,26 +37,32 @@ class EnlistmentsController extends Controller
 {
     public function create(CreateOpenRecruitmentRequest $request)
     {
-        $enlistment = Enlistment::updateOrCreate(
-            ['corporation_id' => $request->get('corporation_id')],
-            ['type' => $request->get('type')]
+
+        $enlistment = Enlistment::query()->updateOrCreate(
+            ['corporation_id' => $request->get('corporation')],
+            [
+                'type' => $request->get('type'),
+                'steps' => $request->get('steps')
+            ]
         );
 
-        return redirect()->back()->with('success', 'enlistment created');
+        return redirect()->back()->with('success', $enlistment->wasRecentlyCreated ? 'Enlistment Created' : 'Enlistment Updated');
     }
 
     public function delete(int $corporation_id)
     {
+
         Enlistment::where('corporation_id', $corporation_id)->delete();
 
-        return back()->with('success', 'corporation is closed for recruitment');
+        return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'corporation is closed for recruitment');
     }
 
-    public function watchlist(int $corporation_id, WatchedArrayAction $action)
+    public function edit(int $corporation_id, WatchedArrayAction $action)
     {
-        return inertia('Corporation/Recruitment/Watchlist/Index', [
+        return inertia('Corporation/Recruitment/Configuration/Index', [
             'activeSidebarElement' => 'corporation.recruitment',
             'corporationId' => $corporation_id,
+            'enlistment' => Enlistment::find($corporation_id),
             'watched' => $action->execute($corporation_id),
         ]);
     }

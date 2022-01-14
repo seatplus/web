@@ -39,7 +39,12 @@
 <script>
   export default {
       name: "Modal",
-      props: ['modelValue'],
+      props: {
+          modelValue: {
+              type: Boolean,
+              default: false
+          }
+      },
 emits: ['update:modelValue'],
       data() {
           return {

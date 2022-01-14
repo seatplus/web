@@ -41,9 +41,9 @@ Route::prefix('recruitment')
         Route::middleware(['permission:can open or close corporations for recruitment,director'])
             ->group(function () {
                 Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
-                Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.corporation.recruitment');
+                Route::get('/{corporation_id}', [EnlistmentsController::class, 'edit'])->name('edit.enlistment');
+                Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.enlistment');
 
-                Route::get('/watchlist/{corporation_id}', [EnlistmentsController::class, 'watchlist'])->name('get.watchlist');
                 Route::post('/watchlist/{corporation_id}', [EnlistmentsController::class, 'updateWatchlist'])->name('update.watchlist');
             });
 

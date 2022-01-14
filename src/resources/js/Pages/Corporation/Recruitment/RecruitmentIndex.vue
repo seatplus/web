@@ -23,12 +23,13 @@
     />
 
     <teleport to="#destination">
-      <SlideOver v-model:open="create_enlistment">
+      <CreateEnlistmentModal v-model="create_enlistment" />
+      <!--<SlideOver v-model:open="create_enlistment">
         <template #title>
           Create Enlistment
         </template>
         <CorporationList :parameters="{permission: 'can open or close corporations for recruitment'}" />
-      </SlideOver>
+      </SlideOver>-->
     </teleport>
   </div>
 </template>
@@ -39,10 +40,11 @@ import HeaderButton from "@/Shared/Layout/HeaderButton"
 import CorporationRecruitment from "./CorporationRecruitment"
 import SlideOver from "@/Shared/Layout/SlideOver";
 import CorporationList from "./CorporationList";
+import CreateEnlistmentModal from "@/Pages/Corporation/Recruitment/CreateEnlistmentModal";
 
 export default {
     name: "RecruitmentIndex",
-    components: {CorporationList, SlideOver, CorporationRecruitment, HeaderButton, PageHeader},
+    components: {CreateEnlistmentModal, CorporationList, SlideOver, CorporationRecruitment, HeaderButton, PageHeader},
     props: {
         can_manage_recruitment: {
             required: true,
