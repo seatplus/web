@@ -29,7 +29,7 @@ use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ApplicationsController
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\EnlistmentsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\GetRecruitmentIndexController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ImpersonateRecruit;
-use Seatplus\Web\Http\Middleware\CheckUserAffiliationForApplication;
+use Seatplus\Web\Http\Middleware\CheckAffiliationForApplication;
 
 Route::prefix('recruitment')
     ->group(function () {
@@ -54,21 +54,17 @@ Route::prefix('recruitment')
         Route::middleware('permission:can accept or deny applications')
             ->group(function () {
                 Route::get('/applications/{corporation_id}', [ApplicationsController::class, 'getOpenCorporationApplications'])->name('open.corporation.applications');
-                Route::get('/shit_list/{corporation_id}', [ApplicationsController::class, 'getAcceptedCorporationApplications'])->name('corporation.shitlist');
-
-                Route::get('/character_application/{character_id}', [ApplicationsController::class, 'getCharacterApplication'])->name('character.application');
-                Route::post('/character_application/{character_id}', [ApplicationsController::class, 'reviewCharacterApplication'])->name('review.character.application');
 
                 Route::get('/update/{character_id}', [ApplicationsController::class, 'getBatchUpdate'])->name('get.batch_update');
                 Route::post('/update/{character_id}', [ApplicationsController::class, 'dispatchBatchUpdate'])->name('dispatch.batch_update');
             });
 
         /* User Applications */
-        Route::middleware(CheckUserAffiliationForApplication::class . ':can accept or deny applications')
+        Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
             ->group(function () {
-                Route::get('/user_application/{recruit}', [ApplicationsController::class, 'getUserApplication'])->name('user.application');
-                Route::post('/user_application/{recruit}', [ApplicationsController::class, 'reviewUserApplication'])->name('review.user.application');
+                Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
+                Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.user.application');
 
-                Route::get('/impersonate/{recruit}', ImpersonateRecruit::class)->name('impersonate.recruit');
+                Route::get('/impersonate/{application_id}', ImpersonateRecruit::class)->name('impersonate.recruit');
             });
     });

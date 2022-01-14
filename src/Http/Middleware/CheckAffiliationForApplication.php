@@ -30,28 +30,27 @@ use Closure;
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
-class CheckUserAffiliationForApplication
+class CheckAffiliationForApplication
 {
-    /**
-     * @param  Closure  $next
-     * @param $permission
-     * @return mixed
-     */
+
     public function handle(Request $request, Closure $next, $permission)
     {
-        $user = $request->recruit;
 
-        abort_unless($user, 404, 'required url parameter user_id is missing');
+        $application_id = $request->application_id;
+
+        abort_unless($application_id, 404, 'required url parameter application_id is missing');
 
         $affiliated_ids = getAffiliatedIdsByPermission($permission);
 
-        $application = Application::whereIn('corporation_id', $affiliated_ids)
-            ->where(['applicationable_type' => User::class, 'applicationable_id' => $user->id])
-            ->with('applicationable')
-            ->first();
+        $application = Application::query()
+            ->whereIn('corporation_id', $affiliated_ids)
+            ->where('id', $application_id)
+            ->with(['applicationable', 'corporation'])
+            ->exists();
 
-        abort_unless($application, 403, 'You are not allowed to review the user');
+        abort_unless($application, 403, 'You are not allowed to review the recruit');
 
         return $next($request);
     }
