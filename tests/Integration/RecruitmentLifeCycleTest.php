@@ -52,7 +52,11 @@ test('user without permission fails to create enlistment', function () {
 
 test('user with permission and affiliations succeeds to create enlistment', function () {
 
+    expect(\Seatplus\Web\Models\Recruitment\Enlistment::all())->toHaveCount(0);
+
     createEnlistment();
+
+    expect(\Seatplus\Web\Models\Recruitment\Enlistment::all())->toHaveCount(1);
 });
 
 test('user with permission and affiliations can delete enlistment', function () {
@@ -64,7 +68,7 @@ test('user with permission and affiliations can delete enlistment', function () 
     ]);
 
     test()->actingAs(test()->test_user)
-        ->delete(route('delete.corporation.recruitment', ['corporation_id' =>  test()->test_character->corporation->corporation_id]));
+        ->delete(route('delete.enlistment', ['corporation_id' =>  test()->test_character->corporation->corporation_id]));
 
     $this->assertDatabaseMissing('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,
@@ -202,8 +206,13 @@ test('junior hr handles open user applications', function () {
 
     // open application
 
+    expect(Application::all())->toHaveCount(1)
+        ->first()->id->toBeString();
+
+    $application = Application::first();
+
     $response = test()->actingAs(test()->test_user)
-        ->get(route('user.application', ['recruit' => test()->secondary_user->id]))
+        ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
         ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
@@ -211,7 +220,7 @@ test('junior hr handles open user applications', function () {
     // Impersonate
 
     test()->actingAs(test()->test_user)
-        ->get(route('impersonate.recruit', ['recruit' => test()->secondary_user->id]))
+        ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertRedirect(route('home'))
         ->assertSessionHas('impersonation_origin', test()->test_user);
 
@@ -232,7 +241,7 @@ test('junior hr handles open user applications', function () {
     ]);
 
     test()->actingAs(test()->test_user)
-        ->post(route('review.user.application', ['recruit' => test()->secondary_user->id]), [
+        ->post(route('review.application', ['application_id' => $application->id]), [
             'decision' => 'rejected',
             'explanation' => 'Some reason'
         ])
@@ -264,9 +273,13 @@ test('junior hr handles open character applications', function () {
         ->assertJsonCount(1, 'data');
 
     // open application
+    expect(Application::all())->toHaveCount(1)
+        ->first()->id->toBeString();
+
+    $application = Application::first();
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('character.application', ['character_id' => test()->secondary_character->character_id]))
+        ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
         ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
@@ -279,7 +292,7 @@ test('junior hr handles open character applications', function () {
     ]);
 
     test()->actingAs(test()->test_user)
-        ->post(route('review.character.application', ['character_id' => test()->secondary_character->character_id]), [
+        ->post(route('review.application', ['application_id' => $application->id]), [
             'decision' => 'rejected',
             'explanation' => 'Some reason'
         ])
@@ -320,10 +333,11 @@ test('senior hr can setup watchlist', function () {
     createEnlistment();
 
     test()->actingAs(test()->test_user->refresh())
-        ->get(route('get.watchlist', test()->test_character->corporation->corporation_id))
+        ->get(route('edit.enlistment', test()->test_character->corporation->corporation_id))
         ->assertOk()
         ->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
+            ->has('enlistment')
             ->has('watched', fn(Assert $prop) => $prop
                 ->has('systems', 0)
                 ->has('regions', 0)
@@ -346,7 +360,7 @@ test('senior hr can setup watchlist', function () {
             ]
         ])
         ->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
             ->has('watched', fn(Assert $prop) => $prop
                 ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
                 ->etc()
@@ -372,7 +386,7 @@ test('senior hr can setup watchlist', function () {
             ]
         ])
         ->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
             ->has('watched', fn(Assert $prop) => $prop
                 ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
                 ->has('regions', 1, fn(Assert $prop) => $prop->where('id', $region->region_id)->etc())
@@ -395,7 +409,7 @@ test('senior hr can setup watchlist', function () {
                 ]
             ],
         ])->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
             ->has('watched', fn(Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
                 ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
@@ -417,7 +431,7 @@ test('senior hr can setup watchlist', function () {
                 ]
             ],
         ])->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
             ->has('watched', fn(Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
                 // however we expect the type previously set to be removed
@@ -443,7 +457,7 @@ test('senior hr can setup watchlist', function () {
                 ],
             ],
         ])->assertInertia( fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Watchlist/Index')
+            ->component('Corporation/Recruitment/Configuration/Index')
             ->has('watched', fn(Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
                 ->has('items', 2)
@@ -491,9 +505,14 @@ test('recruiter can see corporation applications', function () {
     // Apply with secondary user
     applySecondary(false);
 
-    // Get the test_users Applicaton // /character_application/{character_id}
+    expect(Application::all())->toHaveCount(1)
+        ->first()->id->toBeString();
+
+    $application = Application::first();
+
+    // Get the test_users Applicaton // /application/{application_id}
     $response = test()->actingAs($recruiter)
-        ->get(route('character.application', test()->secondary_character->character_id))
+        ->get(route('get.application', $application->id))
         ->assertOk();
 
     // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
@@ -558,7 +577,7 @@ function applySecondary(bool $user = true)
         ->post(route('post.application'), $payload);
 }
 
-function createEnlistment($type = 'user',string $affiliation = 'allowed')
+function createEnlistment($type = 'user', string $affiliation = 'allowed')
 {
     // create role
     test()->actingAs(test()->superuser)
@@ -609,8 +628,11 @@ function createEnlistment($type = 'user',string $affiliation = 'allowed')
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'type' => $type
+            'type' => $type,
+            'steps' => null
         ]);
+
+    expect($response)->exception->toBeNull();
 
     \Pest\Laravel\assertDatabaseHas('enlistments',[
         'corporation_id' => test()->test_character->corporation->corporation_id,

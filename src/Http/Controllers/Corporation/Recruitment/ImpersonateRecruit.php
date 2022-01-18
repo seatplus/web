@@ -27,15 +27,20 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\ImpersonateService;
 
 class ImpersonateRecruit extends Controller
 {
-    public function __invoke(User $recruit)
+    public function __invoke(string $application_id)
     {
-        (new ImpersonateService)->impersonateUser($recruit);
+        $application = Application::find($application_id);
 
-        return redirect()->route('home')->with('success', 'Impersonating ' . $recruit->main_character->name);
+        abort_unless($application->applicationable_type === User::class, 403, 'This action is not allowed');
+
+        (new ImpersonateService)->impersonateUser($application->applicationable);
+
+        return redirect()->route('home')->with('success', 'Impersonating ' . $application->applicationable->main_character->name);
     }
 }

@@ -26,7 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
@@ -35,6 +37,7 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
+use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
@@ -69,7 +72,9 @@ class ApplicationsController extends Controller
 
     public function getOpenCorporationApplications(int $corporation_id)
     {
-        $applications = Application::ofCorporation($corporation_id)->whereStatus('open');
+        $applications = Application::query()
+            ->with('log_entries')
+            ->ofCorporation($corporation_id)->whereStatus('open');
 
         return ApplicationRessource::collection($applications->paginate());
     }
@@ -81,65 +86,62 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getUserApplication(User $recruit, WatchlistArrayAction $action)
+    public function getApplication(string $application_id, WatchlistArrayAction $action)
     {
-        $corporation_id = $recruit->application->corporation->corporation_id;
+        $application = Application::query()
+            ->with(['applicationable' => function (MorphTo $morphTo) {
+                $morphTo->morphWith([
+                    User::class => ['main_character', 'characters', 'characters.batch_update'],
+                    CharacterInfo::class => ['batch_update'],
+                ]);
+            }])
+            ->find($application_id);
+
+        $recruit = match ($application->applicationable_type) {
+            User::class => $application->applicationable,
+            CharacterInfo::class => collect([
+                'main_character' => $application->applicationable,
+                'characters' => [$application->applicationable],
+            ])
+        };
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit->loadMissing('main_character', 'characters', 'characters.batch_update'),
-            'target_corporation' => $recruit->application->corporation,
-            'watchlist' => $action->execute($corporation_id),
+            'recruit' => array_merge($recruit->toArray(), ['application_id' => $application_id]),
+            'target_corporation' => $application->corporation,
+            'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
 
-    public function reviewUserApplication(Request $request, User $recruit)
+    public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action)
     {
         $request->validate([
-            'decision' => 'required',
+            'decision' => ['required', Rule::in(['rejected', 'accepted'])],
             'explanation' => 'required_if:decision,rejected',
         ]);
 
-        $recruit->application()->update([
-            'status' => $request->get('decision'),
-            'comment' => $request->get('explanation') ?? '',
-        ]);
+        $action->setComment($request->get('explanation') ?? '')
+            ->setType('decision')
+            ->setApplicationId($application_id)
+            ->execute();
 
-        return redirect()->route('corporation.recruitment')->with('success', sprintf('User %s', $request->get('decision')));
-    }
+        $application = Application::find($application_id);
 
-    public function getCharacterApplication(int $character_id, WatchlistArrayAction $action)
-    {
-        $character = CharacterInfo::with('application', 'batch_update')->find($character_id);
+        if ($request->get('decision') === 'rejected') {
+            $application->status = 'rejected';
+            $application->save();
+        }
 
-        $recruit = collect([
-            'main_character' => $character,
-            'characters' => [$character],
-        ]);
+        if ($request->get('decision') === 'accepted' && $application->enlistment->steps_count <= $application->decision_count) {
+            $application->status = 'accepted';
+            $application->save();
+        }
 
-        $corporation_id = $character->application->corporation->corporation_id;
-
-        return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit,
-            'target_corporation' => $character->application->corporation,
-            'watchlist' => $action->execute($corporation_id),
-            'activeSidebarElement' => 'corporation.recruitment',
-        ]);
-    }
-
-    public function reviewCharacterApplication(Request $request, int $character_id)
-    {
-        $request->validate([
-            'decision' => 'required',
-            'explanation' => 'required_if:decision,rejected',
-        ]);
-
-        CharacterInfo::find($character_id)->application()->update([
-            'status' => $request->get('decision'),
-            'comment' => $request->get('explanation') ?? '',
-        ]);
-
-        return redirect()->route('corporation.recruitment')->with('success', sprintf('Character %s', $request->get('decision')));
+        return redirect()->route('corporation.recruitment')
+            ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
+                User::class => 'User',
+                CharacterInfo::class => 'Character'
+            }, $request->get('decision')));
     }
 
     public function dispatchBatchUpdate(int $character_id)

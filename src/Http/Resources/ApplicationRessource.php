@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\BuildCharacterScopesArray;
 use Seatplus\Auth\Services\BuildUserLevelRequiredScopes;
@@ -42,38 +43,19 @@ class ApplicationRessource extends JsonResource
      */
     public function toArray($request)
     {
+        $is_user = $this->applicationable_type === User::class;
+
         return [
-            'is_user' => $this->applicationable_type === User::class,
-            $this->mergeWhen($this->applicationable_type === User::class, [
-                'user' => $this->applicationable,
-            ]),
-            'main_character' => $this->applicationable->main_character ?? null,
-            'characters' => $this->applicationable instanceof User ? $this->applicationable->characters->map(fn ($character) => $this->buildCharacterArray($character)) : [],
-            'character' => $this->applicationable instanceof CharacterInfo ? $this->buildCharacterArray($this->applicationable) : [],
+            'application_id' => $this->id,
+            'is_user' => $is_user,
+            $this->mergeWhen($is_user, ['user' => $this->applicationable]),
+            'main_character' => $is_user ? $this->applicationable->main_character : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', $this->applicationable->character_id)->user->main_character,
+            'characters' => $this->getCharacters(),
+            'decision_count' => $this->decision_count,
         ];
     }
 
-    private function getRequiredScopes(CharacterInfo $character): array
-    {
-        // Add global required scopes
-        $global_scope = setting('global_sso_scopes');
-
-        return collect([
-            'corporation_scopes'             => $character->corporation->ssoScopes->selected_scopes ?? [],
-            'alliance_scopes'                => $character->alliance->ssoScopes->selected_scopes ?? [],
-            'character_application_corporation_scopes' => $character->application->corporation->ssoScopes->selected_scopes ?? [],
-            'character_application_alliance_scopes'    => $character->application->corporation->alliance->ssoScopes->selected_scopes ?? [],
-            'global_scopes'                  => json_decode($this->user->global_scope) ?? [],
-            'user_application_corporation_scopes' => $this->applicationable->application->corporation->ssoScopes->selected_scopes ?? [],
-            'user_application_alliance_scopes'    => $this->applicationable->application->corporation->alliance->ssoScopes->selected_scopes ?? [],
-        ])->flatten(1)
-            ->filter()
-            ->unique()
-            ->flatten(1)
-            ->toArray();
-    }
-
-    private function buildCharacterArray(CharacterInfo $character)
+    private function buildCharacterArray(CharacterInfo $character): array
     {
         $user = ! $this->applicationable instanceof User
             ? null
@@ -89,9 +71,27 @@ class ApplicationRessource extends JsonResource
         // Get user level required scopes
         $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];
 
-        return BuildCharacterScopesArray::make()
+        $character_scopes_array = BuildCharacterScopesArray::make()
             ->setCharacter($character)
             ->setUserScopes($user_scopes)
             ->get();
+
+        return array_merge($character_scopes_array, $character->toArray());
+    }
+
+    private function getCharacters(): array
+    {
+        if ($this->applicationable instanceof User) {
+            return $this->applicationable
+                ->characters
+                ->map(fn ($character) => $this->buildCharacterArray($character))
+                ->toArray();
+        }
+
+        if ($this->applicationable instanceof CharacterInfo) {
+            return [$this->buildCharacterArray($this->applicationable)];
+        }
+
+        return [];
     }
 }

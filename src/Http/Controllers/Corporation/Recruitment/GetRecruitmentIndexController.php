@@ -40,13 +40,13 @@ class GetRecruitmentIndexController extends Controller
         $can_manage_recruitment = auth()->user()->can(self::MANAGEPERMISSION);
 
         return Inertia::render('Corporation/Recruitment/RecruitmentIndex', [
-            'can_manage_recruitment' => $can_manage_recruitment,
-            'corporations' => $this->getCorporations(),
+            'canManageRecruitment' => $can_manage_recruitment,
+            'enlistments' => $this->getEnlistments(),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
 
-    private function getCorporations()
+    private function getEnlistments()
     {
         $manageable_ids = getAffiliatedIdsByPermission(self::MANAGEPERMISSION);
         $recruitable_ids = getAffiliatedIdsByPermission(self::RECRUITERPERMISSION);
@@ -55,11 +55,10 @@ class GetRecruitmentIndexController extends Controller
             ->with('corporation.alliance')
             ->get()
             ->map(function ($enlistment) use ($manageable_ids, $recruitable_ids) {
-                $corporation = $enlistment->corporation;
-                $corporation->can_manage = in_array($enlistment->corporation_id, $manageable_ids);
-                $corporation->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
+                $enlistment->can_manage = in_array($enlistment->corporation_id, $manageable_ids);
+                $enlistment->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
 
-                return $corporation;
+                return $enlistment;
             });
     }
 }

@@ -228,7 +228,7 @@ export default {
         submit() {
 
             if(this.recruit.id)
-                return this.$inertia.post(this.$route('review.user.application', this.recruit.id), this.form);
+                return this.$inertia.post(this.$route('review.application', this.recruit.application_id), this.form);
 
             this.$inertia.post(this.$route('review.character.application', this.recruit.main_character.character_id), this.form);
         }

@@ -29,7 +29,7 @@ use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ApplicationsController
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\EnlistmentsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\GetRecruitmentIndexController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ImpersonateRecruit;
-use Seatplus\Web\Http\Middleware\CheckUserAffiliationForApplication;
+use Seatplus\Web\Http\Middleware\CheckAffiliationForApplication;
 
 Route::prefix('recruitment')
     ->group(function () {
@@ -39,36 +39,37 @@ Route::prefix('recruitment')
 
         /* Senior HR */
         Route::middleware(['permission:can open or close corporations for recruitment,director'])
+            ->controller(EnlistmentsController::class)
             ->group(function () {
-                Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
-                Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.corporation.recruitment');
+                Route::post('/', 'create')->name('create.corporation.recruitment');
+                Route::get('/{corporation_id}', 'edit')->name('edit.enlistment');
+                Route::delete('/{corporation_id}', 'delete')->name('delete.enlistment');
 
-                Route::get('/watchlist/{corporation_id}', [EnlistmentsController::class, 'watchlist'])->name('get.watchlist');
-                Route::post('/watchlist/{corporation_id}', [EnlistmentsController::class, 'updateWatchlist'])->name('update.watchlist');
+                Route::post('/watchlist/{corporation_id}', 'updateWatchlist')->name('update.watchlist');
             });
 
         /* Junior HR */
         Route::middleware('permission:can open or close corporations for recruitment|can accept or deny applications,director')
             ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
-        Route::middleware('permission:can accept or deny applications')
+        Route::controller(ApplicationsController::class)
             ->group(function () {
-                Route::get('/applications/{corporation_id}', [ApplicationsController::class, 'getOpenCorporationApplications'])->name('open.corporation.applications');
-                Route::get('/shit_list/{corporation_id}', [ApplicationsController::class, 'getAcceptedCorporationApplications'])->name('corporation.shitlist');
+                Route::middleware('permission:can accept or deny applications')
+                    ->group(function () {
+                        Route::get('/applications/{corporation_id}', 'getOpenCorporationApplications')->name('open.corporation.applications');
 
-                Route::get('/character_application/{character_id}', [ApplicationsController::class, 'getCharacterApplication'])->name('character.application');
-                Route::post('/character_application/{character_id}', [ApplicationsController::class, 'reviewCharacterApplication'])->name('review.character.application');
+                        Route::get('/update/{character_id}', 'getBatchUpdate')->name('get.batch_update');
+                        Route::post('/update/{character_id}', 'dispatchBatchUpdate')->name('dispatch.batch_update');
+                    });
 
-                Route::get('/update/{character_id}', [ApplicationsController::class, 'getBatchUpdate'])->name('get.batch_update');
-                Route::post('/update/{character_id}', [ApplicationsController::class, 'dispatchBatchUpdate'])->name('dispatch.batch_update');
+                Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+                    ->group(function () {
+                        Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
+                        Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.application');
+                    });
             });
 
-        /* User Applications */
-        Route::middleware(CheckUserAffiliationForApplication::class . ':can accept or deny applications')
-            ->group(function () {
-                Route::get('/user_application/{recruit}', [ApplicationsController::class, 'getUserApplication'])->name('user.application');
-                Route::post('/user_application/{recruit}', [ApplicationsController::class, 'reviewUserApplication'])->name('review.user.application');
-
-                Route::get('/impersonate/{recruit}', ImpersonateRecruit::class)->name('impersonate.recruit');
-            });
+        Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+            ->get('/impersonate/{application_id}', ImpersonateRecruit::class)
+            ->name('impersonate.recruit');
     });

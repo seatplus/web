@@ -50,7 +50,13 @@ class CreateOpenRecruitmentRequest extends FormRequest
     {
         return [
             'corporation_id' => ['required', 'exists:corporation_infos,corporation_id'],
-            'type' => ['required', Rule::in(['character', 'user'])],
+            'type' => ['required', 'string', Rule::in(['character', 'user'])],
+            'steps' => ['nullable', 'string'],
         ];
     }
+
+    /*protected function prepareForValidation()
+    {
+        $this->merge(['corporation' => data_get($this->corporation, 'corporation_id')]);
+    }*/
 }
