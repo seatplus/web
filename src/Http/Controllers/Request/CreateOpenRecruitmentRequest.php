@@ -50,24 +50,17 @@ class CreateOpenRecruitmentRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            'corporation' => [
-                'required',
-                'exists:corporation_infos,corporation_id',
-            ],
-            'type' => ['required', Rule::in(['character', 'user'])],
+            'corporation_id' => ['required', 'exists:corporation_infos,corporation_id'],
+            'type' => ['required', 'string', Rule::in(['character', 'user'])],
+            'steps' => ['nullable', 'string']
         ];
     }
 
-    protected function prepareForValidation()
+    /*protected function prepareForValidation()
     {
         $this->merge(['corporation' => data_get($this->corporation, 'corporation_id')]);
-    }
-
-    /*public function withValidator(Validator $validator) : void
-    {
-        $validator->after(function ($validator) {
-            if($this->somethingElseIsInvalid())
-        })
     }*/
+
 }

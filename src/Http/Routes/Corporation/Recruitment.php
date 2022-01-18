@@ -39,32 +39,38 @@ Route::prefix('recruitment')
 
         /* Senior HR */
         Route::middleware(['permission:can open or close corporations for recruitment,director'])
+            ->controller(EnlistmentsController::class)
             ->group(function () {
-                Route::post('/', [EnlistmentsController::class, 'create'])->name('create.corporation.recruitment');
-                Route::get('/{corporation_id}', [EnlistmentsController::class, 'edit'])->name('edit.enlistment');
-                Route::delete('/{corporation_id}', [EnlistmentsController::class, 'delete'])->name('delete.enlistment');
+                Route::post('/','create')->name('create.corporation.recruitment');
+                Route::get('/{corporation_id}', 'edit')->name('edit.enlistment');
+                Route::delete('/{corporation_id}', 'delete')->name('delete.enlistment');
 
-                Route::post('/watchlist/{corporation_id}', [EnlistmentsController::class, 'updateWatchlist'])->name('update.watchlist');
+                Route::post('/watchlist/{corporation_id}', 'updateWatchlist')->name('update.watchlist');
             });
 
         /* Junior HR */
         Route::middleware('permission:can open or close corporations for recruitment|can accept or deny applications,director')
             ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
-        Route::middleware('permission:can accept or deny applications')
+        Route::controller(ApplicationsController::class)
             ->group(function () {
-                Route::get('/applications/{corporation_id}', [ApplicationsController::class, 'getOpenCorporationApplications'])->name('open.corporation.applications');
 
-                Route::get('/update/{character_id}', [ApplicationsController::class, 'getBatchUpdate'])->name('get.batch_update');
-                Route::post('/update/{character_id}', [ApplicationsController::class, 'dispatchBatchUpdate'])->name('dispatch.batch_update');
+                Route::middleware('permission:can accept or deny applications')
+                    ->group(function () {
+                        Route::get('/applications/{corporation_id}', 'getOpenCorporationApplications')->name('open.corporation.applications');
+
+                        Route::get('/update/{character_id}', 'getBatchUpdate')->name('get.batch_update');
+                        Route::post('/update/{character_id}', 'dispatchBatchUpdate')->name('dispatch.batch_update');
+                    });
+
+                Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+                    ->group(function () {
+                        Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
+                        Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.application');
+                    });
             });
 
-        /* User Applications */
         Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
-            ->group(function () {
-                Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
-                Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.user.application');
-
-                Route::get('/impersonate/{application_id}', ImpersonateRecruit::class)->name('impersonate.recruit');
-            });
+            ->get('/impersonate/{application_id}', ImpersonateRecruit::class)
+            ->name('impersonate.recruit');
     });

@@ -118,11 +118,13 @@ export default {
         const form = useForm({
             corporation: props.enlistment,
             type: _.get(props, 'enlistment.type', 'user'),
-            steps: _.get(props, 'enlistment.steps', []).join('; ')
+            steps: _.get(props, 'enlistment.steps', [], '').join('; ')
         })
 
         const submit = () => {
-            form.post(route('create.corporation.recruitment'), {
+            form
+                .transform((data) => ({ ...data, corporation_id: data.corporation.corporation_id}))
+                .post(route('create.corporation.recruitment'), {
                 onSuccess: () => {
                     emit('onSuccess')
                 }

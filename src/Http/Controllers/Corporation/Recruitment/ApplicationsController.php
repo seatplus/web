@@ -86,7 +86,7 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getApplication(int $application_id, WatchlistArrayAction $action)
+    public function getApplication(string $application_id, WatchlistArrayAction $action)
     {
         $application = Application::query()
             ->with(['applicationable' => function(MorphTo $morphTo) {
@@ -100,21 +100,21 @@ class ApplicationsController extends Controller
 
         $recruit = match($application->applicationable_type) {
             User::class => $application->applicationable,
-            CharacterInfo::class => [
+            CharacterInfo::class => collect([
                 'main_character' => $application->applicationable,
                 'characters' => [$application->applicationable],
-            ]
+            ])
         };
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit,
+            'recruit' => array_merge($recruit->toArray(), ['application_id' => $application_id]),
             'target_corporation' => $application->corporation,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
 
-    public function reviewApplication(Request $request, int $application_id, CreateApplicationLogEntryAction $action)
+    public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action)
     {
         $request->validate([
             'decision' => ['required', Rule::in(['rejected', 'accepted'])],

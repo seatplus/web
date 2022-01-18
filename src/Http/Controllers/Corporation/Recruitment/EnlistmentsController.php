@@ -39,10 +39,10 @@ class EnlistmentsController extends Controller
     {
 
         $enlistment = Enlistment::query()->updateOrCreate(
-            ['corporation_id' => $request->get('corporation')],
+            ['corporation_id' => data_get($request->validated(), 'corporation_id')],
             [
-                'type' => $request->get('type'),
-                'steps' => $request->get('steps')
+                'type' => data_get($request->validated(), 'type'),
+                'steps' => data_get($request->validated(), 'steps') ?? ''
             ]
         );
 

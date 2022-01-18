@@ -33,7 +33,7 @@ use Seatplus\Web\Services\ImpersonateService;
 
 class ImpersonateRecruit extends Controller
 {
-    public function __invoke(int $application_id)
+    public function __invoke(string $application_id)
     {
         $application = Application::find($application_id);
 

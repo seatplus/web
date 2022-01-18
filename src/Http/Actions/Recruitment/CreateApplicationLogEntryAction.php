@@ -9,13 +9,13 @@ use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 class CreateApplicationLogEntryAction
 {
 
-    private int $application_id;
+    private string $application_id;
 
     private string $comment = '';
 
     private string $type;
 
-    public function getApplicationId(): int
+    public function getApplicationId(): string
     {
         return $this->application_id;
     }
@@ -39,7 +39,7 @@ class CreateApplicationLogEntryAction
         return $this;
     }
 
-    public function setApplicationId(int $application_id) : self
+    public function setApplicationId(string $application_id) : self
     {
         $this->application_id = $application_id;
 
