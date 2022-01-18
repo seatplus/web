@@ -28,8 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class CreateOpenRecruitmentRequest extends FormRequest
 {
@@ -50,11 +48,10 @@ class CreateOpenRecruitmentRequest extends FormRequest
      */
     public function rules()
     {
-
         return [
             'corporation_id' => ['required', 'exists:corporation_infos,corporation_id'],
             'type' => ['required', 'string', Rule::in(['character', 'user'])],
-            'steps' => ['nullable', 'string']
+            'steps' => ['nullable', 'string'],
         ];
     }
 
@@ -62,5 +59,4 @@ class CreateOpenRecruitmentRequest extends FormRequest
     {
         $this->merge(['corporation' => data_get($this->corporation, 'corporation_id')]);
     }*/
-
 }

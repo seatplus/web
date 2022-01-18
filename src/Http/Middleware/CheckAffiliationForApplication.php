@@ -28,16 +28,12 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class CheckAffiliationForApplication
 {
-
     public function handle(Request $request, Closure $next, $permission)
     {
-
         $application_id = $request->application_id;
 
         abort_unless($application_id, 404, 'required url parameter application_id is missing');

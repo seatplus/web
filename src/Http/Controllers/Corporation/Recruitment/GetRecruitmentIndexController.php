@@ -55,7 +55,6 @@ class GetRecruitmentIndexController extends Controller
             ->with('corporation.alliance')
             ->get()
             ->map(function ($enlistment) use ($manageable_ids, $recruitable_ids) {
-
                 $enlistment->can_manage = in_array($enlistment->corporation_id, $manageable_ids);
                 $enlistment->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
 

@@ -43,7 +43,7 @@ class CorporationInfoRessource extends JsonResource
             'corporation_id' => $this->corporation_id,
             'name' => $this->name,
             'alliance' => $this->whenLoaded('alliance', fn () => $this->alliance->name),
-            'hasEveImage' => true
+            'hasEveImage' => true,
         ];
     }
 }

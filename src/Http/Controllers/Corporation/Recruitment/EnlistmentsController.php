@@ -37,12 +37,11 @@ class EnlistmentsController extends Controller
 {
     public function create(CreateOpenRecruitmentRequest $request)
     {
-
         $enlistment = Enlistment::query()->updateOrCreate(
             ['corporation_id' => data_get($request->validated(), 'corporation_id')],
             [
                 'type' => data_get($request->validated(), 'type'),
-                'steps' => data_get($request->validated(), 'steps') ?? ''
+                'steps' => data_get($request->validated(), 'steps') ?? '',
             ]
         );
 
@@ -51,7 +50,6 @@ class EnlistmentsController extends Controller
 
     public function delete(int $corporation_id)
     {
-
         Enlistment::where('corporation_id', $corporation_id)->delete();
 
         return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'corporation is closed for recruitment');
