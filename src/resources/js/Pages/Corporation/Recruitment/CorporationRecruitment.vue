@@ -49,6 +49,7 @@
     <div class="px-4 py-5 sm:p-6 space-y-4 sm:space-y-6">
       <!--TODO: add finished applications-->
       <BarWithUnderline
+        v-if="steps.length > 1"
         :tabs="steps"
         @select="changeActiveTab"
       />
@@ -67,21 +68,26 @@
                 :number-columns="countColumns"
               >
                 <StickyHeaderCell :cell="columns[0]">
-                  <EntityByIdBlock
-                    :id="applicant.main_character.character_id"
-                    :image-size="10"
-                  />
+                  <div class="flex-shrink">
+                    <EntityByIdBlock
+                      :id="applicant.main_character.character_id"
+                      class="truncate"
+                      :image-size="10"
+                    />
+                  </div>
                 </StickyHeaderCell>
 
                 <StickyHeaderCell
                   :cell="columns[1]"
                   class="self-center"
                 >
-                  <CharacterComplianceElement
-                    v-for="character in applicant.characters"
-                    :key="character"
-                    :character="character"
-                  />
+                  <div class="flex gap-x-2 flex-wrap">
+                    <CharacterComplianceElement
+                      v-for="character in applicant.characters"
+                      :key="character"
+                      :character="character"
+                    />
+                  </div>
                 </StickyHeaderCell>
 
                 <StickyHeaderCell
