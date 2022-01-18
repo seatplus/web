@@ -68,7 +68,7 @@
                 :number-columns="countColumns"
               >
                 <StickyHeaderCell :cell="columns[0]">
-                  <div class="flex-shrink">
+                  <div class="flex-shrink self-center">
                     <EntityByIdBlock
                       :id="applicant.main_character.character_id"
                       class="truncate"
