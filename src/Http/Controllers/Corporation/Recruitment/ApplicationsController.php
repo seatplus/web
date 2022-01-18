@@ -89,16 +89,15 @@ class ApplicationsController extends Controller
     public function getApplication(string $application_id, WatchlistArrayAction $action)
     {
         $application = Application::query()
-            ->with(['applicationable' => function(MorphTo $morphTo) {
+            ->with(['applicationable' => function (MorphTo $morphTo) {
                 $morphTo->morphWith([
                     User::class => ['main_character', 'characters', 'characters.batch_update'],
-                    CharacterInfo::class => ['batch_update']
+                    CharacterInfo::class => ['batch_update'],
                 ]);
             }])
             ->find($application_id);
 
-
-        $recruit = match($application->applicationable_type) {
+        $recruit = match ($application->applicationable_type) {
             User::class => $application->applicationable,
             CharacterInfo::class => collect([
                 'main_character' => $application->applicationable,
@@ -128,15 +127,12 @@ class ApplicationsController extends Controller
 
         $application = Application::find($application_id);
 
-
-        if($request->get('decision') === 'rejected') {
-
+        if ($request->get('decision') === 'rejected') {
             $application->status = 'rejected';
             $application->save();
         }
 
-        if($request->get('decision') === 'accepted' && $application->enlistment->steps_count <= $application->decision_count) {
-
+        if ($request->get('decision') === 'accepted' && $application->enlistment->steps_count <= $application->decision_count) {
             $application->status = 'accepted';
             $application->save();
         }

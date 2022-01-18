@@ -48,10 +48,10 @@ class ApplicationRessource extends JsonResource
         return [
             'application_id' => $this->id,
             'is_user' => $is_user,
-            $this->mergeWhen($is_user, [ 'user' => $this->applicationable ]),
+            $this->mergeWhen($is_user, ['user' => $this->applicationable]),
             'main_character' => $is_user ? $this->applicationable->main_character : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', $this->applicationable->character_id)->user->main_character,
             'characters' => $this->getCharacters(),
-            'decision_count' => $this->decision_count
+            'decision_count' => $this->decision_count,
         ];
     }
 
@@ -81,15 +81,14 @@ class ApplicationRessource extends JsonResource
 
     private function getCharacters(): array
     {
-
-        if($this->applicationable instanceof User) {
+        if ($this->applicationable instanceof User) {
             return $this->applicationable
                 ->characters
                 ->map(fn ($character) => $this->buildCharacterArray($character))
                 ->toArray();
         }
 
-        if($this->applicationable instanceof CharacterInfo) {
+        if ($this->applicationable instanceof CharacterInfo) {
             return [$this->buildCharacterArray($this->applicationable)];
         }
 

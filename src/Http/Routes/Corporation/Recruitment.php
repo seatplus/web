@@ -41,7 +41,7 @@ Route::prefix('recruitment')
         Route::middleware(['permission:can open or close corporations for recruitment,director'])
             ->controller(EnlistmentsController::class)
             ->group(function () {
-                Route::post('/','create')->name('create.corporation.recruitment');
+                Route::post('/', 'create')->name('create.corporation.recruitment');
                 Route::get('/{corporation_id}', 'edit')->name('edit.enlistment');
                 Route::delete('/{corporation_id}', 'delete')->name('delete.enlistment');
 
@@ -54,7 +54,6 @@ Route::prefix('recruitment')
 
         Route::controller(ApplicationsController::class)
             ->group(function () {
-
                 Route::middleware('permission:can accept or deny applications')
                     ->group(function () {
                         Route::get('/applications/{corporation_id}', 'getOpenCorporationApplications')->name('open.corporation.applications');
