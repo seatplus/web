@@ -44,13 +44,13 @@
               <!-- Contract type-->
               <StickyHeaderCell
                 :cell="slotProps.columns[2]"
-                class="text-sm font-medium text-gray-500 sm:self-center"
+                class="flex flex-wrap text-sm font-medium text-gray-500 sm:self-center truncate"
               >
                 <ContractTypeComponent :contract="contract" />
               </StickyHeaderCell>
               <StickyHeaderCell
                 :cell="slotProps.columns[3]"
-                class="text-sm font-medium text-gray-500 sm:self-center sm:grid sm:grid-cols-2 md:grid-cols-3"
+                class="flex flex-wrap gap-x-2 text-sm font-medium text-gray-500 sm:self-center"
               >
                 <DetailsComponent :contract="contract" />
               </StickyHeaderCell>
