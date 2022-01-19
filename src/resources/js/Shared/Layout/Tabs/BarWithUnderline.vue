@@ -15,11 +15,13 @@
         id="tabs"
         name="tabs"
         class="block w-full focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 rounded-md"
+        @select="(tab) => console.log(tab)"
       >
         <option
           v-for="tab in tabs"
           :key="tab.name"
           :selected="isActive(tab)"
+          @click="select(tab)"
         >
           {{ tab.name }}
         </option>
