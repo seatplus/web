@@ -223,7 +223,7 @@ export default {
     },
     methods: {
         impersonate() {
-            return this.$inertia.visit(this.$route('impersonate.recruit', this.recruit.id))
+            return this.$inertia.visit(this.$route('impersonate.recruit', this.recruit.application_id))
         },
         submit() {
 
