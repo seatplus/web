@@ -37,7 +37,6 @@ use Seatplus\Web\Traits\HasWatchlist;
 
 class ContractsController extends Controller
 {
-
     use HasWatchlist;
 
     public function index()
