@@ -26,15 +26,20 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Http\Request;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
+use Seatplus\Web\Traits\HasWatchlist;
 
 class ContractsController extends Controller
 {
+
+    use HasWatchlist;
+
     public function index()
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()
@@ -53,10 +58,12 @@ class ContractsController extends Controller
         ]);
     }
 
-    public function getCharacterContractsDetails(int $character_id)
+    public function getCharacterContractsDetails(int $character_id, Request $request)
     {
         $query = Contract::whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
-            ->with('items', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
+            ->with(['items', 'items.type', 'items.type.group', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation']);
+
+        $this->handleWatchlist($query, $request);
 
         return ContractRessource::collection($query->paginate());
     }

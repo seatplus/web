@@ -48,10 +48,9 @@
       v-if="isActive('Contracts')"
       class="space-y-4"
     >
-      <ContractComponent
-        v-for="character in recruit.characters"
-        :id="character.character_id"
-        :key="`contract.component:${character.character_id}`"
+      <ContractTab
+        :watchlist="watchlist"
+        :character-ids="characterIds"
       />
     </div>
     <div
@@ -119,29 +118,26 @@
 <script>
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
-import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
-import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
 import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
 import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
-import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
 import AssetTab from "@/Pages/Corporation/Recruitment/Tabs/AssetTab";
+import ContractTab from "@/Pages/Corporation/Recruitment/Tabs/ContractTab";
 
 const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
 
 export default {
     name: "TabComponent",
     components: {
+        ContractTab,
         AssetTab,
-        BarWithUnderline,
         CharacterContactsComponent,
         MobileMailList,
         SkillsComponent,
         CorporationHistoryComponent,
-        WalletJournalBalanceChart, ContractComponent,
-        AssetsComponent,
+        WalletJournalBalanceChart,
         WalletJournalComponent,
         WalletTransactionComponent},
     props: {
@@ -170,17 +166,6 @@ export default {
         }
     },
     computed: {
-        asset_params() {
-            return {
-                character_ids: _.map(this.recruit.characters, character => character.character_id),
-            }
-        },
-        unknown_asset_params() {
-            return {
-                character_ids: _.map(this.recruit.characters, character => character.character_id),
-                withUnknownLocations: true
-            }
-        },
         characterIds() {
             return _.map(this.recruit.characters, character => character.character_id)
         }

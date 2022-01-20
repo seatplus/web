@@ -15,7 +15,7 @@
     <div class="relative max-h-96 overflow-y-auto">
       <InfiniteLoadingHelper
         route="character.contracts.details"
-        :params="{character_id: id}"
+        :params="parameters"
         @result="(results) => contracts = results"
       >
         <StickyHeaderTable
@@ -110,6 +110,11 @@ export default {
             required: false,
             type: String,
             default: 'character'
+        },
+        watchlist: {
+            required: false,
+            type: Object,
+            default: () => new Object()
         }
     },
     setup() {
@@ -133,6 +138,9 @@ export default {
                 character_id: this.type === 'character' ? this.id : null,
                 corporation_id: this.type === 'corporation' ? this.id : null
             }
+        },
+        parameters() {
+            return {...this.watchlist, character_id: this.id}
         }
     }
 }
