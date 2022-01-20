@@ -15,7 +15,7 @@
     <div class="relative max-h-96 overflow-y-auto">
       <InfiniteLoadingHelper
         route="character.contracts.details"
-        :params="{character_id: id}"
+        :params="parameters"
         @result="(results) => contracts = results"
       >
         <StickyHeaderTable
@@ -44,13 +44,13 @@
               <!-- Contract type-->
               <StickyHeaderCell
                 :cell="slotProps.columns[2]"
-                class="text-sm font-medium text-gray-500 sm:self-center"
+                class="flex flex-wrap text-sm font-medium text-gray-500 sm:self-center truncate"
               >
                 <ContractTypeComponent :contract="contract" />
               </StickyHeaderCell>
               <StickyHeaderCell
                 :cell="slotProps.columns[3]"
-                class="text-sm font-medium text-gray-500 sm:self-center sm:grid sm:grid-cols-2 md:grid-cols-3"
+                class="flex flex-wrap gap-x-2 text-sm font-medium text-gray-500 sm:self-center"
               >
                 <DetailsComponent :contract="contract" />
               </StickyHeaderCell>
@@ -110,6 +110,11 @@ export default {
             required: false,
             type: String,
             default: 'character'
+        },
+        watchlist: {
+            required: false,
+            type: Object,
+            default: () => new Object()
         }
     },
     setup() {
@@ -133,6 +138,9 @@ export default {
                 character_id: this.type === 'character' ? this.id : null,
                 corporation_id: this.type === 'corporation' ? this.id : null
             }
+        },
+        parameters() {
+            return {...this.watchlist, character_id: this.id}
         }
     }
 }
