@@ -81,7 +81,8 @@ class ApplicationsController extends Controller
 
     public function getClosedCorporationApplications(int $corporation_id)
     {
-        $applications = Application::ofCorporation($corporation_id)
+        $applications = Application::query()->ofCorporation($corporation_id)
+            ->latest('updated_at')
             ->where('status', '<>', 'open');
 
         return ApplicationRessource::collection($applications->paginate());
