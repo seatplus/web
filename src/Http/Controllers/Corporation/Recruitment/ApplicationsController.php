@@ -90,7 +90,7 @@ class ApplicationsController extends Controller
     {
         $application = Application::query()
             ->with([
-                'log_entries.causer' => function(MorphTo $morphTo) {
+                'log_entries.causer' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([User::class => ['main_character']]);
                 },
                 'applicationable' => function (MorphTo $morphTo) {
@@ -98,7 +98,7 @@ class ApplicationsController extends Controller
                         User::class => ['main_character', 'characters', 'characters.batch_update'],
                         CharacterInfo::class => ['batch_update'],
                     ]);
-                }
+                },
             ])
             ->find($application_id);
 
