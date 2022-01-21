@@ -596,7 +596,7 @@ test('recruiter can comment on application', function () {
             ->etc()
         );
 
-})->only();
+});
 
 test('junior hr can dispatch update batch and get status', function () {
 
