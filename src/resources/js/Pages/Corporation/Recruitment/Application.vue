@@ -4,7 +4,7 @@
       User Application
       <template #primary>
         <HeaderButton
-          v-if="recruit.id"
+          v-if="canImpersonate"
           :secondary="true"
           @click="impersonate"
         >
@@ -28,20 +28,7 @@
           <div>
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
               <!-- Heroicon name: check -->
-              <svg
-                class="h-6 w-6 text-indigo-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-                />
-              </svg>
+              <IdentificationIcon class="h-6 w-6 text-indigo-600" />
             </div>
             <div class="mt-3 sm:mt-5">
               <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -59,7 +46,10 @@
                 :character="character"
               />
               <!--Decision-->
-              <div class="mt-6 sm:mt-5 sm:border-t sm:border-gray-200 sm:pt-5">
+              <div
+                v-show="application.status === 'open'"
+                class="mt-6 sm:mt-5 sm:border-t sm:border-gray-200 sm:pt-5"
+              >
                 <div
                   role="group"
                   aria-labelledby="label-notifications"
@@ -151,7 +141,10 @@
               </div>
             </div>
           </div>
-          <div class="mt-5 sm:mt-6">
+          <div
+            v-show="application.status === 'open'"
+            class="mt-5 sm:mt-6"
+          >
             <span class="flex w-full rounded-md shadow-sm">
               <button
                 type="button"
@@ -172,21 +165,17 @@
 import PageHeader from "@/Shared/Layout/PageHeader";
 import HeaderButton from "@/Shared/Layout/HeaderButton";
 import TabComponent from "./TabComponent";
-import LeftAlignedData from "../../../Shared/Layout/DataDisplay/LeftAlignedData";
-import Time from "../../../Shared/Time";
-import Button from "../../../Shared/Layout/Button";
+import {IdentificationIcon} from '@heroicons/vue/outline'
 import UpdateCharacterComponent from "./UpdateCharacterComponent";
 
 export default {
     name: "Application",
     components: {
         UpdateCharacterComponent,
-        Button,
-        Time,
-        LeftAlignedData,
         TabComponent,
         HeaderButton,
-        PageHeader
+        PageHeader,
+        IdentificationIcon
     },
     props: {
         recruit: {
@@ -219,18 +208,16 @@ export default {
         characters() {
             return _.map(this.recruit.characters, (character) => character.name ).join(', ')
         },
-
+        canImpersonate() {
+            return this.recruit.id && this.application.status === 'open'
+        }
     },
     methods: {
         impersonate() {
-            return this.$inertia.visit(this.$route('impersonate.recruit', this.recruit.application_id))
+            return this.$inertia.visit(this.$route('impersonate.recruit', this.application.id))
         },
         submit() {
-
-            if(this.recruit.id)
-                return this.$inertia.post(this.$route('review.application', this.recruit.application_id), this.form);
-
-            this.$inertia.post(this.$route('review.character.application', this.recruit.main_character.character_id), this.form);
+            return this.$inertia.post(this.$route('review.application', this.application.id), this.form);
         }
     }
 }

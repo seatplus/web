@@ -502,6 +502,11 @@ test('recruiter can see corporation applications', function () {
         ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
         ->assertOk();
 
+    // get list with closed applications
+    test()->actingAs($recruiter)
+        ->get(route('closed.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->assertOk();
+
     // Apply with secondary user
     applySecondary(false);
 
