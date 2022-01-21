@@ -19,7 +19,7 @@
         <TabComponent
           :recruit="recruit"
           :watchlist="watchlist"
-          :target-corporation="target_corporation"
+          :application="application"
         />
       </li>
 
@@ -193,7 +193,7 @@ export default {
             required: true,
             type: Object
         },
-        target_corporation: {
+        application: {
             required: true,
             type: Object
         },

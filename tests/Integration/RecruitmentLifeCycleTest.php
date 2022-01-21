@@ -528,6 +528,76 @@ test('recruiter can see corporation applications', function () {
 
 });
 
+test('recruiter can comment on application', function () {
+    // Create Enlistment
+    createEnlistment();
+
+    // create Senior Recruiter user
+
+    $recruiter = Event::fakeFor(fn() =>User::factory()->create());
+
+    // give user roles
+
+    $role = Role::findByName('test');
+
+    $response = test()->actingAs(test()->superuser)
+        ->followingRedirects()
+        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
+            "acl" => [
+                "type" => 'manual',
+                'affiliations' => [],
+                'members' => [
+                    [
+                        'id' => $recruiter->id,
+                        'user' => $recruiter
+                    ],
+                ]
+            ]
+        ])->assertOk();
+
+    expect($recruiter->refresh()->hasRole($role))->toBeTrue();
+
+    // Apply with secondary user
+    applySecondary(false);
+
+    expect(Application::all())->toHaveCount(1)
+        ->first()->id->toBeString();
+
+    $application = Application::first();
+
+    // Get the test_users Application // /application/{application_id}
+    $response = test()->actingAs($recruiter)
+        ->get(route('get.application', $application->id))
+        ->assertOk();
+
+    $comment = faker()->text;
+
+    test()->actingAs($recruiter)
+        ->put(route('comment.application', $application->id), ['comment' => $comment])
+        ->assertRedirect();
+
+    expect(\Seatplus\Eveapi\Models\Recruitment\ApplicationLogs::all())->toHaveCount(1);
+
+    $response = test()->actingAs($recruiter)
+        ->get(route('get.application', $application->id))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/Application')
+            ->has('application', fn (Assert $page) => $page
+                ->has('log_entries', 1, fn (Assert $page) => $page
+                    ->where('comment', $comment)
+                    ->has('causer', fn (Assert $page) => $page
+                        ->where('main_character_id', $recruiter->main_character_id)
+                        ->etc()
+                    )
+                    ->etc()
+                )
+                ->etc()
+            )
+            ->etc()
+        );
+
+});
+
 test('junior hr can dispatch update batch and get status', function () {
 
     createEnlistment();

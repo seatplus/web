@@ -5,7 +5,9 @@
         <label
           for="tabs"
           class="sr-only"
-        >Select a tab</label>
+        >
+          Select a tab
+        </label>
         <select
           id="tabs"
           v-model="active_element"
@@ -34,7 +36,10 @@
         </div>
       </div>
     </div>
-
+    <LogTab
+      v-if="isActive('Log')"
+      :application="application"
+    />
     <div
       v-if="isActive('Assets')"
       class="space-y-4"
@@ -125,12 +130,23 @@ import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
 import AssetTab from "@/Pages/Corporation/Recruitment/Tabs/AssetTab";
 import ContractTab from "@/Pages/Corporation/Recruitment/Tabs/ContractTab";
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
 
-const tabs = ['Assets', 'Contracts', 'Wallets', 'Contacts', 'Corporation History', 'Skills', 'Mails']
+const tabs = [
+    'Log',
+    'Assets',
+    'Contracts',
+    'Wallets',
+    'Contacts',
+    'Corporation History',
+    'Skills',
+    'Mails'
+]
 
 export default {
     name: "TabComponent",
     components: {
+        LogTab,
         ContractTab,
         AssetTab,
         CharacterContactsComponent,
@@ -149,7 +165,7 @@ export default {
             type: Object,
             required: true
         },
-        targetCorporation: {
+        application: {
             type: Object,
             required: true
         }
@@ -161,13 +177,15 @@ export default {
     },
     data() {
         return {
-            active_element: 'Assets',
-
+            active_element: 'Log',
         }
     },
     computed: {
         characterIds() {
             return _.map(this.recruit.characters, character => character.character_id)
+        },
+        targetCorporation() {
+            return this.application.corporation
         }
     },
     methods: {

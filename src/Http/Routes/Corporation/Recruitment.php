@@ -66,6 +66,7 @@ Route::prefix('recruitment')
                     ->group(function () {
                         Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
                         Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.application');
+                        Route::put('/application/{application_id}', 'addComment')->name('comment.application');
                     });
             });
 
