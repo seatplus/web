@@ -12,7 +12,7 @@
       <span :class="{'sr-only' : title.srOnly}">{{ title.label }}</span>
     </div>
   </div>
-  <ul>
+  <ul class="divide-y divide-gray-200">
     <slot
       :columns="columns"
       :countColumns="countColumns"

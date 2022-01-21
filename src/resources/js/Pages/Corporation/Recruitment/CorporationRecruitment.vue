@@ -55,56 +55,15 @@
       />
 
       <div class="bg-white overflow-hidden shadow sm:rounded-lg relative max-h-96 overflow-y-auto">
-        <InfiniteLoadingHelper
-          route="open.corporation.applications"
-          :params="{corporation_id: enlistment.corporation_id}"
-          @result="(results) => rawPending = results"
-        >
-          <StickyHeaderTable :header-titles="headerTitles">
-            <template #default="{ countColumns, columns }">
-              <StickyHeaderTableRow
-                v-for="applicant in pending"
-                :key="applicant"
-                :number-columns="countColumns"
-              >
-                <StickyHeaderCell :cell="columns[0]">
-                  <div class="flex-shrink self-center">
-                    <EntityByIdBlock
-                      :id="applicant.main_character.character_id"
-                      class="truncate"
-                      :image-size="10"
-                    />
-                  </div>
-                </StickyHeaderCell>
-
-                <StickyHeaderCell
-                  :cell="columns[1]"
-                  class="self-center"
-                >
-                  <div class="flex gap-x-2 flex-wrap">
-                    <CharacterComplianceElement
-                      v-for="character in applicant.characters"
-                      :key="character"
-                      :character="character"
-                    />
-                  </div>
-                </StickyHeaderCell>
-
-                <StickyHeaderCell
-                  :cell="columns[2]"
-                  class="self-center"
-                >
-                  <Button
-                    button-size="xs"
-                    :href="$route('get.application', applicant.application_id)"
-                  >
-                    Review
-                  </Button>
-                </stickyheadercell>
-              </StickyHeaderTableRow>
-            </template>
-          </StickyHeaderTable>
-        </InfiniteLoadingHelper>
+        <PendingTable
+          v-if="isPending"
+          :step-count="stepIndex"
+          :corporation-id="enlistment.corporation_id"
+        />
+        <ClosedTable
+          v-else
+          :corporation-id="enlistment.corporation_id"
+        />
       </div>
     </div>
   </div>
@@ -115,23 +74,15 @@
 import {Link} from "@inertiajs/inertia-vue3";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable";
-import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow";
-import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import CharacterComplianceElement from "@/Pages/Corporation/MemberCompliance/CharacterComplianceElement";
-import Button from "@/Shared/Layout/Button";
+import PendingTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/PendingTable";
+import ClosedTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/ClosedTable";
 
 export default {
     name: "CorporationRecruitment",
     components: {
-        Button,
-        CharacterComplianceElement,
-        EntityByIdBlock,
-        StickyHeaderCell,
-        StickyHeaderTableRow,
-        StickyHeaderTable, InfiniteLoadingHelper, BarWithUnderline, EntityBlock, Link },
+        ClosedTable,
+        PendingTable,
+        BarWithUnderline, EntityBlock, Link },
     props: {
         enlistment: {
             required: true,
@@ -151,10 +102,20 @@ export default {
     },
   computed: {
       steps() {
-        return _.map(this.enlistment.steps, (value, index) => new Object({id: index, name: value}))
+          let steps = _.map(this.enlistment.steps, (value, index) => new Object({id: index, name: value}))
+
+          steps.push({
+              id: this.enlistment.steps.length+1,
+              name: 'Closed'
+          })
+
+          return steps
       },
       pending() {
           return _.filter(this.rawPending, {decision_count: this.stepIndex})
+      },
+      isPending() {
+          return this.enlistment.steps.length >= this.stepIndex+1
       }
   },
     methods: {

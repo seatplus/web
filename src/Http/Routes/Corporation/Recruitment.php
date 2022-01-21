@@ -56,7 +56,8 @@ Route::prefix('recruitment')
             ->group(function () {
                 Route::middleware('permission:can accept or deny applications')
                     ->group(function () {
-                        Route::get('/applications/{corporation_id}', 'getOpenCorporationApplications')->name('open.corporation.applications');
+                        Route::get('/applications/{corporation_id}/open', 'getOpenCorporationApplications')->name('open.corporation.applications');
+                        Route::get('/applications/{corporation_id}/closed', 'getClosedCorporationApplications')->name('closed.corporation.applications');
 
                         Route::get('/update/{character_id}', 'getBatchUpdate')->name('get.batch_update');
                         Route::post('/update/{character_id}', 'dispatchBatchUpdate')->name('dispatch.batch_update');
