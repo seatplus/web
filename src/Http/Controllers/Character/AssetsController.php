@@ -38,7 +38,6 @@ use Seatplus\Web\Traits\HasWatchlist;
 
 class AssetsController extends Controller
 {
-
     use HasWatchlist;
 
     public function index()
