@@ -79,9 +79,10 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getAcceptedCorporationApplications(int $corporation_id)
+    public function getClosedCorporationApplications(int $corporation_id)
     {
-        $applications = Application::ofCorporation($corporation_id)->whereStatus('accepted');
+        $applications = Application::ofCorporation($corporation_id)
+            ->where('status', '<>', 'open');
 
         return ApplicationRessource::collection($applications->paginate());
     }
@@ -90,6 +91,7 @@ class ApplicationsController extends Controller
     {
         $application = Application::query()
             ->with([
+                'corporation',
                 'log_entries.causer' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([User::class => ['main_character']]);
                 },
@@ -111,7 +113,7 @@ class ApplicationsController extends Controller
         };
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => array_merge($recruit->toArray(), ['application_id' => $application_id]),
+            'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
