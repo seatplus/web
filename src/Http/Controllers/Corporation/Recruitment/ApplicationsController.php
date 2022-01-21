@@ -89,12 +89,17 @@ class ApplicationsController extends Controller
     public function getApplication(string $application_id, WatchlistArrayAction $action)
     {
         $application = Application::query()
-            ->with(['applicationable' => function (MorphTo $morphTo) {
-                $morphTo->morphWith([
-                    User::class => ['main_character', 'characters', 'characters.batch_update'],
-                    CharacterInfo::class => ['batch_update'],
-                ]);
-            }])
+            ->with([
+                'log_entries.causer' => function(MorphTo $morphTo) {
+                    $morphTo->morphWith([User::class => ['main_character']]);
+                },
+                'applicationable' => function (MorphTo $morphTo) {
+                    $morphTo->morphWith([
+                        User::class => ['main_character', 'characters', 'characters.batch_update'],
+                        CharacterInfo::class => ['batch_update'],
+                    ]);
+                }
+            ])
             ->find($application_id);
 
         $recruit = match ($application->applicationable_type) {
@@ -107,7 +112,7 @@ class ApplicationsController extends Controller
 
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => array_merge($recruit->toArray(), ['application_id' => $application_id]),
-            'target_corporation' => $application->corporation,
+            'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
@@ -142,6 +147,18 @@ class ApplicationsController extends Controller
                 User::class => 'User',
                 CharacterInfo::class => 'Character'
             }, $request->get('decision')));
+    }
+
+    public function addComment(string $application_id, Request $request, CreateApplicationLogEntryAction $action)
+    {
+        $request->validate(['comment' => ['required', 'string']]);
+
+        $action->setApplicationId($application_id)
+            ->setType('comment')
+            ->setComment($request->get('comment'))
+            ->execute();
+
+        return back()->with('success', 'comment created');
     }
 
     public function dispatchBatchUpdate(int $character_id)
