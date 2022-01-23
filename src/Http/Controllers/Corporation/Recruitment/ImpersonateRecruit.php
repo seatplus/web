@@ -36,10 +36,10 @@ class ImpersonateRecruit extends Controller
     public function __invoke(string $application_id)
     {
         $application = Application::query()
-            ->where('status', '<>', 'open')
+            ->whereStatus('open')
             ->find($application_id);
 
-        abort_unless($application->applicationable_type === User::class, 403, 'This action is not allowed');
+        abort_unless($application?->applicationable_type === User::class, 403, 'This action is not allowed');
 
         (new ImpersonateService)->impersonateUser($application->applicationable);
 
