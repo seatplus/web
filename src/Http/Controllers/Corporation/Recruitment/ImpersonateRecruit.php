@@ -35,7 +35,9 @@ class ImpersonateRecruit extends Controller
 {
     public function __invoke(string $application_id)
     {
-        $application = Application::find($application_id);
+        $application = Application::query()
+            ->where('status', '<>', 'open')
+            ->find($application_id);
 
         abort_unless($application->applicationable_type === User::class, 403, 'This action is not allowed');
 
