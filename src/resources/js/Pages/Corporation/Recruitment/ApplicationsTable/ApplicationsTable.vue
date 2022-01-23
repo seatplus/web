@@ -8,12 +8,12 @@
       >
         <StickyHeaderCell
           :cell="columns[0]"
-          class="flex truncate"
+          class="sm:flex truncate"
         >
           <div class="flex-shrink self-center">
             <EntityByIdBlock
               :id="applicant.main_character.character_id"
-              class="truncate"
+              class="flex gap-4 truncate"
               :image-size="10"
             />
           </div>
@@ -36,14 +36,16 @@
           :cell="columns[2]"
           class="self-center"
         >
-          <div class="flex justify-end">
-            <Button
-              button-size="xs"
-              :href="$route('get.application', applicant.application_id)"
-            >
-              Review
-            </Button>
-          </div>
+          <slot :applicant="applicant">
+            <div class="flex justify-end">
+              <Button
+                button-size="xs"
+                :href="$route('get.application', applicant.application_id)"
+              >
+                Review
+              </Button>
+            </div>
+          </slot>
         </stickyheadercell>
       </StickyHeaderTableRow>
     </template>

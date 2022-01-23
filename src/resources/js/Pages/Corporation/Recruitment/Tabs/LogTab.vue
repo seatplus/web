@@ -5,7 +5,10 @@
   >
     <div>
       <div class="divide-y divide-gray-200">
-        <div class="pb-4">
+        <div
+          v-if="withHeader"
+          class="pb-4"
+        >
           <h2
             id="activity-title"
             class="text-lg font-medium text-gray-900"
@@ -158,6 +161,11 @@ export default {
         application: {
             required: true,
             type: Object
+        },
+        withHeader: {
+            required: false,
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
