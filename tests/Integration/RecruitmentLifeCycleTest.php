@@ -218,6 +218,7 @@ test('junior hr handles open user applications', function () {
 
 
     // Impersonate
+    expect($application)->status->toBe('open');
 
     test()->actingAs(test()->test_user)
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
@@ -638,6 +639,37 @@ test('junior hr can dispatch update batch and get status', function () {
     test()->actingAs(test()->test_user)
         ->get(route('get.batch_update', test()->secondary_character->character_id))
         ->assertJsonFragment(['batchable_id' => test()->secondary_character->character_id]);
+});
+
+it('returns activity log entries for closed applications', function (){
+
+    $application = Event::fakeFor(fn() => Application::factory()->create([
+        'id' => \Illuminate\Support\Str::uuid(),
+        'status' => 'rejected'
+    ]));
+
+    $application->log_entries()->create([
+        'causer_type' => CharacterInfo::class,
+        'causer_id' => test()->test_character->character_id,
+        'type' => faker()->randomElement(['decision', 'comment']),
+        'comment' => faker()->text,
+    ]);
+
+    assignPermissionToTestUser('superuser');
+
+    $application =  $application->refresh();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('get.activity.log', $application->id))
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->where('id', $application->id)
+                ->where('status', 'rejected')
+                ->where('log_entries', fn (\Illuminate\Support\Collection $collection) =>
+                    \Illuminate\Support\Arr::has($collection->first(), 'causer')
+                )
+                ->etc()
+        );
+
 });
 
 // Helpers
