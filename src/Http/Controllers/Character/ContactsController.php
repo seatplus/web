@@ -26,8 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ContactsRequest;
 use Seatplus\Web\Http\Resources\ContactResource;
@@ -58,12 +60,19 @@ class ContactsController extends Controller
     {
         $validated = $request->validated();
 
+        $corp_alliance_standing = Contact::query()
+            ->whereIn('contactable_id', collect([$validated['corporation_id'], data_get($validated, 'alliance_id')])->filter()->toArray())
+            ->get();
+
         $query = Contact::with('labels')
             ->where('contactable_id', $character_id)
             ->withStandings($validated['corporation_id'], data_get($validated, 'alliance_id'));
 
         return ContactResource::collection(
             $query->paginate()
-        );
+        )->additional([
+            'corporation_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type instanceof CorporationInfo::class),
+            'alliance_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type instanceof AllianceInfo::class)
+        ]);
     }
 }
