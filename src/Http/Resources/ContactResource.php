@@ -56,7 +56,7 @@ class ContactResource extends JsonResource
 
     private function getStanding(?CharacterAffiliation $affiliation, Collection $contacts): ?int
     {
-        if(is_null($affiliation) || $contacts->isEmpty()) {
+        if (is_null($affiliation) || $contacts->isEmpty()) {
             return null;
         }
 
@@ -64,13 +64,12 @@ class ContactResource extends JsonResource
             $affiliation->alliance_id,
             $affiliation->corporation_id,
             $affiliation->faction_id,
-            $affiliation->character_id
+            $affiliation->character_id,
         ])
             ->filter()
             ->map(fn (int $contact_id) => $contacts->firstWhere('contact_id', $contact_id))
             ->first();
 
         return $contact?->standing;
-
     }
 }
