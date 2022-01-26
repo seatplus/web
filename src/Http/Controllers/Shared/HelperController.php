@@ -142,8 +142,8 @@ class HelperController extends Controller
             ->map(fn ($entry) => [
                 'id' => intval(match ($entry->category) {
                     'type' => 1,
-                        'group' => 2,
-                        'category' => 3,
+                    'group' => 2,
+                    'category' => 3,
                 } . $entry->id),
                 'name' => sprintf('%s (%s)', $entry->name, $entry->category),
                 'watchable_id' => intval($entry->id),

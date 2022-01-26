@@ -39,6 +39,9 @@
             :image-size="5"
             :name-class="selected ? 'font-semibold' : 'font-medium' + ' ' + 'text-sm leading 6 text-gray-900'"
           />
+          <div v-else>
+            {{ option.name }}
+          </div>
           <span
             v-show="selected"
             class="absolute inset-y-0 left-0 flex items-center pl-1.5"
