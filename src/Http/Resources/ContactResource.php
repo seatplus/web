@@ -27,6 +27,8 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 
 class ContactResource extends JsonResource
 {
@@ -38,6 +40,8 @@ class ContactResource extends JsonResource
      */
     public function toArray($request)
     {
+        $corpAllianceContacts = $request->session()->get('contacts');
+
         return [
             'contact_id' => $this->contact_id,
             'contact_type' => $this->contact_type,
@@ -45,8 +49,28 @@ class ContactResource extends JsonResource
             'is_watched' => $this->is_watched,
             'standing' => $this->standing,
             'labels' => $this->labels,
-            'corporation_standing' => $this->corporation_standing,
-            'alliance_standing' => $this->alliance_standing,
+            'corporation_standing' => $this->getStanding($this->affiliation, data_get($corpAllianceContacts, 'corporation_contacts')),
+            'alliance_standing' => $this->getStanding($this->affiliation, data_get($corpAllianceContacts, 'alliance_contacts')),
         ];
+    }
+
+    private function getStanding(?CharacterAffiliation $affiliation, Collection $contacts): ?float
+    {
+        if (is_null($affiliation) || $contacts->isEmpty()) {
+            return null;
+        }
+
+        $contact = collect([
+            $affiliation->alliance_id,
+            $affiliation->corporation_id,
+            $affiliation->faction_id,
+            $affiliation->character_id,
+        ])
+            ->filter()
+            ->map(fn (int $contact_id) => $contacts->firstWhere('contact_id', $contact_id))
+            ->filter()
+            ->first();
+
+        return $contact?->standing;
     }
 }
