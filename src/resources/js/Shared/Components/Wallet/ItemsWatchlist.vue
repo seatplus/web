@@ -69,7 +69,7 @@ export default {
         })
 
         const select = (selection) => form.items.push(selection)
-        const unselect = (watchable_id) => form.items = _.filter(form.items, (item) => item.watchable_id !== watchable_id)
+        const unselect = (id) => form.items = _.filter(form.items, (item) => item.id !== id)
         const submit = () => form.post(route('update.watchlist', props.corporationId))
 
         watch(form.items, () => uniqueId.value++, {deep: true})
