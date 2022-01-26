@@ -62,21 +62,7 @@
       v-if="isActive('Wallets')"
       class="space-y-4"
     >
-      <div
-        v-for="character in recruit.characters"
-        :key="`wallet component ${character.character_id}`"
-        class="space-y-4"
-      >
-        <WalletJournalBalanceChart
-          :id="character.character_id"
-        />
-        <WalletJournalComponent
-          :id="character.character_id"
-        />
-        <WalletTransactionComponent
-          :id="character.character_id"
-        />
-      </div>
+      <WalletTab :character-ids="characterIds" />
     </div>
     <div
       v-if="isActive('Contacts')"
@@ -131,6 +117,7 @@ import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterCo
 import AssetTab from "@/Pages/Corporation/Recruitment/Tabs/AssetTab";
 import ContractTab from "@/Pages/Corporation/Recruitment/Tabs/ContractTab";
 import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
+import WalletTab from "@/Pages/Corporation/Recruitment/Tabs/WalletTab";
 
 const tabs = [
     'Log',
@@ -146,6 +133,7 @@ const tabs = [
 export default {
     name: "TabComponent",
     components: {
+        WalletTab,
         LogTab,
         ContractTab,
         AssetTab,

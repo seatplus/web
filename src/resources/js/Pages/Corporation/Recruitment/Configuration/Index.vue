@@ -73,7 +73,7 @@
 import PageHeader from "@/Shared/Layout/PageHeader";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
 import Multiselect from "@/Shared/Components/Multiselect";
-import ItemsWatchlist from "@/Pages/Corporation/Recruitment/Configuration/ItemsWatchlist";
+import ItemsWatchlist from "@/Shared/Components/Wallet/ItemsWatchlist";
 import EnlistmentConfig from "@/Pages/Corporation/Recruitment/Configuration/EnlistmentConfig";
 import Button from "@/Shared/Layout/Button";
 

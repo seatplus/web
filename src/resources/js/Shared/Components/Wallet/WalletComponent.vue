@@ -15,7 +15,9 @@
     />
     <WalletJournalComponent
       :id="id"
+      :key="filters"
       :division="division"
+      :filters="filters"
     />
     <WalletTransactionComponent
       :id="id"
@@ -39,6 +41,11 @@ export default {
         division: {
             required: false,
             type: Object
+        },
+        filters: {
+            required: false,
+            type: Object,
+            default: () => new Object()
         }
     }
 }

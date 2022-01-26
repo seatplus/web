@@ -71,6 +71,11 @@ export default {
             required: false,
             type: Object,
             default: () => {}
+        },
+        filters: {
+            required: false,
+            type: Object,
+            default: () => new Object()
         }
     },
     data() {
@@ -84,12 +89,13 @@ export default {
             return this.division? 'corporation.wallet_journal.detail' : 'character.wallet_journal.detail'
         },
         routeParameters() {
-            return this.division ? {
-                corporation_id: this.id,
-                division_id: this.division.division_id
-            } : {
-                character_id: this.id
-            }
+
+            let parameters = _.merge({ character_id: this.id }, this.filters)
+
+            if(this.division)
+                parameters = _.merge(parameters, { division_id: this.division.division_id })
+
+            return parameters
         }
     },
     created() {

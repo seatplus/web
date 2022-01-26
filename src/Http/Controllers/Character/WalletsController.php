@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -54,10 +55,49 @@ class WalletsController extends Controller
 
     public function journal(int $character_id)
     {
-        return WalletJournal::where('wallet_journable_id', $character_id)
+        $query =  WalletJournal::query()
+            ->where('wallet_journable_id', $character_id)
             ->with('wallet_journable')
-            ->orderByDesc('date')
-            ->paginate();
+            ->orderByDesc('date');
+
+        request()->whenHas('ref_type', fn(array $types) => $query->whereIn('ref_type', $types));
+
+        return $query->paginate();
+    }
+
+    public function journalTypes()
+    {
+        $term = request()->get('search');
+
+        if (Str::length($term) < 3) {
+            return response('the minimum length of 3 is not met', 403);
+        }
+
+        $alphabet_to_number = function ($string) : float {
+            $string = strtoupper($string);
+            $length = strlen($string);
+            $number = 0;
+            $level = 1;
+            while ($length >= $level ) {
+                $char = $string[$length - $level];
+                $c = ord($char) - 64;
+                $number += $c * (26 ** ($level-1));
+                $level++;
+            }
+            return $number;
+        };
+
+        return WalletJournal::query()
+            ->where('ref_type', 'like', $term . '%')
+            ->select('ref_type')
+            ->groupBy('ref_type')
+            ->limit(15)
+            ->get()
+            ->map(fn ($group, $index) => [
+                'id' => $alphabet_to_number($group->ref_type),
+                'name' => $group->ref_type,
+                'hasEveImage' => false
+            ]);
     }
 
     public function balance(int $character_id)
