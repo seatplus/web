@@ -64,7 +64,7 @@ class ContactsController extends Controller
             ->whereIn('contactable_id', collect([$validated['corporation_id'], data_get($validated, 'alliance_id')])->filter()->toArray())
             ->get();
 
-        $query = Contact::with('labels')
+        $query = Contact::with(['labels', 'character_affiliation', 'corporation_affiliation', 'alliance_affiliation', 'faction_affiliation'])
             ->where('contactable_id', $character_id);
 
         $request->session()->now('contacts', [
