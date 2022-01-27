@@ -75,7 +75,6 @@ class WalletsController extends Controller
         }
 
         return $action->execute($term);
-
     }
 
     public function balance(int $character_id)
