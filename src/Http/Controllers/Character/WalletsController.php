@@ -113,7 +113,8 @@ class WalletsController extends Controller
             ->select(['updated_at as x', 'balance as y']);
 
         $date_part = WalletJournal::query()
-            ->whereBetween('date', [now(), now()->subDays(request()->get('days', 30))])
+            ->whereBetween('date', [now()->subDays(request()->get('days', 30)), now()])
+            ->where('wallet_journable_id', $character_id)
             ->orderByDesc('date')
             ->select(['date as x', 'balance as y']);
 
