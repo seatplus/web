@@ -19,7 +19,7 @@
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
-import WalletFilter from "@/Pages/Character/Wallet/WalletFilter";
+import WalletFilter from "@/Shared/Components/Wallet/WalletFilter";
 export default {
     name: "WalletTab",
     components: {WalletFilter, WalletTransactionComponent, WalletJournalComponent, WalletJournalBalanceChart},
