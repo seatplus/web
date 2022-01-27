@@ -32,6 +32,7 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
+use Seatplus\Web\Http\Actions\Wallet\GetRefTypesAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
@@ -65,7 +66,7 @@ class WalletsController extends Controller
         return $query->paginate();
     }
 
-    public function journalTypes()
+    public function journalTypes(GetRefTypesAction $action)
     {
         $term = request()->get('search');
 
@@ -73,32 +74,8 @@ class WalletsController extends Controller
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $alphabet_to_number = function ($string): float {
-            $string = strtoupper($string);
-            $length = strlen($string);
-            $number = 0;
-            $level = 1;
-            while ($length >= $level) {
-                $char = $string[$length - $level];
-                $c = ord($char) - 64;
-                $number += $c * (26 ** ($level - 1));
-                $level++;
-            }
+        return $action->execute($term);
 
-            return $number;
-        };
-
-        return WalletJournal::query()
-            ->where('ref_type', 'like', $term . '%')
-            ->select('ref_type')
-            ->groupBy('ref_type')
-            ->limit(15)
-            ->get()
-            ->map(fn ($group, $index) => [
-                'id' => $alphabet_to_number($group->ref_type),
-                'name' => $group->ref_type,
-                'hasEveImage' => false,
-            ]);
     }
 
     public function balance(int $character_id)
