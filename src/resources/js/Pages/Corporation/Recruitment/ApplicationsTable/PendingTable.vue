@@ -1,7 +1,8 @@
 <template>
   <InfiniteLoadingHelper
+    :key="routeParams"
     route="open.corporation.applications"
-    :params="{corporation_id: corporationId}"
+    :params="routeParams"
     @result="(results) => raw_pending = results"
   >
     <ApplicationsTable :applications="pending" />
@@ -35,9 +36,17 @@ export default {
 
         const pending = computed(() => _.filter(raw_pending.value, {decision_count: props.stepCount}))
 
+        const routeParams = computed(() => {
+            return {
+                corporation_id: props.corporationId,
+                decision_count: props.stepCount
+            }
+        })
+
         return {
             raw_pending,
-            pending
+            pending,
+            routeParams
         }
     }
 }
