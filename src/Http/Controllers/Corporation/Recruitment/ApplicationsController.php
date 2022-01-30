@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -34,6 +35,7 @@ use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
@@ -70,13 +72,17 @@ class ApplicationsController extends Controller
         return back()->with('success', 'Application deleted');
     }
 
-    public function getOpenCorporationApplications(int $corporation_id)
+    public function getOpenCorporationApplications(int $corporation_id, int $decision_count)
     {
-        $applications = Application::query()
+        $query = Application::query()
             ->with('log_entries')
-            ->ofCorporation($corporation_id)->whereStatus('open');
+            ->whereHas('log_entries', function (Builder $query) {
+                $query->where('type', 'decision');
+            }, '=', $decision_count)
+            ->ofCorporation($corporation_id)
+            ->whereStatus('open');
 
-        return ApplicationRessource::collection($applications->paginate());
+        return ApplicationRessource::collection($query->paginate());
     }
 
     public function getClosedCorporationApplications(int $corporation_id)
