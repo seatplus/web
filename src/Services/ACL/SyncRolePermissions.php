@@ -47,8 +47,7 @@ class SyncRolePermissions
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
     private Role $role
-    )
-    {
+    ) {
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
     }
