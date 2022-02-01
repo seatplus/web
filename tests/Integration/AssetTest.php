@@ -56,7 +56,7 @@ test('load asset', function () {
 
 it('has asset prop', function () {
     $character_assets = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id'   => test()->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
     ]);
 
@@ -73,14 +73,14 @@ it('has asset prop', function () {
 
 it('has list affiliated character list route', function () {
     Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id'   => test()->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.affiliated.characters', [
             'permission' => 'assets',
-            'search' => substr(test()->test_character->name, 5),
+            'search'     => substr(test()->test_character->name, 5),
         ]));
     //->assertOk();
 
@@ -90,8 +90,8 @@ it('has list affiliated character list route', function () {
 test('load asset in system', function () {
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
             'location_flag' => 'Hangar',
         ]);
 
@@ -131,8 +131,8 @@ test('load asset in system', function () {
 test('load asset in region', function () {
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
             'location_flag' => 'Hangar',
         ]);
 
@@ -174,8 +174,8 @@ test('load asset in unknown location', function () {
     // 1. create asset with location
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
             'location_flag' => 'Hangar',
         ]);
 
@@ -184,8 +184,8 @@ test('load asset in unknown location', function () {
     // 2. create asset without location (unknown)
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => 12345,
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => 12345,
             'location_flag' => 'Hangar',
         ]);
 
@@ -217,15 +217,15 @@ test('load asset on watchlist', function () {
     $asset = Asset::factory()
         ->count(2)
         ->create([
-            'assetable_id' => test()->test_character->character_id,
+            'assetable_id'  => test()->test_character->character_id,
             'location_flag' => 'Hangar',
         ])->first();
 
     $content = Asset::factory()
         ->create([
-            'location_id' => $asset->item_id,
+            'location_id'   => $asset->item_id,
             'location_flag' => 'Cargo',
-            'type_id' => Type::factory()->create([
+            'type_id'       => Type::factory()->create([
                 'group_id' => Group::factory()->create(['category_id' => Category::factory()]),
             ]),
         ]);
@@ -241,7 +241,7 @@ test('load asset on watchlist', function () {
 
     $tests = [
         ['types' => [$content->type_id]],
-        ['groups' => [$content->type->group_id]],
+        ['groups'     => [$content->type->group_id]],
         ['categories' => [$content->type->group->category_id]],
     ];
 
