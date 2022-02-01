@@ -35,8 +35,7 @@ class SearchCorporationOrAlliance
      * @var string
      */
     private string $searchParam
-    )
-    {
+    ) {
     }
 
     public function search(): array

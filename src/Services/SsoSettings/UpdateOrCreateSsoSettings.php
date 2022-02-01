@@ -58,10 +58,10 @@ class UpdateOrCreateSsoSettings
     {
         $this->entities->whenEmpty(
             function () {
-            if ($this->type === 'global') {
-                SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
-            }
-        },
+                if ($this->type === 'global') {
+                    SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
+                }
+            },
             fn ($collection) => $collection
             ->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
@@ -69,7 +69,7 @@ class UpdateOrCreateSsoSettings
 
                 $morphable_type = match ($category) {
                     'corporation' => CorporationInfo::class,
-                    'alliance'    => AllianceInfo::class,
+                    'alliance' => AllianceInfo::class,
                 };
 
                 (new DispatchCorporationOrAllianceInfoJob())->handle($morphable_type, $entity_id);
@@ -78,8 +78,8 @@ class UpdateOrCreateSsoSettings
                     'morphable_id' => $entity_id,
                 ], [
                     'selected_scopes' => $this->selected_scopes->unique(),
-                    'morphable_type'  => $morphable_type,
-                    'type'            => $this->type,
+                    'morphable_type' => $morphable_type,
+                    'type' => $this->type,
                 ]);
             })
         );
