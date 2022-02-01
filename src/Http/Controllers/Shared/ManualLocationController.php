@@ -57,7 +57,7 @@ class ManualLocationController extends Controller
     {
         $validated = $request->validate([
             'location_id' => ['required'],
-            'id' => ['required', Rule::in(ManualLocation::where('location_id', $request->get('location_id'))->pluck('id')->toArray())],
+            'id'          => ['required', Rule::in(ManualLocation::where('location_id', $request->get('location_id'))->pluck('id')->toArray())],
         ]);
 
         $suggestion = ManualLocation::find($validated['id']);
@@ -67,7 +67,7 @@ class ManualLocationController extends Controller
         Location::updateOrCreate([
             'location_id' => $suggestion->location_id,
         ], [
-            'locatable_id' => $suggestion->location_id,
+            'locatable_id'   => $suggestion->location_id,
             'locatable_type' => ManualLocation::class,
         ]);
 
@@ -106,8 +106,8 @@ class ManualLocationController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'location_id' => ['required', 'unique:universe_locations,location_id'],
+            'name'            => ['required', 'string'],
+            'location_id'     => ['required', 'unique:universe_locations,location_id'],
             'solar_system_id' => ['required'],
         ]);
 
@@ -115,9 +115,9 @@ class ManualLocationController extends Controller
         ResolveUniverseSystemBySystemIdJob::dispatchAfterResponse($validated['solar_system_id']);
 
         $location = ManualLocation::create([
-            'location_id' => $validated['location_id'],
-            'user_id' => auth()->user()->getAuthIdentifier(),
-            'name' => $validated['name'],
+            'location_id'     => $validated['location_id'],
+            'user_id'         => auth()->user()->getAuthIdentifier(),
+            'name'            => $validated['name'],
             'solar_system_id' => $validated['solar_system_id'],
         ]);
 
