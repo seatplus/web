@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Inertia\Testing\Assert;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -11,23 +34,20 @@ use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Models\Asset\Asset;
 
 test('is protected by authentication', function () {
-
     $response = test()->followingRedirects()
         ->get(route('character.assets'));
 
-    $response->assertInertia( fn (Assert $page) => $page->component('Auth/Login'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Auth/Login'));
 });
 
 test('see component', function () {
-
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.assets'));
 
-    $response->assertInertia( fn (Assert $page) => $page->component('Character/Assets'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Character/Assets'));
 });
 
 test('load asset', function () {
-
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets'));
 
@@ -35,10 +55,9 @@ test('load asset', function () {
 });
 
 it('has asset prop', function () {
-
     $character_assets = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
-        'assetable_type' => CharacterInfo::class
+        'assetable_id'   => test()->test_character->character_id,
+        'assetable_type' => CharacterInfo::class,
     ]);
 
     // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
@@ -49,21 +68,21 @@ it('has asset prop', function () {
 
     //dd($response->exception->getMessage());
 
-    $response->assertInertia( fn (Assert $page) => $page->has('dispatchTransferObject'));
+    $response->assertInertia(fn (Assert $page) => $page->has('dispatchTransferObject'));
 });
 
 it('has list affiliated character list route', function () {
     Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
-        'assetable_type' => CharacterInfo::class
+        'assetable_id'   => test()->test_character->character_id,
+        'assetable_type' => CharacterInfo::class,
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.affiliated.characters', [
             'permission' => 'assets',
-            'search' => substr(test()->test_character->name, 5)
+            'search'     => substr(test()->test_character->name, 5),
         ]));
-        //->assertOk();
+    //->assertOk();
 
     $response->assertOk();
 });
@@ -71,9 +90,9 @@ it('has list affiliated character list route', function () {
 test('load asset in system', function () {
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar'
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
+            'location_flag' => 'Hangar',
         ]);
 
     $system = $asset->location->locatable->system;
@@ -88,14 +107,14 @@ test('load asset in system', function () {
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'systems' => $system->system_id
+            'systems' => $system->system_id,
         ]));
 
     expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'systems' => [$system->system_id]
+            'systems' => [$system->system_id],
         ]));
 
     expect($response->original)->toHaveCount(1);
@@ -103,7 +122,7 @@ test('load asset in system', function () {
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'systems' => $system->system_id+1
+            'systems' => $system->system_id + 1,
         ]));
 
     expect($response->original)->toHaveCount(0);
@@ -112,13 +131,12 @@ test('load asset in system', function () {
 test('load asset in region', function () {
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar'
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
+            'location_flag' => 'Hangar',
         ]);
 
     $region = $asset->location->locatable->system->region;
-
 
     // call without filter
     $response = test()->actingAs(test()->test_user)
@@ -130,14 +148,14 @@ test('load asset in region', function () {
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'regions' => $region->region_id
+            'regions' => $region->region_id,
         ]));
 
     expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'regions' => [$region->region_id]
+            'regions' => [$region->region_id],
         ]));
 
     expect($response->original)->toHaveCount(1);
@@ -145,7 +163,7 @@ test('load asset in region', function () {
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'systems' => $region->region_id+1
+            'systems' => $region->region_id + 1,
         ]));
 
     expect($response->original)->toHaveCount(0);
@@ -156,9 +174,9 @@ test('load asset in unknown location', function () {
     // 1. create asset with location
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar'
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => Location::factory()->for(Station::factory(), 'locatable'),
+            'location_flag' => 'Hangar',
         ]);
 
     test()->assertNotNull($asset->location);
@@ -166,9 +184,9 @@ test('load asset in unknown location', function () {
     // 2. create asset without location (unknown)
     $asset = Asset::factory()
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => 12345,
-            'location_flag' => 'Hangar'
+            'assetable_id'  => test()->test_character->character_id,
+            'location_id'   => 12345,
+            'location_flag' => 'Hangar',
         ]);
 
     expect($asset->location)->toBeNull();
@@ -184,7 +202,7 @@ test('load asset in unknown location', function () {
     // 5. call only unknown locations
     $response = test()->actingAs(test()->test_user)
         ->get(route('load.character.assets', [
-            'withUnknownLocations' => true
+            'withUnknownLocations' => true,
         ]));
 
     // 6. expect only one
@@ -199,21 +217,18 @@ test('load asset on watchlist', function () {
     $asset = Asset::factory()
         ->count(2)
         ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_flag' => 'Hangar'
+            'assetable_id'  => test()->test_character->character_id,
+            'location_flag' => 'Hangar',
         ])->first();
-
 
     $content = Asset::factory()
         ->create([
-            'location_id' => $asset->item_id,
+            'location_id'   => $asset->item_id,
             'location_flag' => 'Cargo',
-            'type_id' => Type::factory()->create([
-                'group_id' => Group::factory()->create(['category_id' => Category::factory()])
-            ])
+            'type_id'       => Type::factory()->create([
+                'group_id' => Group::factory()->create(['category_id' => Category::factory()]),
+            ]),
         ]);
-
-
 
     // Act
     $response = test()->actingAs(test()->test_user)
@@ -226,7 +241,7 @@ test('load asset on watchlist', function () {
 
     $tests = [
         ['types' => [$content->type_id]],
-        ['groups' => [$content->type->group_id]],
+        ['groups'     => [$content->type->group_id]],
         ['categories' => [$content->type->group->category_id]],
     ];
 
@@ -241,5 +256,4 @@ test('load asset on watchlist', function () {
 
         expect($watchlist_location_response->original)->toHaveCount(1);
     }
-
 });

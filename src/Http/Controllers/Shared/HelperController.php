@@ -45,7 +45,7 @@ class HelperController extends Controller
 {
     public function ids()
     {
-        $result = (new GetNamesFromIdsService)->execute(request()->all());
+        $result = (new GetNamesFromIdsService())->execute(request()->all());
 
         return $result->toJson();
     }
@@ -71,14 +71,14 @@ class HelperController extends Controller
 
     public function findSolarSystem(string $search)
     {
-        $ids_to_resolve = (new SearchService)->execute('solar_system', $search);
+        $ids_to_resolve = (new SearchService())->execute('solar_system', $search);
 
         // get names for IDs
         if (empty($ids_to_resolve)) {
             return $ids_to_resolve;
         }
 
-        $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
+        $esi_results = (new GetNamesFromIdsService())->execute($ids_to_resolve);
 
         return $esi_results;
     }
@@ -91,9 +91,9 @@ class HelperController extends Controller
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $system_ids = (new SearchService)->execute('solar_system', $query);
+        $system_ids = (new SearchService())->execute('solar_system', $query);
 
-        return (new GetNamesFromIdsService)->execute(array_slice($system_ids, 0, 15));
+        return (new GetNamesFromIdsService())->execute(array_slice($system_ids, 0, 15));
     }
 
     public function regions()
@@ -104,9 +104,9 @@ class HelperController extends Controller
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $region_ids = (new SearchService)->execute('region', $query);
+        $region_ids = (new SearchService())->execute('region', $query);
 
-        return (new GetNamesFromIdsService)->execute(array_slice($region_ids, 0, 15));
+        return (new GetNamesFromIdsService())->execute(array_slice($region_ids, 0, 15));
     }
 
     public function typesOrGroupsOrCategories()
@@ -119,19 +119,19 @@ class HelperController extends Controller
 
         $typeQuery = Type::query()
             ->select(['type_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'type' as category"))
             ->getQuery();
 
         $groupQuery = Group::query()
             ->select(['group_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'group' as category"))
             ->getQuery();
 
         $categoryQuery = Category::query()
             ->select(['category_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'category' as category"));
 
         return $categoryQuery
@@ -140,17 +140,17 @@ class HelperController extends Controller
             ->limit(15)
             ->get()
             ->map(fn ($entry) => [
-                'id' => intval(match ($entry->category) {
-                    'type' => 1,
-                    'group' => 2,
+                'id'           => intval(match ($entry->category) {
+                    'type'     => 1,
+                    'group'    => 2,
                     'category' => 3,
-                } . $entry->id),
-                'name' => sprintf('%s (%s)', $entry->name, $entry->category),
-                'watchable_id' => intval($entry->id),
+                }.$entry->id),
+                'name'           => sprintf('%s (%s)', $entry->name, $entry->category),
+                'watchable_id'   => intval($entry->id),
                 'watchable_type' => match ($entry->category) {
-                    'type' => Type::class,
-                    'group' => Group::class,
-                    'category' => Category::class,
+                    'type'       => Type::class,
+                    'group'      => Group::class,
+                    'category'   => Category::class,
                 },
             ]);
     }
@@ -161,7 +161,7 @@ class HelperController extends Controller
 
         $image_variants = cache($url);
 
-        if (! $image_variants) {
+        if (!$image_variants) {
             $image_variants = Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
 
             //Cache::put($url, $image_variants, now()->addDay());
@@ -178,8 +178,8 @@ class HelperController extends Controller
         }
 
         $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v1',
+            'method'   => 'get',
+            'version'  => 'v1',
             'endpoint' => '/markets/prices/',
         ]);
 

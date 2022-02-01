@@ -24,11 +24,12 @@
  * SOFTWARE.
  */
 
-if (! function_exists('number_roman')) {
+if (!function_exists('number_roman')) {
     /**
      * Converts an integer to a roman numberal representation.
      *
-     * @param  int  $number
+     * @param int $number
+     *
      * @return string
      */
     function number_roman($number)
@@ -54,20 +55,21 @@ if (! function_exists('number_roman')) {
     }
 }
 
-if (! function_exists('carbon')) {
+if (!function_exists('carbon')) {
 
     /**
      * A helper to get a fresh instance of Carbon.
      *
-     * @param  null  $data
+     * @param null $data
+     *
      * @return \Carbon\Carbon
      */
     function carbon($data = null)
     {
-        if (! is_null($data)) {
+        if (!is_null($data)) {
             return new \Carbon\Carbon($data);
         }
 
-        return new \Carbon\Carbon;
+        return new \Carbon\Carbon();
     }
 }

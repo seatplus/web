@@ -1,10 +1,33 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\Assert;
-use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -42,16 +65,14 @@ beforeEach(function () {
 });
 
 test('user without permission fails to create enlistment', function () {
-
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user'
+            'type'           => 'user',
         ])->assertForbidden();
 });
 
 test('user with permission and affiliations succeeds to create enlistment', function () {
-
     expect(\Seatplus\Web\Models\Recruitment\Enlistment::all())->toHaveCount(0);
 
     createEnlistment();
@@ -60,30 +81,31 @@ test('user with permission and affiliations succeeds to create enlistment', func
 });
 
 test('user with permission and affiliations can delete enlistment', function () {
-
     createEnlistment();
 
-    $this->assertDatabaseHas('enlistments',[
+    $this->assertDatabaseHas('enlistments', [
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 
     test()->actingAs(test()->test_user)
         ->delete(route('delete.enlistment', ['corporation_id' =>  test()->test_character->corporation->corporation_id]));
 
-    $this->assertDatabaseMissing('enlistments',[
+    $this->assertDatabaseMissing('enlistments', [
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 });
 
 test('secondary user can see enlistment', function () {
-
     createEnlistment();
 
     $response = test()->actingAs(test()->secondary_user)
         ->get(route('list.open.enlistments'))
-        ->assertJson(fn (AssertableJson $json) => $json
+        ->assertJson(
+            fn (AssertableJson $json) => $json
             ->has('data', 1)
-            ->has('data.0', fn($json) => $json
+            ->has(
+                'data.0',
+                fn ($json) => $json
                 ->where('corporation_id', test()->test_character->corporation->corporation_id)
                 ->etc()
             )
@@ -92,7 +114,6 @@ test('secondary user can see enlistment', function () {
 });
 
 test('secondary user can apply as character', function () {
-
     createEnlistment('character');
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
@@ -100,7 +121,7 @@ test('secondary user can apply as character', function () {
     $response = test()->actingAs(test()->secondary_user)
         ->post(route('post.application'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'character_id' => test()->secondary_character->character_id
+            'character_id'   => test()->secondary_character->character_id,
         ]);
 
     test()->assertNotNull(test()->secondary_character->refresh()->application);
@@ -114,7 +135,6 @@ test('secondary user can apply as character', function () {
 });
 
 test('secondary user can apply as user', function () {
-
     createEnlistment('user');
 
     expect(test()->secondary_user->refresh()->application)->toBeNull();
@@ -122,7 +142,8 @@ test('secondary user can apply as user', function () {
     // first check that existing applications does not exist
     test()->actingAs(test()->secondary_user)
         ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) //'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(fn (AssertableJson $json) => $json
+        ->assertJson(
+            fn (AssertableJson $json) => $json
             ->has('data', 0)
             ->etc()
         );
@@ -135,11 +156,14 @@ test('secondary user can apply as user', function () {
     // then check that existing applications does exist
     test()->actingAs(test()->secondary_user)
         ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) //'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(fn (AssertableJson $json) => $json
+        ->assertJson(
+            fn (AssertableJson $json) => $json
             ->has('data', 1)
-            ->has('data.0', fn($json) => $json
+            ->has(
+                'data.0',
+                fn ($json) => $json
                 ->where('applicationable_id', test()->secondary_user->id)
-                ->where('corporation_id',  test()->test_character->corporation->corporation_id)
+                ->where('corporation_id', test()->test_character->corporation->corporation_id)
                 ->etc()
             )
             ->etc()
@@ -153,7 +177,6 @@ test('secondary user can apply as user', function () {
 });
 
 test('senior hr sees recruitment component', function () {
-
     expect(test()->test_user->can('superuser'))->toBeFalse();
 
     $response = test()->actingAs(test()->test_user)
@@ -165,7 +188,7 @@ test('senior hr sees recruitment component', function () {
     test()->actingAs(test()->test_user->refresh())
         ->get(route('corporation.recruitment'))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
 });
 
 test('junior hr sees recruitment component', function () {
@@ -186,7 +209,7 @@ test('junior hr sees recruitment component', function () {
 
     expect(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
 });
 
 test('junior hr handles open user applications', function () {
@@ -214,8 +237,7 @@ test('junior hr handles open user applications', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
-
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
     // Impersonate
     expect($application)->status->toBe('open');
@@ -236,26 +258,25 @@ test('junior hr handles open user applications', function () {
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id'   => test()->secondary_user->id,
         'applicationable_type' => User::class,
-        'status' => 'open'
+        'status'               => 'open',
     ]);
 
     test()->actingAs(test()->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
-            'decision' => 'rejected',
-            'explanation' => 'Some reason'
+            'decision'    => 'rejected',
+            'explanation' => 'Some reason',
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id'   => test()->secondary_user->id,
         'applicationable_type' => User::class,
-        'status' => 'rejected'
+        'status'               => 'rejected',
     ]);
 
     expect(test()->secondary_user->refresh()->application)->toBeNull();
-
 });
 
 test('junior hr handles open character applications', function () {
@@ -264,13 +285,13 @@ test('junior hr handles open character applications', function () {
     test()->test_user = test()->test_user->refresh();
 
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications',[test()->test_character->corporation->corporation_id, 0], ))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0], ))
         ->assertJsonCount(0, 'data');
 
     applySecondary(false);
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0] ))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertJsonCount(1, 'data');
 
     // open application
@@ -282,31 +303,30 @@ test('junior hr handles open character applications', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'open'
+        'status'               => 'open',
     ]);
 
     test()->actingAs(test()->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
-            'decision' => 'rejected',
-            'explanation' => 'Some reason'
+            'decision'    => 'rejected',
+            'explanation' => 'Some reason',
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'rejected'
+        'status'               => 'rejected',
     ]);
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
-
 });
 
 test('junior h r can see shitlist', function () {
@@ -336,19 +356,21 @@ test('senior hr can setup watchlist', function () {
     test()->actingAs(test()->test_user->refresh())
         ->get(route('edit.enlistment', test()->test_character->corporation->corporation_id))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
             ->has('enlistment')
-            ->has('watched', fn(Assert $prop) => $prop
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
                 ->has('systems', 0)
                 ->has('regions', 0)
                 ->has('items', 0)
             )
-
         );
 
     // create system
-    $system =  System::factory()->create();
+    $system = System::factory()->create();
 
     // watchlist system
     $response = test()->actingAs(test()->test_user->refresh())
@@ -356,19 +378,21 @@ test('senior hr can setup watchlist', function () {
         ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
             'systems' => [
                 (object) [
-                    'id' => $system->system_id
-                ]
-            ]
+                    'id' => $system->system_id,
+                ],
+            ],
         ])
-        ->assertInertia( fn (Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
-            ->has('watched', fn(Assert $prop) => $prop
-                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
+                ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
                 ->etc()
             )
             ->etc()
         );
-
 
     // add region
     $region = Region::factory()->create();
@@ -377,20 +401,23 @@ test('senior hr can setup watchlist', function () {
         ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
             'systems' => [
                 (object) [
-                    'id' => $system->system_id
-                ]
+                    'id' => $system->system_id,
+                ],
             ],
             'regions' => [
                 (object) [
-                    'id' => $region->region_id
-                ]
-            ]
+                    'id' => $region->region_id,
+                ],
+            ],
         ])
-        ->assertInertia( fn (Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
-            ->has('watched', fn(Assert $prop) => $prop
-                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
-                ->has('regions', 1, fn(Assert $prop) => $prop->where('id', $region->region_id)->etc())
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
+                ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
+                ->has('regions', 1, fn (Assert $prop) => $prop->where('id', $region->region_id)->etc())
                 ->etc()
             )
             ->etc()
@@ -405,17 +432,20 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->type_id,
-                    'watchable_type' => Type::class
-                ]
+                    'watchable_id'   => $type->type_id,
+                    'watchable_type' => Type::class,
+                ],
             ],
-        ])->assertInertia( fn (Assert $page) => $page
+        ])->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
-            ->has('watched', fn(Assert $prop) => $prop
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
-                ->has('systems', 1, fn(Assert $prop) => $prop->where('id', $system->system_id)->etc())
-                ->has('regions', 1, fn(Assert $prop) => $prop->where('id', $region->region_id)->etc())
-                ->has('items', 1, fn(Assert $prop) => $prop->where('watchable_id', $type->type_id)->etc())
+                ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
+                ->has('regions', 1, fn (Assert $prop) => $prop->where('id', $region->region_id)->etc())
+                ->has('items', 1, fn (Assert $prop) => $prop->where('watchable_id', $type->type_id)->etc())
                 ->etc()
             )
             ->etc()
@@ -427,16 +457,19 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
-                    'watchable_type' => Group::class
-                ]
+                    'watchable_id'   => $type->group_id,
+                    'watchable_type' => Group::class,
+                ],
             ],
-        ])->assertInertia( fn (Assert $page) => $page
+        ])->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
-            ->has('watched', fn(Assert $prop) => $prop
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
                 // however we expect the type previously set to be removed
-                ->has('items', 1, fn(Assert $prop) => $prop->where('watchable_id', $type->group_id)->etc())
+                ->has('items', 1, fn (Assert $prop) => $prop->where('watchable_id', $type->group_id)->etc())
                 ->etc()
             )
             ->etc()
@@ -448,25 +481,27 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
-                    'watchable_type' => Group::class
+                    'watchable_id'   => $type->group_id,
+                    'watchable_type' => Group::class,
                 ],
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group->category_id,
-                    'watchable_type' => Category::class
+                    'watchable_id'   => $type->group->category_id,
+                    'watchable_type' => Category::class,
                 ],
             ],
-        ])->assertInertia( fn (Assert $page) => $page
+        ])->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Configuration/Index')
-            ->has('watched', fn(Assert $prop) => $prop
+            ->has(
+                'watched',
+                fn (Assert $prop) => $prop
                 // we expect no change for watchlisted systems and regions
                 ->has('items', 2)
                 ->etc()
             )
             ->etc()
         );
-
 });
 
 test('recruiter can see corporation applications', function () {
@@ -475,7 +510,7 @@ test('recruiter can see corporation applications', function () {
 
     // create Senior Recruiter user
 
-    $recruiter = Event::fakeFor(fn() =>User::factory()->create());
+    $recruiter = Event::fakeFor(fn () => User::factory()->create());
 
     // give user roles
 
@@ -484,16 +519,16 @@ test('recruiter can see corporation applications', function () {
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => $recruiter->id,
-                        'user' => $recruiter
+                        'id'   => $recruiter->id,
+                        'user' => $recruiter,
                     ],
-                ]
-            ]
+                ],
+            ],
         ])->assertOk();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
@@ -526,12 +561,10 @@ test('recruiter can see corporation applications', function () {
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id))
         ->assertOk();
 
-
     // Any other character should be forbidden
     test()->actingAs($recruiter)
-        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id+1))
+        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
         ->assertForbidden();
-
 });
 
 test('recruiter can comment on application', function () {
@@ -540,7 +573,7 @@ test('recruiter can comment on application', function () {
 
     // create Senior Recruiter user
 
-    $recruiter = Event::fakeFor(fn() =>User::factory()->create());
+    $recruiter = Event::fakeFor(fn () => User::factory()->create());
 
     // give user roles
 
@@ -549,16 +582,16 @@ test('recruiter can comment on application', function () {
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => $recruiter->id,
-                        'user' => $recruiter
+                        'id'   => $recruiter->id,
+                        'user' => $recruiter,
                     ],
-                ]
-            ]
+                ],
+            ],
         ])->assertOk();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
@@ -586,12 +619,20 @@ test('recruiter can comment on application', function () {
 
     $response = test()->actingAs($recruiter)
         ->get(route('get.application', $application->id))
-        ->assertInertia(fn (Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/Application')
-            ->has('application', fn (Assert $page) => $page
-                ->has('log_entries', 1, fn (Assert $page) => $page
+            ->has(
+                'application',
+                fn (Assert $page) => $page
+                ->has(
+                    'log_entries',
+                    1,
+                    fn (Assert $page) => $page
                     ->where('comment', $comment)
-                    ->has('causer', fn (Assert $page) => $page
+                    ->has(
+                        'causer',
+                        fn (Assert $page) => $page
                         ->where('main_character_id', $recruiter->main_character_id)
                         ->etc()
                     )
@@ -601,11 +642,9 @@ test('recruiter can comment on application', function () {
             )
             ->etc()
         );
-
 });
 
 test('junior hr can dispatch update batch and get status', function () {
-
     createEnlistment();
 
     test()->test_user = test()->test_user->refresh();
@@ -615,9 +654,9 @@ test('junior hr can dispatch update batch and get status', function () {
     //Check if secondary has applied
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'open'
+        'status'               => 'open',
     ]);
 
     Queue::fake();
@@ -630,10 +669,10 @@ test('junior hr can dispatch update batch and get status', function () {
 
     Queue::assertPushedOn('high', \Seatplus\Eveapi\Jobs\Seatplus\Batch\CharacterBatchJob::class);
 
-     BatchUpdate::firstOrCreate([
-         'batchable_id' => test()->secondary_character->character_id,
-         'batchable_type' => CharacterInfo::class,
-     ]);
+    BatchUpdate::firstOrCreate([
+        'batchable_id'   => test()->secondary_character->character_id,
+        'batchable_type' => CharacterInfo::class,
+    ]);
 
     // then get update job information
     test()->actingAs(test()->test_user)
@@ -641,41 +680,39 @@ test('junior hr can dispatch update batch and get status', function () {
         ->assertJsonFragment(['batchable_id' => test()->secondary_character->character_id]);
 });
 
-it('returns activity log entries for closed applications', function (){
-
-    $application = Event::fakeFor(fn() => Application::factory()->create([
-        'id' => \Illuminate\Support\Str::uuid(),
-        'status' => 'rejected'
+it('returns activity log entries for closed applications', function () {
+    $application = Event::fakeFor(fn () => Application::factory()->create([
+        'id'     => \Illuminate\Support\Str::uuid(),
+        'status' => 'rejected',
     ]));
 
     $application->log_entries()->create([
         'causer_type' => CharacterInfo::class,
-        'causer_id' => test()->test_character->character_id,
-        'type' => faker()->randomElement(['decision', 'comment']),
-        'comment' => faker()->text,
+        'causer_id'   => test()->test_character->character_id,
+        'type'        => faker()->randomElement(['decision', 'comment']),
+        'comment'     => faker()->text,
     ]);
 
     assignPermissionToTestUser('superuser');
 
-    $application =  $application->refresh();
+    $application = $application->refresh();
 
     test()->actingAs(test()->test_user)
         ->get(route('get.activity.log', $application->id))
-        ->assertJson(fn (AssertableJson $json) =>
-            $json->where('id', $application->id)
+        ->assertJson(
+            fn (AssertableJson $json) => $json->where('id', $application->id)
                 ->where('status', 'rejected')
-                ->where('log_entries', fn (\Illuminate\Support\Collection $collection) =>
-                    \Illuminate\Support\Arr::has($collection->first(), 'causer')
+                ->where(
+                    'log_entries',
+                    fn (\Illuminate\Support\Collection $collection) => \Illuminate\Support\Arr::has($collection->first(), 'causer')
                 )
                 ->etc()
         );
-
 });
 
 // Helpers
 function applySecondary(bool $user = true)
 {
-
     $payload = $user
         ? ['corporation_id' => test()->test_character->corporation->corporation_id]
         : ['corporation_id' => test()->test_character->corporation->corporation_id, 'character_id' => test()->secondary_character->character_id];
@@ -696,12 +733,12 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
 
     $response = test()->actingAs(test()->superuser)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
+            'permissions'  => ['can open or close corporations for recruitment', 'can accept or deny applications'],
             'affiliations' => [
                 [
-                    "id" => test()->test_character->corporation->corporation_id,
-                    "category" => 'corporation',
-                    "type" => $affiliation
+                    'id'       => test()->test_character->corporation->corporation_id,
+                    'category' => 'corporation',
+                    'type'     => $affiliation,
                 ],
             ],
         ]);
@@ -711,23 +748,23 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => test()->test_user->id,
-                        'user' => test()->test_user
+                        'id'   => test()->test_user->id,
+                        'user' => test()->test_user,
                     ],
-                ]
-            ]
+                ],
+            ],
         ])->assertOk();
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 
     // Create Enlistment
 
-    \Pest\Laravel\assertDatabaseMissing('enlistments',[
+    \Pest\Laravel\assertDatabaseMissing('enlistments', [
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 
@@ -735,13 +772,13 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'type' => $type,
-            'steps' => null
+            'type'           => $type,
+            'steps'          => null,
         ]);
 
     expect($response)->exception->toBeNull();
 
-    \Pest\Laravel\assertDatabaseHas('enlistments',[
+    \Pest\Laravel\assertDatabaseHas('enlistments', [
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 }

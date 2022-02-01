@@ -39,6 +39,7 @@ class ApplicationRessource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request
+     *
      * @return array
      */
     public function toArray($request)
@@ -47,26 +48,28 @@ class ApplicationRessource extends JsonResource
 
         return [
             'application_id' => $this->id,
-            'is_user' => $is_user,
+            'is_user'        => $is_user,
             $this->mergeWhen($is_user, ['user' => $this->applicationable]),
             'main_character' => $is_user ? $this->applicationable->main_character : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', $this->applicationable->character_id)->user->main_character,
-            'characters' => $this->getCharacters(),
+            'characters'     => $this->getCharacters(),
             'decision_count' => $this->decision_count,
         ];
     }
 
     private function buildCharacterArray(CharacterInfo $character): array
     {
-        $user = ! $this->applicationable instanceof User
+        $user = !$this->applicationable instanceof User
             ? null
-            : $this->applicationable->loadMissing('characters.alliance.ssoScopes',
+            : $this->applicationable->loadMissing(
+                'characters.alliance.ssoScopes',
                 'characters.corporation.ssoScopes',
                 'characters.alliance.ssoScopes',
                 'characters.application.corporation.ssoScopes',
                 'characters.application.corporation.alliance.ssoScopes',
                 'characters.refresh_token',
                 'application.corporation.ssoScopes',
-                'application.corporation.alliance.ssoScopes');
+                'application.corporation.alliance.ssoScopes'
+            );
 
         // Get user level required scopes
         $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];

@@ -1,8 +1,31 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Event;
+use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -35,8 +58,7 @@ beforeEach(function () {
 });
 
 test('user without permission fails to see compliance', function () {
-
-    if(test()->test_user->can('superuser')) {
+    if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
@@ -46,11 +68,10 @@ test('user without permission fails to see compliance', function () {
     $response = test()->actingAs(test()->secondary_user)
         ->get(route('corporation.member_compliance'))
         ->assertForbidden();
-
 });
 
 test('user with permission sees component', function () {
-    if(test()->test_user->can('superuser')) {
+    if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
@@ -67,7 +88,7 @@ test('user with permission sees component', function () {
         ->get(route('corporation.member_compliance'))
         ->assertOk();
 
-    $response->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/MemberCompliance'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/MemberCompliance'));
 });
 
 test('user with permission sees default compliance', function () {
@@ -78,12 +99,11 @@ test('user with permission sees default compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'default'
+            'type'           => 'default',
         ]))
         ->assertOk();
 
     $response->assertJsonCount(1, 'data');
-
 });
 
 it('is possible to search for a character', function () {
@@ -94,13 +114,12 @@ it('is possible to search for a character', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'default',
-            'search' => substr(test()->secondary_character->name, 5)
+            'type'           => 'default',
+            'search'         => substr(test()->secondary_character->name, 5),
         ]))
         ->assertOk();
 
     $response->assertJsonCount(1, 'data');
-
 });
 
 test('user with permission sees user compliance', function () {
@@ -111,7 +130,7 @@ test('user with permission sees user compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user'
+            'type'           => 'user',
         ]));
 
     $response->assertJsonCount(1, 'data');
@@ -128,16 +147,15 @@ test('user with permission sees user compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user'
+            'type'           => 'user',
         ]));
 
     $response->assertJsonFragment(['count_total' => 2]);
-
 });
 
 test('director user without permission can access index', function () {
     // 1. non director can't access the compliance index
-    $non_director = Event::fakeFor( function() {
+    $non_director = Event::fakeFor(function () {
         $user = User::factory()->create();
 
         $roles = $user->characters->first()->roles;
@@ -153,7 +171,7 @@ test('director user without permission can access index', function () {
 
     // 2. director can access the compliance index
 
-    $director = Event::fakeFor( function() {
+    $director = Event::fakeFor(function () {
         $user = User::factory()->create();
 
         $roles = $user->characters->first()->roles;
@@ -166,7 +184,6 @@ test('director user without permission can access index', function () {
     test()->actingAs($director)
         ->get(route('corporation.member_compliance'))
         ->assertOk();
-
 });
 
 it('enables superuser to review corporation member', function () {
@@ -178,12 +195,10 @@ it('enables superuser to review corporation member', function () {
     $response = test()->actingAs(test()->superuser)
         ->getJson(route('corporation.review.user', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'user' => test()->test_user->id
+            'user'           => test()->test_user->id,
         ]))
         ->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
-
-
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 });
 
 it('enables with review permission to review corporation member', function () {
@@ -197,10 +212,9 @@ it('enables with review permission to review corporation member', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.review.user', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'user' => test()->test_user->id
+            'user'           => test()->test_user->id,
         ]))->assertOk()
-        ->assertInertia( fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
-
+        ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 });
 
 // Helpers
@@ -216,15 +230,15 @@ function createScopeSetting(array $permissons = [], $type = 'default')
 
     test()->actingAs(test()->superuser)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "affiliations" => [
+            'affiliations' => [
                 [
-                    "category" => 'corporation',
-                    "id" => test()->secondary_character->corporation->corporation_id,
-                    "type" => "allowed"
+                    'category' => 'corporation',
+                    'id'       => test()->secondary_character->corporation->corporation_id,
+                    'type'     => 'allowed',
                 ],
             ],
             'permissions' => $permissons,
-            "roleName" => $role->name,
+            'roleName'    => $role->name,
         ])
         ->assertRedirect();
 
@@ -236,15 +250,15 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
             'acl' => [
-                "type" => 'manual',
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => test()->test_user->id,
-                        'user' => test()->test_user
+                        'id'   => test()->test_user->id,
+                        'user' => test()->test_user,
                     ],
-                ]
-            ]
+                ],
+            ],
         ])->assertOk();
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
@@ -261,11 +275,10 @@ function createScopeSetting(array $permissons = [], $type = 'default')
     SsoScopes::updateOrCreate([
         'morphable_id' => test()->secondary_character->corporation->corporation_id,
     ], [
-        'selected_scopes' => ["esi-assets.read_assets.v1", "esi-universe.read_structures.v1"],
-        'morphable_type' =>  CorporationInfo::class,
-        'type' => $type
+        'selected_scopes' => ['esi-assets.read_assets.v1', 'esi-universe.read_structures.v1'],
+        'morphable_type'  => CorporationInfo::class,
+        'type'            => $type,
     ]);
 
     expect(SsoScopes::all())->toHaveCount(1);
-
 }

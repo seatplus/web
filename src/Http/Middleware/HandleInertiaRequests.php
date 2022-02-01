@@ -46,7 +46,8 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/asset-versioning
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return string|null
      */
     public function version(Request $request)
@@ -59,7 +60,8 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/shared-data
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return array
      */
     public function share(Request $request)
@@ -68,13 +70,13 @@ class HandleInertiaRequests extends Middleware
             'flash' => function () {
                 return [
                     'success' => session()->pull('success'),
-                    'info' => session()->pull('info'),
+                    'info'    => session()->pull('info'),
                     'warning' => session()->pull('warning'),
-                    'error' => session()->pull('error'),
+                    'error'   => session()->pull('error'),
                 ];
             },
             'sidebar' => function () {
-                return auth()->guest() ? [] : (new SidebarEntries)->filter();
+                return auth()->guest() ? [] : (new SidebarEntries())->filter();
             },
             'user' => function () {
                 return auth()->guest() ? '' : UserRessource::make(
@@ -86,9 +88,9 @@ class HandleInertiaRequests extends Middleware
             'translation' => function () {
                 return [
                     'success' => trans('web::notifications.success'),
-                    'info' => trans('web::notifications.info'),
+                    'info'    => trans('web::notifications.info'),
                     'warning' => trans('web::notifications.warning'),
-                    'error' => trans('web::notifications.error'),
+                    'error'   => trans('web::notifications.error'),
                 ];
             },
             'errors' => function () {

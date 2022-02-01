@@ -34,7 +34,7 @@ Route::prefix('mails')
         Route::get('', [MailsController::class, 'index'])->name('character.mails');
         Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
 
-        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Skill::class)))
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.'.Skill::class)))
             ->group(function () {
                 Route::get('/headers/', [MailsController::class, 'mailHeaders'])->name('get.mail.headers');
                 /*Route::get('/{character_id}/skills', [SkillsController::class, 'skills'])->name('get.character.skills');

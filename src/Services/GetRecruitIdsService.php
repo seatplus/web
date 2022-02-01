@@ -36,7 +36,7 @@ class GetRecruitIdsService
     {
         $recruiter_permission = 'can accept or deny applications';
 
-        if (! auth()->user()->can($recruiter_permission)) {
+        if (!auth()->user()->can($recruiter_permission)) {
             return [];
         }
 
@@ -45,7 +45,7 @@ class GetRecruitIdsService
 
         $recruit_ids = cache($cache_key);
 
-        if (! $recruit_ids) {
+        if (!$recruit_ids) {
             $recruit_ids = Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
                 ->whereStatus('open')
                 ->with([
@@ -54,7 +54,8 @@ class GetRecruitIdsService
                     ]),
                 ])
                 ->get()
-                ->map(fn ($recruit) => $recruit->applicationable->characters
+                ->map(
+                    fn ($recruit) => $recruit->applicationable->characters
                     ? $recruit->applicationable->characters->pluck('character_id')
                     : $recruit->applicationable->character_id
                 )

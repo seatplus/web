@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 namespace Seatplus\Web\Tests;
 
@@ -13,14 +36,13 @@ use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
-use Spatie\Permission\PermissionRegistrar;
 use Staudenmeir\LaravelCte\DatabaseServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
@@ -34,7 +56,6 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function setUp(): void
     {
-
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
@@ -57,7 +78,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_character = $this->test_user->characters->first();
 
-        $this->app->instance('path.public', __DIR__ .'/../public');
+        $this->app->instance('path.public', __DIR__.'/../public');
 
         Permission::findOrCreate('superuser');
     }
@@ -65,7 +86,8 @@ abstract class TestCase extends OrchestraTestCase
     /**
      * Resolve application HTTP Kernel implementation.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return void
      */
     protected function resolveApplicationHttpKernel($app)
@@ -76,7 +98,7 @@ abstract class TestCase extends OrchestraTestCase
     /**
      * Get application providers.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return array
      */
@@ -88,12 +110,12 @@ abstract class TestCase extends OrchestraTestCase
             DatabaseServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
-            InertiaServiceProviderAlias::class
+            InertiaServiceProviderAlias::class,
         ];
     }
 
     /**
-     * @param \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
      */
     private function setupDatabase($app)
     {
@@ -105,14 +127,14 @@ abstract class TestCase extends OrchestraTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return void
      */
     protected function getEnvironmentSetUp($app)
     {
         // Use memory SQLite, cleans it self up
         $app['config']->set('database.default', 'mysql');
-
 
         config(['app.debug' => true]);
         config(['activitylog.table_name' => 'activity_log']);
@@ -128,10 +150,9 @@ abstract class TestCase extends OrchestraTestCase
         config()->set('inertia.testing.page_paths', array_merge(
             config()->get('inertia.testing.page_paths', []),
             [
-                realpath(__DIR__ . '/../resources/js/Pages'),
-                realpath(__DIR__ . '/../resources/js/Shared')
+                realpath(__DIR__.'/../resources/js/Pages'),
+                realpath(__DIR__.'/../resources/js/Shared'),
             ],
         ));
     }
-
 }

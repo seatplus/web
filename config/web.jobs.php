@@ -34,12 +34,12 @@ use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBat
 use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
 
 return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
+    'contacts'           => ContactHydrateBatch::class,
+    'membertracking'     => CorporationMemberTrackingHydrateBatch::class,
+    'assets'             => CharacterAssetsHydrateBatch::class,
+    'wallet'             => WalletHydrateBatch::class,
+    'contract'           => ContractHydrateBatch::class,
     'corporation.wallet' => CorporationWalletHydrateBatch::class,
-    'skills' => SkillsHydrateBatch::class,
-    'mails' => MailsHydrateBatch::class,
+    'skills'             => SkillsHydrateBatch::class,
+    'mails'              => MailsHydrateBatch::class,
 ];

@@ -45,7 +45,8 @@ class SyncRoleAffiliations
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-    private Role $role)
+    private Role $role
+    )
     {
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
@@ -55,13 +56,14 @@ class SyncRoleAffiliations
     {
         if (Arr::has($validated_data, 'affiliations')) {
             collect(data_get($validated_data, 'affiliations', []))
-                ->each(fn ($affiliation) => $this
+                ->each(
+                    fn ($affiliation) => $this
                     ->target_affiliations
                     ->push(Affiliation::firstOrCreate([
-                        'role_id' => $this->role->id,
-                        'affiliatable_id' => data_get($affiliation, 'id'),
+                        'role_id'           => $this->role->id,
+                        'affiliatable_id'   => data_get($affiliation, 'id'),
                         'affiliatable_type' => $this->getAffiliatableType($affiliation),
-                        'type' => data_get($affiliation, 'type'),
+                        'type'              => data_get($affiliation, 'type'),
                     ]))
                 );
         }
@@ -72,9 +74,9 @@ class SyncRoleAffiliations
     private function getAffiliatableType(array $affiliation): string
     {
         return match (data_get($affiliation, 'category')) {
-            'character' => CharacterInfo::class,
+            'character'   => CharacterInfo::class,
             'corporation' => CorporationInfo::class,
-            'alliance' => AllianceInfo::class,
+            'alliance'    => AllianceInfo::class,
         };
     }
 
@@ -84,9 +86,9 @@ class SyncRoleAffiliations
             return $this->target_affiliations->contains($current_affiliation);
         })->each(function ($affiliation) {
             Affiliation::where([
-                'role_id' => $affiliation->role_id,
+                'role_id'         => $affiliation->role_id,
                 'affiliatable_id' => $affiliation->affiliatable_id,
-                'type' => $affiliation->type,
+                'type'            => $affiliation->type,
             ])->delete();
         });
     }

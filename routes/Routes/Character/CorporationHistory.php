@@ -30,7 +30,7 @@ use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
 
 Route::prefix('corporation_history')
-    ->middleware(sprintf('permission:%s', config('eveapi.permissions.' . CorporationHistory::class)))
+    ->middleware(sprintf('permission:%s', config('eveapi.permissions.'.CorporationHistory::class)))
     ->group(function () {
         Route::get('/{character_id}', [CorporationHistoryController::class, 'index'])->name('corporation.history');
     });
