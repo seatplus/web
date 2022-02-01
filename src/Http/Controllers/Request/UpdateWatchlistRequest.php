@@ -51,11 +51,11 @@ class UpdateWatchlistRequest extends FormRequest
         return [
             'systems' => ['array'],
             'regions' => ['array'],
-            'items' => [
+            'items'   => [
                 'array',
                 function ($attribute, $items_array, $fail) {
                     foreach ($items_array as $item) {
-                        if (! Arr::has($item, ['watchable_id', 'watchable_type'])) {
+                        if (!Arr::has($item, ['watchable_id', 'watchable_type'])) {
                             $fail('The '.$attribute.' is invalid. Missing watchable_id and/or watchable_type');
                         }
                     }

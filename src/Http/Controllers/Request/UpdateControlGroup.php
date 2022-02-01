@@ -49,8 +49,8 @@ class UpdateControlGroup extends FormRequest
     {
         return [
             'permissions.*.name' => 'string',
-            'affiliations' => 'array',
-            'roleName' => 'string',
+            'affiliations'       => 'array',
+            'roleName'           => 'string',
         ];
     }
 }
