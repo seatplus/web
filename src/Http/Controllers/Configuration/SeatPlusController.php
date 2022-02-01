@@ -58,7 +58,7 @@ class SeatPlusController extends Controller
         );
 
         return Inertia::render('Configuration/UserList', [
-            'users' => $users,
+            'users'                => $users,
             'activeSidebarElement' => 'server.settings',
         ]);
     }
