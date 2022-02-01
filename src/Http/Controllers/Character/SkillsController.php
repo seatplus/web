@@ -46,7 +46,7 @@ class SkillsController extends Controller
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'character_ids' => $ids,
+            'character_ids'          => $ids,
         ]);
     }
 
