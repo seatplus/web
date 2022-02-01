@@ -129,7 +129,7 @@ class DispatchJobController extends Controller
 
         if ($batch->failedJobs > 0 && $batch->progress() < 100) {
             return [
-                'state' =>'failures',
+                'state' => 'failures',
                 'time' => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
@@ -137,7 +137,7 @@ class DispatchJobController extends Controller
 
         if ($batch->progress() == 100) {
             return [
-                'state' =>'finished',
+                'state' => 'finished',
                 'time' => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
@@ -145,7 +145,7 @@ class DispatchJobController extends Controller
 
         if ($batch->pendingJobs > 0 && ! $batch->failedJobs) {
             return [
-                'state' =>'pending',
+                'state' => 'pending',
                 'time' => $batch->createdAt,
                 'batch_id' => $batch_id,
             ];

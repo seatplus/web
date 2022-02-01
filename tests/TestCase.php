@@ -13,14 +13,13 @@ use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
-use Spatie\Permission\PermissionRegistrar;
 use Staudenmeir\LaravelCte\DatabaseServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
@@ -34,7 +33,6 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function setUp(): void
     {
-
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
@@ -88,7 +86,7 @@ abstract class TestCase extends OrchestraTestCase
             DatabaseServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
-            InertiaServiceProviderAlias::class
+            InertiaServiceProviderAlias::class,
         ];
     }
 
@@ -129,9 +127,8 @@ abstract class TestCase extends OrchestraTestCase
             config()->get('inertia.testing.page_paths', []),
             [
                 realpath(__DIR__ . '/../resources/js/Pages'),
-                realpath(__DIR__ . '/../resources/js/Shared')
+                realpath(__DIR__ . '/../resources/js/Shared'),
             ],
         ));
     }
-
 }

@@ -10,9 +10,8 @@ beforeEach(function () {
         'manual_job' => array_search(ContactHydrateBatch::class, config('web.jobs')),
         'permission' => config('eveapi.permissions.' . Contact::class),
         'required_scopes' => config('eveapi.scopes.character.contacts'),
-        'required_corporation_role' => ''
+        'required_corporation_role' => '',
     ];
-
 });
 
 it('dispatches job', function () {
@@ -31,16 +30,15 @@ it('dispatches job', function () {
     expect(cache($cache_key))->toBeNull();
 
     $response = test()->actingAs(test()->test_user)
-        ->post(route('dispatch.job'),[
+        ->post(route('dispatch.job'), [
             'character_id' => $character_id,
-            'dispatch_transfer_object' => $dispatch_transfer_object
+            'dispatch_transfer_object' => $dispatch_transfer_object,
         ]);
 
     test()->assertNotNull(cache($cache_key));
 });
 
 test('one get dispatchable entities', function () {
-
     updateRefreshTokenWithScopes(test()->test_character->refresh_token, test()->dispatch_transfer_object['required_scopes']);
 
     $response = test()->actingAs(test()->test_user)
@@ -51,7 +49,7 @@ test('one get dispatchable entities', function () {
             [
                 'character_id' => test()->test_character->character_id,
                 'name' => test()->test_character->name,
-                'batch' => ['state' =>'ready']
-            ]
+                'batch' => ['state' => 'ready'],
+            ],
         ]);
 });

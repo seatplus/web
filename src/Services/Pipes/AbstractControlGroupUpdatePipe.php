@@ -84,7 +84,8 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 
         $data->role->refresh()
             ->acl_affiliations()
-            ->whereDoesntHaveMorph('affiliatable',
+            ->whereDoesntHaveMorph(
+                'affiliatable',
                 [CorporationInfo::class, AllianceInfo::class]
             )
             ->get()

@@ -138,7 +138,8 @@ class GetEntityFromId
 
         $affiliation = $this->type === 'character'
             ? $this->buildCharacterResponse($character_affiliation)
-            : ($this->type === 'corporation'
+            : (
+                $this->type === 'corporation'
                 ? $this->buildCorporationResponse($character_affiliation)
                 : $this->buildAllianceResponse($character_affiliation)
             );

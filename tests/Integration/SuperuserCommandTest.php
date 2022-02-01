@@ -9,14 +9,12 @@ use Seatplus\Auth\Models\User;
 
 beforeEach(function () {
     // this assures that we have a user->characters relationship
-    Event::fakeFor(fn() => CharacterUser::factory()->create(['user_id' => test()->test_user->id]));
-
+    Event::fakeFor(fn () => CharacterUser::factory()->create(['user_id' => test()->test_user->id]));
 });
 
 it('accepts legal user id', function () {
-
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?',test()->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', test()->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 });
@@ -25,7 +23,7 @@ it('does not accepts illegal user id', function () {
     \Pest\Laravel\assertDatabaseMissing('users', ['id' => test()->test_user->id + 1]);
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?',test()->test_user->id + 1)
+        ->expectsQuestion('Who should be superadmin?', test()->test_user->id + 1)
         ->assertExitCode(0);
 });
 
@@ -33,7 +31,7 @@ it('creates role', function () {
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'Superuser']);
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?',test()->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', test()->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 
@@ -44,7 +42,7 @@ it('assigns super user to user', function () {
     expect(test()->test_user->can('superuser'))->toBeFalse();
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => test()->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?',test()->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', test()->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 
@@ -58,7 +56,7 @@ test('a second super user can not be assigned', function () {
     $role->givePermissionTo($permission);
     test()->test_user->assignRole($role);
 
-    $secondary_user = Event::fakeFor(fn() => User::factory()->create()) ;
+    $secondary_user = Event::fakeFor(fn () => User::factory()->create()) ;
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => $secondary_user->main_character])
         ->expectsOutput('Superuser has already been assigned, ask any of the following users to help you out:')
