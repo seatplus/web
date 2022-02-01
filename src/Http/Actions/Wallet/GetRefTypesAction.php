@@ -38,8 +38,8 @@ class GetRefTypesAction
         return $this->getRefTypes()
             ->filter(fn ($type) => Str::contains($type->ref_type, $term))
             ->map(fn ($group, $index) => [
-                'id'          => $this->alphabetToNumber($group->ref_type),
-                'name'        => $group->ref_type,
+                'id' => $this->alphabetToNumber($group->ref_type),
+                'name' => $group->ref_type,
                 'hasEveImage' => false,
             ])
             ->values();
