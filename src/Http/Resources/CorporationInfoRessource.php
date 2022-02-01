@@ -40,11 +40,11 @@ class CorporationInfoRessource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'             => $this->corporation_id,
+            'id' => $this->corporation_id,
             'corporation_id' => $this->corporation_id,
-            'name'           => $this->name,
-            'alliance'       => $this->whenLoaded('alliance', fn () => $this->alliance->name),
-            'hasEveImage'    => true,
+            'name' => $this->name,
+            'alliance' => $this->whenLoaded('alliance', fn () => $this->alliance->name),
+            'hasEveImage' => true,
         ];
     }
 }
