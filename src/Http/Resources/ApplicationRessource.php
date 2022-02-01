@@ -48,17 +48,17 @@ class ApplicationRessource extends JsonResource
 
         return [
             'application_id' => $this->id,
-            'is_user'        => $is_user,
+            'is_user' => $is_user,
             $this->mergeWhen($is_user, ['user' => $this->applicationable]),
             'main_character' => $is_user ? $this->applicationable->main_character : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', $this->applicationable->character_id)->user->main_character,
-            'characters'     => $this->getCharacters(),
+            'characters' => $this->getCharacters(),
             'decision_count' => $this->decision_count,
         ];
     }
 
     private function buildCharacterArray(CharacterInfo $character): array
     {
-        $user = !$this->applicationable instanceof User
+        $user = ! $this->applicationable instanceof User
             ? null
             : $this->applicationable->loadMissing(
                 'characters.alliance.ssoScopes',
