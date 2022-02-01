@@ -56,7 +56,7 @@ class HomeController extends Controller
             [User::class, CharacterInfo::class],
             function (Builder $query, $type) {
                 match ($type) {
-                    User::class          => $query->where('id', auth()->user()->getAuthIdentifier()),
+                    User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
                     CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
                 };
 

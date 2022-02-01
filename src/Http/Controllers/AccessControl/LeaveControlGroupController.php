@@ -41,7 +41,7 @@ class LeaveControlGroupController extends Controller
         $this->role = Role::find($role_id);
         $this->user = User::find($user_id);
 
-        if (!in_array($this->role->type, ['opt-in', 'on-request'])) {
+        if (! in_array($this->role->type, ['opt-in', 'on-request'])) {
             return abort(403, 'This action is not allowed on this access control group');
         }
 
