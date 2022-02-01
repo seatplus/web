@@ -44,14 +44,14 @@ class ContactResource extends JsonResource
         $corpAllianceContacts = $request->session()->get('contacts');
 
         return [
-            'contact_id'           => $this->contact_id,
-            'contact_type'         => $this->contact_type,
-            'is_blocked'           => $this->is_blocked,
-            'is_watched'           => $this->is_watched,
-            'standing'             => $this->standing,
-            'labels'               => $this->labels,
+            'contact_id' => $this->contact_id,
+            'contact_type' => $this->contact_type,
+            'is_blocked' => $this->is_blocked,
+            'is_watched' => $this->is_watched,
+            'standing' => $this->standing,
+            'labels' => $this->labels,
             'corporation_standing' => $this->getStanding($this->affiliation, data_get($corpAllianceContacts, 'corporation_contacts')),
-            'alliance_standing'    => $this->getStanding($this->affiliation, data_get($corpAllianceContacts, 'alliance_contacts')),
+            'alliance_standing' => $this->getStanding($this->affiliation, data_get($corpAllianceContacts, 'alliance_contacts')),
         ];
     }
 

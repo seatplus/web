@@ -36,7 +36,7 @@ class GetSsoScopeEntries
     {
         return SsoScopes::with('morphable')->get()->map(function ($scope) {
             $selectedEntity = [
-                'id'   => $scope->morphable_id,
+                'id' => $scope->morphable_id,
                 'name' => optional($scope->morphable)->name,
             ];
 
