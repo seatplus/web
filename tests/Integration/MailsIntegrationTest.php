@@ -66,27 +66,27 @@ test('get mail body test', function () {
     $secondary_charcter = Event::fakeFor(fn () => CharacterInfo::factory()->create());
 
     $mail_receipient = Event::fakeFor(fn () => MailRecipients::factory()->create([
-        'mail_id'         => $mail->id,
-        'receivable_id'   => $secondary_charcter->character_id,
+        'mail_id' => $mail->id,
+        'receivable_id' => $secondary_charcter->character_id,
         'receivable_type' => CharacterInfo::class,
     ]));
 
     //Prepare ESI Response of GetIdsFromNamesService
     $data = [
         [
-            'id'   => 91356804,
+            'id' => 91356804,
             'name' => 'Steel Roamer',
         ],
         [
-            'id'   => 98467521,
+            'id' => 98467521,
             'name' => 'ShekelSquad',
         ],
         [
-            'id'   => 95002093,
+            'id' => 95002093,
             'name' => 'Rory Wolf',
         ],
         [
-            'id'   => 94159646,
+            'id' => 94159646,
             'name' => 'evillady Lennelluc',
         ],
     ];
