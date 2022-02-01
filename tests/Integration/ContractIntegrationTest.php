@@ -63,7 +63,7 @@ test('one can call transaction endpoint', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('contract.details', [
             'character_id' => test()->test_character->character_id,
-            'contract_id' => 1234,
+            'contract_id'  => 1234,
         ]))
         ->assertOk();
 
