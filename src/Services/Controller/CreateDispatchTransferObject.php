@@ -112,9 +112,11 @@ class CreateDispatchTransferObject
     private function getRequiredScopes(string $scope)
     {
         return config(
-            sprintf('eveapi.scopes.%s.%s',
+            sprintf(
+                'eveapi.scopes.%s.%s',
                 $this->isCharacter() ? 'character' : 'corporation',
-                $scope)
+                $scope
+            )
         );
     }
 

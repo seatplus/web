@@ -45,7 +45,8 @@ class SyncRoleAffiliations
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-    private Role $role)
+    private Role $role
+    )
     {
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
@@ -55,7 +56,8 @@ class SyncRoleAffiliations
     {
         if (Arr::has($validated_data, 'affiliations')) {
             collect(data_get($validated_data, 'affiliations', []))
-                ->each(fn ($affiliation) => $this
+                ->each(
+                    fn ($affiliation) => $this
                     ->target_affiliations
                     ->push(Affiliation::firstOrCreate([
                         'role_id' => $this->role->id,

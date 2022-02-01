@@ -43,7 +43,6 @@ class ManualLocation extends Model
      */
     protected $guarded = [];
 
-
     public function location()
     {
         return $this->belongsTo(Location::class, 'location_id', 'location_id');

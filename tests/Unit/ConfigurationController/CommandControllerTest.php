@@ -4,8 +4,6 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
 test('if post cache clear clears cache', function () {
-
-
     $route = route('cache.clear');
 
     // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
@@ -23,7 +21,6 @@ test('if post cache clear clears cache', function () {
         ->with('seatplus:cache:clear --force')
         ->andReturn(1);
 
-   $response = test()->actingAs(test()->test_user)
+    $response = test()->actingAs(test()->test_user)
         ->post($route)->assertOk();
-
 });

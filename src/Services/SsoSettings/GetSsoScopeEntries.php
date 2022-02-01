@@ -40,7 +40,9 @@ class GetSsoScopeEntries
                 'name' => optional($scope->morphable)->name,
             ];
 
-            $selectedEntity = array_merge($selectedEntity, $scope->morphable_type === CorporationInfo::class
+            $selectedEntity = array_merge(
+                $selectedEntity,
+                $scope->morphable_type === CorporationInfo::class
                 ? ['corporation_id' => $scope->morphable_id]
                 : ['alliance_id' => $scope->morphable_id]
             );

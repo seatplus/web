@@ -6,10 +6,8 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Spatie\Permission\PermissionRegistrar;
 
 it('has control groups', function () {
-
     assignPermissionToTestUser(['view access control']);
 
     $response = test()->actingAs(test()->test_user)
@@ -17,7 +15,7 @@ it('has control groups', function () {
 
     $response->assertOk();
 
-    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+    $response->assertInertia(fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
 });
 
 it('has list control groups', function () {
@@ -41,7 +39,7 @@ it('has edit control groups', function () {
                 [
                     "category" => 'character',
                     "id" => test()->test_character->character_id,
-                    "type" => "allowed"
+                    "type" => "allowed",
                 ],
             ],
             "roleName" => $role->name,
@@ -50,36 +48,34 @@ it('has edit control groups', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.edit', ['role_id' => $role->id]))
-        ->assertInertia( fn (Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('AccessControl/EditGroup')
             ->has('affiliations', 1)
         );
-
 });
 
 it('create control groups', function () {
-
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
 
-    \Pest\Laravel\assertDatabaseMissing('roles',[
-        'name' => 'test'
+    \Pest\Laravel\assertDatabaseMissing('roles', [
+        'name' => 'test',
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('acl.create'), ['name' => 'test']);
 
-    \Pest\Laravel\assertDatabaseHas('roles',[
-        'name' => 'test'
+    \Pest\Laravel\assertDatabaseHas('roles', [
+        'name' => 'test',
     ]);
 });
 
 it('deletes control group', function () {
-
     $role = Role::create(['name' => 'test']);
 
-    \Pest\Laravel\assertDatabaseHas('roles',[
-        'name' => 'test'
+    \Pest\Laravel\assertDatabaseHas('roles', [
+        'name' => 'test',
     ]);
 
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
@@ -88,18 +84,17 @@ it('deletes control group', function () {
         ->followingRedirects()
         ->json('DELETE', route('acl.delete', ['role_id' => $role->id]));
 
-    \Pest\Laravel\assertDatabaseMissing('roles',[
-        'name' => 'test'
+    \Pest\Laravel\assertDatabaseMissing('roles', [
+        'name' => 'test',
     ]);
-
 });
 
 it('updates permissions', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    \Pest\Laravel\assertDatabaseMissing('permissions',[
-        'name' => 'character.assets'
+    \Pest\Laravel\assertDatabaseMissing('permissions', [
+        'name' => 'character.assets',
     ]);
 
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
@@ -107,11 +102,11 @@ it('updates permissions', function () {
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
             "roleName" => $name,
-            "permissions" => ["character.assets", "superuser"]
+            "permissions" => ["character.assets", "superuser"],
         ]);
 
-    \Pest\Laravel\assertDatabaseHas('permissions',[
-        'name' => 'character.assets'
+    \Pest\Laravel\assertDatabaseHas('permissions', [
+        'name' => 'character.assets',
     ]);
 
     $permission = Permission::findByName("character.assets");
@@ -119,12 +114,12 @@ it('updates permissions', function () {
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
             "roleName" => $name,
-            "permissions" => ["superuser"]
+            "permissions" => ["superuser"],
         ]);
 
-    \Pest\Laravel\assertDatabaseMissing('role_has_permissions',[
+    \Pest\Laravel\assertDatabaseMissing('role_has_permissions', [
         'permission_id' => $permission->id,
-        'role_id' => $role->id
+        'role_id' => $role->id,
     ]);
 });
 
@@ -132,8 +127,8 @@ it('updates affiliations', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    \Pest\Laravel\assertDatabaseMissing('affiliations',[
-        'role_id' => $role->id
+    \Pest\Laravel\assertDatabaseMissing('affiliations', [
+        'role_id' => $role->id,
     ]);
 
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
@@ -145,15 +140,15 @@ it('updates affiliations', function () {
                 [
                     "category" => 'character',
                     "id" => 95725047,
-                    "type" => "allowed"
+                    "type" => "allowed",
                 ],
             ],
             "roleName" => $name,
         ]);
 
-    \Pest\Laravel\assertDatabaseHas('affiliations',[
+    \Pest\Laravel\assertDatabaseHas('affiliations', [
         'role_id' => $role->id,
-        'affiliatable_id' => 95725047
+        'affiliatable_id' => 95725047,
     ]);
 
     // Delete Affiliation
@@ -163,9 +158,9 @@ it('updates affiliations', function () {
             "roleName" => $name,
         ]);
 
-    \Pest\Laravel\assertDatabaseMissing('affiliations',[
+    \Pest\Laravel\assertDatabaseMissing('affiliations', [
         'role_id' => $role->id,
-        'affiliatable_id' => 95725047
+        'affiliatable_id' => 95725047,
     ]);
 });
 
@@ -173,8 +168,8 @@ it('updates name', function () {
     $name = 'update permissions';
     $role = Role::create(['name' => $name]);
 
-    \Pest\Laravel\assertDatabaseHas('roles',[
-        'name' => $name
+    \Pest\Laravel\assertDatabaseHas('roles', [
+        'name' => $name,
     ]);
 
     assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
@@ -185,14 +180,14 @@ it('updates name', function () {
                 [
                     "character_id" => 95725047,
                     "id" => 95725047,
-                    "name" => "Herpaderp Aldent"
+                    "name" => "Herpaderp Aldent",
                 ],
             ],
             "roleName" => 'someOtherName',
         ]);
 
-    \Pest\Laravel\assertDatabaseMissing('roles',[
-        'name' => $name
+    \Pest\Laravel\assertDatabaseMissing('roles', [
+        'name' => $name,
     ]);
 });
 
@@ -204,7 +199,7 @@ test('one can manage control group members', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.manage', ['role_id' => $role->id]));
 
-    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ManageControlGroup'));
+    $response->assertInertia(fn (Assert $page) => $page->component('AccessControl/ManageControlGroup'));
 });
 
 test('moderator can manage applications', function () {
@@ -215,13 +210,13 @@ test('moderator can manage applications', function () {
     $role->acl_affiliations()->create([
         'affiliatable_id' => test()->test_user->id,
         'affiliatable_type' => User::class,
-        'can_moderate' => true
+        'can_moderate' => true,
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('manage.acl.members', ['role_id' => $role->id]));
 
-    $response->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+    $response->assertInertia(fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
 
     // List Members
     $response = test()->actingAs(test()->test_user)
@@ -247,16 +242,21 @@ test('setup on request group and save twice', function () {
     // navigate to groups
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.groups'))
-        ->assertInertia( fn(Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
+        ->assertInertia(fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
 
     // open manage control group
     test()->actingAs(test()->test_user)
         ->get(route('acl.manage', $role->id))
-        ->assertInertia( fn(Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('AccessControl/ManageControlGroup')
-            ->has('role', fn(Assert $page) => $page
+            ->has(
+                'role',
+                fn (Assert $page) => $page
                 ->where('id', $role->id)
-                ->has('acl', fn(Assert $page) => $page
+                ->has(
+                    'acl',
+                    fn (Assert $page) => $page
                     ->where('moderators', [])
                     ->etc()
                 )
@@ -272,10 +272,10 @@ test('setup on request group and save twice', function () {
                 "type" => 'on-request',
                 'moderators' => [
                     [
-                        'id' => $secondary_user->id
-                    ]
-                ]
-            ]
+                        'id' => $secondary_user->id,
+                    ],
+                ],
+            ],
         ]);
 
     expect($role->refresh()->moderators->isNotEmpty())->toBeTrue();
@@ -291,14 +291,12 @@ test('setup on request group and save twice', function () {
     // Try moderating
     $response = test()->actingAs($secondary_user)
         ->get(route('manage.acl.members', ['role_id' => $role->id]))
-        ->assertInertia( fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
+        ->assertInertia(fn (Assert $page) => $page->component('AccessControl/ModerateMembers'));
 
     // List Members
     $response = test()->actingAs($secondary_user)
         ->get(route('acl.members', ['role_id' => $role->id]))
         ->assertOk();
-
-
 });
 
 test('search for character', function () {
@@ -311,29 +309,26 @@ test('search for character', function () {
 
     $response->assertJsonFragment([
         'id' => test()->test_character->character_id,
-        'category' => 'character'
+        'category' => 'character',
     ]);
 
     // now search with query-string
     test()->mockRetrieveEsiDataAction([
         'character' => [
-            test()->test_character->character_id
-        ]
+            test()->test_character->character_id,
+        ],
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.search.affiliatable', [
-            'query' => test()->test_character->name
+            'query' => test()->test_character->name,
         ]))
         ->assertOk();
 
     $response->assertJsonFragment([
         'id' => test()->test_character->character_id,
-        'category' => 'character'
+        'category' => 'character',
     ]);
-
-
 });
 
 // Helpers
-

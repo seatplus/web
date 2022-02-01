@@ -141,27 +141,33 @@ class WebServiceProvider extends ServiceProvider
     private function mergeConfigurations()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/web.config.php', 'web.config'
+            __DIR__ . '/../config/web.config.php',
+            'web.config'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/package.sidebar.php', 'package.sidebar'
+            __DIR__ . '/../config/package.sidebar.php',
+            'package.sidebar'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/web.permissions.php', 'web.permissions'
+            __DIR__ . '/../config/web.permissions.php',
+            'web.permissions'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/web.settings.php', 'web.settings'
+            __DIR__ . '/../config/web.settings.php',
+            'web.settings'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/web.cronExpressions.php', 'web.cronExpressions'
+            __DIR__ . '/../config/web.cronExpressions.php',
+            'web.cronExpressions'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/web.jobs.php', 'web.jobs'
+            __DIR__ . '/../config/web.jobs.php',
+            'web.jobs'
         );
     }
 

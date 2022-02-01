@@ -3,10 +3,8 @@
 
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
-use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     Queue::fake();
@@ -29,8 +27,6 @@ beforeEach(function () {
 });
 
 test('user can join waitlist', function () {
-
-
     expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['view access control', 'manage access control group']);
@@ -45,11 +41,11 @@ test('user can join waitlist', function () {
                 'affiliations' => [
                     [
                         'type' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id
-                    ]
+                        'id' => test()->test_character->corporation->corporation_id,
+                    ],
                 ],
-                'members' => []
-            ]
+                'members' => [],
+            ],
         ]);
 
     expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeFalse();
@@ -59,7 +55,7 @@ test('user can join waitlist', function () {
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.join'), [
             'user_id' => test()->test_user->id,
-            'role_id' => test()->role->id
+            'role_id' => test()->role->id,
         ]);
 
 
@@ -69,7 +65,6 @@ test('user can join waitlist', function () {
 });
 
 test('superuser can join immediately', function () {
-
     expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     assignPermissionToTestUser(['superuser']);
@@ -84,11 +79,11 @@ test('superuser can join immediately', function () {
                 'affiliations' => [
                     [
                         'type' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id
-                    ]
+                        'id' => test()->test_character->corporation->corporation_id,
+                    ],
                 ],
-                'members' => []
-            ]
+                'members' => [],
+            ],
         ]);
 
     expect(test()->role->refresh()->acl_affiliations->isEmpty())->toBeFalse();
@@ -98,14 +93,13 @@ test('superuser can join immediately', function () {
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.join'), [
             'user_id' => test()->test_user->id,
-            'role_id' => test()->role->id
+            'role_id' => test()->role->id,
         ]);
 
 
     expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 
     expect(test()->role->members()->first()->user_id)->toEqual(test()->test_user->id);
-
 });
 
 // Helpers
