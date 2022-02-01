@@ -43,7 +43,7 @@ class CorporationWalletController extends Controller
 
         return inertia('Corporation/Wallets/Wallet', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporationDivisions'   => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
+            'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
         ]);
     }
 
