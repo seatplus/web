@@ -65,7 +65,7 @@ class GetEntityFromId
             $this->determineTyp($character_affiliation);
         }
 
-        if (!$character_affiliation) {
+        if (! $character_affiliation) {
             $character_affiliation = $this->makeCharacterAffiliation();
         }
 
@@ -78,7 +78,7 @@ class GetEntityFromId
 
         $this->type = $this->names->first()->category;
 
-        if (!in_array($this->type, ['character', 'corporation', 'alliance'])) {
+        if (! in_array($this->type, ['character', 'corporation', 'alliance'])) {
             return null;
         }
 
@@ -173,10 +173,10 @@ class GetEntityFromId
     private function buildCharacterResponse(CharacterAffiliation $character_affiliation): array
     {
         $character = [
-            'id'           => $this->id,
+            'id' => $this->id,
             'character_id' => $this->id,
-            'name'         => $character_affiliation?->character?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
-            'corporation'  => [
+            'name' => $character_affiliation?->character?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
+            'corporation' => [
                 'name' => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name) => $name->id === $character_affiliation->corporation_id)->name,
             ],
         ];
@@ -191,9 +191,9 @@ class GetEntityFromId
     private function buildCorporationResponse(CharacterAffiliation $character_affiliation): array
     {
         $corporation = [
-            'id'             => $this->id,
+            'id' => $this->id,
             'corporation_id' => $this->id,
-            'name'           => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
+            'name' => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
         ];
 
         if ($character_affiliation->alliance_id) {
@@ -206,9 +206,9 @@ class GetEntityFromId
     private function buildAllianceResponse(CharacterAffiliation $character_affiliation): array
     {
         return [
-            'id'          => $this->id,
+            'id' => $this->id,
             'alliance_id' => $this->id,
-            'name'        => $character_affiliation?->alliance?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
+            'name' => $character_affiliation?->alliance?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
         ];
     }
 
@@ -217,7 +217,7 @@ class GetEntityFromId
         $unknown = $this->names->first();
 
         $return_value = [
-            'id'   => $unknown->id,
+            'id' => $unknown->id,
             'name' => $unknown->name,
         ];
 
@@ -229,7 +229,7 @@ class GetEntityFromId
             $return_value['corporation_id'] = $unknown->id;
         }
 
-        if ($unknown->category === 'alliance' || !in_array($unknown->category, ['character', 'corporation'])) {
+        if ($unknown->category === 'alliance' || ! in_array($unknown->category, ['character', 'corporation'])) {
             $return_value['alliance_id'] = $unknown->id;
         }
 
