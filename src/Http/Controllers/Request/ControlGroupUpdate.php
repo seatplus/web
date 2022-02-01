@@ -38,10 +38,10 @@ class ControlGroupUpdate extends FormRequest
     public function rules()
     {
         return [
-            'acl.type' => ['required', 'string'],
+            'acl.type'         => ['required', 'string'],
             'acl.affiliations' => ['array'],
-            'acl.members' => ['array'],
-            'acl.moderators' => ['array'],
+            'acl.members'      => ['array'],
+            'acl.moderators'   => ['array'],
         ];
     }
 }
