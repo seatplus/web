@@ -56,7 +56,7 @@ test('one can create a schedule', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->postJson(route('schedules.updateOrCreate'), [
-            'job' => 'test-job',
+            'job'        => 'test-job',
             'expression' => 'test-expression',
         ]);
 
@@ -67,7 +67,7 @@ test('one can create a schedule', function () {
 
 test('one can view schedule details', function () {
     $schedule = Schedules::create([
-        'job' => 'test-job',
+        'job'        => 'test-job',
         'expression' => 'test-expression',
     ]);
 
@@ -81,7 +81,7 @@ test('one can view schedule details', function () {
 
 test('one can delete schedule', function () {
     $schedule = Schedules::create([
-        'job' => 'test-job',
+        'job'        => 'test-job',
         'expression' => 'test-expression',
     ]);
 
