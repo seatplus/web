@@ -49,9 +49,9 @@ test('on can update role type', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'         => 'automatic',
+                'type' => 'automatic',
                 'affiliations' => [],
-                'members'      => [],
+                'members' => [],
             ],
         ]);
 
@@ -69,11 +69,11 @@ test('manual control group adds member', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'         => 'manual',
+                'type' => 'manual',
                 'affiliations' => [],
-                'members'      => [
+                'members' => [
                     [
-                        'id'   => test()->test_user->id,
+                        'id' => test()->test_user->id,
                         'user' => test()->test_user,
                     ],
                 ],
@@ -96,9 +96,9 @@ test('manual control group removes member', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'         => 'manual',
+                'type' => 'manual',
                 'affiliations' => [],
-                'members'      => [],
+                'members' => [],
             ],
         ]);
 
@@ -116,11 +116,11 @@ test('automatic control group adds affiliation', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'         => 'automatic',
+                'type' => 'automatic',
                 'affiliations' => [
                     [
                         'type' => 'corporation',
-                        'id'   => CorporationInfo::factory()->make()->corporation_id,
+                        'id' => CorporationInfo::factory()->make()->corporation_id,
                     ],
                 ],
                 'members' => [],
@@ -134,7 +134,7 @@ test('automatic control group removes affiliation', function () {
     expect(test()->role->acl_affiliations->isEmpty())->toBeTrue();
 
     test()->role->acl_affiliations()->create([
-        'affiliatable_id'   => CorporationInfo::factory()->make()->corporation_id,
+        'affiliatable_id' => CorporationInfo::factory()->make()->corporation_id,
         'affiliatable_type' => CorporationInfo::class,
     ]);
 
@@ -148,9 +148,9 @@ test('automatic control group removes affiliation', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'         => 'automatic',
+                'type' => 'automatic',
                 'affiliations' => [],
-                'members'      => [],
+                'members' => [],
             ],
         ]);
 
@@ -168,7 +168,7 @@ test('on request control group adds and removes moderators', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type'       => 'on-request',
+                'type' => 'on-request',
                 'moderators' => [
                     [
                         'id' => test()->test_user->id,
