@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {useValidateObject} from "../../../Functions/useValidateObject";
+import {useValidateObject} from "@/Functions/useValidateObject";
 import {computed} from "vue";
 
 var schema = {

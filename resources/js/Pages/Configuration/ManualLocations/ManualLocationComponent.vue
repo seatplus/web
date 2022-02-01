@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import RadioListWithDescription from "../../../Shared/Layout/RadioListWithDescription";
+import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"

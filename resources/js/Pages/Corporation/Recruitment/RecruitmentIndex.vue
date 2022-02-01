@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader"
-import HeaderButton from "../../../Shared/Layout/HeaderButton"
+import PageHeader from "@/Shared/Layout/PageHeader"
+import HeaderButton from "@/Shared/Layout/HeaderButton"
 import CorporationRecruitment from "./CorporationRecruitment"
 import CreateEnlistmentModal from "./CreateEnlistmentModal";
 

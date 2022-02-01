@@ -79,12 +79,12 @@
 </template>
 
 <script>
-import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import {computed, ref} from "vue";
-import ModalWithFooter from "../../Shared/Modals/ModalWithFooter";
-import EveImage from "../../Shared/EveImage";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
+import EveImage from "@/Shared/EveImage";
 import CharacterApplication from "./CharacterApplication";
-import {useLoadCompleteResource} from "../../Functions/useLoadCompleteResource";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
 
 export default {

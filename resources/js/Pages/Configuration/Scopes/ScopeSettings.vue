@@ -125,13 +125,13 @@
 
 <script>
 
-import Layout from "../../../Shared/SidebarLayout/Layout"
+import Layout from "@/Shared/SidebarLayout/Layout"
 import CharacterScopes from "./CharacterScopes"
 import CorporationScopes from "./CorporationScopes"
-import EveImage from "../../../Shared/EveImage"
-import SearchCorpOrAlliance from "../../../Shared/SearchCorpOrAlliance"
-import PageHeader from "../../../Shared/Layout/PageHeader"
-import RadioListWithDescription from "../../../Shared/Layout/RadioListWithDescription";
+import EveImage from "@/Shared/EveImage"
+import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
+import PageHeader from "@/Shared/Layout/PageHeader"
+import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
 import route from 'ziggy';
 
 export default {

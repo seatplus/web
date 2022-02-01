@@ -211,13 +211,13 @@
 </template>
 
 <script>
-import PageHeader from "../../Shared/Layout/PageHeader"
-import HeaderButton from "../../Shared/Layout/HeaderButton"
+import PageHeader from "@/Shared/Layout/PageHeader"
+import HeaderButton from "@/Shared/Layout/HeaderButton"
 import Manual from "./AclTypes/Manual"
 import AutomaticRole from "./AclTypes/AutomaticRole"
 import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup"
 import OptInControlGroup from "./AclTypes/OptInControlGroup"
-import Layout from "../../Shared/SidebarLayout/Layout";
+import Layout from "@/Shared/SidebarLayout/Layout";
 import {useForm} from "@inertiajs/inertia-vue3/src";
 
 export default {

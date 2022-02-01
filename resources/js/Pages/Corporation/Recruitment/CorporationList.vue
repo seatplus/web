@@ -71,8 +71,8 @@
 
 <script>
 
-import EveImage from "../../../Shared/EveImage"
-import {useInfinityScrolling} from "../../../Functions/useInfinityScrolling";
+import EveImage from "@/Shared/EveImage"
+import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 export default {
   name: "CorporationList",
   components: {EveImage,

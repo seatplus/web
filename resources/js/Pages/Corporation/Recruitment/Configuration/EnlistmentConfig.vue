@@ -91,12 +91,12 @@
 <script>
 import {useForm} from "@inertiajs/inertia-vue3";
 import {computed} from "vue";
-import SimpleToggle from "../../../../Shared/SimpleToggle";
-import Autosuggest from "../../../../Shared/Components/Autosuggest";
-import TwoColumnCardWithSubmitAction from "../../../../Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
+import SimpleToggle from "@/Shared/SimpleToggle";
+import Autosuggest from "@/Shared/Components/Autosuggest";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
 import route from 'ziggy'
-import EntityBlock from "../../../../Shared/Layout/Eve/EntityBlock";
-import EntityByIdBlock from "../../../../Shared/Layout/Eve/EntityByIdBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 
 export default {
     name: "EnlistmentConfig",

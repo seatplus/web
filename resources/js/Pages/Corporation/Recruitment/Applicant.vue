@@ -95,7 +95,7 @@
 
 <script>
 
-import EveImage from "../../../Shared/EveImage";
+import EveImage from "@/Shared/EveImage";
 
 export default {
     name: "Applicant",

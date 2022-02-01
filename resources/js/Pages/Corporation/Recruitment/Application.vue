@@ -162,8 +162,8 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import HeaderButton from "../../../Shared/Layout/HeaderButton";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import HeaderButton from "@/Shared/Layout/HeaderButton";
 import TabComponent from "./TabComponent";
 import {IdentificationIcon} from '@heroicons/vue/outline'
 import UpdateCharacterComponent from "./UpdateCharacterComponent";

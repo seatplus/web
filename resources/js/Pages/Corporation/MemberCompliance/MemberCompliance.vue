@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
+import PageHeader from "@/Shared/Layout/PageHeader";
 import ComplianceTabs from "./ComplianceTabs";
 import ComplianceComponent from "./ComplianceComponent";
 

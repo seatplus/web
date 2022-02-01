@@ -133,9 +133,9 @@
 </template>
 
 <script>
-    import PageHeader from "../../Shared/Layout/PageHeader";
-    import SelectComponent from "../../Shared/Components/SelectComponent";
-    import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
+    import PageHeader from "@/Shared/Layout/PageHeader";
+    import SelectComponent from "@/Shared/Components/SelectComponent";
+    import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
     import {computed, ref, watch} from "vue";
     import {useForm} from "@inertiajs/inertia-vue3";
     import route from 'ziggy';

@@ -115,8 +115,8 @@
 
 <script>
     import Settings from "../Settings"
-    import WideListElement from "../../../Shared/WideListElement"
-    import EveImage from "../../../Shared/EveImage"
+    import WideListElement from "@/Shared/WideListElement"
+    import EveImage from "@/Shared/EveImage"
 
     export default {
         name: "OverviewScopeSettings",

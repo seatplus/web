@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader"
+import PageHeader from "@/Shared/Layout/PageHeader"
 import MemberTrackingComponent from "./MemberTrackingComponent";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 
 export default {
     name: "MemberTracking",

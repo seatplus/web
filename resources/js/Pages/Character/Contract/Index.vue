@@ -27,11 +27,11 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
-import ContractComponent from "../../../Shared/Components/Contracts/ContractComponent";
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
 
 export default {
     name: "Index",

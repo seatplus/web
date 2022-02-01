@@ -22,7 +22,7 @@
 
 <script>
 import {computed} from "vue";
-import {useValidateObject} from "../../../Functions/useValidateObject";
+import {useValidateObject} from "@/Functions/useValidateObject";
 
 var schema = {
     title: value => _.isString(value),

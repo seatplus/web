@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import ContractDetailsComponent from "../../../Shared/Components/Contracts/ContractDetailsComponent";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import ContractDetailsComponent from "@/Shared/Components/Contracts/ContractDetailsComponent";
 export default {
     name: "ContractDetails",
     components: {

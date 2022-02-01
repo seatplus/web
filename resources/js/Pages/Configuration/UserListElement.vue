@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 export default {
     name: "UserListElement",
     components: {EntityBlock},

@@ -88,7 +88,7 @@
 
 <script>
 import Settings from "../Settings"
-import WideListElement from "../../../Shared/WideListElement"
+import WideListElement from "@/Shared/WideListElement"
 export default {
     name: "SchedulesIndex",
     components: {Settings, WideListElement},

@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import EveImage from "../../Shared/EveImage"
+import EveImage from "@/Shared/EveImage"
 import {computed, ref} from "vue";
 import {usePage} from "@inertiajs/inertia-vue3";
 import { Inertia } from '@inertiajs/inertia'

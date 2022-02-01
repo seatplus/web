@@ -52,10 +52,10 @@
 </template>
 
 <script>
-import CardWithHeader from "../../../Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "../../../Shared/Layout/Eve/EntityBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import MemberTrackingListElement from "./MemberTrackingListElement";
-import {useInfinityScrolling} from "../../../Functions/useInfinityScrolling";
+import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 import MemberTrackingListElementForSmallDevices from "./MemberTrackingListElementForSmallDevices";
 
 export default {

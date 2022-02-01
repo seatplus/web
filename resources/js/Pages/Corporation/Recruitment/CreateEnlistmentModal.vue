@@ -12,11 +12,11 @@
 
 <script >
 import {computed, ref} from "vue";
-import WithDismissButtonModal from "../../../Shared/Modals/WithDismissButtonModal";
+import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal";
 import {useForm} from "@inertiajs/inertia-vue3";
-import Autosuggest from "../../../Shared/Components/Autosuggest";
-import SimpleToggle from "../../../Shared/SimpleToggle";
-import TwoColumnCardWithSubmitAction from "../../../Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
+import Autosuggest from "@/Shared/Components/Autosuggest";
+import SimpleToggle from "@/Shared/SimpleToggle";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
 import EnlistmentConfig from "./Configuration/EnlistmentConfig";
 
 export default {

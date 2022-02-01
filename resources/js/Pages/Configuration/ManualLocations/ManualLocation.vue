@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
+import PageHeader from "@/Shared/Layout/PageHeader";
 import ManualLocationComponent from "./ManualLocationComponent";
-import InfiniteLoadingHelper from "../../../Shared/InfiniteLoadingHelper";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
 
 
 export default {

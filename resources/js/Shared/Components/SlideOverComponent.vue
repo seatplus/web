@@ -15,7 +15,7 @@
 
 <script>
 import SlideOver from "../Layout/SlideOver";
-import CorporationList from "../../Pages/Corporation/Recruitment/CorporationList";
+import CorporationList from "@/Pages/Corporation/Recruitment/CorporationList";
 
 export default {
     name: "SlideOverComponent",

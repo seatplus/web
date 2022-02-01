@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import InfiniteLoadingHelper from "../../../../Shared/InfiniteLoadingHelper";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
 import {computed, ref} from "vue";
 import ApplicationsTable from "./ApplicationsTable";
 

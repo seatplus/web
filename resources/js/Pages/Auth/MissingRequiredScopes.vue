@@ -83,9 +83,9 @@
 </template>
 
 <script>
-    import EveImage from "../../Shared/EveImage"
-    import ImpersonatingBanner from "../../Shared/SidebarLayout/ImpersonatingBanner";
-    import EmptyLayout from "../../Shared/Layout/AuthLayout/EmptyLayout";
+    import EveImage from "@/Shared/EveImage"
+    import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner";
+    import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout";
     export default {
         name: "MissingRequiredScopes",
         components: {ImpersonatingBanner, EveImage},

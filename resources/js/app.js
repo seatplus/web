@@ -5,12 +5,12 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-import Layout from "./Shared/SidebarLayout/Layout";
+import Layout from "@/Shared/SidebarLayout/Layout";
 import { createApp, h } from 'vue'
 import { App, plugin } from '@inertiajs/inertia-vue3'
 import { InertiaProgress } from '@inertiajs/progress'
 import I18n from './vendor/I18n';
-import SingleColumnLayout from "./Shared/SidebarLayout/SingleColumnLayout";
+import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout";
 
 require('./bootstrap');
 

@@ -86,9 +86,9 @@
 </template>
 
 <script>
-import PageHeader from "../../Shared/Layout/PageHeader"
-import HeaderButton from "../../Shared/Layout/HeaderButton"
-import Layout from "../../Shared/SidebarLayout/Layout";
+import PageHeader from "@/Shared/Layout/PageHeader"
+import HeaderButton from "@/Shared/Layout/HeaderButton"
+import Layout from "@/Shared/SidebarLayout/Layout";
 import EditSettings from "./Edit/EditSettings";
 import {useForm} from "@inertiajs/inertia-vue3/src";
 import {ref} from "vue";

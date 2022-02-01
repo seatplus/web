@@ -138,10 +138,10 @@
 </template>
 
 <script>
-    import EveImage from "../../Shared/EveImage"
-    import AvatarGroupTopToBottom from "../../Shared/AvatarGroupTopToBottom"
-    import PageHeader from "../../Shared/Layout/PageHeader";
-    import InfiniteLoadingHelper from "../../Shared/InfiniteLoadingHelper";
+    import EveImage from "@/Shared/EveImage"
+    import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom"
+    import PageHeader from "@/Shared/Layout/PageHeader";
+    import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
     export default {
         name: "ModerateMembers",
         components: {
