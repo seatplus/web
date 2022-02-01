@@ -71,9 +71,9 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
                 $moderators
                     ->reject(fn ($moderator) => in_array($moderator['id'], $existing_ids))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
-                        'affiliatable_id' => Arr::get($affiliation, 'id'),
+                        'affiliatable_id'   => Arr::get($affiliation, 'id'),
                         'affiliatable_type' => User::class,
-                        'can_moderate' => true,
+                        'can_moderate'      => true,
                     ]));
 
                 return $moderators;
