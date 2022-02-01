@@ -62,7 +62,7 @@
 
 <script>
 import CardWithHeader from "../../Layout/Cards/CardWithHeader";
-import EntityBlock from "../../Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import route from 'ziggy'
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
 import {ref} from "vue";

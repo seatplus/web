@@ -63,7 +63,7 @@ import {
     ListboxOption,
     ListboxLabel
 } from '@headlessui/vue'
-import EntityBlock from "../Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 
 export default {
     name: "Autosuggest",

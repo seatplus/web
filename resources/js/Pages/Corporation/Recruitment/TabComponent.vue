@@ -116,7 +116,7 @@ import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
 import AssetTab from "./Tabs/AssetTab";
 import ContractTab from "./Tabs/ContractTab";
-import LogTab from "./Tabs/LogTab";
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
 import WalletTab from "./Tabs/WalletTab";
 
 const tabs = [

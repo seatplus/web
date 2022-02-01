@@ -62,8 +62,7 @@
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout"
-import Commands from "./Commands"
+import Commands from "@/Pages/Configuration/Commands"
 import HorizonStats from "./HorizonStats"
 import {Inertia} from "@inertiajs/inertia"
 

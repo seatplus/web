@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import Settings from "../Settings"
+import Settings from "@/Pages/Configuration/Settings"
 import WideListElement from "@/Shared/WideListElement"
 export default {
     name: "SchedulesIndex",
