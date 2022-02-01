@@ -42,7 +42,7 @@ class DispatchIndividualJob extends FormRequest
      */
     public function authorize()
     {
-        return !auth()->guest();
+        return ! auth()->guest();
     }
 
     /**
@@ -59,11 +59,11 @@ class DispatchIndividualJob extends FormRequest
         $affiliated_ids = $this->buildAffiliatedIds();
 
         return [
-            'dispatch_transfer_object.manual_job'                => ['required', Rule::in($jobs)],
-            'dispatch_transfer_object.permission'                => ['required', Rule::in(config('eveapi.permissions'))],
+            'dispatch_transfer_object.manual_job' => ['required', Rule::in($jobs)],
+            'dispatch_transfer_object.permission' => ['required', Rule::in(config('eveapi.permissions'))],
             'dispatch_transfer_object.required_corporation_role' => ['present'],
-            'character_id'                                       => [Rule::requiredIf(fn () => !$this->get('corporation_id')), Rule::in($affiliated_ids)],
-            'corporation_id'                                     => [Rule::requiredIf(fn () => !$this->get('character_id')), Rule::in($affiliated_ids)],
+            'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($affiliated_ids)],
+            'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($affiliated_ids)],
         ];
     }
 
