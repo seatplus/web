@@ -64,7 +64,7 @@ test('one can call transaction endpoint', function () {
 test('on get ballance records from last30 days', function () {
     WalletJournal::factory()->count(1)->create([
         'wallet_journable_id' => test()->test_character->character_id,
-        'date' => now()->subDays(29),
+        'date'                => now()->subDays(29),
     ]);
 
     $response = test()->actingAs(test()->test_user)
@@ -78,7 +78,7 @@ test('on get ballance records from last30 days', function () {
 test('on get ballance records from before30 days', function () {
     WalletJournal::factory()->count(1)->create([
         'wallet_journable_id' => test()->test_character->character_id,
-        'date' => now()->subDays(33),
+        'date'                => now()->subDays(33),
     ]);
 
     $response = test()->actingAs(test()->test_user)
