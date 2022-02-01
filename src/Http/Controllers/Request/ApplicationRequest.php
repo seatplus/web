@@ -49,7 +49,7 @@ class ApplicationRequest extends FormRequest
     {
         return [
             'corporation_id' => ['required', 'exists:enlistments,corporation_id'],
-            'character_id' => ['exists:character_infos,character_id'],
+            'character_id'   => ['exists:character_infos,character_id'],
         ];
     }
 }
