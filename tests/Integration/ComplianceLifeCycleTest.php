@@ -99,7 +99,7 @@ test('user with permission sees default compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'default',
+            'type'           => 'default',
         ]))
         ->assertOk();
 
@@ -114,8 +114,8 @@ it('is possible to search for a character', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'default',
-            'search' => substr(test()->secondary_character->name, 5),
+            'type'           => 'default',
+            'search'         => substr(test()->secondary_character->name, 5),
         ]))
         ->assertOk();
 
@@ -130,7 +130,7 @@ test('user with permission sees user compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user',
+            'type'           => 'user',
         ]));
 
     $response->assertJsonCount(1, 'data');
@@ -147,7 +147,7 @@ test('user with permission sees user compliance', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user',
+            'type'           => 'user',
         ]));
 
     $response->assertJsonFragment(['count_total' => 2]);
@@ -195,7 +195,7 @@ it('enables superuser to review corporation member', function () {
     $response = test()->actingAs(test()->superuser)
         ->getJson(route('corporation.review.user', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'user' => test()->test_user->id,
+            'user'           => test()->test_user->id,
         ]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
@@ -212,7 +212,7 @@ it('enables with review permission to review corporation member', function () {
     $response = test()->actingAs(test()->test_user)
         ->getJson(route('corporation.review.user', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'user' => test()->test_user->id,
+            'user'           => test()->test_user->id,
         ]))->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 });
@@ -233,12 +233,12 @@ function createScopeSetting(array $permissons = [], $type = 'default')
             'affiliations' => [
                 [
                     'category' => 'corporation',
-                    'id' => test()->secondary_character->corporation->corporation_id,
-                    'type' => 'allowed',
+                    'id'       => test()->secondary_character->corporation->corporation_id,
+                    'type'     => 'allowed',
                 ],
             ],
             'permissions' => $permissons,
-            'roleName' => $role->name,
+            'roleName'    => $role->name,
         ])
         ->assertRedirect();
 
@@ -250,11 +250,11 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
             'acl' => [
-                'type' => 'manual',
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => test()->test_user->id,
+                        'id'   => test()->test_user->id,
                         'user' => test()->test_user,
                     ],
                 ],
@@ -276,8 +276,8 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         'morphable_id' => test()->secondary_character->corporation->corporation_id,
     ], [
         'selected_scopes' => ['esi-assets.read_assets.v1', 'esi-universe.read_structures.v1'],
-        'morphable_type' => CorporationInfo::class,
-        'type' => $type,
+        'morphable_type'  => CorporationInfo::class,
+        'type'            => $type,
     ]);
 
     expect(SsoScopes::all())->toHaveCount(1);
