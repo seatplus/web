@@ -38,8 +38,8 @@ it('stores resolved id to cache', function () {
     $id = test()->test_character->character_id;
 
     $esi_mock_return_data = [
-        'id'       => $id,
-        'name'     => test()->test_character->name,
+        'id' => $id,
+        'name' => test()->test_character->name,
         'category' => 'character',
     ];
 
@@ -60,8 +60,8 @@ it('returns cached value for resolved ids', function () {
     $id = test()->test_character->character_id;
 
     $cached_value = [
-        'id'       => $id,
-        'name'     => test()->test_character->name,
+        'id' => $id,
+        'name' => test()->test_character->name,
         'category' => 'character',
     ];
 
@@ -79,10 +79,10 @@ it('resolves character affiliation', function () {
     $id = test()->test_character->character_id;
 
     $esi_mock_return_data = [
-        'alliance_id'    => 123,
-        'character_id'   => 456,
+        'alliance_id' => 123,
+        'character_id' => 456,
         'corporation_id' => 789,
-        'faction_id'     => null,
+        'faction_id' => null,
     ];
 
     test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
@@ -128,8 +128,8 @@ test('one can search for solar systems', function () {
     // as mocking is difficult we will set the cached result
     cache([
         sprintf('name:%s', $system->system_id) => [
-            'category'   => 'solar_system',
-            'id'         => $system->system_id,
+            'category' => 'solar_system',
+            'id' => $system->system_id,
             'faction_id' => $system->name,
         ],
     ]);
@@ -160,15 +160,15 @@ test('one can search existing systems', function () {
             ]),
             test()->mockEsiResponse([
                 [
-                    'id'       => $system->system_id,
-                    'name'     => $system->name,
+                    'id' => $system->system_id,
+                    'name' => $system->name,
                     'category' => 'solar_system',
                 ],
             ])
         );
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.system', ['search' =>'jit']))
+        ->get(route('autosuggestion.system', ['search' => 'jit']))
         ->assertOk();
 
     expect($result->original)->toHaveCount(1);
@@ -195,15 +195,15 @@ test('one can search existing region', function () {
             ]),
             test()->mockEsiResponse([
                 [
-                    'id'       => $region->region_id,
-                    'name'     => $region->name,
+                    'id' => $region->region_id,
+                    'name' => $region->name,
                     'category' => 'region',
                 ],
             ])
         );
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.region', ['search' =>'Del']))
+        ->get(route('autosuggestion.region', ['search' => 'Del']))
         ->assertOk();
 
     expect($result->original)->toHaveCount(1);
@@ -225,7 +225,7 @@ test('one can get resource variants via http and cache', function () {
     $result = test()->actingAs(test()->test_user)
         ->get(route('get.resource.variants', [
             'resource_type' => $resource_type,
-            'resource_id'   => $resource_id,
+            'resource_id' => $resource_id,
         ]))
         ->assertOk()
         ->assertJson($expected_response);
@@ -235,24 +235,24 @@ test('one can get resource variants via http and cache', function () {
 
 test('one can get market prices', function () {
     $container = new EsiRequestContainer([
-        'method'   => 'get',
-        'version'  => 'v1',
+        'method' => 'get',
+        'version' => 'v1',
         'endpoint' => '/markets/prices/',
     ]);
 
     test()->mockRetrieveEsiDataAction([
         (object) [
-            'adjusted_price'=> 0,
+            'adjusted_price' => 0,
             'average_price' => 31214609.93,
-            'type_id'       => 43691,
+            'type_id' => 43691,
         ],
-        (object) ['adjusted_price'=> 1005248.1289154688,
-            'average_price'       => 1002393.46,
-            'type_id'             => 32772,
+        (object) ['adjusted_price' => 1005248.1289154688,
+            'average_price' => 1002393.46,
+            'type_id' => 32772,
         ],
-        (object) ['adjusted_price'=> 111879.41656101559,
-            'average_price'       => 104750.07,
-            'type_id'             => 32774,
+        (object) ['adjusted_price' => 111879.41656101559,
+            'average_price' => 104750.07,
+            'type_id' => 32774,
         ],
     ]);
 
@@ -267,9 +267,9 @@ test('one can get market prices', function () {
 
 it('has auttosuggest for types, groups and categories', function () {
     $type = Type::factory()->create([
-        'name'     => 'TypeName',
+        'name' => 'TypeName',
         'group_id' => Group::factory()->create([
-            'name'        => 'GroupName',
+            'name' => 'GroupName',
             'category_id' => Category::factory()->create([
                 'name' => 'CategoryName',
             ]),

@@ -56,9 +56,9 @@ class CheckPermissionAffiliation
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
     {
         $validated_data = $request->validate([
-            'character_ids'   => ['sometimes', 'array'],
+            'character_ids' => ['sometimes', 'array'],
             'corporation_ids' => ['sometimes', 'array'],
-            'alliance_ids'    => ['sometimes', 'array'],
+            'alliance_ids' => ['sometimes', 'array'],
         ]);
 
         $this->setUser();
@@ -186,7 +186,7 @@ class CheckPermissionAffiliation
 
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
-        $bag->add(['validated_ids' =>  $validated_ids->all()]);
+        $bag->add(['validated_ids' => $validated_ids->all()]);
     }
 
     public function getUser(): User

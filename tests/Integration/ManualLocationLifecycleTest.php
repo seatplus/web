@@ -54,8 +54,8 @@ test('one can submit suggestion', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('post.manual_location'), [
-            'name'            => $manual_loaction->name,
-            'location_id'     => $manual_loaction->location_id,
+            'name' => $manual_loaction->name,
+            'location_id' => $manual_loaction->location_id,
             'solar_system_id' => $manual_loaction->solar_system_id,
         ])->assertRedirect();
 
@@ -76,13 +76,13 @@ test('one get own suggestion', function () {
 test('one get suggestion of other user', function () {
     ManualLocation::factory()->count(5)->create([
         'location_id' => 12345,
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
-        'created_at'  => carbon()->subDay(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_loaction = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->actingAs(test()->test_user)
@@ -94,13 +94,13 @@ test('one get suggestion of other user', function () {
 test('admin can accept suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
-        'created_at'  => carbon()->subDay(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->assignPermissionToTestUser(['manage manual locations']);
@@ -121,12 +121,12 @@ test('admin can accept suggestion', function () {
     expect(json_decode($response->content())->data)->toHaveCount(5);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' =>12345]));
+    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
-            'id'          => $manual_location->id,
+            'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
@@ -144,24 +144,24 @@ test('admin can accept suggestion', function () {
 test('one get accepted suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
-        'created_at'  => carbon()->subDay(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
-        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => \Seatplus\Auth\Models\User::factory(),
         'location_id' => 12345,
     ]);
 
     test()->assignPermissionToTestUser(['manage manual locations']);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' =>12345]));
+    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
-            'id'          => $manual_location->id,
+            'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
@@ -186,8 +186,8 @@ test('if location is resolved via jobs delete manual suggestions', function () {
     ]);
 
     $location = Location::factory()->create([
-        'location_id'    => $manual_location->location_id,
-        'locatable_id'   => $manual_location->location_id,
+        'location_id' => $manual_location->location_id,
+        'locatable_id' => $manual_location->location_id,
         'locatable_type' => Station::class,
     ]);
 
