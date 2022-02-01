@@ -39,7 +39,7 @@ class QueueController extends Controller
             'queue_count' => collect(resolve(WorkloadRepository::class)->get())
                 ->sum('length'),
             'error_count' => app(JobRepository::class)->countRecentlyFailed(),
-            'status' => $this->currentStatus(),
+            'status'      => $this->currentStatus(),
         ];
     }
 
@@ -48,7 +48,7 @@ class QueueController extends Controller
      */
     private function currentStatus()
     {
-        if (! $masters = app(MasterSupervisorRepository::class)->all()) {
+        if (!$masters = app(MasterSupervisorRepository::class)->all()) {
             return 'inactive';
         }
 

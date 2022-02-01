@@ -46,8 +46,8 @@ class SsoSettingsController extends Controller
 
         return Inertia::render('Configuration/ScopeSettings', [
             'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
-            'active' => $entity_id,
+            'entries'          => $sso_scopes_entries,
+            'active'           => $entity_id,
         ]);
     }
 
@@ -62,8 +62,8 @@ class SsoSettingsController extends Controller
 
         return Inertia::render('Configuration/Scopes/ScopeSettings', [
             'available_scopes' => $available_scopes,
-            'entity' => fn () => $this->getEntity($entity_id),
-            'options' => [
+            'entity'           => fn ()           => $this->getEntity($entity_id),
+            'options'          => [
                 ['title' => 'default', 'description' => 'Only characters within the selected entity are required to fulfill the selected scopes'],
                 ['title' => 'user', 'description' => 'All characters of a user within this corporation are required to met the required scopes'],
                 ['title' => 'global', 'description' => 'Every character in this seat plus instance must met the requirements'],
