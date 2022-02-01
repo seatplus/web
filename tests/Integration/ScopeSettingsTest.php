@@ -74,9 +74,9 @@ test('one can create sso setting', function () {
                 'selectedEntities' => [
                     [
                         'corporation_id' => $corporation->corporation_id,
-                        'id'             => $corporation->corporation_id,
-                        'name'           => 'Amok.',
-                        'type'           => 'corporation',
+                        'id' => $corporation->corporation_id,
+                        'name' => 'Amok.',
+                        'type' => 'corporation',
                     ],
                 ],
                 'selectedScopes' => [
@@ -120,9 +120,9 @@ test('one can delete sso setting', function () {
                 'selectedEntities' => [
                     [
                         'corporation_id' => $corporation->corporation_id,
-                        'id'             => $corporation->corporation_id,
-                        'name'           => 'Amok.',
-                        'type'           => 'corporation',
+                        'id' => $corporation->corporation_id,
+                        'name' => 'Amok.',
+                        'type' => 'corporation',
                     ],
                 ],
                 'selectedScopes' => [
