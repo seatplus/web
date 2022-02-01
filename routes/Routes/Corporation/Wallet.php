@@ -29,8 +29,9 @@ use Seatplus\Web\Http\Controllers\Corporation\Wallet\CorporationWalletController
 
 Route::prefix('wallet')
     ->middleware([
-        sprintf('permission:%s,%s',
-            config('eveapi.permissions.' . WalletJournal::class),
+        sprintf(
+            'permission:%s,%s',
+            config('eveapi.permissions.'.WalletJournal::class),
             'Accountant|Junior_Accountant'
         ),
     ])

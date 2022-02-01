@@ -58,7 +58,7 @@ class SeatPlusController extends Controller
         );
 
         return Inertia::render('Configuration/UserList', [
-            'users' => $users,
+            'users'                => $users,
             'activeSidebarElement' => 'server.settings',
         ]);
     }
@@ -67,8 +67,8 @@ class SeatPlusController extends Controller
     {
         $impersonated_user = User::find($user_id);
 
-        (new ImpersonateService)->impersonateUser($impersonated_user);
+        (new ImpersonateService())->impersonateUser($impersonated_user);
 
-        return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$impersonated_user->main_character->name);
     }
 }

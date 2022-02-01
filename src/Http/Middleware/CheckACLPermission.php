@@ -35,10 +35,11 @@ use Seatplus\Auth\Models\User;
 class CheckACLPermission
 {
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @param  string  $permission
-     * @param  string|null  $character_role
+     * @param Request     $request
+     * @param Closure     $next
+     * @param string      $permission
+     * @param string|null $character_role
+     *
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $permission)
@@ -57,7 +58,7 @@ class CheckACLPermission
 
         $requested_id = Arr::get($url_parameters, 'role_id');
 
-        if (! $requested_id) {
+        if (!$requested_id) {
             abort_unless($moderated_role_ids->isNotEmpty(), 403, 'You do not have the necessary permission to perform this action.');
 
             return $next($request);

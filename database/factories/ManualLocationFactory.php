@@ -37,9 +37,9 @@ class ManualLocationFactory extends Factory
     public function definition()
     {
         return [
-            'location_id' => $this->faker->numberBetween(0, 10000),
-            'user_id' => User::factory(),
-            'name' => $this->faker->name,
+            'location_id'     => $this->faker->numberBetween(0, 10000),
+            'user_id'         => User::factory(),
+            'name'            => $this->faker->name,
             'solar_system_id' => $this->faker->numberBetween(60000000, 64000000),
         ];
     }

@@ -57,10 +57,11 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  Throwable  $exception
-     * @return void
+     * @param Throwable $exception
      *
      * @throws Exception
+     *
+     * @return void
      */
     public function report(Throwable $exception)
     {
@@ -72,11 +73,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        Inertia::share((new HandleInertiaRequests)->share($request));
+        Inertia::share((new HandleInertiaRequests())->share($request));
 
         $response = parent::render($request, $exception);
 
-        if (! app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
+        if (!app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
             return Inertia::render('Error', ['status' => $response->status()])
                 ->rootView('web::app')
                 ->toResponse($request)

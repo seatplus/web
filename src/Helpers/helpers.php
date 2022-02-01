@@ -24,17 +24,18 @@
  * SOFTWARE.
  */
 
-if (! function_exists('number_roman')) {
+if (!function_exists('number_roman')) {
     /**
      * Converts an integer to a roman numberal representation.
      *
-     * @param  int  $number
+     * @param int $number
+     *
      * @return string
      */
     function number_roman($number)
     {
         $map = [
-            'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50,
+            'M'  => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50,
             'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1,
         ];
 
@@ -55,20 +56,21 @@ if (! function_exists('number_roman')) {
     }
 }
 
-if (! function_exists('carbon')) {
+if (!function_exists('carbon')) {
 
     /**
      * A helper to get a fresh instance of Carbon.
      *
-     * @param  null  $data
+     * @param null $data
+     *
      * @return \Carbon\Carbon
      */
     function carbon($data = null)
     {
-        if (! is_null($data)) {
+        if (!is_null($data)) {
             return new \Carbon\Carbon($data);
         }
 
-        return new \Carbon\Carbon;
+        return new \Carbon\Carbon();
     }
 }

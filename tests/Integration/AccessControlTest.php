@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Inertia\Testing\Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -35,14 +58,14 @@ it('has edit control groups', function () {
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "affiliations" => [
+            'affiliations' => [
                 [
-                    "category" => 'character',
-                    "id" => test()->test_character->character_id,
-                    "type" => "allowed",
+                    'category' => 'character',
+                    'id'       => test()->test_character->character_id,
+                    'type'     => 'allowed',
                 ],
             ],
-            "roleName" => $role->name,
+            'roleName' => $role->name,
         ])
         ->assertRedirect();
 
@@ -101,25 +124,25 @@ it('updates permissions', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "roleName" => $name,
-            "permissions" => ["character.assets", "superuser"],
+            'roleName'    => $name,
+            'permissions' => ['character.assets', 'superuser'],
         ]);
 
     \Pest\Laravel\assertDatabaseHas('permissions', [
         'name' => 'character.assets',
     ]);
 
-    $permission = Permission::findByName("character.assets");
+    $permission = Permission::findByName('character.assets');
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "roleName" => $name,
-            "permissions" => ["superuser"],
+            'roleName'    => $name,
+            'permissions' => ['superuser'],
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('role_has_permissions', [
         'permission_id' => $permission->id,
-        'role_id' => $role->id,
+        'role_id'       => $role->id,
     ]);
 });
 
@@ -136,30 +159,30 @@ it('updates affiliations', function () {
     // Adding Affiliation
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "affiliations" => [
+            'affiliations' => [
                 [
-                    "category" => 'character',
-                    "id" => 95725047,
-                    "type" => "allowed",
+                    'category' => 'character',
+                    'id'       => 95725047,
+                    'type'     => 'allowed',
                 ],
             ],
-            "roleName" => $name,
+            'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseHas('affiliations', [
-        'role_id' => $role->id,
+        'role_id'         => $role->id,
         'affiliatable_id' => 95725047,
     ]);
 
     // Delete Affiliation
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "allowed" => [],
-            "roleName" => $name,
+            'allowed'  => [],
+            'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('affiliations', [
-        'role_id' => $role->id,
+        'role_id'         => $role->id,
         'affiliatable_id' => 95725047,
     ]);
 });
@@ -176,14 +199,14 @@ it('updates name', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "allowed" => [
+            'allowed' => [
                 [
-                    "character_id" => 95725047,
-                    "id" => 95725047,
-                    "name" => "Herpaderp Aldent",
+                    'character_id' => 95725047,
+                    'id'           => 95725047,
+                    'name'         => 'Herpaderp Aldent',
                 ],
             ],
-            "roleName" => 'someOtherName',
+            'roleName' => 'someOtherName',
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('roles', [
@@ -208,9 +231,9 @@ test('moderator can manage applications', function () {
     assignPermissionToTestUser(['view access control']);
 
     $role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_user->id,
+        'affiliatable_id'   => test()->test_user->id,
         'affiliatable_type' => User::class,
-        'can_moderate' => true,
+        'can_moderate'      => true,
     ]);
 
     $response = test()->actingAs(test()->test_user)
@@ -268,8 +291,8 @@ test('setup on request group and save twice', function () {
     test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'on-request',
+            'acl' => [
+                'type'       => 'on-request',
                 'moderators' => [
                     [
                         'id' => $secondary_user->id,
@@ -308,7 +331,7 @@ test('search for character', function () {
         ->assertOk();
 
     $response->assertJsonFragment([
-        'id' => test()->test_character->character_id,
+        'id'       => test()->test_character->character_id,
         'category' => 'character',
     ]);
 
@@ -326,7 +349,7 @@ test('search for character', function () {
         ->assertOk();
 
     $response->assertJsonFragment([
-        'id' => test()->test_character->character_id,
+        'id'       => test()->test_character->character_id,
         'category' => 'character',
     ]);
 });

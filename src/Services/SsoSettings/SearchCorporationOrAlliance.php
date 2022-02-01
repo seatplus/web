@@ -35,8 +35,7 @@ class SearchCorporationOrAlliance
      * @var string
      */
     private string $searchParam
-    )
-    {
+    ) {
     }
 
     public function search(): array
@@ -47,6 +46,6 @@ class SearchCorporationOrAlliance
             return collect()->toArray();
         }
 
-        return (new SearchService)->execute(['alliance', 'corporation'], $this->searchParam);
+        return (new SearchService())->execute(['alliance', 'corporation'], $this->searchParam);
     }
 }

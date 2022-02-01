@@ -33,7 +33,7 @@ Route::prefix('wallets')
     ->group(function () {
         Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
 
-        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . WalletJournal::class)))
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.'.WalletJournal::class)))
             ->group(function () {
                 Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
                 Route::get('/{character_id}/balance', [WalletsController::class, 'balance'])->name('character.balance');

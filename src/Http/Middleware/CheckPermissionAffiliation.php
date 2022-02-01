@@ -46,18 +46,19 @@ class CheckPermissionAffiliation
     }
 
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @param  string  $permission
-     * @param  string|null  $character_role
+     * @param Request     $request
+     * @param Closure     $next
+     * @param string      $permission
+     * @param string|null $character_role
+     *
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
     {
         $validated_data = $request->validate([
-            'character_ids' => ['sometimes', 'array'],
+            'character_ids'   => ['sometimes', 'array'],
             'corporation_ids' => ['sometimes', 'array'],
-            'alliance_ids' => ['sometimes', 'array'],
+            'alliance_ids'    => ['sometimes', 'array'],
         ]);
 
         $this->setUser();

@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -43,29 +66,28 @@ test('get mail body test', function () {
     $secondary_charcter = Event::fakeFor(fn () => CharacterInfo::factory()->create());
 
     $mail_receipient = Event::fakeFor(fn () => MailRecipients::factory()->create([
-        'mail_id' => $mail->id,
-        'receivable_id' => $secondary_charcter->character_id,
+        'mail_id'         => $mail->id,
+        'receivable_id'   => $secondary_charcter->character_id,
         'receivable_type' => CharacterInfo::class,
     ]));
-
 
     //Prepare ESI Response of GetIdsFromNamesService
     $data = [
         [
-            "id" => 91356804,
-            "name" => "Steel Roamer",
+            'id'   => 91356804,
+            'name' => 'Steel Roamer',
         ],
         [
-            "id" => 98467521,
-            "name" => "ShekelSquad",
+            'id'   => 98467521,
+            'name' => 'ShekelSquad',
         ],
         [
-            'id' => 95002093,
-            "name" => "Rory Wolf",
+            'id'   => 95002093,
+            'name' => 'Rory Wolf',
         ],
         [
-            'id' => 94159646,
-            "name" => "evillady Lennelluc",
+            'id'   => 94159646,
+            'name' => 'evillady Lennelluc',
         ],
     ];
 

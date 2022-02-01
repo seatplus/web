@@ -34,26 +34,27 @@ class UserRessource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request
+     *
      * @return array
      */
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            'id'             => $this->id,
             'main_character' => $this->main_character,
-            'characters' => $this->characters
+            'characters'     => $this->characters
                 //->reject(fn($character) => $character->character_id === $this->main_character_id)
                 ->map(function ($character) {
                     return [
                         'character_id' => $character->character_id,
-                        'name' => $character->name,
-                        'corporation' => $character->corporation,
-                        'alliance' => $character->alliance,
-                        'scopes' => $character->refresh_token?->scopes,
+                        'name'         => $character->name,
+                        'corporation'  => $character->corporation,
+                        'alliance'     => $character->alliance,
+                        'scopes'       => $character->refresh_token?->scopes,
                     ];
                 }),
             'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status),
+            'status'        => $this->when($this->status ? true : false, $this->status),
         ];
     }
 }

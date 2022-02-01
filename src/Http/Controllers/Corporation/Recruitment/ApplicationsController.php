@@ -48,14 +48,14 @@ class ApplicationsController extends Controller
 {
     public function apply(ApplicationRequest $application_request)
     {
-        (new HandleApplicationAction)->execute($application_request->all());
+        (new HandleApplicationAction())->execute($application_request->all());
 
         return back()->with('success', 'Application submitted');
     }
 
     public function pullCharacterApplication(int $character_id)
     {
-        $user_owns_character_id = in_array($character_id, (new GetOwnedIds)->execute());
+        $user_owns_character_id = in_array($character_id, (new GetOwnedIds())->execute());
 
         abort_unless($user_owns_character_id, 403, 'submitted character_id does not belong to user');
 
@@ -103,7 +103,7 @@ class ApplicationsController extends Controller
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['main_character', 'characters', 'characters.batch_update'],
+                        User::class          => ['main_character', 'characters', 'characters.batch_update'],
                         CharacterInfo::class => ['batch_update'],
                     ]);
                 },
@@ -111,17 +111,17 @@ class ApplicationsController extends Controller
             ->find($application_id);
 
         $recruit = match ($application->applicationable_type) {
-            User::class => $application->applicationable,
+            User::class          => $application->applicationable,
             CharacterInfo::class => collect([
                 'main_character' => $application->applicationable,
-                'characters' => [$application->applicationable],
+                'characters'     => [$application->applicationable],
             ])
         };
 
         return inertia('Corporation/Recruitment/Application', [
-            'recruit' => $recruit->toArray(),
-            'application' => $application,
-            'watchlist' => $action->execute($application->corporation_id),
+            'recruit'              => $recruit->toArray(),
+            'application'          => $application,
+            'watchlist'            => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
@@ -129,7 +129,7 @@ class ApplicationsController extends Controller
     public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action)
     {
         $request->validate([
-            'decision' => ['required', Rule::in(['rejected', 'accepted'])],
+            'decision'    => ['required', Rule::in(['rejected', 'accepted'])],
             'explanation' => 'required_if:decision,rejected',
         ]);
 
@@ -152,7 +152,7 @@ class ApplicationsController extends Controller
 
         return redirect()->route('corporation.recruitment')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
-                User::class => 'User',
+                User::class          => 'User',
                 CharacterInfo::class => 'Character'
             }, $request->get('decision')));
     }
@@ -178,7 +178,7 @@ class ApplicationsController extends Controller
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['main_character', 'characters', 'characters.batch_update'],
+                        User::class          => ['main_character', 'characters', 'characters.batch_update'],
                         CharacterInfo::class => ['batch_update'],
                     ]);
                 },

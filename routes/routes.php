@@ -39,47 +39,47 @@ Route::middleware('web')
 
                 Route::prefix('queue')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Queue/Queue.php';
+                        include __DIR__.'/Routes/Queue/Queue.php';
                     });
 
                 Route::prefix('configuration')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Configuration/Configuration.php';
-                        include __DIR__ . '/Routes/Configuration/UserSettings.php';
-                        include __DIR__ . '/Routes/Configuration/ManualLocations.php';
+                        include __DIR__.'/Routes/Configuration/Configuration.php';
+                        include __DIR__.'/Routes/Configuration/UserSettings.php';
+                        include __DIR__.'/Routes/Configuration/ManualLocations.php';
                         Route::middleware(['permission:superuser'])->group(function () {
-                            include __DIR__ . '/Routes/Configuration/Schedules.php';
+                            include __DIR__.'/Routes/Configuration/Schedules.php';
                         });
                     });
 
                 Route::prefix('character')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Character/View.php';
-                        include __DIR__ . '/Routes/Character/Contact.php';
-                        include __DIR__ . '/Routes/Character/Wallet.php';
-                        include __DIR__ . '/Routes/Character/Contract.php';
-                        include __DIR__ . '/Routes/Character/CorporationHistory.php';
-                        include __DIR__ . '/Routes/Character/Skills.php';
-                        include __DIR__ . '/Routes/Character/Mails.php';
+                        include __DIR__.'/Routes/Character/View.php';
+                        include __DIR__.'/Routes/Character/Contact.php';
+                        include __DIR__.'/Routes/Character/Wallet.php';
+                        include __DIR__.'/Routes/Character/Contract.php';
+                        include __DIR__.'/Routes/Character/CorporationHistory.php';
+                        include __DIR__.'/Routes/Character/Skills.php';
+                        include __DIR__.'/Routes/Character/Mails.php';
                     });
 
                 Route::prefix('corporation')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Corporation/Wallet.php';
-                        include __DIR__ . '/Routes/Corporation/MemberTracking.php';
-                        include __DIR__ . '/Routes/Corporation/Recruitment.php';
-                        include __DIR__ . '/Routes/Corporation/MemberCompliance.php';
+                        include __DIR__.'/Routes/Corporation/Wallet.php';
+                        include __DIR__.'/Routes/Corporation/MemberTracking.php';
+                        include __DIR__.'/Routes/Corporation/Recruitment.php';
+                        include __DIR__.'/Routes/Corporation/MemberCompliance.php';
                     });
 
                 Route::prefix('acl')
                     ->middleware(['acl-permission:view access control'])
                     ->group(function () {
-                        include __DIR__ . '/Routes/AccessControl/View.php';
+                        include __DIR__.'/Routes/AccessControl/View.php';
                     });
 
                 Route::prefix('shared')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Shared/Shared.php';
+                        include __DIR__.'/Routes/Shared/Shared.php';
                     });
             });
 

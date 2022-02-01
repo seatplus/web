@@ -37,12 +37,12 @@ class OverviewController extends Controller
         $available_scopes = config('eveapi.scopes');
 
         $sso_scopes_entries = function () {
-            return (new GetSsoScopeEntries)->execute();
+            return (new GetSsoScopeEntries())->execute();
         };
 
         return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
-            'available_scopes' => $available_scopes,
-            'entries' => $sso_scopes_entries,
+            'available_scopes'     => $available_scopes,
+            'entries'              => $sso_scopes_entries,
             'activeSidebarElement' => 'server.settings',
         ]);
     }
