@@ -1,16 +1,15 @@
 <template>
   <InfiniteLoadingHelper
+    v-slot="{results}"
     route="open.corporation.applications"
     :params="{corporation_id: corporationId}"
-    @result="(results) => raw_pending = results"
   >
-    <ApplicationsTable :applications="pending" />
+    <ApplicationsTable :applications="filterPendings(results)" />
   </InfiniteLoadingHelper>
 </template>
 
 <script>
 import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import {computed, ref} from "vue";
 import ApplicationsTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/ApplicationsTable";
 
 export default {
@@ -29,17 +28,11 @@ export default {
             type: Number
         }
     },
-    setup(props) {
-
-        const raw_pending = ref([])
-
-        const pending = computed(() => _.filter(raw_pending.value, {decision_count: props.stepCount}))
-
-        return {
-            raw_pending,
-            pending
+    methods: {
+        filterPendings(pendings) {
+            return _.filter(pendings, {decision_count: this.stepCount})
         }
-    }
+    },
 }
 </script>
 

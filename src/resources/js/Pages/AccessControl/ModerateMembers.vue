@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="space-y-4">
     <teleport to="#head">
       <title>{{ title(pageTitle) }}</title>
     </teleport>
@@ -24,12 +24,12 @@
       <div class="bg-white shadow overflow-hidden sm:rounded-md">
         <ul class="divide-y divide-gray-200">
           <InfiniteLoadingHelper
+            v-slot="{results}"
             route="acl.members"
-            :params="role.id"
-            @result="(results) => membersList = results"
+            :params="{role_id: role.id}"
           >
             <li
-              v-for="member in sortedMembers"
+              v-for="member in sortMembers(results)"
               :key="member.id"
             >
               <div class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
@@ -158,33 +158,12 @@
         data()  {
             return {
                 pageTitle: 'Manage Members',
-                membersList: [],
                 breadcrumbs: [
                     {
                         name: 'Control Group',
                         route: this.$route('acl.groups')
                     }
                 ]
-            }
-        },
-        computed: {
-            cleanMembers() {
-                return _.map(this.membersList, function (member) {
-                    member.characters = _.reject(member.characters, (character) => character.character_id === member.main_character.character_id)
-                    return member
-                })
-            },
-            applicants() {
-                return _.filter(this.cleanMembers, (member) => member.status === 'waitlist')
-            },
-            pausedMembers() {
-                return _.filter(this.cleanMembers, (member) => member.status === 'paused')
-            },
-            members() {
-                return _.filter(this.cleanMembers, (member) => member.status === 'member')
-            },
-            sortedMembers() {
-                return [...this.applicants, ...this.pausedMembers, ...this.members]
             }
         },
         methods: {
@@ -211,6 +190,25 @@
                     only: [],
                 })
             },
+            sortMembers(members) {
+
+                let cleanMembers = _.map(members, function (member) {
+                    member.characters = _.reject(member.characters, (character) => character.character_id === member.main_character.character_id)
+                    return member
+                })
+
+                let sortedMembers = []
+
+                _.each(['waitlist', 'paused', 'member'], function (type) {
+
+                    let filteredMembers = _.filter(cleanMembers, (member) => member.status === type)
+
+                    _.each(filteredMembers, (filteredMember) => sortedMembers.push(filteredMember))
+                })
+
+                return sortedMembers
+
+            }
         }
     }
 </script>

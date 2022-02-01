@@ -2,13 +2,13 @@
   <div>
     <InfiniteLoadingHelper
       :key="loadingHelperKey"
+      v-slot="{results}"
       :params="parameters"
       route="load.character.assets"
-      @result="(results) => locations = results"
     >
       <div class="space-y-2 sm:space-y-6">
         <LocationComponent
-          v-for="location in locations"
+          v-for="location in results"
           :key="location.location_id"
           :query-parameters="parameters"
           :location="location"

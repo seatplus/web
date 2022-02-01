@@ -5,12 +5,12 @@
   >
     <InfiniteLoadingHelper
       :key="Object.values(params).join(',')"
+      v-slot="{results}"
       :route="route"
       :params="params"
-      @result="(results) => entities = results"
     >
       <SelectionEntity
-        v-for="character in entities"
+        v-for="character in results"
         :key="character.character_id"
         v-model="selected_ids"
         :entity="character"
@@ -44,7 +44,6 @@ export default {
     },
     setup(props) {
 
-        const entities = ref([])
         const params = ref(props.type === 'character'
             ? { permission: props.dispatchTransferObject.permission }
             : { permission: props.dispatchTransferObject.permission, corporation_role: props.dispatchTransferObject.required_corporation_role}
@@ -59,8 +58,7 @@ export default {
 
         return {
             route,
-            params,
-            entities
+            params
         }
     },
     data() {

@@ -1,12 +1,13 @@
 <template>
   <InfiniteLoadingHelper
+    v-slot="{results}"
     route="get.mail.headers"
     :params="{character_ids: characterIds}"
     @result="assignResult"
   >
     <ul class="divide-y divide-gray-200">
       <Disclosure
-        v-for="mail in mails"
+        v-for="mail in results"
         :key="mail.id"
         v-slot="{open}"
         as="li"
@@ -78,20 +79,18 @@ export default {
             required: true
         },
         selectedId: {
+            type: Number,
             required: false
         }
     },
     emits: ['update:selectedId'],
     setup(props, {emit}) {
-        const mails = ref([])
 
-        const assignResult = (results) => mails.value = results
+
         const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
         const isSelected = (mail) => mail.id === props.selectedId
 
         return {
-            assignResult,
-            mails,
             emitSelection,
             isSelected
         }

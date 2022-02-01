@@ -10,11 +10,11 @@
 
     <InfiniteLoadingHelper
       :key="infiniteId"
+      v-slot="{results}"
       route="get.manuel_locations.suggestions"
-      @result="(result) => results = result"
     >
       <ManualLocationComponent
-        v-for="(location, index) in grouped_suggestions"
+        v-for="(location, index) in groupSuggestions(results)"
         :key="`${location.location_id}:${infiniteId}`"
         :index="index"
         :location="location"
@@ -42,25 +42,22 @@ export default {
     data() {
         return {
             infiniteId: +new Date(),
-            pageTitle: 'Manual Locations',
-            results: []
-        }
-    },
-    computed: {
-        grouped_suggestions() {
-            return _.filter(_.map(_.groupBy(this.results, 'location_id'), (value, prop) => (
-                {
-                    location_id: _.toInteger(prop),
-                    data: value,
-                    selected: _.filter(value, 'selected')
-                }
-            )), location => location.data.length > 1 || _.isEmpty(location.selected))
+            pageTitle: 'Manual Locations'
         }
     },
     methods: {
         reset() {
             this.infiniteId++
             console.log('resetting')
+        },
+        groupSuggestions(suggestions) {
+            return _.filter(_.map(_.groupBy(suggestions, 'location_id'), (value, prop) => (
+                {
+                    location_id: _.toInteger(prop),
+                    data: value,
+                    selected: _.filter(value, 'selected')
+                }
+            )), location => location.data.length > 1 || _.isEmpty(location.selected))
         }
     }
 }

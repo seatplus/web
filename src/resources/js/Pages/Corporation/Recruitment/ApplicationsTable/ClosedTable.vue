@@ -1,10 +1,10 @@
 <template>
   <InfiniteLoadingHelper
+    v-slot="{results}"
     route="closed.corporation.applications"
     :params="{corporation_id: corporationId}"
-    @result="(results) => closed = results"
   >
-    <ApplicationsTable :applications="closed">
+    <ApplicationsTable :applications="results">
       <template #default="{ applicant }">
         <ActivityLogModal :application-id="applicant.application_id" />
       </template>
@@ -28,14 +28,6 @@ export default {
         corporationId: {
             required: true,
             type: Number
-        }
-    },
-    setup() {
-
-        const closed = ref([])
-
-        return {
-            closed
         }
     }
 }

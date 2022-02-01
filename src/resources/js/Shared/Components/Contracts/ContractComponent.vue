@@ -14,16 +14,16 @@
     <!-- This example requires Tailwind CSS v2.0+ -->
     <div class="relative max-h-96 overflow-y-auto">
       <InfiniteLoadingHelper
+        v-slot="{results}"
         route="character.contracts.details"
         :params="parameters"
-        @result="(results) => contracts = results"
       >
         <StickyHeaderTable
           :header-titles="[{title: 'Issuer', columnSpan: 2}, {title: 'Assignee', columnSpan: 2}, {title: 'Type', columnSpan: 2}, {title: 'Details', columnSpan: 4}, {title: 'Content', columnSpan: 1, srOnly: true}]"
         >
           <template #default="slotProps">
             <StickyHeaderTableRow
-              v-for="contract in contracts"
+              v-for="contract in results"
               :key="contract.contract_id"
               :number-columns="slotProps.countColumns"
             >
