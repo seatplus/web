@@ -39,10 +39,10 @@ class WatchlistArrayAction
         }
 
         return [
-            'systems'    => $enlistment->systems?->pluck('system_id'),
-            'regions'    => $enlistment->regions?->pluck('region_id'),
-            'types'      => $enlistment->types?->pluck('type_id'),
-            'groups'     => $enlistment->groups?->pluck('group_id'),
+            'systems' => $enlistment->systems?->pluck('system_id'),
+            'regions' => $enlistment->regions?->pluck('region_id'),
+            'types' => $enlistment->types?->pluck('type_id'),
+            'groups' => $enlistment->groups?->pluck('group_id'),
             'categories' => $enlistment->categories?->pluck('category_id'),
         ];
     }

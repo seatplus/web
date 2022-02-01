@@ -47,18 +47,18 @@ class ManageControlGroupMembersController
 
         $mappedRole = [
             'title' => $role->name,
-            'id'    => $role->id,
-            'type'  => $role->type,
-            'acl'   => [
+            'id' => $role->id,
+            'type' => $role->type,
+            'acl' => [
                 'affiliations' => $role->acl_affiliations->map(fn ($affiliation) => [
-                    'id'   => $affiliation->affiliatable_id,
+                    'id' => $affiliation->affiliatable_id,
                     'type' => [
                         CorporationInfo::class => 'corporation',
-                        AllianceInfo::class    => 'alliance',
+                        AllianceInfo::class => 'alliance',
                     ][$affiliation->affiliatable_type],
                 ]),
                 'moderators' => $role->moderators->map(fn ($affiliation) => $affiliation->affiliatable),
-                'members'    => $role->acl_members->map(function ($member) {
+                'members' => $role->acl_members->map(function ($member) {
                     $member->id = $member->user_id;
 
                     return $member;
@@ -67,7 +67,7 @@ class ManageControlGroupMembersController
         ];
 
         return Inertia::render('AccessControl/ManageControlGroup', [
-            'role'                 => $mappedRole,
+            'role' => $mappedRole,
             'activeSidebarElement' => 'acl.groups',
         ]);
     }
