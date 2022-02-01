@@ -52,7 +52,7 @@ class ContactsController extends Controller
 
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characters' => $characters,
+            'characters'             => $characters,
         ]);
     }
 
@@ -69,7 +69,7 @@ class ContactsController extends Controller
 
         $request->session()->now('contacts', [
             'corporation_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type === CorporationInfo::class),
-            'alliance_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type === AllianceInfo::class),
+            'alliance_contacts'    => $corp_alliance_standing->filter(fn (Contact $contact)    => $contact->contactable_type === AllianceInfo::class),
         ]);
 
         return ContactResource::collection(
