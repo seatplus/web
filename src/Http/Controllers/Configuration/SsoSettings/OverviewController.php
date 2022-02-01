@@ -41,8 +41,8 @@ class OverviewController extends Controller
         };
 
         return Inertia::render('Configuration/Scopes/OverviewScopeSettings', [
-            'available_scopes'     => $available_scopes,
-            'entries'              => $sso_scopes_entries,
+            'available_scopes' => $available_scopes,
+            'entries' => $sso_scopes_entries,
             'activeSidebarElement' => 'server.settings',
         ]);
     }
