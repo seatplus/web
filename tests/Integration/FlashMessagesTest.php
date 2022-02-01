@@ -32,9 +32,9 @@ beforeEach(function () {
         'flash' => function () {
             return [
                 'success' => session()->pull('success'),
-                'info' => session()->pull('info'),
+                'info'    => session()->pull('info'),
                 'warning' => session()->pull('warning'),
-                'error' => session()->pull('error'),
+                'error'   => session()->pull('error'),
             ];
         },
     ]);
