@@ -48,7 +48,7 @@ class MemberComplianceController
 
         return inertia('Corporation/MemberCompliance/MemberCompliance', [
             'corporations' => $affiliated_corporations,
-            'canReview'    => auth()->user()->can('member compliance: review user'),
+            'canReview' => auth()->user()->can('member compliance: review user'),
         ]);
     }
 
@@ -90,9 +90,9 @@ class MemberComplianceController
             ]);
 
         return inertia('Corporation/MemberCompliance/ReviewUser', [
-            'member'            => $member,
+            'member' => $member,
             'targetCorporation' => CorporationInfo::find($corporation_id),
-            'watchlist'         => $action->execute($corporation_id),
+            'watchlist' => $action->execute($corporation_id),
         ]);
     }
 }
