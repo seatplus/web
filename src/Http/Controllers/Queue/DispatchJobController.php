@@ -71,9 +71,9 @@ class DispatchJobController extends Controller
     public function getEntities(Request $request)
     {
         $validated_data = $request->validate([
-            'manual_job' => ['required', fn ($attribute, $value, $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
-            'permission' => ['required'],
-            'required_scopes' => ['required', 'array'],
+            'manual_job'                => ['required', fn ($attribute, $value, $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
+            'permission'                => ['required'],
+            'required_scopes'           => ['required', 'array'],
             'required_corporation_role' => ['nullable', 'string'],
         ]);
 
@@ -91,10 +91,10 @@ class DispatchJobController extends Controller
                     ->unique(fn ($token) => $token->corporation_id);
             })
             ->map(fn ($token) => collect([
-                'character_id' => $required_corporation_role ? null : $token->character_id,
+                'character_id'   => $required_corporation_role ? null : $token->character_id,
                 'corporation_id' => $required_corporation_role ? $token->corporation_id : null,
-                'name' => $required_corporation_role ? $token->corporation->name : $token->character->name,
-                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $required_corporation_role ? $token->corporation_id : $token->character_id))),
+                'name'           => $required_corporation_role ? $token->corporation->name : $token->character->name,
+                'batch'          => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $required_corporation_role ? $token->corporation_id : $token->character_id))),
             ])->filter()->toArray())
             ->toJson();
     }
@@ -129,24 +129,24 @@ class DispatchJobController extends Controller
 
         if ($batch->failedJobs > 0 && $batch->progress() < 100) {
             return [
-                'state' => 'failures',
-                'time' => $batch->finishedAt,
+                'state'    => 'failures',
+                'time'     => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
         }
 
         if ($batch->progress() == 100) {
             return [
-                'state' => 'finished',
-                'time' => $batch->finishedAt,
+                'state'    => 'finished',
+                'time'     => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
         }
 
-        if ($batch->pendingJobs > 0 && ! $batch->failedJobs) {
+        if ($batch->pendingJobs > 0 && !$batch->failedJobs) {
             return [
-                'state' => 'pending',
-                'time' => $batch->createdAt,
+                'state'    => 'pending',
+                'time'     => $batch->createdAt,
                 'batch_id' => $batch_id,
             ];
         }
