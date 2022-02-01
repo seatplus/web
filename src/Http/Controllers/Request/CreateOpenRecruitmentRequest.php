@@ -50,8 +50,8 @@ class CreateOpenRecruitmentRequest extends FormRequest
     {
         return [
             'corporation_id' => ['required', 'exists:corporation_infos,corporation_id'],
-            'type'           => ['required', 'string', Rule::in(['character', 'user'])],
-            'steps'          => ['nullable', 'string'],
+            'type' => ['required', 'string', Rule::in(['character', 'user'])],
+            'steps' => ['nullable', 'string'],
         ];
     }
 
