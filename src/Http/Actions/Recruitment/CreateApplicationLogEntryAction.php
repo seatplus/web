@@ -79,10 +79,10 @@ class CreateApplicationLogEntryAction
     {
         ApplicationLogs::query()->create([
             'application_id' => $this->getApplicationId(),
-            'causer_type'    => User::class,
-            'causer_id'      => auth()->user()->getAuthIdentifier(),
-            'type'           => $this->getType(),
-            'comment'        => $this->getComment(),
+            'causer_type' => User::class,
+            'causer_id' => auth()->user()->getAuthIdentifier(),
+            'type' => $this->getType(),
+            'comment' => $this->getComment(),
         ]);
     }
 }

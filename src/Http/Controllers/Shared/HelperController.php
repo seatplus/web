@@ -140,17 +140,17 @@ class HelperController extends Controller
             ->limit(15)
             ->get()
             ->map(fn ($entry) => [
-                'id'           => intval(match ($entry->category) {
-                    'type'     => 1,
-                    'group'    => 2,
+                'id' => intval(match ($entry->category) {
+                    'type' => 1,
+                    'group' => 2,
                     'category' => 3,
                 }.$entry->id),
-                'name'           => sprintf('%s (%s)', $entry->name, $entry->category),
-                'watchable_id'   => intval($entry->id),
+                'name' => sprintf('%s (%s)', $entry->name, $entry->category),
+                'watchable_id' => intval($entry->id),
                 'watchable_type' => match ($entry->category) {
-                    'type'       => Type::class,
-                    'group'      => Group::class,
-                    'category'   => Category::class,
+                    'type' => Type::class,
+                    'group' => Group::class,
+                    'category' => Category::class,
                 },
             ]);
     }
@@ -161,7 +161,7 @@ class HelperController extends Controller
 
         $image_variants = cache($url);
 
-        if (!$image_variants) {
+        if (! $image_variants) {
             $image_variants = Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
 
             //Cache::put($url, $image_variants, now()->addDay());
@@ -178,8 +178,8 @@ class HelperController extends Controller
         }
 
         $container = new EsiRequestContainer([
-            'method'   => 'get',
-            'version'  => 'v1',
+            'method' => 'get',
+            'version' => 'v1',
             'endpoint' => '/markets/prices/',
         ]);
 
