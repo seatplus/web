@@ -34,9 +34,9 @@ class GetCorporationInfo
     public function execute($corporation_id)
     {
         $corporation_info_container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v4',
-            'endpoint' => '/corporations/{corporation_id}/',
+            'method'      => 'get',
+            'version'     => 'v4',
+            'endpoint'    => '/corporations/{corporation_id}/',
             'path_values' => ['corporation_id' => $corporation_id],
         ]);
 

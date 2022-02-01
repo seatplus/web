@@ -72,7 +72,7 @@ class AssignSuperuser extends Command
                 ->get()
                 ->map(function ($user) {
                     return [
-                        'id' => $user->id,
+                        'id'         => $user->id,
                         'characters' => $user->characters->implode('name', ', '),
                     ];
                 });
@@ -91,7 +91,7 @@ class AssignSuperuser extends Command
             ->get()
             ->map(function ($user) {
                 return [
-                    'id' => $user->id,
+                    'id'         => $user->id,
                     'characters' => $user->characters->implode('name', ', '),
                 ];
             })
@@ -105,13 +105,13 @@ class AssignSuperuser extends Command
 
         $this->user = User::find($user_id);
 
-        if (! $this->user) {
+        if (!$this->user) {
             return $this->alert('illegal user_id selected');
         }
 
         $this->info('Please note after setting a superuser via console, you are only able to set another via web ui.');
 
-        if (! $this->confirm('Do you wish to a continue?')) {
+        if (!$this->confirm('Do you wish to a continue?')) {
             return $this->error('aborted');
         }
 
