@@ -53,7 +53,7 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
             ->reject(fn ($member) => in_array(Arr::get($member, 'id'), $current_member_ids->toArray()))
             // remove members on waitlist or paused
             ->reject(fn ($member) => Arr::has($member, 'status') ? $member['status'] !== 'member' : false)
-            ->each(fn ($member)   => $data->role->activateMember(User::find(Arr::get($member, 'id'))));
+            ->each(fn ($member) => $data->role->activateMember(User::find(Arr::get($member, 'id'))));
     }
 
     public function handleAffiliations(ControlGroupUpdateData $data)
@@ -73,8 +73,8 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
 
                 collect($data->affiliations)
                     ->reject(fn ($affiliation) => in_array($affiliation['id'], $existing_ids->toArray()))
-                    ->each(fn ($affiliation)   => $data->role->acl_affiliations()->create([
-                        'affiliatable_id'   => $affiliation['id'],
+                    ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
+                        'affiliatable_id' => $affiliation['id'],
                         'affiliatable_type' => $affiliation['type'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
                     ]));
 
