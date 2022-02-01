@@ -60,7 +60,7 @@
 
 <script>
 
-import EntityBlock from "../../Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import CardWithHeader from "../../Layout/Cards/CardWithHeader";
 import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper";
 import CharacterContactsRowComponent from "./CharacterContactsRowComponent";

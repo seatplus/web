@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import ModalWithFooter from "../../Modals/ModalWithFooter";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
 import Autosuggest from "../Autosuggest";
 //TODO import { VueAutosuggest } from "vue-autosuggest"
 export default {

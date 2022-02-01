@@ -13,7 +13,7 @@
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader";
-import LogTab from "./Tabs/LogTab";
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
 
 export default {
     name: "ActivityLog",

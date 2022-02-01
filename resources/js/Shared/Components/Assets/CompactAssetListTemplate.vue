@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import EntityBlock from "../../Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import {prefix} from "metric-prefix";
 import { ChevronRightIcon } from '@heroicons/vue/solid'
 import EveImage from "../../EveImage";
