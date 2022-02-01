@@ -195,13 +195,13 @@ test('junior hr handles open user applications', function () {
     test()->test_user = test()->test_user->refresh();
 
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertJsonCount(0, 'data');
 
     applySecondary();
 
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertJsonCount(1, 'data');
 
     // open application
@@ -264,13 +264,13 @@ test('junior hr handles open character applications', function () {
     test()->test_user = test()->test_user->refresh();
 
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications',[test()->test_character->corporation->corporation_id, 0], ))
         ->assertJsonCount(0, 'data');
 
     applySecondary(false);
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0] ))
         ->assertJsonCount(1, 'data');
 
     // open application
@@ -320,13 +320,13 @@ test('junior h r can see shitlist', function () {
 
     // Test that test user is not on shitlist
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertJsonCount(0, 'data');
 
     applySecondary();
 
     test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertJsonCount(1, 'data');
 });
 
@@ -500,7 +500,7 @@ test('recruiter can see corporation applications', function () {
 
     // get list with open appliactions
     $response = test()->actingAs($recruiter)
-        ->get(route('open.corporation.applications', test()->test_character->corporation->corporation_id))
+        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
         ->assertOk();
 
     // get list with closed applications

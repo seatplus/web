@@ -1,8 +1,9 @@
 <template>
   <InfiniteLoadingHelper
+    :key="routeParams"
     v-slot="{results}"
     route="open.corporation.applications"
-    :params="{corporation_id: corporationId}"
+    :params="routeParams"
   >
     <ApplicationsTable :applications="filterPendings(results)" />
   </InfiniteLoadingHelper>
@@ -28,11 +29,19 @@ export default {
             type: Number
         }
     },
+    computed: {
+        routeParams() {
+            return {
+                corporation_id: this.corporationId,
+                decision_count: this.stepCount
+            }
+        }
+    },
     methods: {
         filterPendings(pendings) {
             return _.filter(pendings, {decision_count: this.stepCount})
         }
-    },
+    }
 }
 </script>
 
