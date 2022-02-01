@@ -34,6 +34,7 @@ class CharacterInfoRessource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request
+     *
      * @return array
      */
     public function toArray($request)
@@ -41,11 +42,11 @@ class CharacterInfoRessource extends JsonResource
         $owned_character_ids = auth()->user()->characters->pluck('character_id');
 
         return [
-            'id' => $this->character_id,
-            'character_id' => $this->character_id,
-            'name' => $this->name,
-            'corporation' => $this->whenLoaded('corporation'),
-            'alliance' => $this->whenLoaded('alliance'),
+            'id'            => $this->character_id,
+            'character_id'  => $this->character_id,
+            'name'          => $this->name,
+            'corporation'   => $this->whenLoaded('corporation'),
+            'alliance'      => $this->whenLoaded('alliance'),
             'owned_by_user' => in_array($this->character_id, $owned_character_ids->toArray()),
         ];
     }

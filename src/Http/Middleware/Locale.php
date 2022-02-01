@@ -34,11 +34,12 @@ class Locale
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
      *
      * @throws \Seatplus\Web\Exceptions\SettingException
+     *
+     * @return mixed
      */
     public function handle($request, Closure $next)
     {

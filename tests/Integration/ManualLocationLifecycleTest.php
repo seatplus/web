@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -31,8 +54,8 @@ test('one can submit suggestion', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('post.manual_location'), [
-            'name' => $manual_loaction->name,
-            'location_id' => $manual_loaction->location_id,
+            'name'            => $manual_loaction->name,
+            'location_id'     => $manual_loaction->location_id,
             'solar_system_id' => $manual_loaction->solar_system_id,
         ])->assertRedirect();
 
@@ -53,13 +76,13 @@ test('one get own suggestion', function () {
 test('one get suggestion of other user', function () {
     ManualLocation::factory()->count(5)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'created_at'  => carbon()->subDay(),
     ]);
 
     $manual_loaction = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->actingAs(test()->test_user)
@@ -71,13 +94,13 @@ test('one get suggestion of other user', function () {
 test('admin can accept suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'created_at'  => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     test()->assignPermissionToTestUser(['manage manual locations']);
@@ -103,7 +126,7 @@ test('admin can accept suggestion', function () {
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
-            'id' => $manual_location->id,
+            'id'          => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
@@ -121,12 +144,12 @@ test('admin can accept suggestion', function () {
 test('one get accepted suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
+        'created_at'  => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id'     => \Seatplus\Auth\Models\User::factory(),
         'location_id' => 12345,
     ]);
 
@@ -138,7 +161,7 @@ test('one get accepted suggestion', function () {
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
-            'id' => $manual_location->id,
+            'id'          => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
@@ -163,8 +186,8 @@ test('if location is resolved via jobs delete manual suggestions', function () {
     ]);
 
     $location = Location::factory()->create([
-        'location_id' => $manual_location->location_id,
-        'locatable_id' => $manual_location->location_id,
+        'location_id'    => $manual_location->location_id,
+        'locatable_id'   => $manual_location->location_id,
         'locatable_type' => Station::class,
     ]);
 

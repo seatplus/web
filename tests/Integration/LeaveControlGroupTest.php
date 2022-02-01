@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -20,10 +43,9 @@ test('user can leave himself', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_id'   => test()->test_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
-
 
     // Second make test character member
     test()->role->activateMember(test()->test_user);
@@ -45,7 +67,7 @@ test('user can kick other user as superuser', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
@@ -72,7 +94,7 @@ test('user can kick other user as moderator', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
@@ -83,9 +105,9 @@ test('user can kick other user as moderator', function () {
     // Thirdly make primary character moderator
     expect(test()->role->moderators->isEmpty())->toBeTrue();
     test()->role->moderators()->create([
-        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_id'   => test()->test_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
-        'can_moderate' => true,
+        'can_moderate'      => true,
     ]);
     expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
@@ -108,7 +130,7 @@ test('user can not kick other user as vanilla user', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 

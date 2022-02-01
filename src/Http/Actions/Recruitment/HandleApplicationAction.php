@@ -46,7 +46,7 @@ class HandleApplicationAction
     {
         $character_id = Arr::get($application_request, 'character_id');
 
-        $user_owns_character_id = in_array($character_id, (new GetOwnedIds)->execute());
+        $user_owns_character_id = in_array($character_id, (new GetOwnedIds())->execute());
 
         abort_unless($user_owns_character_id, 403, 'submitted character_id does not belong to user');
 

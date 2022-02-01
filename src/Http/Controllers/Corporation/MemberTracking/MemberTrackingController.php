@@ -44,7 +44,7 @@ class MemberTrackingController extends Controller
 
         return Inertia::render('Corporation/MemberTracking/MemberTracking', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporations' => $this->getAffiliatedCorporations($dispatchTransferObject),
+            'corporations'           => $this->getAffiliatedCorporations($dispatchTransferObject),
         ]);
     }
 
@@ -53,7 +53,7 @@ class MemberTrackingController extends Controller
         $corporation = CorporationInfo::find($corporation_id);
         $sso_scopes = collect([
             'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
-            'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
+            'alliance_scopes'    => $corporation?->alliance?->ssoScopes?->selected_scopes,
         ])->flatten(1)->filter();
 
         $query = CorporationMemberTracking::where('corporation_id', $corporation_id)
@@ -76,12 +76,12 @@ class MemberTrackingController extends Controller
             ->map(function ($corporation) {
                 $sso_scopes = collect([
                     'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
-                    'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
+                    'alliance_scopes'    => $corporation?->alliance?->ssoScopes?->selected_scopes,
                 ])->flatten(1)->filter();
 
                 return [
-                    'corporation_id' => $corporation->corporation_id,
-                    'name' => $corporation->name,
+                    'corporation_id'  => $corporation->corporation_id,
+                    'name'            => $corporation->name,
                     'required_scopes' => $sso_scopes->unique()->toArray(),
                 ];
             });

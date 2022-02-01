@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -14,10 +37,10 @@ test('happy path', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id' => $character_affiliation->character_id,
+        'id'           => $character_affiliation->character_id,
         'character_id' => $character_affiliation->character_id,
-        'name' => $character_affiliation->character->name,
-        'corporation' => [
+        'name'         => $character_affiliation->character->name,
+        'corporation'  => [
             'name' => $character_affiliation->corporation->name,
         ],
         'alliance' => [
@@ -46,10 +69,10 @@ test('happy path without alliance', function () {
     $character_affiliation->save();
 
     $expected_result = [
-        'id' => $character_affiliation->character_id,
+        'id'           => $character_affiliation->character_id,
         'character_id' => $character_affiliation->character_id,
-        'name' => $character_affiliation->character->name,
-        'corporation' => [
+        'name'         => $character_affiliation->character->name,
+        'corporation'  => [
             'name' => $character_affiliation->corporation->name,
         ],
     ];
@@ -67,10 +90,10 @@ test('happy path via corporation id', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id' => $character_affiliation->corporation_id,
+        'id'             => $character_affiliation->corporation_id,
         'corporation_id' => $character_affiliation->corporation_id,
-        'name' => $character_affiliation->corporation->name,
-        'alliance' => [
+        'name'           => $character_affiliation->corporation->name,
+        'alliance'       => [
             'name' => $character_affiliation->alliance->name,
         ],
     ];
@@ -88,9 +111,9 @@ test('happy path via alliance id', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id' => $character_affiliation->alliance_id,
+        'id'          => $character_affiliation->alliance_id,
         'alliance_id' => $character_affiliation->alliance_id,
-        'name' => $character_affiliation->alliance->name,
+        'name'        => $character_affiliation->alliance->name,
     ];
 
     $service = new GetEntityFromId($character_affiliation->alliance_id);
@@ -113,16 +136,16 @@ test('unknown character id', function () {
     ]);
 
     $esi_mock_return_data = [
-        'alliance_id' => $alliance->alliance_id,
-        'character_id' => $character->character_id,
+        'alliance_id'    => $alliance->alliance_id,
+        'character_id'   => $character->character_id,
         'corporation_id' => $corporation->corporation_id,
-        'faction_id' => null,
+        'faction_id'     => null,
     ];
 
     $body = [
         array_merge($esi_mock_return_data, [
-            'id' => $character->character_id,
-            'name' => $character->name,
+            'id'       => $character->character_id,
+            'name'     => $character->name,
             'category' => 'character',
         ]),
     ];
@@ -135,12 +158,11 @@ test('unknown character id', function () {
         ->twice()
         ->andReturn($response);
 
-
     $expected_result = [
-        'id' => $character->character_id,
+        'id'           => $character->character_id,
         'character_id' => $character->character_id,
-        'name' => $character->name,
-        'corporation' => [
+        'name'         => $character->name,
+        'corporation'  => [
             'name' => $corporation->name,
         ],
         'alliance' => [

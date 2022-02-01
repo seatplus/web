@@ -63,7 +63,7 @@ Route::prefix('recruitment')
                         Route::post('/update/{character_id}', 'dispatchBatchUpdate')->name('dispatch.batch_update');
                     });
 
-                Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+                Route::middleware(CheckAffiliationForApplication::class.':can accept or deny applications')
                     ->group(function () {
                         Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
                         Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.application');
@@ -73,7 +73,7 @@ Route::prefix('recruitment')
                     });
             });
 
-        Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+        Route::middleware(CheckAffiliationForApplication::class.':can accept or deny applications')
             ->get('/impersonate/{application_id}', ImpersonateRecruit::class)
             ->name('impersonate.recruit');
     });

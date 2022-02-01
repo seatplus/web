@@ -1,5 +1,28 @@
 <?php
 
+/*
+ * MIT License
+ *
+ * Copyright (c) 2019, 2020, 2021 Felix Huber
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -45,7 +68,7 @@ test('user without permission fails to create enlistment', function () {
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'type' => 'user',
+            'type'           => 'user',
         ])->assertForbidden();
 });
 
@@ -98,7 +121,7 @@ test('secondary user can apply as character', function () {
     $response = test()->actingAs(test()->secondary_user)
         ->post(route('post.application'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'character_id' => test()->secondary_character->character_id,
+            'character_id'   => test()->secondary_character->character_id,
         ]);
 
     test()->assertNotNull(test()->secondary_character->refresh()->application);
@@ -140,7 +163,7 @@ test('secondary user can apply as user', function () {
                 'data.0',
                 fn ($json) => $json
                 ->where('applicationable_id', test()->secondary_user->id)
-                ->where('corporation_id',  test()->test_character->corporation->corporation_id)
+                ->where('corporation_id', test()->test_character->corporation->corporation_id)
                 ->etc()
             )
             ->etc()
@@ -216,7 +239,6 @@ test('junior hr handles open user applications', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
 
-
     // Impersonate
     expect($application)->status->toBe('open');
 
@@ -236,22 +258,22 @@ test('junior hr handles open user applications', function () {
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id'   => test()->secondary_user->id,
         'applicationable_type' => User::class,
-        'status' => 'open',
+        'status'               => 'open',
     ]);
 
     test()->actingAs(test()->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
-            'decision' => 'rejected',
+            'decision'    => 'rejected',
             'explanation' => 'Some reason',
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id'   => test()->secondary_user->id,
         'applicationable_type' => User::class,
-        'status' => 'rejected',
+        'status'               => 'rejected',
     ]);
 
     expect(test()->secondary_user->refresh()->application)->toBeNull();
@@ -286,22 +308,22 @@ test('junior hr handles open character applications', function () {
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'open',
+        'status'               => 'open',
     ]);
 
     test()->actingAs(test()->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
-            'decision' => 'rejected',
+            'decision'    => 'rejected',
             'explanation' => 'Some reason',
         ])
         ->assertRedirect(route('corporation.recruitment'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'rejected',
+        'status'               => 'rejected',
     ]);
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
@@ -372,7 +394,6 @@ test('senior hr can setup watchlist', function () {
             ->etc()
         );
 
-
     // add region
     $region = Region::factory()->create();
     test()->actingAs(test()->test_user->refresh())
@@ -411,7 +432,7 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->type_id,
+                    'watchable_id'   => $type->type_id,
                     'watchable_type' => Type::class,
                 ],
             ],
@@ -436,7 +457,7 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
+                    'watchable_id'   => $type->group_id,
                     'watchable_type' => Group::class,
                 ],
             ],
@@ -460,12 +481,12 @@ test('senior hr can setup watchlist', function () {
             'items' => [
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
+                    'watchable_id'   => $type->group_id,
                     'watchable_type' => Group::class,
                 ],
                 [
                     // only watchable_id and type is required
-                    'watchable_id' => $type->group->category_id,
+                    'watchable_id'   => $type->group->category_id,
                     'watchable_type' => Category::class,
                 ],
             ],
@@ -498,12 +519,12 @@ test('recruiter can see corporation applications', function () {
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => $recruiter->id,
+                        'id'   => $recruiter->id,
                         'user' => $recruiter,
                     ],
                 ],
@@ -540,7 +561,6 @@ test('recruiter can see corporation applications', function () {
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id))
         ->assertOk();
 
-
     // Any other character should be forbidden
     test()->actingAs($recruiter)
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
@@ -562,12 +582,12 @@ test('recruiter can comment on application', function () {
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => $recruiter->id,
+                        'id'   => $recruiter->id,
                         'user' => $recruiter,
                     ],
                 ],
@@ -634,9 +654,9 @@ test('junior hr can dispatch update batch and get status', function () {
     //Check if secondary has applied
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id'   => test()->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
-        'status' => 'open',
+        'status'               => 'open',
     ]);
 
     Queue::fake();
@@ -650,9 +670,9 @@ test('junior hr can dispatch update batch and get status', function () {
     Queue::assertPushedOn('high', \Seatplus\Eveapi\Jobs\Seatplus\Batch\CharacterBatchJob::class);
 
     BatchUpdate::firstOrCreate([
-         'batchable_id' => test()->secondary_character->character_id,
-         'batchable_type' => CharacterInfo::class,
-     ]);
+        'batchable_id'   => test()->secondary_character->character_id,
+        'batchable_type' => CharacterInfo::class,
+    ]);
 
     // then get update job information
     test()->actingAs(test()->test_user)
@@ -662,15 +682,15 @@ test('junior hr can dispatch update batch and get status', function () {
 
 it('returns activity log entries for closed applications', function () {
     $application = Event::fakeFor(fn () => Application::factory()->create([
-        'id' => \Illuminate\Support\Str::uuid(),
+        'id'     => \Illuminate\Support\Str::uuid(),
         'status' => 'rejected',
     ]));
 
     $application->log_entries()->create([
         'causer_type' => CharacterInfo::class,
-        'causer_id' => test()->test_character->character_id,
-        'type' => faker()->randomElement(['decision', 'comment']),
-        'comment' => faker()->text,
+        'causer_id'   => test()->test_character->character_id,
+        'type'        => faker()->randomElement(['decision', 'comment']),
+        'comment'     => faker()->text,
     ]);
 
     assignPermissionToTestUser('superuser');
@@ -680,13 +700,11 @@ it('returns activity log entries for closed applications', function () {
     test()->actingAs(test()->test_user)
         ->get(route('get.activity.log', $application->id))
         ->assertJson(
-            fn (AssertableJson $json) =>
-            $json->where('id', $application->id)
+            fn (AssertableJson $json) => $json->where('id', $application->id)
                 ->where('status', 'rejected')
                 ->where(
                     'log_entries',
-                    fn (\Illuminate\Support\Collection $collection) =>
-                    \Illuminate\Support\Arr::has($collection->first(), 'causer')
+                    fn (\Illuminate\Support\Collection $collection) => \Illuminate\Support\Arr::has($collection->first(), 'causer')
                 )
                 ->etc()
         );
@@ -715,12 +733,12 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
 
     $response = test()->actingAs(test()->superuser)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "permissions" => ["can open or close corporations for recruitment", "can accept or deny applications"],
+            'permissions'  => ['can open or close corporations for recruitment', 'can accept or deny applications'],
             'affiliations' => [
                 [
-                    "id" => test()->test_character->corporation->corporation_id,
-                    "category" => 'corporation',
-                    "type" => $affiliation,
+                    'id'       => test()->test_character->corporation->corporation_id,
+                    'category' => 'corporation',
+                    'type'     => $affiliation,
                 ],
             ],
         ]);
@@ -730,12 +748,12 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     $response = test()->actingAs(test()->superuser)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type'         => 'manual',
                 'affiliations' => [],
-                'members' => [
+                'members'      => [
                     [
-                        'id' => test()->test_user->id,
+                        'id'   => test()->test_user->id,
                         'user' => test()->test_user,
                     ],
                 ],
@@ -754,8 +772,8 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     $response = test()->actingAs(test()->test_user)
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'type' => $type,
-            'steps' => null,
+            'type'           => $type,
+            'steps'          => null,
         ]);
 
     expect($response)->exception->toBeNull();
