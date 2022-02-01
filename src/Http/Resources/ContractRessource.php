@@ -40,22 +40,22 @@ class ContractRessource extends JsonResource
     public function toArray($request)
     {
         return [
-            'contract_id'           => $this->contract_id,
-            'issuer_id'             => $this->issuer_id,
+            'contract_id' => $this->contract_id,
+            'issuer_id' => $this->issuer_id,
             'issuer_corporation_id' => $this->issuer_corporation_id,
-            'for_corporation'       => $this->for_corporation,
-            'assignee_id'           => $this->assignee_id,
-            'acceptor_id'           => $this->acceptor_id,
-            'type'                  => $this->type,
-            'title'                 => $this->title,
-            'status'                => $this->status,
-            'collateral'            => $this->collateral,
-            'price'                 => $this->price,
-            'reward'                => $this->reward,
-            'items'                 => $this->items->count(),
-            'volume'                => $this->volume,
-            'start_location'        => $this->start_location?->locatable,
-            'end_location'          => $this->end_location?->locatable,
+            'for_corporation' => $this->for_corporation,
+            'assignee_id' => $this->assignee_id,
+            'acceptor_id' => $this->acceptor_id,
+            'type' => $this->type,
+            'title' => $this->title,
+            'status' => $this->status,
+            'collateral' => $this->collateral,
+            'price' => $this->price,
+            'reward' => $this->reward,
+            'items' => $this->items->count(),
+            'volume' => $this->volume,
+            'start_location' => $this->start_location?->locatable,
+            'end_location' => $this->end_location?->locatable,
         ];
     }
 }
