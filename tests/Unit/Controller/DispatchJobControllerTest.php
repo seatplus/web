@@ -30,9 +30,9 @@ use Seatplus\Web\Jobs\ManualDispatchedJob;
 
 beforeEach(function () {
     test()->dispatch_transfer_object = [
-        'manual_job'                => array_search(ContactHydrateBatch::class, config('web.jobs')),
-        'permission'                => config('eveapi.permissions.'.Contact::class),
-        'required_scopes'           => config('eveapi.scopes.character.contacts'),
+        'manual_job' => array_search(ContactHydrateBatch::class, config('web.jobs')),
+        'permission' => config('eveapi.permissions.'.Contact::class),
+        'required_scopes' => config('eveapi.scopes.character.contacts'),
         'required_corporation_role' => '',
     ];
 });
@@ -53,7 +53,7 @@ it('dispatches job', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->post(route('dispatch.job'), [
-            'character_id'             => $character_id,
+            'character_id' => $character_id,
             'dispatch_transfer_object' => $dispatch_transfer_object,
         ]);
 
@@ -70,8 +70,8 @@ test('one get dispatchable entities', function () {
         ->assertJson([
             [
                 'character_id' => test()->test_character->character_id,
-                'name'         => test()->test_character->name,
-                'batch'        => ['state' => 'ready'],
+                'name' => test()->test_character->name,
+                'batch' => ['state' => 'ready'],
             ],
         ]);
 });
