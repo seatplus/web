@@ -6,8 +6,8 @@ node_modules/
 
 vendor/
 
-src/public/css/
+public/css/
 
 .phpunit.result.cache
 
-src/public/js/
+public/js/

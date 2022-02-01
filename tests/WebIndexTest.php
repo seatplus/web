@@ -13,8 +13,6 @@ test('redirects to login if unauthorized', function () {
 });
 
 test('redirects to login vue component if unauthorized', function () {
-    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    //app()->instance('path.public', __DIR__ .'/../src/public');
 
     $response = test()->followingRedirects()
         ->get('/home');
@@ -23,8 +21,6 @@ test('redirects to login vue component if unauthorized', function () {
 });
 
 test('redirects to home if authorized', function () {
-    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    app()->instance('path.public', __DIR__ .'/../src/public');
 
     $response = test()->actingAs(test()->test_user)
         ->get('/home');
@@ -37,8 +33,6 @@ test('redirects to home if authorized', function () {
 });
 
 test('logout if authorized', function () {
-    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    app()->instance('path.public', __DIR__ .'/../src/public');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
