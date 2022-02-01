@@ -2,9 +2,9 @@
 @import url('https://rsms.me/inter/inter.css');
 
 /*Tailwind CSS*/
-@import "../../node_modules/tailwindcss/base.css";
-@import "../../node_modules/tailwindcss/components.css";
-@import "../../node_modules/tailwindcss/utilities.css";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 .delay-75 {
   transition-delay: 75ms;
