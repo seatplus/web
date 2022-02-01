@@ -71,17 +71,17 @@ class ControlGroupsController
         };
 
         $existing_affiliations = fn () => $role->affiliations->map(fn ($affiliation) => [
-            'id' => $affiliation->affiliatable_id,
+            'id'       => $affiliation->affiliatable_id,
             'category' => $affiliation->affiliatable_type,
-            'type' => $affiliation->type,
+            'type'     => $affiliation->type,
         ]);
 
         return Inertia::render('AccessControl/EditGroup', [
-            'role' => $role,
-            'affiliations' => $existing_affiliations,
+            'role'                  => $role,
+            'affiliations'          => $existing_affiliations,
             'available-permissions' => $permissions,
-            'permissions' => $role->permissions,
-            'activeSidebarElement' => 'acl.groups',
+            'permissions'           => $role->permissions,
+            'activeSidebarElement'  => 'acl.groups',
         ]);
     }
 
@@ -114,7 +114,7 @@ class ControlGroupsController
             collect($result)
                 ->flatMap(fn ($result, $category) => collect($result)
                     ->map(fn ($res) => [
-                        'id' => $res,
+                        'id'       => $res,
                         'category' => $category,
                     ]))
         );
@@ -140,9 +140,9 @@ class ControlGroupsController
             ->take(15);
 
         return [
-            'alliance' => $alliance_ids->intersect($ids)->toArray(),
+            'alliance'    => $alliance_ids->intersect($ids)->toArray(),
             'corporation' => $corporation_ids->intersect($ids)->toArray(),
-            'character' => $character_ids->intersect($ids)->toArray(),
+            'character'   => $character_ids->intersect($ids)->toArray(),
         ];
     }
 }
