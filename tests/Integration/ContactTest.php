@@ -54,21 +54,21 @@ it('has details', function () {
 it('has corporation standing', function (string $contact_type, string $corp_contact_level) {
     $affiliation = CharacterAffiliation::factory()->create([
         'alliance_id' => faker()->numberBetween(99000000, 100000000),
-        'faction_id'  => faker()->numberBetween(500000, 1000000),
+        'faction_id' => faker()->numberBetween(500000, 1000000),
     ]);
 
     $contact_id = match ($contact_type) {
-        'character'   => $affiliation->character_id,
+        'character' => $affiliation->character_id,
         'corporation' => $affiliation->corporation_id,
-        'alliance'    => $affiliation->alliance_id,
-        'faction'     => $affiliation->faction_id,
+        'alliance' => $affiliation->alliance_id,
+        'faction' => $affiliation->faction_id,
     };
 
     $contact = Contact::factory()->create([
-        'contact_id'       => $contact_id,
-        'contact_type'     => $contact_type,
-        'standing'         => 10.0,
-        'contactable_id'   => $this->test_character->character_id,
+        'contact_id' => $contact_id,
+        'contact_type' => $contact_type,
+        'standing' => 10.0,
+        'contactable_id' => $this->test_character->character_id,
         'contactable_type' => CharacterInfo::class,
     ]);
 
@@ -78,25 +78,25 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
         $corp_standing = null;
 
         $contacts_array = match ($corp_contact_level) {
-            'alliance'    => ['alliance', 'corporation', 'faction', 'character'],
+            'alliance' => ['alliance', 'corporation', 'faction', 'character'],
             'corporation' => ['corporation', 'faction', 'character'],
-            'faction'     => ['faction', 'character'],
-            'character'   => ['character'],
+            'faction' => ['faction', 'character'],
+            'character' => ['character'],
         };
 
         $getIdFromAffiliationByType = fn (string $type) => match ($type) {
-            'character'                                 => $affiliation->character_id,
-            'corporation'                               => $affiliation->corporation_id,
-            'alliance'                                  => $affiliation->alliance_id,
-            'faction'                                   => $affiliation->faction_id,
+            'character' => $affiliation->character_id,
+            'corporation' => $affiliation->corporation_id,
+            'alliance' => $affiliation->alliance_id,
+            'faction' => $affiliation->faction_id,
         };
 
         foreach ($contacts_array as $contact_type) {
             $contact = Contact::factory()->create([
-                'contact_id'       => $getIdFromAffiliationByType($contact_type),
-                'contact_type'     => $contact_type,
-                'standing'         => round(faker()->randomFloat(1, -10.0, 10.0), 1),
-                'contactable_id'   => $this->test_character->corporation->corporation_id,
+                'contact_id' => $getIdFromAffiliationByType($contact_type),
+                'contact_type' => $contact_type,
+                'standing' => round(faker()->randomFloat(1, -10.0, 10.0), 1),
+                'contactable_id' => $this->test_character->corporation->corporation_id,
                 'contactable_type' => CorporationInfo::class,
             ]);
 
