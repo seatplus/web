@@ -42,7 +42,7 @@ class JoinControlGroupController extends Controller
         $this->role = Role::find($request->role_id);
         $this->user = User::find($request->user_id ?? auth()->user()->getAuthIdentifier());
 
-        if (! in_array($this->role->type, ['opt-in', 'on-request'])) {
+        if (!in_array($this->role->type, ['opt-in', 'on-request'])) {
             return abort(403);
         }
 

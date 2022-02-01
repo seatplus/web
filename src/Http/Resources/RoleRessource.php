@@ -40,13 +40,13 @@ class RoleRessource extends JsonResource
     public function toArray($request)
     {
         return [
-            'name' => $this->name,
-            'id' => $this->id,
-            'members' => $this->users->count(),
-            'type' => $this->type,
-            'can_edit' => $this->when(auth()->user()->can('create,update and delete access control group'), true),
+            'name'         => $this->name,
+            'id'           => $this->id,
+            'members'      => $this->users->count(),
+            'type'         => $this->type,
+            'can_edit'     => $this->when(auth()->user()->can('create,update and delete access control group'), true),
             'can_moderate' => $this->when($this->canModerate(), true),
-            'status' => $this->acl_members()->whereUserId(auth()->user()->getAuthIdentifier())->get()->first()->status ?? false,
+            'status'       => $this->acl_members()->whereUserId(auth()->user()->getAuthIdentifier())->get()->first()->status ?? false,
         ];
     }
 
