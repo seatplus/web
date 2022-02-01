@@ -43,7 +43,7 @@ test('user can leave himself', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_id'   => test()->test_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
@@ -67,7 +67,7 @@ test('user can kick other user as superuser', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
@@ -94,7 +94,7 @@ test('user can kick other user as moderator', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
@@ -105,9 +105,9 @@ test('user can kick other user as moderator', function () {
     // Thirdly make primary character moderator
     expect(test()->role->moderators->isEmpty())->toBeTrue();
     test()->role->moderators()->create([
-        'affiliatable_id' => test()->test_character->character_id,
+        'affiliatable_id'   => test()->test_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
-        'can_moderate' => true,
+        'can_moderate'      => true,
     ]);
     expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
 
@@ -130,7 +130,7 @@ test('user can not kick other user as vanilla user', function () {
 
     // First create affiliation
     test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
+        'affiliatable_id'   => test()->secondary_character->character_id,
         'affiliatable_type' => CharacterInfo::class,
     ]);
 
