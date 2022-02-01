@@ -9,7 +9,10 @@
 export default {
     name: "Error",
     props: {
-        status: Number
+        status: {
+            type: Number,
+            required: true
+        }
     },
     computed: {
         title() {
