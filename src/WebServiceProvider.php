@@ -90,10 +90,10 @@ class WebServiceProvider extends ServiceProvider
          * or use Laravel Mix to copy the folder to public repo of core.
          */
         $this->publishes([
-            __DIR__.'/../public/img' => public_path('img'),
-            __DIR__.'/../resources/js' => resource_path('js'),
-            __DIR__.'/../resources/css' => resource_path('css'),
-            $this->getPackageJsonFile() => base_path('package.json'),
+            __DIR__.'/../public/img'          => public_path('img'),
+            __DIR__.'/../resources/js'        => resource_path('js'),
+            __DIR__.'/../resources/css'       => resource_path('css'),
+            $this->getPackageJsonFile()       => base_path('package.json'),
             $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
         ], 'web');
     }

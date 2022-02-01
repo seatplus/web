@@ -61,8 +61,8 @@ it('has edit control groups', function () {
             'affiliations' => [
                 [
                     'category' => 'character',
-                    'id' => test()->test_character->character_id,
-                    'type' => 'allowed',
+                    'id'       => test()->test_character->character_id,
+                    'type'     => 'allowed',
                 ],
             ],
             'roleName' => $role->name,
@@ -124,7 +124,7 @@ it('updates permissions', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            'roleName' => $name,
+            'roleName'    => $name,
             'permissions' => ['character.assets', 'superuser'],
         ]);
 
@@ -136,13 +136,13 @@ it('updates permissions', function () {
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            'roleName' => $name,
+            'roleName'    => $name,
             'permissions' => ['superuser'],
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('role_has_permissions', [
         'permission_id' => $permission->id,
-        'role_id' => $role->id,
+        'role_id'       => $role->id,
     ]);
 });
 
@@ -162,27 +162,27 @@ it('updates affiliations', function () {
             'affiliations' => [
                 [
                     'category' => 'character',
-                    'id' => 95725047,
-                    'type' => 'allowed',
+                    'id'       => 95725047,
+                    'type'     => 'allowed',
                 ],
             ],
             'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseHas('affiliations', [
-        'role_id' => $role->id,
+        'role_id'         => $role->id,
         'affiliatable_id' => 95725047,
     ]);
 
     // Delete Affiliation
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            'allowed' => [],
+            'allowed'  => [],
             'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('affiliations', [
-        'role_id' => $role->id,
+        'role_id'         => $role->id,
         'affiliatable_id' => 95725047,
     ]);
 });
@@ -202,8 +202,8 @@ it('updates name', function () {
             'allowed' => [
                 [
                     'character_id' => 95725047,
-                    'id' => 95725047,
-                    'name' => 'Herpaderp Aldent',
+                    'id'           => 95725047,
+                    'name'         => 'Herpaderp Aldent',
                 ],
             ],
             'roleName' => 'someOtherName',
@@ -231,9 +231,9 @@ test('moderator can manage applications', function () {
     assignPermissionToTestUser(['view access control']);
 
     $role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_user->id,
+        'affiliatable_id'   => test()->test_user->id,
         'affiliatable_type' => User::class,
-        'can_moderate' => true,
+        'can_moderate'      => true,
     ]);
 
     $response = test()->actingAs(test()->test_user)
@@ -292,7 +292,7 @@ test('setup on request group and save twice', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
             'acl' => [
-                'type' => 'on-request',
+                'type'       => 'on-request',
                 'moderators' => [
                     [
                         'id' => $secondary_user->id,
@@ -331,7 +331,7 @@ test('search for character', function () {
         ->assertOk();
 
     $response->assertJsonFragment([
-        'id' => test()->test_character->character_id,
+        'id'       => test()->test_character->character_id,
         'category' => 'character',
     ]);
 
@@ -349,7 +349,7 @@ test('search for character', function () {
         ->assertOk();
 
     $response->assertJsonFragment([
-        'id' => test()->test_character->character_id,
+        'id'       => test()->test_character->character_id,
         'category' => 'character',
     ]);
 });
