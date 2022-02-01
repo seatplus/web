@@ -77,10 +77,10 @@
 </template>
 
 <script>
-import LeftAligned from "../../Shared/Layout/DataDisplay/LeftAligned";
-import EntityBlock from "../../Shared/Layout/Eve/EntityBlock";
-import LeftAlignedData from "../../Shared/Layout/DataDisplay/LeftAlignedData";
-import Time from "../../Shared/Time";
+import LeftAligned from "@/Shared/Layout/DataDisplay/LeftAligned";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData";
+import Time from "@/Shared/Time";
 export default {
     name: "Characters",
     components: {Time, LeftAlignedData, EntityBlock, LeftAligned},

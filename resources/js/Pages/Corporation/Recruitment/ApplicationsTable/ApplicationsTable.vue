@@ -53,12 +53,12 @@
 </template>
 
 <script>
-import StickyHeaderTable from "../../../../Shared/Layout/Table/StickyHeaderTable";
-import StickyHeaderTableRow from "../../../../Shared/Layout/Table/StickyHeaderTableRow";
-import StickyHeaderCell from "../../../../Shared/Layout/Table/StickyHeaderCell";
-import EntityByIdBlock from "../../../../Shared/Layout/Eve/EntityByIdBlock";
+import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable";
+import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow";
+import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import CharacterComplianceElement from "../../MemberCompliance/CharacterComplianceElement";
-import Button from "../../../../Shared/Layout/Button";
+import Button from "@/Shared/Layout/Button";
 
 let headerTitles = [
     {title: 'Main Character', columnSpan: 3},

@@ -30,12 +30,12 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import WalletComponent from "../../../Shared/Components/Wallet/WalletComponent";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import WalletFilter from "../../../Shared/Components/Wallet/WalletFilter";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import WalletComponent from "@/Shared/Components/Wallet/WalletComponent";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import WalletFilter from "@/Shared/Components/Wallet/WalletFilter";
 
 export default {
     name: "Index",

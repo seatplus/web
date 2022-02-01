@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import PageHeader from "../../../../Shared/Layout/PageHeader";
-import TwoColumnCardWithSubmitAction from "../../../../Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import Multiselect from "../../../../Shared/Components/Multiselect";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
+import Multiselect from "@/Shared/Components/Multiselect";
 import EnlistmentConfig from "./EnlistmentConfig";
-import Button from "../../../../Shared/Layout/Button";
+import Button from "@/Shared/Layout/Button";
 import ItemsWatchlist from "./ItemsWatchlist";
 
 export default {

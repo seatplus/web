@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import PageHeader from "../../Shared/Layout/PageHeader";
+import PageHeader from "@/Shared/Layout/PageHeader";
 import CreateGroupButton from "./AclTypes/CreateGroupButton";
 import ControlGroups from "./ControlGroups";
-import {useInfinityScrolling} from "../../Functions/useInfinityScrolling";
+import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 
 export default {
   name: "ControlGroupsIndex",

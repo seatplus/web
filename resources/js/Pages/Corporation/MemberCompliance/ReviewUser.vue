@@ -21,7 +21,7 @@
 
 <script>
 import TabComponent from "../Recruitment/TabComponent";
-import PageHeader from "../../../Shared/Layout/PageHeader";
+import PageHeader from "@/Shared/Layout/PageHeader";
 export default {
     name: "ReviewUser",
     components: {PageHeader, TabComponent},

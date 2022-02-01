@@ -26,7 +26,7 @@
 <script>
 import CardWithHeader from "../../../Layout/Cards/CardWithHeader";
 import EntityByIdBlock from "../../../Layout/Eve/EntityByIdBlock";
-import {useLoadCompleteResource} from "../../../../Functions/useLoadCompleteResource";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import LineChart from "../../../Charts/LineChart";
 
 export default {

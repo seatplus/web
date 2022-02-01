@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "../../../Functions/useLoadCompleteResource";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import { CheckIcon, ThumbUpIcon, UserIcon, BookOpenIcon } from '@heroicons/vue/solid'
 import Time from "../../Time";

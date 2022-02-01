@@ -50,15 +50,15 @@
 </template>
 
 <script>
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
-import MultiColumnLayout from "../../../Shared/SidebarLayout/MultiColumnLayout";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import MultiColumnLayout from "@/Shared/SidebarLayout/MultiColumnLayout";
 import {ref} from "vue";
-import MailRepresentation from "../../../Shared/Components/Mails/MailRepresentation";
-import DesktopMailList from "../../../Shared/Components/Mails/DesktopMailList";
-import MobileMailList from "../../../Shared/Components/Mails/MobileMailList";
+import MailRepresentation from "@/Shared/Components/Mails/MailRepresentation";
+import DesktopMailList from "@/Shared/Components/Mails/DesktopMailList";
+import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
 export default {
     name: "Index",
     components: {

@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
-import WalletComponent from "../../../Shared/Components/Wallet/WalletComponent";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import WalletComponent from "@/Shared/Components/Wallet/WalletComponent";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
 
 export default {
     name: "Wallet",

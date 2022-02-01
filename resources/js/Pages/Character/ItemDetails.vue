@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import EveImage from "../../Shared/EveImage"
-import PageHeader from "../../Shared/Layout/PageHeader";
-import ItemLayout from "../../Shared/Components/ItemLayout";
+import EveImage from "@/Shared/EveImage"
+import PageHeader from "@/Shared/Layout/PageHeader";
+import ItemLayout from "@/Shared/Components/ItemLayout";
 
 export default {
     name: "ItemDetails",

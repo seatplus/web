@@ -51,7 +51,7 @@
 </template>
 
 <script>
-    import Pagination from "../../Shared/Pagination"
+    import Pagination from "@/Shared/Pagination"
     import {Inertia} from "@inertiajs/inertia"
     import Settings from "./Settings"
     import UserListElement from "./UserListElement";

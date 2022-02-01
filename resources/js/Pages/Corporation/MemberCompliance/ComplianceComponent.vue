@@ -67,12 +67,12 @@
 </template>
 
 <script>
-import CardWithHeader from "../../../Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "../../../Shared/Layout/Eve/EntityBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import { SearchIcon } from '@heroicons/vue/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement";
 import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "../../../Shared/Layout/CompleteLoadingHelper";
+import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper";
 export default {
     name: "ComplianceComponent",
     components: {

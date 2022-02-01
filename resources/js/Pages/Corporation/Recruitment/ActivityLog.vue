@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
+import PageHeader from "@/Shared/Layout/PageHeader";
 import LogTab from "./Tabs/LogTab";
 
 export default {

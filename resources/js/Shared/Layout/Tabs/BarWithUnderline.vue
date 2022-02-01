@@ -52,7 +52,7 @@
 
 <script>
 import {ref} from "vue";
-import {useValidateObject} from "../../../Functions/useValidateObject";
+import {useValidateObject} from "@/Functions/useValidateObject";
 
 let schema = {
     id: value => _.isInteger(value),

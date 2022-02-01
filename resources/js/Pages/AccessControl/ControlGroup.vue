@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import Avatar from "../../Shared/Avatar";
+import Avatar from "@/Shared/Avatar";
 export default {
     name: "ControlGroup",
     components: {Avatar},

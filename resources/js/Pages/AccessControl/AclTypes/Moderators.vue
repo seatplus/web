@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import EveImage from "../../../Shared/EveImage"
-import EntityBlock from "../../../Shared/Layout/Eve/EntityBlock";
+import EveImage from "@/Shared/EveImage"
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 export default {
     name: "Moderators",
     components: {EntityBlock},

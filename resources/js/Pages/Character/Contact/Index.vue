@@ -29,11 +29,11 @@
 </template>
 
 <script>
-import PageHeader from "../../../Shared/Layout/PageHeader";
-import EntitySelectionButton from "../../../Shared/Components/SlideOver/EntitySelectionButton";
-import DispatchUpdateButton from "../../../Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "../../../Shared/SidebarLayout/RequiredScopesWarning";
-import CharacterContactsComponent from "../../../Shared/Components/Contacts/CharacterContactsComponent";
+import PageHeader from "@/Shared/Layout/PageHeader";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
+import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
 export default {
     name: "Index",
     components: {

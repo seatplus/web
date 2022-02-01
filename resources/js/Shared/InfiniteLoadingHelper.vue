@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { useInfinityScrolling } from "../Functions/useInfinityScrolling";
+import { useInfinityScrolling } from "@/Functions/useInfinityScrolling";
 import { TransitionRoot } from '@headlessui/vue'
 import { computed } from "vue";
 

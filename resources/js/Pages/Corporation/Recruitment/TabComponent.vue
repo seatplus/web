@@ -107,13 +107,13 @@
 </template>
 
 <script>
-import WalletTransactionComponent from "../../../Shared/Components/Wallet/Transaction/WalletTransactionComponent";
-import WalletJournalComponent from "../../../Shared/Components/Wallet/Journal/WalletJournalComponent";
-import WalletJournalBalanceChart from "../../../Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
-import CorporationHistoryComponent from "../../../Shared/Components/Character/CorporationHistoryComponent";
-import SkillsComponent from "../../../Shared/Components/Skills/SkillsComponent";
-import MobileMailList from "../../../Shared/Components/Mails/MobileMailList";
-import CharacterContactsComponent from "../../../Shared/Components/Contacts/CharacterContactsComponent";
+import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
+import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
+import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
+import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
+import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
+import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
+import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
 import AssetTab from "./Tabs/AssetTab";
 import ContractTab from "./Tabs/ContractTab";
 import LogTab from "./Tabs/LogTab";

@@ -59,9 +59,9 @@
 </template>
 
 <script>
-    import Layout from "../../../Shared/SidebarLayout/Layout"
-    import InputGroup from "../../../Shared/InputGroup"
-    import SeatPlusSelect from "../../../Shared/SeatPlusSelect"
+    import Layout from "@/Shared/SidebarLayout/Layout"
+    import InputGroup from "@/Shared/InputGroup"
+    import SeatPlusSelect from "@/Shared/SeatPlusSelect"
     export default {
         name: "SchedulesCreate",
         components: {SeatPlusSelect, InputGroup},

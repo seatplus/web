@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import InfiniteLoadingHelper from "../../../../Shared/InfiniteLoadingHelper";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
 import {ref} from "vue";
 import ApplicationsTable from "./ApplicationsTable";
 import ActivityLogModal from "./ActivityLogModal";

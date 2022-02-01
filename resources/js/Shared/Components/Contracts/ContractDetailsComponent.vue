@@ -202,7 +202,7 @@ import WideListElement from "../../WideListElement";
 import EveImage from "../../EveImage";
 import WideLists from "../../WideLists";
 import AssigneeComponent from "./Cells/AssigneeComponent";
-import {useValidateObject} from "../../../Functions/useValidateObject";
+import {useValidateObject} from "@/Functions/useValidateObject";
 import IssuerComponent from "./Cells/IssuerComponent";
 import ContractTypeComponent from "./Cells/ContractTypeComponent";
 import DetailsComponent from "./Cells/DetailsComponent";

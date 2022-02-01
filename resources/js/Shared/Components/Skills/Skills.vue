@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "../../../Functions/useLoadCompleteResource";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import LeftAligned from "../../Layout/DataDisplay/LeftAligned";
 import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData";

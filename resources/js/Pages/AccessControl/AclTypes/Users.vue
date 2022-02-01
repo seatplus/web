@@ -95,8 +95,8 @@
 </template>
 
 <script>
-import EveImage from "../../../Shared/EveImage"
-import InfiniteLoadingHelper from "../../../Shared/InfiniteLoadingHelper";
+import EveImage from "@/Shared/EveImage"
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
 
 export default {
     name: "Users",

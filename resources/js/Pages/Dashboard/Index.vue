@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import Layout from "../../Shared/SidebarLayout/Layout";
-import PageHeader from "../../Shared/Layout/PageHeader"
+import Layout from "@/Shared/SidebarLayout/Layout";
+import PageHeader from "@/Shared/Layout/PageHeader"
 import Enlistments from "./Enlistments"
 import Characters from "./Characters"
 

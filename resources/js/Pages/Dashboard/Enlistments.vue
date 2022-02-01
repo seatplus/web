@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "../../Functions/useLoadCompleteResource";
+import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import Enlistment from "./Enlistment";
 export default {

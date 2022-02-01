@@ -72,8 +72,8 @@
 <script>
 
 import {Link} from "@inertiajs/inertia-vue3";
-import EntityBlock from "../../../Shared/Layout/Eve/EntityBlock";
-import BarWithUnderline from "../../../Shared/Layout/Tabs/BarWithUnderline";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
 import PendingTable from "./ApplicationsTable/PendingTable";
 import ClosedTable from "./ApplicationsTable/ClosedTable";
 

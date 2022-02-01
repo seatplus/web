@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import SearchCorpOrAlliance from "../../../Shared/SearchCorpOrAlliance"
+  import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
   import Members from "./Members"
   import Affiliations from "./Affiliations"
   export default {
