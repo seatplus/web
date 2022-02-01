@@ -37,10 +37,10 @@ test('happy path', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id'           => $character_affiliation->character_id,
+        'id' => $character_affiliation->character_id,
         'character_id' => $character_affiliation->character_id,
-        'name'         => $character_affiliation->character->name,
-        'corporation'  => [
+        'name' => $character_affiliation->character->name,
+        'corporation' => [
             'name' => $character_affiliation->corporation->name,
         ],
         'alliance' => [
@@ -69,10 +69,10 @@ test('happy path without alliance', function () {
     $character_affiliation->save();
 
     $expected_result = [
-        'id'           => $character_affiliation->character_id,
+        'id' => $character_affiliation->character_id,
         'character_id' => $character_affiliation->character_id,
-        'name'         => $character_affiliation->character->name,
-        'corporation'  => [
+        'name' => $character_affiliation->character->name,
+        'corporation' => [
             'name' => $character_affiliation->corporation->name,
         ],
     ];
@@ -90,10 +90,10 @@ test('happy path via corporation id', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id'             => $character_affiliation->corporation_id,
+        'id' => $character_affiliation->corporation_id,
         'corporation_id' => $character_affiliation->corporation_id,
-        'name'           => $character_affiliation->corporation->name,
-        'alliance'       => [
+        'name' => $character_affiliation->corporation->name,
+        'alliance' => [
             'name' => $character_affiliation->alliance->name,
         ],
     ];
@@ -111,9 +111,9 @@ test('happy path via alliance id', function () {
     $character_affiliation = $character->character_affiliation;
 
     $expected_result = [
-        'id'          => $character_affiliation->alliance_id,
+        'id' => $character_affiliation->alliance_id,
         'alliance_id' => $character_affiliation->alliance_id,
-        'name'        => $character_affiliation->alliance->name,
+        'name' => $character_affiliation->alliance->name,
     ];
 
     $service = new GetEntityFromId($character_affiliation->alliance_id);
@@ -136,16 +136,16 @@ test('unknown character id', function () {
     ]);
 
     $esi_mock_return_data = [
-        'alliance_id'    => $alliance->alliance_id,
-        'character_id'   => $character->character_id,
+        'alliance_id' => $alliance->alliance_id,
+        'character_id' => $character->character_id,
         'corporation_id' => $corporation->corporation_id,
-        'faction_id'     => null,
+        'faction_id' => null,
     ];
 
     $body = [
         array_merge($esi_mock_return_data, [
-            'id'       => $character->character_id,
-            'name'     => $character->name,
+            'id' => $character->character_id,
+            'name' => $character->name,
             'category' => 'character',
         ]),
     ];
@@ -159,10 +159,10 @@ test('unknown character id', function () {
         ->andReturn($response);
 
     $expected_result = [
-        'id'           => $character->character_id,
+        'id' => $character->character_id,
         'character_id' => $character->character_id,
-        'name'         => $character->name,
-        'corporation'  => [
+        'name' => $character->name,
+        'corporation' => [
             'name' => $corporation->name,
         ],
         'alliance' => [
