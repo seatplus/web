@@ -54,7 +54,7 @@ class UpdateWatchlistAction
 
     private function handleSystems()
     {
-        if (!Arr::has($this->validatedData, 'systems')) {
+        if (! Arr::has($this->validatedData, 'systems')) {
             // return early if systems is not part of the validated data, f.e. when updating items only
             return;
         }
@@ -69,7 +69,7 @@ class UpdateWatchlistAction
 
     private function handleRegions()
     {
-        if (!Arr::has($this->validatedData, 'regions')) {
+        if (! Arr::has($this->validatedData, 'regions')) {
             // return early if systems is not part of the validated data, f.e. when updating items only
             return;
         }
@@ -84,7 +84,7 @@ class UpdateWatchlistAction
 
     private function handleItems()
     {
-        if (!Arr::has($this->validatedData, 'items')) {
+        if (! Arr::has($this->validatedData, 'items')) {
             // return early if systems is not part of the validated data, f.e. when updating regions
             return;
         }
@@ -92,7 +92,7 @@ class UpdateWatchlistAction
         collect(data_get($this->validatedData, 'items', []))
             ->groupBy('watchable_type')->pipe(function (Collection $collection) {
                 foreach ([Type::class, Group::class, Category::class] as $key) {
-                    if (!$collection->has($key)) {
+                    if (! $collection->has($key)) {
                         $collection = $collection->mergeRecursive([$key => []]);
                     }
                 }
@@ -100,8 +100,8 @@ class UpdateWatchlistAction
                 return $collection;
             })
             ->each(fn ($items, $category) => match ($category) {
-                Type::class     => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
-                Group::class    => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
+                Type::class => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
+                Group::class => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
                 Category::class => $this->enlistment->categories()->sync(data_get($items, '*.watchable_id')),
             });
     }
