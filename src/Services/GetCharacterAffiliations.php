@@ -35,9 +35,9 @@ class GetCharacterAffiliations
     public function execute(array $character_ids): Collection
     {
         $character_affiliation_container = new EsiRequestContainer([
-            'method'       => 'post',
-            'version'      => 'v1',
-            'endpoint'     => '/characters/affiliation/',
+            'method' => 'post',
+            'version' => 'v1',
+            'endpoint' => '/characters/affiliation/',
             'request_body' => $character_ids,
         ]);
 

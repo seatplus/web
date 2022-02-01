@@ -34,18 +34,18 @@ class CorporationComplianceResource extends JsonResource
     public function toArray($request)
     {
         $characters = $this->characters->map(fn ($character) => [
-            'character_id'   => $character->character_id,
-            'name'           => $character->name,
+            'character_id' => $character->character_id,
+            'name' => $character->name,
             'missing_scopes' => array_values($this->getMissingScopes($character)),
         ]);
 
         return [
-            'id'             => $this->id,
+            'id' => $this->id,
             'main_character' => $this->main_character,
-            'characters'     => $characters,
-            'count_missing'  => collect($characters)->filter(fn ($character)  => data_get($character, 'missing_scopes'))->count(),
+            'characters' => $characters,
+            'count_missing' => collect($characters)->filter(fn ($character) => data_get($character, 'missing_scopes'))->count(),
             'count_complete' => collect($characters)->reject(fn ($character) => data_get($character, 'missing_scopes'))->count(),
-            'count_total'    => collect($characters)->count(),
+            'count_total' => collect($characters)->count(),
         ];
     }
 
