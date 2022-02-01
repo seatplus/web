@@ -40,7 +40,7 @@ class EnlistmentsController extends Controller
         $enlistment = Enlistment::query()->updateOrCreate(
             ['corporation_id' => data_get($request->validated(), 'corporation_id')],
             [
-                'type'  => data_get($request->validated(), 'type'),
+                'type' => data_get($request->validated(), 'type'),
                 'steps' => data_get($request->validated(), 'steps') ?? '',
             ]
         );
@@ -59,9 +59,9 @@ class EnlistmentsController extends Controller
     {
         return inertia('Corporation/Recruitment/Configuration/Index', [
             'activeSidebarElement' => 'corporation.recruitment',
-            'corporationId'        => $corporation_id,
-            'enlistment'           => Enlistment::find($corporation_id),
-            'watched'              => $action->execute($corporation_id),
+            'corporationId' => $corporation_id,
+            'enlistment' => Enlistment::find($corporation_id),
+            'watched' => $action->execute($corporation_id),
         ]);
     }
 
