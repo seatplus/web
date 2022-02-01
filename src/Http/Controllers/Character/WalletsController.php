@@ -50,7 +50,7 @@ class WalletsController extends Controller
 
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'character_ids'          => $ids,
+            'character_ids' => $ids,
         ]);
     }
 
