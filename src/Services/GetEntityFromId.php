@@ -175,7 +175,7 @@ class GetEntityFromId
         $character = [
             'id'           => $this->id,
             'character_id' => $this->id,
-            'name'         => $character_affiliation?->character?->name ?? $this->names->first(fn ($name)         => $name->id === $this->id)->name,
+            'name'         => $character_affiliation?->character?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
             'corporation'  => [
                 'name' => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name) => $name->id === $character_affiliation->corporation_id)->name,
             ],
@@ -193,7 +193,7 @@ class GetEntityFromId
         $corporation = [
             'id'             => $this->id,
             'corporation_id' => $this->id,
-            'name'           => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name)           => $name->id === $this->id)->name,
+            'name'           => $character_affiliation?->corporation?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
         ];
 
         if ($character_affiliation->alliance_id) {
@@ -208,7 +208,7 @@ class GetEntityFromId
         return [
             'id'          => $this->id,
             'alliance_id' => $this->id,
-            'name'        => $character_affiliation?->alliance?->name ?? $this->names->first(fn ($name)        => $name->id === $this->id)->name,
+            'name'        => $character_affiliation?->alliance?->name ?? $this->names->first(fn ($name) => $name->id === $this->id)->name,
         ];
     }
 
