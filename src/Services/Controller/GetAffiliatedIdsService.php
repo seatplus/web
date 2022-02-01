@@ -69,7 +69,7 @@ class GetAffiliatedIdsService
     public function setRequestFlavour(string $flavour): GetAffiliatedIdsService
     {
         $this->request_parameter = match ($flavour) {
-            'character'   => 'character_ids',
+            'character' => 'character_ids',
             'corporation' => 'corporation_ids'
         };
 
@@ -103,7 +103,7 @@ class GetAffiliatedIdsService
     private function getOwnedIds(): array
     {
         return match ($this->getRequestParameter()) {
-            'character_ids'   => auth()->user()->characters->pluck('character_id')->toArray(),
+            'character_ids' => auth()->user()->characters->pluck('character_id')->toArray(),
             'corporation_ids' => auth()->user()->characters->map(fn ($character) => $character->corporation->corporation_id)->toArray()
         };
     }
