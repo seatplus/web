@@ -70,23 +70,23 @@ class WatchedArrayAction
     private function handleItems()
     {
         $types = $this->enlistment->types->map(fn ($type) => [
-            'id'             => intval(1 .$type->type_id),
-            'name'           => $type->name.' (type)',
-            'watchable_id'   => $type->type_id,
+            'id' => intval(1 .$type->type_id),
+            'name' => $type->name.' (type)',
+            'watchable_id' => $type->type_id,
             'watchable_type' => Type::class,
         ]) ?? [];
 
         $groups = $this->enlistment->groups->map(fn ($group) => [
-            'id'             => intval(1 .$group->group_id),
-            'name'           => $group->name.' (group)',
-            'watchable_id'   => $group->group_id,
+            'id' => intval(1 .$group->group_id),
+            'name' => $group->name.' (group)',
+            'watchable_id' => $group->group_id,
             'watchable_type' => Group::class,
         ]) ?? [];
 
         $categories = $this->enlistment->categories->map(fn ($category) => [
-            'id'             => intval(1 .$category->category_id),
-            'name'           => $category->name.' (category)',
-            'watchable_id'   => $category->category_id,
+            'id' => intval(1 .$category->category_id),
+            'name' => $category->name.' (category)',
+            'watchable_id' => $category->category_id,
             'watchable_type' => Category::class,
         ]) ?? [];
 
