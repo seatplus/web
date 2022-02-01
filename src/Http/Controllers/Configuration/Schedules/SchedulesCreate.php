@@ -36,8 +36,8 @@ class SchedulesCreate extends Controller
         $cron = config('web.cronExpressions');
 
         return Inertia::render('Configuration/Schedules/SchedulesCreate', [
-            'cron' => $cron,
-            'jobs' => config('seatplus.updateJobs'),
+            'cron'                 => $cron,
+            'jobs'                 => config('seatplus.updateJobs'),
             'activeSidebarElement' => 'server.settings',
         ]);
     }
