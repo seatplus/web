@@ -40,17 +40,20 @@ class ListControlGroupsController extends Controller
         $character_ids = auth()->user()->characters->map(fn ($character) => $character->character_id)->toArray();
 
         $query = Role::with('moderators.affiliatable.characters', 'acl_members')
-            ->when(auth()->user()->can('superuser'),
+            ->when(
+                auth()->user()->can('superuser'),
                 // Condition if user has superuser
                 fn ($query) => $query->orWhereNotIn('id', []),
                 // if user does not have superuser
                 fn ($query) => $query
                     ->whereHas('members', fn ($query) => $query->whereUserId(auth()->user()->getAuthIdentifier()))
-                    ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph('affiliatable',
+                    ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph(
+                        'affiliatable',
                         [CorporationInfo::class, AllianceInfo::class],
                         fn ($query) => $query->whereHas('characters', fn ($query) => $query->whereIn('character_infos.character_id', $character_ids))
                     ))
-                    ->orWhereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
+                    ->orWhereHas('moderators', fn ($query) => $query->whereHasMorph(
+                        'affiliatable',
                         [User::class],
                         fn ($query) => $query->whereId(auth()->user()->getAuthIdentifier())
                     ))

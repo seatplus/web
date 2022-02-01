@@ -1,8 +1,8 @@
 <?php
 
 
-use Inertia\Testing\Assert;
 use Inertia\Inertia;
+use Inertia\Testing\Assert;
 
 beforeEach(function () {
     Inertia::share([
@@ -21,28 +21,26 @@ test('see success flash messages', function () {
     $response = test()->withSession(['success','SuccessFlashMessage'])
         ->get('auth/login');
 
-    $response->assertInertia( fn (Assert $page) => $page->has('flash.success'));
+    $response->assertInertia(fn (Assert $page) => $page->has('flash.success'));
 });
 
 test('see error flash messages', function () {
     $response = test()->withSession(['error','ErrorFlashMessage'])
         ->get('auth/login');
 
-    $response->assertInertia( fn (Assert $page) => $page->has('flash.error'));
+    $response->assertInertia(fn (Assert $page) => $page->has('flash.error'));
 });
 
 test('see warning flash messages', function () {
     $response = test()->withSession(['warning','WarningFlashMessage'])
         ->get('auth/login');
 
-    $response->assertInertia( fn (Assert $page) => $page->has('flash.warning'));
-
+    $response->assertInertia(fn (Assert $page) => $page->has('flash.warning'));
 });
 
 test('see info flash messages', function () {
     $response = test()->withSession(['info','InfoFlashMessage'])
         ->get('auth/login');
 
-    $response->assertInertia( fn (Assert $page) => $page->has('flash.info'));
-
+    $response->assertInertia(fn (Assert $page) => $page->has('flash.info'));
 });

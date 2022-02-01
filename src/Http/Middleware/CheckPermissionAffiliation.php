@@ -169,7 +169,8 @@ class CheckPermissionAffiliation
         $affiliated_ids_from_character_role = $this->getUser()
             ->load(['characters.roles', 'characters.corporation'])
             ->characters
-            ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
+            ->map(
+                fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
                 ? $character->corporation->corporation_id
                 : false
             )
@@ -184,7 +185,7 @@ class CheckPermissionAffiliation
 
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
-        $bag->add(['validated_ids' =>  $validated_ids->all()]);
+        $bag->add(['validated_ids' => $validated_ids->all()]);
     }
 
     public function getUser(): User

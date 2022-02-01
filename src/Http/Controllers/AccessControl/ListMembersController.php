@@ -42,7 +42,7 @@ class ListMembersController extends Controller
 
         $users = User::query()
             ->join('acl_members', fn ($join) => (
-            $join->on('users.id', '=', 'acl_members.user_id')
+                $join->on('users.id', '=', 'acl_members.user_id')
                 ->where('acl_members.role_id', $role_id)
             ))
             ->addSelect([

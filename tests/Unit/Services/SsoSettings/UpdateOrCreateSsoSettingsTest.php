@@ -8,10 +8,10 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 it('calls alliance info action', function () {
-     /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);
-     $mock->shouldReceive('execute')
-        ->once()
-        ->andReturn(null);*/
+    /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);
+    $mock->shouldReceive('execute')
+       ->once()
+       ->andReturn(null);*/
 
     Bus::fake();
 
@@ -19,16 +19,16 @@ it('calls alliance info action', function () {
         'selectedEntities' => [
             [
                 'alliance_id' => 1354830081,
-                'id' =>1354830081,
+                'id' => 1354830081,
                 'name' => "Goonswarm Federation",
-                'type' => 'alliance'
-            ]
+                'type' => 'alliance',
+            ],
         ],
         'selectedScopes' => [
             "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
-            'publicData'
+            'publicData',
         ],
-        'type' => 'default'
+        'type' => 'default',
     ];
 
     (new UpdateOrCreateSsoSettings($request))->execute();
@@ -41,23 +41,23 @@ it('calls alliance info action', function () {
  * @preserveGlobalState disabled
  */
 it('calls corporation info action', function () {
-   Bus::fake();
+    Bus::fake();
 
     $request = [
         'selectedEntities' => [
             [
                 'corporation_id' => 1184675423,
-                'id' =>1184675423,
+                'id' => 1184675423,
                 'name' => "Amok.",
-                'type' => 'corporation'
+                'type' => 'corporation',
             ],
 
         ],
         'selectedScopes' => [
             "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
-            'publicData'
+            'publicData',
         ],
-        'type' => 'default'
+        'type' => 'default',
     ];
 
     (new UpdateOrCreateSsoSettings($request))->execute();
@@ -78,25 +78,25 @@ it('creates sso settings', function () {
         'selectedEntities' => [
             [
                 'corporation_id' => 1184675423,
-                'id' =>1184675423,
+                'id' => 1184675423,
                 'name' => "Amok.",
-                'type' => 'corporation'
+                'type' => 'corporation',
             ],
         ],
         'selectedScopes' => [
             "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
-            'publicData'
+            'publicData',
         ],
-        'type' => 'default'
+        'type' => 'default',
     ];
 
     \Pest\Laravel\assertDatabaseMissing('sso_scopes', [
-        'morphable_id' => 1184675423
+        'morphable_id' => 1184675423,
     ]);
 
     (new UpdateOrCreateSsoSettings($request))->execute();
 
     \Pest\Laravel\assertDatabaseHas('sso_scopes', [
-        'morphable_id' => 1184675423
+        'morphable_id' => 1184675423,
     ]);
 });

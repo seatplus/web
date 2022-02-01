@@ -13,16 +13,14 @@ use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Spatie\Permission\PermissionRegistrar;
 
 test('see component', function () {
-
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.mails'));
 
-    $response->assertInertia( fn (Assert $page) => $page->component('Character/Mail/Index'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Character/Mail/Index'));
 });
 
 test('get mail headers of secondary user', function () {
-
-    if(test()->test_user->can('superuser')) {
+    if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
@@ -39,12 +37,12 @@ test('get mail body test', function () {
 
     $mail = Mail::factory()->create([
         'from' => 96898138,
-        'body' => $body
+        'body' => $body,
     ]);
 
-    $secondary_charcter = Event::fakeFor( fn() => CharacterInfo::factory()->create());
+    $secondary_charcter = Event::fakeFor(fn () => CharacterInfo::factory()->create());
 
-    $mail_receipient = Event::fakeFor( fn() =>  MailRecipients::factory()->create([
+    $mail_receipient = Event::fakeFor(fn () => MailRecipients::factory()->create([
         'mail_id' => $mail->id,
         'receivable_id' => $secondary_charcter->character_id,
         'receivable_type' => CharacterInfo::class,
@@ -54,21 +52,21 @@ test('get mail body test', function () {
     //Prepare ESI Response of GetIdsFromNamesService
     $data = [
         [
-            "id"=> 91356804,
-            "name"=> "Steel Roamer"
+            "id" => 91356804,
+            "name" => "Steel Roamer",
         ],
         [
             "id" => 98467521,
-            "name"=> "ShekelSquad"
+            "name" => "ShekelSquad",
         ],
         [
             'id' => 95002093,
-            "name"=> "Rory Wolf"
+            "name" => "Rory Wolf",
         ],
         [
             'id' => 94159646,
-            "name"=> "evillady Lennelluc"
-        ]
+            "name" => "evillady Lennelluc",
+        ],
     ];
 
     //Mock EsiResponse
@@ -91,5 +89,5 @@ test('get mail body test', function () {
 
     test()->actingAs(test()->test_user)
         ->get(route('get.mail', $mail->id))
-        ->assertJson(fn(AssertableJson $json) => $json->count(4));
+        ->assertJson(fn (AssertableJson $json) => $json->count(4));
 });
