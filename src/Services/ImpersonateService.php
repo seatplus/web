@@ -35,7 +35,7 @@ class ImpersonateService
         // Store the original user and return url in the session
         session([
             'impersonation_origin' => auth()->user(),
-            'route' => url()->previous(),
+            'route'                => url()->previous(),
         ]);
 
         auth()->login($user);
