@@ -41,14 +41,14 @@ class MemberTrackingResource extends JsonResource
     {
         return [
             'corporation_id' => $this->corporation_id,
-            'character_id' => $this->character_id,
-            'character' => $this->whenLoaded('character'),
-            'start_date' => $this->start_date,
-            'logon_date' => $this->logon_date,
-            'location_id' => $this->location_id,
-            'location' => $this->location?->locatable,
-            'ship_type_id' => $this->ship_type_id,
-            'ship' => $this->whenLoaded('ship'),
+            'character_id'   => $this->character_id,
+            'character'      => $this->whenLoaded('character'),
+            'start_date'     => $this->start_date,
+            'logon_date'     => $this->logon_date,
+            'location_id'    => $this->location_id,
+            'location'       => $this->location?->locatable,
+            'ship_type_id'   => $this->ship_type_id,
+            'ship'           => $this->whenLoaded('ship'),
         ];
     }
 }
