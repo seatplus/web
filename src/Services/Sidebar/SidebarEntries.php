@@ -55,7 +55,7 @@ class SidebarEntries
                 ? [$category => null]
                 : [
                     $category => [
-                        'name' => $category,
+                        'name'    => $category,
                         'entries' => $entries,
                     ],
                 ];
