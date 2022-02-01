@@ -42,9 +42,9 @@ it('calls alliance info action', function () {
         'selectedEntities' => [
             [
                 'alliance_id' => 1354830081,
-                'id' => 1354830081,
-                'name' => 'Goonswarm Federation',
-                'type' => 'alliance',
+                'id'          => 1354830081,
+                'name'        => 'Goonswarm Federation',
+                'type'        => 'alliance',
             ],
         ],
         'selectedScopes' => [
@@ -70,9 +70,9 @@ it('calls corporation info action', function () {
         'selectedEntities' => [
             [
                 'corporation_id' => 1184675423,
-                'id' => 1184675423,
-                'name' => 'Amok.',
-                'type' => 'corporation',
+                'id'             => 1184675423,
+                'name'           => 'Amok.',
+                'type'           => 'corporation',
             ],
 
         ],
@@ -101,9 +101,9 @@ it('creates sso settings', function () {
         'selectedEntities' => [
             [
                 'corporation_id' => 1184675423,
-                'id' => 1184675423,
-                'name' => 'Amok.',
-                'type' => 'corporation',
+                'id'             => 1184675423,
+                'name'           => 'Amok.',
+                'type'           => 'corporation',
             ],
         ],
         'selectedScopes' => [

@@ -48,7 +48,7 @@ class CreateSsoScopeSettingsValidation extends FormRequest
     public function rules()
     {
         return [
-            'selectedScopes' => 'required|array',
+            'selectedScopes'   => 'required|array',
             'selectedEntities' => ['required_unless:type,global', 'array'],
         ];
     }
@@ -62,7 +62,7 @@ class CreateSsoScopeSettingsValidation extends FormRequest
     {
         return [
             'selectedEntities.required' => 'At least one corporation or alliance is required to be selected',
-            'selectedScopes.required' => 'At least one character or corporation scope is required',
+            'selectedScopes.required'   => 'At least one character or corporation scope is required',
         ];
     }
 }

@@ -60,11 +60,11 @@ test('user can join waitlist', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type' => 'on-request',
+                'type'         => 'on-request',
                 'affiliations' => [
                     [
                         'type' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id,
+                        'id'   => test()->test_character->corporation->corporation_id,
                     ],
                 ],
                 'members' => [],
@@ -97,11 +97,11 @@ test('superuser can join immediately', function () {
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
             'acl' => [
-                'type' => 'on-request',
+                'type'         => 'on-request',
                 'affiliations' => [
                     [
                         'type' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id,
+                        'id'   => test()->test_character->corporation->corporation_id,
                     ],
                 ],
                 'members' => [],
