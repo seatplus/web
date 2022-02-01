@@ -53,7 +53,7 @@ class ContractsController extends Controller
 
         return inertia('Character/Contract/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characters' => $characters,
+            'characters'             => $characters,
         ]);
     }
 
@@ -78,7 +78,7 @@ class ContractsController extends Controller
         }
 
         return inertia('Character/Contract/ContractDetails', [
-            'contract' => $query->first(),
+            'contract'             => $query->first(),
             'activeSidebarElement' => 'character.contracts',
         ]);
     }
