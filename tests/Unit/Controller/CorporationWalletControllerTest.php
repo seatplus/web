@@ -53,7 +53,7 @@ test('one can call journal endpoint', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.wallet_journal.detail', [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'division_id' => 1,
+            'division_id'    => 1,
         ]))
         ->assertOk();
 });
@@ -62,7 +62,7 @@ test('one can call transaction endpoint', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.wallet_transaction.detail', [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'division_id' => 1,
+            'division_id'    => 1,
         ]))
         ->assertOk();
 });
@@ -70,14 +70,14 @@ test('one can call transaction endpoint', function () {
 test('on get ballance records from last30 days', function () {
     WalletJournal::factory()->count(1)->create([
         'wallet_journable_id' => test()->test_character->corporation->corporation_id,
-        'division' => 1,
-        'date' => now()->subDays(29),
+        'division'            => 1,
+        'date'                => now()->subDays(29),
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.balance', [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'division_id' => 1,
+            'division_id'    => 1,
         ]));
 
     $response->assertOk();
@@ -88,14 +88,14 @@ test('on get ballance records from last30 days', function () {
 test('on get ballance records from before30 days', function () {
     WalletJournal::factory()->count(1)->create([
         'wallet_journable_id' => test()->test_character->corporation->corporation_id,
-        'division' => 1,
-        'date' => now()->subDays(33),
+        'division'            => 1,
+        'date'                => now()->subDays(33),
     ]);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.balance', [
             'corporation_id' => test()->test_character->corporation->corporation_id,
-            'division_id' => 1,
+            'division_id'    => 1,
         ]));
 
     $response->assertOk();

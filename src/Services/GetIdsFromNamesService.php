@@ -47,7 +47,7 @@ class GetIdsFromNamesService
     public function execute(array $names): Collection
     {
         $names_to_resolve = collect($names)->filter(function ($name) {
-            if (! cache()->has(sprintf('id:%s', $name))) {
+            if (!cache()->has(sprintf('id:%s', $name))) {
                 return true;
             }
 
@@ -61,9 +61,9 @@ class GetIdsFromNamesService
         }
 
         $container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v1',
-            'endpoint' => '/universe/ids/',
+            'method'       => 'post',
+            'version'      => 'v1',
+            'endpoint'     => '/universe/ids/',
             'request_body' => [...$names_to_resolve->toArray()],
         ]);
 
