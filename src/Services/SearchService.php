@@ -36,12 +36,12 @@ class SearchService
         $category_string = is_string($category) ? $category : implode(',', $category);
 
         $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v2',
-            'endpoint' => '/search/',
+            'method'           => 'get',
+            'version'          => 'v2',
+            'endpoint'         => '/search/',
             'query_parameters' => [
                 'categories' => $category_string,
-                'search' => $query,
+                'search'     => $query,
             ],
         ]);
 
