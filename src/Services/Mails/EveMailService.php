@@ -70,11 +70,11 @@ class EveMailService
     private function handleFirstMail(string $mail)
     {
         return [
-            'from'       => ['id' => $this->mail->from],
+            'from' => ['id' => $this->mail->from],
             'recipients' => $this->mail->recipients->map(fn ($recipient) => ['id' => $recipient->receivable_id]),
-            'timestamp'  => carbon($this->mail->timestamp),
-            'subject'    => $this->mail->subject,
-            'body'       => $mail,
+            'timestamp' => carbon($this->mail->timestamp),
+            'subject' => $this->mail->subject,
+            'body' => $mail,
         ];
     }
 
@@ -85,11 +85,11 @@ class EveMailService
         $message = explode('<br>', $mail, 5);
 
         return [
-            'from'       => $this->getSender($message[1]),
+            'from' => $this->getSender($message[1]),
             'recipients' => $this->getRecipients($message[3]),
-            'timestamp'  => Carbon::createFromFormat('Y.m.d H:i', Str::after($message[2], 'Sent: ')),
-            'subject'    => $message[0],
-            'body'       => $message[4],
+            'timestamp' => Carbon::createFromFormat('Y.m.d H:i', Str::after($message[2], 'Sent: ')),
+            'subject' => $message[0],
+            'body' => $message[4],
         ];
     }
 
