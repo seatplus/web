@@ -24,7 +24,7 @@ trait MockRetrieveEsiDataAction
 
     public function mockEsiResponse(array $body) : EsiResponse
     {
-        $data = json_encode($body);
+        $data = json_encode($body, JSON_THROW_ON_ERROR);
 
         return new EsiResponse($data, [], 'now', 200);
     }

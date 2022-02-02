@@ -30,8 +30,8 @@ it('has details', function () {
 
 it('has corporation standing', function (string $contact_type, string $corp_contact_level) {
     $affiliation = CharacterAffiliation::factory()->create([
-        'alliance_id' => faker()->numberBetween(99000000, 100000000),
-        'faction_id' => faker()->numberBetween(500000, 1000000),
+        'alliance_id' => faker()->numberBetween(99_000_000, 100_000_000),
+        'faction_id' => faker()->numberBetween(500000, 1_000_000),
     ]);
 
     $contact_id = match ($contact_type) {
@@ -103,7 +103,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                 ->has(
                     'data.0',
                     fn (AssertableJson $json) =>
-                    $json->where('corporation_standing', json_decode(json_encode($corp_standing)))
+                    $json->where('corporation_standing', json_decode(json_encode($corp_standing, JSON_THROW_ON_ERROR), null, 512, JSON_THROW_ON_ERROR))
                     ->etc()
                 )
                 ->etc()
