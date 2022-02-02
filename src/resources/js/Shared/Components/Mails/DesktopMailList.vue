@@ -2,13 +2,13 @@
   <!--  py-6 px-4 sm:px-6 lg:px-8-->
   <div class="absolute inset-0 overflow-y-auto">
     <InfiniteLoadingHelper
+      v-slot="{results}"
       route="get.mail.headers"
       :params="{character_ids: characterIds}"
-      @result="assignResult"
     >
       <ul class="divide-y divide-gray-200">
         <li
-          v-for="mail in mails"
+          v-for="mail in mails(results)"
           :key="mail.id"
           :class="[mail.current ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900', 'flex space-x-3 cursor-pointer' ,'py-6 px-4 sm:px-6 lg:px-8 rounded-md ml-1 mr-1']"
           @click="emitSelection(mail.id)"
@@ -62,22 +62,19 @@ export default {
     },
     emits: ['update:selectedId'],
     setup(props, {emit}) {
-        const rawMails = ref([])
 
-        const assignResult = (results) => rawMails.value = results
         const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
 
-        const mails = computed(() => {
-            return _.map(rawMails.value, result => {
+        const mails = (results) => {
+            return _.map(results, result => {
                 return {
                     ...result,
                     current: _.isEqual(props.selectedId, result.id)
                 }
             })
-        })
+        }
 
         return {
-            assignResult,
             mails,
             emitSelection,
         }

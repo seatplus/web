@@ -32,12 +32,12 @@
 
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
+          v-slot="{results}"
           :route="route"
           :params="routeParameters"
-          @result="(result) => assets_data = result"
         >
           <WalletJournalRowComponent
-            v-for="(entry, index) in assets_data"
+            v-for="(entry, index) in results"
             :key="entry.id"
             :entry="entry"
             :even="index%2"
@@ -81,7 +81,6 @@ export default {
     data() {
         return {
             infiniteId: +new Date(),
-            assets_data: []
         }
     },
     computed: {

@@ -33,13 +33,13 @@
 
     <InfiniteLoadingHelper
       :key="index"
+      v-slot="{results}"
       route="list.users"
       :params="{name: search}"
-      @result="(results) => users = results"
     >
       <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
         <li
-          v-for="user of filteredUsers"
+          v-for="user of filterUsers(results)"
           :key="user.id"
           class="col-span-1 bg-white rounded-lg shadow"
         >
@@ -123,10 +123,6 @@ export default {
         }
     },
     computed: {
-        filteredUsers() {
-
-            return _.filter(this.users, (user) => !_.includes(this.memberIds, user.id))
-        },
         memberIds() {
             return _.map(this.members, (user) => user.id)
         }
@@ -158,11 +154,13 @@ export default {
 
             return _.shuffle(characters).join(', ')
         },
-
         addMember(user) {
 
             this.members.push(user)
         },
+        filterUsers(users) {
+            return _.filter(users, (user) => !_.includes(this.memberIds, user.id))
+        }
     }
 }
 </script>

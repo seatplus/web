@@ -1,59 +1,67 @@
-import {onBeforeMount,  onUnmounted, ref, watch} from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import route from 'ziggy'
 
 export function useInfinityScrolling(routeName, params) {
 
-    const url = ref(route(routeName,params))
+    const url = route(routeName,params)
     const scrollComponent = ref(null)
     const result = ref([])
     const page = ref(1)
-    const isInitialRequestLoading = ref(true)
     const isLoading = ref(false)
     const isComplete = ref(false)
+    const isVisible = ref(null)
 
     const source = axios.CancelToken.source()
 
-    const fetchData = async () => {
+    const fetchData = function () {
 
         if(isLoading.value || isComplete.value)
             return
 
-        isLoading.value = true
+        const timeout = setTimeout(() => isLoading.value = true, 250)
 
-        await axios.get(url.value, {
+        axios.get(url, {
             cancelToken: source.token,
             params: {
                 page: page.value,
             },
         }).then(response => {
 
+            clearTimeout(timeout)
+            isLoading.value = false
+
             if (response.data.data.length) {
                 page.value += 1;
                 result.value.push(...response.data.data);
-                isLoading.value = false
+
             } else {
                 isComplete.value = true
-                isLoading.value = false
             }
         }).catch(error => console.log(error));
     }
 
-    const observer = new IntersectionObserver(function(entries) {
+    const options =  {
+        threshold: [1]
+    }
+
+    function handleIntersect(entries) {
         if(entries[0].isIntersecting === true) {
+
+            isVisible.value = true
+
             if(isComplete.value || isLoading.value)
                 return
 
             fetchData()
+        } else {
+
+            isVisible.value = false
         }
-    }, { threshold: [1] });
+    }
 
+    const observer = new IntersectionObserver(handleIntersect, options)
 
-    onBeforeMount(async () => {
-        await fetchData()
-        isInitialRequestLoading.value = false
-    })
-
-    watch(scrollComponent, (newValue) => observer.observe(newValue))
+    onMounted(() => observer.observe(scrollComponent.value))
 
     onUnmounted(() => {
         observer.disconnect()
@@ -63,8 +71,8 @@ export function useInfinityScrolling(routeName, params) {
     return {
         scrollComponent,
         result,
-        isInitialRequestLoading,
         isComplete,
-        isLoading
+        isLoading,
+        isVisible
     }
 }

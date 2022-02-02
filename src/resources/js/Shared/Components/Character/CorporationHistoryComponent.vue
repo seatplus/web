@@ -13,19 +13,19 @@
     </template>
     <div class="max-h-96 overflow-auto">
       <InfiniteLoadingHelper
+        v-slot="{results}"
         route="corporation.history"
         :params="{ character_id: character.character_id }"
-        @result="assignResult"
       >
         <div class="p-4 sm:p-6 flow-root">
           <ul class="-mb-8">
             <li
-              v-for="(event, eventIdx) in history"
+              v-for="(event, eventIdx) in results"
               :key="event.record_id"
             >
               <div class="relative pb-8">
                 <span
-                  v-if="(eventIdx !== history.length - 1)"
+                  v-if="(eventIdx !== results.length - 1)"
                   class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                   aria-hidden="true"
                 />
@@ -77,16 +77,6 @@ export default {
         character: {
             type: Object,
             required: true
-        }
-    },
-    setup(props) {
-        const history = ref([])
-
-        const assignResult = (results) => history.value = results
-
-        return {
-            history,
-            assignResult
         }
     }
 }

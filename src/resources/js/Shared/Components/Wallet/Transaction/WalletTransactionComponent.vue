@@ -33,21 +33,19 @@
 
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
+          v-slot="{results}"
           :route="route"
           :params="routeParameters"
-          @result="(result) => transactions = result"
         >
           <WalletTransactionRowComponent
-            v-for="(entry, index) in transactions"
+            v-for="(entry, index) in results"
             :key="entry.transaction_id"
             :entry="entry"
             :even="index%2"
           />
         </InfiniteLoadingHelper>
       </ul>
-
     </div>
-
   </CardWithHeader>
 </template>
 
@@ -78,11 +76,7 @@ export default {
     data() {
         return {
             infiniteId: +new Date(),
-            transactions: []
         }
-    },
-    created() {
-        this.infiniteId += 1;
     },
     computed: {
         route() {
@@ -96,6 +90,9 @@ export default {
                 character_id: this.id
             }
         }
+    },
+    created() {
+        this.infiniteId += 1;
     },
 }
 </script>
