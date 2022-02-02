@@ -34,6 +34,8 @@ export function useInfinityScrolling(routeName, params) {
                 page.value += 1;
                 result.value.push(...response.data.data);
 
+                // Todo check if still in view and fetch again
+
             } else {
                 isComplete.value = true
             }
