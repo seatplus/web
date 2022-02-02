@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import EveImage from "../../EveImage";
+import EveImage from "@/Shared/EveImage"
 import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
 import route from 'ziggy'

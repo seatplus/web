@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import EntityByIdBlock from "../../../Layout/Eve/EntityByIdBlock";
-import EveImage from "../../../EveImage";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EveImage from "@/Shared/EveImage"
 export default {
     name: "ExtendedWalletTransactionRowComponent",
     components: {EveImage, EntityByIdBlock},

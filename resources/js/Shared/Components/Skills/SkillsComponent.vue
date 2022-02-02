@@ -28,7 +28,7 @@
 <script>
 import Skills from "./Skills";
 import SkillQueue from "./SkillQueue";
-import EntityByIdBlock from "../../Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 export default {
     name: "SkillsComponent",
     components: {EntityByIdBlock, SkillQueue, Skills},

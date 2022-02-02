@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import Time from "../../../Time";
+import Time from "@/Shared/Time";
 import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent";
 
 export default {

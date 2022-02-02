@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import EntityByIdBlock from "../Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 export default {
     name: "SelectedEntity",
     components: {EntityByIdBlock},

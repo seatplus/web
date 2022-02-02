@@ -54,10 +54,9 @@
 </template>
 
 <script>
-import {ref} from "vue";
 import MailRepresentation from "./MailRepresentation";
-import EveImage from "../../EveImage";
-import Time from "../../Time";
+import EveImage from "@/Shared/EveImage"
+import Time from "@/Shared/Time";
 import ResolveIdToName from "../../ResolveIdToName";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
 import {ChevronUpIcon} from "@heroicons/vue/solid/esm";

@@ -46,8 +46,7 @@
 
 <script>
 
-import axios from "axios";
-import EntityByIdBlock from "../../../Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 
 export default {
     name: "ExtendedWalletJournalRowComponent",

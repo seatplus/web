@@ -298,7 +298,7 @@ import * as OutlineHeroicons from '@heroicons/vue/outline'
 import route from 'ziggy'
 import ImpersonatingBanner from "./ImpersonatingBanner";
 import Notifications from "../Notifications/Notifications";
-import EveImage from "../EveImage";
+import EveImage from "@/Shared/EveImage"
 
 /*const navigation2 = [
     { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },

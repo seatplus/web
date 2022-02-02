@@ -49,8 +49,8 @@
 </template>
 
 <script>
-import EveImage from "../../EveImage"
-import Time from "../../Time"
+import EveImage from "@/Shared/EveImage"
+import Time from "@/Shared/Time";
 import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/outline"
 import {computed, onBeforeMount, onUnmounted, ref, watch} from "vue";
 import axios from "axios";

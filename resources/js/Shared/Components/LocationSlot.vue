@@ -94,7 +94,7 @@
 import WideLists from "../WideLists";
 import WideListElement from "../WideListElement";
 import EveImage from "../EveImage"
-import CardWithHeader from "../Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 
 export default {
     name: "LocationSlot",

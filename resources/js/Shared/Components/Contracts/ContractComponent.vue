@@ -75,8 +75,8 @@
 
 <script>
 
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "../../Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import StickyHeaderTable from "../../Layout/Table/StickyHeaderTable";
 import StickyHeaderTableRow from "../../Layout/Table/StickyHeaderTableRow";
 import StickyHeaderCell from "../../Layout/Table/StickyHeaderCell";

@@ -61,13 +61,12 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import {prefix} from "metric-prefix";
 import { ChevronRightIcon } from '@heroicons/vue/solid'
-import EveImage from "../../EveImage";
+import EveImage from "@/Shared/EveImage"
 export default {
     name: "CompactAssetListTemplate",
-    components: {EveImage, EntityBlock, ChevronRightIcon},
+    components: {EveImage, ChevronRightIcon},
     props: {
         entry: {
             required: true,

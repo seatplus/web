@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import EveImage from "../../EveImage";
+import EveImage from "@/Shared/EveImage"
 export default {
     name: "EntityBlock",
     components: {EveImage},

@@ -196,10 +196,10 @@
 </template>
 
 <script>
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import {prefix} from "metric-prefix";
 import WideListElement from "../../WideListElement";
-import EveImage from "../../EveImage";
+import EveImage from "@/Shared/EveImage"
 import WideLists from "../../WideLists";
 import AssigneeComponent from "./Cells/AssigneeComponent";
 import {useValidateObject} from "@/Functions/useValidateObject";

@@ -120,16 +120,13 @@
 </template>
 
 <script>
-import TableRow from "../../../Layout/Cards/Table/TableRow";
-import DataCell from "../../../Layout/Cards/Table/DataCell";
-/*TODO import {Fragment} from "vue-fragment"*/
-import EveImage from "../../../EveImage";
-import Time from "../../../Time";
+import EveImage from "@/Shared/EveImage"
+import Time from "@/Shared/Time";
 import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent";
 
 export default {
     name: "WalletTransactionRowComponent",
-    components: {ExtendedWalletTransactionRowComponent, Time, EveImage, DataCell, TableRow, /*Fragment*/},
+    components: {ExtendedWalletTransactionRowComponent, Time, EveImage },
     props: {
         entry: {
             required: true

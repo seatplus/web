@@ -56,8 +56,8 @@
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import { CheckIcon, ThumbUpIcon, UserIcon, BookOpenIcon } from '@heroicons/vue/solid'
-import Time from "../../Time";
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
+import Time from "@/Shared/Time";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 
 const timeline = [
     {

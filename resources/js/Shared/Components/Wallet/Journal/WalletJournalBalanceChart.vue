@@ -24,8 +24,8 @@
 </template>
 
 <script>
-import CardWithHeader from "../../../Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "../../../Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import LineChart from "../../../Charts/LineChart";
 

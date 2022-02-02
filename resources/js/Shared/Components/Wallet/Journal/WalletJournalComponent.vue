@@ -49,9 +49,9 @@
 </template>
 
 <script>
-import CardWithHeader from "../../../Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import WalletJournalRowComponent from "./WalletJournalRowComponent";
-import EntityByIdBlock from "../../../Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper";
 
 export default {

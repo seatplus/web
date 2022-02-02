@@ -61,13 +61,11 @@
 </template>
 
 <script>
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import route from 'ziggy'
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import {ref} from "vue";
-import EveImage from "../../EveImage";
-import Time from "../../Time";
+import EveImage from "@/Shared/EveImage"
+import Time from "@/Shared/Time";
 import ResolveIdToName from "../../ResolveIdToName";
 
 export default {

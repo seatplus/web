@@ -42,10 +42,9 @@
 </template>
 
 <script>
-import {computed, ref} from "vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import EveImage from "../../EveImage";
-import Time from "../../Time";
+import EveImage from "@/Shared/EveImage"
+import Time from "@/Shared/Time";
 import ResolveIdToName from "../../ResolveIdToName";
 
 export default {

@@ -62,7 +62,7 @@
 
 <script>
 import axios from 'axios';
-import EntityByIdBlock from "./Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import {ref, watch} from "vue";
 import route from "ziggy";
 import {usePage} from "@inertiajs/inertia-vue3";

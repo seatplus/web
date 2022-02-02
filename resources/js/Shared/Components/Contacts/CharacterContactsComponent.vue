@@ -61,7 +61,7 @@
 <script>
 
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import CardWithHeader from "../../Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper";
 import CharacterContactsRowComponent from "./CharacterContactsRowComponent";
 import {computed, ref} from "vue";

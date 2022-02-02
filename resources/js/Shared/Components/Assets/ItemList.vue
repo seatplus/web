@@ -100,7 +100,7 @@
 
 <script>
 
-  import EveImage from "../../EveImage"
+  import EveImage from "@/Shared/EveImage"
   import { prefix } from 'metric-prefix'
   import WideListElement from "@/Shared//WideListElement";
   import CompactAssetListComponent from "./CompactAssetListComponent";
