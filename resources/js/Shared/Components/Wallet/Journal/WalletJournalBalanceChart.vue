@@ -15,9 +15,7 @@
       <LineChart
         v-if="results.length > 0"
         class="p-2"
-        :chart-data="chartData"
-        :chart-options="chartOptions"
-        :style="{height: '12rem', position: 'relative'}"
+        v-bind="lineChartProps"
       />
     </div>
   </CardWithHeader>
@@ -27,7 +25,11 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import LineChart from "../../../Charts/LineChart";
+import {LineChart, useLineChart } from "vue-chart-3";
+import {computed} from "vue";
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 export default {
     name: "WalletJournalBalanceChart",
@@ -57,51 +59,54 @@ export default {
             character_id: props.id
         }
 
-        return useLoadCompleteResource(route, routeParameters)
-    },
-    data() {
-        return {
-            chartOptions: {
-                responsive: true,
+        const chartOptions = {
+            responsive: true,
                 maintainAspectRatio: false,
                 legend: {
-                    display: false
-                },
-                scales: {
-                    xAxes: [{
-                        type: 'time',
-                        distribution: 'linear'
-                    }],
+                display: false
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    distribution: 'linear'
+                }],
                     yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function(value, index, values) {
-                                return 'ISK ' + value.toLocaleString();
-                            }
+                    ticks: {
+                        beginAtZero: true,
+                        callback: function(value) {
+                            return 'ISK ' + value.toLocaleString();
                         }
-                    }],
-                }
+                    }
+                }],
             }
         }
-    },
-    computed: {
-        chartData() {
 
+        const {results} = useLoadCompleteResource(route, routeParameters)
+
+        const chartData = computed(() => {
             return {
-                labels: _.map(this.results, (result) => result.x),
+                labels: _.map(results.value, (result) => result.x),
                 datasets: [{
                     label: 'ISK',
-                    data: _.map(this.results, (result) => result.y),
+                    data: _.map(results.value, (result) => result.y),
                     borderWidth: 3,
                     fill: false,
                     borderColor: '#4f46e5'
                 }]
             }
+        })
+
+        const {lineChartProps, lineChartRef} = useLineChart({
+            chartData, chartOptions, style: {height: '12rem', position: 'relative'}
+        })
+
+
+        return {
+            results,
+            lineChartProps,
+            lineChartRef
         }
     },
-    created() {
-        this.infiniteId += 1;
-    }
 }
 </script>
 
