@@ -20,7 +20,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-    test()->secondary_user = Event::fakeFor(fn() => User::factory()->create());
+    test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
     /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
     test()->superuser = Event::fakeFor(function () {

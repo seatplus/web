@@ -63,28 +63,28 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request)
     {
         return array_merge(parent::share($request), [
-            'flash' => fn() => [
+            'flash' => fn () => [
                 'success' => session()->pull('success'),
                 'info' => session()->pull('info'),
                 'warning' => session()->pull('warning'),
                 'error' => session()->pull('error'),
             ],
-            'sidebar' => fn() => auth()->guest() ? [] : (new SidebarEntries)->filter(),
-            'user' => fn() => auth()->guest() ? '' : UserRessource::make(
+            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->filter(),
+            'user' => fn () => auth()->guest() ? '' : UserRessource::make(
                 User::with('main_character', 'characters', 'characters.refresh_token')
                     ->where('id', auth()->user()->getAuthIdentifier())
                     ->first()
             ),
-            'translation' => fn() => [
+            'translation' => fn () => [
                 'success' => trans('web::notifications.success'),
                 'info' => trans('web::notifications.info'),
                 'warning' => trans('web::notifications.warning'),
                 'error' => trans('web::notifications.error'),
             ],
-            'errors' => fn() => Session::get('errors')
+            'errors' => fn () => Session::get('errors')
                 ? Session::get('errors')->getBag('default')->getMessages()
                 : (object) [],
-            'images' => fn() => [
+            'images' => fn () => [
                 'logo' => asset('img/seat_plus.svg'),
             ],
         ]);

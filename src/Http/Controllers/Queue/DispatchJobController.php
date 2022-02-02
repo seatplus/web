@@ -85,7 +85,7 @@ class DispatchJobController extends Controller
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->when($required_corporation_role, fn($tokens) => $tokens
+            ->when($required_corporation_role, fn ($tokens) => $tokens
                 ->filter(fn ($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
                 ->unique(fn ($token) => $token->corporation_id))
             ->map(fn ($token) => collect([

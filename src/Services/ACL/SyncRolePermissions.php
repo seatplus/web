@@ -41,8 +41,7 @@ class SyncRolePermissions
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
     private Role $role
-    )
-    {
+    ) {
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
     }
@@ -72,6 +71,6 @@ class SyncRolePermissions
 
     private function removeUnassignedPermissions()
     {
-        $this->current_permissions->diff($this->target_permissions)->each(fn($to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
+        $this->current_permissions->diff($this->target_permissions)->each(fn ($to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
     }
 }

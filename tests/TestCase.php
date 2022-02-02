@@ -49,7 +49,7 @@ abstract class TestCase extends OrchestraTestCase
         $this->setupDatabase($this->app);
 
         /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-        $this->test_user = Event::fakeFor(fn() => User::factory()->create());
+        $this->test_user = Event::fakeFor(fn () => User::factory()->create());
 
         $this->test_character = $this->test_user->characters->first();
 

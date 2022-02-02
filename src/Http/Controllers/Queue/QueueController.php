@@ -52,6 +52,6 @@ class QueueController extends Controller
             return 'inactive';
         }
 
-        return collect($masters)->contains(fn($master) => $master->status === 'paused') ? 'paused' : 'running';
+        return collect($masters)->contains(fn ($master) => $master->status === 'paused') ? 'paused' : 'running';
     }
 }
