@@ -35,9 +35,9 @@ class ControlGroupUpdateData extends DataTransferObject
 
     public string $role_type;
 
-    public ?array $affiliations;
+    public ?array $affiliations = null;
 
-    public ?array $members;
+    public ?array $members = null;
 
-    public ?array $moderators;
+    public ?array $moderators = null;
 }

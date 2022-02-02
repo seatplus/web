@@ -35,9 +35,6 @@ use Seatplus\Auth\Models\User;
 class CheckACLPermission
 {
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @param  string  $permission
      * @param  string|null  $character_role
      * @return mixed
      */
