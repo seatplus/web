@@ -33,22 +33,15 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SyncRolePermissions
 {
-    /**
-     * @var \Illuminate\Support\Collection
-     */
-    private $current_permissions;
+    private \Illuminate\Support\Collection $current_permissions;
 
-    /**
-     * @var \Illuminate\Support\Collection
-     */
-    private $target_permissions;
+    private \Illuminate\Support\Collection $target_permissions;
 
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
     private Role $role
-    )
-    {
+    ) {
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
     }
@@ -78,8 +71,6 @@ class SyncRolePermissions
 
     private function removeUnassignedPermissions()
     {
-        $this->current_permissions->diff($this->target_permissions)->each(function ($to_be_removed_permissions) {
-            return $this->role->revokePermissionTo($to_be_removed_permissions);
-        });
+        $this->current_permissions->diff($this->target_permissions)->each(fn ($to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
     }
 }

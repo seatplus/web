@@ -102,7 +102,7 @@ test('happy path via alliance id', function () {
 
 test('unknown character id', function () {
     $alliance = AllianceInfo::factory()->create([
-        'alliance_id' => 99000000123,
+        'alliance_id' => 99_000_000_123,
     ]);
 
     $corporation = CorporationInfo::factory()->create([
@@ -127,7 +127,7 @@ test('unknown character id', function () {
         ]),
     ];
 
-    $data = json_encode($body);
+    $data = json_encode($body, JSON_THROW_ON_ERROR);
 
     $response = new EsiResponse($data, [], 'now', 200);
 

@@ -33,7 +33,7 @@ test('one can create sso setting', function () {
     $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
     $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
-        json_encode($corporation->attributesToArray()),
+        json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200
@@ -77,7 +77,7 @@ test('one can delete sso setting', function () {
     $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
     $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
-        json_encode($corporation->attributesToArray()),
+        json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200

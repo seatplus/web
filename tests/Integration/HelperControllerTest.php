@@ -221,11 +221,11 @@ test('one can get market prices', function () {
     test()->mockRetrieveEsiDataAction([
         (object) [
             "adjusted_price" => 0,
-            "average_price" => 31214609.93,
+            "average_price" => 31_214_609.93,
             "type_id" => 43691,
         ],
-        (object) [ "adjusted_price" => 1005248.1289154688,
-            "average_price" => 1002393.46,
+        (object) [ "adjusted_price" => 1_005_248.1289155,
+            "average_price" => 1_002_393.46,
             "type_id" => 32772,
         ],
         (object) [ "adjusted_price" => 111879.41656101559,

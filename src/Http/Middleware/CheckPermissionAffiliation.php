@@ -46,10 +46,6 @@ class CheckPermissionAffiliation
     }
 
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @param  string  $permission
-     * @param  string|null  $character_role
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
@@ -105,9 +101,6 @@ class CheckPermissionAffiliation
         return $next($request);
     }
 
-    /**
-     * @return Collection
-     */
     public function getAffiliatedIds(): Collection
     {
         return $this->affiliated_ids

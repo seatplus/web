@@ -139,7 +139,7 @@ it('updates affiliations', function () {
             "affiliations" => [
                 [
                     "category" => 'character',
-                    "id" => 95725047,
+                    "id" => 95_725_047,
                     "type" => "allowed",
                 ],
             ],
@@ -148,7 +148,7 @@ it('updates affiliations', function () {
 
     \Pest\Laravel\assertDatabaseHas('affiliations', [
         'role_id' => $role->id,
-        'affiliatable_id' => 95725047,
+        'affiliatable_id' => 95_725_047,
     ]);
 
     // Delete Affiliation
@@ -160,7 +160,7 @@ it('updates affiliations', function () {
 
     \Pest\Laravel\assertDatabaseMissing('affiliations', [
         'role_id' => $role->id,
-        'affiliatable_id' => 95725047,
+        'affiliatable_id' => 95_725_047,
     ]);
 });
 
@@ -178,8 +178,8 @@ it('updates name', function () {
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
             "allowed" => [
                 [
-                    "character_id" => 95725047,
-                    "id" => 95725047,
+                    "character_id" => 95_725_047,
+                    "id" => 95_725_047,
                     "name" => "Herpaderp Aldent",
                 ],
             ],

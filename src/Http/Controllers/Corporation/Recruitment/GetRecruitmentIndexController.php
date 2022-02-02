@@ -32,8 +32,8 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class GetRecruitmentIndexController extends Controller
 {
-    const MANAGEPERMISSION = 'can open or close corporations for recruitment';
-    const RECRUITERPERMISSION = 'can accept or deny applications';
+    public const MANAGEPERMISSION = 'can open or close corporations for recruitment';
+    public const RECRUITERPERMISSION = 'can accept or deny applications';
 
     public function __invoke()
     {

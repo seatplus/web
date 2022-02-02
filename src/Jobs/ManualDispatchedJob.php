@@ -34,10 +34,6 @@ class ManualDispatchedJob
 
     private string $name = 'manual job';
 
-    /**
-     * @param  array  $jobs
-     * @return ManualDispatchedJob
-     */
     public function setJobs(array $jobs): ManualDispatchedJob
     {
         $this->jobs = $jobs;
@@ -58,10 +54,6 @@ class ManualDispatchedJob
         return $batch->id;
     }
 
-    /**
-     * @param  string  $name
-     * @return ManualDispatchedJob
-     */
     public function setName(string $name): ManualDispatchedJob
     {
         $this->name = $name;

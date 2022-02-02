@@ -36,7 +36,7 @@ test('get mail body test', function () {
     $body = '<font size="12" color="#bfffffff"></font><font size="12" color="#ff007fff">hey man hope you change your mind and come back to us<br><br>if not enjoy and maybe paths will cross again one day<br></font><font size="12" color="#bfffffff">--------------------------------<br>Re: FW: Leaving<br>From: </font><font size="12" color="#ffffa600"><a href="showinfo:1377//91356804">Steel Roamer</a><br></font><font size="12" color="#bfffffff">Sent: 2018.02.08 17:42<br>To: ShekelSquad, </font><font size="12" color="#ffffa600"><a href="showinfo:1377//95002093">Rory Wolf</a></font><font size="12" color="#bfffffff">,  <br><br>:(<br><br>--------------------------------<br>FW: Leaving<br>From: Rory Wolf<br>Sent: 2018.02.08 17:28<br>To: ShekelSquad<br><br></font><font size="12" color="#ff007fff">OK which one of you guys has the shitty attitude?<br><br>Possible answers:<br><br>NOT ME!<br>Who cares!<br>Everyone!<br>SteelRoamer!!!!!!!!!!!!!!!!!!!!!!<br><br></font><font size="12" color="#bfffffff">--------------------------------<br>Leaving<br>From: </font><font size="12" color="#ffffa600"><a href="showinfo:1377//94159646">evillady Lennelluc</a><br></font><font size="12" color="#bfffffff">Sent: 2018.02.08 13:51<br>To: ShekelSquad, <br><br></font><font size="12" color="#ff007fff">hey guys<br><br>i desided to leave corp <br>mostly cause of lack of people in my TZ <br>also some peoples additude <br>i wish you guys good luck and lost of fun <br>and maybe untill we meet again o/<br><br>fly it like yo stole it o7<br>Evil</font>';
 
     $mail = Mail::factory()->create([
-        'from' => 96898138,
+        'from' => 96_898_138,
         'body' => $body,
     ]);
 
@@ -52,19 +52,19 @@ test('get mail body test', function () {
     //Prepare ESI Response of GetIdsFromNamesService
     $data = [
         [
-            "id" => 91356804,
+            "id" => 91_356_804,
             "name" => "Steel Roamer",
         ],
         [
-            "id" => 98467521,
+            "id" => 98_467_521,
             "name" => "ShekelSquad",
         ],
         [
-            'id' => 95002093,
+            'id' => 95_002_093,
             "name" => "Rory Wolf",
         ],
         [
-            'id' => 94159646,
+            'id' => 94_159_646,
             "name" => "evillady Lennelluc",
         ],
     ];

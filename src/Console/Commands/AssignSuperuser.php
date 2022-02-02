@@ -49,8 +49,7 @@ class AssignSuperuser extends Command
      */
     protected $description = 'Assign superuser permission to a user, search by character name';
 
-    /** @var null|User */
-    private $user;
+    private ?\Seatplus\Auth\Models\User $user = null;
 
     /**
      * Create a new command instance.
@@ -70,12 +69,10 @@ class AssignSuperuser extends Command
             $users = User::with('characters')
                 ->permission('superuser')
                 ->get()
-                ->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'characters' => $user->characters->implode('name', ', '),
-                    ];
-                });
+                ->map(fn ($user) => [
+                    'id' => $user->id,
+                    'characters' => $user->characters->implode('name', ', '),
+                ]);
 
             $this->table(['user_id', 'characters'], $users);
 
@@ -89,12 +86,10 @@ class AssignSuperuser extends Command
         $users = User::with('characters')
             ->search($character_name)
             ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'characters' => $user->characters->implode('name', ', '),
-                ];
-            })
+            ->map(fn ($user) => [
+                'id' => $user->id,
+                'characters' => $user->characters->implode('name', ', '),
+            ])
             ->toArray();
 
         $this->table(['user_id', 'characters'], $users);

@@ -6,14 +6,12 @@ use Inertia\Testing\Assert;
 
 beforeEach(function () {
     Inertia::share([
-        'flash' => function () {
-            return [
-                'success' => session()->pull('success'),
-                'info' => session()->pull('info'),
-                'warning' => session()->pull('warning'),
-                'error' => session()->pull('error'),
-            ];
-        },
+        'flash' => fn () => [
+            'success' => session()->pull('success'),
+            'info' => session()->pull('info'),
+            'warning' => session()->pull('warning'),
+            'error' => session()->pull('error'),
+        ],
     ]);
 });
 

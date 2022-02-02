@@ -37,17 +37,13 @@ class SyncRoleAffiliations
 {
     private $current_affiliations;
 
-    /**
-     * @var \Illuminate\Support\Collection
-     */
-    private $target_affiliations;
+    private \Illuminate\Support\Collection $target_affiliations;
 
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
     private Role $role
-    )
-    {
+    ) {
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
     }
@@ -82,9 +78,7 @@ class SyncRoleAffiliations
 
     private function removeUnassignedAffiliations()
     {
-        $this->current_affiliations->reject(function ($current_affiliation) {
-            return $this->target_affiliations->contains($current_affiliation);
-        })->each(function ($affiliation) {
+        $this->current_affiliations->reject(fn ($current_affiliation) => $this->target_affiliations->contains($current_affiliation))->each(function ($affiliation) {
             Affiliation::where([
                 'role_id' => $affiliation->role_id,
                 'affiliatable_id' => $affiliation->affiliatable_id,

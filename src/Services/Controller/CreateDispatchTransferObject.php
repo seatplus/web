@@ -120,10 +120,6 @@ class CreateDispatchTransferObject
         );
     }
 
-    /**
-     * @param  bool  $isCharacter
-     * @return CreateDispatchTransferObject
-     */
     public function setIsCharacter(bool $isCharacter): CreateDispatchTransferObject
     {
         $this->isCharacter = $isCharacter;
@@ -131,9 +127,6 @@ class CreateDispatchTransferObject
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     private function isCharacter(): bool
     {
         return $this->isCharacter;
