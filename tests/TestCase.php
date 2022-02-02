@@ -3,6 +3,7 @@
 
 namespace Seatplus\Web\Tests;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -12,14 +13,13 @@ use Laravel\Horizon\HorizonServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seatplus\Auth\AuthenticationServiceProvider;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
-use Spatie\Permission\PermissionRegistrar;
 use Staudenmeir\LaravelCte\DatabaseServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
@@ -33,8 +33,11 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function setUp(): void
     {
-
         parent::setUp();
+
+        Factory::guessFactoryNamesUsing(
+            fn (string $modelName) => 'Seatplus\\Web\\Database\\Factories\\'.class_basename($modelName).'Factory'
+        );
 
         //Setup Inertia Root View
         Inertia::setRootView('web::app');
@@ -52,7 +55,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_character = $this->test_user->characters->first();
 
-        $this->app->instance('path.public', __DIR__ .'/Stubs');
+        $this->app->instance('path.public', __DIR__ .'/../public');
 
         Permission::findOrCreate('superuser');
     }
@@ -83,7 +86,7 @@ abstract class TestCase extends OrchestraTestCase
             DatabaseServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
-            InertiaServiceProviderAlias::class
+            InertiaServiceProviderAlias::class,
         ];
     }
 
@@ -122,8 +125,10 @@ abstract class TestCase extends OrchestraTestCase
         //Setup Inertia for package development
         config()->set('inertia.testing.page_paths', array_merge(
             config()->get('inertia.testing.page_paths', []),
-            [realpath(__DIR__ . '/../src/resources/js/Pages'), realpath(__DIR__ . '/../src/resources/js/Shared')],
+            [
+                realpath(__DIR__ . '/../resources/js/Pages'),
+                realpath(__DIR__ . '/../resources/js/Shared'),
+            ],
         ));
     }
-
 }

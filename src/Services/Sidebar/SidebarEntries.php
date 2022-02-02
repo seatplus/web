@@ -97,7 +97,8 @@ class SidebarEntries
 
             // Moderators of roles should see the access control link even without the permission
             if ($category === 'Access Control') {
-                $roles = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
+                $roles = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph(
+                    'affiliatable',
                     [User::class],
                     fn ($query) => $query->whereId($this->user->getAuthIdentifier())
                 ))->get();

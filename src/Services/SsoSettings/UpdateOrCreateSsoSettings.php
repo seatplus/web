@@ -56,11 +56,13 @@ class UpdateOrCreateSsoSettings
 
     public function execute()
     {
-        $this->entities->whenEmpty(function () {
+        $this->entities->whenEmpty(
+            function () {
             if ($this->type === 'global') {
                 SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
             }
-        }, fn ($collection) => $collection
+        },
+            fn ($collection) => $collection
             ->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
                 $category = Arr::get($entity, 'type');

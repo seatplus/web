@@ -8,5 +8,4 @@ test('invoke', function () {
         ->get(route('load.character.assets'));
 
     $response->assertOk();
-
 });

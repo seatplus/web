@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Model;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\System;
-use Seatplus\Web\database\factories\ManualLocationFactory;
 
 class ManualLocation extends Model
 {
@@ -43,11 +42,6 @@ class ManualLocation extends Model
      * @var array
      */
     protected $guarded = [];
-
-    protected static function newFactory()
-    {
-        return ManualLocationFactory::new();
-    }
 
     public function location()
     {

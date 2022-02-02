@@ -61,7 +61,7 @@ class CreateSsoScopeSettingsValidation extends FormRequest
     public function messages()
     {
         return [
-            'selectedEntities.required'  => 'At least one corporation or alliance is required to be selected',
+            'selectedEntities.required' => 'At least one corporation or alliance is required to be selected',
             'selectedScopes.required' => 'At least one character or corporation scope is required',
         ];
     }

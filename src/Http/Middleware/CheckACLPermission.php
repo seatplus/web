@@ -47,7 +47,8 @@ class CheckACLPermission
             return $next($request);
         }
 
-        $moderated_role_ids = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph('affiliatable',
+        $moderated_role_ids = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph(
+            'affiliatable',
             [User::class],
             fn ($query) => $query->whereId(auth()->user()->getAuthIdentifier())
         ))->pluck('id');
