@@ -8,6 +8,9 @@ vendor/
 
 public/css/
 
+.php_cs
+.php_cs.cache
 .phpunit.result.cache
+.php-cs-fixer.cache
 
 public/js/

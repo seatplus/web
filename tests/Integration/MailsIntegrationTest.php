@@ -3,7 +3,7 @@
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Inertia\Testing\Assert;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -28,8 +28,10 @@ test('get mail headers of secondary user', function () {
     }
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('get.mail.headers', ['character_ids' => [test()->test_character->character_id]]))
-        ->assertOk();
+        ->get(route('get.mail.headers', ['character_ids' => [test()->test_character->character_id]]));
+
+    $response->assertOk();
+
 });
 
 test('get mail body test', function () {

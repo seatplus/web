@@ -17,6 +17,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
@@ -56,6 +57,17 @@ abstract class TestCase extends OrchestraTestCase
         $this->app->instance('path.public', __DIR__ .'/../public');
 
         Permission::findOrCreate('superuser');
+    }
+
+    /**
+     * Resolve application Console Kernel implementation.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    protected function resolveApplicationConsoleKernel($app)
+    {
+        $app->singleton('Illuminate\Contracts\Console\Kernel', ConsoleKernel::class);
     }
 
     /**

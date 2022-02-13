@@ -1,7 +1,7 @@
 <?php
 
 
-use Inertia\Testing\Assert;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Contracts\ContractItem;
 use Spatie\Permission\PermissionRegistrar;

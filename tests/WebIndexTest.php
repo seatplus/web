@@ -1,7 +1,7 @@
 <?php
 
 
-use Inertia\Testing\Assert;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Web\Tests\TestCase;
 
 uses(TestCase::class);

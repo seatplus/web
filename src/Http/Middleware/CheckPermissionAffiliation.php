@@ -96,7 +96,7 @@ class CheckPermissionAffiliation
 
         abort_unless($validated_ids->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
 
-        $this->appendValidatedIds($request->request, $validated_ids);
+        $this->appendValidatedIds($request->query, $validated_ids);
 
         return $next($request);
     }

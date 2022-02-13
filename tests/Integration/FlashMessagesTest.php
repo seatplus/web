@@ -2,7 +2,7 @@
 
 
 use Inertia\Inertia;
-use Inertia\Testing\Assert;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     Inertia::share([
