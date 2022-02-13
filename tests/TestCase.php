@@ -54,7 +54,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $this->test_character = $this->test_user->characters->first();
 
-        $this->app->instance('path.public', __DIR__ .'/../public');
+        $this->app->instance('path.public', __DIR__ .'/Stubs');
 
         Permission::findOrCreate('superuser');
     }
