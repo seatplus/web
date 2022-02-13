@@ -3,7 +3,6 @@
 
 namespace Seatplus\Web\Tests\Stubs;
 
-use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Orchestra\Testbench\Foundation\Http\Kernel as OrchestraHttpKernel;
 use Orchestra\Testbench\Http\Middleware\RedirectIfAuthenticated;
@@ -31,6 +30,6 @@ class Kernel extends OrchestraHttpKernel
      * @var array
      */
     protected $middleware = [
-        StartSession::class
+        StartSession::class,
     ];
 }

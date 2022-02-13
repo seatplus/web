@@ -31,7 +31,6 @@ test('get mail headers of secondary user', function () {
         ->get(route('get.mail.headers', ['character_ids' => [test()->test_character->character_id]]));
 
     $response->assertOk();
-
 });
 
 test('get mail body test', function () {
