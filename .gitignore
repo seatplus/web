@@ -6,8 +6,11 @@ node_modules/
 
 vendor/
 
-src/public/css/
+public/css/
 
+.php_cs
+.php_cs.cache
 .phpunit.result.cache
+.php-cs-fixer.cache
 
-src/public/js/
+public/js/

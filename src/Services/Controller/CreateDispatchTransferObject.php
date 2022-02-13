@@ -112,16 +112,14 @@ class CreateDispatchTransferObject
     private function getRequiredScopes(string $scope)
     {
         return config(
-            sprintf('eveapi.scopes.%s.%s',
+            sprintf(
+                'eveapi.scopes.%s.%s',
                 $this->isCharacter() ? 'character' : 'corporation',
-                $scope)
+                $scope
+            )
         );
     }
 
-    /**
-     * @param  bool  $isCharacter
-     * @return CreateDispatchTransferObject
-     */
     public function setIsCharacter(bool $isCharacter): CreateDispatchTransferObject
     {
         $this->isCharacter = $isCharacter;
@@ -129,9 +127,6 @@ class CreateDispatchTransferObject
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     private function isCharacter(): bool
     {
         return $this->isCharacter;

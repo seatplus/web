@@ -47,7 +47,10 @@ class GetRefTypesAction
 
     private function getRefTypes(): Collection
     {
-        return Cache::remember('ref_types', now()->addDay(), fn () => WalletJournal::query()
+        return Cache::remember(
+            'ref_types',
+            now()->addDay(),
+            fn () => WalletJournal::query()
             ->select('ref_type')
             ->groupBy('ref_type')
             ->get()

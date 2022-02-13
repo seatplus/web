@@ -2,10 +2,10 @@
 
 
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Services\GetEntityFromId;
 
 test('happy path', function () {
@@ -18,14 +18,14 @@ test('happy path', function () {
         'character_id' => $character_affiliation->character_id,
         'name' => $character_affiliation->character->name,
         'corporation' => [
-            'name' => $character_affiliation->corporation->name
+            'name' => $character_affiliation->corporation->name,
         ],
         'alliance' => [
-            'name' => $character_affiliation->alliance->name
-        ]
+            'name' => $character_affiliation->alliance->name,
+        ],
     ];
 
-    $cache_key =  sprintf('entityById:%s', $character_affiliation->character_id);
+    $cache_key = sprintf('entityById:%s', $character_affiliation->character_id);
     expect(cache($cache_key))->toBeNull();
 
     $service = new GetEntityFromId($character_affiliation->character_id);
@@ -50,8 +50,8 @@ test('happy path without alliance', function () {
         'character_id' => $character_affiliation->character_id,
         'name' => $character_affiliation->character->name,
         'corporation' => [
-            'name' => $character_affiliation->corporation->name
-        ]
+            'name' => $character_affiliation->corporation->name,
+        ],
     ];
 
     $service = new GetEntityFromId($character_affiliation->character_id);
@@ -71,8 +71,8 @@ test('happy path via corporation id', function () {
         'corporation_id' => $character_affiliation->corporation_id,
         'name' => $character_affiliation->corporation->name,
         'alliance' => [
-            'name' => $character_affiliation->alliance->name
-        ]
+            'name' => $character_affiliation->alliance->name,
+        ],
     ];
 
     $service = new GetEntityFromId($character_affiliation->corporation_id);
@@ -83,7 +83,6 @@ test('happy path via corporation id', function () {
 });
 
 test('happy path via alliance id', function () {
-
     $character = CharacterInfo::factory()->create();
 
     $character_affiliation = $character->character_affiliation;
@@ -91,7 +90,7 @@ test('happy path via alliance id', function () {
     $expected_result = [
         'id' => $character_affiliation->alliance_id,
         'alliance_id' => $character_affiliation->alliance_id,
-        'name' => $character_affiliation->alliance->name
+        'name' => $character_affiliation->alliance->name,
     ];
 
     $service = new GetEntityFromId($character_affiliation->alliance_id);
@@ -102,34 +101,33 @@ test('happy path via alliance id', function () {
 });
 
 test('unknown character id', function () {
-
     $alliance = AllianceInfo::factory()->create([
-        'alliance_id' => 99000000123
+        'alliance_id' => 99_000_000_123,
     ]);
 
     $corporation = CorporationInfo::factory()->create([
-        'alliance_id' => $alliance->alliance_id
+        'alliance_id' => $alliance->alliance_id,
     ]);
     $character = CharacterInfo::factory()->make([
-        'corporation_id' => $corporation->corporation_id
+        'corporation_id' => $corporation->corporation_id,
     ]);
 
     $esi_mock_return_data = [
         'alliance_id' => $alliance->alliance_id,
         'character_id' => $character->character_id,
         'corporation_id' => $corporation->corporation_id,
-        'faction_id' => null
+        'faction_id' => null,
     ];
 
     $body = [
         array_merge($esi_mock_return_data, [
             'id' => $character->character_id,
             'name' => $character->name,
-            'category' => 'character'
-        ])
+            'category' => 'character',
+        ]),
     ];
 
-    $data = json_encode($body);
+    $data = json_encode($body, JSON_THROW_ON_ERROR);
 
     $response = new EsiResponse($data, [], 'now', 200);
 
@@ -143,11 +141,11 @@ test('unknown character id', function () {
         'character_id' => $character->character_id,
         'name' => $character->name,
         'corporation' => [
-            'name' => $corporation->name
+            'name' => $corporation->name,
         ],
         'alliance' => [
-            'name' => $alliance->name
-        ]
+            'name' => $alliance->name,
+        ],
     ];
 
     $service = new GetEntityFromId($character->character_id);

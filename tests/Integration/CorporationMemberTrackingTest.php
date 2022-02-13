@@ -1,7 +1,7 @@
 <?php
 
 
-use Inertia\Testing\Assert;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -10,7 +10,6 @@ beforeEach(function () {
 });
 
 test('has dispatchable job', function () {
-
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->get(route('corporation.member_tracking'))
@@ -29,5 +28,5 @@ test('has dispatchable job', function () {
         ->get(route('corporation.member_tracking'))
         ->assertOk();
 
-    $response->assertInertia( fn (Assert $page) => $page->has('dispatchTransferObject'));
+    $response->assertInertia(fn (Assert $page) => $page->has('dispatchTransferObject'));
 });

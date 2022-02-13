@@ -85,11 +85,9 @@ class DispatchJobController extends Controller
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->when($required_corporation_role, function ($tokens) use ($validated_data) {
-                return $tokens
-                    ->filter(fn ($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
-                    ->unique(fn ($token) => $token->corporation_id);
-            })
+            ->when($required_corporation_role, fn ($tokens) => $tokens
+                ->filter(fn ($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
+                ->unique(fn ($token) => $token->corporation_id))
             ->map(fn ($token) => collect([
                 'character_id' => $required_corporation_role ? null : $token->character_id,
                 'corporation_id' => $required_corporation_role ? $token->corporation_id : null,
@@ -129,7 +127,7 @@ class DispatchJobController extends Controller
 
         if ($batch->failedJobs > 0 && $batch->progress() < 100) {
             return [
-                'state' =>'failures',
+                'state' => 'failures',
                 'time' => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
@@ -137,7 +135,7 @@ class DispatchJobController extends Controller
 
         if ($batch->progress() == 100) {
             return [
-                'state' =>'finished',
+                'state' => 'finished',
                 'time' => $batch->finishedAt,
                 'batch_id' => $batch_id,
             ];
@@ -145,7 +143,7 @@ class DispatchJobController extends Controller
 
         if ($batch->pendingJobs > 0 && ! $batch->failedJobs) {
             return [
-                'state' =>'pending',
+                'state' => 'pending',
                 'time' => $batch->createdAt,
                 'batch_id' => $batch_id,
             ];

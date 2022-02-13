@@ -52,16 +52,16 @@ class WebServiceProvider extends ServiceProvider
         $this->addPublications();
 
         // Add routes
-        $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
 
         // Add views
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'web');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'web');
 
         //Add Migrations
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations/');
 
         // Add translations
-        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'web');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'web');
 
         // Add Middlewares
         $this->addMiddleware();
@@ -90,9 +90,9 @@ class WebServiceProvider extends ServiceProvider
          * or use Laravel Mix to copy the folder to public repo of core.
          */
         $this->publishes([
-            __DIR__ . '/public/img' => public_path('img'),
-            __DIR__ . '/resources/js' => resource_path('js'),
-            __DIR__ . '/resources/css' => resource_path('css'),
+            __DIR__ . '/../public/img' => public_path('img'),
+            __DIR__ . '/../resources/js' => resource_path('js'),
+            __DIR__ . '/../resources/css' => resource_path('css'),
             $this->getPackageJsonFile() => base_path('package.json'),
             $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
         ], 'web');
@@ -141,27 +141,33 @@ class WebServiceProvider extends ServiceProvider
     private function mergeConfigurations()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/config/web.config.php', 'web.config'
+            __DIR__ . '/../config/web.config.php',
+            'web.config'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/config/package.sidebar.php', 'package.sidebar'
+            __DIR__ . '/../config/package.sidebar.php',
+            'package.sidebar'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/config/web.permissions.php', 'web.permissions'
+            __DIR__ . '/../config/web.permissions.php',
+            'web.permissions'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/config/web.settings.php', 'web.settings'
+            __DIR__ . '/../config/web.settings.php',
+            'web.settings'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/config/web.cronExpressions.php', 'web.cronExpressions'
+            __DIR__ . '/../config/web.cronExpressions.php',
+            'web.cronExpressions'
         );
 
         $this->mergeConfigFrom(
-            __DIR__ . '/config/web.jobs.php', 'web.jobs'
+            __DIR__ . '/../config/web.jobs.php',
+            'web.jobs'
         );
     }
 

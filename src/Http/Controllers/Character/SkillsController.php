@@ -63,7 +63,8 @@ class SkillsController extends Controller
         return SkillQueue::query()
             ->with('type.group')
             ->where('character_id', $character_id)
-            ->where(fn (Builder $query) => $query
+            ->where(
+                fn (Builder $query) => $query
                 ->where('finish_date', '>=', now())
                 ->orWhereNull('finish_date')
             )

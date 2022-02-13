@@ -46,7 +46,6 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/asset-versioning
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
     public function version(Request $request)
@@ -59,48 +58,35 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/shared-data
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function share(Request $request)
     {
         return array_merge(parent::share($request), [
-            'flash' => function () {
-                return [
-                    'success' => session()->pull('success'),
-                    'info' => session()->pull('info'),
-                    'warning' => session()->pull('warning'),
-                    'error' => session()->pull('error'),
-                ];
-            },
-            'sidebar' => function () {
-                return auth()->guest() ? [] : (new SidebarEntries)->filter();
-            },
-            'user' => function () {
-                return auth()->guest() ? '' : UserRessource::make(
-                    User::with('main_character', 'characters', 'characters.refresh_token')
-                        ->where('id', auth()->user()->getAuthIdentifier())
-                        ->first()
-                );
-            },
-            'translation' => function () {
-                return [
-                    'success' => trans('web::notifications.success'),
-                    'info' => trans('web::notifications.info'),
-                    'warning' => trans('web::notifications.warning'),
-                    'error' => trans('web::notifications.error'),
-                ];
-            },
-            'errors' => function () {
-                return Session::get('errors')
-                    ? Session::get('errors')->getBag('default')->getMessages()
-                    : (object) [];
-            },
-            'images' => function () {
-                return [
-                    'logo' => asset('img/seat_plus.svg'),
-                ];
-            },
+            'flash' => fn () => [
+                'success' => session()->pull('success'),
+                'info' => session()->pull('info'),
+                'warning' => session()->pull('warning'),
+                'error' => session()->pull('error'),
+            ],
+            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->filter(),
+            'user' => fn () => auth()->guest() ? '' : UserRessource::make(
+                User::with('main_character', 'characters', 'characters.refresh_token')
+                    ->where('id', auth()->user()->getAuthIdentifier())
+                    ->first()
+            ),
+            'translation' => fn () => [
+                'success' => trans('web::notifications.success'),
+                'info' => trans('web::notifications.info'),
+                'warning' => trans('web::notifications.warning'),
+                'error' => trans('web::notifications.error'),
+            ],
+            'errors' => fn () => Session::get('errors')
+                ? Session::get('errors')->getBag('default')->getMessages()
+                : (object) [],
+            'images' => fn () => [
+                'logo' => asset('img/seat_plus.svg'),
+            ],
         ]);
     }
 }

@@ -46,10 +46,6 @@ class CheckPermissionAffiliation
     }
 
     /**
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @param  string  $permission
-     * @param  string|null  $character_role
      * @return mixed
      */
     public function handle(Request $request, Closure $next, string $permission, ?string $character_role = null)
@@ -100,14 +96,11 @@ class CheckPermissionAffiliation
 
         abort_unless($validated_ids->isNotEmpty(), 403, 'You are not allowed to access the requested entity');
 
-        $this->appendValidatedIds($request->request, $validated_ids);
+        $this->appendValidatedIds($request->query, $validated_ids);
 
         return $next($request);
     }
 
-    /**
-     * @return Collection
-     */
     public function getAffiliatedIds(): Collection
     {
         return $this->affiliated_ids
@@ -169,7 +162,8 @@ class CheckPermissionAffiliation
         $affiliated_ids_from_character_role = $this->getUser()
             ->load(['characters.roles', 'characters.corporation'])
             ->characters
-            ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
+            ->map(
+                fn ($character) => HasCharacterNecessaryRole::check($character, $character_role)
                 ? $character->corporation->corporation_id
                 : false
             )
@@ -184,7 +178,7 @@ class CheckPermissionAffiliation
 
     private function appendValidatedIds(ParameterBag $bag, Collection $validated_ids)
     {
-        $bag->add(['validated_ids' =>  $validated_ids->all()]);
+        $bag->add(['validated_ids' => $validated_ids->all()]);
     }
 
     public function getUser(): User

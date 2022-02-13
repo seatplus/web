@@ -2,8 +2,8 @@
 
 
 use Illuminate\Support\Facades\Bus;
-use Inertia\Testing\Assert;
 use Illuminate\Support\Facades\Queue;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -22,11 +22,9 @@ it('resolves unknown location', function () {
         ->get(route('get.manual_location', $manual_loaction->location_id))
         ->assertOk()
         ->assertJson(['name' => $expected_name]);
-
 });
 
 test('one can submit suggestion', function () {
-
     Bus::fake();
 
     $manual_loaction = ManualLocation::factory()->make();
@@ -35,7 +33,7 @@ test('one can submit suggestion', function () {
         ->post(route('post.manual_location'), [
             'name' => $manual_loaction->name,
             'location_id' => $manual_loaction->location_id,
-            'solar_system_id' => $manual_loaction->solar_system_id
+            'solar_system_id' => $manual_loaction->solar_system_id,
         ])->assertRedirect();
 
     Bus::dispatchedAfterResponse(ResolveUniverseSystemBySystemIdJob::class);
@@ -43,7 +41,7 @@ test('one can submit suggestion', function () {
 
 test('one get own suggestion', function () {
     $manual_loaction = ManualLocation::factory()->create([
-        'user_id' => test()->test_user->id
+        'user_id' => test()->test_user->id,
     ]);
 
     $response = test()->actingAs(test()->test_user)
@@ -56,7 +54,7 @@ test('one get suggestion of other user', function () {
     ManualLocation::factory()->count(5)->create([
         'location_id' => 12345,
         'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay()
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_loaction = ManualLocation::factory()->create([
@@ -74,7 +72,7 @@ test('admin can accept suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
         'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay()
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
@@ -89,7 +87,7 @@ test('admin can accept suggestion', function () {
         ->get(route('manage.manual_locations'))
         ->assertOk();
 
-    $response->assertInertia(fn(Assert $page) => $page->component('Configuration/ManualLocations/ManualLocation'));
+    $response->assertInertia(fn (Assert $page) => $page->component('Configuration/ManualLocations/ManualLocation'));
 
     // load suggestions
     $response = test()->actingAs(test()->test_user)
@@ -97,35 +95,34 @@ test('admin can accept suggestion', function () {
         ->assertOk();
 
     // check that there are 5 suggestions
-    expect(json_decode($response->content())->data)->toHaveCount(5);
+    expect(json_decode($response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(5);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' =>12345]));
+    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
             'id' => $manual_location->id,
-            'location_id' => $manual_location->location_id
+            'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
 
     // Make sure there is one suggestion in universe_locations
-    test()->assertCount(1, Location::where('location_id',12345)->get());
+    test()->assertCount(1, Location::where('location_id', 12345)->get());
 
     // check that there there is only one left after accepting
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.manuel_locations.suggestions'))
         ->assertOk();
-    expect(json_decode($response->content())->data)->toHaveCount(1);
-
+    expect(json_decode($response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(1);
 });
 
 test('one get accepted suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
         'user_id' => \Seatplus\Auth\Models\User::factory(),
-        'created_at' => carbon()->subDay()
+        'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
@@ -136,41 +133,39 @@ test('one get accepted suggestion', function () {
     test()->assignPermissionToTestUser(['manage manual locations']);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' =>12345]));
+    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
     $response = test()->actingAs(test()->test_user)
         ->post(route('get.manuel_locations.suggestions'), [
             'id' => $manual_location->id,
-            'location_id' => $manual_location->location_id
+            'location_id' => $manual_location->location_id,
         ])
         ->assertRedirect(route('manage.manual_locations'));
 
     // Make sure there is one suggestion in universe_locations
-    test()->assertCount(1, Location::where('location_id',12345)->get());
+    test()->assertCount(1, Location::where('location_id', 12345)->get());
 
     // Lookup name
     test()->actingAs(test()->test_user)
         ->get(route('get.manual_location', $manual_location->location_id))
         ->assertOk()
         ->assertJson(['name' => $manual_location->name]);
-
 });
 
 test('if location is resolved via jobs delete manual suggestions', function () {
-
     $manual_location = ManualLocation::factory()->create([
         'user_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     $station = Station::factory()->create([
-        'station_id' => $manual_location->location_id
+        'station_id' => $manual_location->location_id,
     ]);
 
     $location = Location::factory()->create([
         'location_id' => $manual_location->location_id,
         'locatable_id' => $manual_location->location_id,
-        'locatable_type' => Station::class
+        'locatable_type' => Station::class,
     ]);
 
     test()->assignPermissionToTestUser(['manage manual locations']);
@@ -181,9 +176,8 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         ->assertOk();
 
     // check that there are no suggestions
-    expect(json_decode($response->content())->data)->toHaveCount(0);
+    expect(json_decode($response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0);
     expect(ManualLocation::all())->toBeEmpty();
-
 });
 
 test('if location does not have system dispatch job', function () {
