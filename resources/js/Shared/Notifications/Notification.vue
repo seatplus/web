@@ -1,44 +1,81 @@
 <template>
-    <div :class="['shadow-lg rounded-lg pointer-events-auto border', {'bg-gray-50' : isDefault, 'bg-blue-50': isType('info'), 'bg-yellow-50': isType('warning'), 'bg-red-50': isType('error'), 'bg-green-50': isType('success')}]">
-        <div class="rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-            <div class="p-4">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <svg v-if="isDefault === 'outline'" :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]" stroke="currentColor" fill="none" viewBox="0 0 24 24" v-html="this.icon"></svg>
-                        <svg v-else :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]" fill="currentColor" viewBox="0 0 20 20" v-html="this.icon"></svg>
-                    </div>
-                    <div class="ml-3 w-0 flex-1 pt-0.5">
-                        <p :class="['text-sm leading-5 font-medium', {'text-gray-800' : isDefault, 'text-blue-800': isType('info'), 'text-yellow-800': isType('warning'), 'text-red-800': isType('error'), 'text-green-800': isType('success')}]">
-                            {{ this.title }}
-                        </p>
-                        <p :class="['mt-1 text-sm leading-5', {'text-gray-700' : isDefault, 'text-blue-700': isType('info'), 'text-yellow-700': isType('warning'), 'text-red-700': isType('error'), 'text-green-700': isType('success')}]">
-                            {{ this.text }}
-                        </p>
-                        <div class="mt-2" v-if="this.link1 || this.link2">
-                            <inertia-link v-if="this.link1" :href="this.route(this.payload.link1.route)" class="text-sm leading-5 font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                                {{ this.payload.link1.text }}
-                            </inertia-link>
-                            <inertia-link v-if="this.link2" :href="this.route(this.payload.link2.route)" class="ml-6 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                                {{ this.payload.link2.text }}
-                            </inertia-link>
-                        </div>
-                    </div>
-                    <div class="ml-4 flex-shrink-0 flex">
-                        <button @click="$emit('remove', id)" :class="['inline-flex focus:outline-none transition ease-in-out duration-150', {'text-gray-400 focus:text-gray-700' : isDefault, 'text-blue-400 focus:text-blue-700': isType('info'), 'text-yellow-400 focus:text-yellow-700': isType('warning'), 'text-red-400 focus:text-red-700': isType('error'), 'text-green-400 focus:text-green-700': isType('success')}]">
-                            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+  <div :class="['shadow-lg rounded-lg pointer-events-auto border', {'bg-gray-50' : isDefault, 'bg-blue-50': isType('info'), 'bg-yellow-50': isType('warning'), 'bg-red-50': isType('error'), 'bg-green-50': isType('success')}]">
+    <div class="rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
+      <div class="p-4">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <svg
+              v-if="isDefault === 'outline'"
+              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]"
+              stroke="currentColor"
+              fill="none"
+              viewBox="0 0 24 24"
+              v-html="icon"
+            />
+            <svg
+              v-else
+              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              v-html="icon"
+            />
+          </div>
+          <div class="ml-3 w-0 flex-1 pt-0.5">
+            <p :class="['text-sm leading-5 font-medium', {'text-gray-800' : isDefault, 'text-blue-800': isType('info'), 'text-yellow-800': isType('warning'), 'text-red-800': isType('error'), 'text-green-800': isType('success')}]">
+              {{ title }}
+            </p>
+            <p :class="['mt-1 text-sm leading-5', {'text-gray-700' : isDefault, 'text-blue-700': isType('info'), 'text-yellow-700': isType('warning'), 'text-red-700': isType('error'), 'text-green-700': isType('success')}]">
+              {{ text }}
+            </p>
+            <div
+              v-if="link1 || link2"
+              class="mt-2"
+            >
+              <Link
+                v-if="link1"
+                :href="route(payload.link1.route)"
+                class="text-sm leading-5 font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150"
+              >
+                {{ payload.link1.text }}
+              </Link>
+              <Link
+                v-if="link2"
+                :href="route(payload.link2.route)"
+                class="ml-6 text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:underline transition ease-in-out duration-150"
+              >
+                {{ payload.link2.text }}
+              </Link>
             </div>
+          </div>
+          <div class="ml-4 flex-shrink-0 flex">
+            <button
+              :class="['inline-flex focus:outline-none transition ease-in-out duration-150', {'text-gray-400 focus:text-gray-700' : isDefault, 'text-blue-400 focus:text-blue-700': isType('info'), 'text-yellow-400 focus:text-yellow-700': isType('warning'), 'text-red-400 focus:text-red-700': isType('error'), 'text-green-400 focus:text-green-700': isType('success')}]"
+              @click="$emit('remove', id)"
+            >
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
+import { Link } from '@inertiajs/inertia-vue3'
     export default {
         name: "Notification",
+        components: {Link},
         props: ['id', 'payload'],
         data() {
             return {
@@ -52,11 +89,6 @@
                     default: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
                 },
             }
-        },
-        methods: {
-            isType(type) {
-                return _.isEqual(type, this.type)
-            },
         },
         computed: {
             type() {
@@ -103,6 +135,11 @@
                 }
                 return false
             }
+        },
+        methods: {
+            isType(type) {
+                return _.isEqual(type, this.type)
+            },
         }
     }
 </script>

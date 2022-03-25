@@ -8,7 +8,7 @@
     <PageHeader>
       {{ creationMode ? 'Create ': 'Edit ' }} Scope Setting
       <template #primary>
-        <inertia-link
+        <Link
           :href="$route('create.scopes')"
           method="post"
           as="button"
@@ -16,21 +16,21 @@
           class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           Save
-        </inertia-link>
+        </Link>
       </template>
       <template
         v-if="!creationMode"
         #secondary
       >
         <span class="shadow-sm rounded-md">
-          <inertia-link
+          <Link
             :href="$route('delete.scopes', object.id)"
             method="delete"
             as="button"
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out"
           >
             Deletes
-          </inertia-link>
+          </Link>
         </span>
       </template>
     </PageHeader>
@@ -125,7 +125,6 @@
 
 <script>
 
-import Layout from "@/Shared/SidebarLayout/Layout"
 import CharacterScopes from "./CharacterScopes"
 import CorporationScopes from "./CorporationScopes"
 import EveImage from "@/Shared/EveImage"
@@ -133,12 +132,13 @@ import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
 import PageHeader from "@/Shared/Layout/PageHeader"
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
 import route from 'ziggy';
+import { Link } from '@inertiajs/inertia-vue3'
 
 export default {
     name: "ScopeSettings",
     components: {
         RadioListWithDescription,
-        PageHeader, SearchCorpOrAlliance, EveImage, CorporationScopes, CharacterScopes, Layout},
+        PageHeader, SearchCorpOrAlliance, EveImage, CorporationScopes, CharacterScopes, Link},
     props: {
         available_scopes: {
             type: Object,

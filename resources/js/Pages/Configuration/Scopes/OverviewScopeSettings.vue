@@ -42,7 +42,7 @@
         </template>
       </WideListElement>
       <WideListElement
-        v-for="(entry, index) in entities"
+        v-for="(entry) in entities"
         :key="entry.selectedEntity.id"
         :url="$route('view.scopes.settings', entry.selectedEntity.id)"
       >
@@ -72,7 +72,7 @@
         </template>
       </WideListElement>
       <li>
-        <inertia-link
+        <Link
           :href="$route('view.create.scopes')"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
@@ -107,7 +107,7 @@
               </svg>
             </div>
           </div>
-        </inertia-link>
+        </Link>
       </li>
     </ul>
   </Settings>
@@ -117,10 +117,11 @@
     import Settings from "@/Pages/Configuration/Settings"
     import WideListElement from "@/Shared/WideListElement"
     import EveImage from "@/Shared/EveImage"
+    import { Link } from '@inertiajs/inertia-vue3'
 
     export default {
         name: "OverviewScopeSettings",
-        components: {WideListElement, EveImage, Settings},
+        components: {WideListElement, EveImage, Settings, Link},
         props: {
             available_scopes: {
                 type: Object,

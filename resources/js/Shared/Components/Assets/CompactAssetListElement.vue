@@ -1,5 +1,5 @@
 <template>
-  <inertia-link
+  <Link
     v-if="hasContent"
     class="justify-self-end"
     :href="$route('character.item', entry.item_id)"
@@ -10,7 +10,7 @@
       :entry="entry"
       :even="even"
     />
-  </inertia-link>
+  </Link>
   <CompactAssetListTemplate
     v-else
     :entry="entry"
@@ -20,9 +20,10 @@
 
 <script>
 import CompactAssetListTemplate from "./CompactAssetListTemplate";
+import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "CompactAssetListElement",
-    components: {CompactAssetListTemplate},
+    components: {CompactAssetListTemplate, Link},
     props: {
         entry: {
             required: true,

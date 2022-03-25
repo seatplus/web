@@ -2,7 +2,7 @@
   <div>
     <div v-if="breadcrumbs">
       <nav class="sm:hidden">
-        <inertia-link
+        <Link
           :href="getBack.route"
           class="flex items-center text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out"
         >
@@ -18,16 +18,16 @@
             />
           </svg>
           {{ getBack.name }}
-        </inertia-link>
+        </Link>
       </nav>
       <nav class="hidden sm:flex items-center text-sm leading-5 font-medium">
         <template v-for="breadcrumb of breadcrumbs">
-          <inertia-link
+          <Link
             :href="breadcrumb.route"
             class="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out"
           >
             {{ breadcrumb.name }}
-          </inertia-link>
+          </Link>
           <svg
             v-if="breadcrumb !== getBack"
             class="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
@@ -61,8 +61,10 @@
 </template>
 
 <script>
+import { Link } from '@inertiajs/inertia-vue3'
   export default {
       name: "PageHeader",
+      components: {Link},
       props: ['breadcrumbs'],
       computed: {
           getBack() {

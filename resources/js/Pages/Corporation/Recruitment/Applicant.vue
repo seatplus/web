@@ -1,6 +1,6 @@
 <template>
   <li>
-    <inertia-link
+    <Link
       :href="href"
       class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
     >
@@ -89,17 +89,17 @@
           </svg>
         </div>
       </div>
-    </inertia-link>
+    </Link>
   </li>
 </template>
 
 <script>
 
 import EveImage from "@/Shared/EveImage";
-
+import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "Applicant",
-    components: {EveImage},
+    components: {EveImage, Link},
     props: {
         character: {
             required: true,

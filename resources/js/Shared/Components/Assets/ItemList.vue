@@ -75,7 +75,7 @@
       </template>
 
       <template #navigation>
-        <inertia-link
+        <Link
           v-if="asset.content[0]"
           :href="$route('character.item', asset.item_id)"
           preserve-state
@@ -92,7 +92,7 @@
               clip-rule="evenodd"
             />
           </svg>
-        </inertia-link>
+        </Link>
       </template>
     </WideListElement>
   </div>
@@ -104,10 +104,11 @@
   import { prefix } from 'metric-prefix'
   import WideListElement from "@/Shared//WideListElement";
   import CompactAssetListComponent from "./CompactAssetListComponent";
+  import { Link } from '@inertiajs/inertia-vue3'
 
   export default {
     name: "ItemList",
-        components: {CompactAssetListComponent, WideListElement, EveImage},
+        components: {CompactAssetListComponent, WideListElement, EveImage, Link},
         props: {
             compact: {
                 required: true,
