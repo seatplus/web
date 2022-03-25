@@ -95,6 +95,8 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/css' => resource_path('css'),
             $this->getPackageJsonFile() => base_path('package.json'),
             $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
+            // publish teh I18n vendor file too
+            __DIR__ . '/../vendor/conedevelopment/i18n/resources/js' => resource_path('js/vendor')
         ], 'web');
     }
 
