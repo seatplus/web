@@ -16,6 +16,7 @@
       </template>
     </PageHeader>
 
+    <p>Test for something new</p>
     <CorporationRecruitment
       v-for="enlistment in enlistments"
       :key="enlistment"
@@ -31,12 +32,12 @@
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader"
 import HeaderButton from "@/Shared/Layout/HeaderButton"
-import CorporationRecruitment from "./CorporationRecruitment"
 import CreateEnlistmentModal from "./CreateEnlistmentModal";
+import CorporationRecruitment from "@/Pages/Corporation/Recruitment/CorporationRecruitment";
 
 export default {
     name: "RecruitmentIndex",
-    components: {CreateEnlistmentModal, CorporationRecruitment, HeaderButton, PageHeader},
+    components: {CorporationRecruitment, CreateEnlistmentModal, HeaderButton, PageHeader},
     props: {
         canManageRecruitment: {
             required: true,

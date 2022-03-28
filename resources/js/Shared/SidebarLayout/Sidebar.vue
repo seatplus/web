@@ -4,7 +4,7 @@
       <h3 :class="['text-xs leading-4 font-semibold text-white uppercase tracking-wider',{'mt-3' : index > 0}]">
         {{ category.name }}
       </h3>
-      <inertia-link
+      <Link
         v-for="(entry, index) in category.entries"
         :key="entry.name"
         :href="$route(entry.route)"
@@ -25,16 +25,17 @@
         />
 
         {{ entry.name }}
-      </inertia-link>
+      </Link>
     </div>
   </nav>
 </template>
 
 <script>
   import * as SolidHeroicons from '@heroicons/vue/outline'
+  import { Link } from '@inertiajs/inertia-vue3'
     export default {
         name: "Sidebar",
-        components: {...SolidHeroicons},
+        components: {...SolidHeroicons, Link},
         props: {
             main_character: Object,
             activeEntryUrl: {

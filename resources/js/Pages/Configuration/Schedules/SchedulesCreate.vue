@@ -16,7 +16,8 @@
               v-model="expression"
             >
               <option
-                v-for="(expression,description) in cron"
+                v-for="(expression,description, index) in cron"
+                :key="index"
                 :value="expression"
               >
                 {{ description }}
@@ -32,7 +33,8 @@
               v-model="job"
             >
               <option
-                v-for="(job) in jobs"
+                v-for="(job, index) in jobs"
+                :key="index"
                 :value="job"
               >
                 {{ job }}
@@ -43,7 +45,7 @@
       </div>
       <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
         <span class="inline-flex rounded-md shadow-sm">
-          <inertia-link
+          <Link
             method="post"
             :data="$data"
             preserve-state
@@ -51,7 +53,7 @@
             class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
           >
             Save
-          </inertia-link>
+          </Link>
         </span>
       </div>
     </div>
@@ -59,12 +61,12 @@
 </template>
 
 <script>
-    import Layout from "@/Shared/SidebarLayout/Layout"
     import InputGroup from "@/Shared/InputGroup"
     import SeatPlusSelect from "@/Shared/SeatPlusSelect"
+    import { Link } from '@inertiajs/inertia-vue3'
     export default {
         name: "SchedulesCreate",
-        components: {SeatPlusSelect, InputGroup},
+        components: {SeatPlusSelect, InputGroup, Link},
         props: {
             cron: {
                 type: Object,

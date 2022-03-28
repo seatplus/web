@@ -73,7 +73,7 @@
                     {{ category.name }}
                   </h3>
                   <div class="space-y-1">
-                    <inertia-link
+                    <Link
                       v-for="item in category.entries"
                       :key="item.name"
                       :href="$route(item.route)"
@@ -85,13 +85,13 @@
                         aria-hidden="true"
                       />
                       {{ item.name }}
-                    </inertia-link>
+                    </Link>
                   </div>
                 </div>
               </nav>
             </div>
             <div class="flex-shrink-0 flex bg-gray-700 p-4">
-              <inertia-link
+              <Link
                 :href="$route('user.settings')"
                 class="flex-shrink-0 group block"
               >
@@ -111,7 +111,7 @@
                     </p>
                   </div>
                 </div>
-              </inertia-link>
+              </Link>
             </div>
           </div>
         </TransitionChild>
@@ -139,7 +139,7 @@
                 v-for="(category, name) in navigation"
                 :key="`${name}.${component}`"
               >
-                <inertia-link
+                <Link
                   v-if="category.entries.length === 1"
                   :href="$route(category.entries[0].route)"
                   :class="[category.entries[0].current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group w-full flex items-center px-2 pr-2 py-2 text-sm font-medium rounded-md']"
@@ -150,7 +150,7 @@
                     aria-hidden="true"
                   />
                   {{ category.entries[0].name }}
-                </inertia-link>
+                </Link>
                 <Disclosure
                   v-else
                   v-slot="{ open }"
@@ -174,7 +174,7 @@
                   </DisclosureButton>
                   <DisclosurePanel class="space-y-1">
                     <!--                    class="group w-full flex items-center pl-10 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50"-->
-                    <inertia-link
+                    <Link
                       v-for="subItem in category.entries"
                       :key="subItem.name"
                       :href="$route(subItem.route)"
@@ -186,33 +186,15 @@
                         aria-hidden="true"
                       />
                       {{ subItem.name }}
-                    </inertia-link>
+                    </Link>
                   </DisclosurePanel>
                 </disclosure>
-                <!--                <h3 class="text-xs leading-4 font-semibold text-white uppercase tracking-wider">
-                  {{ category.name }}
-                </h3>
-                <div class="space-y-1">
-                  <inertia-link
-                    v-for="item in category.entries"
-                    :key="item.name"
-                    :href="$route(item.route)"
-                    :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-sm font-medium rounded-md']"
-                  >
-                    <component
-                      :is="item.icon"
-                      :class="[item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 flex-shrink-0 h-6 w-6']"
-                      aria-hidden="true"
-                    />
-                    {{ item.name }}
-                  </inertia-link>
-                </div>-->
               </template>
             </nav>
           </div>
           <!-- User Menu          -->
           <div class="flex-shrink-0 flex bg-gray-700 p-4">
-            <inertia-link
+            <Link
               :href="$route('user.settings')"
               class="flex-shrink-0 w-full group block"
             >
@@ -232,7 +214,7 @@
                   </p>
                 </div>
               </div>
-            </inertia-link>
+            </Link>
           </div>
         </div>
       </div>
@@ -299,16 +281,7 @@ import route from 'ziggy'
 import ImpersonatingBanner from "./ImpersonatingBanner";
 import Notifications from "../Notifications/Notifications";
 import EveImage from "@/Shared/EveImage"
-
-/*const navigation2 = [
-    { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
-    { name: 'Team', href: '#', icon: UsersIcon, current: false },
-    { name: 'Projects', href: '#', icon: FolderIcon, current: false },
-    { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-    { name: 'Documents', href: '#', icon: InboxIcon, current: false },
-    { name: 'Reports', href: '#', icon: ChartBarIcon, current: false },
-]*/
-
+import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "DarkSidebar",
     components: {
@@ -323,6 +296,7 @@ export default {
         DisclosureButton,
         DisclosurePanel,
         ...OutlineHeroicons,
+        Link
     },
     setup() {
         const sidebarOpen = ref(false)

@@ -43,7 +43,7 @@
         </template>
       </WideListElement>
       <li>
-        <inertia-link
+        <Link
           :href="$route('schedules.create')"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
@@ -80,7 +80,7 @@
               </svg>
             </div>
           </div>
-        </inertia-link>
+        </Link>
       </li>
     </ul>
   </Settings>
@@ -89,9 +89,10 @@
 <script>
 import Settings from "@/Pages/Configuration/Settings"
 import WideListElement from "@/Shared/WideListElement"
+import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "SchedulesIndex",
-    components: {Settings, WideListElement},
+    components: {Settings, WideListElement, Link},
     props: {
         schedules: {
             type: Array,

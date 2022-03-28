@@ -15,12 +15,12 @@
           </div>
         </div>
         <div>
-          <inertia-link
+          <Link
             :href="$route('impersonate.start', user.id)"
             class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
           >
             Impersonate
-          </inertia-link>
+          </Link>
         </div>
       </div>
       <div
@@ -35,9 +35,10 @@
 
 <script>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "UserListElement",
-    components: {EntityBlock},
+    components: {EntityBlock, Link},
     props: {
         user: {
             type: Object,

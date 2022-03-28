@@ -43,7 +43,7 @@
           v-else
           class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto"
         >
-          <inertia-link
+          <Link
             v-if="hasApplications"
             :href="$route('delete.user.application')"
             method="delete"
@@ -56,8 +56,8 @@
               aria-hidden="true"
             />
             Remove Application
-          </inertia-link>
-          <inertia-link
+          </Link>
+          <Link
             v-else
             :href="$route('post.application')"
             method="post"
@@ -71,7 +71,7 @@
               aria-hidden="true"
             />
             Apply
-          </inertia-link>
+          </Link>
         </span>
       </template>
     </ModalWithFooter>
@@ -86,10 +86,11 @@ import EveImage from "@/Shared/EveImage";
 import CharacterApplication from "./CharacterApplication";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
+import { Link } from '@inertiajs/inertia-vue3'
 
 export default {
     name: "Enlistment",
-    components: {CharacterApplication, EveImage, ModalWithFooter, EntityBlock, UserAddIcon, UserRemoveIcon},
+    components: {CharacterApplication, EveImage, ModalWithFooter, EntityBlock, UserAddIcon, UserRemoveIcon, Link},
     props: {
         enlistment: {
             type: Object,
