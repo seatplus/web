@@ -40,7 +40,6 @@ class GetAffiliatedCharactersController extends Controller
 
     public function __invoke(string $permission)
     {
-
         $search_param = request()->get('search');
 
         $owned_characters = CharacterInfo::query()
@@ -51,17 +50,19 @@ class GetAffiliatedCharactersController extends Controller
                     ->where('character_users.user_id', auth()->user()->getAuthIdentifier())
             )
             ->whereNotNull('character_users.character_id')
-            ->when($search_param, fn($query) => $query
+            ->when(
+                $search_param,
+                fn ($query) => $query
                 ->where('name', 'like', "%${search_param}%")
             )
             ->select('character_infos.*');
 
         $recruits = CharacterInfo::query()
             ->whereIn('character_id', GetRecruitIdsService::get())
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $affiliatables = $this->scopeAffiliatedCharacters(CharacterInfo::query(), 'character_id', $permission)
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $query = $owned_characters
             ->union($recruits)

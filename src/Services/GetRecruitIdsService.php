@@ -61,7 +61,7 @@ class GetRecruitIdsService
                 )
                 ->flatten()
                 ->unique()
-                ->map(fn($recruit_id) => intval($recruit_id))
+                ->map(fn ($recruit_id) => intval($recruit_id))
                 ->filter()
                 ->toArray();
 

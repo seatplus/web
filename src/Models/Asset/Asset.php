@@ -35,7 +35,6 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class Asset extends EveApiAsset
 {
-
     use HasAffiliated;
 
     protected $table = 'assets';
@@ -53,8 +52,7 @@ class Asset extends EveApiAsset
 
     public function scopeValidateSelectedCharacters(Builder $query, ?array $character_ids = null): Builder
     {
-
-        if(is_null($character_ids)) {
+        if (is_null($character_ids)) {
 
             // if no character_ids are submitted return user owned characters
             return $query->join(
@@ -66,11 +64,12 @@ class Asset extends EveApiAsset
         }
 
         return $query
-            ->where(fn ($query) => $query
+            ->where(
+                fn ($query) => $query
                 ->affiliatedCharacters('assetable_id')
                 ->orWhereIn('assetable_id', GetRecruitIdsService::get())
             )
-            ->whereIn('assetable_id',$character_ids);
+            ->whereIn('assetable_id', $character_ids);
 
 
 
