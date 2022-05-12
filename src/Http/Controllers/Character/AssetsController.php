@@ -51,7 +51,8 @@ class AssetsController extends Controller
     {
         $query = WebAssetAlias::query()
             ->with('location')
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->validateSelectedCharacters($request->query('character_ids'))
+            //->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->select('location_id')
             ->groupBy('location_id')

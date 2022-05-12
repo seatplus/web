@@ -61,6 +61,8 @@ class GetRecruitIdsService
                 )
                 ->flatten()
                 ->unique()
+                ->map(fn($recruit_id) => intval($recruit_id))
+                ->filter()
                 ->toArray();
 
             cache([$cache_key => $recruit_ids], now()->addMinutes(15));

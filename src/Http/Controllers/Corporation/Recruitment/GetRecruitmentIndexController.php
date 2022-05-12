@@ -51,12 +51,13 @@ class GetRecruitmentIndexController extends Controller
         $manageable_ids = getAffiliatedIdsByPermission(self::MANAGEPERMISSION);
         $recruitable_ids = getAffiliatedIdsByPermission(self::RECRUITERPERMISSION);
 
-        return Enlistments::whereIn('corporation_id', [...$manageable_ids, ...$recruitable_ids])
+        return Enlistments::query()
+            //->whereIn('corporation_id', [...$manageable_ids, ...$recruitable_ids])
             ->with('corporation.alliance')
             ->get()
             ->map(function ($enlistment) use ($manageable_ids, $recruitable_ids) {
                 $enlistment->can_manage = in_array($enlistment->corporation_id, $manageable_ids);
-                $enlistment->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
+                //$enlistment->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
 
                 return $enlistment;
             });

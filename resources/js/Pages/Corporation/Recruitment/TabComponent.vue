@@ -37,7 +37,7 @@
       </div>
     </div>
     <LogTab
-      v-if="isActive('Log')"
+      v-if="isActive('Log') && application"
       :application="application"
     />
     <div
@@ -153,9 +153,13 @@ export default {
             type: Object,
             required: true
         },
+        targetCorporation: {
+            type: Object,
+            required: false
+        },
         application: {
             type: Object,
-            required: true
+            required: false
         }
     },
     setup() {
@@ -172,9 +176,9 @@ export default {
         characterIds() {
             return _.map(this.recruit.characters, character => character.character_id)
         },
-        targetCorporation() {
+        /*targetCorporation() {
             return this.application.corporation
-        }
+        }*/
     },
     methods: {
         isActive(entry) {

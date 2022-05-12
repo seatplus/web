@@ -15,7 +15,7 @@
       :recruit="member"
       :watchlist="watchlist"
       :target-corporation="targetCorporation"
-    />
+     />
   </div>
 </template>
 
