@@ -67,31 +67,11 @@ class GetAffiliatedCharactersController extends Controller
             ->union($recruits)
             ->union($affiliatables);
 
-        /*request()->whenHas('search', fn(string $search_query) => $query
-            ->where('name', 'like', "%${search_query}%")
-        );*/
-
-        $query->dump();
-
         $query = $query
             ->with('corporation', 'alliance')
             ->has($permission)
             ->paginate();
 
         return CharacterInfoRessource::collection($query);
-
-
-
-        $ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])
-            ->unique();
-
-        $search_query = request()->get('search');
-
-        $query = CharacterInfo::whereIn('character_id', $ids)
-            ->with('corporation', 'alliance')
-            ->when($search_query, fn (Builder $query) => $query->where('name', 'like', "%${search_query}%"))
-            ->has($permission);
-
-        return CharacterInfoRessource::collection($query->paginate());
     }
 }

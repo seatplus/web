@@ -27,27 +27,65 @@
 namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Database\Eloquent\Builder;
+use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Traits\HasAffiliated;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-    public function __invoke(string $permission, string $corporation_role = '')
+
+    use HasAffiliated;
+
+    public function __invoke(string $permission, string $corporation_roles = '')
     {
-        $ids = collect([...getAffiliatedIdsByPermission($permission, $corporation_role), ...GetRecruitIdsService::get()])
-            ->unique();
 
-        $search_query = request()->get('search');
+        $corporation_roles = explode('|', $corporation_roles);
 
-        $query = CorporationInfo::with('alliance')
-            ->whereIn('corporation_id', $ids)
-            ->when($search_query, fn (Builder $query) => $query->where('name', 'like', "%${search_query}%"))
-            ->when(method_exists(CorporationInfo::class, $permission), fn ($query) => $query->has($permission));
+        $search_param = request()->get('search');
+
+        $owned_corporations = CorporationInfo::query()
+            ->joinSub(CharacterUser::query()
+                ->whereHas(
+                    'character.roles',
+                    function (Builder $query) use ($corporation_roles) {
+                        $query->whereJsonContains('roles', 'Director');
+
+
+                        foreach ($corporation_roles as $role) {
+                            $query->orWhereJsonContains('roles', $role);
+                        }
+                    }
+                )
+                ->addSelect([
+                        'corporation_id' => CharacterAffiliation::query()
+                            ->select('corporation_id')
+                            ->whereColumn('character_users.character_id', 'character_id')
+                    ]
+                )
+                ->where('user_id', auth()->user()->getAuthIdentifier()),
+                'owned',
+                'owned.corporation_id',
+                'corporation_infos.corporation_id'
+            )
+            ->select('corporation_infos.*')
+            ->when($search_param, fn($query) => $query
+                ->where('name', 'like', "%${search_param}%")
+            );
+
+        $affiliatables = $this->scopeAffiliatedCorporations(CorporationInfo::query(), 'corporation_id', $permission, $corporation_roles)
+            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+
+        $query = $owned_corporations
+            ->union($affiliatables);
 
         return CorporationInfoRessource::collection(
-            $query->paginate()
+            $query
+                ->with('alliance')
+                ->has($permission)
+                ->paginate()
         );
     }
 }
