@@ -85,7 +85,6 @@ class CorporationWalletController extends Controller
 
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject)
     {
-
         $affiliations_dto = new AffiliationsDto(
             permission: data_get($dispatchTransferObject, 'permission'),
             user: auth()->user(),

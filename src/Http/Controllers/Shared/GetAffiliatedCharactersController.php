@@ -41,7 +41,6 @@ class GetAffiliatedCharactersController extends Controller
 
     public function __invoke(string $permission)
     {
-
         $search_param = request()->get('search');
 
         $affiliationsDto = new AffiliationsDto(
@@ -57,14 +56,16 @@ class GetAffiliatedCharactersController extends Controller
                     ->where('character_users.user_id', $affiliationsDto->user->getAuthIdentifier())
             )
             ->whereNotNull('character_users.character_id')
-            ->when($search_param, fn($query) => $query
+            ->when(
+                $search_param,
+                fn ($query) => $query
                 ->where('name', 'like', "%${search_param}%")
             )
             ->select('character_infos.*');
 
         $recruits = CharacterInfo::query()
             ->whereIn('character_id', GetRecruitIdsService::get())
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $affiliatables = LimitAffiliatedService::make(
             affiliationsDto: $affiliationsDto,
@@ -73,7 +74,7 @@ class GetAffiliatedCharactersController extends Controller
             column: 'character_id'
         )
             ->getQuery()
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $query = $owned_characters
             ->union($recruits)

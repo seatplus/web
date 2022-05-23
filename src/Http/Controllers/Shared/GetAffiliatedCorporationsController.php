@@ -36,12 +36,10 @@ use Seatplus\Web\Http\Resources\CorporationInfoRessource;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-
     use HasAffiliated;
 
     public function __invoke(string $permission, string $corporation_roles = '')
     {
-
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
             permission: $permission,
@@ -60,7 +58,7 @@ class GetAffiliatedCorporationsController extends Controller
                 'corporation_infos.corporation_id'
             )
             ->select('corporation_infos.*')
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $affiliatables = LimitAffiliatedService::make(
             affiliationsDto: $affiliationsDto,
@@ -72,7 +70,7 @@ class GetAffiliatedCorporationsController extends Controller
             ->getQuery()
             // Remove Doomheim corporation
             ->where('corporation_infos.corporation_id', '<>', 1_000_001)
-            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+            ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
 
         $query = $owned_corporations
