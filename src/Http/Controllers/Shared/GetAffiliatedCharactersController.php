@@ -26,8 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Auth\Services\LimitAffiliatedService;
 use Seatplus\Auth\Traits\HasAffiliated;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -43,12 +44,17 @@ class GetAffiliatedCharactersController extends Controller
 
         $search_param = request()->get('search');
 
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permission: $permission
+        );
+
         $owned_characters = CharacterInfo::query()
             ->join(
                 'character_users',
                 fn (JoinClause $join) => $join
                     ->on('character_infos.character_id', '=', 'character_users.character_id')
-                    ->where('character_users.user_id', auth()->user()->getAuthIdentifier())
+                    ->where('character_users.user_id', $affiliationsDto->user->getAuthIdentifier())
             )
             ->whereNotNull('character_users.character_id')
             ->when($search_param, fn($query) => $query
@@ -60,12 +66,19 @@ class GetAffiliatedCharactersController extends Controller
             ->whereIn('character_id', GetRecruitIdsService::get())
             ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
 
-        $affiliatables = $this->scopeAffiliatedCharacters(CharacterInfo::query(), 'character_id', $permission)
+        $affiliatables = LimitAffiliatedService::make(
+            affiliationsDto: $affiliationsDto,
+            query: CharacterInfo::query(),
+            table: 'character_infos',
+            column: 'character_id'
+        )
+            ->getQuery()
             ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $query = $owned_characters
             ->union($recruits)
-            ->union($affiliatables);
+            ->union($affiliatables)
+            ->distinct();
 
         $query = $query
             ->with('corporation', 'alliance')

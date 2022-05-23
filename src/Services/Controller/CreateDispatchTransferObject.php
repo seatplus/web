@@ -70,7 +70,7 @@ class CreateDispatchTransferObject
                 'manual_job' => $this->getManualJob(WalletHydrateBatch::class),
                 'permission' => $this->getPermission(WalletJournal::class),
                 'required_scopes' => $this->isCharacter() ? $this->getRequiredScopes('wallet') : [...$this->getRequiredScopes('wallet'), 'esi-characters.read_corporation_roles.v1'],
-                'required_corporation_role' => $this->isCharacter() ? '' : 'Accountant|Junior_Accountant',
+                'required_corporation_role' => $this->isCharacter() ? '' : ['Accountant','Junior_Accountant'],
             ],
             Contact::class => [
                 'manual_job' => $this->getManualJob(ContactHydrateBatch::class),

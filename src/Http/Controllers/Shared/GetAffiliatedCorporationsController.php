@@ -26,10 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Database\Eloquent\Builder;
-use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Auth\Services\LimitAffiliatedService;
 use Seatplus\Auth\Traits\HasAffiliated;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
@@ -42,41 +42,38 @@ class GetAffiliatedCorporationsController extends Controller
     public function __invoke(string $permission, string $corporation_roles = '')
     {
 
-        $corporation_roles = explode('|', $corporation_roles);
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permission: $permission,
+            corporation_roles: explode('|', $corporation_roles)
+        );
 
         $search_param = request()->get('search');
 
+        $owned_affiliations = GetOwnedCharacterAffiliationsService::make($affiliationsDto)->getQuery();
+
         $owned_corporations = CorporationInfo::query()
-            ->joinSub(CharacterUser::query()
-                ->whereHas(
-                    'character.roles',
-                    function (Builder $query) use ($corporation_roles) {
-                        $query->whereJsonContains('roles', 'Director');
-
-
-                        foreach ($corporation_roles as $role) {
-                            $query->orWhereJsonContains('roles', $role);
-                        }
-                    }
-                )
-                ->addSelect([
-                        'corporation_id' => CharacterAffiliation::query()
-                            ->select('corporation_id')
-                            ->whereColumn('character_users.character_id', 'character_id')
-                    ]
-                )
-                ->where('user_id', auth()->user()->getAuthIdentifier()),
+            ->joinSub(
+                $owned_affiliations,
                 'owned',
                 'owned.corporation_id',
                 'corporation_infos.corporation_id'
             )
             ->select('corporation_infos.*')
-            ->when($search_param, fn($query) => $query
-                ->where('name', 'like', "%${search_param}%")
-            );
-
-        $affiliatables = $this->scopeAffiliatedCorporations(CorporationInfo::query(), 'corporation_id', $permission, $corporation_roles)
             ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+
+        $affiliatables = LimitAffiliatedService::make(
+            affiliationsDto: $affiliationsDto,
+            query: CorporationInfo::query(),
+            table: 'corporation_infos',
+            column: 'corporation_id'
+        )
+            ->setType('corporation')
+            ->getQuery()
+            // Remove Doomheim corporation
+            ->where('corporation_infos.corporation_id', '<>', 1_000_001)
+            ->when($search_param, fn($query) => $query->where('name', 'like', "%${search_param}%"));
+
 
         $query = $owned_corporations
             ->union($affiliatables);
