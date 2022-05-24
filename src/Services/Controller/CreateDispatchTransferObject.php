@@ -58,43 +58,43 @@ class CreateDispatchTransferObject
                 'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
                 'permission' => $this->getPermission(Contract::class),
                 'required_scopes' => $this->getRequiredScopes('contracts'),
-                'required_corporation_role' => $this->isCharacter() ? '' : '',
+                'required_corporation_role' => null,
             ],
             Asset::class => [
                 'manual_job' => $this->getManualJob(CharacterAssetsHydrateBatch::class),
                 'permission' => $this->getPermission(Asset::class),
                 'required_scopes' => $this->getRequiredScopes('assets'),
-                'required_corporation_role' => '',
+                'required_corporation_role' => null,
             ],
             WalletJournal::class => [
                 'manual_job' => $this->getManualJob(WalletHydrateBatch::class),
                 'permission' => $this->getPermission(WalletJournal::class),
                 'required_scopes' => $this->isCharacter() ? $this->getRequiredScopes('wallet') : [...$this->getRequiredScopes('wallet'), 'esi-characters.read_corporation_roles.v1'],
-                'required_corporation_role' => $this->isCharacter() ? '' : ['Accountant','Junior_Accountant'],
+                'required_corporation_role' => $this->isCharacter() ? null : ['Accountant','Junior_Accountant'],
             ],
             Contact::class => [
                 'manual_job' => $this->getManualJob(ContactHydrateBatch::class),
                 'permission' => $this->getPermission(Contact::class),
                 'required_scopes' => $this->getRequiredScopes('contacts'),
-                'required_corporation_role' => '',
+                'required_corporation_role' => null,
             ],
             CorporationMemberTracking::class => [
                 'manual_job' => $this->getManualJob(CorporationMemberTrackingHydrateBatch::class),
                 'permission' => $this->getPermission(CorporationMemberTracking::class),
                 'required_scopes' => $this->getRequiredScopes('membertracking'),
-                'required_corporation_role' => 'Director',
+                'required_corporation_role' => ['Director'],
             ],
             Skill::class => [
                 'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
                 'permission' => $this->getPermission(Skill::class),
                 'required_scopes' => $this->getRequiredScopes('skills'),
-                'required_corporation_role' => '',
+                'required_corporation_role' => null,
             ],
             Mail::class => [
                 'manual_job' => $this->getManualJob(MailsHydrateBatch::class),
                 'permission' => $this->getPermission(Mail::class),
                 'required_scopes' => $this->getRequiredScopes('mails'),
-                'required_corporation_role' => '',
+                'required_corporation_role' => null,
             ]
         };
     }

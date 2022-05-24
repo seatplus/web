@@ -27,8 +27,11 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
+use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\MemberTrackingResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
@@ -64,26 +67,33 @@ class MemberTrackingController extends Controller
 
     private function getAffiliatedCorporations(object $dispatchTransferObject)
     {
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('corporation')
-            ->get();
 
-        return CorporationInfo::whereIn('corporation_id', $ids)
-            ->with('alliance', 'ssoScopes', 'alliance.ssoScopes')
+        $affiliations_dto = new AffiliationsDto(
+            permission: data_get($dispatchTransferObject, 'permission'),
+            user: auth()->user(),
+            corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
+        );
+
+        $owned_corporations = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+            ->getQuery();
+
+        CorporationInfo::query()
+            ->with('alliance')
+            ->where(fn($query) => $query
+                ->has('alliance.ssoScopes')
+                ->orHas('ssoScopes')
+            )
             ->has('members')
+            ->addSelect([
+                'corporation_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.corporation_id')->limit(1),
+                'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1)
+            ])
+            ->when(
+                request()->has('corporation_ids'),
+                fn ($query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
+                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'corporation_infos.corporation_id', '=', 'owned_corporations.corporation_id')
+            )
             ->get()
-            ->map(function ($corporation) {
-                $sso_scopes = collect([
-                    'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
-                    'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
-                ])->flatten(1)->filter();
-
-                return [
-                    'corporation_id' => $corporation->corporation_id,
-                    'name' => $corporation->name,
-                    'required_scopes' => $sso_scopes->unique()->toArray(),
-                ];
-            });
+            ->map(fn($corporation) => $corporation->required_scopes = collect([$corporation->corporation_scopes, $corporation->alliance_scopes])->filter()->unique()->toArray());
     }
 }
