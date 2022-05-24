@@ -27,12 +27,13 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
+use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 use Seatplus\Web\Traits\HasWatchlist;
 
 class ContractsController extends Controller
@@ -44,12 +45,22 @@ class ContractsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contract::class);
 
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $affiliations_dto = new AffiliationsDto(
+            permission: data_get($dispatchTransferObject, 'permission'),
+            user: auth()->user()
+        );
 
-        $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation', 'character.alliance')->get();
+        $owned_characters = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+            ->getQuery();
+
+        $characters = CharacterAffiliation::query()
+            ->when(
+                request()->has('character_ids'),
+                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_affiliations.character_id', '=', 'owned_characters.character_id')
+            )
+            ->has('character.contracts')
+            ->with('character.corporation', 'character.alliance')->get();
 
         return inertia('Character/Contract/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
