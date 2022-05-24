@@ -26,15 +26,17 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ContactsRequest;
 use Seatplus\Web\Http\Resources\ContactResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class ContactsController extends Controller
 {
@@ -43,12 +45,21 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $affiliations_dto = new AffiliationsDto(
+            permission: data_get($dispatchTransferObject, 'permission'),
+            user: auth()->user()
+        );
 
-        $characters = CharacterAffiliation::whereIn('character_id', $ids)->with('character.corporation')->get();
+        $owned_characters = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+            ->getQuery();
+
+        $characters = CharacterInfo::query()
+            ->has('contacts')
+            ->when(
+                request()->has('character_ids'),
+                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_infos.character_id', '=', 'owned_characters.character_id')
+            )->get();
 
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
