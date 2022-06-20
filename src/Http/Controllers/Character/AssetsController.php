@@ -26,9 +26,15 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Models\Asset\Asset as WebAssetAlias;
@@ -51,12 +57,12 @@ class AssetsController extends Controller
     {
         $query = WebAssetAlias::query()
             ->with('location')
-            ->validateSelectedCharacters($request->query('character_ids'))
-            //->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->select('location_id')
             ->groupBy('location_id')
             ->orderBy('location_id', 'asc');
+
+        $query = $this->handleAffiliated($query);
 
         $request->whenHas('search', fn ($term) => $query->search($term));
 
@@ -74,8 +80,9 @@ class AssetsController extends Controller
     public function loadLocation(int $location_id, Request $request)
     {
         $query = EveApiAsset::with(['assetable', 'type', 'type.group', 'content'])
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->where('location_id', $location_id);
+
+        $query = $this->handleAffiliated($query);
 
         $request->whenHas('search', fn ($term) => $query->search($term));
 
@@ -97,5 +104,31 @@ class AssetsController extends Controller
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,
         ]);
+    }
+
+    private function handleAffiliated(Builder $query) : Builder
+    {
+
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permissions: [config('eveapi.permissions.' . Asset::class)]
+        );
+
+        $affiliations = request()->hasAny(['character_ids', 'corporation_ids'])
+            ? GetAffiliatedIdsService::make($affiliationsDto)->getQuery()
+            : GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+        request()->whenHas('character_ids', fn(array $character_ids) => $affiliations->whereIn('affiliated_id', $character_ids));
+        request()->whenHas('corporation_ids', fn(array $corporation_ids) => $affiliations->whereIn('affiliated_id', $corporation_ids));
+
+        $table = (new Asset)->getTable();
+
+        return $query->joinSub(
+            $affiliations,
+            'affiliations',
+            fn ($query) => $query
+                ->on('affiliations.affiliated_id', '=', "$table.assetable_id")
+                ->where("$table.assetable_type", CharacterInfo::class)
+        );
     }
 }
