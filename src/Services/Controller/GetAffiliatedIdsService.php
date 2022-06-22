@@ -26,90 +26,55 @@
 
 namespace Seatplus\Web\Services\Controller;
 
-use Illuminate\Support\Collection;
-use Seatplus\Web\Services\GetRecruitIdsService;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class GetAffiliatedIdsService
 {
-    private string $request_parameter;
 
-    private string $required_corporation_role = '';
+    private AffiliationsDto $affiliations_dto;
 
-    private string $permission;
-
-    private function getPermission(): string
+    public function __construct(object $dispatchTransferObject)
     {
-        return $this->permission;
+        $this->affiliations_dto = new AffiliationsDto(
+            permissions: [data_get($dispatchTransferObject, 'permission')],
+            user: auth()->user(),
+            corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
+        );
     }
 
-    public function setPermission(string $permission): GetAffiliatedIdsService
+    public static function make(object $dispatchTransferObject)
     {
-        $this->permission = $permission;
-
-        return $this;
+        return new static($dispatchTransferObject);
     }
 
-    private function getRequiredCorporationRole(): string
+    private function getOwnedAffiliatedIdsQuery() : Builder
     {
-        return $this->required_corporation_role;
+        return GetOwnedAffiliatedIdsService::make($this->getAffiliationsDto())->getQuery();
     }
 
-    public function setRequiredCorporationRole(string $required_corporation_role): GetAffiliatedIdsService
+    public function getCharacterIds(): array
     {
-        $this->required_corporation_role = $required_corporation_role;
 
-        return $this;
+        return CharacterInfo::query()
+            ->joinSub(
+                $this->getOwnedAffiliatedIdsQuery(),
+                'owned',
+                'owned.affiliated_id', '=', 'character_infos.character_id'
+            )
+            ->pluck('character_id')
+            ->values()
+            ->toArray();
     }
 
-    private function getRequestParameter(): string
+    /**
+     * @return AffiliationsDto
+     */
+    public function getAffiliationsDto(): AffiliationsDto
     {
-        return $this->request_parameter;
+        return $this->affiliations_dto;
     }
 
-    public function setRequestFlavour(string $flavour): GetAffiliatedIdsService
-    {
-        $this->request_parameter = match ($flavour) {
-            'character' => 'character_ids',
-            'corporation' => 'corporation_ids'
-        };
-
-        return $this;
-    }
-
-    public static function make()
-    {
-        return new static();
-    }
-
-    public function get(): Collection
-    {
-        $ids = request()->has($this->getRequestParameter())
-            ? request()->get($this->getRequestParameter())
-            : $this->getOwnedIds();
-
-        return collect($ids)
-            ->intersect([...$this->getAffiliatedIds(), ...GetRecruitIdsService::get()])
-            ->map(fn ($id) => (int) $id);
-    }
-
-    public function viaDispatchTransferObject(object $dispatchTransferObject): GetAffiliatedIdsService
-    {
-        $this->permission = data_get($dispatchTransferObject, 'permission');
-        $this->required_corporation_role = data_get($dispatchTransferObject, 'required_corporation_role');
-
-        return $this;
-    }
-
-    private function getOwnedIds(): array
-    {
-        return match ($this->getRequestParameter()) {
-            'character_ids' => auth()->user()->characters->pluck('character_id')->toArray(),
-            'corporation_ids' => auth()->user()->characters->map(fn ($character) => $character->corporation->corporation_id)->toArray()
-        };
-    }
-
-    private function getAffiliatedIds(): array
-    {
-        return getAffiliatedIdsByPermission($this->getPermission(), $this->getRequiredCorporationRole());
-    }
 }
