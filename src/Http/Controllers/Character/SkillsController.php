@@ -39,10 +39,7 @@ class SkillsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $ids = GetAffiliatedIdsService::make($dispatchTransferObject)->getCharacterIds();
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

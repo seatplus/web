@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
@@ -46,18 +47,18 @@ class ContractsController extends Controller
             ->create(Contract::class);
 
         $affiliations_dto = new AffiliationsDto(
-            permission: data_get($dispatchTransferObject, 'permission'),
+            permissions: [data_get($dispatchTransferObject, 'permission')],
             user: auth()->user()
         );
 
-        $owned_characters = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
             ->getQuery();
 
         $characters = CharacterAffiliation::query()
             ->when(
                 request()->has('character_ids'),
                 fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_affiliations.character_id', '=', 'owned_characters.character_id')
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_affiliations.character_id', '=', 'owned_characters.affiliated_id')
             )
             ->has('character.contracts')
             ->with('character.corporation', 'character.alliance')->get();

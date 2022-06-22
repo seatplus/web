@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -35,7 +36,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\MemberTrackingResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class MemberTrackingController extends Controller
 {
@@ -69,12 +69,12 @@ class MemberTrackingController extends Controller
     {
 
         $affiliations_dto = new AffiliationsDto(
-            permission: data_get($dispatchTransferObject, 'permission'),
+            permissions: [data_get($dispatchTransferObject, 'permission')],
             user: auth()->user(),
             corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
         );
 
-        $owned_corporations = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+        $owned_corporations = GetOwnedAffiliatedIdsService::make($affiliations_dto)
             ->getQuery();
 
         CorporationInfo::query()
@@ -91,7 +91,7 @@ class MemberTrackingController extends Controller
             ->when(
                 request()->has('corporation_ids'),
                 fn ($query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
-                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'corporation_infos.corporation_id', '=', 'owned_corporations.corporation_id')
+                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'owned_corporations.affiliated_id', '=', 'corporation_infos.corporation_id')
             )
             ->get()
             ->map(fn($corporation) => $corporation->required_scopes = collect([$corporation->corporation_scopes, $corporation->alliance_scopes])->filter()->unique()->toArray());

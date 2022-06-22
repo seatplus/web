@@ -26,52 +26,52 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Auth\Services\LimitAffiliatedService;
-use Seatplus\Auth\Traits\HasAffiliated;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-    use HasAffiliated;
 
     public function __invoke(string $permission, string $corporation_roles = '')
     {
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
-            permission: $permission,
+            permissions: explode('|', $permission),
             corporation_roles: explode('|', $corporation_roles)
         );
 
         $search_param = request()->get('search');
 
-        $owned_affiliations = GetOwnedCharacterAffiliationsService::make($affiliationsDto)->getQuery();
+        $owned_affiliations = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
 
         $owned_corporations = CorporationInfo::query()
             ->joinSub(
                 $owned_affiliations,
                 'owned',
-                'owned.corporation_id',
+                'owned.affiliated_id',
+                '=',
                 'corporation_infos.corporation_id'
             )
             ->select('corporation_infos.*')
             ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
-        $affiliatables = LimitAffiliatedService::make(
-            affiliationsDto: $affiliationsDto,
-            query: CorporationInfo::query(),
-            table: 'corporation_infos',
-            column: 'corporation_id'
-        )
-            ->setType('corporation')
-            ->getQuery()
+        $affiliatables = CorporationInfo::query()
+            ->joinSub(
+                GetAffiliatedIdsService::make($affiliationsDto)->getQuery(),
+                'affiliated',
+                'affiliated.affiliated_id',
+                '=',
+                'corporation_infos.corporation_id'
+            )
             // Remove Doomheim corporation
             ->where('corporation_infos.corporation_id', '<>', 1_000_001)
+            ->select('corporation_infos.*')
             ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
-
 
         $query = $owned_corporations
             ->union($affiliatables);

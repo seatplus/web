@@ -7,7 +7,7 @@ use Spatie\Permission\PermissionRegistrar;
 it('protects configurations routes', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('server.settings'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 it('protects access control routes', function () {

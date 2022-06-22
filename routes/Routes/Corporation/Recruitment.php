@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ApplicationsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\EnlistmentsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\GetRecruitmentIndexController;
@@ -49,7 +50,7 @@ Route::prefix('recruitment')
             });
 
         /* Junior HR */
-        Route::middleware('permission:can open or close corporations for recruitment|can accept or deny applications,director')
+        Route::middleware(CheckPermissionOrCorporationRole::class . ':can open or close corporations for recruitment|can accept or deny applications,director')
             ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
         Route::controller(ApplicationsController::class)
@@ -73,7 +74,7 @@ Route::prefix('recruitment')
                     });
             });
 
-        Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+        Route::middleware(CheckPermissionOrCorporationRole::class . ':can accept or deny applications')
             ->get('/impersonate/{application_id}', ImpersonateRecruit::class)
             ->name('impersonate.recruit');
     });

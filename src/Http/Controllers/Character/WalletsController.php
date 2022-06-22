@@ -43,10 +43,7 @@ class WalletsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
 
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $ids = GetAffiliatedIdsService::make($dispatchTransferObject)->getCharacterIds();
 
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

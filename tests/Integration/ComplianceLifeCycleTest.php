@@ -42,7 +42,7 @@ test('user without permission fails to see compliance', function () {
 
     $response = test()->actingAs(test()->secondary_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 test('user with permission sees component', function () {
@@ -55,7 +55,7 @@ test('user with permission sees component', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     assignPermissionToTestUser(['view member compliance']);
 
@@ -142,7 +142,7 @@ test('director user without permission can access index', function () {
 
     test()->actingAs($non_director)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     // 2. director can access the compliance index
 
@@ -156,9 +156,10 @@ test('director user without permission can access index', function () {
         return $user->refresh();
     });
 
-    test()->actingAs($director)
+    $response = test()->actingAs($director)
         ->get(route('corporation.member_compliance'))
-        ->assertOk();
+        ->assertOk()
+    ;
 });
 
 it('enables superuser to review corporation member', function () {

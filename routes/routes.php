@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
 use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
@@ -47,7 +48,7 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Configuration/Configuration.php';
                         include __DIR__ . '/Routes/Configuration/UserSettings.php';
                         include __DIR__ . '/Routes/Configuration/ManualLocations.php';
-                        Route::middleware(['permission:superuser'])->group(function () {
+                        Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->group(function () {
                             include __DIR__ . '/Routes/Configuration/Schedules.php';
                         });
                     });

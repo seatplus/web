@@ -25,12 +25,13 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
 use Seatplus\Web\Http\Controllers\Configuration\CommandsController;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
 
-Route::middleware(['permission:superuser'])->group(function () {
+Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->group(function () {
     Route::get('/settings', [SeatPlusController::class, 'settings'])->name('server.settings');
 
     Route::post('/cache/clear', [CommandsController::class, 'clear'])->name('cache.clear');

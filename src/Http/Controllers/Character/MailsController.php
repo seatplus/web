@@ -29,11 +29,13 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\Mails\EveMailService;
 
@@ -53,18 +55,14 @@ class MailsController extends Controller
 
     public function mailHeaders(Request $request)
     {
-        $validated_data = $request->validate([
-            'validated_ids' => ['required', 'array'],
-        ]);
-
-        $validated_ids = data_get($validated_data, 'validated_ids');
+        $character_ids = $request->get('character_ids');
 
         return Mail::query()
             ->select('id', 'from', 'subject', 'timestamp')
             ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn (Builder $query) => $query->whereIn('character_id', $validated_ids)
+                fn (Builder $query) => $query->whereIn('character_id', $character_ids)
             ))
             ->orderByDesc('timestamp')
             ->paginate();
@@ -94,9 +92,20 @@ class MailsController extends Controller
 
     private function getAffiliatedIds(object $dispatchTransferObject): Collection
     {
-        return GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $affiliations_dto = new AffiliationsDto(
+            permissions: [data_get($dispatchTransferObject, 'permission')],
+            user: auth()->user()
+        );
+
+        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
+            ->getQuery();
+
+        return CharacterInfo::query()
+            ->has('mails')
+            ->when(
+                request()->has('character_ids'),
+                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'owned_characters.affiliated_id', '=', 'character_infos.character_id')
+            )->pluck('character_infos.character_id');
     }
 }

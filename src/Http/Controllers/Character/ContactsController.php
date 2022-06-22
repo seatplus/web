@@ -26,10 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -46,11 +45,11 @@ class ContactsController extends Controller
             ->create(Contact::class);
 
         $affiliations_dto = new AffiliationsDto(
-            permission: data_get($dispatchTransferObject, 'permission'),
+            permissions: [data_get($dispatchTransferObject, 'permission')],
             user: auth()->user()
         );
 
-        $owned_characters = GetOwnedCharacterAffiliationsService::make($affiliations_dto)
+        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
             ->getQuery();
 
         $characters = CharacterInfo::query()
@@ -58,7 +57,7 @@ class ContactsController extends Controller
             ->when(
                 request()->has('character_ids'),
                 fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_infos.character_id', '=', 'owned_characters.character_id')
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_infos.character_id', '=', 'owned_characters.affiliated_id')
             )->get();
 
         return inertia('Character/Contact/Index', [

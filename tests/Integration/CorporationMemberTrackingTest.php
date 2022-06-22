@@ -13,7 +13,7 @@ test('has dispatchable job', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->get(route('corporation.member_tracking'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
 
     $permission = Permission::findOrCreate('view member tracking');
