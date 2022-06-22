@@ -27,16 +27,14 @@
 namespace Seatplus\Web;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
-use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckACLPermission;
-use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
+use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
+use Seatplus\Web\Http\Middleware\HasPermission;
 use Seatplus\Web\Http\Middleware\Locale;
 
 class WebServiceProvider extends ServiceProvider
@@ -120,7 +118,7 @@ class WebServiceProvider extends ServiceProvider
         $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add permission Middelware
-        $router->aliasMiddleware('permission', CheckPermissionAffiliation::class);
+        $router->aliasMiddleware('permission', CheckPermissionAndAffiliation::class);
 
         // Add acl-permission Middelware
         $router->aliasMiddleware('acl-permission', CheckACLPermission::class);
