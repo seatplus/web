@@ -49,7 +49,7 @@ class AssetsController extends Controller
     public function index()
     {
         return Inertia::render('Character/Assets', [
-            'dispatchTransferObject' => CreateDispatchTransferObject::new()->create(EveApiAsset::class),
+            'dispatchTransferObject' => $this->getDispatchTransferObject(),
         ]);
     }
 
@@ -96,8 +96,9 @@ class AssetsController extends Controller
     public function details(int $item_id)
     {
         $query = EveApiAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->whereIn('assetable_id', [...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()])
             ->where('item_id', $item_id);
+
+        $query = $this->handleAffiliated($query);
 
         $item = AssetResource::collection($query->get());
 
@@ -106,29 +107,28 @@ class AssetsController extends Controller
         ]);
     }
 
+    private function getDispatchTransferObject()
+    {
+
+        return CreateDispatchTransferObject::new()->create(EveApiAsset::class);
+    }
+
     private function handleAffiliated(Builder $query) : Builder
     {
 
-        $affiliationsDto = new AffiliationsDto(
-            user: auth()->user(),
-            permissions: [config('eveapi.permissions.' . Asset::class)]
+        $column = 'assetable_id';
+
+        $query = $this->joinAffiliated(
+            $query,
+            (new Asset)->getTable(),
+            $column,
+            $this->getDispatchTransferObject(),
+            !request()->hasAny(['character_ids', 'corporation_ids'])
         );
 
-        $affiliations = request()->hasAny(['character_ids', 'corporation_ids'])
-            ? GetAffiliatedIdsService::make($affiliationsDto)->getQuery()
-            : GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+        request()->whenHas('character_ids', fn(array $character_ids) => $query->whereIn($column, $character_ids));
+        request()->whenHas('corporation_ids', fn(array $corporation_ids) => $query->whereIn($column, $corporation_ids));
 
-        request()->whenHas('character_ids', fn(array $character_ids) => $affiliations->whereIn('affiliated_id', $character_ids));
-        request()->whenHas('corporation_ids', fn(array $corporation_ids) => $affiliations->whereIn('affiliated_id', $corporation_ids));
-
-        $table = (new Asset)->getTable();
-
-        return $query->joinSub(
-            $affiliations,
-            'affiliations',
-            fn ($query) => $query
-                ->on('affiliations.affiliated_id', '=', "$table.assetable_id")
-                ->where("$table.assetable_type", CharacterInfo::class)
-        );
+        return $query;
     }
 }
