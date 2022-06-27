@@ -11,6 +11,7 @@ use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Spatie\Permission\PermissionRegistrar;
+use function Pest\Laravel\get;
 
 test('see component', function () {
     $response = test()->actingAs(test()->test_user)
@@ -78,17 +79,16 @@ test('get mail body test', function () {
         ->andReturn($response);
 
     // Give user superuser
-    $permission = Permission::findOrCreate('superuser');
-
-    test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    test()->assignPermissionToTestUser('superuser');
 
     expect(test()->test_user->can('superuser'))->toBeTrue();
+
     expect(Mail::all())->toHaveCount(1);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('get.mail', $mail->id))
-        ->assertJson(fn (AssertableJson $json) => $json->count(4));
+    test()->actingAs(test()->test_user);
+
+    $response = get(route('get.mail', $mail->id));
+
+    $response->assertJson(fn (AssertableJson $json) => $json->count(4));
+
 });

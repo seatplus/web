@@ -45,7 +45,7 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $ids = $this->getAffiliatedIds($dispatchTransferObject);
+        $ids = $this->getAffiliatedIds($dispatchTransferObject, 'mails');
 
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -70,42 +70,34 @@ class MailsController extends Controller
 
     public function getMail(int $mail_id)
     {
-        $permission = data_get($this->getDispatchTransferObject(), 'permission');
-        $affiliated_ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])->unique();
+
+
+        $dispatchTransferObject = $this->getDispatchTransferObject();
 
         $mail = Mail::query()
             ->with(['recipients'])
-            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
-                'receivable',
-                CharacterInfo::class,
-                fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids->toArray())
-            ))
+            ->when(
+                !auth()->user()->can('superuser'),
+                fn(Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+                    'receivable',
+                    CharacterInfo::class,
+                    fn (Builder $query) => $this->joinAffiliated(
+                        $query,
+                        'character_infos',
+                        'character_id',
+                        $dispatchTransferObject
+                    )
+                ))
+            )
             ->firstWhere('id', $mail_id);
 
-        return $mail ? EveMailService::make($mail)->getThreads() : [];
+        abort_unless($mail, 404, 'Mail not found');
+
+        return EveMailService::make($mail)->getThreads();
     }
 
     private function getDispatchTransferObject(): object
     {
         return CreateDispatchTransferObject::new()->create(Mail::class);
-    }
-
-    private function getAffiliatedIds(object $dispatchTransferObject): Collection
-    {
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user()
-        );
-
-        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
-            ->getQuery();
-
-        return CharacterInfo::query()
-            ->has('mails')
-            ->when(
-                request()->has('character_ids'),
-                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'owned_characters.affiliated_id', '=', 'character_infos.character_id')
-            )->pluck('character_infos.character_id');
     }
 }
