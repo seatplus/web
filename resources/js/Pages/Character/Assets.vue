@@ -4,7 +4,7 @@
       <title>{{ title(pageTitle) }}</title>
     </teleport>
 
-    <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
+    <!--<RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />-->
 
     <PageHeader>
       {{ pageTitle }}
@@ -123,27 +123,32 @@ export default {
             type: Object,
             default: () => {}
         },
+        characterIds: {
+            required: true,
+            type: Array,
+            default: () => []
+        },
     },
-    setup() {
+    setup(props) {
         const switchValue = ref(false)
         const infiniteId = ref(+new Date())
         const search = ref(null)
         const regions = ref([])
         const systems = ref([])
 
-        const selectedCharacterIds = computed(() => {
+        /*const selectedCharacterIds = computed(() => {
             let character_ids = _.get(route().params, 'character_ids')
 
             if(!character_ids)
                 return []
 
             return  _.map(character_ids, (id) => parseInt(id))
-        })
+        })*/
 
         const cleanParams = computed(() => {
             return {
                 search: search.value === "" ? null : search.value,
-                character_ids: selectedCharacterIds.value,
+                character_ids: props.characterIds,
                 regions: _.map(regions.value, 'id'),
                 systems: _.map(systems.value, 'id')
             }

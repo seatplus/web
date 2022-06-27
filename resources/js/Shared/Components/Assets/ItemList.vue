@@ -77,7 +77,7 @@
       <template #navigation>
         <Link
           v-if="asset.content[0]"
-          :href="$route('character.item', asset.item_id)"
+          :href="$route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id})"
           preserve-state
           preserve-scroll
         >
@@ -140,7 +140,7 @@
                 return prefix(numeric_value, {precision: 3, unit: 'm³'})
             },
             url(asset) {
-                return asset.content[0] ? this.$route('character.item', asset.item_id) : ''
+                return asset.content[0] ? this.$route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
             },
         }
   }

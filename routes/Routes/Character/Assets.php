@@ -25,9 +25,19 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Web\Http\Controllers\Character\AssetsController;
 
-Route::get('/assets', [AssetsController::class, 'index'])->name('character.assets');
-Route::get('/assets/list', [AssetsController::class, 'getLocations'])->name('load.character.assets');
-Route::get('/assets/{location_id}', [AssetsController::class, 'loadLocation'])->name('location.assets');
-Route::get('/item/{item_id}', [AssetsController::class, 'details'])->name('character.item');
+Route::prefix('assets')
+    ->controller(AssetsController::class)
+    ->group(function () {
+        Route::get('', 'index')->name('character.assets');
+
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Asset::class)))
+            ->group(function () {
+                Route::get('locations', 'getLocations')->name('get.character.assets.locations');
+                Route::get('/location/{location_id}', 'loadLocation')->name('location.assets');
+                Route::get('/{character_id}/item/{item_id}', 'item')->name('character.item');
+            });
+
+    });
