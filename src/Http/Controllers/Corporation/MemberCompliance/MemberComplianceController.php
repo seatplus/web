@@ -28,6 +28,9 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberCompliance;
 
 use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
@@ -37,9 +40,15 @@ class MemberComplianceController
 {
     public function index()
     {
-        $affiliated_ids = getAffiliatedIdsByPermission('view member compliance', 'director');
 
-        $affiliated_corporations = CorporationInfo::whereIn('corporation_id', $affiliated_ids)
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permissions: ['view member compliance'],
+            corporation_roles: ['director'],
+        );
+
+        $affiliated_corporations = CorporationInfo::query()
+            ->whereAffiliatedCorporation($affiliationsDto)
             ->has('ssoScopes')
             ->orHas('alliance.ssoScopes')
             ->select('name', 'corporation_id')

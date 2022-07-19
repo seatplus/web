@@ -27,7 +27,11 @@
 namespace Seatplus\Web;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
@@ -66,6 +70,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Add commands
         $this->addCommands();
+
+        // Add query macros
+        $this->addQueryMacros();
     }
 
     public function register()
@@ -178,5 +185,24 @@ class WebServiceProvider extends ServiceProvider
                 AssignSuperuser::class,
             ]);
         }
+    }
+
+    private function addQueryMacros()
+    {
+        Builder::macro('whereAffiliatedCorporation', function (AffiliationsDto $affiliationsDto) {
+
+            $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
+            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+            return $this->when(! $affiliationsDto->user->can('superuser'), fn(Builder $query) => $query
+                ->joinSub(
+                    $affiliated_ids->union($owned_ids),
+                    'affiliated',
+                    'corporation_infos.corporation_id',
+                    '=',
+                    'affiliated.affiliated_id'
+                )
+            );
+        });
     }
 }
