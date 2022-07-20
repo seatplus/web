@@ -29,11 +29,14 @@ namespace Seatplus\Web\Http\Controllers\Request;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\HydrateCharacterBase;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class DispatchIndividualJob extends FormRequest
 {
     protected array $dispatch_transfer_object = [];
+    protected AffiliationsDto $affiliationsDto;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -56,30 +59,50 @@ class DispatchIndividualJob extends FormRequest
 
         $jobs = array_keys(config('web.jobs'));
 
-        $affiliated_ids = $this->buildAffiliatedIds();
-
         return [
             'dispatch_transfer_object.manual_job' => ['required', Rule::in($jobs)],
             'dispatch_transfer_object.permission' => ['required', Rule::in(config('eveapi.permissions'))],
             'dispatch_transfer_object.required_corporation_role' => ['present'],
-            'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($affiliated_ids)],
-            'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($affiliated_ids)],
+            'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($this->getAffiliatedCharacterIds())],
+            'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($this->getAffiliatedCorporationIds())],
         ];
     }
 
-    private function buildAffiliatedIds(): array
+    public function getAffiliationsDto(): AffiliationsDto
     {
-        return getAffiliatedIdsByPermission(Arr::get($this->dispatch_transfer_object, 'permission'));
+
+
+        if(!isset($this->affiliationsDto)) {
+            $this->affiliationsDto = new AffiliationsDto(
+                permissions: [Arr::get($this->dispatch_transfer_object, 'permission')],
+                user: auth()->user(),
+                corporation_roles: Arr::get($this->dispatch_transfer_object, 'required_corporation_role') ? [Arr::get($this->dispatch_transfer_object, 'required_corporation_role')] : null,
+            );
+        }
+
+        return $this->affiliationsDto;
     }
 
-    /* private function buildDispatchableJob(): HydrateCharacterBase
-     {
-         $dispatchable_job_class = Arr::get(config('web.jobs'), Arr::get($this->dispatch_transfer_object, 'manual_job'));
+    private function getAffiliatedCharacterIds(): array
+    {
 
-         if (! $dispatchable_job_class) {
-             throw new \Exception('unable to get lock of the dispatchable job');
-         }
+        $affiliationsDto = $this->getAffiliationsDto();
 
-         return new $dispatchable_job_class;
-     }*/
+        return CharacterInfo::query()
+            ->whereAffiliatedCharacters($affiliationsDto)
+            ->pluck('character_id')
+            ->values()
+            ->toArray();
+    }
+
+    private function getAffiliatedCorporationIds(): array
+    {
+        $affiliationsDto = $this->getAffiliationsDto();
+
+        return CorporationInfo::query()
+            ->whereAffiliatedCorporations($affiliationsDto)
+            ->pluck('corporation_id')
+            ->values()
+            ->toArray();
+    }
 }

@@ -40,7 +40,8 @@ it('dispatches job', function () {
         ->post(route('dispatch.job'), [
             'character_id' => $character_id,
             'dispatch_transfer_object' => $dispatch_transfer_object,
-        ]);
+        ])
+        ->assertOk();
 
     test()->assertNotNull(cache($cache_key));
 });
