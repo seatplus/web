@@ -40,6 +40,7 @@ use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\HasPermission;
 use Seatplus\Web\Http\Middleware\Locale;
+use Seatplus\Web\Services\GetRecruitIdsService;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -199,6 +200,22 @@ class WebServiceProvider extends ServiceProvider
                     $affiliated_ids->union($owned_ids),
                     'affiliated',
                     'corporation_infos.corporation_id',
+                    '=',
+                    'affiliated.affiliated_id'
+                )
+            );
+        });
+
+        Builder::macro('whereAffiliatedCharacters', function (AffiliationsDto $affiliationsDto, ) {
+
+            $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
+            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+            return $this->when(! $affiliationsDto->user->can('superuser'), fn(Builder $query) => $query
+                ->joinSub(
+                    $affiliated_ids->union($owned_ids),
+                    'affiliated',
+                    'character_infos.character_id',
                     '=',
                     'affiliated.affiliated_id'
                 )
