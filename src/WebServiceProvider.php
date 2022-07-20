@@ -190,7 +190,7 @@ class WebServiceProvider extends ServiceProvider
 
     private function addQueryMacros()
     {
-        Builder::macro('whereAffiliatedCorporation', function (AffiliationsDto $affiliationsDto) {
+        Builder::macro('whereAffiliatedCorporations', function (AffiliationsDto $affiliationsDto) {
 
             $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
             $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();

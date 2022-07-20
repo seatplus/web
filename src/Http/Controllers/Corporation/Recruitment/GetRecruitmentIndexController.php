@@ -55,7 +55,7 @@ class GetRecruitmentIndexController extends Controller
         $manageable_enlistments = Enlistments::query()
             ->with('corporation.alliance')
             ->whereHas('corporation', function (Builder $query) {
-                $query->whereAffiliatedCorporation(new AffiliationsDto(
+                $query->whereAffiliatedCorporations(new AffiliationsDto(
                     permissions: [self::MANAGEPERMISSION],
                     user: auth()->user(),
                     corporation_roles: ['Director']
@@ -67,7 +67,7 @@ class GetRecruitmentIndexController extends Controller
             ->with('corporation.alliance')
             ->whereNotIn('corporation_id', fn ($query) => $query->select('corporation_id')->from($manageable_enlistments))
             ->whereHas('corporation', function (Builder $query) {
-                $query->whereAffiliatedCorporation(new AffiliationsDto(
+                $query->whereAffiliatedCorporations(new AffiliationsDto(
                     permissions: [self::RECRUITERPERMISSION],
                     user: auth()->user(),
                     corporation_roles: ['Director']

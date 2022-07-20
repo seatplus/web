@@ -48,7 +48,7 @@ class MemberComplianceController
         );
 
         $affiliated_corporations = CorporationInfo::query()
-            ->whereAffiliatedCorporation($affiliationsDto)
+            ->whereAffiliatedCorporations($affiliationsDto)
             ->has('ssoScopes')
             ->orHas('alliance.ssoScopes')
             ->select('name', 'corporation_id')
