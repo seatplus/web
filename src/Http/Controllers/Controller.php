@@ -26,10 +26,40 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Collection;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class Controller extends BaseController
 {
     use ValidatesRequests;
+
+    protected function getCharacterIds(object $dispatchTransferObject, string $character_relation): Collection
+    {
+        return $this->getCharacters($dispatchTransferObject, $character_relation)
+            ->pluck('character_id');
+    }
+
+    protected function getCharacters(object $dispatchTransferObject, string $character_relation): Builder
+    {
+        $affiliations_dto = new AffiliationsDto(
+            permissions: [data_get($dispatchTransferObject, 'permission')],
+            user: auth()->user(),
+            corporation_roles: data_get($dispatchTransferObject, 'corporation_roles')
+        );
+
+        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)->getQuery();
+
+        return CharacterInfo::query()
+            ->has($character_relation)
+            ->when(
+                request()->has('character_ids'),
+                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
+                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'owned_characters.affiliated_id', '=', 'character_infos.character_id')
+            );
+    }
 }

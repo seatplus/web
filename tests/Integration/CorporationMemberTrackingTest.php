@@ -2,26 +2,21 @@
 
 
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\Auth\Models\Permissions\Permission;
-use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     test()->test_character->roles()->update(['roles' => ['']]);
 });
 
 test('has dispatchable job', function () {
-    $response = test()->actingAs(test()->test_user)
+    test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->get(route('corporation.member_tracking'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
 
-    $permission = Permission::findOrCreate('view member tracking');
 
-    test()->test_user->givePermissionTo($permission);
 
-    // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    test()->assignPermissionToTestUser('view member tracking');
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()

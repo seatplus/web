@@ -4,7 +4,7 @@
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\Auth\Models\Permissions\Permission;
+use function Pest\Laravel\get;
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
@@ -78,17 +78,15 @@ test('get mail body test', function () {
         ->andReturn($response);
 
     // Give user superuser
-    $permission = Permission::findOrCreate('superuser');
-
-    test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    test()->assignPermissionToTestUser('superuser');
 
     expect(test()->test_user->can('superuser'))->toBeTrue();
+
     expect(Mail::all())->toHaveCount(1);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('get.mail', $mail->id))
-        ->assertJson(fn (AssertableJson $json) => $json->count(4));
+    test()->actingAs(test()->test_user);
+
+    $response = get(route('get.mail', $mail->id));
+
+    $response->assertJson(fn (AssertableJson $json) => $json->count(4));
 });

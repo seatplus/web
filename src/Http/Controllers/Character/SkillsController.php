@@ -31,7 +31,6 @@ use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class SkillsController extends Controller
 {
@@ -39,10 +38,7 @@ class SkillsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'skills');
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

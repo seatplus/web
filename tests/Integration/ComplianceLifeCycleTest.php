@@ -12,10 +12,8 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
-    /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
     test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
-    /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
     test()->superuser = Event::fakeFor(function () {
         $user = User::factory()->create();
 
@@ -42,7 +40,7 @@ test('user without permission fails to see compliance', function () {
 
     $response = test()->actingAs(test()->secondary_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 test('user with permission sees component', function () {
@@ -55,7 +53,7 @@ test('user with permission sees component', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     assignPermissionToTestUser(['view member compliance']);
 
@@ -128,7 +126,7 @@ test('user with permission sees user compliance', function () {
     $response->assertJsonFragment(['count_total' => 2]);
 });
 
-test('director user without permission can access index', function () {
+test('non director can not access the compliance index', function () {
     // 1. non director can't access the compliance index
     $non_director = Event::fakeFor(function () {
         $user = User::factory()->create();
@@ -142,10 +140,10 @@ test('director user without permission can access index', function () {
 
     test()->actingAs($non_director)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
+});
 
-    // 2. director can access the compliance index
-
+test('director user without permission can access index', function () {
     $director = Event::fakeFor(function () {
         $user = User::factory()->create();
 
@@ -156,9 +154,61 @@ test('director user without permission can access index', function () {
         return $user->refresh();
     });
 
-    test()->actingAs($director)
+    $response = test()->actingAs($director)
         ->get(route('corporation.member_compliance'))
         ->assertOk();
+
+    $response->assertInertia(
+        fn (Assert $page) => $page
+        ->component('Corporation/MemberCompliance/MemberCompliance')
+    );
+});
+
+test('director user without permission can review its corp members', function () {
+
+    //createScopeSetting();
+
+    // 1. make sure user ist not superuser
+    expect(test()->test_user->can('superuser'))->toBeFalse();
+
+    // 2. director can access the compliance index
+    $director = Event::fakeFor(function () {
+        $user = test()->test_user;
+
+        $roles = $user->characters->first()->roles;
+        $roles->roles = ['Director'];
+        $roles->save();
+
+        return $user->refresh();
+    });
+
+    expect(test()->test_character->roles->first()->roles)->toContain('Director');
+
+    // 3. setup ssoScope
+    SsoScopes::updateOrCreate([
+        'morphable_id' => test()->test_character->corporation->corporation_id,
+    ], [
+        'selected_scopes' => test()->test_character->refresh_token->scopes,
+        'morphable_type' => CorporationInfo::class,
+        'type' => 'default',
+    ]);
+
+    CorporationInfo::query()
+        ->has('ssoScopes')
+        ->orHas('alliance.ssoScopes')
+        ->select('name', 'corporation_id')
+        ->addSelect(['type' => SsoScopes::whereColumn('morphable_id', 'corporation_id')->limit(1)->select('type')])
+        ->get();
+
+    $response = test()->actingAs($director)
+        ->get(route('corporation.member_compliance'))
+        ->assertOk();
+
+    $response->assertInertia(
+        fn (Assert $page) => $page
+        ->component('Corporation/MemberCompliance/MemberCompliance')
+        ->has('corporations', 1)
+    );
 });
 
 it('enables superuser to review corporation member', function () {

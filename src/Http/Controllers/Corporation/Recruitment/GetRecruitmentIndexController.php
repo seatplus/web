@@ -26,7 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
+use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Web\Http\Controllers\Controller;
 
@@ -48,18 +51,29 @@ class GetRecruitmentIndexController extends Controller
 
     private function getEnlistments()
     {
-        $manageable_ids = getAffiliatedIdsByPermission(self::MANAGEPERMISSION);
-        $recruitable_ids = getAffiliatedIdsByPermission(self::RECRUITERPERMISSION);
-
-        return Enlistments::query()
-            //->whereIn('corporation_id', [...$manageable_ids, ...$recruitable_ids])
+        $manageable_enlistments = Enlistments::query()
             ->with('corporation.alliance')
-            ->get()
-            ->map(function ($enlistment) use ($manageable_ids, $recruitable_ids) {
-                $enlistment->can_manage = in_array($enlistment->corporation_id, $manageable_ids);
-                //$enlistment->can_recruit = in_array($enlistment->corporation_id, $recruitable_ids);
+            ->whereHas('corporation', function (Builder $query) {
+                $query->whereAffiliatedCorporations(new AffiliationsDto(
+                    permissions: [self::MANAGEPERMISSION],
+                    user: auth()->user(),
+                    corporation_roles: ['Director']
+                ));
+            })
+            ->select(['*', DB::raw("'true' as can_manage")]);
 
-                return $enlistment;
-            });
+        $recruitable_enlistments = Enlistments::query()
+            ->with('corporation.alliance')
+            ->whereNotIn('corporation_id', fn ($query) => $query->select('corporation_id')->from($manageable_enlistments))
+            ->whereHas('corporation', function (Builder $query) {
+                $query->whereAffiliatedCorporations(new AffiliationsDto(
+                    permissions: [self::RECRUITERPERMISSION],
+                    user: auth()->user(),
+                    corporation_roles: ['Director']
+                ));
+            })
+            ->select(['*', DB::raw("'false' as can_manage")]);
+
+        return $manageable_enlistments->union($recruitable_enlistments)->get();
     }
 }

@@ -26,48 +26,58 @@
 
 namespace Seatplus\Web\Services;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Application;
 
 class GetRecruitIdsService
 {
     public static function get(): array
     {
-        $recruiter_permission = 'can accept or deny applications';
+        $permission = 'can accept or deny applications';
 
-        if (! auth()->user()->can($recruiter_permission)) {
-            return [];
-        }
+        $affiliations_dto = new AffiliationsDto(
+            permissions: [$permission],
+            user: auth()->user(),
+            corporation_roles: ['Director']
+        );
 
-        $user_id = auth()->user()->getAuthIdentifier();
-        $cache_key = "${recruiter_permission}:${user_id}";
+        $cache_key = hash('sha256', json_encode($affiliations_dto));
 
-        $recruit_ids = cache($cache_key);
+        return Cache::remember($cache_key, now()->addMinutes(15), function () use ($affiliations_dto) {
+            $affiliated_ids = GetAffiliatedIdsService::make($affiliations_dto)->getQuery();
+            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliations_dto)->getQuery();
 
-        if (! $recruit_ids) {
-            $recruit_ids = Application::whereIn('corporation_id', getAffiliatedIdsByPermission($recruiter_permission))
-                ->whereStatus('open')
+            $affiliated = $affiliated_ids->union($owned_ids);
+
+            return Application::query()
                 ->with([
                     'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
                         User::class => ['characters'],
                     ]),
                 ])
+                ->when(
+                    ! $affiliations_dto->user->can('superuser'),
+                    fn (Builder $query) => $query
+                    ->joinSub($affiliated, 'affiliated', 'applications.corporation_id', '=', 'affiliated.affiliated_id')
+                )
+                ->where('status', 'open')
                 ->get()
                 ->map(
                     fn ($recruit) => $recruit->applicationable->characters
-                    ? $recruit->applicationable->characters->pluck('character_id')
-                    : $recruit->applicationable->character_id
+                        ? $recruit->applicationable->characters->pluck('character_id')
+                        : $recruit->applicationable->character_id
                 )
                 ->flatten()
                 ->unique()
                 ->map(fn ($recruit_id) => intval($recruit_id))
                 ->filter()
                 ->toArray();
-
-            cache([$cache_key => $recruit_ids], now()->addMinutes(15));
-        }
-
-        return $recruit_ids;
+        });
     }
 }

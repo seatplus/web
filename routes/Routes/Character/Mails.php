@@ -28,16 +28,15 @@ use Illuminate\Support\Facades\Route;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Web\Http\Controllers\Character\MailsController;
 use Seatplus\Web\Http\Controllers\Character\SkillsController;
+use Seatplus\Eveapi\Models\Mail\Mail;
 
 Route::prefix('mails')
     ->group(callback: function () {
         Route::get('', [MailsController::class, 'index'])->name('character.mails');
         Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
 
-        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Skill::class)))
+        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Mail::class)))
             ->group(function () {
                 Route::get('/headers/', [MailsController::class, 'mailHeaders'])->name('get.mail.headers');
-                /*Route::get('/{character_id}/skills', [SkillsController::class, 'skills'])->name('get.character.skills');
-                Route::get('/{character_id}/skillqueue', [SkillsController::class, 'skillQueue'])->name('get.character.skill.queue');*/
             });
     });

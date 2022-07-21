@@ -27,15 +27,16 @@
 namespace Seatplus\Web;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
-use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckACLPermission;
-use Seatplus\Web\Http\Middleware\CheckPermissionAffiliation;
+use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
 
@@ -68,6 +69,9 @@ class WebServiceProvider extends ServiceProvider
 
         // Add commands
         $this->addCommands();
+
+        // Add query macros
+        $this->addQueryMacros();
     }
 
     public function register()
@@ -120,7 +124,7 @@ class WebServiceProvider extends ServiceProvider
         $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add permission Middelware
-        $router->aliasMiddleware('permission', CheckPermissionAffiliation::class);
+        $router->aliasMiddleware('permission', CheckPermissionAndAffiliation::class);
 
         // Add acl-permission Middelware
         $router->aliasMiddleware('acl-permission', CheckACLPermission::class);
@@ -180,5 +184,42 @@ class WebServiceProvider extends ServiceProvider
                 AssignSuperuser::class,
             ]);
         }
+    }
+
+    private function addQueryMacros()
+    {
+        Builder::macro('whereAffiliatedCorporations', function (AffiliationsDto $affiliationsDto) {
+            $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
+            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+            return $this->when(
+                ! $affiliationsDto->user->can('superuser'),
+                fn (Builder $query) => $query
+                ->joinSub(
+                    $affiliated_ids->union($owned_ids),
+                    'affiliated',
+                    'corporation_infos.corporation_id',
+                    '=',
+                    'affiliated.affiliated_id'
+                )
+            );
+        });
+
+        Builder::macro('whereAffiliatedCharacters', function (AffiliationsDto $affiliationsDto) {
+            $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
+            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+            return $this->when(
+                ! $affiliationsDto->user->can('superuser'),
+                fn (Builder $query) => $query
+                ->joinSub(
+                    $affiliated_ids->union($owned_ids),
+                    'affiliated',
+                    'character_infos.character_id',
+                    '=',
+                    'affiliated.affiliated_id'
+                )
+            );
+        });
     }
 }

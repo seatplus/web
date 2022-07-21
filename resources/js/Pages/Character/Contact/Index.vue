@@ -18,11 +18,11 @@
 
     <div class="space-y-4">
       <CharacterContactsComponent
-        v-for="character_affiliation in characters"
-        :key="character_affiliation.character_id"
-        :character="character_affiliation.character"
-        :corporation_id="character_affiliation.corporation_id"
-        :alliance_id="character_affiliation.alliance_id"
+        v-for="character in characters"
+        :key="character.character_id"
+        :character="character"
+        :corporation_id="character.corporation_id"
+        :alliance_id="character.alliance_id"
       />
     </div>
   </div>

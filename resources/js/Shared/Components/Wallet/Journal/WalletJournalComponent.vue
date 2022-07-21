@@ -92,7 +92,10 @@ export default {
             let parameters = _.merge({ character_id: this.id }, this.filters)
 
             if(this.division)
-                parameters = _.merge(parameters, { division_id: this.division.division_id })
+                parameters = _.merge(parameters, {
+                    division_id: this.division.division_id,
+                    corporation_id: this.division.corporation_id
+                })
 
             return parameters
         }

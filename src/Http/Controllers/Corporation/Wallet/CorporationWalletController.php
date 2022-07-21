@@ -26,12 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class CorporationWalletController extends Controller
 {
@@ -84,13 +85,25 @@ class CorporationWalletController extends Controller
 
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject)
     {
-        $ids = GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('corporation')
-            ->get();
+        $affiliations_dto = new AffiliationsDto(
+            permissions: [data_get($dispatchTransferObject, 'permission')],
+            user: auth()->user(),
+            corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
+        );
 
-        return CorporationDivision::whereIn('corporation_id', $ids)
+        $owned_corporations = GetOwnedAffiliatedIdsService::make($affiliations_dto)
+            ->getQuery();
+
+        //whereIn('corporation_id', $ids)
+        return CorporationDivision::query()
             ->where('division_type', 'wallet')
+            ->when(
+                request()->has('corporation_ids'),
+                fn ($query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
+                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'owned_corporations.affiliated_id', '=', 'corporation_divisions.corporation_id')
+            )
+            ->select('corporation_divisions.*')
+            ->distinct()
             ->get();
     }
 }

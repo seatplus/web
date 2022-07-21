@@ -24,9 +24,21 @@ test('see component', function () {
     $response->assertInertia(fn (Assert $page) => $page->component('Character/Assets'));
 });
 
+test('requires character_ids parameter', function (string $route) {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route($route, 1));
+
+    $response->assertStatus(403);
+})->with([
+    '/locations' => 'get.character.assets.locations',
+    '/location/{location_id}' => 'location.assets',
+]);
+
 test('load asset', function () {
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets'));
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
+        ]));
 
     $response->assertOk();
 });
@@ -37,15 +49,14 @@ it('has asset prop', function () {
         'assetable_type' => CharacterInfo::class,
     ]);
 
-    // Change path.public from Laravel IoC Container to point to proper laravel mix manifest.
-    //app()->instance('path.public', __DIR__ .'/../../src/public');
-
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.assets'));
 
-    //dd($response->exception->getMessage());
-
-    $response->assertInertia(fn (Assert $page) => $page->has('dispatchTransferObject'));
+    $response->assertInertia(
+        fn (Assert $page) => $page
+        ->has('dispatchTransferObject')
+        ->has('characterIds')
+    );
 });
 
 it('has list affiliated character list route', function () {
@@ -76,21 +87,25 @@ test('load asset in system', function () {
 
     // call without filter
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets'))
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
+        ]))
         ->assertOk();
 
     expect($response->original)->toHaveCount(1);
 
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'systems' => $system->system_id,
         ]));
 
     expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'systems' => [$system->system_id],
         ]));
 
@@ -98,7 +113,8 @@ test('load asset in system', function () {
 
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'systems' => $system->system_id + 1,
         ]));
 
@@ -118,21 +134,25 @@ test('load asset in region', function () {
 
     // call without filter
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets'))
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
+        ]))
         ->assertOk();
 
     expect($response->original)->toHaveCount(1);
 
     // call with system_id filter
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'regions' => $region->region_id,
         ]));
 
     expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'regions' => [$region->region_id],
         ]));
 
@@ -140,7 +160,8 @@ test('load asset in region', function () {
 
     // call with system_id + 1 filter and expect no assets to be found
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'systems' => $region->region_id + 1,
         ]));
 
@@ -172,14 +193,17 @@ test('load asset in unknown location', function () {
 
     // 3. call normally
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets'));
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
+        ]));
 
     // 4. expect 2 assets
     expect($response->original)->toHaveCount(2);
 
     // 5. call only unknown locations
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets', [
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
             'withUnknownLocations' => true,
         ]));
 
@@ -209,11 +233,11 @@ test('load asset on watchlist', function () {
             ]),
         ]);
 
-
-
     // Act
     $response = test()->actingAs(test()->test_user)
-        ->get(route('load.character.assets'));
+        ->get(route('get.character.assets.locations', [
+            'character_ids' => [test()->test_character->character_id],
+        ]));
 
     // we expect a total of 3 assets
     expect(Asset::all())->toHaveCount(3);
@@ -227,13 +251,17 @@ test('load asset on watchlist', function () {
     ];
 
     foreach ($tests as $test) {
+        $payload = array_merge($test, [
+            'character_ids' => [test()->test_character->character_id],
+        ]);
+
         $watchlist_response = test()->actingAs(test()->test_user)
-            ->get(route('load.character.assets', $test));
+            ->get(route('get.character.assets.locations', $payload));
 
         expect($watchlist_response->original)->toHaveCount(1);
 
         $watchlist_location_response = test()->actingAs(test()->test_user)
-            ->get(route('location.assets', $asset->location_id, $test));
+            ->get(route('location.assets', ['location_id' => $asset->location_id, ...$payload]));
 
         expect($watchlist_location_response->original)->toHaveCount(1);
     }

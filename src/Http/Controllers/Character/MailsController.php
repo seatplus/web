@@ -28,13 +28,10 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
-use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\Mails\EveMailService;
 
 class MailsController extends Controller
@@ -43,7 +40,7 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $ids = $this->getAffiliatedIds($dispatchTransferObject);
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'mails');
 
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -53,18 +50,14 @@ class MailsController extends Controller
 
     public function mailHeaders(Request $request)
     {
-        $validated_data = $request->validate([
-            'validated_ids' => ['required', 'array'],
-        ]);
-
-        $validated_ids = data_get($validated_data, 'validated_ids');
+        $character_ids = $request->get('character_ids');
 
         return Mail::query()
             ->select('id', 'from', 'subject', 'timestamp')
             ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn (Builder $query) => $query->whereIn('character_id', $validated_ids)
+                fn (Builder $query) => $query->whereIn('character_id', $character_ids)
             ))
             ->orderByDesc('timestamp')
             ->paginate();
@@ -72,31 +65,32 @@ class MailsController extends Controller
 
     public function getMail(int $mail_id)
     {
-        $permission = data_get($this->getDispatchTransferObject(), 'permission');
-        $affiliated_ids = collect([...getAffiliatedIdsByPermission($permission), ...GetRecruitIdsService::get()])->unique();
+        $dispatchTransferObject = $this->getDispatchTransferObject();
 
         $mail = Mail::query()
             ->with(['recipients'])
-            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
-                'receivable',
-                CharacterInfo::class,
-                fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids->toArray())
-            ))
+            ->when(
+                ! auth()->user()->can('superuser'),
+                fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+                    'receivable',
+                    CharacterInfo::class,
+                    fn (Builder $query) => $this->joinAffiliated(
+                        $query,
+                        'character_infos',
+                        'character_id',
+                        $dispatchTransferObject
+                    )
+                ))
+            )
             ->firstWhere('id', $mail_id);
 
-        return $mail ? EveMailService::make($mail)->getThreads() : [];
+        abort_unless($mail, 404, 'Mail not found');
+
+        return EveMailService::make($mail)->getThreads();
     }
 
     private function getDispatchTransferObject(): object
     {
         return CreateDispatchTransferObject::new()->create(Mail::class);
-    }
-
-    private function getAffiliatedIds(object $dispatchTransferObject): Collection
-    {
-        return GetAffiliatedIdsService::make()
-            ->viaDispatchTransferObject($dispatchTransferObject)
-            ->setRequestFlavour('character')
-            ->get();
     }
 }

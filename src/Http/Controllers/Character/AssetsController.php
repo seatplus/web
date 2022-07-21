@@ -29,11 +29,11 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Models\Asset\Asset as WebAssetAlias;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Traits\HasWatchlist;
 
 class AssetsController extends Controller
@@ -42,20 +42,27 @@ class AssetsController extends Controller
 
     public function index()
     {
+        $dispatchTransferObject = $this->getDispatchTransferObject();
+
         return Inertia::render('Character/Assets', [
-            'dispatchTransferObject' => CreateDispatchTransferObject::new()->create(EveApiAsset::class),
+            'dispatchTransferObject' => $dispatchTransferObject,
+            'characterIds' => $this->getCharacterIds($dispatchTransferObject, 'assets'),
         ]);
     }
 
     public function getLocations(Request $request)
     {
+        $character_ids = $request->get('character_ids');
+
+        abort_unless($character_ids, 404);
+
         $query = WebAssetAlias::query()
             ->with('location')
-            ->validateSelectedCharacters($request->query('character_ids'))
-            //->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
             ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->select('location_id')
-            ->groupBy('location_id')
+            ->whereIn('assetable_id', $character_ids)
+            ->where('assetable_type', CharacterInfo::class)
+            ->select('location_id', 'assetable_id')
+            ->groupBy('location_id', 'assetable_id')
             ->orderBy('location_id', 'asc');
 
         $request->whenHas('search', fn ($term) => $query->search($term));
@@ -67,14 +74,19 @@ class AssetsController extends Controller
         }
 
         return AssetResource::collection(
-            $query->paginate(3)
+            $query->paginate(5)
         );
     }
 
     public function loadLocation(int $location_id, Request $request)
     {
+        $character_ids = $request->get('character_ids');
+
+        abort_unless($character_ids, 404);
+
         $query = EveApiAsset::with(['assetable', 'type', 'type.group', 'content'])
-            ->affiliated([...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()], request()->query('character_ids'))
+            ->whereIn('assetable_id', $character_ids)
+            ->where('assetable_type', CharacterInfo::class)
             ->where('location_id', $location_id);
 
         $request->whenHas('search', fn ($term) => $query->search($term));
@@ -86,10 +98,11 @@ class AssetsController extends Controller
         );
     }
 
-    public function details(int $item_id)
+    public function item(int $character_id, int $item_id)
     {
         $query = EveApiAsset::with('location', 'type', 'type.group', 'container', 'content', 'content.content', 'content.type', 'content.type.group')
-            ->whereIn('assetable_id', [...getAffiliatedIdsByClass(EveApiAsset::class), ...GetRecruitIdsService::get()])
+            ->where('assetable_id', $character_id)
+            ->where('assetable_type', CharacterInfo::class)
             ->where('item_id', $item_id);
 
         $item = AssetResource::collection($query->get());
@@ -97,5 +110,10 @@ class AssetsController extends Controller
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,
         ]);
+    }
+
+    private function getDispatchTransferObject()
+    {
+        return CreateDispatchTransferObject::new()->create(EveApiAsset::class);
     }
 }

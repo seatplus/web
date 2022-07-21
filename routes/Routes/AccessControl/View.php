@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\JoinControlGroupController;
@@ -43,7 +44,7 @@ Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.mem
 Route::post('/', JoinControlGroupController::class)->name('acl.join');
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
-Route::middleware(['permission:create or update or delete access control group'])->group(function () {
+Route::middleware([CheckPermissionOrCorporationRole::class . ':create or update or delete access control group'])->group(function () {
     Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');
 
     Route::get('/acl/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
@@ -53,7 +54,7 @@ Route::middleware(['permission:create or update or delete access control group']
     Route::get('/search', [ControlGroupsController::class, 'search'])->name('acl.search.affiliatable');
 });
 
-Route::middleware(['permission:manage access control group|create or update or delete access control group'])->group(function () {
+Route::middleware([CheckPermissionOrCorporationRole::class . ':manage access control group|create or update or delete access control group'])->group(function () {
     Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
     Route::post('/manage_control_group/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
 

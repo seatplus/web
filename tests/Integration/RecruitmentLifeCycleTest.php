@@ -44,7 +44,7 @@ test('user without permission fails to create enlistment', function () {
         ->post(route('create.corporation.recruitment'), [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
             'type' => 'user',
-        ])->assertForbidden();
+        ])->assertUnauthorized();
 });
 
 test('user with permission and affiliations succeeds to create enlistment', function () {
@@ -156,7 +156,7 @@ test('senior hr sees recruitment component', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.recruitment'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     assignPermissionToTestUser(['can open or close corporations for recruitment']);
 
@@ -167,6 +167,7 @@ test('senior hr sees recruitment component', function () {
 });
 
 test('junior hr sees recruitment component', function () {
+    createEnlistment();
 
     // First remove all roles from the user
     test()->test_user->syncRoles([]);
@@ -178,13 +179,22 @@ test('junior hr sees recruitment component', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.recruitment'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     assignPermissionToTestUser(['can accept or deny applications']);
 
-    expect(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
+    expect(test()->test_user->characters)->toHaveCount(1)
+        ->and(test()->test_user->characters->first()->character_id)->toBe(test()->test_character->character_id)
+        ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
+        ->and(test()->test_user->can('superuser'))->toBeFalse()
+        ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
+        ->and(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+        ->assertInertia(
+            fn (Assert $page) => $page
+            ->component('Corporation/Recruitment/RecruitmentIndex')
+            ->has('enlistments', 1)
+        );
 });
 
 test('junior hr handles open user applications', function () {
@@ -218,10 +228,12 @@ test('junior hr handles open user applications', function () {
     // Impersonate
     expect($application)->status->toBe('open');
 
-    test()->actingAs(test()->test_user)
+    $response = test()->actingAs(test()->test_user)
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertRedirect(route('home'))
-        ->assertSessionHas('impersonation_origin', test()->test_user);
+        ->assertSessionHas('impersonation_origin', function ($user) {
+            return $user->id === test()->test_user->id;
+        });
 
     // Stop Impersonate
 
@@ -542,7 +554,7 @@ test('recruiter can see corporation applications', function () {
     // Any other character should be forbidden
     test()->actingAs($recruiter)
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 test('recruiter can comment on application', function () {

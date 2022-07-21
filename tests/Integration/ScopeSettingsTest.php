@@ -21,7 +21,6 @@ it('has scope settings', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('settings.scopes'));
 
-
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
 });
 

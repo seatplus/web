@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Queue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Containers\JobContainer;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
@@ -77,22 +78,30 @@ class DispatchJobController extends Controller
             'required_corporation_role' => ['nullable', 'string'],
         ]);
 
-        $affiliated_ids = getAffiliatedIdsByPermission($request->get('permission'), $request->get('required_corporation_role') ?? '');
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permissions: [data_get($validated_data, 'permission')],
+            corporation_roles:  data_get($validated_data, 'required_corporation_role') ? [ data_get($validated_data, 'required_corporation_role') ] : null,
+        );
 
-        $required_corporation_role = Arr::get($validated_data, 'required_corporation_role');
+        $isCorporationScope = ! ! $affiliationsDto->corporation_roles;
 
-        return RefreshToken::whereIn('character_id', $affiliated_ids)
+        return RefreshToken::query()
+            ->whereHas('character', fn ($query) => $query->whereAffiliatedCharacters($affiliationsDto))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->when($required_corporation_role, fn ($tokens) => $tokens
-                ->filter(fn ($token) => $token->character->roles->hasRole('roles', Arr::get($validated_data, 'required_corporation_role')))
-                ->unique(fn ($token) => $token->corporation_id))
+            ->when(
+                $isCorporationScope,
+                fn ($tokens) => $tokens
+                ->filter(fn ($token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
+                ->unique(fn ($token) => $token->corporation_id)
+            )
             ->map(fn ($token) => collect([
-                'character_id' => $required_corporation_role ? null : $token->character_id,
-                'corporation_id' => $required_corporation_role ? $token->corporation_id : null,
-                'name' => $required_corporation_role ? $token->corporation->name : $token->character->name,
-                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $required_corporation_role ? $token->corporation_id : $token->character_id))),
+                'character_id' => $isCorporationScope ? null : $token->character_id,
+                'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
+                'name' => $isCorporationScope ? $token->corporation->name : $token->character->name,
+                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $isCorporationScope ? $token->corporation_id : $token->character_id))),
             ])->filter()->toArray())
             ->toJson();
     }

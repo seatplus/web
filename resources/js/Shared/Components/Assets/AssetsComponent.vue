@@ -4,7 +4,7 @@
       :key="loadingHelperKey"
       v-slot="{results}"
       :params="parameters"
-      route="load.character.assets"
+      route="get.character.assets.locations"
     >
       <div class="space-y-2 sm:space-y-6">
         <LocationComponent
