@@ -44,25 +44,9 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user()
-        );
-
-        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
-            ->getQuery();
-
-        $characters = CharacterInfo::query()
-            ->has('contacts')
-            ->when(
-                request()->has('character_ids'),
-                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_infos.character_id', '=', 'owned_characters.affiliated_id')
-            )->get();
-
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characters' => $characters,
+            'characters' => $this->getCharacters($dispatchTransferObject, 'contacts')->get(),
         ]);
     }
 

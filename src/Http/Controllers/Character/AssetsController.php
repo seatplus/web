@@ -53,7 +53,7 @@ class AssetsController extends Controller
 
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characterIds' => $this->getAffiliatedIds($dispatchTransferObject, 'assets'),
+            'characterIds' => $this->getCharacterIds($dispatchTransferObject, 'assets'),
         ]);
     }
 

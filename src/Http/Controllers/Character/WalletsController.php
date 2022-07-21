@@ -35,7 +35,6 @@ use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Actions\Wallet\GetRefTypesAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\Controller\GetAffiliatedIdsService;
 
 class WalletsController extends Controller
 {
@@ -43,7 +42,7 @@ class WalletsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
 
-        $ids = GetAffiliatedIdsService::make($dispatchTransferObject)->getCharacterIds();
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'wallet_journals');
 
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
