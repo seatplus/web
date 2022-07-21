@@ -28,15 +28,10 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\GetRecruitIdsService;
 use Seatplus\Web\Services\Mails\EveMailService;
 
 class MailsController extends Controller
@@ -70,15 +65,13 @@ class MailsController extends Controller
 
     public function getMail(int $mail_id)
     {
-
-
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
         $mail = Mail::query()
             ->with(['recipients'])
             ->when(
-                !auth()->user()->can('superuser'),
-                fn(Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+                ! auth()->user()->can('superuser'),
+                fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                     'receivable',
                     CharacterInfo::class,
                     fn (Builder $query) => $this->joinAffiliated(

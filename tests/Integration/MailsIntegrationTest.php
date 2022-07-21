@@ -4,14 +4,13 @@
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\Auth\Models\Permissions\Permission;
+use function Pest\Laravel\get;
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Spatie\Permission\PermissionRegistrar;
-use function Pest\Laravel\get;
 
 test('see component', function () {
     $response = test()->actingAs(test()->test_user)
@@ -90,5 +89,4 @@ test('get mail body test', function () {
     $response = get(route('get.mail', $mail->id));
 
     $response->assertJson(fn (AssertableJson $json) => $json->count(4));
-
 });

@@ -29,14 +29,12 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
-use Seatplus\Auth\Services\LimitAffiliatedService;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CorporationInfoRessource;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-
     public function __invoke(string $permission, string $corporation_roles = '')
     {
         $affiliationsDto = new AffiliationsDto(

@@ -18,7 +18,6 @@ beforeEach(function () {
         'contactable_id' => test()->test_character->character_id,
         'contactable_type' => CharacterInfo::class,
     ]);
-
 });
 
 it('dispatches job', function () {
@@ -67,7 +66,6 @@ test('one get dispatchable character entities', function () {
 });
 
 test('one get dispatchable corporation entities', function () {
-
     $dispatch_transfer_object = test()->dispatch_transfer_object;
 
     expect($dispatch_transfer_object)->toBeArray();

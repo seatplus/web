@@ -8,7 +8,6 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class CheckRecruitsAffiliatedIdPipe extends CheckPermissionAffiliationPipeline
 {
-
     protected function check(CheckPermissionAffiliationDto $checkPermissionAffiliationDto): CheckPermissionAffiliationDto
     {
         $validated_ids = GetRecruitIdsService::get();

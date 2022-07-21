@@ -38,9 +38,7 @@ use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckACLPermission;
 use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
-use Seatplus\Web\Http\Middleware\HasPermission;
 use Seatplus\Web\Http\Middleware\Locale;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -191,11 +189,12 @@ class WebServiceProvider extends ServiceProvider
     private function addQueryMacros()
     {
         Builder::macro('whereAffiliatedCorporations', function (AffiliationsDto $affiliationsDto) {
-
             $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
             $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
 
-            return $this->when(! $affiliationsDto->user->can('superuser'), fn(Builder $query) => $query
+            return $this->when(
+                ! $affiliationsDto->user->can('superuser'),
+                fn (Builder $query) => $query
                 ->joinSub(
                     $affiliated_ids->union($owned_ids),
                     'affiliated',
@@ -206,12 +205,13 @@ class WebServiceProvider extends ServiceProvider
             );
         });
 
-        Builder::macro('whereAffiliatedCharacters', function (AffiliationsDto $affiliationsDto, ) {
-
+        Builder::macro('whereAffiliatedCharacters', function (AffiliationsDto $affiliationsDto) {
             $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
             $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
 
-            return $this->when(! $affiliationsDto->user->can('superuser'), fn(Builder $query) => $query
+            return $this->when(
+                ! $affiliationsDto->user->can('superuser'),
+                fn (Builder $query) => $query
                 ->joinSub(
                     $affiliated_ids->union($owned_ids),
                     'affiliated',

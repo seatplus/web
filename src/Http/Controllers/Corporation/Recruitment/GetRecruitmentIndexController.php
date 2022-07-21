@@ -51,7 +51,6 @@ class GetRecruitmentIndexController extends Controller
 
     private function getEnlistments()
     {
-
         $manageable_enlistments = Enlistments::query()
             ->with('corporation.alliance')
             ->whereHas('corporation', function (Builder $query) {

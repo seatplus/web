@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Http\Request;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;

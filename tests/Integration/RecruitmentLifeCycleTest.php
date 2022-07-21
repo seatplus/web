@@ -45,7 +45,6 @@ test('user without permission fails to create enlistment', function () {
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
             'type' => 'user',
         ])->assertUnauthorized();
-
 });
 
 test('user with permission and affiliations succeeds to create enlistment', function () {
@@ -168,7 +167,6 @@ test('senior hr sees recruitment component', function () {
 });
 
 test('junior hr sees recruitment component', function () {
-
     createEnlistment();
 
     // First remove all roles from the user
@@ -192,12 +190,11 @@ test('junior hr sees recruitment component', function () {
         ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
         ->and(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
         ->assertOk()
-        ->assertInertia(fn(Assert $page) => $page
+        ->assertInertia(
+            fn (Assert $page) => $page
             ->component('Corporation/Recruitment/RecruitmentIndex')
-            ->has('enlistments',1)
+            ->has('enlistments', 1)
         );
-
-
 });
 
 test('junior hr handles open user applications', function () {

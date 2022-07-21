@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Inertia\Inertia;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
@@ -67,7 +66,6 @@ class MemberTrackingController extends Controller
 
     private function getAffiliatedCorporations(object $dispatchTransferObject)
     {
-
         $affiliations_dto = new AffiliationsDto(
             permissions: [data_get($dispatchTransferObject, 'permission')],
             user: auth()->user(),
@@ -79,14 +77,15 @@ class MemberTrackingController extends Controller
 
         CorporationInfo::query()
             ->with('alliance')
-            ->where(fn($query) => $query
+            ->where(
+                fn ($query) => $query
                 ->has('alliance.ssoScopes')
                 ->orHas('ssoScopes')
             )
             ->has('members')
             ->addSelect([
                 'corporation_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.corporation_id')->limit(1),
-                'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1)
+                'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1),
             ])
             ->when(
                 request()->has('corporation_ids'),
@@ -94,6 +93,6 @@ class MemberTrackingController extends Controller
                 fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'owned_corporations.affiliated_id', '=', 'corporation_infos.corporation_id')
             )
             ->get()
-            ->map(fn($corporation) => $corporation->required_scopes = collect([$corporation->corporation_scopes, $corporation->alliance_scopes])->filter()->unique()->toArray());
+            ->map(fn ($corporation) => $corporation->required_scopes = collect([$corporation->corporation_scopes, $corporation->alliance_scopes])->filter()->unique()->toArray());
     }
 }

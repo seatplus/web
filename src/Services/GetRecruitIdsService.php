@@ -37,12 +37,8 @@ use Seatplus\Eveapi\Models\Application;
 
 class GetRecruitIdsService
 {
-
-
-
     public static function get(): array
     {
-
         $permission = 'can accept or deny applications';
 
         $affiliations_dto = new AffiliationsDto(
@@ -54,7 +50,6 @@ class GetRecruitIdsService
         $cache_key = hash('sha256', json_encode($affiliations_dto));
 
         return Cache::remember($cache_key, now()->addMinutes(15), function () use ($affiliations_dto) {
-
             $affiliated_ids = GetAffiliatedIdsService::make($affiliations_dto)->getQuery();
             $owned_ids = GetOwnedAffiliatedIdsService::make($affiliations_dto)->getQuery();
 
@@ -66,10 +61,12 @@ class GetRecruitIdsService
                         User::class => ['characters'],
                     ]),
                 ])
-                ->when(! $affiliations_dto->user->can('superuser'), fn(Builder $query) => $query
+                ->when(
+                    ! $affiliations_dto->user->can('superuser'),
+                    fn (Builder $query) => $query
                     ->joinSub($affiliated, 'affiliated', 'applications.corporation_id', '=', 'affiliated.affiliated_id')
                 )
-                ->where('status','open')
+                ->where('status', 'open')
                 ->get()
                 ->map(
                     fn ($recruit) => $recruit->applicationable->characters
@@ -81,9 +78,6 @@ class GetRecruitIdsService
                 ->map(fn ($recruit_id) => intval($recruit_id))
                 ->filter()
                 ->toArray();
-
         });
     }
-
-
 }
