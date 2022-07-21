@@ -8,7 +8,6 @@ beforeEach(function () {
 });
 
 test('has dispatchable job', function () {
-
     test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->get(route('corporation.member_tracking'))

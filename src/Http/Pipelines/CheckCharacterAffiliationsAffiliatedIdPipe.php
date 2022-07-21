@@ -11,7 +11,6 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class CheckCharacterAffiliationsAffiliatedIdPipe extends CheckPermissionAffiliationPipeline
 {
-
     protected function check(CheckPermissionAffiliationDto $checkPermissionAffiliationDto): CheckPermissionAffiliationDto
     {
         $owned_ids = GetOwnedAffiliatedIdsService::make($checkPermissionAffiliationDto->affiliationsDto)->getQuery();
@@ -32,7 +31,7 @@ class CheckCharacterAffiliationsAffiliatedIdPipe extends CheckPermissionAffiliat
             ->union($recruits)
             ->select(['character_id', 'corporation_id', 'alliance_id'])
             ->get()
-            ->map(fn(CharacterAffiliation $characterAffiliation) => $characterAffiliation->getAttributes())
+            ->map(fn (CharacterAffiliation $characterAffiliation) => $characterAffiliation->getAttributes())
             ->flatten()
             ->filter()
             ->unique()

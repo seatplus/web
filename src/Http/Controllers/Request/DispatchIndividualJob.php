@@ -70,9 +70,7 @@ class DispatchIndividualJob extends FormRequest
 
     public function getAffiliationsDto(): AffiliationsDto
     {
-
-
-        if(!isset($this->affiliationsDto)) {
+        if (! isset($this->affiliationsDto)) {
             $this->affiliationsDto = new AffiliationsDto(
                 permissions: [Arr::get($this->dispatch_transfer_object, 'permission')],
                 user: auth()->user(),
@@ -85,7 +83,6 @@ class DispatchIndividualJob extends FormRequest
 
     private function getAffiliatedCharacterIds(): array
     {
-
         $affiliationsDto = $this->getAffiliationsDto();
 
         return CharacterInfo::query()

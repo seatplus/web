@@ -25,7 +25,6 @@ test('see component', function () {
 });
 
 test('requires character_ids parameter', function (string $route) {
-
     $response = test()->actingAs(test()->test_user)
         ->get(route($route, 1));
 
@@ -53,7 +52,8 @@ it('has asset prop', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.assets'));
 
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(
+        fn (Assert $page) => $page
         ->has('dispatchTransferObject')
         ->has('characterIds')
     );
@@ -251,7 +251,6 @@ test('load asset on watchlist', function () {
     ];
 
     foreach ($tests as $test) {
-
         $payload = array_merge($test, [
             'character_ids' => [test()->test_character->character_id],
         ]);

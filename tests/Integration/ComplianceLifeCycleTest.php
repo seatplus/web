@@ -12,7 +12,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
-
     test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
     test()->superuser = Event::fakeFor(function () {
@@ -145,7 +144,6 @@ test('non director can not access the compliance index', function () {
 });
 
 test('director user without permission can access index', function () {
-
     $director = Event::fakeFor(function () {
         $user = User::factory()->create();
 
@@ -160,10 +158,10 @@ test('director user without permission can access index', function () {
         ->get(route('corporation.member_compliance'))
         ->assertOk();
 
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(
+        fn (Assert $page) => $page
         ->component('Corporation/MemberCompliance/MemberCompliance')
     );
-
 });
 
 test('director user without permission can review its corp members', function () {
@@ -206,11 +204,11 @@ test('director user without permission can review its corp members', function ()
         ->get(route('corporation.member_compliance'))
         ->assertOk();
 
-    $response->assertInertia(fn (Assert $page) => $page
+    $response->assertInertia(
+        fn (Assert $page) => $page
         ->component('Corporation/MemberCompliance/MemberCompliance')
         ->has('corporations', 1)
     );
-
 });
 
 it('enables superuser to review corporation member', function () {

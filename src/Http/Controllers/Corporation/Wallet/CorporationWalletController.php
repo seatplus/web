@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\CharacterAffiliations\GetOwnedCharacterAffiliationsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;

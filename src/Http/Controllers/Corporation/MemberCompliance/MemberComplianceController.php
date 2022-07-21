@@ -28,8 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberCompliance;
 
 use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -40,7 +38,6 @@ class MemberComplianceController
 {
     public function index()
     {
-
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
             permissions: ['view member compliance'],

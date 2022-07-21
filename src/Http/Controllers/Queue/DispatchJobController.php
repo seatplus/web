@@ -81,17 +81,19 @@ class DispatchJobController extends Controller
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
             permissions: [data_get($validated_data, 'permission')],
-            corporation_roles:  data_get($validated_data,'required_corporation_role') ? [ data_get($validated_data,'required_corporation_role') ] : null,
+            corporation_roles:  data_get($validated_data, 'required_corporation_role') ? [ data_get($validated_data, 'required_corporation_role') ] : null,
         );
 
-        $isCorporationScope = !!$affiliationsDto->corporation_roles;
+        $isCorporationScope = ! ! $affiliationsDto->corporation_roles;
 
         return RefreshToken::query()
-            ->whereHas('character', fn($query) => $query->whereAffiliatedCharacters($affiliationsDto))
+            ->whereHas('character', fn ($query) => $query->whereAffiliatedCharacters($affiliationsDto))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
-            ->when($isCorporationScope, fn ($tokens) => $tokens
+            ->when(
+                $isCorporationScope,
+                fn ($tokens) => $tokens
                 ->filter(fn ($token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
                 ->unique(fn ($token) => $token->corporation_id)
             )

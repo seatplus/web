@@ -32,7 +32,6 @@ use Seatplus\Web\Models\ManualLocation;
 
 class Asset extends EveApiAsset
 {
-
     protected $table = 'assets';
 
     public function manual_location()

@@ -34,14 +34,13 @@ use Seatplus\Web\Http\Pipelines\CheckRecruitsAffiliatedIdPipe;
 
 class CheckContactsAndAffiliation extends CheckPermissionAffiliationOriginal
 {
-
     public function getPipelines(): array
     {
         return [
             CheckOwnedAffiliatedIdsPipe::class,
             CheckRecruitsAffiliatedIdPipe::class,
             CheckAffiliatedIdsPipe::class,
-            CheckCharacterAffiliationsAffiliatedIdPipe::class
+            CheckCharacterAffiliationsAffiliatedIdPipe::class,
         ];
     }
 }

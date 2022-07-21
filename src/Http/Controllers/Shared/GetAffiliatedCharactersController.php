@@ -29,7 +29,6 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Illuminate\Database\Query\JoinClause;
 use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
-use Seatplus\Auth\Services\LimitAffiliatedService;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CharacterInfoRessource;
@@ -37,7 +36,6 @@ use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCharactersController extends Controller
 {
-
     public function __invoke(string $permission)
     {
         $search_param = request()->get('search');
@@ -70,7 +68,9 @@ class GetAffiliatedCharactersController extends Controller
             ->joinSub(
                 GetAffiliatedIdsService::make($affiliationsDto)->getQuery(),
                 'affiliatables',
-                'affiliatables.affiliated_id', '=', 'character_infos.character_id'
+                'affiliatables.affiliated_id',
+                '=',
+                'character_infos.character_id'
             )
             ->when($search_param, fn ($query) => $query->where('character_infos.name', 'like', "%${search_param}%"))
             ->select('character_infos.*');
