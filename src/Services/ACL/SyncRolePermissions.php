@@ -40,7 +40,7 @@ class SyncRolePermissions
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-    private Role $role
+        private Role $role
     ) {
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
