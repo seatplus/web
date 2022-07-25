@@ -34,7 +34,7 @@ class SearchCorporationOrAlliance
     public function __construct(/**
      * @var string
      */
-    private string $searchParam
+        private string $searchParam
     ) {
     }
 
