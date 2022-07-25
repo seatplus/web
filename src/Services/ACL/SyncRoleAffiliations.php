@@ -42,7 +42,7 @@ class SyncRoleAffiliations
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-    private Role $role
+        private Role $role
     ) {
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();
