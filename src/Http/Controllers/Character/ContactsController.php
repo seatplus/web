@@ -27,7 +27,6 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
