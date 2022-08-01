@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -43,7 +44,9 @@ class ContactsController extends Controller
 
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characters' => $this->getCharacters($dispatchTransferObject, 'contacts')->get(),
+            'characters' => $this->getCharacters($dispatchTransferObject, 'contacts')
+                ->join('character_affiliations', 'character_affiliations.character_id', '=', 'character_infos.character_id')
+                ->get(),
         ]);
     }
 
