@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Application;
 
 class CheckAffiliationForApplication
@@ -38,10 +39,17 @@ class CheckAffiliationForApplication
 
         abort_unless($application_id, 404, 'required url parameter application_id is missing');
 
-        $affiliated_ids = getAffiliatedIdsByPermission($permission);
-
         $application = Application::query()
-            ->whereIn('corporation_id', $affiliated_ids)
+            ->whereHas('corporation', function ($query) use ($permission) {
+
+                $affiliationsDto = new AffiliationsDto(
+                    user: auth()->user(),
+                    permissions: [$permission],
+                    corporation_roles: ['director'],
+                );
+
+                return $query->whereAffiliatedCorporations($affiliationsDto);
+            })
             ->where('id', $application_id)
             ->with(['applicationable', 'corporation'])
             ->exists();
