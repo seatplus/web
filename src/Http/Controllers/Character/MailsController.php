@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -67,21 +68,18 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
+        $affiliationsDto = new AffiliationsDto(
+            user: auth()->user(),
+            permissions: [data_get($dispatchTransferObject, 'permission')]
+        );
+
         $mail = Mail::query()
             ->with(['recipients'])
-            ->when(
-                ! auth()->user()->can('superuser'),
-                fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
-                    'receivable',
-                    CharacterInfo::class,
-                    fn (Builder $query) => $this->joinAffiliated(
-                        $query,
-                        'character_infos',
-                        'character_id',
-                        $dispatchTransferObject
-                    )
-                ))
-            )
+            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+                'receivable',
+                CharacterInfo::class,
+                fn (Builder $query) => $query->whereAffiliatedCharacters($affiliationsDto)
+            ))
             ->firstWhere('id', $mail_id);
 
         abort_unless($mail, 404, 'Mail not found');
