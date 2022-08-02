@@ -20,6 +20,7 @@
           :recruit="recruit"
           :watchlist="watchlist"
           :application="application"
+          :target-corporation="application.corporation"
         />
       </li>
 
