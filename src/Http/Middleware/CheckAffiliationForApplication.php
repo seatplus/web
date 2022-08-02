@@ -41,7 +41,6 @@ class CheckAffiliationForApplication
 
         $application = Application::query()
             ->whereHas('corporation', function ($query) use ($permission) {
-
                 $affiliationsDto = new AffiliationsDto(
                     user: auth()->user(),
                     permissions: [$permission],
