@@ -43,7 +43,9 @@ class ContactsController extends Controller
 
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characters' => $this->getCharacters($dispatchTransferObject, 'contacts')->get(),
+            'characters' => $this->getCharacters($dispatchTransferObject, 'contacts')
+                ->join('character_affiliations', 'character_affiliations.character_id', '=', 'character_infos.character_id')
+                ->get(),
         ]);
     }
 
