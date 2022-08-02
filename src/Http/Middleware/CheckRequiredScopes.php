@@ -35,11 +35,9 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 {
-
     public function handle(Request $request, Closure $next)
     {
-
-        if(! app()->environment('production')) {
+        if (! app()->environment('production')) {
             return $next($request);
         }
 
