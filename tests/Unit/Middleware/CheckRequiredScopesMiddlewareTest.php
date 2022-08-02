@@ -15,18 +15,18 @@ beforeEach(function () {
 });
 
 it('should skip handle if environment is not production', function () {
-
     test()->request->shouldReceive('forward')->times(1);
     test()->middleware->shouldReceive('redirectTo')->times(0);
 
     test()->middleware->handle(test()->request, test()->next);
-
 });
 
 it('should call parent method on production environment', function () {
 
     // set production environment
-    app()->detectEnvironment(function() { return 'production'; });
+    app()->detectEnvironment(function () {
+        return 'production';
+    });
 
     test()->actingAs(test()->test_user);
     $user_id = test()->test_user->id;
@@ -42,5 +42,4 @@ it('should call parent method on production environment', function () {
     test()->middleware->shouldReceive('redirectTo')->times(1);
 
     test()->middleware->handle(test()->request, test()->next);
-
 });
