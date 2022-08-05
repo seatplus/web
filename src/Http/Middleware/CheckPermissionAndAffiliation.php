@@ -28,16 +28,19 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Seatplus\Auth\Pipelines\Middleware\CheckAffiliatedIdsPipe;
 use Seatplus\Auth\Pipelines\Middleware\CheckOwnedAffiliatedIdsPipe;
+use Seatplus\Web\Http\Pipelines\CheckCorporationMemberComplianceAffiliatedIdPipe;
 use Seatplus\Web\Http\Pipelines\CheckRecruitsAffiliatedIdPipe;
 
 class CheckPermissionAndAffiliation extends \Seatplus\Auth\Http\Middleware\CheckPermissionAndAffiliation
 {
     public function getPipelines(): array
     {
+
         return [
             CheckOwnedAffiliatedIdsPipe::class,
             CheckRecruitsAffiliatedIdPipe::class,
             CheckAffiliatedIdsPipe::class,
+            CheckCorporationMemberComplianceAffiliatedIdPipe::class
         ];
     }
 }

@@ -9,6 +9,7 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
 use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
@@ -240,6 +241,63 @@ it('enables with review permission to review corporation member', function () {
             'user' => test()->test_user->id,
         ]))->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
+});
+
+it('allows user with review permission to review corporation member', function () {
+
+    \Illuminate\Support\Facades\Event::fake();
+
+    // create a user with two characters
+    $user = User::factory()->create();
+    $secondary_character = CharacterUser::factory()->make();
+
+    $user->character_users()->save($secondary_character);
+
+    expect($user->characters->count())->toEqual(2);
+
+    $first_character = $user->characters->first();
+    $second_character = $user->characters->last();
+
+    expect($first_character->character_id)->not()->toEqual($second_character->character_id);
+
+    // create role
+    $role = Role::create(['name' => faker()->name]);
+    $permission = Permission::create(['name' => 'member compliance: review user']);
+
+    $role->givePermissionTo($permission);
+    $role->activateMember(test()->test_user);
+
+    // check if test user has permission
+    expect(test()->test_user->can('member compliance: review user'))->toBeTrue();
+
+    // create affiliation
+    $role->affiliations()->create([
+        'affiliatable_id' => $first_character->character_id,
+        'affiliatable_type' => \Seatplus\Eveapi\Models\Character\CharacterInfo::class,
+        'type' => 'allowed',
+    ]);
+
+    // create sso scope
+    $sso_scope = SsoScopes::factory()->create([
+        'morphable_type' => \Seatplus\Eveapi\Models\Corporation\CorporationInfo::class,
+        'morphable_id' => $first_character->corporation->corporation_id,
+        'type' => 'user',
+        'selected_scopes' => collect(['esi-alliances.read_corporations.v1'])->toJson(),
+    ]);
+
+    \Pest\Laravel\actingAs(test()->test_user);
+    $affiliated_ids = GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery()->get();
+
+    expect($affiliated_ids)->toHaveCount(2)
+        ->and($affiliated_ids->first()->affiliated_id)->toEqual($first_character->character_id)
+        ->and($affiliated_ids->last()->affiliated_id)->toEqual($second_character->character_id);
+
+    $response = test()->actingAs(test()->test_user)->get(route('get.character.skills', [
+        'character_id' => $second_character->character_id,
+    ]));
+
+    $response->assertOk();
+
 });
 
 // Helpers
