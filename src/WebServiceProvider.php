@@ -39,6 +39,7 @@ use Seatplus\Web\Http\Middleware\CheckACLPermission;
 use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
+use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
 
 class WebServiceProvider extends ServiceProvider
 {
@@ -208,6 +209,12 @@ class WebServiceProvider extends ServiceProvider
         Builder::macro('whereAffiliatedCharacters', function (AffiliationsDto $affiliationsDto) {
             $affiliated_ids = GetAffiliatedIdsService::make($affiliationsDto)->getQuery();
             $owned_ids = GetOwnedAffiliatedIdsService::make($affiliationsDto)->getQuery();
+
+            $combined_query = $affiliated_ids->union($owned_ids);
+
+            if(! $affiliationsDto->user->can('member compliance: review user')) {
+                $combined_query = $combined_query->union(GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery());
+            }
 
             return $this->when(
                 ! $affiliationsDto->user->can('superuser'),
