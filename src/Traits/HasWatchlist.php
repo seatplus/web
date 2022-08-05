@@ -34,7 +34,6 @@ trait HasWatchlist
 {
     private function handleWatchlist(Builder|QueryBuilder $query, Request $request)
     {
-
         $query->where(function ($query) use ($request) {
             $query->where(function ($query) use ($request) {
                 $request->whenHas('systems', fn ($system_ids) => $query->orWhere(fn ($query) => $query->inSystems($system_ids)));
@@ -44,6 +43,5 @@ trait HasWatchlist
                 $request->whenHas('categories', fn ($category_ids) => $query->orWhere(fn ($query) => $query->ofCategories($category_ids)));
             });
         });
-
     }
 }

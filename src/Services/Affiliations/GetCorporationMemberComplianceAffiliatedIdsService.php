@@ -28,7 +28,6 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public function getQuery() : Builder
     {
-
         $affiliated_ids = GetAffiliatedIdsService::make($this->affiliationsDto)->getQuery();
 
         $user_query = User::query()
@@ -59,6 +58,5 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
         return $character_user_query
             ->union($affiliated_ids);
-
     }
 }
