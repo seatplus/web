@@ -35,12 +35,11 @@ class CheckPermissionAndAffiliation extends \Seatplus\Auth\Http\Middleware\Check
 {
     public function getPipelines(): array
     {
-
         return [
             CheckOwnedAffiliatedIdsPipe::class,
             CheckRecruitsAffiliatedIdPipe::class,
             CheckAffiliatedIdsPipe::class,
-            CheckCorporationMemberComplianceAffiliatedIdPipe::class
+            CheckCorporationMemberComplianceAffiliatedIdPipe::class,
         ];
     }
 }

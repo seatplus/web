@@ -223,7 +223,7 @@ class WebServiceProvider extends ServiceProvider
                 ! $affiliationsDto->user->can('superuser'),
                 fn (Builder $query) => $query
                 ->joinSub(
-                    $combined_query,
+                    $affiliated_ids->union($owned_ids),
                     'affiliated',
                     'character_infos.character_id',
                     '=',

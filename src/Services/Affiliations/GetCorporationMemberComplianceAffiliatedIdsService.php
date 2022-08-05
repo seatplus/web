@@ -10,7 +10,6 @@ use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 
 class GetCorporationMemberComplianceAffiliatedIdsService
 {
-
     public function __construct(
         private AffiliationsDto $affiliationsDto
     ) {
@@ -18,7 +17,6 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public static function make()
     {
-
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
             permissions: ['member compliance: review user'],
