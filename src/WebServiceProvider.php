@@ -213,14 +213,17 @@ class WebServiceProvider extends ServiceProvider
             $combined_query = $affiliated_ids->union($owned_ids);
 
             if(! $affiliationsDto->user->can('member compliance: review user')) {
-                $combined_query = $combined_query->union(GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery());
+
+                $corporatioon_member_compliance_affiliated_ids = GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery();
+
+                $combined_query = $combined_query->union($corporatioon_member_compliance_affiliated_ids);
             }
 
             return $this->when(
                 ! $affiliationsDto->user->can('superuser'),
                 fn (Builder $query) => $query
                 ->joinSub(
-                    $affiliated_ids->union($owned_ids),
+                    $combined_query,
                     'affiliated',
                     'character_infos.character_id',
                     '=',
