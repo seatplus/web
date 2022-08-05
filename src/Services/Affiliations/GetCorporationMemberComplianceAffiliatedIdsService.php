@@ -10,7 +10,6 @@ use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 
 class GetCorporationMemberComplianceAffiliatedIdsService
 {
-
     public function __construct(
         private AffiliationsDto $affiliationsDto
     ) {
@@ -18,7 +17,6 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public static function make()
     {
-
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
             permissions: ['member compliance: review user'],
@@ -30,7 +28,6 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public function getQuery() : Builder
     {
-
         $user_query = User::query()
             ->whereHas(
                 'characters',
@@ -53,6 +50,5 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
         return $character_user_query
             ->union(GetAffiliatedIdsService::make($this->affiliationsDto)->getQuery());
-
     }
 }

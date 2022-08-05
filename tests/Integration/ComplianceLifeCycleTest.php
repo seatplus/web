@@ -244,7 +244,6 @@ it('enables with review permission to review corporation member', function () {
 });
 
 it('allows user with review permission to review corporation member', function () {
-
     \Illuminate\Support\Facades\Event::fake();
 
     // create a user with two characters
@@ -297,7 +296,6 @@ it('allows user with review permission to review corporation member', function (
     ]));
 
     $response->assertOk();
-
 });
 
 // Helpers

@@ -22,8 +22,6 @@ class CheckCorporationMemberComplianceAffiliatedIdPipe extends CheckPermissionAf
 
     protected function shouldBeChecked(CheckPermissionAffiliationDto $checkPermissionAffiliationDto): bool
     {
-
-
         if ($checkPermissionAffiliationDto->allIdsValidated()) {
             return false;
         }

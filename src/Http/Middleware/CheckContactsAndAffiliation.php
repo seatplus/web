@@ -42,7 +42,7 @@ class CheckContactsAndAffiliation extends CheckPermissionAffiliationOriginal
             CheckRecruitsAffiliatedIdPipe::class,
             CheckAffiliatedIdsPipe::class,
             CheckCharacterAffiliationsAffiliatedIdPipe::class,
-            CheckCorporationMemberComplianceAffiliatedIdPipe::class
+            CheckCorporationMemberComplianceAffiliatedIdPipe::class,
         ];
     }
 }
