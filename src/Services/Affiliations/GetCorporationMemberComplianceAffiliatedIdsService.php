@@ -58,6 +58,5 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
         return $character_user_query
             ->union($affiliated_ids);
-
     }
 }
