@@ -28,6 +28,8 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public function getQuery() : Builder
     {
+        $affiliated_ids = GetAffiliatedIdsService::make($this->affiliationsDto)->getQuery();
+
         $user_query = User::query()
             ->whereHas(
                 'characters',
@@ -40,7 +42,13 @@ class GetCorporationMemberComplianceAffiliatedIdsService
                         'alliance',
                         fn (Builder $query) => $query->whereHas('ssoScopes', fn (Builder $query) => $query->whereIn('type', ['global', 'user']))
                     )
-                    ->whereAffiliatedCharacters($this->affiliationsDto)
+                    ->joinSub(
+                        $affiliated_ids,
+                        'affiliated',
+                        'character_infos.character_id',
+                        '=',
+                        'affiliated.affiliated_id'
+                    )
             )
             ->select('users.id');
 
@@ -49,6 +57,6 @@ class GetCorporationMemberComplianceAffiliatedIdsService
             ->select('character_id as affiliated_id');
 
         return $character_user_query
-            ->union(GetAffiliatedIdsService::make($this->affiliationsDto)->getQuery());
+            ->union($affiliated_ids);
     }
 }
