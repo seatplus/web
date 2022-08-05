@@ -30,6 +30,7 @@ use Seatplus\Auth\Http\Middleware\CheckPermissionAndAffiliation as CheckPermissi
 use Seatplus\Auth\Pipelines\Middleware\CheckAffiliatedIdsPipe;
 use Seatplus\Auth\Pipelines\Middleware\CheckOwnedAffiliatedIdsPipe;
 use Seatplus\Web\Http\Pipelines\CheckCharacterAffiliationsAffiliatedIdPipe;
+use Seatplus\Web\Http\Pipelines\CheckCorporationMemberComplianceAffiliatedIdPipe;
 use Seatplus\Web\Http\Pipelines\CheckRecruitsAffiliatedIdPipe;
 
 class CheckContactsAndAffiliation extends CheckPermissionAffiliationOriginal
@@ -41,6 +42,7 @@ class CheckContactsAndAffiliation extends CheckPermissionAffiliationOriginal
             CheckRecruitsAffiliatedIdPipe::class,
             CheckAffiliatedIdsPipe::class,
             CheckCharacterAffiliationsAffiliatedIdPipe::class,
+            CheckCorporationMemberComplianceAffiliatedIdPipe::class,
         ];
     }
 }
