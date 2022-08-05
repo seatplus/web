@@ -23,10 +23,6 @@ class CheckRecruitsAffiliatedIdPipe extends CheckPermissionAffiliationPipeline
             return false;
         }
 
-        if ($checkPermissionAffiliationDto->requested_ids->count() > 1) {
-            return false;
-        }
-
         return true;
     }
 }
