@@ -90,10 +90,9 @@ class MemberTrackingController extends Controller
             ->whereAffiliatedCorporations($affiliations_dto)
             ->get()
             ->map(function ($corporation) {
-
                 $corporation->required_scopes = collect([
                     json_decode($corporation->corporation_scopes, true),
-                    json_decode($corporation->alliance_scopes,true)
+                    json_decode($corporation->alliance_scopes, true),
                 ])->flatten()->filter()->unique()->toArray();
 
                 return $corporation;
