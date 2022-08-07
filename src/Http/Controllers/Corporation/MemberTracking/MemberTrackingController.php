@@ -75,7 +75,7 @@ class MemberTrackingController extends Controller
         $owned_corporations = GetOwnedAffiliatedIdsService::make($affiliations_dto)
             ->getQuery();
 
-        CorporationInfo::query()
+        return CorporationInfo::query()
             ->with('alliance')
             ->where(
                 fn ($query) => $query
@@ -87,12 +87,15 @@ class MemberTrackingController extends Controller
                 'corporation_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.corporation_id')->limit(1),
                 'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1),
             ])
-            ->when(
-                request()->has('corporation_ids'),
-                fn ($query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
-                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'owned_corporations.affiliated_id', '=', 'corporation_infos.corporation_id')
-            )
+            ->whereAffiliatedCorporations($affiliations_dto)
             ->get()
-            ->map(fn ($corporation) => $corporation->required_scopes = collect([$corporation->corporation_scopes, $corporation->alliance_scopes])->filter()->unique()->toArray());
+            ->map(function ($corporation) {
+                $corporation->required_scopes = collect([
+                    json_decode($corporation->corporation_scopes, true),
+                    json_decode($corporation->alliance_scopes, true),
+                ])->flatten()->filter()->unique()->toArray();
+
+                return $corporation;
+            });
     }
 }
