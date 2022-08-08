@@ -26,6 +26,8 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
@@ -59,19 +61,16 @@ class CorporationWalletController extends Controller
 
     public function balance(int $corporation_id, int $division_id)
     {
-        $date_part = WalletJournal::query()
-            ->whereBetween('date', [now(), now()->subDays(request()->get('days', 30))])
+        $entries = WalletJournal::query()
+            ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
             ->orderByDesc('date')
-            ->select(['date as x', 'balance as y']);
-
-        return WalletJournal::query()
-            ->limit(90)
-            ->orderByDesc('date')
-            ->union($date_part)
             ->where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
-            ->select(['date as x', 'balance as y'])
-            ->paginate();
+            ->groupBy('x')
+            ->limit(30)
+            ->get();
+
+        return new LengthAwarePaginator($entries, 30, 30);
     }
 
     public function transaction(int $corporation_id, int $division_id)

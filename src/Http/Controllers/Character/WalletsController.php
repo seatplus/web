@@ -27,6 +27,8 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
@@ -82,22 +84,16 @@ class WalletsController extends Controller
                 fn (Builder $query) => $query->where('character_id', $character_id)
             )
             ->limit(1)
-            ->select(['updated_at as x', 'balance as y']);
+            ->select(DB::raw('DATE(updated_at) as x'), 'balance as y');
 
-        $date_part = WalletJournal::query()
-            ->whereBetween('date', [now()->subDays(request()->get('days', 30)), now()])
-            ->where('wallet_journable_id', $character_id)
+        $journal_entries = WalletJournal::query()
+            ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
             ->orderByDesc('date')
-            ->select(['date as x', 'balance as y']);
+            ->where('wallet_journable_id', $character_id)
+            ->groupBy('x')
+            ->limit(30);
 
-        return WalletJournal::query()
-            ->limit(90)
-            ->orderByDesc('date')
-            ->union($date_part)
-            ->union($balance_part)
-            ->where('wallet_journable_id', $character_id)
-            ->select(['date as x', 'balance as y'])
-            ->paginate();
+        return new LengthAwarePaginator($balance_part->union($journal_entries)->limit(30)->get(), 30, 30);
     }
 
     public function transaction(int $character_id)
