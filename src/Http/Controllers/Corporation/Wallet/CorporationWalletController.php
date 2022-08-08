@@ -61,7 +61,6 @@ class CorporationWalletController extends Controller
 
     public function balance(int $corporation_id, int $division_id)
     {
-
         $entries = WalletJournal::query()
             ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
             ->orderByDesc('date')
