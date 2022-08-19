@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
