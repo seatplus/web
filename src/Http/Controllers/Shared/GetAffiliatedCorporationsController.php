@@ -39,8 +39,8 @@ class GetAffiliatedCorporationsController extends Controller
     {
         $affiliationsDto = new AffiliationsDto(
             user: auth()->user(),
-            permissions: explode('|', $permission),
-            corporation_roles: explode('|', $corporation_roles)
+            permissions: [$permission],
+            corporation_roles: explode(',', $corporation_roles)
         );
 
         $search_param = request()->get('search');
@@ -59,16 +59,11 @@ class GetAffiliatedCorporationsController extends Controller
             ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $affiliatables = CorporationInfo::query()
-            ->joinSub(
-                GetAffiliatedIdsService::make($affiliationsDto)->getQuery(),
-                'affiliated',
-                'affiliated.affiliated_id',
-                '=',
-                'corporation_infos.corporation_id'
-            )
+            ->whereAffiliatedCorporations($affiliationsDto)
             // Remove Doomheim corporation
             ->where('corporation_infos.corporation_id', '<>', 1_000_001)
             ->select('corporation_infos.*')
+            ->has($permission)
             ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $query = $owned_corporations
@@ -77,7 +72,6 @@ class GetAffiliatedCorporationsController extends Controller
         return CorporationInfoRessource::collection(
             $query
                 ->with('alliance')
-                ->has($permission)
                 ->paginate()
         );
     }
