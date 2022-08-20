@@ -1,6 +1,6 @@
 <template>
   <ul class="divide-y divide-gray-200 overflow-y-auto">
-    <InfiniteLoadingComponent
+    <InfiniteLoadingHelper
       v-slot="{results}"
       route="manual_job.entities"
       method="POST"
@@ -10,7 +10,7 @@
               :key="`dispatchable entry ${index}`"
               :entry="entity"
       />
-    </InfiniteLoadingComponent>
+    </InfiniteLoadingHelper>
   </ul>
 </template>
 
@@ -18,12 +18,11 @@
 
 import DispatchableEntry from "./DispatchableEntry";
 import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import InfiniteLoadingComponent from "@/Shared/InfiniteLoadingComponent";
 import EveImage from "@/Shared/EveImage";
 
 export default {
     name: "DispatchUpdate",
-    components: {EveImage, InfiniteLoadingComponent, InfiniteLoadingHelper, DispatchableEntry},
+    components: {EveImage, InfiniteLoadingHelper, DispatchableEntry},
     data: function () {
         return {
             //job_name: this.$page.props.dispatch_transfer_object.manual_job,
