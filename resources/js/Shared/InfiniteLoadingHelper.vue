@@ -60,42 +60,30 @@
   <div ref="scrollComponent" />
 </template>
 
-<script>
+<script setup>
 import { useInfinityScrolling } from "@/Functions/useInfinityScrolling";
 import { TransitionRoot } from '@headlessui/vue'
 import { computed } from "vue";
 
-export default {
-    name: "InfiniteLoadingHelper",
-    components: {
-        TransitionRoot,
+const props = defineProps({
+    route: {
+        type: String,
+        required: true
     },
-    props: {
-        route: {
-            type: String,
-            required: true
-        },
-        params: {
-            required: false,
-            type: Object,
-            default: () => new Object()
-        }
+    params: {
+        required: false,
+        type: Object,
+        default: () => new Object()
     },
-    emits: ['result'],
-    setup(props) {
+    method: {
+        required: false,
+        type: String,
+        default: 'GET'
+    },
+})
 
-        const {result, isLoading, isComplete, scrollComponent} = useInfinityScrolling(props.route, props.params);
+const {result, isLoading, isComplete, scrollComponent} = useInfinityScrolling(props.route, props.params, props.method)
 
-        const noResults = computed(() => isComplete.value && result.value.length === 0)
-        const showLoadingIndicator = computed(() => isLoading.value)
-
-        return {
-            result,
-            noResults,
-            isComplete,
-            scrollComponent,
-            showLoadingIndicator
-        }
-    }
-}
+const noResults = computed(() => isComplete.value && result.value.length === 0)
+const showLoadingIndicator = computed(() => isLoading.value)
 </script>

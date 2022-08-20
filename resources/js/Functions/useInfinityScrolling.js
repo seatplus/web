@@ -1,12 +1,11 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import route from 'ziggy'
 
-export function useInfinityScrolling(routeName, params) {
+export function useInfinityScrolling(routeName, params, method = 'GET') {
 
-    const url = route(routeName,params)
+    const url = ref(route(routeName,params))
     const scrollComponent = ref(null)
     const result = ref([])
-    const page = ref(1)
     const isLoading = ref(false)
     const isComplete = ref(false)
     const isVisible = ref(null)
@@ -20,26 +19,29 @@ export function useInfinityScrolling(routeName, params) {
 
         const timeout = setTimeout(() => isLoading.value = true, 250)
 
-        axios.get(url, {
+        axios({
+            method: method,
+            url: url.value,
+            data: method === 'POST' ? params : null,
             cancelToken: source.token,
-            params: {
-                page: page.value,
-            },
-        }).then(response => {
+            params: params
+        })
+            .then(response => {
 
-            clearTimeout(timeout)
-            isLoading.value = false
+                clearTimeout(timeout)
 
-            if (response.data.data.length) {
-                page.value += 1;
+                if (response.data.length === 0) {
+                    isComplete.value = true;
+                }
+
                 result.value.push(...response.data.data);
-
-                // Todo check if still in view and fetch again
-
-            } else {
-                isComplete.value = true
-            }
-        }).catch(error => console.log(error));
+                url.value = response.data.links.next;
+            })
+            .catch(error => {
+                console.log(error);
+            }).finally(() => {
+                isLoading.value = false;
+            });
     }
 
     const options =  {
