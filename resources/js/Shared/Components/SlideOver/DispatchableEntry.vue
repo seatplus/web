@@ -19,7 +19,7 @@
             <div class="text-sm leading-5 text-gray-500 truncate">
               <span v-if="status === 'ready'">job can be dispatched</span>
               <span v-if="['pending', 'finished', 'failures'].includes(status)">
-                <Time :timestamp="entry.batch.time" />
+                <Time v-if=time :timestamp="time" />
               </span>
             </div>
           </div>
@@ -75,6 +75,7 @@ export default {
             character_id: props.entry.character_id,
             corporation_id: props.entry.corporation_id,
         }))
+        const time = computed(() => _.get(props.entry, 'batch.time'))
 
         function getStatus() {
             axios
@@ -113,7 +114,8 @@ export default {
             batch_id,
             dispatch_transfer_object,
             url,
-            dispatchJob
+            dispatchJob,
+            time
         }
     }
 }
