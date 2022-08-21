@@ -92,7 +92,6 @@ class UpdateOrCreateSsoSettings
         collect(Arr::get($this->request, 'selectedScopes'))
             ->flatMap(fn ($scope) => explode(',', $scope))
             ->each(function ($scope) {
-
                 // If it is a corporation scope, we need to know the characters role
                 if (Str::of($scope)->contains('corporation')) {
                     $this->selected_scopes->push('esi-characters.read_corporation_roles.v1');

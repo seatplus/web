@@ -32,7 +32,6 @@ class StopImpersonateController extends Controller
 {
     public function __invoke()
     {
-
         // If there is no user set in the session, abort!
         abort_unless(session()->has('impersonation_origin'), 404);
 

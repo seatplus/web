@@ -22,7 +22,6 @@ it('should skip handle if environment is not production', function () {
 });
 
 it('should call parent method on production environment', function () {
-
     // set production environment
     app()->detectEnvironment(function () {
         return 'production';

@@ -166,7 +166,6 @@ test('director user without permission can access index', function () {
 });
 
 test('director user without permission can review its corp members', function () {
-
     //createScopeSetting();
 
     // 1. make sure user ist not superuser
