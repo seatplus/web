@@ -59,9 +59,11 @@ export default {
         },
         subText() {
 
+            let alliance = _.get(this.entity, 'alliance', null)
+
             let names = _.compact([
                 _.get(this.entity, 'corporation.name'),
-                _.get(this.entity, 'alliance.name')
+                _.isString(alliance) ? alliance : _.get(alliance, 'name', null),
             ])
 
             return _.join(names, ' | ')
