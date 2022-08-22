@@ -57,8 +57,11 @@ test('one get dispatchable character entities', function () {
         ->postJson(route('manual_job.entities'), test()->dispatch_transfer_object);
 
     $response->assertStatus(200)
-        ->assertJson(fn (AssertableJson $json) =>
-            $json->has('data.0', fn (AssertableJson $data) =>
+        ->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+                'data.0',
+                fn (AssertableJson $data) =>
                 $data->where('character_id', test()->test_character->character_id)
                     ->where('name', test()->test_character->name)
                     ->where('batch.state', 'ready')
@@ -66,7 +69,6 @@ test('one get dispatchable character entities', function () {
             )
             ->etc()
         );
-
 });
 
 test('one get dispatchable corporation entities', function () {
@@ -101,13 +103,16 @@ test('one get dispatchable corporation entities', function () {
         ->postJson(route('manual_job.entities'), $dispatch_transfer_object);
 
     $response->assertStatus(200)
-        ->assertJson(fn (AssertableJson $json) =>
-        $json->has('data.0', fn (AssertableJson $data) =>
+        ->assertJson(
+            fn (AssertableJson $json) =>
+        $json->has(
+            'data.0',
+            fn (AssertableJson $data) =>
             $data->where('corporation_id', test()->test_character->corporation->corporation_id)
                 ->where('name', test()->test_character->corporation->name)
                 ->where('batch.state', 'ready')
                 ->etc()
-            )
+        )
             ->etc()
         );
 });
