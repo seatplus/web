@@ -13,7 +13,6 @@ beforeEach(function () {
 });
 
 test('on can update role type', function () {
-
     //dd(test()->test_user->hasRole('test'));
 
     expect(test()->test_user->hasRole('test'))->toBeFalse();

@@ -17,7 +17,6 @@ beforeEach(function () {
 });
 
 test('user can leave himself', function () {
-
     // First create affiliation
     test()->role->acl_affiliations()->create([
         'affiliatable_id' => test()->test_character->character_id,
@@ -42,7 +41,6 @@ test('user can leave himself', function () {
 });
 
 test('user can kick other user as superuser', function () {
-
     // First create affiliation
     test()->role->acl_affiliations()->create([
         'affiliatable_id' => test()->secondary_character->character_id,
@@ -69,7 +67,6 @@ test('user can kick other user as superuser', function () {
 });
 
 test('user can kick other user as moderator', function () {
-
     // First create affiliation
     test()->role->acl_affiliations()->create([
         'affiliatable_id' => test()->secondary_character->character_id,
@@ -105,7 +102,6 @@ test('user can kick other user as moderator', function () {
 });
 
 test('user can not kick other user as vanilla user', function () {
-
     // First create affiliation
     test()->role->acl_affiliations()->create([
         'affiliatable_id' => test()->secondary_character->character_id,

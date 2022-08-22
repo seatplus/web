@@ -4,7 +4,7 @@
       <title>{{ title(pageTitle) }}</title>
     </teleport>
 
-    <!--<RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />-->
+    <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
     <PageHeader>
       {{ pageTitle }}

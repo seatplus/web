@@ -1,6 +1,7 @@
 <?php
 
 
+use Illuminate\Testing\Fluent\AssertableJson;
 use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
@@ -56,13 +57,18 @@ test('one get dispatchable character entities', function () {
         ->postJson(route('manual_job.entities'), test()->dispatch_transfer_object);
 
     $response->assertStatus(200)
-        ->assertJson([
-            [
-                'character_id' => test()->test_character->character_id,
-                'name' => test()->test_character->name,
-                'batch' => ['state' => 'ready'],
-            ],
-        ]);
+        ->assertJson(
+            fn (AssertableJson $json) =>
+            $json->has(
+                'data.0',
+                fn (AssertableJson $data) =>
+                $data->where('character_id', test()->test_character->character_id)
+                    ->where('name', test()->test_character->name)
+                    ->where('batch.state', 'ready')
+                ->etc()
+            )
+            ->etc()
+        );
 });
 
 test('one get dispatchable corporation entities', function () {
@@ -93,17 +99,20 @@ test('one get dispatchable corporation entities', function () {
 
     expect(test()->test_character->corporation->contacts()->count())->toBeGreaterThan(0);
 
-    //expect(test()->test_character->roles->hasRole('roles', test()->dispatch_transfer_object['required_scopes']))->toBeTrue();
-
     $response = test()->actingAs(test()->test_user)
         ->postJson(route('manual_job.entities'), $dispatch_transfer_object);
 
     $response->assertStatus(200)
-        ->assertJson([
-            [
-                'corporation_id' => test()->test_character->corporation->corporation_id,
-                'name' => test()->test_character->corporation->name,
-                'batch' => ['state' => 'ready'],
-            ],
-        ]);
+        ->assertJson(
+            fn (AssertableJson $json) =>
+        $json->has(
+            'data.0',
+            fn (AssertableJson $data) =>
+            $data->where('corporation_id', test()->test_character->corporation->corporation_id)
+                ->where('name', test()->test_character->corporation->name)
+                ->where('batch.state', 'ready')
+                ->etc()
+        )
+            ->etc()
+        );
 });

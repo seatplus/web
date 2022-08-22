@@ -169,7 +169,6 @@ test('load asset in region', function () {
 });
 
 test('load asset in unknown location', function () {
-
     // 1. create asset with location
     $asset = Asset::factory()
         ->create([
@@ -214,7 +213,6 @@ test('load asset in unknown location', function () {
 });
 
 test('load asset on watchlist', function () {
-
     // Prepare
     $asset = Asset::factory()
         ->count(2)

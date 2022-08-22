@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Queue;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
@@ -86,7 +87,7 @@ class DispatchJobController extends Controller
 
         $isCorporationScope = ! ! $affiliationsDto->corporation_roles;
 
-        return RefreshToken::query()
+        $tokens = RefreshToken::query()
             ->whereHas('character', fn ($query) => $query->whereAffiliatedCharacters($affiliationsDto))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
@@ -103,7 +104,9 @@ class DispatchJobController extends Controller
                 'name' => $isCorporationScope ? $token->corporation->name : $token->character->name,
                 'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $isCorporationScope ? $token->corporation_id : $token->character_id))),
             ])->filter()->toArray())
-            ->toJson();
+            ->values();
+
+        return new LengthAwarePaginator($tokens, $tokens->count(), $tokens->count());
     }
 
     private function getRefreshToken(DispatchIndividualJob $job)

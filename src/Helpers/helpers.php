@@ -56,7 +56,6 @@ if (! function_exists('number_roman')) {
 }
 
 if (! function_exists('carbon')) {
-
     /**
      * A helper to get a fresh instance of Carbon.
      *
