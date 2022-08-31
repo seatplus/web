@@ -57,6 +57,8 @@ abstract class TestCase extends OrchestraTestCase
         $this->app->instance('path.public', __DIR__ .'/Stubs');
 
         Permission::findOrCreate('superuser');
+
+        $this->withoutVite();
     }
 
     /**
