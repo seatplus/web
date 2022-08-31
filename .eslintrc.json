@@ -6,7 +6,8 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:vue/vue3-recommended"
+        "plugin:vue/vue3-recommended",
+        "plugin:import/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -22,5 +23,9 @@
         "vue"
     ],
     "rules": {
+      "import/extensions": {
+        "js": "never",
+        "vue": "always"
+      }
     }
 }

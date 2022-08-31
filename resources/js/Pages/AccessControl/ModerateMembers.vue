@@ -138,7 +138,7 @@
 </template>
 
 <script>
-    import EveImage from "@/Shared/EveImage"
+    import EveImage from "@/Shared/EveImage.vue"
     import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom"
     import PageHeader from "@/Shared/Layout/PageHeader";
     import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
@@ -161,7 +161,7 @@
                 breadcrumbs: [
                     {
                         name: 'Control Group',
-                        route: this.$route('acl.groups')
+                        route: this.route('acl.groups')
                     }
                 ]
             }
@@ -174,7 +174,7 @@
                     role_id: this.role.id
                 };
 
-                this.$inertia.post(this.$route('acl.join'), data, {
+                this.$inertia.post(this.route('acl.join'), data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -183,7 +183,7 @@
             },
             removeMember(member) {
 
-                this.$inertia.delete(this.$route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
+                this.$inertia.delete(this.route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,

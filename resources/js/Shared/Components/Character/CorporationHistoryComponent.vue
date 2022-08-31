@@ -64,7 +64,7 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time";
 import ResolveIdToName from "../../ResolveIdToName";
 

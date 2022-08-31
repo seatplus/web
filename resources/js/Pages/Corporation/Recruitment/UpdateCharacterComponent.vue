@@ -51,12 +51,11 @@
 </template>
 
 <script>
-import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData";
-import Button from "@/Shared/Layout/Button";
+import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData.vue";
+import Button from "@/Shared/Layout/Button.vue";
 import {computed, ref, watch} from "vue";
 import dayjs from "dayjs";
-import Time from "@/Shared/Time";
-import route from 'ziggy';
+import Time from "@/Shared/Time.vue";
 
 export default {
     name: "UpdateCharacterComponent",

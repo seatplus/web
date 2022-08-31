@@ -18,7 +18,7 @@
 
 import DispatchableEntry from "./DispatchableEntry";
 import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import EveImage from "@/Shared/EveImage";
+import EveImage from "@/Shared/EveImage.vue";
 
 export default {
     name: "DispatchUpdate",
@@ -44,7 +44,7 @@ export default {
             if(entity.batch !== 'ready')
                 return
 
-            axios.post(this.$route('dispatch.job', {
+            axios.post(this.route('dispatch.job', {
                 character_id: entity.character_id,
                 corporation_id: entity.corporation_id,
             }), {
@@ -57,7 +57,7 @@ export default {
         },
         async getEntities() {
             //TODO refactor this
-            //axios.post(this.$route('manual_job.entities'), this.dispatch_transfer_object)
+            //axios.post(this.route('manual_job.entities'), this.dispatch_transfer_object)
             //    .then((response) => {
             //        this.entities = response.data
             //        this.infiniteId++
@@ -69,7 +69,7 @@ export default {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
         },
         route() {
-            return this.$route('manual_job.entities')
+            return this.route('manual_job.entities')
         },
         job_name() {
             return _.get(this.dispatch_transfer_object, 'manual_job')

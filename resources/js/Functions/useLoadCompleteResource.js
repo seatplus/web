@@ -1,5 +1,5 @@
 import {computed, onBeforeMount, onBeforeUnmount, ref} from "vue";
-import route from 'ziggy'
+//import route from 'ziggy'
 import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
 
 export function useLoadCompleteResource(routeName, params, formData = {}) {

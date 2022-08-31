@@ -130,7 +130,7 @@ export default {
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '' : this.$route('character.item', asset.item_id)
+            return _.isEmpty(asset.content) ? '' : this.route('character.item', asset.item_id)
         },
         hasContent(content) {
             return !_.isEmpty(content)

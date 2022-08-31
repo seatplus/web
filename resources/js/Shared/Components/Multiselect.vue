@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import Autosuggest from "./Autosuggest";
-import DismissibleButton from "../Layout/Buttons/DismissibleButton";
+import Autosuggest from "./Autosuggest.vue";
+import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 export default {
   name: "Multiselect",
   components: {

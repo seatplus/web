@@ -68,7 +68,7 @@ export default {
     },
     computed: {
         has_selected() {
-            let ids = _.get(this.$route().params, `${this.type}_ids`)
+            let ids = _.get(this.route().params, `${this.type}_ids`)
 
             return !!ids
         },

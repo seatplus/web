@@ -63,8 +63,7 @@
 
 <script>
 import {onBeforeMount, ref} from "vue";
-import route from 'ziggy'
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Time from "@/Shared/Time";
 
 export default {

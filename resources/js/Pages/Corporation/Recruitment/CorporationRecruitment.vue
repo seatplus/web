@@ -15,7 +15,7 @@
           <span class="inline-flex rounded-md shadow-sm">
 
             <Link
-              :href="$route('edit.enlistment', enlistment.corporation_id)"
+              :href="route('edit.enlistment', enlistment.corporation_id)"
               method="get"
               as="button"
               type="button"

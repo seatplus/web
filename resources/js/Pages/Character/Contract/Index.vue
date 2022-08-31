@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     getUrl(character_id) {
-      return this.$route('character.contracts.details', character_id)
+      return this.route('character.contracts.details', character_id)
     }
   }
 }

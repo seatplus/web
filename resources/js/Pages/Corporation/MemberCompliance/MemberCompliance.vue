@@ -58,11 +58,11 @@ export default {
   methods: {
     getCharacterComplianceUrl(corporation_id) {
 
-      return this.$route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
+      return this.route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
     },
     getUserComplianceUrl(corporation_id) {
 
-      return this.$route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
+      return this.route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
     }
   }
 }

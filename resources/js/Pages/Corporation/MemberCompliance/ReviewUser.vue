@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-3">
     <div>
-      <PageHeader :breadcrumbs="[{name: 'Compliance ', route: $route('corporation.member_compliance')}]">
+      <PageHeader :breadcrumbs="[{name: 'Compliance ', route: route('corporation.member_compliance')}]">
         Review: {{ member.main_character.name }}
       </PageHeader>
       <div class="pt-1.5">

@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
   import Modal from "./Modal"
   export default {
       name: "CharacterFilterModal",
@@ -71,7 +71,7 @@ import EveImage from "@/Shared/EveImage"
               openModal: this.value.open,
               selected: this.value.selectedCharacters,
               characters: [],
-              route: this.$route('get.affiliated.characters', this.permission),
+              route: this.route('get.affiliated.characters', this.permission),
               page: 1
           }
       },

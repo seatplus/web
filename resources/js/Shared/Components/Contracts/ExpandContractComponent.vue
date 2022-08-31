@@ -30,10 +30,9 @@
 <script>
 import {ArrowsExpandIcon} from "@heroicons/vue/solid";
 import {ref} from "vue";
-import route from 'ziggy'
-import WithDismissButtonModal from "../../Modals/WithDismissButtonModal";
+import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";
-import ContractDetailsComponent from "./ContractDetailsComponent";
+import ContractDetailsComponent from "./ContractDetailsComponent.vue";
 
 export default {
     name: "ExpandContractComponent",

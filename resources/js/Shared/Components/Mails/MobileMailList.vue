@@ -55,7 +55,7 @@
 
 <script>
 import MailRepresentation from "./MailRepresentation";
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time";
 import ResolveIdToName from "../../ResolveIdToName";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";

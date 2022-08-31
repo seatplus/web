@@ -76,7 +76,7 @@
                     <Link
                       v-for="item in category.entries"
                       :key="item.name"
-                      :href="$route(item.route)"
+                      :href="route(item.route)"
                       :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']"
                     >
                       <component
@@ -92,7 +92,7 @@
             </div>
             <div class="flex-shrink-0 flex bg-gray-700 p-4">
               <Link
-                :href="$route('user.settings')"
+                :href="route('user.settings')"
                 class="flex-shrink-0 group block"
               >
                 <div class="flex items-center">
@@ -141,7 +141,7 @@
               >
                 <Link
                   v-if="category.entries.length === 1"
-                  :href="$route(category.entries[0].route)"
+                  :href="route(category.entries[0].route)"
                   :class="[category.entries[0].current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group w-full flex items-center px-2 pr-2 py-2 text-sm font-medium rounded-md']"
                 >
                   <component
@@ -177,7 +177,7 @@
                     <Link
                       v-for="subItem in category.entries"
                       :key="subItem.name"
-                      :href="$route(subItem.route)"
+                      :href="route(subItem.route)"
                       :class="[subItem.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group w-full flex items-center pl-10 pr-2 py-2 text-sm font-medium rounded-md']"
                     >
                       <component
@@ -195,7 +195,7 @@
           <!-- User Menu          -->
           <div class="flex-shrink-0 flex bg-gray-700 p-4">
             <Link
-              :href="$route('user.settings')"
+              :href="route('user.settings')"
               class="flex-shrink-0 w-full group block"
             >
               <div class="flex items-center">
@@ -277,11 +277,11 @@ import {
 } from '@headlessui/vue'
 import {usePage} from "@inertiajs/inertia-vue3";
 import * as OutlineHeroicons from '@heroicons/vue/outline'
-import route from 'ziggy'
-import ImpersonatingBanner from "./ImpersonatingBanner";
-import Notifications from "../Notifications/Notifications";
-import EveImage from "@/Shared/EveImage"
+import ImpersonatingBanner from "./ImpersonatingBanner.vue";
+import Notifications from "../Notifications/Notifications.vue";
+import EveImage from "@/Shared/EveImage.vue"
 import { Link } from '@inertiajs/inertia-vue3'
+
 export default {
     name: "DarkSidebar",
     components: {

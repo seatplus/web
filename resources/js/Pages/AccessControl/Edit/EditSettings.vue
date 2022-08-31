@@ -151,12 +151,11 @@
 
 <script>
 import axios from "axios"
-import ListTransition from "@/Shared/Transitions/ListTransition"
-import AffiliationList from "./AffiliationList"
+import ListTransition from "@/Shared/Transitions/ListTransition.vue"
+import AffiliationList from "./AffiliationList.vue"
 import {computed, onBeforeMount, ref, watch} from "vue";
-import route from 'ziggy'
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import SimpleToggle from "@/Shared/SimpleToggle";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import SimpleToggle from "@/Shared/SimpleToggle.vue";
 
 export default {
     name: "EditSettings",

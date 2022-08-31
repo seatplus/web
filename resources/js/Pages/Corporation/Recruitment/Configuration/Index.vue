@@ -6,7 +6,7 @@
         <!--TODO: Create Delete Button with confirmation dialog-->
         <span class="shadow-sm rounded-md">
           <Button
-            :href="$route('delete.enlistment', enlistment.corporation_id)"
+            :href="route('delete.enlistment', enlistment.corporation_id)"
             method="delete"
           >
             Delete
@@ -95,7 +95,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Corporation Recruitment',
-                    route: this.$route('corporation.recruitment')
+                    route: this.route('corporation.recruitment')
                 }
             ],
             form: this.$inertia.form({
@@ -106,7 +106,7 @@ export default {
     },
     methods: {
         submit() {
-            this.$inertia.post(this.$route('update.watchlist', this.corporationId), this.form)
+            this.$inertia.post(this.route('update.watchlist', this.corporationId), this.form)
         }
     }
 }

@@ -92,7 +92,7 @@
             </ul>
           </div>
           <div class="mt-6">
-            <form @submit.prevent="form.put($route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
+            <form @submit.prevent="form.put(route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
               <div class="flex space-x-3">
                 <div class="flex-shrink-0">
                   <div class="relative">
@@ -150,7 +150,7 @@
 <script>
 import { ChatAltIcon } from '@heroicons/vue/solid'
 import { computed } from "vue";
-import EveImage from "@/Shared/EveImage";
+import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time";
 import {useForm, usePage} from "@inertiajs/inertia-vue3";
 

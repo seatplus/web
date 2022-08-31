@@ -28,10 +28,9 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
-import route from 'ziggy'
 
 export default {
     name: "EntityByIdBlock",

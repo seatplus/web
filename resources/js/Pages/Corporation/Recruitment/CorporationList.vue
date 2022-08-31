@@ -71,7 +71,7 @@
 
 <script>
 
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 export default {
   name: "CorporationList",
@@ -92,7 +92,7 @@ export default {
   methods: {
     create(corporation, type) {
 
-      this.$inertia.post(this.$route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
+      this.$inertia.post(this.route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
     }
   }
 }

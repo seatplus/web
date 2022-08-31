@@ -112,7 +112,7 @@ export default {
         submit() {
             let self = this;
 
-            return this.form.post(this.$route('accept.manuel_locations'), {
+            return this.form.post(this.route('accept.manuel_locations'), {
                 onSuccess: () => {
                     self.$emit('onSubmittedSuggestion')
                 }

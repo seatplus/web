@@ -104,7 +104,7 @@
 <script>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import EveImage from "@/Shared/EveImage";
+import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time";
 
 export default {

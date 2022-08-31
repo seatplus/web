@@ -40,7 +40,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Character Contracts',
-                    route: this.$route('character.contracts')
+                    route: this.route('character.contracts')
                 }
             ]
         }

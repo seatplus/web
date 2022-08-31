@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 export default {
     name: "Members",
     components: {EveImage},

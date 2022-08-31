@@ -26,11 +26,10 @@
 </template>
 
 <script>
-import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal";
+import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {computed, ref, watchEffect} from "vue";
-import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
-import Button from "@/Shared/Layout/Button";
-import route from 'ziggy'
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
+import Button from "@/Shared/Layout/Button.vue";
 import {DialogTitle} from "@headlessui/vue";
 
 

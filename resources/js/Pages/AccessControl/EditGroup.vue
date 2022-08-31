@@ -86,13 +86,12 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import HeaderButton from "@/Shared/Layout/HeaderButton"
-import Layout from "@/Shared/SidebarLayout/Layout";
-import EditSettings from "./Edit/EditSettings";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
+import EditSettings from "./Edit/EditSettings.vue";
 import {useForm} from "@inertiajs/inertia-vue3/src";
 import {ref} from "vue";
-import route from 'ziggy'
+
 export default {
     name: "EditGroup",
     components: {

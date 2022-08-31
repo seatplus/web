@@ -72,13 +72,13 @@
         },
         computed: {
             searchparam() {
-                return this.$route().params
+                return this.route().params
             }
         },
         watch: {
             search() {
 
-                let params = this.$route().params
+                let params = this.route().params
 
                 if(_.has(params,'search_param') && this.search === '')
                     _.unset(params, 'search_param')
@@ -88,9 +88,9 @@
 
                 _.set(params, 'page', 1)
 
-                let url_name = this.$route().current()
+                let url_name = this.route().current()
 
-                Inertia.visit(this.$route(url_name, params), {
+                Inertia.visit(this.route(url_name, params), {
                     preserveScroll: true,
                     preserveState: true,
                     only: ['users'],
@@ -106,7 +106,7 @@
                 })
             },
             getSearchParams() {
-                let params = this.$route().params
+                let params = this.route().params
 
                 return _.get(params, 'search_param', '')
             }

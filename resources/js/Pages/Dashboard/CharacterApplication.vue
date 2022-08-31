@@ -47,12 +47,11 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import {computed, ref} from "vue";
 import {usePage} from "@inertiajs/inertia-vue3";
 import { Inertia } from '@inertiajs/inertia'
 import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
-import route from 'ziggy'
 
 export default {
     name: "CharacterApplication",

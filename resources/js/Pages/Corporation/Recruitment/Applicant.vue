@@ -95,7 +95,7 @@
 
 <script>
 
-import EveImage from "@/Shared/EveImage";
+import EveImage from "@/Shared/EveImage.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "Applicant",

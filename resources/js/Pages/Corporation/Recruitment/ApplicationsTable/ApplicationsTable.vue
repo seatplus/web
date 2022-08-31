@@ -40,7 +40,7 @@
             <div class="flex justify-end">
               <Button
                 button-size="xs"
-                :href="$route('get.application', applicant.application_id)"
+                :href="route('get.application', applicant.application_id)"
               >
                 Review
               </Button>

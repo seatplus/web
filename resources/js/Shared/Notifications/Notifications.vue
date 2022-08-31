@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import Notification from "./Notification"
+import Notification from "./Notification.vue"
 import { v4 as uuidv4 } from 'uuid';
 
 export default {

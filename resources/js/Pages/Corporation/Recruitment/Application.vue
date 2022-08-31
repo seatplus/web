@@ -215,10 +215,10 @@ export default {
     },
     methods: {
         impersonate() {
-            return this.$inertia.visit(this.$route('impersonate.recruit', this.application.id))
+            return this.$inertia.visit(this.route('impersonate.recruit', this.application.id))
         },
         submit() {
-            return this.$inertia.post(this.$route('review.application', this.application.id), this.form);
+            return this.$inertia.post(this.route('review.application', this.application.id), this.form);
         }
     }
 }

@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time";
 import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent";
 

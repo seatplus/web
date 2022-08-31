@@ -6,7 +6,7 @@
     <ul class="divide-y divide-gray-200">
       <WideListElement
         v-if="hasGlobalScopes"
-        :url="$route('view.global.scopes')"
+        :url="route('view.global.scopes')"
       >
         <template #avatar>
           <svg
@@ -44,7 +44,7 @@
       <WideListElement
         v-for="(entry) in entities"
         :key="entry.selectedEntity.id"
-        :url="$route('view.scopes.settings', entry.selectedEntity.id)"
+        :url="route('view.scopes.settings', entry.selectedEntity.id)"
       >
         <template #avatar>
           <eve-image
@@ -73,7 +73,7 @@
       </WideListElement>
       <li>
         <Link
-          :href="$route('view.create.scopes')"
+          :href="route('view.create.scopes')"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
           <div class="flex items-center px-4 py-4 sm:px-6">
@@ -116,7 +116,7 @@
 <script>
     import Settings from "@/Pages/Configuration/Settings"
     import WideListElement from "@/Shared/WideListElement"
-    import EveImage from "@/Shared/EveImage"
+    import EveImage from "@/Shared/EveImage.vue"
     import { Link } from '@inertiajs/inertia-vue3'
 
     export default {

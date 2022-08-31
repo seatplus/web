@@ -161,7 +161,7 @@ emits: ['update:modelValue'],
             this.showSuggestions = true
 
             if(this.query.length > 2)
-                return axios.get(this.$route('resolve.solar_system', this.query))
+                return axios.get(this.route('resolve.solar_system', this.query))
                     .then((result) => this.suggestions = result.data)
 
             this.suggestions = []
@@ -173,7 +173,7 @@ emits: ['update:modelValue'],
             this.form.transform((data) => ({
                 ...data,
                 location_id: this.location_id
-            })).post(this.$route('post.manual_location'), {
+            })).post(this.route('post.manual_location'), {
                 onSuccess: () => {
                     self.form.reset()
                     self.suggestions = []

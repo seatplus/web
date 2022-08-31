@@ -45,7 +45,7 @@
         >
           <Link
             v-if="hasApplications"
-            :href="$route('delete.user.application')"
+            :href="route('delete.user.application')"
             method="delete"
             :preserve-state="false"
             as="button"
@@ -59,7 +59,7 @@
           </Link>
           <Link
             v-else
-            :href="$route('post.application')"
+            :href="route('post.application')"
             method="post"
             :preserve-state="false"
             as="button"
@@ -79,11 +79,11 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import {computed, ref} from "vue";
-import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
-import EveImage from "@/Shared/EveImage";
-import CharacterApplication from "./CharacterApplication";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
+import EveImage from "@/Shared/EveImage.vue";
+import CharacterApplication from "./CharacterApplication.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
 import { Link } from '@inertiajs/inertia-vue3'

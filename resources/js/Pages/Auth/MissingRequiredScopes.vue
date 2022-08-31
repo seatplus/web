@@ -83,7 +83,7 @@
 </template>
 
 <script>
-    import EveImage from "@/Shared/EveImage"
+    import EveImage from "@/Shared/EveImage.vue"
     import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner";
     import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout";
     export default {

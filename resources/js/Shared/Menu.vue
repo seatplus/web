@@ -38,13 +38,13 @@
       >
         <div class="py-1 rounded-md bg-white ring-1 ring-black ring-opacity-5">
           <Link
-            :href="$route('user.settings')"
+            :href="route('user.settings')"
             :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'"
           >
             Settings
           </Link>
           <Link
-            :href="$route('auth.logout')"
+            :href="route('auth.logout')"
             :class="'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition ease-in-out duration-150'"
           >
             Sign out

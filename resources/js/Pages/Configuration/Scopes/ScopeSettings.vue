@@ -9,7 +9,7 @@
       {{ creationMode ? 'Create ': 'Edit ' }} Scope Setting
       <template #primary>
         <Link
-          :href="$route('create.scopes')"
+          :href="route('create.scopes')"
           method="post"
           as="button"
           :data="{selectedScopes: selected_scopes, selectedEntities: selectedEntities, type: type}"
@@ -24,7 +24,7 @@
       >
         <span class="shadow-sm rounded-md">
           <Link
-            :href="$route('delete.scopes', object.id)"
+            :href="route('delete.scopes', object.id)"
             method="delete"
             as="button"
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out"
@@ -125,13 +125,12 @@
 
 <script>
 
-import CharacterScopes from "./CharacterScopes"
-import CorporationScopes from "./CorporationScopes"
-import EveImage from "@/Shared/EveImage"
-import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-import PageHeader from "@/Shared/Layout/PageHeader"
-import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
-import route from 'ziggy';
+import CharacterScopes from "./CharacterScopes.vue"
+import CorporationScopes from "./CorporationScopes.vue"
+import EveImage from "@/Shared/EveImage.vue"
+import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance.vue"
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 
 export default {

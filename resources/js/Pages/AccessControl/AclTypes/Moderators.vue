@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
 export default {
     name: "Moderators",

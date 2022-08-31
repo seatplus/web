@@ -40,12 +40,11 @@
 </template>
 
 <script>
-import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import Autosuggest from "@/Shared/Components/Autosuggest";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
+import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import {ref, watch} from "vue";
-import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton";
+import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 import {useForm} from "@inertiajs/inertia-vue3";
-import route from 'ziggy'
 
 export default {
     name: "ItemsWatchlist",

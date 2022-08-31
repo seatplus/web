@@ -25,7 +25,7 @@ export default {
     components: {EntityByIdBlock},
     computed: {
         selectedIds() {
-            let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
+            let selectedCharacterIds = _.get(this.route().params, 'character_ids', null)
 
             return _.map(selectedCharacterIds, (id) => parseInt(id))
         }

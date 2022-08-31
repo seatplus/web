@@ -24,7 +24,7 @@
       <Link
         v-if="isJoinable"
         as="button"
-        :href="$route('acl.join')"
+        :href="route('acl.join')"
         method="post"
         :data="{ role_id: role.id }"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
@@ -41,7 +41,7 @@
       <Link
         v-if="isLeavable"
         as="button"
-        :href="$route('acl.leave', leaveParams)"
+        :href="route('acl.leave', leaveParams)"
         method="delete"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
@@ -57,7 +57,7 @@
       <Link
         v-if="isModeratable"
         as="button"
-        :href="$route('manage.acl.members', role.id)"
+        :href="route('manage.acl.members', role.id)"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <!-- Heroicon name: solid/mail -->
@@ -73,7 +73,7 @@
       <Link
         v-if="isEditable"
         as="button"
-        :href="$route('acl.edit', role.id)"
+        :href="route('acl.edit', role.id)"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg
@@ -93,7 +93,7 @@
       <Link
         v-if="isManageable"
         as="button"
-        :href="$route('acl.manage', role.id)"
+        :href="route('acl.manage', role.id)"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg

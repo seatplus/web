@@ -92,16 +92,15 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
-import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import Multiselect from "@/Shared/Components/Multiselect";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
+import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
+import Multiselect from "@/Shared/Components/Multiselect.vue";
 import {computed, ref, watch} from 'vue'
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
-import SelectedEntity from "@/Shared/Components/SelectedEntity";
-import route from 'ziggy'
+import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
 
 export default {
     name: "Assets",

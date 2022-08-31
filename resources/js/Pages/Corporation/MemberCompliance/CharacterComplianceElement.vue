@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage";
+import EveImage from "@/Shared/EveImage.vue";
 import { XIcon, CheckIcon } from '@heroicons/vue/outline'
 import {computed} from "vue";
 export default {

@@ -125,7 +125,7 @@ export default {
 
             //let $queryParams = _.merge({search: query}, this.routeParameters)
 
-            return axios.get(this.$route(this.route, {search: query, ...this.routeParameters}))
+            return axios.get(this.route(this.route, {search: query, ...this.routeParameters}))
                 .then((result) => {
                     self.suggestions = result.data
 

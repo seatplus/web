@@ -37,7 +37,7 @@
       <div class="flex gap-x-2 flex-wrap">
         <Button
           button-size="xs"
-          :href="$route('corporation.review.user', {'corporation_id': corporationId, 'user': user.id})"
+          :href="route('corporation.review.user', {'corporation_id': corporationId, 'user': user.id})"
         >
           Review
         </Button>

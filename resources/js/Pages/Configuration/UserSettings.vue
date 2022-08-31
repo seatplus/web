@@ -123,7 +123,7 @@
     </div>
 
     <Link
-      :href="$route('auth.logout')"
+      :href="route('auth.logout')"
       as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     >
@@ -133,12 +133,11 @@
 </template>
 
 <script>
-    import PageHeader from "@/Shared/Layout/PageHeader";
-    import SelectComponent from "@/Shared/Components/SelectComponent";
-    import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+    import PageHeader from "@/Shared/Layout/PageHeader.vue";
+    import SelectComponent from "@/Shared/Components/SelectComponent.vue";
+    import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
     import {useForm} from "@inertiajs/inertia-vue3";
-    import route from 'ziggy';
     import { Link } from '@inertiajs/inertia-vue3'
 
     export default {

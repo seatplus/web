@@ -251,7 +251,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Control Group',
-                    route: this.$route('acl.groups')
+                    route: this.route('acl.groups')
                 }
             ],
             updated: false
@@ -289,7 +289,7 @@ export default {
         },
         store: function () {
 
-            this.form.post(this.$route('update.acl.affiliations', this.role.id),{
+            this.form.post(this.route('update.acl.affiliations', this.role.id),{
                 onSuccess: () => {
                     this.$inertia.reload({
                         preserveState: false
