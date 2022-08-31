@@ -60,8 +60,8 @@
 </template>
 
 <script>
-import InputGroup from "@/Shared/InputGroup"
-import SeatPlusSelect from "@/Shared/SeatPlusSelect"
+import InputGroup from "@/Shared/InputGroup.vue"
+import SeatPlusSelect from "@/Shared/SeatPlusSelect.vue"
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "SchedulesDetails",

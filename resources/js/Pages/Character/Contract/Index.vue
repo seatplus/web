@@ -27,11 +27,11 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
-import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
+import ContractComponent from "@/Shared/Components/Contracts/ContractComponent.vue";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 
 export default {
     name: "Index",
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     getUrl(character_id) {
-      return this.route('character.contracts.details', character_id)
+      return route('character.contracts.details', character_id)
     }
   }
 }

@@ -66,7 +66,7 @@ import { TransitionRoot } from '@headlessui/vue'
 import { computed } from "vue";
 
 const props = defineProps({
-    route: {
+    routeName: {
         type: String,
         required: true
     },
@@ -82,7 +82,7 @@ const props = defineProps({
     },
 })
 
-const {result, isLoading, isComplete, scrollComponent} = useInfinityScrolling(props.route, props.params, props.method)
+const {result, isLoading, isComplete, scrollComponent} = useInfinityScrolling(props.routeName, props.params, props.method)
 
 const noResults = computed(() => isComplete.value && result.value.length === 0)
 const showLoadingIndicator = computed(() => isLoading.value)

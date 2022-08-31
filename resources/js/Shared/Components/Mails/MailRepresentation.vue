@@ -64,7 +64,7 @@
 <script>
 import {onBeforeMount, ref} from "vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-import Time from "@/Shared/Time";
+import Time from "@/Shared/Time.vue";
 
 export default {
     name: "MailRepresentation",

@@ -211,13 +211,12 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import HeaderButton from "@/Shared/Layout/HeaderButton"
-import Manual from "./AclTypes/Manual"
-import AutomaticRole from "./AclTypes/AutomaticRole"
-import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup"
-import OptInControlGroup from "./AclTypes/OptInControlGroup"
-import Layout from "@/Shared/SidebarLayout/Layout";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
+import Manual from "./AclTypes/Manual.vue"
+import AutomaticRole from "./AclTypes/AutomaticRole.vue"
+import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup.vue"
+import OptInControlGroup from "./AclTypes/OptInControlGroup.vue"
 import {useForm} from "@inertiajs/inertia-vue3/src";
 
 export default {
@@ -251,7 +250,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Control Group',
-                    route: this.route('acl.groups')
+                    route: route('acl.groups')
                 }
             ],
             updated: false
@@ -289,7 +288,7 @@ export default {
         },
         store: function () {
 
-            this.form.post(this.route('update.acl.affiliations', this.role.id),{
+            this.form.post(route('update.acl.affiliations', this.role.id),{
                 onSuccess: () => {
                     this.$inertia.reload({
                         preserveState: false

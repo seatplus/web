@@ -121,8 +121,8 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
-import Time from "@/Shared/Time";
-import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent";
+import Time from "@/Shared/Time.vue";
+import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent.vue";
 
 export default {
     name: "WalletTransactionRowComponent",

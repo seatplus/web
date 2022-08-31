@@ -88,12 +88,11 @@
 </template>
 
 <script>
-    import Menu from "../Menu"
-    import Notifications from "../Notifications/Notifications"
-    import NotificationsBell from "./NotificationsBell"
-    import ImpersonatingBanner from "./ImpersonatingBanner"
-    import MobileMenu from "./MobileMenu";
-    import DesktopSidebar from "./DesktopSidebar";
+    import Menu from "../Menu.vue"
+    import Notifications from "../Notifications/Notifications.vue"
+    import ImpersonatingBanner from "./ImpersonatingBanner.vue"
+    import MobileMenu from "./MobileMenu.vue";
+    import DesktopSidebar from "./DesktopSidebar.vue";
 
     export default {
         name: "Layout",

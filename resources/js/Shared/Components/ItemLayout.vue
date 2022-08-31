@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import LocationSlot from "./LocationSlot";
+import LocationSlot from "./LocationSlot.vue";
 export default {
     name: "ItemLayout",
     components: {LocationSlot},

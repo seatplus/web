@@ -48,10 +48,9 @@
 
 <script>
 import {computed} from "vue";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import CharacterComplianceElement from "./CharacterComplianceElement";
-import {usePage} from "@inertiajs/inertia-vue3";
-import Button from "@/Shared/Layout/Button";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import CharacterComplianceElement from "./CharacterComplianceElement.vue";
+import Button from "@/Shared/Layout/Button.vue";
 
 export default {
     name: "MemberComplianceListElement",

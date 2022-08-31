@@ -216,7 +216,7 @@ export default {
     methods: {
         post() {
 
-            const url = this.route('create.scopes');
+            const url = route('create.scopes');
 
             const data = {
                 selectedScopes: this.selectedScopes,

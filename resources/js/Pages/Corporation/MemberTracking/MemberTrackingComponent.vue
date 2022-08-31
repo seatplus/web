@@ -52,11 +52,11 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import MemberTrackingListElement from "./MemberTrackingListElement";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import MemberTrackingListElement from "./MemberTrackingListElement.vue";
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
-import MemberTrackingListElementForSmallDevices from "./MemberTrackingListElementForSmallDevices";
+import MemberTrackingListElementForSmallDevices from "./MemberTrackingListElementForSmallDevices.vue";
 
 export default {
     name: "MemberTrackingComponent",

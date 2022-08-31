@@ -34,7 +34,7 @@
     <InfiniteLoadingHelper
       :key="index"
       v-slot="{results}"
-      route="list.users"
+      route-name="list.users"
       :params="{name: search}"
     >
       <ul :class="[{'lg:grid-cols-3' : !twoColumns},'grid grid-cols-1 gap-6 sm:grid-cols-2 mt-6 sm:mt-5']">
@@ -96,7 +96,7 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 
 export default {
     name: "Users",

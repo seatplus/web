@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import CompactAssetListTemplate from "./CompactAssetListTemplate";
+import CompactAssetListTemplate from "./CompactAssetListTemplate.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "CompactAssetListElement",

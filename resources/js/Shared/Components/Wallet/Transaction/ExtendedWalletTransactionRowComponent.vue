@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import EveImage from "@/Shared/EveImage.vue"
 export default {
     name: "ExtendedWalletTransactionRowComponent",

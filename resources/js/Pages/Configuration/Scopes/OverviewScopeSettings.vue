@@ -114,8 +114,8 @@
 </template>
 
 <script>
-    import Settings from "@/Pages/Configuration/Settings"
-    import WideListElement from "@/Shared/WideListElement"
+    import Settings from "@/Pages/Configuration/Settings.vue"
+    import WideListElement from "@/Shared/WideListElement.vue"
     import EveImage from "@/Shared/EveImage.vue"
     import { Link } from '@inertiajs/inertia-vue3'
 

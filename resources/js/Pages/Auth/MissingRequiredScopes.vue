@@ -84,8 +84,8 @@
 
 <script>
     import EveImage from "@/Shared/EveImage.vue"
-    import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner";
-    import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout";
+    import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
+    import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
     export default {
         name: "MissingRequiredScopes",
         components: {ImpersonatingBanner, EveImage},

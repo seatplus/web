@@ -74,7 +74,7 @@
 
         <Autosuggest
           v-model="form.solar_system_id"
-          route="resolve.solar_system"
+          route-name="resolve.solar_system"
           placeholder="Search for a solar system"
           label="search"
           @selected="(id) => form.solar_system_id = id"
@@ -105,8 +105,8 @@
 </template>
 
 <script>
-import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
-import Autosuggest from "../Autosuggest";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
+import Autosuggest from "../Autosuggest.vue";
 //TODO import { VueAutosuggest } from "vue-autosuggest"
 export default {
     name: "AddManualLocationModal",
@@ -161,7 +161,7 @@ emits: ['update:modelValue'],
             this.showSuggestions = true
 
             if(this.query.length > 2)
-                return axios.get(this.route('resolve.solar_system', this.query))
+                return axios.get(route('resolve.solar_system', this.query))
                     .then((result) => this.suggestions = result.data)
 
             this.suggestions = []
@@ -173,7 +173,7 @@ emits: ['update:modelValue'],
             this.form.transform((data) => ({
                 ...data,
                 location_id: this.location_id
-            })).post(this.route('post.manual_location'), {
+            })).post(route('post.manual_location'), {
                 onSuccess: () => {
                     self.form.reset()
                     self.suggestions = []

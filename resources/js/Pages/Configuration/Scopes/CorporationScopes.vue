@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ScopeToggle from "./ScopeToggle";
+import ScopeToggle from "./ScopeToggle.vue";
 import {computed, ref, watch} from "vue";
 export default {
     name: "CorporationScopes",

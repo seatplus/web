@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 
 export default {
     name: "IssuerComponent",

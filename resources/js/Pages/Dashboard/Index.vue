@@ -4,8 +4,6 @@
       <title>{{ title(pageTitle) }}</title>
     </teleport>
 
-    Maybe i have found it: no? now? this looks good
-
     <PageHeader>
       {{ pageTitle }}
     </PageHeader>
@@ -29,7 +27,8 @@ export default {
     components: {Characters, Enlistments, PageHeader},
     props: {
         characters: {
-            type: Array
+            type: Array,
+            default: () => []
         },
     },
     setup() {

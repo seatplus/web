@@ -4,7 +4,7 @@
       :key="loadingHelperKey"
       v-slot="{results}"
       :params="parameters"
-      route="get.character.assets.locations"
+      route-name="get.character.assets.locations"
     >
       <div class="space-y-2 sm:space-y-6">
         <LocationComponent
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import LocationComponent from "./LocationComponent";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import LocationComponent from "./LocationComponent.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import { ref, watch } from "vue";
 export default {
     name: "AssetsComponent",

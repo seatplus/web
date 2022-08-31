@@ -37,7 +37,7 @@
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
               <Multiselect
                 v-model="regions"
-                route="autosuggestion.region"
+                route-name="autosuggestion.region"
                 label="Region"
                 placeholder="search for region"
               />
@@ -46,7 +46,7 @@
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
               <Multiselect
                 v-model="systems"
-                route="autosuggestion.system"
+                route-name="autosuggestion.system"
                 label="Solar System"
                 placeholder="search for solar system"
               />

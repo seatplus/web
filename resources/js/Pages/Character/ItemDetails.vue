@@ -26,8 +26,8 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
-import PageHeader from "@/Shared/Layout/PageHeader";
-import ItemLayout from "@/Shared/Components/ItemLayout";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import ItemLayout from "@/Shared/Components/ItemLayout.vue";
 
 export default {
     name: "ItemDetails",
@@ -44,7 +44,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Character Assets',
-                    route: this.route('character.assets')
+                    route: route('character.assets')
                 }
             ]
         }
@@ -53,7 +53,7 @@ export default {
         if(this.object.container)
             this.breadcrumbs.push({
                 name: this.object.container.name,
-                route: this.route('character.item', this.object.container.item_id)
+                route: route('character.item', this.object.container.item_id)
             })
     },
     methods: {
@@ -65,7 +65,7 @@ export default {
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '#' : this.route('character.item', asset.item_id)
+            return _.isEmpty(asset.content) ? '#' : route('character.item', asset.item_id)
         },
         hasContent(content) {
             return !_.isEmpty(content)

@@ -34,7 +34,7 @@
         <div>
           <Multiselect
             v-model="form.regions"
-            route="autosuggestion.region"
+            route-name="autosuggestion.region"
             label="Region"
             placeholder="search for Region"
           />
@@ -43,7 +43,7 @@
         <div>
           <Multiselect
             v-model="form.systems"
-            route="autosuggestion.system"
+            route-name="autosuggestion.system"
             label="Solar System"
             placeholder="search for solar system"
           />
@@ -70,12 +70,12 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import Multiselect from "@/Shared/Components/Multiselect";
-import EnlistmentConfig from "./EnlistmentConfig";
-import Button from "@/Shared/Layout/Button";
-import ItemsWatchlist from "./ItemsWatchlist";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
+import Multiselect from "@/Shared/Components/Multiselect.vue";
+import EnlistmentConfig from "./EnlistmentConfig.vue";
+import Button from "@/Shared/Layout/Button.vue";
+import ItemsWatchlist from "./ItemsWatchlist.vue";
 
 export default {
     name: "Index",
@@ -95,7 +95,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Corporation Recruitment',
-                    route: this.route('corporation.recruitment')
+                    route: route('corporation.recruitment')
                 }
             ],
             form: this.$inertia.form({
@@ -106,7 +106,7 @@ export default {
     },
     methods: {
         submit() {
-            this.$inertia.post(this.route('update.watchlist', this.corporationId), this.form)
+            this.$inertia.post(route('update.watchlist', this.corporationId), this.form)
         }
     }
 }

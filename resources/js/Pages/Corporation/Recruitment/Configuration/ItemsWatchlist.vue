@@ -10,7 +10,7 @@
       <div>
         <Autosuggest
           :key="uniqueId"
-          route="autosuggestion.typesOrGroupOrCategories"
+          route-name="autosuggestion.typesOrGroupOrCategories"
           label="Items"
           placeholder="Search for Items"
           @selectedObject="select"

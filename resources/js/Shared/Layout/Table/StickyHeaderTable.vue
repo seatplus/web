@@ -15,7 +15,7 @@
   <ul class="divide-y divide-gray-200">
     <slot
       :columns="columns"
-      :countColumns="countColumns"
+      :count-columns="countColumns"
     />
   </ul>
 </template>

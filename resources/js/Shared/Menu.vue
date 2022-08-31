@@ -56,7 +56,7 @@
 </template>
 
 <script>
-  import EveImage from "./EveImage"
+  import EveImage from "./EveImage.vue"
   import { Link } from '@inertiajs/inertia-vue3'
   export default {
     name: "Menu",

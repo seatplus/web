@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import PageHeader from "@/Shared/Layout/PageHeader";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import WalletComponent from "@/Shared/Components/Wallet/WalletComponent";
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import WalletComponent from "@/Shared/Components/Wallet/WalletComponent.vue";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 
 export default {
     name: "Wallet",

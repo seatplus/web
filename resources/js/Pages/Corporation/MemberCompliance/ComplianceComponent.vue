@@ -48,7 +48,7 @@
       <ul class="relative z-0">
         <CompleteLoadingHelper
           :key="Object.values(urlParams).join(',')"
-          route="corporation.compliance"
+          route-name="corporation.compliance"
           :params="urlParams"
           @results="(results) => rawUsers = results"
         >
@@ -67,12 +67,12 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { SearchIcon } from '@heroicons/vue/solid'
-import MemberComplianceListElement from "./MemberComplianceListElement";
+import MemberComplianceListElement from "./MemberComplianceListElement.vue";
 import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper";
+import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";
 export default {
     name: "ComplianceComponent",
     components: {

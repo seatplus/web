@@ -15,7 +15,7 @@
     <div class="relative max-h-96 overflow-y-auto">
       <InfiniteLoadingHelper
         v-slot="{results}"
-        route="character.contracts.details"
+        route-name="character.contracts.details"
         :params="parameters"
       >
         <StickyHeaderTable
@@ -75,18 +75,18 @@
 
 <script>
 
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import StickyHeaderTable from "../../Layout/Table/StickyHeaderTable";
-import StickyHeaderTableRow from "../../Layout/Table/StickyHeaderTableRow";
-import StickyHeaderCell from "../../Layout/Table/StickyHeaderCell";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import StickyHeaderTable from "../../Layout/Table/StickyHeaderTable.vue";
+import StickyHeaderTableRow from "../../Layout/Table/StickyHeaderTableRow.vue";
+import StickyHeaderCell from "../../Layout/Table/StickyHeaderCell.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import {ref} from "vue";
-import ExpandContractComponent from "./ExpandContractComponent";
-import IssuerComponent from "./Cells/IssuerComponent";
-import AssigneeComponent from "./Cells/AssigneeComponent";
-import ContractTypeComponent from "./Cells/ContractTypeComponent";
-import DetailsComponent from "./Cells/DetailsComponent";
+import ExpandContractComponent from "./ExpandContractComponent.vue";
+import IssuerComponent from "./Cells/IssuerComponent.vue";
+import AssigneeComponent from "./Cells/AssigneeComponent.vue";
+import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
+import DetailsComponent from "./Cells/DetailsComponent.vue";
  
 export default {
     name: "ContractComponent",

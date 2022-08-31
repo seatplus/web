@@ -137,9 +137,8 @@
     import SelectComponent from "@/Shared/Components/SelectComponent.vue";
     import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
-    import {useForm} from "@inertiajs/inertia-vue3";
-    import { Link } from '@inertiajs/inertia-vue3'
-
+    import {useForm, Link } from "@inertiajs/inertia-vue3";
+    
     export default {
         name: "UserSettings",
         components: {EntityBlock, SelectComponent, PageHeader, Link},

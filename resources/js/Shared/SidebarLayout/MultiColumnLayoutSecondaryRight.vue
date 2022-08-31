@@ -21,7 +21,7 @@
   </DarkSidebar>
 </template>
 <script>
-import DarkSidebar from "./DarkSidebar";
+import DarkSidebar from "./DarkSidebar.vue";
 export default {
     name: "MultiColumnLayoutSecondaryRight",
     components: {DarkSidebar},

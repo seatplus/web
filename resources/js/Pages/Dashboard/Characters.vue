@@ -86,11 +86,12 @@ export default {
     components: {Time, LeftAlignedData, EntityBlock, LeftAligned},
     props: {
         characters: {
-            type: Array
+            type: Array,
+            required: true
         },
         enlistments: {
             type: Array,
-            default: []
+            default: () => []
         }
     },
     computed: {

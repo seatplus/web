@@ -51,10 +51,10 @@
 </template>
 
 <script>
-    import Pagination from "@/Shared/Pagination"
+    import Pagination from "@/Shared/Pagination.vue"
     import {Inertia} from "@inertiajs/inertia"
-    import Settings from "./Settings"
-    import UserListElement from "./UserListElement";
+    import Settings from "./Settings.vue"
+    import UserListElement from "./UserListElement.vue";
 
     export default {
         name: "UserList",
@@ -72,13 +72,13 @@
         },
         computed: {
             searchparam() {
-                return this.route().params
+                return route().params
             }
         },
         watch: {
             search() {
 
-                let params = this.route().params
+                let params = route().params
 
                 if(_.has(params,'search_param') && this.search === '')
                     _.unset(params, 'search_param')
@@ -88,9 +88,9 @@
 
                 _.set(params, 'page', 1)
 
-                let url_name = this.route().current()
+                let url_name = route().current()
 
-                Inertia.visit(this.route(url_name, params), {
+                Inertia.visit(route(url_name, params), {
                     preserveScroll: true,
                     preserveState: true,
                     only: ['users'],
@@ -106,7 +106,7 @@
                 })
             },
             getSearchParams() {
-                let params = this.route().params
+                let params = route().params
 
                 return _.get(params, 'search_param', '')
             }

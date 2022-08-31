@@ -66,7 +66,7 @@
 
 <script>
 
-import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout";
+import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 
 export default {
     name: "Login",

@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import CreateGroupButton from "./AclTypes/CreateGroupButton";
-import ControlGroups from "./ControlGroups";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import CreateGroupButton from "./AclTypes/CreateGroupButton.vue";
+import ControlGroups from "./ControlGroups.vue";
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 
 export default {

@@ -111,7 +111,7 @@
           },
           removeMember(member) {
 
-              this.$inertia.delete(this.route('acl.leave', [member.role_id, member.user_id]), {
+              this.$inertia.delete(route('acl.leave', [member.role_id, member.user_id]), {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,
@@ -125,7 +125,7 @@
                   role_id: member.role_id
               };
 
-              this.$inertia.post(this.route('acl.join'), data, {
+              this.$inertia.post(route('acl.join'), data, {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,

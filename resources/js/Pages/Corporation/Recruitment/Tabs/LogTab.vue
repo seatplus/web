@@ -151,7 +151,7 @@
 import { ChatAltIcon } from '@heroicons/vue/solid'
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
-import Time from "@/Shared/Time";
+import Time from "@/Shared/Time.vue";
 import {useForm, usePage} from "@inertiajs/inertia-vue3";
 
 export default {

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import Sidebar from "./Sidebar";
+import Sidebar from "./Sidebar.vue";
 export default {
   name: "DesktopSidebar",
   components: {Sidebar},

@@ -196,17 +196,17 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import {prefix} from "metric-prefix";
-import WideListElement from "../../WideListElement";
+import WideListElement from "../../WideListElement.vue";
 import EveImage from "@/Shared/EveImage.vue"
-import WideLists from "../../WideLists";
-import AssigneeComponent from "./Cells/AssigneeComponent";
+import WideLists from "../../WideLists.vue";
+import AssigneeComponent from "./Cells/AssigneeComponent.vue";
 import {useValidateObject} from "@/Functions/useValidateObject";
-import IssuerComponent from "./Cells/IssuerComponent";
-import ContractTypeComponent from "./Cells/ContractTypeComponent";
-import DetailsComponent from "./Cells/DetailsComponent";
-import Card from "../../Layout/Cards/Card";
+import IssuerComponent from "./Cells/IssuerComponent.vue";
+import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
+import DetailsComponent from "./Cells/DetailsComponent.vue";
+import Card from "../../Layout/Cards/Card.vue";
 
 const schema = {
     items: value => _.isArray(value),

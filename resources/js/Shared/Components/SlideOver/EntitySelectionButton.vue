@@ -46,9 +46,9 @@
 </template>
 
 <script>
-import HeaderButton from "../../Layout/HeaderButton";
-import SlideOver from "../../Layout/SlideOver";
-import EntitySelection from "./EntitySelection";
+import HeaderButton from "../../Layout/HeaderButton.vue";
+import SlideOver from "../../Layout/SlideOver.vue";
+import EntitySelection from "./EntitySelection.vue";
 import { SearchIcon } from '@heroicons/vue/solid';
 
 export default {
@@ -68,7 +68,7 @@ export default {
     },
     computed: {
         has_selected() {
-            let ids = _.get(this.route().params, `${this.type}_ids`)
+            let ids = _.get(route().params, `${this.type}_ids`)
 
             return !!ids
         },

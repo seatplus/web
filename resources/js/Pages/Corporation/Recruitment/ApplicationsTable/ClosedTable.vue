@@ -1,7 +1,7 @@
 <template>
   <InfiniteLoadingHelper
     v-slot="{results}"
-    route="closed.corporation.applications"
+    route-name="closed.corporation.applications"
     :params="{corporation_id: corporationId}"
   >
     <ApplicationsTable :applications="results">
@@ -13,10 +13,9 @@
 </template>
 
 <script>
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import {ref} from "vue";
-import ApplicationsTable from "./ApplicationsTable";
-import ActivityLogModal from "./ActivityLogModal";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+import ApplicationsTable from "./ApplicationsTable.vue";
+import ActivityLogModal from "./ActivityLogModal.vue";
 
 export default {
     name: "ClosedTable",

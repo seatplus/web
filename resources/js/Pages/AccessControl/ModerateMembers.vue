@@ -25,7 +25,7 @@
         <ul class="divide-y divide-gray-200">
           <InfiniteLoadingHelper
             v-slot="{results}"
-            route="acl.members"
+            route-name="acl.members"
             :params="{role_id: role.id}"
           >
             <li
@@ -139,9 +139,9 @@
 
 <script>
     import EveImage from "@/Shared/EveImage.vue"
-    import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom"
-    import PageHeader from "@/Shared/Layout/PageHeader";
-    import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
+    import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom.vue"
+    import PageHeader from "@/Shared/Layout/PageHeader.vue";
+    import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
     export default {
         name: "ModerateMembers",
         components: {
@@ -161,7 +161,7 @@
                 breadcrumbs: [
                     {
                         name: 'Control Group',
-                        route: this.route('acl.groups')
+                        route: route('acl.groups')
                     }
                 ]
             }
@@ -174,7 +174,7 @@
                     role_id: this.role.id
                 };
 
-                this.$inertia.post(this.route('acl.join'), data, {
+                this.$inertia.post(route('acl.join'), data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -183,7 +183,7 @@
             },
             removeMember(member) {
 
-                this.$inertia.delete(this.route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
+                this.$inertia.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,

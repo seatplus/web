@@ -72,7 +72,7 @@
 import {ref, watch} from 'vue'
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid'
-import EveImage from "../EveImage";
+import EveImage from "../EveImage.vue";
 
 export default {
     components: {

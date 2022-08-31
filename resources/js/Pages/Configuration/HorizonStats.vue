@@ -151,6 +151,16 @@
                 }
             }
         },
+        computed : {
+            isLoading: function () {
+                var obj = this.stats;
+                for(var key in obj) {
+                    if(obj.hasOwnProperty(key))
+                        return false;
+                }
+                return true;
+            }
+        },
         mounted() {
             this.refreshStats()
 
@@ -179,16 +189,7 @@
                     });
             }
         },
-        computed : {
-            isLoading: function () {
-                var obj = this.stats;
-                for(var key in obj) {
-                    if(obj.hasOwnProperty(key))
-                        return false;
-                }
-                return true;
-            }
-        },
+
         beforeUnmount () {
             clearInterval(this.timer)
         }

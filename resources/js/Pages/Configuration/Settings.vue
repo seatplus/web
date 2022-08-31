@@ -62,8 +62,8 @@
 </template>
 
 <script>
-import Commands from "@/Pages/Configuration/Commands"
-import HorizonStats from "./HorizonStats"
+import Commands from "@/Pages/Configuration/Commands.vue"
+import HorizonStats from "./HorizonStats.vue"
 import {Inertia} from "@inertiajs/inertia"
 
 export default {

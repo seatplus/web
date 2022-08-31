@@ -1,5 +1,4 @@
 import { onMounted, onUnmounted, ref } from "vue";
-import route from 'ziggy'
 
 export function useInfinityScrolling(routeName, params, method = 'GET') {
 

@@ -19,7 +19,10 @@
             <div class="text-sm leading-5 text-gray-500 truncate">
               <span v-if="status === 'ready'">job can be dispatched</span>
               <span v-if="['pending', 'finished', 'failures'].includes(status)">
-                <Time v-if=time :timestamp="time" />
+                <Time
+                  v-if="time"
+                  :timestamp="time"
+                />
               </span>
             </div>
           </div>

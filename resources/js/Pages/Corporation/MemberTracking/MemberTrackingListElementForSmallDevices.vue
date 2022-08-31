@@ -102,10 +102,10 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import EveImage from "@/Shared/EveImage.vue";
-import Time from "@/Shared/Time";
+import Time from "@/Shared/Time.vue";
 
 export default {
     name: "MemberTrackingListElementForSmallDevices",

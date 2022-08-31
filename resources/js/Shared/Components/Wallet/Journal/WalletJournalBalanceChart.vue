@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {LineChart, useLineChart } from "vue-chart-3";
 import {computed} from "vue";

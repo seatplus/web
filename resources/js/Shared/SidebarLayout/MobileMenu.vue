@@ -73,12 +73,10 @@
       </div>
     </div>
   </transition>
-
-
 </template>
 
 <script>
-import Sidebar from "./Sidebar";
+import Sidebar from "./Sidebar.vue";
 export default {
   name: "MobileMenu",
   components: {Sidebar},

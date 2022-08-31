@@ -92,7 +92,7 @@ export default {
   methods: {
     create(corporation, type) {
 
-      this.$inertia.post(this.route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
+      this.$inertia.post(route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
     }
   }
 }

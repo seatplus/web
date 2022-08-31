@@ -58,10 +58,10 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/solid'
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import Time from "@/Shared/Time";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import Time from "@/Shared/Time.vue";
 export default {
     name: "MemberTrackingListElement",
     components: {Time, EntityByIdBlock, EntityBlock, CheckCircleIcon, XCircleIcon},

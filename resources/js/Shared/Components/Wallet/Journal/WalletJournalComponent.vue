@@ -33,7 +33,7 @@
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
           v-slot="{results}"
-          :route="route"
+          :route-name="route"
           :params="routeParameters"
         >
           <WalletJournalRowComponent
@@ -49,10 +49,10 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import WalletJournalRowComponent from "./WalletJournalRowComponent";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
 
 export default {
     name: "WalletJournalComponent",

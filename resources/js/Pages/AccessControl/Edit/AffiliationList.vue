@@ -33,9 +33,9 @@
 </template>
 
 <script>
-import ListTransition from "@/Shared/Transitions/ListTransition"
+import ListTransition from "@/Shared/Transitions/ListTransition.vue"
 import {computed} from "vue";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 export default {
     name: "AffiliationList",
     components: {EntityByIdBlock, ListTransition},

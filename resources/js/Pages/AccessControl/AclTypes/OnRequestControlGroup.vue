@@ -53,12 +53,12 @@
 </template>
 
 <script>
-import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-import Members from "./Members"
-import Affiliations from "./Affiliations"
-import Applicants from "./Applicants"
-import Users from "./Users"
-import Moderators from "./Moderators"
+import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance.vue"
+import Members from "./Members.vue"
+import Affiliations from "./Affiliations.vue"
+import Applicants from "./Applicants.vue"
+import Users from "./Users.vue"
+import Moderators from "./Moderators.vue"
 export default {
     name: "OnRequestControlGroup",
     components: {Moderators, Users, Applicants, Affiliations, Members, SearchCorpOrAlliance},

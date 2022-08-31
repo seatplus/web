@@ -63,8 +63,8 @@
 </template>
 
 <script>
-import HeaderButton from "@/Shared/Layout/HeaderButton";
-import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
   name: "CreateGroupButton",

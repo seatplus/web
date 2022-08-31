@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import DarkSidebar from "./DarkSidebar";
+import DarkSidebar from "./DarkSidebar.vue";
 export default {
     name: "MultiColumnLayout",
     components: {DarkSidebar},

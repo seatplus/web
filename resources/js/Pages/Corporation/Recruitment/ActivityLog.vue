@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
 
 export default {
     name: "ActivityLog",

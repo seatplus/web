@@ -1,7 +1,7 @@
 <template>
   <InfiniteLoadingHelper
     v-slot="{results}"
-    route="get.mail.headers"
+    route-name="get.mail.headers"
     :params="{character_ids: characterIds}"
     @result="assignResult"
   >
@@ -54,11 +54,11 @@
 </template>
 
 <script>
-import MailRepresentation from "./MailRepresentation";
+import MailRepresentation from "./MailRepresentation.vue";
 import EveImage from "@/Shared/EveImage.vue"
-import Time from "@/Shared/Time";
-import ResolveIdToName from "../../ResolveIdToName";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import Time from "@/Shared/Time.vue";
+import ResolveIdToName from "../../ResolveIdToName.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import {ChevronUpIcon} from "@heroicons/vue/solid/esm";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 

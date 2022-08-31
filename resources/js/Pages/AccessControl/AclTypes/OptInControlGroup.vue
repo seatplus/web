@@ -22,9 +22,9 @@
 </template>
 
 <script>
-  import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-  import Members from "./Members"
-  import Affiliations from "./Affiliations"
+  import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance.vue"
+  import Members from "./Members.vue"
+  import Affiliations from "./Affiliations.vue"
   export default {
       name: "OptInControlGroup",
       components: {Affiliations, Members, SearchCorpOrAlliance},

@@ -3,7 +3,6 @@
   <div class="bg-white overflow-hidden shadow sm:rounded-lg my-5">
     <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
       <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
-
         <div class="ml-4 mt-4">
           <EntityBlock :entity="enlistment.corporation" />
         </div>
@@ -54,10 +53,10 @@
 <script>
 
 import {Link} from "@inertiajs/inertia-vue3";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
-import PendingTable from "./ApplicationsTable/PendingTable";
-import ClosedTable from "./ApplicationsTable/ClosedTable";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
+import PendingTable from "./ApplicationsTable/PendingTable.vue";
+import ClosedTable from "./ApplicationsTable/ClosedTable.vue";
 
 export default {
     name: "CorporationRecruitment",

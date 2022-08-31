@@ -62,8 +62,8 @@
 <script>
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
-import LeftAligned from "../../Layout/DataDisplay/LeftAligned";
-import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData";
+import LeftAligned from "../../Layout/DataDisplay/LeftAligned.vue";
+import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData.vue";
 import {StarIcon} from "@heroicons/vue/solid";
 import {StarIcon as StarIconOutline} from "@heroicons/vue/outline";
 

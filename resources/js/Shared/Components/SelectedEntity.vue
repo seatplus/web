@@ -19,13 +19,13 @@
 </template>
 
 <script>
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 export default {
     name: "SelectedEntity",
     components: {EntityByIdBlock},
     computed: {
         selectedIds() {
-            let selectedCharacterIds = _.get(this.route().params, 'character_ids', null)
+            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
 
             return _.map(selectedCharacterIds, (id) => parseInt(id))
         }

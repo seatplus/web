@@ -102,8 +102,8 @@
 
   import EveImage from "@/Shared/EveImage.vue"
   import { prefix } from 'metric-prefix'
-  import WideListElement from "@/Shared//WideListElement";
-  import CompactAssetListComponent from "./CompactAssetListComponent";
+  import WideListElement from "@/Shared//WideListElement.vue";
+  import CompactAssetListComponent from "./CompactAssetListComponent.vue";
   import { Link } from '@inertiajs/inertia-vue3'
 
   export default {
@@ -126,7 +126,7 @@
             },
             hasOwnerPicture() {
 
-                let selectedCharacterIds = _.get(this.route().params, 'character_ids', null)
+                let selectedCharacterIds = _.get(route().params, 'character_ids', null)
 
                 if (_.size(selectedCharacterIds) > 1)
                     return true
@@ -140,7 +140,7 @@
                 return prefix(numeric_value, {precision: 3, unit: 'm³'})
             },
             url(asset) {
-                return asset.content[0] ? this.route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
+                return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
             },
         }
   }

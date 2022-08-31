@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import Avatar from "@/Shared/Avatar";
+import Avatar from "@/Shared/Avatar.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "ControlGroup",

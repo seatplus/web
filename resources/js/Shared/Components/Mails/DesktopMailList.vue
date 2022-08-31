@@ -3,7 +3,7 @@
   <div class="absolute inset-0 overflow-y-auto">
     <InfiniteLoadingHelper
       v-slot="{results}"
-      route="get.mail.headers"
+      route-name="get.mail.headers"
       :params="{character_ids: characterIds}"
     >
       <ul class="divide-y divide-gray-200">
@@ -42,10 +42,10 @@
 </template>
 
 <script>
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import EveImage from "@/Shared/EveImage.vue"
-import Time from "@/Shared/Time";
-import ResolveIdToName from "../../ResolveIdToName";
+import Time from "@/Shared/Time.vue";
+import ResolveIdToName from "../../ResolveIdToName.vue";
 
 export default {
     name: "DesktopMailList",

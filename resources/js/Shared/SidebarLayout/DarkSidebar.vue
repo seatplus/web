@@ -275,12 +275,11 @@ import {
     TransitionChild,
     TransitionRoot
 } from '@headlessui/vue'
-import {usePage} from "@inertiajs/inertia-vue3";
+import {usePage, Link } from "@inertiajs/inertia-vue3";
 import * as OutlineHeroicons from '@heroicons/vue/outline'
 import ImpersonatingBanner from "./ImpersonatingBanner.vue";
 import Notifications from "../Notifications/Notifications.vue";
 import EveImage from "@/Shared/EveImage.vue"
-import { Link } from '@inertiajs/inertia-vue3'
 
 export default {
     name: "DarkSidebar",

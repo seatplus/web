@@ -31,7 +31,7 @@
     <template #elements>
       <CompleteLoadingHelper
         :key="Object.values(enrichedQueryParameters).join(',')"
-        route="location.assets"
+        route-name="location.assets"
         :params="enrichedQueryParameters"
         @results="(results) => rawResults = results"
       >
@@ -52,11 +52,11 @@
 </template>
 
 <script>
-import WideLists from "../../WideLists";
-import LocationName from "./LocationName";
-import ItemList from "./ItemList";
-import AddManualLocationModal from "./AddManualLocationModal";
-import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper";
+import WideLists from "../../WideLists.vue";
+import LocationName from "./LocationName.vue";
+import ItemList from "./ItemList.vue";
+import AddManualLocationModal from "./AddManualLocationModal.vue";
+import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper.vue";
 import {computed, ref} from "vue";
 import {prefix} from "metric-prefix";
 

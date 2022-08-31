@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import MemberTrackingComponent from "./MemberTrackingComponent";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import MemberTrackingComponent from "./MemberTrackingComponent.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 
 export default {
     name: "MemberTracking",

@@ -4,7 +4,17 @@
         "es6": true,
         "node": true
     },
-    "extends": [
+  "settings": {
+    "import/resolver": {
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "@": "./resources/js"
+        },
+        "extensions": [".vue", ".js"]
+      }
+    }
+  },
+  "extends": [
         "eslint:recommended",
         "plugin:vue/vue3-recommended",
         "plugin:import/recommended"
@@ -13,7 +23,8 @@
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
         "_": true,
-        "axios": true
+        "axios": true,
+        "route": true
     },
     "parserOptions": {
         "ecmaVersion": 2020,
@@ -23,9 +34,10 @@
         "vue"
     ],
     "rules": {
-      "import/extensions": {
+      "import/extensions": [1, {
         "js": "never",
         "vue": "always"
-      }
+      }],
+      "vue/multi-word-component-names": 0
     }
 }

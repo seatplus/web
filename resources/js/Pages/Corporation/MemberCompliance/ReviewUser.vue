@@ -15,13 +15,13 @@
       :recruit="member"
       :watchlist="watchlist"
       :target-corporation="targetCorporation"
-     />
+    />
   </div>
 </template>
 
 <script>
-import TabComponent from "../Recruitment/TabComponent";
-import PageHeader from "@/Shared/Layout/PageHeader";
+import TabComponent from "../Recruitment/TabComponent.vue";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
 export default {
     name: "ReviewUser",
     components: {PageHeader, TabComponent},

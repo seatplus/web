@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     url() {
-      return this.route('manual_job.entities', this.dispatch_transfer_object)
+      return route('manual_job.entities', this.dispatch_transfer_object)
     }
   }
 }

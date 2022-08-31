@@ -6,7 +6,7 @@
     <InfiniteLoadingHelper
       :key="Object.values(params).join(',')"
       v-slot="{results}"
-      :route="route"
+      :route-name="route"
       :params="params"
     >
       <SelectionEntity
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import SelectionEntity from "./SelectionEntity";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
+import SelectionEntity from "./SelectionEntity.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import {computed, ref, watch} from "vue";
 
 export default {
@@ -74,7 +74,7 @@ export default {
     },
     beforeMount() {
 
-        let ids = _.get(this.route().params, `${this.type}_ids`)
+        let ids = _.get(route().params, `${this.type}_ids`)
 
         if(!ids)
             return
@@ -88,14 +88,14 @@ export default {
         if(!this.changed)
             return
 
-        let route = this.route().current()
+        let route = route().current()
 
         if(_.isEmpty(this.selected_ids))
-            return this.$inertia.get(this.route(route))
+            return this.$inertia.get(route(route))
 
         let queryParameter = this.type === 'character' ? { character_ids: this.selected_ids } : {corporation_ids: this.selected_ids}
 
-        this.$inertia.get(this.route(route, {_query: queryParameter}))
+        this.$inertia.get(route(route, {_query: queryParameter}))
     },
 }
 </script>

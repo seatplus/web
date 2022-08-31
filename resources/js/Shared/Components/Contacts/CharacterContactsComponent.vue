@@ -41,7 +41,7 @@
       </div>
       <ul class="relative z-0 divide-y divide-gray-200">
         <CompleteLoadingHelper
-          route="character.contacts.detail"
+          route-name="character.contacts.detail"
           :params="{character_id: character.character_id}"
           :form-data="{corporation_id: corporation_id, alliance_id: alliance_id}"
           @results="(result) => contacts_raw = result"
@@ -60,12 +60,12 @@
 
 <script>
 
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper";
-import CharacterContactsRowComponent from "./CharacterContactsRowComponent";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper.vue";
+import CharacterContactsRowComponent from "./CharacterContactsRowComponent.vue";
 import {computed, ref} from "vue";
-import SimpleInlineList from "../../Layout/SimpleInlineList";
+import SimpleInlineList from "../../Layout/SimpleInlineList.vue";
 
 export default {
     name: "CharacterContactsComponent",
