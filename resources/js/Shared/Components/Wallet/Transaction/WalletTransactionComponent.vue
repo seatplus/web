@@ -34,7 +34,7 @@
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
           v-slot="{results}"
-          :route-name="route"
+          :route-name="routeName"
           :params="routeParameters"
         >
           <WalletTransactionRowComponent
@@ -79,7 +79,7 @@ export default {
         }
     },
     computed: {
-        route() {
+        routeName() {
             return this.division? 'corporation.wallet_transaction.detail' : 'character.wallet_transaction.detail'
         },
         routeParameters() {

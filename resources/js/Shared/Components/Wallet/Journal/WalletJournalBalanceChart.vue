@@ -51,7 +51,7 @@ export default {
     },
     setup(props) {
 
-        let route = props.division? 'corporation.balance' : 'character.balance'
+        let routeName = props.division? 'corporation.balance' : 'character.balance'
         let routeParameters = props.division ? {
             corporation_id: props.id,
             division_id: props.division.division_id
@@ -81,7 +81,7 @@ export default {
             }
         }
 
-        const {results} = useLoadCompleteResource(route, routeParameters)
+        const {results} = useLoadCompleteResource(routeName, routeParameters)
 
         const chartData = computed(() => {
             return {

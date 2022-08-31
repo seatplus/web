@@ -59,9 +59,9 @@
             }
         },
         methods: {
-            isActive(routename) {
+            isActive(routeName) {
 
-                return this.activeEntryUrl === route(routename)
+                return this.activeEntryUrl === route(routeName)
             }
         }
     }

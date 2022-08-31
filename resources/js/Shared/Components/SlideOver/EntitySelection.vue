@@ -6,7 +6,7 @@
     <InfiniteLoadingHelper
       :key="Object.values(params).join(',')"
       v-slot="{results}"
-      :route-name="route"
+      :route-name="routeName"
       :params="params"
     >
       <SelectionEntity
@@ -50,14 +50,14 @@ export default {
         )
 
         const search = computed(() => props.search)
-        const route = computed( () => props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations')
+        const routeName = computed( () => props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations')
 
         watch(search,(newValue) => {
             newValue.length >= 3 ? params.value.search = newValue : delete params.value.search
         })
 
         return {
-            route,
+            routeName,
             params
         }
     },
@@ -88,14 +88,14 @@ export default {
         if(!this.changed)
             return
 
-        let route = route().current()
+        let routeName = route().current()
 
         if(_.isEmpty(this.selected_ids))
-            return this.$inertia.get(route(route))
+            return this.$inertia.get(route(routeName))
 
         let queryParameter = this.type === 'character' ? { character_ids: this.selected_ids } : {corporation_ids: this.selected_ids}
 
-        this.$inertia.get(route(route, {_query: queryParameter}))
+        this.$inertia.get(route(routeName, {_query: queryParameter}))
     },
 }
 </script>

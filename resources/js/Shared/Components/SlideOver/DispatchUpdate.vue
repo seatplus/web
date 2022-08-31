@@ -35,9 +35,6 @@ export default {
         dispatch_transfer_object() {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
         },
-        route() {
-            return route('manual_job.entities')
-        },
         job_name() {
             return _.get(this.dispatch_transfer_object, 'manual_job')
         }
@@ -64,15 +61,6 @@ export default {
 
             setTimeout(() => this.getEntities(), 100)
 
-
-        },
-        async getEntities() {
-            //TODO refactor this
-            //axios.post(route('manual_job.entities'), this.dispatch_transfer_object)
-            //    .then((response) => {
-            //        this.entities = response.data
-            //        this.infiniteId++
-            //    })
         }
     }
 }

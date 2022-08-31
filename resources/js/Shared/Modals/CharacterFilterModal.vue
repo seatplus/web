@@ -71,7 +71,7 @@ import EveImage from "@/Shared/EveImage.vue"
               openModal: this.value.open,
               selected: this.value.selectedCharacters,
               characters: [],
-              route: route('get.affiliated.characters', this.permission),
+              routeName: route('get.affiliated.characters', this.permission),
               page: 1
           }
       },
@@ -125,7 +125,7 @@ import EveImage from "@/Shared/EveImage.vue"
               this.selected = _.remove(this.selected, (select) => select !== entity.character_id)
           },
           load: function () {
-              axios.get(this.route, {
+              axios.get(this.routeName, {
                   params: {
                       page: this.page,
                   },

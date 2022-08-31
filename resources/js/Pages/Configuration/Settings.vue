@@ -83,11 +83,11 @@ export default {
                     this.currentRoute = navTab.route
             })
         },
-        currentRoute(route) {
-            if(this.isActive(route))
+        currentRoute(currentRoute) {
+            if(this.isActive(currentRoute))
                 return
 
-            this.visitRoute(route)
+            this.visitRoute(currentRoute)
         }
     },
     mounted() {
