@@ -6,7 +6,7 @@
     <div class="px-3 py-4 sm:py-1 self-center whitespace-normal">
       <CheckCircleIcon
         v-if="isOk"
-        class="h-5 w-5 text-green-500"
+        class="h-5 w-5 text-emerald-500"
       />
       <XCircleIcon
         v-else

@@ -23,7 +23,7 @@
                   </h3>
                   <span
                     v-if="isSelected(character)"
-                    class="flex-shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full"
+                    class="shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full"
                   >Selected</span>
                 </div>
                 <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
@@ -33,7 +33,7 @@
               <EveImage
                 :object="character"
                 :size="256"
-                tailwind_class="w-8 h-8 bg-gray-300 rounded-full flex-shrink-0"
+                tailwind_class="w-8 h-8 bg-gray-300 rounded-full shrink-0"
               />
             </div>
           </li>

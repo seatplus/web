@@ -13,7 +13,7 @@
     <DesktopSidebar :active-sidebar-element="activeSidebarElement" />
 
     <div class="flex flex-col w-0 flex-1 overflow-hidden">
-      <div class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+      <div class="relative z-10 shrink-0 flex h-16 bg-white shadow">
         <button
           class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:bg-gray-100 focus:text-gray-600 md:hidden"
           @click.stop="sidebarOpen = true"

@@ -9,7 +9,7 @@
         {{ role.members }} {{ role.members > 1 ? 'Members' : 'Member' }}
       </dd>
       <dd class="mt-3">
-        <span :class="[isPausedOrWaitlist? 'bg-yellow-100 text-yellow-800': 'bg-teal-100 text-teal-800','px-2 py-1  text-xs leading-4 font-medium  rounded-full']">{{ role.status ? role.status : role.type }}</span>
+        <span :class="[isPausedOrWaitlist? 'bg-amber-100 text-amber-800': 'bg-teal-100 text-teal-800','px-2 py-1  text-xs leading-4 font-medium  rounded-full']">{{ role.status ? role.status : role.type }}</span>
       </dd>
     </dl>
   </div>

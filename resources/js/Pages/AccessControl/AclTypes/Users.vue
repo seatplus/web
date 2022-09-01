@@ -49,7 +49,7 @@
                 <h3 class="text-gray-900 text-sm leading-5 font-medium truncate">
                   {{ getMainName(user) }}
                 </h3>
-                <!--<span class="flex-shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full">Member</span>-->
+                <!--<span class="shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full">Member</span>-->
               </div>
               <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
                 {{ getCharacterNames(user) }}
@@ -58,7 +58,7 @@
             <EveImage
               :object="user.main_character"
               :size="256"
-              tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+              tailwind_class="w-10 h-10 bg-gray-300 rounded-full shrink-0"
             />
           </div>
 
@@ -69,7 +69,7 @@
             <div class="-mt-px flex">
               <div class="w-0 flex-1 flex border-r border-gray-200">
                 <button
-                  class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-green-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-green-700 focus:outline-none focus:ring-blue focus:border-green-300 focus:z-10 transition ease-in-out duration-150"
+                  class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-emerald-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-emerald-700 focus:outline-none focus:ring-blue focus:border-emerald-300 focus:z-10 transition ease-in-out duration-150"
                   @click="addMember(user)"
                 >
                   <svg

@@ -7,7 +7,7 @@
           class="flex items-center text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out"
         >
           <svg
-            class="flex-shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400"
+            class="shrink-0 -ml-1 mr-1 h-5 w-5 text-gray-400"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -30,7 +30,7 @@
           </Link>
           <svg
             v-if="breadcrumb !== getBack"
-            class="flex-shrink-0 mx-2 h-5 w-5 text-gray-400"
+            class="shrink-0 mx-2 h-5 w-5 text-gray-400"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -50,7 +50,7 @@
           <slot />
         </h2>
       </div>
-      <div class="mt-4 flex-shrink-0 flex md:mt-0 md:ml-4 space-x-3">
+      <div class="mt-4 shrink-0 flex md:mt-0 md:ml-4 space-x-3">
         <slot name="secondary">
           <span class="shadow-sm rounded-md" />
         </slot>

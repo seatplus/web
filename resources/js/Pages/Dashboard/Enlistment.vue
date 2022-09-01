@@ -16,7 +16,7 @@
   <teleport to="#destination">
     <ModalWithFooter v-model="openModal">
       <template #symbol>
-        <div class="flex-shrink-0 flex items-center justify-center">
+        <div class="shrink-0 flex items-center justify-center">
           <EveImage
             :object="enlistment"
             :size="256"
@@ -64,7 +64,7 @@
             :preserve-state="false"
             as="button"
             :data="{corporation_id: enlistment.corporation_id}"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             <UserAddIcon
               class="-ml-1 mr-2 h-5 w-5"

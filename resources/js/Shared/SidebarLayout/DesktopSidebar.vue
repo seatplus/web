@@ -1,8 +1,8 @@
 <template>
   <!-- Static sidebar for desktop -->
-  <div class="hidden md:flex md:flex-shrink-0">
+  <div class="hidden md:flex md:shrink-0">
     <div class="flex flex-col w-64">
-      <div class="flex items-center h-16 flex-shrink-0 px-4 bg-gray-900">
+      <div class="flex items-center h-16 shrink-0 px-4 bg-gray-900">
         <img
           class="h-8 w-auto"
           :src="$page.props.images.logo"

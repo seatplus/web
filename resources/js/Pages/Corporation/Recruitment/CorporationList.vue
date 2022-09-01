@@ -13,7 +13,7 @@
             </h3>
             <span
               v-if="corporation.alliance"
-              class="flex-shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full"
+              class="shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full"
             >{{ corporation.alliance }}</span>
           </div>
           <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
@@ -23,7 +23,7 @@
         <EveImage
           :object="corporation"
           :size="256"
-          tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+          tailwind_class="w-10 h-10 bg-gray-300 rounded-full shrink-0"
         />
       </div>
       <div class="border-t border-gray-200">

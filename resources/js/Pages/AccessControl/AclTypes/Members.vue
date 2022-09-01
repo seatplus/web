@@ -17,7 +17,7 @@
               <h3 class="text-gray-900 text-sm leading-5 font-medium truncate">
                 {{ getMainName(member) }}
               </h3>
-              <span :class="[{'text-teal-800 bg-teal-100': member.status === 'member'}, {'text-yellow-800 bg-yellow-100': member.status === 'paused'}, 'flex-shrink-0 inline-block px-2 py-0.5  text-xs leading-4 font-medium  rounded-full capitalize']"> {{ member.status }} </span>
+              <span :class="[{'text-teal-800 bg-teal-100': member.status === 'member'}, {'text-amber-800 bg-amber-100': member.status === 'paused'}, 'shrink-0 inline-block px-2 py-0.5  text-xs leading-4 font-medium  rounded-full capitalize']"> {{ member.status }} </span>
             </div>
             <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
               {{ getCharacterNames(member) }}
@@ -26,7 +26,7 @@
           <EveImage
             :object="getMain(member)"
             :size="256"
-            tailwind_class="w-10 h-10 bg-gray-300 rounded-full flex-shrink-0"
+            tailwind_class="w-10 h-10 bg-gray-300 rounded-full shrink-0"
           />
         </div>
         <div

@@ -7,7 +7,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -50,7 +50,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 class="h-6 w-6 text-white"
                 fill="none"
@@ -96,7 +96,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 stroke-linecap="round"
                 stroke-linejoin="round"

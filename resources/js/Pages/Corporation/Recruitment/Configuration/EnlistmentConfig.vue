@@ -45,11 +45,11 @@
           Typ
         </label>
         <div class="mt-1 sm:mt-0 sm:col-span-2 space-y-2">
-          <div class="flex flex-shrink-0 items-center space-x-2">
+          <div class="flex shrink-0 items-center space-x-2">
             <SimpleToggle v-model="isUserType" />
             <span class="text-sm font-medium text-gray-900">User Type</span>
           </div>
-          <div class="flex flex-shrink-0 items-center space-x-2">
+          <div class="flex shrink-0 items-center space-x-2">
             <SimpleToggle v-model="isCharacterType" />
             <span class="text-sm font-medium text-gray-900">Character Type</span>
           </div>

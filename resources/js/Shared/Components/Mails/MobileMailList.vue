@@ -12,7 +12,7 @@
         v-slot="{open}"
         as="li"
       >
-        <DisclosureButton class="flex w-full py-2 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+        <DisclosureButton class="flex w-full py-2 hover:bg-violet-200 focus:outline-none focus-visible:ring focus-visible:ring-violet-500 focus-visible:ring-opacity-75">
           <div class="flex w-full space-x-3">
             <EveImage
               :object="{character_id: mail.from}"

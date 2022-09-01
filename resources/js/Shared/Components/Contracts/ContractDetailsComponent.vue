@@ -50,7 +50,7 @@
 
               <template #lower_left>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -88,7 +88,7 @@
 
               <template #lower_right>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5"
+                  class="shrink-0 mr-1.5 h-5 w-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -137,7 +137,7 @@
 
               <template #lower_left>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -175,7 +175,7 @@
 
               <template #lower_right>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5"
+                  class="shrink-0 mr-1.5 h-5 w-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >

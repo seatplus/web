@@ -5,7 +5,7 @@
     @click.stop.prevent="open()"
   >
     <ArrowsExpandIcon
-      class="flex-shrink-0 h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-400"
+      class="shrink-0 h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-400"
     />
   </a>
   <teleport to="#destination">
