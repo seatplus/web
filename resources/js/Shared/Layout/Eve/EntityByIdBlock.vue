@@ -5,7 +5,7 @@
   >
     <div
       v-if="isReady"
-      class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center"
+      class="mb-4 shrink-0 sm:mb-0 sm:mr-4 self-center"
     >
       <EveImage
         :object="entity"

@@ -64,7 +64,7 @@
                     v-slot="{ checked }"
                     v-model="switchValue"
                     as="button"
-                    class="relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
+                    class="relative inline-flex shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
                     :class="switchValue ? 'bg-indigo-600' : 'bg-gray-200'"
                   >
                     <span

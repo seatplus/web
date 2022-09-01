@@ -57,7 +57,7 @@
               </div>
             </TransitionChild>
             <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-              <div class="flex-shrink-0 flex items-center px-4">
+              <div class="shrink-0 flex items-center px-4">
                 <img
                   class="h-8 w-auto"
                   :src="logo"
@@ -81,7 +81,7 @@
                     >
                       <component
                         :is="item.icon"
-                        :class="[item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-4 flex-shrink-0 h-6 w-6']"
+                        :class="[item.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-4 shrink-0 h-6 w-6']"
                         aria-hidden="true"
                       />
                       {{ item.name }}
@@ -90,10 +90,10 @@
                 </div>
               </nav>
             </div>
-            <div class="flex-shrink-0 flex bg-gray-700 p-4">
+            <div class="shrink-0 flex bg-gray-700 p-4">
               <Link
                 :href="route('user.settings')"
-                class="flex-shrink-0 group block"
+                class="shrink-0 group block"
               >
                 <div class="flex items-center">
                   <div>
@@ -115,19 +115,19 @@
             </div>
           </div>
         </TransitionChild>
-        <div class="flex-shrink-0 w-14">
+        <div class="shrink-0 w-14">
           <!-- Force sidebar to shrink to fit close icon -->
         </div>
       </Dialog>
     </TransitionRoot>
 
     <!-- Static sidebar for desktop -->
-    <div class="hidden md:flex md:flex-shrink-0">
+    <div class="hidden md:flex md:shrink-0">
       <div class="flex flex-col w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
         <div class="flex flex-col h-0 flex-1 bg-gray-800">
           <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-            <div class="flex items-center flex-shrink-0 px-4">
+            <div class="flex items-center shrink-0 px-4">
               <img
                 class="h-8 w-auto"
                 :src="logo"
@@ -146,7 +146,7 @@
                 >
                   <component
                     :is="category.entries[0].icon"
-                    :class="[category.entries[0].current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 flex-shrink-0 h-6 w-6']"
+                    :class="[category.entries[0].current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 shrink-0 h-6 w-6']"
                     aria-hidden="true"
                   />
                   {{ category.entries[0].name }}
@@ -161,7 +161,7 @@
                   <!--              :class="[category.current ? 'bg-gray-100 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900', 'group w-full flex items-center pr-2 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500']"    -->
                   <DisclosureButton :class="['text-white font-semibold uppercase text-xs hover:text-gray-400', 'group w-full flex items-center pr-2 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500']">
                     <svg
-                      :class="[open ? 'text-gray-400 rotate-90' : 'text-gray-300', 'mr-2 flex-shrink-0 h-5 w-5 transform group-hover:text-gray-400 transition-colors ease-in-out duration-150']"
+                      :class="[open ? 'text-gray-400 rotate-90' : 'text-gray-300', 'mr-2 shrink-0 h-5 w-5 transform group-hover:text-gray-400 transition-colors ease-in-out duration-150']"
                       viewBox="0 0 20 20"
                       aria-hidden="true"
                     >
@@ -182,7 +182,7 @@
                     >
                       <component
                         :is="subItem.icon"
-                        :class="[subItem.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 flex-shrink-0 h-6 w-6']"
+                        :class="[subItem.current ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300', 'mr-3 shrink-0 h-6 w-6']"
                         aria-hidden="true"
                       />
                       {{ subItem.name }}
@@ -193,10 +193,10 @@
             </nav>
           </div>
           <!-- User Menu          -->
-          <div class="flex-shrink-0 flex bg-gray-700 p-4">
+          <div class="shrink-0 flex bg-gray-700 p-4">
             <Link
               :href="route('user.settings')"
-              class="flex-shrink-0 w-full group block"
+              class="shrink-0 w-full group block"
             >
               <div class="flex items-center">
                 <div>

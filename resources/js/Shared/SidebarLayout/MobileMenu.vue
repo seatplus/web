@@ -55,7 +55,7 @@
                 </svg>
               </button>
             </div>
-            <div class="flex-shrink-0 flex items-center px-4">
+            <div class="shrink-0 flex items-center px-4">
               <img
                 class="h-8 w-auto"
                 :src="$page.props.images.logo"
@@ -67,7 +67,7 @@
             </div>
           </div>
         </transition>
-        <div class="flex-shrink-0 w-14">
+        <div class="shrink-0 w-14">
           <!-- Dummy element to force sidebar to shrink to fit close icon -->
         </div>
       </div>

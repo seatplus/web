@@ -94,7 +94,7 @@
           <div class="mt-6">
             <form @submit.prevent="form.put(route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
               <div class="flex space-x-3">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                   <div class="relative">
                     <EveImage
                       :object="user.main_character"

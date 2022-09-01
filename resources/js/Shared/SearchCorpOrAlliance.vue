@@ -45,7 +45,7 @@
         v-for="entity of entities"
         :key="entity.id"
         class="col-span-1 bg-white rounded-lg shadow"
-        :class="{'bg-green-50' : isSelected(entity)}"
+        :class="{'bg-emerald-50' : isSelected(entity)}"
         @click="flipSelect(entity)"
       >
         <div class="w-full flex items-center justify-between p-6 space-x-6">

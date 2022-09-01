@@ -18,7 +18,7 @@
           {{ character.name }}
         </span>
       </div>
-      <div class="ml-4 flex-shrink-0">
+      <div class="ml-4 shrink-0">
         <button
           v-if="hasApplied(character.character_id)"
           class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red focus:border-red-700"

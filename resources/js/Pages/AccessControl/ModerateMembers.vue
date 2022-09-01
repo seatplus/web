@@ -45,7 +45,7 @@
                         <div class="text-sm leading-5 font-medium text-indigo-600 truncate">
                           {{ member.main_character.name }}
                         </div>
-                        <span :class="[{'bg-green-100 text-green-800': member.status === 'member', 'bg-blue-100 text-blue-800': member.status === 'waitlist', 'bg-yellow-100 text-yellow-800': member.status === 'paused'},'px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize']">
+                        <span :class="[{'bg-emerald-100 text-emerald-800': member.status === 'member', 'bg-blue-100 text-blue-800': member.status === 'waitlist', 'bg-amber-100 text-amber-800': member.status === 'paused'},'px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize']">
                           {{ member.status }}
                         </span>
                       </div>
@@ -60,7 +60,7 @@
                       </div>
                     </div>
 
-                    <div class="ml-2 flex-shrink-0 flex">
+                    <div class="ml-2 shrink-0 flex">
                       <span
                         v-if="member.status === 'waitlist'"
                         class="relative z-0 inline-flex shadow-sm rounded-md"

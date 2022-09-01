@@ -15,7 +15,7 @@
         <span class="flex items-center">
           <EveImage
             :object="selectedOption"
-            tailwind_class="flex-shrink-0 h-6 w-6 rounded-full"
+            tailwind_class="shrink-0 h-6 w-6 rounded-full"
           />
           <span class="ml-3 block truncate">{{ selectedOption.name }}</span>
         </span>
@@ -44,7 +44,7 @@
               <div class="flex items-center">
                 <EveImage
                   :object="option"
-                  tailwind_class="flex-shrink-0 h-6 w-6 rounded-full"
+                  tailwind_class="shrink-0 h-6 w-6 rounded-full"
                 />
                 <span :class="[selected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate']">
                   {{ option.name }}

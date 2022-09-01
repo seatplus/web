@@ -14,7 +14,7 @@
           <div class="inline-flex items-baseline space-x-2">
             <div
               v-if="!location.location && context !== 'recruitment' && !(location.location_id === 2004)"
-              class="ml-4 mt-4 flex-shrink-0"
+              class="ml-4 mt-4 shrink-0"
             >
               <button
                 type="button"

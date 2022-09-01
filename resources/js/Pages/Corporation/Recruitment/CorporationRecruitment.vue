@@ -9,7 +9,7 @@
 
         <div
           v-if="enlistment.can_manage"
-          class="ml-4 mt-4 flex-shrink-0 flex space-x-3"
+          class="ml-4 mt-4 shrink-0 flex space-x-3"
         >
           <span class="inline-flex rounded-md shadow-sm">
 

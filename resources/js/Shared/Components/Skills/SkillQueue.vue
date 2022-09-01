@@ -88,7 +88,7 @@ const timeline = [
         date: 'Sep 28',
         datetime: '2020-09-28',
         icon: CheckIcon,
-        iconBackground: 'bg-green-500',
+        iconBackground: 'bg-emerald-500',
     },
     {
         id: 4,
@@ -108,7 +108,7 @@ const timeline = [
         date: 'Oct 4',
         datetime: '2020-10-04',
         icon: CheckIcon,
-        iconBackground: 'bg-green-500',
+        iconBackground: 'bg-emerald-500',
     },
 ]
 

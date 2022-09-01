@@ -26,7 +26,7 @@
             >
               <div class="flex items-center px-4 py-4 sm:px-6">
                 <div class="min-w-0 flex-1 flex items-center">
-                  <div class="flex-shrink-0">
+                  <div class="shrink-0">
                     <eve-image
                       :object="character"
                       :size="256"
@@ -38,7 +38,7 @@
                       <div class="text-sm leading-5 font-medium text-indigo-600 truncate">{{ character.name }}</div>
                       <div class="mt-2 flex items-center text-sm leading-5 text-gray-500">
                         <svg
-                          class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                          class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                           fill="none"
                           viewBox="0 0 24 24"
                         >

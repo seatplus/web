@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center">
-    <div class="flex-shrink-0">
+    <div class="shrink-0">
       <EveImage
         :object="entity"
         :size="256"

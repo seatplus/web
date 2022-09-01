@@ -42,7 +42,7 @@
           v-if="entry.location"
           class="flex items-center"
         >
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <EveImage
               :object="entry.location.locatable"
               :size="256"

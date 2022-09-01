@@ -36,11 +36,11 @@
         />
         <PlayIcon
           v-if="status === 'pending'"
-          class="h-8 w-8 text-yellow-400"
+          class="h-8 w-8 text-amber-400"
         />
         <CheckCircleIcon
           v-if="status === 'finished'"
-          class="h-8 w-8 text-green-400"
+          class="h-8 w-8 text-emerald-400"
         />
         <XCircleIcon
           v-if="status === 'failures'"

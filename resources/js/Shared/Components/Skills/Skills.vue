@@ -12,7 +12,7 @@
           <span>{{ sumSkillpoints(skills) }} total skillpoints</span>
           <div class="flex space-x-1.5">
             <div class="flex">
-              <div class="flex-shrink-0 self-center">
+              <div class="shrink-0 self-center">
                 <StarIcon class="h-4 w-4" />
               </div>
               <span>
@@ -20,7 +20,7 @@
               </span>
             </div>
             <div class="flex">
-              <div class="flex-shrink-0 self-center">
+              <div class="shrink-0 self-center">
                 <StarIconOutline class="h-4 w-4" />
               </div>
               <span>

@@ -8,7 +8,7 @@
     </HeaderButton>
     <span
       v-if="has_selected"
-      class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-yellow-400"
+      class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-amber-400"
     />
   </span>
   <teleport to="#destination">

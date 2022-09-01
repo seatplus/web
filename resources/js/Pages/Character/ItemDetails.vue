@@ -5,7 +5,7 @@
     </teleport>
     <PageHeader :breadcrumbs="breadcrumbs">
       <div class="flex items-center">
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <EveImage
             :object="object"
             :size="256"
