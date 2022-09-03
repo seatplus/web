@@ -13,7 +13,7 @@ export function useInfinityScrolling(routeName, params, method = 'GET') {
 
     const fetchData = function () {
 
-        if(isLoading.value || isComplete.value)
+        if(isLoading.value || isComplete.value || _.isNil(url.value))
             return
 
         const timeout = setTimeout(() => isLoading.value = true, 250)
