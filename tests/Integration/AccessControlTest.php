@@ -312,13 +312,6 @@ test('search for character', function () {
         'category' => 'character',
     ]);
 
-    // now search with query-string
-    test()->mockRetrieveEsiDataAction([
-        'character' => [
-            test()->test_character->character_id,
-        ],
-    ]);
-
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.search.affiliatable', [
             'query' => test()->test_character->name,
@@ -329,6 +322,6 @@ test('search for character', function () {
         'id' => test()->test_character->character_id,
         'category' => 'character',
     ]);
-});
+})->only();
 
 // Helpers

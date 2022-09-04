@@ -85,28 +85,30 @@ class HelperController extends Controller
 
     public function systems()
     {
-        $query = request()->get('search');
+        $term = request()->get('search');
 
-        if (Str::length($query) < 3) {
+        if (Str::length($term) < 3) {
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $system_ids = (new SearchService)->execute('solar_system', $query);
-
-        return (new GetNamesFromIdsService)->execute(array_slice($system_ids, 0, 15));
+        return (new SearchService)
+            ->setIsIdsOnly(false)
+            ->execute('solar_system', $term);
     }
 
     public function regions()
     {
-        $query = request()->get('search');
+        $term = request()->get('search');
 
-        if (Str::length($query) < 3) {
+        if (Str::length($term) < 3) {
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $region_ids = (new SearchService)->execute('region', $query);
+        $results =  (new SearchService)
+            ->setIsIdsOnly(false)
+            ->execute('region', $term);
 
-        return (new GetNamesFromIdsService)->execute(array_slice($region_ids, 0, 15));
+        return collect($results)->flatten(1)->toArray();
     }
 
     public function typesOrGroupsOrCategories()

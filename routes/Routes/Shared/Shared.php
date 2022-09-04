@@ -42,9 +42,14 @@ Route::get('search/systems/{search}', [HelperController::class, 'findSolarSystem
 Route::get('/location/{location_id}', [ManualLocationController::class, 'getLocation'])->name('get.manual_location');
 Route::post('/location/', [ManualLocationController::class, 'create'])->name('post.manual_location');
 
-Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestion.system');
-Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');
-Route::get('typesOrGroupOrCategories', [HelperController::class, 'typesOrGroupsOrCategories'])->name('autosuggestion.typesOrGroupOrCategories');
+Route::prefix('autosuggest')
+    ->controller(HelperController::class)
+    ->group(function () {
+        Route::get('systems', 'systems')->name('autosuggestion.system');
+        Route::get('regions', 'regions')->name('autosuggestion.region');
+        Route::get('typesOrGroupOrCategories', 'typesOrGroupsOrCategories')->name('autosuggestion.typesOrGroupOrCategories');
+});
+
 
 Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
 Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');

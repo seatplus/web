@@ -26,27 +26,79 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use phpDocumentor\Reflection\Types\This;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Constellation;
+use Seatplus\Eveapi\Models\Universe\Group;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
+use Seatplus\Eveapi\Models\Universe\Type;
 
 class SearchService
 {
-    public function execute(string|array $category, string $query): array
+
+    private bool $isIdsOnly = true;
+
+    /**
+     * @return bool
+     */
+    public function isIdsOnly(): bool
     {
-        $category_string = is_string($category) ? $category : implode(',', $category);
-
-        $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v2',
-            'endpoint' => '/search/',
-            'query_parameters' => [
-                'categories' => $category_string,
-                'search' => $query,
-            ],
-        ]);
-
-        $result = RetrieveEsiData::execute($container);
-
-        return is_string($category) ? ($result->$category ?? []) : collect($result)->toArray();
+        return $this->isIdsOnly;
     }
+
+
+    public function setIsIdsOnly(bool $isIdsOnly): SearchService
+    {
+        $this->isIdsOnly = $isIdsOnly;
+
+        return $this;
+    }
+
+    public function execute(string|array $categories, string $query): array
+    {
+
+        $result = collect($categories)
+            ->mapWithKeys(fn($category) => [$category => $this->getSearchResult($category, $query)]);
+
+        // TODO don't forget to add hasEveImage
+
+        return $result->toArray();
+    }
+
+    private function getSearchResult(string $category, string $term) : array
+    {
+        $query = match ($category) {
+            // Items
+            'type' => Type::query()->select(['type_id as id', 'name']),
+            'group' => Group::query()->select(['group_id as id', 'name']),
+            'category' => Category::query()->select(['category_id as id', 'name']),
+            // Locations
+            'solar_system' => System::query()->select(['system_id as id', 'name']),
+            'region' => Region::query()->select(['region_id as id', 'name']),
+            'constellation' => Constellation::query()->select(['constellation_id as id', 'name']),
+            // Entity
+            'character' => CharacterInfo::query()->select(['character_id as id', 'name']),
+            'corporation' => CorporationInfo::query()->select(['corporation_id as id', 'name']),
+            'alliance' => AllianceInfo::query()->select(['alliance_id as id', 'name']),
+        };
+
+        match ($category) {
+            'type', 'group' => $query->where('name_normalized', 'like', $term . '%'),
+            default => $query->where('name', 'like', $term . '%'),
+        };
+
+        return $this->isIdsOnly()
+            ? $query-> pluck('id')->toArray()
+            : $query->limit(15)->get()->map(fn($result) => [
+                'id' => $result->id,
+                'name' => $result->name,
+                'category' => $category
+            ])->toArray();
+    }
+
+
 }
