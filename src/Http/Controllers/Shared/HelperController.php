@@ -104,7 +104,7 @@ class HelperController extends Controller
             return response('the minimum length of 3 is not met', 403);
         }
 
-        $results =  (new SearchService)
+        $results = (new SearchService)
             ->setIsIdsOnly(false)
             ->execute('region', $term);
 

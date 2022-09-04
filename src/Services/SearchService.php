@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Services;
 
-use phpDocumentor\Reflection\Types\This;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -39,7 +38,6 @@ use Seatplus\Eveapi\Models\Universe\Type;
 
 class SearchService
 {
-
     private bool $isIdsOnly = true;
 
     /**
@@ -50,7 +48,6 @@ class SearchService
         return $this->isIdsOnly;
     }
 
-
     public function setIsIdsOnly(bool $isIdsOnly): SearchService
     {
         $this->isIdsOnly = $isIdsOnly;
@@ -60,9 +57,8 @@ class SearchService
 
     public function execute(string|array $categories, string $query): array
     {
-
         $result = collect($categories)
-            ->mapWithKeys(fn($category) => [$category => $this->getSearchResult($category, $query)]);
+            ->mapWithKeys(fn ($category) => [$category => $this->getSearchResult($category, $query)]);
 
         // TODO don't forget to add hasEveImage
 
@@ -93,12 +89,10 @@ class SearchService
 
         return $this->isIdsOnly()
             ? $query-> pluck('id')->toArray()
-            : $query->limit(15)->get()->map(fn($result) => [
+            : $query->limit(15)->get()->map(fn ($result) => [
                 'id' => $result->id,
                 'name' => $result->name,
-                'category' => $category
+                'category' => $category,
             ])->toArray();
     }
-
-
 }
