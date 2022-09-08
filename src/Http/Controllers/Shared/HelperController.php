@@ -87,13 +87,11 @@ class HelperController extends Controller
 
     public function systems()
     {
-
         return $this->search('solar_system');
     }
 
     public function regions()
     {
-
         return $this->search('region');
     }
 
