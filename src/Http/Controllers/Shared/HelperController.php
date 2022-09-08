@@ -29,6 +29,8 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -85,30 +87,14 @@ class HelperController extends Controller
 
     public function systems()
     {
-        $term = request()->get('search');
 
-        if (Str::length($term) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        return (new SearchService)
-            ->setIsIdsOnly(false)
-            ->execute('solar_system', $term);
+        return $this->search('solar_system');
     }
 
     public function regions()
     {
-        $term = request()->get('search');
 
-        if (Str::length($term) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        $results =  (new SearchService)
-            ->setIsIdsOnly(false)
-            ->execute('region', $term);
-
-        return collect($results)->flatten(1)->toArray();
+        return $this->search('region');
     }
 
     public function typesOrGroupsOrCategories()
@@ -192,5 +178,23 @@ class HelperController extends Controller
         cache(['market_prices' => $prices], now()->addDay());
 
         return $prices->toJson();
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws \Throwable
+     * @throws NotFoundExceptionInterface
+     */
+    private function search(string $category, ?string $term = null) : array
+    {
+        $term = $term ?? request()->get('search');
+
+        throw_if(Str::length($term) < 3, 'the minimum length of 3 is not met', 403);
+
+        $results = (new SearchService)
+            ->setIsIdsOnly(false)
+            ->execute($category, $term);
+
+        return collect($results)->flatten(1)->toArray();
     }
 }

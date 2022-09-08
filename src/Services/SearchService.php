@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Services;
 
-use phpDocumentor\Reflection\Types\This;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
