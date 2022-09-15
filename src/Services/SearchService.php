@@ -26,27 +26,48 @@
 
 namespace Seatplus\Web\Services;
 
+use Illuminate\Support\Facades\Cache;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class SearchService
 {
-    public function execute(string|array $category, string $query): array
+    public function execute(RefreshToken $token, array $categories, string $term)
     {
-        $category_string = is_string($category) ? $category : implode(',', $category);
 
         $container = new EsiRequestContainer([
             'method' => 'get',
-            'version' => 'v2',
-            'endpoint' => '/search/',
+            'version' => 'v3',
+            'endpoint' => '/characters/{character_id}/search/',
+            'path_values' => [
+                'character_id' => $token->character_id,
+            ],
+            'refresh_token' => $token,
             'query_parameters' => [
-                'categories' => $category_string,
-                'search' => $query,
+                'categories' => implode(',', $categories),
+                'search' => $term,
             ],
         ]);
 
-        $result = RetrieveEsiData::execute($container);
+        return RetrieveEsiData::execute($container);
 
-        return is_string($category) ? ($result->$category ?? []) : collect($result)->toArray();
+        return count($categories) === 1 ? ($result->$categories[0] ?? []) : collect($result)->toArray();
+    }
+
+    public static function getTokenFromCurrentUser(): ?RefreshToken
+    {
+        $user_id = auth()->user()->getAuthIdentifier();
+
+        return Cache::remember("esi-search:$user_id", now()->addHour()->diffInSeconds(), function () {
+            $user = User::query()
+                ->with('characters.refresh_token')
+                ->find(auth()->user()->getAuthIdentifier());
+
+            $tokens = $user->characters->map(fn($character) => $character->refresh_token)->filter();
+
+            return $tokens->firstWhere(fn($token) => in_array('esi-search.search_structures.v1', $token->scopes));
+        });
     }
 }

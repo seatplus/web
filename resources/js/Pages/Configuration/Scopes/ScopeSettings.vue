@@ -136,8 +136,9 @@ import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "ScopeSettings",
     components: {
+        SearchCorpOrAlliance,
         RadioListWithDescription,
-        PageHeader, SearchCorpOrAlliance, EveImage, CorporationScopes, CharacterScopes, Link},
+        PageHeader, EveImage, CorporationScopes, CharacterScopes, Link},
     props: {
         available_scopes: {
             type: Object,

@@ -36,7 +36,7 @@ return [
         [
             'name' => 'Assets',
             'route' => 'character.assets',
-            'icon' => 'ArchiveIcon',
+            'icon' => 'ArchiveBoxIcon',
         ],
         [
             'name' => 'Contacts',
@@ -46,12 +46,12 @@ return [
         [
             'name' => 'Wallets',
             'route' => 'character.wallets',
-            'icon' => 'CashIcon',
+            'icon' => 'BanknotesIcon',
         ],
         [
             'name' => 'Contracts',
             'route' => 'character.contracts',
-            'icon' => 'PencilAltIcon',
+            'icon' => 'PencilSquareIcon',
         ],
         [
             'name' => 'Skills',
@@ -70,14 +70,14 @@ return [
             'permission' => 'wallets',
             'character_role' => 'Accountant|Junior_Accountant',
             'route' => 'corporation.wallet',
-            'icon' => 'CashIcon',
+            'icon' => 'BanknotesIcon',
         ],
         [
             'name' => 'Member Tracking',
             'permission' => 'view member tracking',
             'character_role' => 'director',
             'route' => 'corporation.member_tracking',
-            'icon' => 'BadgeCheckIcon',
+            'icon' => 'CheckBadgeIcon',
         ],
         [
             'name' => 'Member Compliance',
@@ -91,7 +91,7 @@ return [
             'permission' => 'can open or close corporations for recruitment|can accept or deny applications',
             'character_role' => 'director',
             'route' => 'corporation.recruitment',
-            'icon' => 'ClipboardCheckIcon',
+            'icon' => 'ClipboardDocumentCheckIcon',
         ],
     ],
     'Access Control' => [
@@ -113,7 +113,7 @@ return [
             'name'  => 'Manual Locations',
             'permission' => 'manage manual locations',
             'route' => 'manage.manual_locations',
-            'icon' => 'LocationMarkerIcon',
+            'icon' => 'MapIcon',
         ],
     ],
 ];

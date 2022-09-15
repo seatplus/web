@@ -20,7 +20,7 @@
         <div class="z-10 sticky top-0">
           <div class="ml-3 mb-3 relative rounded-md bg-white shadow-sm">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon
+              <MagnifyingGlassIcon
                 class="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
@@ -49,11 +49,11 @@
 import HeaderButton from "../../Layout/HeaderButton.vue";
 import SlideOver from "../../Layout/SlideOver.vue";
 import EntitySelection from "./EntitySelection.vue";
-import { SearchIcon } from '@heroicons/vue/solid';
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 
 export default {
     name: "EntitySelectionButton",
-    components: {EntitySelection, SlideOver, HeaderButton, SearchIcon},
+    components: {EntitySelection, SlideOver, HeaderButton, MagnifyingGlassIcon},
     props: {
         type: {
             type: String,

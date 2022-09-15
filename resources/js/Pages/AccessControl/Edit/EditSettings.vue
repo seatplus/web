@@ -18,7 +18,7 @@
         </p>
       </div>
       <div v-show="!affiliateEverything">
-        <div class="w-full flex md:ml-0 px-6">
+        <!--<div class="w-full flex md:ml-0 px-6">
           <label
             for="search_field"
             class="sr-only"
@@ -47,9 +47,57 @@
               type="search"
             >
           </div>
-        </div>
+        </div>-->
+        <InputWithValidation
+          v-model="query"
+          label="Search"
+          placeholder="Search"
+          class="px-6"
+          :warning="showWarning ? 'No results found' : ''"
+        >
+          <template #description>
+            <TransitionRoot
+              :show="showWarning"
+              enter="transition-opacity duration-75"
+              enter-from="opacity-0"
+              enter-to="opacity-100"
+              leave="transition-opacity duration-150"
+              leave-from="opacity-100"
+              leave-to="opacity-0"
+            >
+              <div class="mt-2 text-sm">
+                <div
+                  class="border-l-4 border-yellow-400 bg-yellow-50 p-4"
+                >
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <ExclamationTriangleIcon
+                        class="h-5 w-5 text-yellow-400"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div class="ml-3">
+                      <p class="text-sm text-yellow-700">
+                        You have no character refresh token with required scope.
+                        {{ ' ' }}
+                        <Link
+                          :href="route('enable_esi_search')"
+                          class="font-medium text-yellow-700 underline hover:text-yellow-600"
+                        >
+                          Upgrade one token to be able to use this search.
+                        </Link>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TransitionRoot>
+          </template>
+        </InputWithValidation>
 
-        <div class="overflow-auto overflow-x-hidden h-64">
+        <div
+          class="overflow-auto overflow-x-hidden h-64"
+        >
           <ListTransition :entries="filteredEntities">
             <div
               v-for="(entity, index) in filteredEntities"
@@ -153,13 +201,17 @@
 import axios from "axios"
 import ListTransition from "@/Shared/Transitions/ListTransition.vue"
 import AffiliationList from "./AffiliationList.vue"
-import {computed, onBeforeMount, ref, watch} from "vue";
+import {computed, onBeforeMount, ref, watch, watchEffect} from "vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import SimpleToggle from "@/Shared/SimpleToggle.vue";
+import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
+import {TransitionRoot} from "@headlessui/vue";
+import {ExclamationTriangleIcon} from '@heroicons/vue/20/solid';
+import { Link } from "@inertiajs/inertia-vue3";
 
 export default {
     name: "EditSettings",
-    components: {SimpleToggle, EntityByIdBlock, AffiliationList, ListTransition},
+    components: {TransitionRoot, InputWithValidation, SimpleToggle, EntityByIdBlock, AffiliationList, ListTransition, ExclamationTriangleIcon, Link},
     props: {
         affiliations: {
             type: Array,
@@ -173,7 +225,10 @@ export default {
         const affiliationsValue = ref(props.affiliations)
         const affiliateEverything = ref(!!_.find(props.affiliations, {'id' : 1000001}))
 
+        const hasToken = ref(null);
+
         const fetchData = _.debounce(async () => {
+
             await axios.get(route('acl.search.affiliatable', { query: query.value.length > 2 ? query.value : '' }))
                 .then(result => {
 
@@ -199,12 +254,22 @@ export default {
            })
         }
 
-        watch(query, () => {
-            console.log('update')
+        const checkToken = async () => {
 
-            fetchData()
-
-        })
+            // If hasToken is null, we don't know yet if the user has a token
+            if (_.isNull(hasToken.value)) {
+                // check if the user has a token with required scope
+                await axios.get(route('autosuggestion.token'))
+                    .then(response => {
+                        // if the user has a token, set hasToken to true
+                        // we don't need to check again
+                        // we expect the response to be a 1 or 0 and turn it into a boolean
+                        hasToken.value = !!response.data;
+                    }).catch(error => {
+                        console.log(error)
+                    })
+            }
+        }
 
         watch([affiliationsValue, affiliateEverything], (newAffiliationsValue, affiliateEverythingValue) => {
 
@@ -213,6 +278,38 @@ export default {
                 category: "corporation",
                 type: "inverse",
             }])
+        })
+
+        watchEffect(async () => {
+
+            if (query.value === undefined) {
+                return;
+            }
+
+            if (hasToken.value === false) {
+                return;
+            }
+
+            await checkToken();
+
+            if (hasToken.value === false) {
+                return;
+            }
+
+            if (query.value.length < 3) {
+                return
+            }
+
+            await fetchData();
+        })
+
+        const showWarning = computed(() => {
+
+            if (query.value.length < 1) {
+                return false;
+            }
+
+            return !_.isNull(hasToken.value) && !hasToken.value
         })
 
         onBeforeMount(() => {
@@ -225,7 +322,8 @@ export default {
             query,
             addAffiliation,
             affiliationsValue,
-            affiliateEverything
+            affiliateEverything,
+            showWarning
         }
 
     },

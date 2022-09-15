@@ -26,10 +26,15 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Firebase\JWT\JWT;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Type;
@@ -81,6 +86,30 @@ class HelperController extends Controller
         $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
 
         return $esi_results;
+    }
+
+    public function token()
+    {
+
+        $token = $this->getEsiSearchToken();
+
+        return $token ? 1 : 0;
+
+    }
+
+    public function esiSearch(Request $request)
+    {
+        $validated_data = $request->validate([
+            'search' => ['required', 'string', 'min:3'],
+            'categories' => ['required','array'],
+        ]);
+
+        $token = $this->getEsiSearchToken();
+
+        $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
+
+        return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
+
     }
 
     public function systems()
@@ -190,5 +219,10 @@ class HelperController extends Controller
         cache(['market_prices' => $prices], now()->addDay());
 
         return $prices->toJson();
+    }
+
+    private function getEsiSearchToken() : ?RefreshToken
+    {
+        return SearchService::getTokenFromCurrentUser();
     }
 }

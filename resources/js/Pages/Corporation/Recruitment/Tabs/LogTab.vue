@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { ChatAltIcon } from '@heroicons/vue/solid'
+import { ChatAltIcon } from '@heroicons/vue/20/solid'
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time.vue";

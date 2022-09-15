@@ -69,7 +69,7 @@
 <script>
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-import { SearchIcon } from '@heroicons/vue/solid'
+import { SearchIcon } from '@heroicons/vue/20/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement.vue";
 import {computed, ref, watch} from "vue";
 import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";

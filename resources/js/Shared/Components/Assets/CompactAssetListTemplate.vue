@@ -62,7 +62,7 @@
 
 <script>
 import {prefix} from "metric-prefix";
-import { ChevronRightIcon } from '@heroicons/vue/solid'
+import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import EveImage from "@/Shared/EveImage.vue"
 export default {
     name: "CompactAssetListTemplate",

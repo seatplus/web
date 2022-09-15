@@ -54,7 +54,7 @@
 <script>
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
-import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/outline"
+import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
 import {computed, onBeforeMount, onUnmounted, ref, watch} from "vue";
 import axios from "axios";
 import {usePage} from "@inertiajs/inertia-vue3";

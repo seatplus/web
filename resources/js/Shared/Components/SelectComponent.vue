@@ -71,7 +71,7 @@
 <script>
 import {ref, watch} from 'vue'
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid'
+import { CheckIcon, SelectorIcon } from '@heroicons/vue/20/solid'
 import EveImage from "../EveImage.vue";
 
 export default {

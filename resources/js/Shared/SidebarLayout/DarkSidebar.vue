@@ -49,7 +49,7 @@
                   @click="sidebarOpen = false"
                 >
                   <span class="sr-only">Close sidebar</span>
-                  <XIcon
+                  <XMarkIcon
                     class="h-6 w-6 text-white"
                     aria-hidden="true"
                   />
@@ -276,7 +276,7 @@ import {
     TransitionRoot
 } from '@headlessui/vue'
 import {usePage, Link } from "@inertiajs/inertia-vue3";
-import * as OutlineHeroicons from '@heroicons/vue/outline'
+import * as OutlineHeroicons from '@heroicons/vue/24/outline'
 import ImpersonatingBanner from "./ImpersonatingBanner.vue";
 import Notifications from "../Notifications/Notifications.vue";
 import EveImage from "@/Shared/EveImage.vue"
