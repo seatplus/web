@@ -108,7 +108,7 @@ class ControlGroupsController
 
         $token = SearchService::getTokenFromCurrentUser();
 
-        $result = $query ? (new SearchService)->execute($token,['character', 'corporation', 'alliance'], $query) : $this->getFirstSelection();
+        $result = $query ? (new SearchService)->execute($token, ['character', 'corporation', 'alliance'], $query) : $this->getFirstSelection();
 
         return $this->paginate(
             collect($result)

@@ -7,18 +7,16 @@ use Seatplus\Web\Services\SearchService;
 
 class EnableEsiSearchController
 {
-
     public function __invoke()
     {
         // First check if user has already an esi search token
         if (SearchService::getTokenFromCurrentUser()) {
-
             // If so, redirect to intended url or home
-            return redirect(session()->pull('from','/'));
+            return redirect(session()->pull('from', '/'));
         }
 
         // If session has no from url, set it to previous url
-        if(!session()->has('from')){
+        if (! session()->has('from')) {
             session()->put('from', url()->previous());
         }
 
@@ -27,7 +25,7 @@ class EnableEsiSearchController
             ->find(auth()->user()->getAuthIdentifier());
 
         return inertia('EnableEsiSearch', [
-            'characters' => $user->characters->map(fn($character) => [
+            'characters' => $user->characters->map(fn ($character) => [
                 'character_id' => $character->character_id,
                 'name' => $character->name,
                 'corporation' => $character->corporation->name ?? 'Unknown Corporation',

@@ -66,7 +66,6 @@ class GetNamesFromIdsService
 
         return collect($esi_results)
             ->map(function ($esi_result) {
-
                 match ($esi_result->category) {
                     'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category . "_id", $esi_result->id),
                     default => $esi_result,

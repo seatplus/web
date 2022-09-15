@@ -36,7 +36,6 @@ class SearchService
 {
     public function execute(RefreshToken $token, array $categories, string $term)
     {
-
         $container = new EsiRequestContainer([
             'method' => 'get',
             'version' => 'v3',
@@ -65,9 +64,9 @@ class SearchService
                 ->with('characters.refresh_token')
                 ->find(auth()->user()->getAuthIdentifier());
 
-            $tokens = $user->characters->map(fn($character) => $character->refresh_token)->filter();
+            $tokens = $user->characters->map(fn ($character) => $character->refresh_token)->filter();
 
-            return $tokens->firstWhere(fn($token) => in_array('esi-search.search_structures.v1', $token->scopes));
+            return $tokens->firstWhere(fn ($token) => in_array('esi-search.search_structures.v1', $token->scopes));
         });
     }
 }
