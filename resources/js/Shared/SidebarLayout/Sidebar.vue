@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import * as SolidHeroicons from '@heroicons/vue/outline'
+  import * as SolidHeroicons from '@heroicons/vue/20/solid'
   import { Link } from '@inertiajs/inertia-vue3'
     export default {
         name: "Sidebar",

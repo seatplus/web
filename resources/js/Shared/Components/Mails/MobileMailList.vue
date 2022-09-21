@@ -59,7 +59,7 @@ import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
-import {ChevronUpIcon} from "@heroicons/vue/solid/esm";
+import {ChevronUpIcon} from "@heroicons/vue/20/solid/esm";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 
 export default {

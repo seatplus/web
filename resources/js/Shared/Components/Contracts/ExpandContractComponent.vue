@@ -28,7 +28,7 @@
   </teleport>
 </template>
 <script>
-import {ArrowsExpandIcon} from "@heroicons/vue/solid";
+import {ArrowsExpandIcon} from "@heroicons/vue/20/solid";
 import {ref} from "vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";

@@ -32,18 +32,18 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Multiselect
+          <EsiMultiselect
             v-model="form.regions"
-            route-name="autosuggestion.region"
+            :categories="['region']"
             label="Region"
-            placeholder="search for Region"
+            placeholder="search for region"
           />
         </div>
 
         <div>
-          <Multiselect
+          <EsiMultiselect
             v-model="form.systems"
-            route-name="autosuggestion.system"
+            :categories="['solar_system']"
             label="Solar System"
             placeholder="search for solar system"
           />
@@ -72,14 +72,14 @@
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
-import Multiselect from "@/Shared/Components/Multiselect.vue";
 import EnlistmentConfig from "./EnlistmentConfig.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import ItemsWatchlist from "./ItemsWatchlist.vue";
+import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 
 export default {
     name: "Index",
-    components: {ItemsWatchlist, Button, EnlistmentConfig, Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
+    components: {ItemsWatchlist, Button, EnlistmentConfig, EsiMultiselect, TwoColumnCardWithSubmitAction, PageHeader},
     props: {
         watched: {
             required: true,

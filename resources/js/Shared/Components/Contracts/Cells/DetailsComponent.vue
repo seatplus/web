@@ -46,7 +46,7 @@ import {
     StatusOnlineIcon,
     CashIcon,
     ArchiveIcon,
-} from "@heroicons/vue/solid";
+} from "@heroicons/vue/20/solid";
 export default {
     name: "DetailsComponent",
     components: {

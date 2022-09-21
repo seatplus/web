@@ -4,12 +4,13 @@
       This is the automatic control group settings. Users with characters in the selected affilites will gain access to the control group
     </p>
 
-    <SearchCorpOrAlliance
-      v-model="affiliations"
-      class="mt-6"
-    >
-      Search for corporation or alliance that you wish to affiliate
-    </SearchCorpOrAlliance>
+    <EsiAutosuggest
+      label="Search for Corporation or Alliance"
+      :categories="['corporation', 'alliance']"
+      placeholder="corporation or alliance name"
+      :reset-after-select="true"
+      @selected-object="(selectedOption) => affiliations.push(selectedOption)"
+    />
 
     <Affiliations v-model="affiliations" />
 
@@ -21,12 +22,12 @@
 </template>
 
 <script>
-  import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance.vue"
   import Members from "./Members.vue"
   import Affiliations from "./Affiliations.vue"
+  import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
   export default {
       name: "AutomaticRole",
-      components: {Affiliations, Members, SearchCorpOrAlliance},
+      components: {EsiAutosuggest, Affiliations, Members},
       props: {
           modelValue: {}
       },

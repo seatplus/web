@@ -59,7 +59,7 @@
 
 <script>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/solid'
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/20/solid'
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Time from "@/Shared/Time.vue";
 export default {

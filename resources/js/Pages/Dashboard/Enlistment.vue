@@ -85,7 +85,7 @@ import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
+import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/inertia-vue3'
 
 export default {

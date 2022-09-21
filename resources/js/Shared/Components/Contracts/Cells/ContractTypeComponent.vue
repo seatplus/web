@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {LocationMarkerIcon} from "@heroicons/vue/solid";
+import {LocationMarkerIcon} from "@heroicons/vue/20/solid";
 import {ref} from "vue";
 
 export default {

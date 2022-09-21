@@ -166,7 +166,7 @@
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
 import TabComponent from "./TabComponent.vue";
-import {IdentificationIcon} from '@heroicons/vue/outline'
+import {IdentificationIcon} from '@heroicons/vue/24/outline'
 import UpdateCharacterComponent from "./UpdateCharacterComponent.vue";
 
 export default {

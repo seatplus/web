@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Web\Http\Controllers\Shared\EnableEsiSearchController;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCharactersController;
 use Seatplus\Web\Http\Controllers\Shared\GetAffiliatedCorporationsController;
 use Seatplus\Web\Http\Controllers\Shared\HelperController;
@@ -37,10 +38,18 @@ Route::post('resolve/ids', [HelperController::class, 'ids'])->name('resolve.ids'
 Route::post('resolve/character_affiliations', [HelperController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
 Route::get('resolve/{corporation_id}/corporation_info', [HelperController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
 Route::get('resolve/{id}', [HelperController::class, 'getEntityFromId'])->name('resolve.id');
-Route::get('search/systems/{search}', [HelperController::class, 'findSolarSystem'])->name('resolve.solar_system');
 
 Route::get('/location/{location_id}', [ManualLocationController::class, 'getLocation'])->name('get.manual_location');
 Route::post('/location/', [ManualLocationController::class, 'create'])->name('post.manual_location');
+
+Route::controller(HelperController::class)
+    ->prefix('autosuggest')
+    ->group(function() {
+        Route::get('search', 'esiSearch')->name('autosuggestion.search');
+        Route::get('token', 'token')->name('autosuggestion.token');
+    });
+
+Route::get('enable_esi_search', EnableEsiSearchController::class)->name('enable_esi_search');
 
 Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestion.system');
 Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');

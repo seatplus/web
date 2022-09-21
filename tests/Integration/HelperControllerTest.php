@@ -87,36 +87,9 @@ it('resolves corporation info', function () {
     ]);
 });
 
-/**
- * @runInSeparateProcess
- * @preserveGlobalState disabled
- */
-test('one can search for solar systems', function () {
-    $system = System::factory()->make([
-        'name' => 'test',
-    ]);
-
-    $esi_mock_return_data = [
-        'solar_system' => [$system->system_id],
-    ];
-
-    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
-
-    // as mocking is difficult we will set the cached result
-    cache([
-        sprintf('name:%s', $system->system_id) => [
-            'category' => 'solar_system',
-            'id' => $system->system_id,
-            'faction_id' => $system->name,
-        ],
-    ]);
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('resolve.solar_system', 'tes'))
-        ->assertOk();
-});
-
 test('one can search existing systems', function () {
+    updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
+
     $system = System::factory()->create([
         'name' => 'jita',
     ]);
@@ -124,8 +97,8 @@ test('one can search existing systems', function () {
     System::factory()->count(4)->create();
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.system', ['search' => '']))
-        ->assertForbidden();
+        ->get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
+        ->assertInvalid(['search' => 'The search must be at least 3 characters.']);
 
     RetrieveEsiData::shouldReceive('execute')
         ->twice()
@@ -145,7 +118,7 @@ test('one can search existing systems', function () {
         );
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.system', ['search' => 'jit']))
+        ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
         ->assertOk();
 
 
@@ -153,6 +126,8 @@ test('one can search existing systems', function () {
 });
 
 test('one can search existing region', function () {
+    updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
+
     $region = Region::factory()->create([
         'name' => 'Delve',
     ]);
@@ -160,8 +135,8 @@ test('one can search existing region', function () {
     Region::factory()->count(4)->create();
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.region', ['search' => '']))
-        ->assertForbidden();
+        ->get(route('autosuggestion.search', ['search' => 'D', 'categories' => ['region']]))
+        ->assertInvalid(['search']);
 
     RetrieveEsiData::shouldReceive('execute')
         ->twice()
@@ -181,7 +156,7 @@ test('one can search existing region', function () {
         );
 
     $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.region', ['search' => 'Del']))
+        ->get(route('autosuggestion.search', ['search' => 'Del', 'categories' => ['region']]))
         ->assertOk();
 
     expect($result->original)->toHaveCount(1);

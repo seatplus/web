@@ -75,7 +75,7 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
                     ->reject(fn ($affiliation) => in_array($affiliation['id'], $existing_ids->toArray()))
                     ->each(fn ($affiliation) => $data->role->acl_affiliations()->create([
                         'affiliatable_id' => $affiliation['id'],
-                        'affiliatable_type' => $affiliation['type'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
+                        'affiliatable_type' => $affiliation['category'] === 'corporation' ? CorporationInfo::class : AllianceInfo::class,
                     ]));
 
                 return $affiliations;

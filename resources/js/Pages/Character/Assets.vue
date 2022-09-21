@@ -35,18 +35,18 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <Multiselect
+              <EsiMultiselect
                 v-model="regions"
-                route-name="autosuggestion.region"
+                :categories="['region']"
                 label="Region"
                 placeholder="search for region"
               />
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <Multiselect
+              <EsiMultiselect
                 v-model="systems"
-                route-name="autosuggestion.system"
+                :categories="['solar_system']"
                 label="Solar System"
                 placeholder="search for solar system"
               />
@@ -97,16 +97,16 @@ import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelection
 import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
-import Multiselect from "@/Shared/Components/Multiselect.vue";
 import {computed, ref, watch} from 'vue'
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
+import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 
 export default {
     name: "Assets",
     components: {
+        EsiMultiselect,
         SelectedEntity,
-        Multiselect,
         RequiredScopesWarning,
         DispatchUpdateButton,
         AssetsComponent,
@@ -134,15 +134,6 @@ export default {
         const search = ref(null)
         const regions = ref([])
         const systems = ref([])
-
-        /*const selectedCharacterIds = computed(() => {
-            let character_ids = _.get(route().params, 'character_ids')
-
-            if(!character_ids)
-                return []
-
-            return  _.map(character_ids, (id) => parseInt(id))
-        })*/
 
         const cleanParams = computed(() => {
             return {

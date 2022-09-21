@@ -47,7 +47,7 @@
                 @click="close()"
               >
                 <span class="sr-only">Close</span>
-                <XIcon
+                <XMarkIcon
                   class="h-6 w-6"
                   aria-hidden="true"
                 />
@@ -101,7 +101,7 @@
 <script>
 import { computed } from 'vue'
 import { Dialog, DialogOverlay, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { XIcon } from '@heroicons/vue/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 export default {
     name: "WithDismissButtonModal",
@@ -110,7 +110,7 @@ export default {
         DialogOverlay,
         TransitionChild,
         TransitionRoot,
-        XIcon,
+        XMarkIcon,
     },
     props: {
         modelValue: {

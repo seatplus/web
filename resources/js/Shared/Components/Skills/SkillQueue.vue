@@ -55,7 +55,7 @@
 <script>
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
-import { CheckIcon, ThumbUpIcon, UserIcon, BookOpenIcon } from '@heroicons/vue/solid'
+import { CheckIcon, ThumbUpIcon, UserIcon, BookOpenIcon } from '@heroicons/vue/20/solid'
 import Time from "@/Shared/Time.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 

@@ -103,7 +103,7 @@
                     />
 
                     <span class="absolute -bottom-0.5 -right-1 bg-white rounded-tl px-0.5 py-px">
-                      <ChatAltIcon
+                      <ChatBubbleBottomCenterTextIcon
                         class="h-5 w-5 text-gray-400"
                         aria-hidden="true"
                       />
@@ -148,7 +148,7 @@
 </template>
 
 <script>
-import { ChatAltIcon } from '@heroicons/vue/solid'
+import { ChatBubbleBottomCenterTextIcon } from '@heroicons/vue/20/solid'
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time.vue";
@@ -156,7 +156,7 @@ import {useForm, usePage} from "@inertiajs/inertia-vue3";
 
 export default {
     name: "LogTab",
-    components: {Time, EveImage, ChatAltIcon },
+    components: {Time, EveImage, ChatBubbleBottomCenterTextIcon },
     props: {
         application: {
             required: true,

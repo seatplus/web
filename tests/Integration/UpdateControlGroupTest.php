@@ -95,7 +95,7 @@ test('automatic control group adds affiliation', function () {
                 "type" => 'automatic',
                 'affiliations' => [
                     [
-                        'type' => 'corporation',
+                        'category' => 'corporation',
                         'id' => CorporationInfo::factory()->make()->corporation_id,
                     ],
                 ],
