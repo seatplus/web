@@ -8,7 +8,7 @@
         <div>
           <div class="mt-1 relative rounded-md shadow-sm">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon
+              <MagnifyingGlassIcon
                 class="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
@@ -69,7 +69,7 @@
 <script>
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-import { SearchIcon } from '@heroicons/vue/20/solid'
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement.vue";
 import {computed, ref, watch} from "vue";
 import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";
@@ -78,7 +78,7 @@ export default {
     components: {
         CompleteLoadingHelper,
         MemberComplianceListElement,
-        EntityBlock, CardWithHeader, SearchIcon},
+        EntityBlock, CardWithHeader, MagnifyingGlassIcon},
     props: {
         corporation: {
             type: Object,

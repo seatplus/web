@@ -51,7 +51,7 @@
             as="button"
             class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
-            <UserRemoveIcon
+            <UserMinusIcon
               class="-ml-1 mr-2 h-5 w-5"
               aria-hidden="true"
             />
@@ -66,7 +66,7 @@
             :data="{corporation_id: enlistment.corporation_id}"
             class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
-            <UserAddIcon
+            <UserPlusIcon
               class="-ml-1 mr-2 h-5 w-5"
               aria-hidden="true"
             />
@@ -85,12 +85,12 @@ import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/20/solid";
+import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/inertia-vue3'
 
 export default {
     name: "Enlistment",
-    components: {CharacterApplication, EveImage, ModalWithFooter, EntityBlock, UserAddIcon, UserRemoveIcon, Link},
+    components: {CharacterApplication, EveImage, ModalWithFooter, EntityBlock, UserPlusIcon, UserMinusIcon, Link},
     props: {
         enlistment: {
             type: Object,

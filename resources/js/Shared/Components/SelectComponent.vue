@@ -20,7 +20,7 @@
           <span class="ml-3 block truncate">{{ selectedOption.name }}</span>
         </span>
         <span class="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <SelectorIcon
+          <ChevronUpDownIcon
             class="h-5 w-5 text-gray-400"
             aria-hidden="true"
           />
@@ -71,7 +71,7 @@
 <script>
 import {ref, watch} from 'vue'
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/20/solid'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import EveImage from "../EveImage.vue";
 
 export default {
@@ -83,7 +83,7 @@ export default {
         ListboxOption,
         ListboxOptions,
         CheckIcon,
-        SelectorIcon,
+        ChevronUpDownIcon,
     },
     props: {
         listLabel: {
