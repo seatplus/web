@@ -77,8 +77,6 @@ class WebServiceProvider extends ServiceProvider
 
     public function register()
     {
-        // Register any extra services
-        $this->register_services();
 
         //$this->registerIntertiaJs();
 
@@ -89,6 +87,14 @@ class WebServiceProvider extends ServiceProvider
 
     private function addPublications()
     {
+
+        $this->publishes([
+            $this->getBaseFilePath() . 'package.json' => base_path('package.json'),
+            $this->getBaseFilePath() . 'tailwind.config.js' => base_path('tailwind.config.js'),
+            $this->getBaseFilePath() . 'postcss.config.js' => base_path('postcss.config.js'),
+            $this->getBaseFilePath() . 'vite.config.js' => base_path('vite.config.js'),
+        ], 'web-static');
+
         /*
          * to publish assets one can run:
          * php artisan vendor:publish --tag=web --force
@@ -98,8 +104,6 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/../public/img' => public_path('img'),
             __DIR__ . '/../resources/js' => resource_path('js'),
             __DIR__ . '/../resources/css' => resource_path('css'),
-            $this->getPackageJsonFile() => base_path('package.json'),
-            $this->getPackageTailwindConfig() => base_path('tailwind.config.js'),
             // publish teh I18n vendor file too
             base_path('vendor/conedevelopment/i18n/resources/js') => resource_path('js/vendor'),
         ], 'web');
@@ -131,18 +135,9 @@ class WebServiceProvider extends ServiceProvider
         $router->aliasMiddleware('acl-permission', CheckACLPermission::class);
     }
 
-    private function register_services()
+    private function getBaseFilePath() : string
     {
-    }
-
-    private function getPackageJsonFile()
-    {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'package.json';
-    }
-
-    private function getPackageTailwindConfig()
-    {
-        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tailwind.config.js';
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR;
     }
 
     private function mergeConfigurations()
