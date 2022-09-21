@@ -4,7 +4,7 @@
     :href="url"
     @click.stop.prevent="open()"
   >
-    <ArrowsExpandIcon
+    <ArrowsPointingOutIcon
       class="shrink-0 h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-400"
     />
   </a>
@@ -28,7 +28,7 @@
   </teleport>
 </template>
 <script>
-import {ArrowsExpandIcon} from "@heroicons/vue/20/solid";
+import {ArrowsPointingOutIcon} from "@heroicons/vue/20/solid";
 import {ref} from "vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";
@@ -38,7 +38,7 @@ export default {
     name: "ExpandContractComponent",
     components: {
         ContractDetailsComponent,
-        WithDismissButtonModal, ArrowsExpandIcon, DialogTitle},
+        WithDismissButtonModal, ArrowsPointingOutIcon, DialogTitle},
     props: {
         contract: {
             required: true,

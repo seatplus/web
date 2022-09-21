@@ -20,7 +20,9 @@ createInertiaApp({
         const page = resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue'));
 
         page.then((module) => {
-            module.default.layout = module.default.layout || SingleColumnLayout;
+            if (module.default.layout === undefined) {
+                module.default.layout = SingleColumnLayout;
+            }
         });
 
         return page;
