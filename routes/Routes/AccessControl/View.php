@@ -51,7 +51,6 @@ Route::middleware([CheckPermissionOrCorporationRole::class . ':create or update 
     Route::post('/acl/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
     Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
 
-    // TODO Clear this route
     Route::get('/search', [ControlGroupsController::class, 'search'])->name('acl.search.affiliatable');
 });
 

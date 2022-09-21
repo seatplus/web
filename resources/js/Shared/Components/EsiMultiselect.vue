@@ -4,7 +4,7 @@
       :key="uniqueID"
       :label="label"
       :placeholder="placeholder"
-      categories=""
+      :categories="categories"
       @selected-object="(obj) => selections.push(obj)"
     />
     <DismissibleButton
@@ -27,7 +27,8 @@ import {ref, watchEffect} from "vue";
 const props = defineProps({
     modelValue: {
         required: true,
-        type: Array
+        type: Array,
+        default: () => []
     },
     categories: {
         required: true,
@@ -43,7 +44,7 @@ const props = defineProps({
     }
 });
 
-const selections = ref([props.modelValue]);
+const selections = ref(props.modelValue);
 const uniqueID = ref(+new Date());
 
 const emits = defineEmits(['update:modelValue']);

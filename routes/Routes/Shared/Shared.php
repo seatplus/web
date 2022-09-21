@@ -38,7 +38,6 @@ Route::post('resolve/ids', [HelperController::class, 'ids'])->name('resolve.ids'
 Route::post('resolve/character_affiliations', [HelperController::class, 'characterAffiliations'])->name('resolve.character_affiliation');
 Route::get('resolve/{corporation_id}/corporation_info', [HelperController::class, 'getCorporationInfo'])->name('resolve.corporation_info');
 Route::get('resolve/{id}', [HelperController::class, 'getEntityFromId'])->name('resolve.id');
-Route::get('search/systems/{search}', [HelperController::class, 'findSolarSystem'])->name('resolve.solar_system');
 
 Route::get('/location/{location_id}', [ManualLocationController::class, 'getLocation'])->name('get.manual_location');
 Route::post('/location/', [ManualLocationController::class, 'create'])->name('post.manual_location');

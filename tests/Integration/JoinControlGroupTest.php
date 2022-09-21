@@ -40,7 +40,7 @@ test('user can join waitlist', function () {
                 "type" => 'on-request',
                 'affiliations' => [
                     [
-                        'type' => 'corporation',
+                        'category' => 'corporation',
                         'id' => test()->test_character->corporation->corporation_id,
                     ],
                 ],
@@ -78,7 +78,7 @@ test('superuser can join immediately', function () {
                 "type" => 'on-request',
                 'affiliations' => [
                     [
-                        'type' => 'corporation',
+                        'category' => 'corporation',
                         'id' => test()->test_character->corporation->corporation_id,
                     ],
                 ],

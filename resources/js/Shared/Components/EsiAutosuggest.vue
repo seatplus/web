@@ -9,6 +9,7 @@
         :label="label"
         :placeholder="placeholder"
         :warning="showWarning ? 'No results found' : ''"
+        @keydown.delete="handleBackspace"
       >
         <template #label>
           <ListboxLabel
@@ -235,6 +236,7 @@ const handleBackspace = () => {
     suggestions.value = []
     selected.value = null
     emit('selected', null)
+    emit('selectedObject', null)
 }
 
 </script>

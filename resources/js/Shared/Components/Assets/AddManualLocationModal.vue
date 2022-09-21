@@ -72,11 +72,11 @@
           </div>
         </div>
 
-        <Autosuggest
+        <EsiAutosuggest
           v-model="form.solar_system_id"
-          route-name="resolve.solar_system"
           placeholder="Search for a solar system"
-          label="search"
+          :categories="['solar_system']"
+          label="Search"
           @selected="(id) => form.solar_system_id = id"
         />
 
@@ -106,11 +106,11 @@
 
 <script>
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
-import Autosuggest from "../Autosuggest.vue";
-//TODO import { VueAutosuggest } from "vue-autosuggest"
+import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
+
 export default {
     name: "AddManualLocationModal",
-    components: {Autosuggest, ModalWithFooter, /*VueAutosuggest*/},
+    components: {EsiAutosuggest, ModalWithFooter,},
     props: {
       modelValue: {
         required: true
@@ -135,7 +135,7 @@ emits: ['update:modelValue'],
         }
     },
     computed: {
-        filteredSuggestions() {
+        /*filteredSuggestions() {
             return [
                 {
                     data: this.suggestions.filter(item => {
@@ -145,7 +145,7 @@ emits: ['update:modelValue'],
                     })
                 }
             ];
-        }
+        }*/
     },
     watch: {
       modelValue(newVal) {
@@ -156,17 +156,6 @@ emits: ['update:modelValue'],
       }
     },
     methods: {
-        onInputChange() {
-            // event fired when the input changes
-            this.showSuggestions = true
-
-            if(this.query.length > 2)
-                return axios.get(route('resolve.solar_system', this.query))
-                    .then((result) => this.suggestions = result.data)
-
-            this.suggestions = []
-
-        },
         submit() {
             let self = this;
 
