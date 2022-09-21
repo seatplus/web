@@ -26,13 +26,11 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Universe\Category;
@@ -90,11 +88,9 @@ class HelperController extends Controller
 
     public function token()
     {
-
         $token = $this->getEsiSearchToken();
 
         return $token ? 1 : 0;
-
     }
 
     public function esiSearch(Request $request)
@@ -109,7 +105,6 @@ class HelperController extends Controller
         $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
 
         return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
-
     }
 
     public function systems()
