@@ -88,7 +88,6 @@ it('resolves corporation info', function () {
 });
 
 test('one can search existing systems', function () {
-
     updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
 
     $system = System::factory()->create([
@@ -127,7 +126,6 @@ test('one can search existing systems', function () {
 });
 
 test('one can search existing region', function () {
-
     updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
 
     $region = Region::factory()->create([
