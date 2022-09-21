@@ -77,7 +77,6 @@ class WebServiceProvider extends ServiceProvider
 
     public function register()
     {
-
         //$this->registerIntertiaJs();
 
         $this->mergeConfigurations();
@@ -87,7 +86,6 @@ class WebServiceProvider extends ServiceProvider
 
     private function addPublications()
     {
-
         $this->publishes([
             $this->getBaseFilePath() . 'package.json' => base_path('package.json'),
             $this->getBaseFilePath() . 'tailwind.config.js' => base_path('tailwind.config.js'),
