@@ -1,5 +1,5 @@
 <template>
-  <DarkSidebar>
+  <DarkSidebar :active-sidebar-element="activeSidebarElement">
     <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <slot>
@@ -21,14 +21,16 @@
   </DarkSidebar>
 </template>
 
-<script>
+<script setup>
 import DarkSidebar from "@/Shared/SidebarLayout/DarkSidebar.vue";
-export default {
-    name: "SingleColumnLayout",
-    components: {DarkSidebar}
-}
+
+defineProps({
+  activeSidebarElement: {
+    type: String,
+    required: false,
+      default: () => route().current()
+  },
+});
+
 </script>
 
-<style scoped>
-
-</style>
