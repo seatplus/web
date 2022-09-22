@@ -265,7 +265,17 @@
 </template>
 
 <script>
-import {computed, onMounted, ref, watch} from 'vue'
+import * as OutlineHeroicons from '@heroicons/vue/24/outline';
+
+export default {
+    components: {
+        ...OutlineHeroicons
+    }
+}
+</script>
+
+<script setup>
+import {computed, ref, watch} from 'vue'
 import {
     Dialog,
     DialogOverlay,
@@ -276,75 +286,54 @@ import {
     TransitionRoot
 } from '@headlessui/vue'
 import {usePage, Link } from "@inertiajs/inertia-vue3";
-import * as OutlineHeroicons from '@heroicons/vue/24/outline'
 import ImpersonatingBanner from "./ImpersonatingBanner.vue";
 import Notifications from "../Notifications/Notifications.vue";
 import EveImage from "@/Shared/EveImage.vue"
 
-export default {
-    name: "DarkSidebar",
-    components: {
-        EveImage,
-        Notifications,
-        ImpersonatingBanner,
-        Dialog,
-        DialogOverlay,
-        TransitionChild,
-        TransitionRoot,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
-        ...OutlineHeroicons,
-        Link
-    },
-    setup() {
-        const sidebarOpen = ref(false)
-        const sidebar = usePage().props.value.sidebar
-        const logo = usePage().props.value.images.logo
-        const activeSidebarElement = ref(usePage().props.value.activeSidebarElement)
-        const main = _.get(usePage().props.value.user, 'data.main_character')
-        const component = usePage().component
-        const navigation = ref([])
+  const props = defineProps({
+      activeSidebarElement: {
+          type: String,
+          required: true
+      },
+  })
 
-        const buildNavigation = function () {
+  const sidebarOpen = ref(false)
 
-            return _.map(sidebar, (category) => {
+  const logo = usePage().props.value.images.logo
+  const main = _.get(usePage().props.value.user, 'data.main_character')
+  const component = usePage().component
+  const navigation = ref([])
 
-                let subItems = _.map(category.entries, (entry) => {
+  const buildNavigation = function () {
 
-                    let current = activeSidebarElement.value != null ? activeSidebarElement.value : route().current()
+      const sidebar = usePage().props.value.sidebar
 
-                    return {
-                        ...entry,
-                        current: current === entry.route
-                    }
+      return _.map(sidebar, (category) => {
 
-                })
+          let subItems = _.map(category.entries, (entry) => {
 
-                return {
-                    name: category.name,
-                    entries: subItems,
-                    current: !!_.find(subItems, {current: true})
-                }
-            })
-        }
+              let current = props.activeSidebarElement != null ? props.activeSidebarElement : route().current()
 
-        const mainCharacter = computed(() => {
-            return main !== null ? main : {name: 'unknown', character_id: null}
-        })
+              return {
+                  ...entry,
+                  current: current === entry.route
+              }
 
-        watch(component, () => navigation.value = buildNavigation())
+          })
 
-        onMounted(() => navigation.value = buildNavigation())
+          return {
+              name: category.name,
+              entries: subItems,
+              current: !!_.find(subItems, {current: true})
+          }
+      })
+  }
 
-        return {
-            navigation,
-            sidebarOpen,
-            logo,
-            mainCharacter,
-            component
-        }
-    },
-}
+  const mainCharacter = computed(() => {
+      return main !== null ? main : {name: 'unknown', character_id: null}
+  })
+
+  watch(() => props.activeSidebarElement,  () => navigation.value = buildNavigation(), {immediate: true})
+
 </script>
 
