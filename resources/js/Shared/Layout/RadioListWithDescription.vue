@@ -51,10 +51,6 @@ export default {
         RadioGroupOption,
     },
     props: {
-        title: {
-            type: String,
-            default: 'Default'
-        },
         options: {
             type: Array,
             default: () => [
