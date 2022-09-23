@@ -27,8 +27,7 @@ import DarkSidebar from "@/Shared/SidebarLayout/DarkSidebar.vue";
 defineProps({
   activeSidebarElement: {
     type: String,
-    required: false,
-      default: () => route().current()
+    required: true,
   },
 });
 
