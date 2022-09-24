@@ -15,4 +15,4 @@ Here a couple of features that comes with seatplus/web
 * Reduce cli as much as possible (f.e. resetting cache is possible via UI)
 
 # Requirements
-Node > 10.x
+Node > 14.18+, 16+ is recommended
