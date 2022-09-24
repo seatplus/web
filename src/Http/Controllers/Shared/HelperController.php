@@ -102,6 +102,8 @@ class HelperController extends Controller
 
         $token = $this->getEsiSearchToken();
 
+        throw_if(! $token, new \Exception('No ESI Search Token found, at least one character needs to have the scope esi-search.search_structures.v1'));
+
         $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
 
         return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
