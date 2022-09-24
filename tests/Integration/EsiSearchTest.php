@@ -1,8 +1,8 @@
 <?php
 
+use Inertia\Testing\AssertableInertia;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use Inertia\Testing\AssertableInertia;
 
 // First as vanilla user without necessairy 'esi-search.search_structures.v1' scope
 // try getting the token and fail to do so
@@ -17,17 +17,14 @@ it('returns falsy if the user does not have the necessary scope', function () {
 
 // without a token, try to do a search and fail to do so
 it('throws an exception if the user does not have the necessary scope', function () {
-
     $this->actingAs($this->test_user)
         ->withoutExceptionHandling()
         ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
         ->assertStatus(500);
-
 })->throws('No ESI Search Token found, at least one character needs to have the scope esi-search.search_structures.v1');
 
 // navigate to Enabling ESI Search page to create a token
 it('can navigate to the enabling ESI Search page', function () {
-
     test()->actingAs($this->test_user)
         ->get(route('enable_esi_search'))
         ->assertInertia(
@@ -43,7 +40,6 @@ it('can navigate to the enabling ESI Search page', function () {
     test()->actingAs($this->test_user)
         ->get(route('enable_esi_search'))
         ->assertRedirect('/');
-
 });
 
 // try get the token and succeed to do so
