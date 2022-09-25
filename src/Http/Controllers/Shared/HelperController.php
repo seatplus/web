@@ -72,20 +72,6 @@ class HelperController extends Controller
         return (new GetEntityFromId($id))->execute();
     }
 
-    public function findSolarSystem(string $search)
-    {
-        $ids_to_resolve = (new SearchService)->execute('solar_system', $search);
-
-        // get names for IDs
-        if (empty($ids_to_resolve)) {
-            return $ids_to_resolve;
-        }
-
-        $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
-
-        return $esi_results;
-    }
-
     public function token()
     {
         $token = $this->getEsiSearchToken();
@@ -107,32 +93,6 @@ class HelperController extends Controller
         $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
 
         return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
-    }
-
-    public function systems()
-    {
-        $query = request()->get('search');
-
-        if (Str::length($query) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        $system_ids = (new SearchService)->execute('solar_system', $query);
-
-        return (new GetNamesFromIdsService)->execute(array_slice($system_ids, 0, 15));
-    }
-
-    public function regions()
-    {
-        $query = request()->get('search');
-
-        if (Str::length($query) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        $region_ids = (new SearchService)->execute('region', $query);
-
-        return (new GetNamesFromIdsService)->execute(array_slice($region_ids, 0, 15));
     }
 
     public function typesOrGroupsOrCategories()

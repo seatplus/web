@@ -46,14 +46,15 @@ Route::controller(HelperController::class)
     ->prefix('autosuggest')
     ->group(function() {
         Route::get('search', 'esiSearch')->name('autosuggestion.search');
-        Route::get('token', 'token')->name('autosuggestion.token');
+        Route::get('typesOrGroupOrCategories', 'typesOrGroupsOrCategories')->name('autosuggestion.typesOrGroupOrCategories');
     });
 
-Route::get('enable_esi_search', EnableEsiSearchController::class)->name('enable_esi_search');
+Route::prefix('esi-search')
+    ->group(function() {
+        Route::get('enable_esi_search', EnableEsiSearchController::class)->name('enable_esi_search');
+        Route::get('token', [HelperController::class, 'token'])->name('autosuggestion.token');
+    });
 
-Route::get('systems', [HelperController::class, 'systems'])->name('autosuggestion.system');
-Route::get('regions', [HelperController::class, 'regions'])->name('autosuggestion.region');
-Route::get('typesOrGroupOrCategories', [HelperController::class, 'typesOrGroupsOrCategories'])->name('autosuggestion.typesOrGroupOrCategories');
 
 Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
 Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');
