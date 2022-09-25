@@ -40,9 +40,12 @@
       <div class="bg-white overflow-hidden shadow rounded-lg col-span-2">
         <div class="px-4 py-5 sm:p-6">
           <!-- Content goes here -->
-          <SearchCorpOrAlliance
+          <EsiMultiselect
             v-if="creationMode && !isGlobal"
             v-model="selectedEntities"
+            :categories="['corporation', 'alliance']"
+            label="Search for Corporation or Alliance"
+            placeholder="corporation or alliance name"
           />
           <h3
             v-else-if="isGlobal"
@@ -128,7 +131,7 @@
 import CharacterScopes from "./CharacterScopes.vue"
 import CorporationScopes from "./CorporationScopes.vue"
 import EveImage from "@/Shared/EveImage.vue"
-import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance.vue"
+import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
 import { Link } from '@inertiajs/inertia-vue3'
@@ -136,7 +139,7 @@ import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "ScopeSettings",
     components: {
-        SearchCorpOrAlliance,
+        EsiMultiselect,
         RadioListWithDescription,
         PageHeader, EveImage, CorporationScopes, CharacterScopes, Link},
     props: {
