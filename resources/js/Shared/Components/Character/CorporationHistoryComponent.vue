@@ -14,7 +14,7 @@
     <div class="max-h-96 overflow-auto">
       <InfiniteLoadingHelper
         v-slot="{results}"
-        route="corporation.history"
+        route-name="corporation.history"
         :params="{ character_id: character.character_id }"
       >
         <div class="p-4 sm:p-6 flow-root">
@@ -61,12 +61,12 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import EveImage from "@/Shared/EveImage"
-import Time from "@/Shared/Time";
-import ResolveIdToName from "../../ResolveIdToName";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
+import EveImage from "@/Shared/EveImage.vue"
+import Time from "@/Shared/Time.vue";
+import ResolveIdToName from "../../ResolveIdToName.vue";
 
 export default {
     name: "CorporationHistoryComponent",

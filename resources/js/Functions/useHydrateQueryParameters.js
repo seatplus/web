@@ -1,4 +1,3 @@
-import route from 'ziggy'
 
 export function useHydrateQueryParameters(params = {}) {
 

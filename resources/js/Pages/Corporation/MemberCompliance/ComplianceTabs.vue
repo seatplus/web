@@ -60,7 +60,7 @@ export default {
         }
     },
 emits: ['update:modelValue'],
-    setup(props, {emit}) {
+    setup(props) {
 
         const tabs = computed(() => _.map(raw_tabs, function (tab) {
 

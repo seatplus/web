@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import HeaderButton from "../../Layout/HeaderButton";
-import SlideOver from "../../Layout/SlideOver";
-import DispatchUpdate from "./DispatchUpdate";
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
+import SlideOver from "@/Shared/Layout/SlideOver.vue";
+import DispatchUpdate from "./DispatchUpdate.vue";
 export default {
   name: "DispatchUpdateButton",
   components: {DispatchUpdate, SlideOver, HeaderButton},
@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     url() {
-      return this.$route('manual_job.entities', this.dispatch_transfer_object)
+      return route('manual_job.entities', this.dispatch_transfer_object)
     }
   }
 }

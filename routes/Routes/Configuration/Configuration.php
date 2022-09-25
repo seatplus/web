@@ -48,6 +48,4 @@ Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->gro
     Route::get('/settings/scopes/create', [SsoSettingsController::class, 'index'])->name('view.create.scopes');
     Route::post('/settings/scopes/create', [SsoSettingsController::class, 'create'])->name('create.scopes');
     Route::delete('/settings/scopes/delete/{entity_id?}', [SsoSettingsController::class, 'deleteSsoScopeSetting'])->name('delete.scopes');
-
-    Route::get('/search/{searchParam}', [SsoSettingsController::class, 'searchAllianceCorporations'])->name('search.alliance.corporation');
 });

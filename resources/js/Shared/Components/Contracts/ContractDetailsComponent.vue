@@ -50,7 +50,7 @@
 
               <template #lower_left>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -88,7 +88,7 @@
 
               <template #lower_right>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5"
+                  class="shrink-0 mr-1.5 h-5 w-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -137,7 +137,7 @@
 
               <template #lower_left>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                  class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -175,7 +175,7 @@
 
               <template #lower_right>
                 <svg
-                  class="flex-shrink-0 mr-1.5 h-5 w-5"
+                  class="shrink-0 mr-1.5 h-5 w-5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -196,17 +196,17 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import {prefix} from "metric-prefix";
-import WideListElement from "../../WideListElement";
-import EveImage from "@/Shared/EveImage"
-import WideLists from "../../WideLists";
-import AssigneeComponent from "./Cells/AssigneeComponent";
+import WideListElement from "../../WideListElement.vue";
+import EveImage from "@/Shared/EveImage.vue"
+import WideLists from "../../WideLists.vue";
+import AssigneeComponent from "./Cells/AssigneeComponent.vue";
 import {useValidateObject} from "@/Functions/useValidateObject";
-import IssuerComponent from "./Cells/IssuerComponent";
-import ContractTypeComponent from "./Cells/ContractTypeComponent";
-import DetailsComponent from "./Cells/DetailsComponent";
-import Card from "../../Layout/Cards/Card";
+import IssuerComponent from "./Cells/IssuerComponent.vue";
+import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
+import DetailsComponent from "./Cells/DetailsComponent.vue";
+import Card from "../../Layout/Cards/Card.vue";
 
 const schema = {
     items: value => _.isArray(value),

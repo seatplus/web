@@ -1,8 +1,8 @@
 <template>
-    <tr>
-        <slot />
-    </tr>
-    <!-- Odd row -->
+  <tr>
+    <slot />
+  </tr>
+  <!-- Odd row -->
 <!--    <tr class="bg-white">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
             Jane Cooper
@@ -21,7 +21,7 @@
         </td>
     </tr>-->
 
-    <!-- Even row -->
+  <!-- Even row -->
 <!--    <tr class="bg-gray-50">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
             Cody Fisher
@@ -40,7 +40,7 @@
         </td>
     </tr>-->
 
-    <!-- More rows... -->
+  <!-- More rows... -->
 </template>
 
 <script>

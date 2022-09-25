@@ -1,9 +1,9 @@
 <template>
   <ModalWithFooter v-model="open">
     <template #symbol>
-      <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+      <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
         <svg
-          class="h-6 w-6 text-green-600"
+          class="h-6 w-6 text-emerald-600"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -72,11 +72,11 @@
           </div>
         </div>
 
-        <Autosuggest
+        <EsiAutosuggest
           v-model="form.solar_system_id"
-          route="resolve.solar_system"
           placeholder="Search for a solar system"
-          label="search"
+          :categories="['solar_system']"
+          label="Search"
           @selected="(id) => form.solar_system_id = id"
         />
 
@@ -94,7 +94,7 @@
         <button
           :disabled="form.processing"
           type="submit"
-          class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+          class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           @click="submit()"
         >
           Submit
@@ -105,12 +105,12 @@
 </template>
 
 <script>
-import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
-import Autosuggest from "../Autosuggest";
-//TODO import { VueAutosuggest } from "vue-autosuggest"
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
+import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
+
 export default {
     name: "AddManualLocationModal",
-    components: {Autosuggest, ModalWithFooter, /*VueAutosuggest*/},
+    components: {EsiAutosuggest, ModalWithFooter,},
     props: {
       modelValue: {
         required: true
@@ -135,7 +135,7 @@ emits: ['update:modelValue'],
         }
     },
     computed: {
-        filteredSuggestions() {
+        /*filteredSuggestions() {
             return [
                 {
                     data: this.suggestions.filter(item => {
@@ -145,7 +145,7 @@ emits: ['update:modelValue'],
                     })
                 }
             ];
-        }
+        }*/
     },
     watch: {
       modelValue(newVal) {
@@ -156,24 +156,13 @@ emits: ['update:modelValue'],
       }
     },
     methods: {
-        onInputChange() {
-            // event fired when the input changes
-            this.showSuggestions = true
-
-            if(this.query.length > 2)
-                return axios.get(this.$route('resolve.solar_system', this.query))
-                    .then((result) => this.suggestions = result.data)
-
-            this.suggestions = []
-
-        },
         submit() {
             let self = this;
 
             this.form.transform((data) => ({
                 ...data,
                 location_id: this.location_id
-            })).post(this.$route('post.manual_location'), {
+            })).post(route('post.manual_location'), {
                 onSuccess: () => {
                     self.form.reset()
                     self.suggestions = []

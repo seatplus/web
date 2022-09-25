@@ -30,10 +30,10 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import HeaderButton from "@/Shared/Layout/HeaderButton"
-import CreateEnlistmentModal from "./CreateEnlistmentModal";
-import CorporationRecruitment from "@/Pages/Corporation/Recruitment/CorporationRecruitment";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
+import CreateEnlistmentModal from "./CreateEnlistmentModal.vue";
+import CorporationRecruitment from "@/Pages/Corporation/Recruitment/CorporationRecruitment.vue";
 
 export default {
     name: "RecruitmentIndex",

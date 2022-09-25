@@ -92,9 +92,9 @@
             </ul>
           </div>
           <div class="mt-6">
-            <form @submit.prevent="form.put($route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
+            <form @submit.prevent="form.put(route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
               <div class="flex space-x-3">
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                   <div class="relative">
                     <EveImage
                       :object="user.main_character"
@@ -103,7 +103,7 @@
                     />
 
                     <span class="absolute -bottom-0.5 -right-1 bg-white rounded-tl px-0.5 py-px">
-                      <ChatAltIcon
+                      <ChatBubbleBottomCenterTextIcon
                         class="h-5 w-5 text-gray-400"
                         aria-hidden="true"
                       />
@@ -148,15 +148,15 @@
 </template>
 
 <script>
-import { ChatAltIcon } from '@heroicons/vue/solid'
+import { ChatBubbleBottomCenterTextIcon } from '@heroicons/vue/20/solid'
 import { computed } from "vue";
-import EveImage from "@/Shared/EveImage";
-import Time from "@/Shared/Time";
+import EveImage from "@/Shared/EveImage.vue";
+import Time from "@/Shared/Time.vue";
 import {useForm, usePage} from "@inertiajs/inertia-vue3";
 
 export default {
     name: "LogTab",
-    components: {Time, EveImage, ChatAltIcon },
+    components: {Time, EveImage, ChatBubbleBottomCenterTextIcon },
     props: {
         application: {
             required: true,

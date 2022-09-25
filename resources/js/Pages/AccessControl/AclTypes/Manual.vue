@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import Members from "./Members"
-import Users from "./Users"
+import Members from "./Members.vue"
+import Users from "./Users.vue"
 
 export default {
   name: "Manual",

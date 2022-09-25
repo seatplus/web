@@ -42,7 +42,7 @@
           v-if="entry.location"
           class="flex items-center"
         >
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <EveImage
               :object="entry.location.locatable"
               :size="256"
@@ -71,8 +71,8 @@
 </template>
 
 <script>
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import EveImage from "@/Shared/EveImage"
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import EveImage from "@/Shared/EveImage.vue"
 export default {
     name: "ExtendedWalletTransactionRowComponent",
     components: {EveImage, EntityByIdBlock},

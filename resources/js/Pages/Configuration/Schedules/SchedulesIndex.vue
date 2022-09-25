@@ -7,7 +7,7 @@
       <WideListElement
         v-for="schedule of schedules"
         :key="schedule.id"
-        :url="$route('schedules.details', schedule.id)"
+        :url="route('schedules.details', schedule.id)"
       >
         <template #avatar>
           <svg
@@ -44,7 +44,7 @@
       </WideListElement>
       <li>
         <Link
-          :href="$route('schedules.create')"
+          :href="route('schedules.create')"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
           <div class="flex items-center px-4 py-4 sm:px-6">
@@ -87,8 +87,8 @@
 </template>
 
 <script>
-import Settings from "@/Pages/Configuration/Settings"
-import WideListElement from "@/Shared/WideListElement"
+import Settings from "@/Pages/Configuration/Settings.vue"
+import WideListElement from "@/Shared/WideListElement.vue"
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
     name: "SchedulesIndex",

@@ -14,10 +14,10 @@
               :with-sub-text="false"
             />
           </div>
-          <div class="ml-2 flex-shrink-0 flex">
+          <div class="ml-2 shrink-0 flex">
             <span
               v-if="isOk"
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800"
             >
               compliant
             </span>
@@ -33,7 +33,7 @@
           <div class="sm:flex">
             <div class="mt-2 flex items-center text-sm leading-5 text-gray-500 sm:mt-0">
               <svg
-                class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+                class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -49,7 +49,7 @@
               <svg
                 viewBox="0 0 20 20"
                 fill="currentColor"
-                class="flex-shrink-0 h-5 w-5 text-gray-400"
+                class="shrink-0 h-5 w-5 text-gray-400"
               >
                 <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
               </svg>
@@ -80,7 +80,7 @@
           </div>
           <div class="mt-2 flex items-center text-sm leading-5 text-gray-500 sm:mt-0">
             <svg
-              class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+              class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -102,10 +102,10 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import EveImage from "@/Shared/EveImage";
-import Time from "@/Shared/Time";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import EveImage from "@/Shared/EveImage.vue";
+import Time from "@/Shared/Time.vue";
 
 export default {
     name: "MemberTrackingListElementForSmallDevices",

@@ -18,13 +18,13 @@
           {{ character.name }}
         </span>
       </div>
-      <div class="ml-4 flex-shrink-0">
+      <div class="ml-4 shrink-0">
         <button
           v-if="hasApplied(character.character_id)"
           class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red focus:border-red-700"
           @click="remove(character.character_id)"
         >
-          <UserRemoveIcon
+          <UserMinusIcon
             class="-ml-0.5 mr-1 h-4 w-4"
             aria-hidden="true"
           />
@@ -35,7 +35,7 @@
           class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           @click="apply(character.character_id)"
         >
-          <UserAddIcon
+          <UserPlusIcon
             class="-ml-0.5 mr-1 h-4 w-4"
             aria-hidden="true"
           />
@@ -47,16 +47,15 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import {computed, ref} from "vue";
 import {usePage} from "@inertiajs/inertia-vue3";
 import { Inertia } from '@inertiajs/inertia'
-import {UserAddIcon, UserRemoveIcon} from "@heroicons/vue/solid";
-import route from 'ziggy'
+import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 
 export default {
     name: "CharacterApplication",
-    components: {EveImage, UserAddIcon, UserRemoveIcon},
+    components: {EveImage, UserPlusIcon, UserMinusIcon},
     props: {
         enlistment: {
             type: Object,

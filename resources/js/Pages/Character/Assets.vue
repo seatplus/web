@@ -35,18 +35,18 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <Multiselect
+              <EsiMultiselect
                 v-model="regions"
-                route="autosuggestion.region"
+                :categories="['region']"
                 label="Region"
                 placeholder="search for region"
               />
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <Multiselect
+              <EsiMultiselect
                 v-model="systems"
-                route="autosuggestion.system"
+                :categories="['solar_system']"
                 label="Solar System"
                 placeholder="search for solar system"
               />
@@ -64,7 +64,7 @@
                     v-slot="{ checked }"
                     v-model="switchValue"
                     as="button"
-                    class="relative inline-flex flex-shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
+                    class="relative inline-flex shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
                     :class="switchValue ? 'bg-indigo-600' : 'bg-gray-200'"
                   >
                     <span
@@ -92,22 +92,21 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
-import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import Multiselect from "@/Shared/Components/Multiselect";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
+import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import {computed, ref, watch} from 'vue'
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
-import SelectedEntity from "@/Shared/Components/SelectedEntity";
-import route from 'ziggy'
+import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
+import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 
 export default {
     name: "Assets",
     components: {
+        EsiMultiselect,
         SelectedEntity,
-        Multiselect,
         RequiredScopesWarning,
         DispatchUpdateButton,
         AssetsComponent,
@@ -135,15 +134,6 @@ export default {
         const search = ref(null)
         const regions = ref([])
         const systems = ref([])
-
-        /*const selectedCharacterIds = computed(() => {
-            let character_ids = _.get(route().params, 'character_ids')
-
-            if(!character_ids)
-                return []
-
-            return  _.map(character_ids, (id) => parseInt(id))
-        })*/
 
         const cleanParams = computed(() => {
             return {

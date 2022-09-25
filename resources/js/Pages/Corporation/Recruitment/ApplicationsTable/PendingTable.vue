@@ -2,7 +2,7 @@
   <InfiniteLoadingHelper
     :key="routeParams"
     v-slot="{results}"
-    route="open.corporation.applications"
+    route-name="open.corporation.applications"
     :params="routeParams"
   >
     <ApplicationsTable :applications="filterPendings(results)" />
@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
-import ApplicationsTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/ApplicationsTable";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+import ApplicationsTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/ApplicationsTable.vue";
 
 export default {
     name: "PendingTable",

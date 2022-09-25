@@ -18,17 +18,17 @@
 </template>
 
 <script>
-import Layout from "@/Shared/SidebarLayout/Layout";
-import PageHeader from "@/Shared/Layout/PageHeader"
-import Enlistments from "./Enlistments"
-import Characters from "./Characters"
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import Enlistments from "./Enlistments.vue"
+import Characters from "./Characters.vue"
 
 export default {
     name: "Index",
     components: {Characters, Enlistments, PageHeader},
     props: {
         characters: {
-            type: Array
+            type: Array,
+            default: () => []
         },
     },
     setup() {

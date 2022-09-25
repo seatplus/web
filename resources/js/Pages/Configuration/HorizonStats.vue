@@ -7,7 +7,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -39,7 +39,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="$route('horizon.index')"
+              :href="route('horizon.index')"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -50,7 +50,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 class="h-6 w-6 text-white"
                 fill="none"
@@ -85,7 +85,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="$route('horizon.index')"
+              :href="route('horizon.index')"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -96,7 +96,7 @@
       <div class="bg-white overflow-hidden shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
-            <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+            <div class="shrink-0 bg-indigo-500 rounded-md p-3">
               <svg
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -125,7 +125,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="$route('horizon.index')"
+              :href="route('horizon.index')"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -149,6 +149,16 @@
                     'inactive'  : '<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>',
                     'paused'    : '<path d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
                 }
+            }
+        },
+        computed : {
+            isLoading: function () {
+                var obj = this.stats;
+                for(var key in obj) {
+                    if(obj.hasOwnProperty(key))
+                        return false;
+                }
+                return true;
             }
         },
         mounted() {
@@ -179,16 +189,7 @@
                     });
             }
         },
-        computed : {
-            isLoading: function () {
-                var obj = this.stats;
-                for(var key in obj) {
-                    if(obj.hasOwnProperty(key))
-                        return false;
-                }
-                return true;
-            }
-        },
+
         beforeUnmount () {
             clearInterval(this.timer)
         }

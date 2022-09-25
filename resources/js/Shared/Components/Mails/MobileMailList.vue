@@ -1,7 +1,7 @@
 <template>
   <InfiniteLoadingHelper
     v-slot="{results}"
-    route="get.mail.headers"
+    route-name="get.mail.headers"
     :params="{character_ids: characterIds}"
     @result="assignResult"
   >
@@ -12,7 +12,7 @@
         v-slot="{open}"
         as="li"
       >
-        <DisclosureButton class="flex w-full py-2 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75">
+        <DisclosureButton class="flex w-full py-2 hover:bg-violet-200 focus:outline-none focus-visible:ring focus-visible:ring-violet-500 focus-visible:ring-opacity-75">
           <div class="flex w-full space-x-3">
             <EveImage
               :object="{character_id: mail.from}"
@@ -54,12 +54,12 @@
 </template>
 
 <script>
-import MailRepresentation from "./MailRepresentation";
-import EveImage from "@/Shared/EveImage"
-import Time from "@/Shared/Time";
-import ResolveIdToName from "../../ResolveIdToName";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper";
-import {ChevronUpIcon} from "@heroicons/vue/solid/esm";
+import MailRepresentation from "./MailRepresentation.vue";
+import EveImage from "@/Shared/EveImage.vue"
+import Time from "@/Shared/Time.vue";
+import ResolveIdToName from "../../ResolveIdToName.vue";
+import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
+import {ChevronUpIcon} from "@heroicons/vue/20/solid/esm";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 
 export default {

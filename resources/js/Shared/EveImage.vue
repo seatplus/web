@@ -25,7 +25,6 @@
 
 <script>
 import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import route from 'ziggy'
 
     export default {
         name: "EveImage",

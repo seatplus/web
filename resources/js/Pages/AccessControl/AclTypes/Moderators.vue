@@ -43,8 +43,7 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 export default {
     name: "Moderators",
     components: {EntityBlock},

@@ -111,8 +111,8 @@
 </template>
 
 <script>
-import Time from "@/Shared/Time";
-import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent";
+import Time from "@/Shared/Time.vue";
+import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent.vue";
 
 export default {
     name: "WalletJournalRowComponent",

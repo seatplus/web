@@ -11,7 +11,7 @@
     <InfiniteLoadingHelper
       :key="infiniteId"
       v-slot="{results}"
-      route="get.manuel_locations.suggestions"
+      route-name="get.manuel_locations.suggestions"
     >
       <ManualLocationComponent
         v-for="(location, index) in groupSuggestions(results)"
@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import ManualLocationComponent from "./ManualLocationComponent";
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import ManualLocationComponent from "./ManualLocationComponent.vue";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 
 
 export default {

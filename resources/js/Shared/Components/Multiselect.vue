@@ -2,7 +2,7 @@
   <div>
     <Autosuggest
       :key="uniqueID"
-      :route="route"
+      :route-name="routeName"
       :label="label"
       :placeholder="placeholder"
       @selectedObject="onSelected"
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import Autosuggest from "./Autosuggest";
-import DismissibleButton from "../Layout/Buttons/DismissibleButton";
+import Autosuggest from "./Autosuggest.vue";
+import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 export default {
   name: "Multiselect",
   components: {
@@ -30,7 +30,7 @@ export default {
     modelValue: {
       required: true
     },
-    route: {
+    routeName: {
       required: true,
       type: String
     },

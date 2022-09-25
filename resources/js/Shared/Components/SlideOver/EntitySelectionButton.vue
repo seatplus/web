@@ -8,7 +8,7 @@
     </HeaderButton>
     <span
       v-if="has_selected"
-      class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-yellow-400"
+      class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-amber-400"
     />
   </span>
   <teleport to="#destination">
@@ -20,7 +20,7 @@
         <div class="z-10 sticky top-0">
           <div class="ml-3 mb-3 relative rounded-md bg-white shadow-sm">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon
+              <MagnifyingGlassIcon
                 class="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
@@ -46,14 +46,14 @@
 </template>
 
 <script>
-import HeaderButton from "../../Layout/HeaderButton";
-import SlideOver from "../../Layout/SlideOver";
-import EntitySelection from "./EntitySelection";
-import { SearchIcon } from '@heroicons/vue/solid';
+import HeaderButton from "../../Layout/HeaderButton.vue";
+import SlideOver from "../../Layout/SlideOver.vue";
+import EntitySelection from "./EntitySelection.vue";
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 
 export default {
     name: "EntitySelectionButton",
-    components: {EntitySelection, SlideOver, HeaderButton, SearchIcon},
+    components: {EntitySelection, SlideOver, HeaderButton, MagnifyingGlassIcon},
     props: {
         type: {
             type: String,
@@ -68,7 +68,7 @@ export default {
     },
     computed: {
         has_selected() {
-            let ids = _.get(this.$route().params, `${this.type}_ids`)
+            let ids = _.get(route().params, `${this.type}_ids`)
 
             return !!ids
         },

@@ -8,7 +8,7 @@
         <div>
           <div class="mt-1 relative rounded-md shadow-sm">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon
+              <MagnifyingGlassIcon
                 class="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
@@ -48,7 +48,7 @@
       <ul class="relative z-0">
         <CompleteLoadingHelper
           :key="Object.values(urlParams).join(',')"
-          route="corporation.compliance"
+          route-name="corporation.compliance"
           :params="urlParams"
           @results="(results) => rawUsers = results"
         >
@@ -67,18 +67,18 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import { SearchIcon } from '@heroicons/vue/solid'
-import MemberComplianceListElement from "./MemberComplianceListElement";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import MemberComplianceListElement from "./MemberComplianceListElement.vue";
 import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper";
+import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";
 export default {
     name: "ComplianceComponent",
     components: {
         CompleteLoadingHelper,
         MemberComplianceListElement,
-        EntityBlock, CardWithHeader, SearchIcon},
+        EntityBlock, CardWithHeader, MagnifyingGlassIcon},
     props: {
         corporation: {
             type: Object,

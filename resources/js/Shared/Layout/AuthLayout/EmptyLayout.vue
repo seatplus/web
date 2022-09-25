@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import Notifications from "../../Notifications/Notifications";
+import Notifications from "../../Notifications/Notifications.vue";
 
 export default {
     name: "EmptyLayout",

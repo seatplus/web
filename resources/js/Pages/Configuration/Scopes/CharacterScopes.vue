@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ScopeToggle from "./ScopeToggle";
+import ScopeToggle from "./ScopeToggle.vue";
 export default {
     name: "CharacterScopes",
     components: {ScopeToggle},

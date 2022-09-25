@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import CompactAssetListElement from "./CompactAssetListElement";
+import CompactAssetListElement from "./CompactAssetListElement.vue";
 
 export default {
     name: "CompactAssetListComponent",
@@ -42,7 +42,7 @@ export default {
         },
         hasOwnerPicture() {
 
-            let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
+            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
 
             if (_.size(selectedCharacterIds) > 1)
                 return true

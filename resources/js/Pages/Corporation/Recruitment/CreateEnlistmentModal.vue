@@ -10,14 +10,10 @@
   </WithDismissButtonModal>
 </template>
 
-<script >
-import {computed, ref} from "vue";
-import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal";
-import {useForm} from "@inertiajs/inertia-vue3";
-import Autosuggest from "@/Shared/Components/Autosuggest";
-import SimpleToggle from "@/Shared/SimpleToggle";
-import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import EnlistmentConfig from "./Configuration/EnlistmentConfig";
+<script>
+import { computed } from "vue";
+import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
+import EnlistmentConfig from "./Configuration/EnlistmentConfig.vue";
 
 export default {
     name: "CreateEnlistmentModal",

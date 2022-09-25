@@ -25,7 +25,7 @@
         <ul class="divide-y divide-gray-200">
           <InfiniteLoadingHelper
             v-slot="{results}"
-            route="acl.members"
+            route-name="acl.members"
             :params="{role_id: role.id}"
           >
             <li
@@ -45,7 +45,7 @@
                         <div class="text-sm leading-5 font-medium text-indigo-600 truncate">
                           {{ member.main_character.name }}
                         </div>
-                        <span :class="[{'bg-green-100 text-green-800': member.status === 'member', 'bg-blue-100 text-blue-800': member.status === 'waitlist', 'bg-yellow-100 text-yellow-800': member.status === 'paused'},'px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize']">
+                        <span :class="[{'bg-emerald-100 text-emerald-800': member.status === 'member', 'bg-blue-100 text-blue-800': member.status === 'waitlist', 'bg-amber-100 text-amber-800': member.status === 'paused'},'px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize']">
                           {{ member.status }}
                         </span>
                       </div>
@@ -60,7 +60,7 @@
                       </div>
                     </div>
 
-                    <div class="ml-2 flex-shrink-0 flex">
+                    <div class="ml-2 shrink-0 flex">
                       <span
                         v-if="member.status === 'waitlist'"
                         class="relative z-0 inline-flex shadow-sm rounded-md"
@@ -138,10 +138,10 @@
 </template>
 
 <script>
-    import EveImage from "@/Shared/EveImage"
-    import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom"
-    import PageHeader from "@/Shared/Layout/PageHeader";
-    import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper";
+    import EveImage from "@/Shared/EveImage.vue"
+    import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom.vue"
+    import PageHeader from "@/Shared/Layout/PageHeader.vue";
+    import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
     export default {
         name: "ModerateMembers",
         components: {
@@ -161,7 +161,7 @@
                 breadcrumbs: [
                     {
                         name: 'Control Group',
-                        route: this.$route('acl.groups')
+                        route: route('acl.groups')
                     }
                 ]
             }
@@ -174,7 +174,7 @@
                     role_id: this.role.id
                 };
 
-                this.$inertia.post(this.$route('acl.join'), data, {
+                this.$inertia.post(route('acl.join'), data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -183,7 +183,7 @@
             },
             removeMember(member) {
 
-                this.$inertia.delete(this.$route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
+                this.$inertia.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,

@@ -63,9 +63,8 @@
 
 <script>
 import {onBeforeMount, ref} from "vue";
-import route from 'ziggy'
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import Time from "@/Shared/Time";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import Time from "@/Shared/Time.vue";
 
 export default {
     name: "MailRepresentation",

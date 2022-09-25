@@ -2,13 +2,13 @@
   <div aria-hidden="true">
     <span
       v-show="!src"
-      class="inline-flex items-center justify-center h-32 w-32 flex-shrink-0 mx-auto rounded-full bg-gray-500"
+      class="inline-flex items-center justify-center h-32 w-32 shrink-0 mx-auto rounded-full bg-gray-500"
     >
       <span class="text-5xl font-medium leading-none text-white">{{ getInitials(name) }}</span>
     </span>
     <img
       v-if="src"
-      class="w-32 h-32 flex-shrink-0 mx-auto bg-black rounded-full"
+      class="w-32 h-32 shrink-0 mx-auto bg-black rounded-full"
       :src="src"
       alt=""
     >

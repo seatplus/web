@@ -5,9 +5,9 @@
   <teleport to="#destination">
     <ModalWithFooter v-model="open">
       <template #symbol>
-        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+        <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
           <svg
-            class="h-6 w-6 text-green-600"
+            class="h-6 w-6 text-emerald-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -49,10 +49,10 @@
           <Link
             method="post"
             as="button"
-            :href="$route('acl.create')"
+            :href="route('acl.create')"
             :data="{name: name}"
             type="button"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:ring-green transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             Create
           </Link>
@@ -63,8 +63,8 @@
 </template>
 
 <script>
-import HeaderButton from "@/Shared/Layout/HeaderButton";
-import ModalWithFooter from "@/Shared/Modals/ModalWithFooter";
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import { Link } from '@inertiajs/inertia-vue3'
 export default {
   name: "CreateGroupButton",

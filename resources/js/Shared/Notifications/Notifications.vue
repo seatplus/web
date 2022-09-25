@@ -12,10 +12,10 @@
         move-class="transition ease-in-out duration-500"
       >
         <Notification
-          :key="notification.id"
-          :id="notification.id"
-          :payload="notification.payload"
           v-for="(notification, index) in slicedNotifications"
+          :id="notification.id"
+          :key="notification.id"
+          :payload="notification.payload"
           :class="[{'mt-4': index > 0 }]"
           @remove="removeNotification"
         />
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import Notification from "./Notification"
+import Notification from "./Notification.vue"
 import { v4 as uuidv4 } from 'uuid';
 
 export default {

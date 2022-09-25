@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import {computed, ref} from "vue";
-import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent";
+import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
 
 let raw_tabs = [
     {id: 1, name: 'Watchlisted Assets'},

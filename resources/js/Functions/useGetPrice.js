@@ -1,4 +1,3 @@
-import route from 'ziggy'
 import {ls} from './useLocalStorage'
 import axios from "axios";
 

@@ -1,7 +1,7 @@
 <template>
-    <li class="">
-        <slot />
-    </li>
+  <li class="">
+    <slot />
+  </li>
 </template>
 
 <script>

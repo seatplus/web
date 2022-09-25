@@ -300,9 +300,10 @@ test('setup on request group and save twice', function () {
 });
 
 test('search for character', function () {
-    // Assing superuser to test_user
+    // Assign superuser to test_user
     assignPermissionToTestUser(['superuser']);
 
+    // first get default search results by searching with an empty query string
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.search.affiliatable'))
         ->assertOk();
@@ -313,12 +314,21 @@ test('search for character', function () {
     ]);
 
     // now search with query-string
+
+    // prepare search
+
+    // create token with search permission
+    $token = test()->test_character->refresh_token;
+    updateRefreshTokenWithScopes($token, ['esi-search.search_structures.v1']);
+
+    // create esi response mock
     test()->mockRetrieveEsiDataAction([
         'character' => [
             test()->test_character->character_id,
         ],
     ]);
 
+    // Execute Test
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.search.affiliatable', [
             'query' => test()->test_character->name,

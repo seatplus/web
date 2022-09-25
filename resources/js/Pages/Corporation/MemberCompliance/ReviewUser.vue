@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-3">
     <div>
-      <PageHeader :breadcrumbs="[{name: 'Compliance ', route: $route('corporation.member_compliance')}]">
+      <PageHeader :breadcrumbs="[{name: 'Compliance ', route: route('corporation.member_compliance')}]">
         Review: {{ member.main_character.name }}
       </PageHeader>
       <div class="pt-1.5">
@@ -15,13 +15,13 @@
       :recruit="member"
       :watchlist="watchlist"
       :target-corporation="targetCorporation"
-     />
+    />
   </div>
 </template>
 
 <script>
-import TabComponent from "../Recruitment/TabComponent";
-import PageHeader from "@/Shared/Layout/PageHeader";
+import TabComponent from "../Recruitment/TabComponent.vue";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
 export default {
     name: "ReviewUser",
     components: {PageHeader, TabComponent},

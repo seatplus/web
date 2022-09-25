@@ -26,9 +26,9 @@
 </template>
 
 <script>
-import Skills from "./Skills";
-import SkillQueue from "./SkillQueue";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import Skills from "./Skills.vue";
+import SkillQueue from "./SkillQueue.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 export default {
     name: "SkillsComponent",
     components: {EntityByIdBlock, SkillQueue, Skills},

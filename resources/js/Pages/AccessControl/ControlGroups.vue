@@ -12,7 +12,7 @@
 
 <script>
 
-import ControlGroup from "./ControlGroup";
+import ControlGroup from "./ControlGroup.vue";
 export default {
     name: "ControlGroups",
     components: {ControlGroup},

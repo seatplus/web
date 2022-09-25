@@ -1,5 +1,5 @@
 <template>
-    <span :key="seconds"> {{ getTimeFromNow() }} </span>
+  <span :key="seconds"> {{ getTimeFromNow() }} </span>
 </template>
 
 <script>

@@ -34,7 +34,7 @@
 
           <template #lower_left>
             <svg
-              class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+              class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -57,7 +57,7 @@
 
           <template #lower_right>
             <svg
-              class="flex-shrink-0 mr-1.5 h-5 w-5"
+              class="shrink-0 mr-1.5 h-5 w-5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -91,10 +91,10 @@
 </template>
 
 <script>
-import WideLists from "../WideLists";
-import WideListElement from "../WideListElement";
-import EveImage from "../EveImage"
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
+import WideLists from "../WideLists.vue";
+import WideListElement from "../WideListElement.vue";
+import EveImage from "../EveImage.vue"
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 
 export default {
     name: "LocationSlot",
@@ -130,7 +130,7 @@ export default {
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '' : this.$route('character.item', asset.item_id)
+            return _.isEmpty(asset.content) ? '' : route('character.item', asset.item_id)
         },
         hasContent(content) {
             return !_.isEmpty(content)

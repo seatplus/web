@@ -6,7 +6,7 @@
         <!--TODO: Create Delete Button with confirmation dialog-->
         <span class="shadow-sm rounded-md">
           <Button
-            :href="$route('delete.enlistment', enlistment.corporation_id)"
+            :href="route('delete.enlistment', enlistment.corporation_id)"
             method="delete"
           >
             Delete
@@ -32,18 +32,18 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Multiselect
+          <EsiMultiselect
             v-model="form.regions"
-            route="autosuggestion.region"
+            :categories="['region']"
             label="Region"
-            placeholder="search for Region"
+            placeholder="search for region"
           />
         </div>
 
         <div>
-          <Multiselect
+          <EsiMultiselect
             v-model="form.systems"
-            route="autosuggestion.system"
+            :categories="['solar_system']"
             label="Solar System"
             placeholder="search for solar system"
           />
@@ -70,16 +70,16 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import Multiselect from "@/Shared/Components/Multiselect";
-import EnlistmentConfig from "./EnlistmentConfig";
-import Button from "@/Shared/Layout/Button";
-import ItemsWatchlist from "./ItemsWatchlist";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
+import EnlistmentConfig from "./EnlistmentConfig.vue";
+import Button from "@/Shared/Layout/Button.vue";
+import ItemsWatchlist from "./ItemsWatchlist.vue";
+import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 
 export default {
     name: "Index",
-    components: {ItemsWatchlist, Button, EnlistmentConfig, Multiselect, TwoColumnCardWithSubmitAction, PageHeader},
+    components: {ItemsWatchlist, Button, EnlistmentConfig, EsiMultiselect, TwoColumnCardWithSubmitAction, PageHeader},
     props: {
         watched: {
             required: true,
@@ -95,7 +95,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Corporation Recruitment',
-                    route: this.$route('corporation.recruitment')
+                    route: route('corporation.recruitment')
                 }
             ],
             form: this.$inertia.form({
@@ -106,7 +106,7 @@ export default {
     },
     methods: {
         submit() {
-            this.$inertia.post(this.$route('update.watchlist', this.corporationId), this.form)
+            this.$inertia.post(route('update.watchlist', this.corporationId), this.form)
         }
     }
 }

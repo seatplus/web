@@ -47,7 +47,7 @@
                 @click="close()"
               >
                 <span class="sr-only">Close</span>
-                <XIcon
+                <XMarkIcon
                   class="h-6 w-6"
                   aria-hidden="true"
                 />
@@ -55,7 +55,7 @@
             </div>
             <slot />
             <!--<div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                 <ExclamationIcon
                   class="h-6 w-6 text-red-600"
                   aria-hidden="true"
@@ -101,7 +101,7 @@
 <script>
 import { computed } from 'vue'
 import { Dialog, DialogOverlay, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { XIcon } from '@heroicons/vue/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 export default {
     name: "WithDismissButtonModal",
@@ -110,7 +110,7 @@ export default {
         DialogOverlay,
         TransitionChild,
         TransitionRoot,
-        XIcon,
+        XMarkIcon,
     },
     props: {
         modelValue: {

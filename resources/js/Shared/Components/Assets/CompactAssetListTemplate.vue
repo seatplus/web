@@ -62,8 +62,8 @@
 
 <script>
 import {prefix} from "metric-prefix";
-import { ChevronRightIcon } from '@heroicons/vue/solid'
-import EveImage from "@/Shared/EveImage"
+import { ChevronRightIcon } from '@heroicons/vue/20/solid'
+import EveImage from "@/Shared/EveImage.vue"
 export default {
     name: "CompactAssetListTemplate",
     components: {EveImage, ChevronRightIcon},
@@ -108,7 +108,7 @@ export default {
         },
         hasOwnerPicture() {
 
-            let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
+            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
 
             if (_.size(selectedCharacterIds) > 1)
                 return true

@@ -4,12 +4,13 @@
       This is the opt in control group settings. Users with characters in the selected affilites can freely join or leave
     </p>
 
-    <SearchCorpOrAlliance
-      v-model="affiliations"
-      class="mt-6"
-    >
-      Search for corporation or alliance that you wish to affiliate
-    </SearchCorpOrAlliance>
+    <EsiAutosuggest
+      label="Search for Corporation or Alliance"
+      :categories="['corporation', 'alliance']"
+      placeholder="corporation or alliance name"
+      :reset-after-select="true"
+      @selected-object="(selectedOption) => affiliations.push(selectedOption)"
+    />
 
     <Affiliations v-model="affiliations" />
 
@@ -22,12 +23,12 @@
 </template>
 
 <script>
-  import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-  import Members from "./Members"
-  import Affiliations from "./Affiliations"
+  import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
+  import Members from "./Members.vue"
+  import Affiliations from "./Affiliations.vue"
   export default {
       name: "OptInControlGroup",
-      components: {Affiliations, Members, SearchCorpOrAlliance},
+      components: {Affiliations, Members, EsiAutosuggest},
       props: {
           modelValue: {}
       },

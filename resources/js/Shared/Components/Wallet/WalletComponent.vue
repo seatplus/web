@@ -27,9 +27,9 @@
 </template>
 
 <script>
-import WalletJournalComponent from "./Journal/WalletJournalComponent";
-import WalletTransactionComponent from "./Transaction/WalletTransactionComponent";
-import WalletJournalBalanceChart from "./Journal/WalletJournalBalanceChart";
+import WalletJournalComponent from "./Journal/WalletJournalComponent.vue";
+import WalletTransactionComponent from "./Transaction/WalletTransactionComponent.vue";
+import WalletJournalBalanceChart from "./Journal/WalletJournalBalanceChart.vue";
 export default {
     name: "WalletComponent",
     components: {WalletJournalBalanceChart, WalletTransactionComponent, WalletJournalComponent},

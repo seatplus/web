@@ -12,7 +12,7 @@
           <span>{{ sumSkillpoints(skills) }} total skillpoints</span>
           <div class="flex space-x-1.5">
             <div class="flex">
-              <div class="flex-shrink-0 self-center">
+              <div class="shrink-0 self-center">
                 <StarIcon class="h-4 w-4" />
               </div>
               <span>
@@ -20,7 +20,7 @@
               </span>
             </div>
             <div class="flex">
-              <div class="flex-shrink-0 self-center">
+              <div class="shrink-0 self-center">
                 <StarIconOutline class="h-4 w-4" />
               </div>
               <span>
@@ -62,10 +62,10 @@
 <script>
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
-import LeftAligned from "../../Layout/DataDisplay/LeftAligned";
-import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData";
-import {StarIcon} from "@heroicons/vue/solid";
-import {StarIcon as StarIconOutline} from "@heroicons/vue/outline";
+import LeftAligned from "../../Layout/DataDisplay/LeftAligned.vue";
+import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData.vue";
+import {StarIcon} from "@heroicons/vue/20/solid";
+import {StarIcon as StarIconOutline} from "@heroicons/vue/24/outline";
 
 export default {
     name: "Skills",

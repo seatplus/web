@@ -19,7 +19,10 @@
             <div class="text-sm leading-5 text-gray-500 truncate">
               <span v-if="status === 'ready'">job can be dispatched</span>
               <span v-if="['pending', 'finished', 'failures'].includes(status)">
-                <Time v-if=time :timestamp="time" />
+                <Time
+                  v-if="time"
+                  :timestamp="time"
+                />
               </span>
             </div>
           </div>
@@ -33,11 +36,11 @@
         />
         <PlayIcon
           v-if="status === 'pending'"
-          class="h-8 w-8 text-yellow-400"
+          class="h-8 w-8 text-amber-400"
         />
         <CheckCircleIcon
           v-if="status === 'finished'"
-          class="h-8 w-8 text-green-400"
+          class="h-8 w-8 text-emerald-400"
         />
         <XCircleIcon
           v-if="status === 'failures'"
@@ -49,12 +52,11 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
-import Time from "@/Shared/Time";
-import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/outline"
+import EveImage from "@/Shared/EveImage.vue"
+import Time from "@/Shared/Time.vue";
+import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
 import {computed, onBeforeMount, onUnmounted, ref, watch} from "vue";
 import axios from "axios";
-import route from 'ziggy'
 import {usePage} from "@inertiajs/inertia-vue3";
 
 export default {

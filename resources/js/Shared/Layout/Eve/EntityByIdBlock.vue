@@ -5,7 +5,7 @@
   >
     <div
       v-if="isReady"
-      class="mb-4 flex-shrink-0 sm:mb-0 sm:mr-4 self-center"
+      class="mb-4 shrink-0 sm:mb-0 sm:mr-4 self-center"
     >
       <EveImage
         :object="entity"
@@ -28,10 +28,9 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
+import EveImage from "@/Shared/EveImage.vue"
 import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
-import route from 'ziggy'
 
 export default {
     name: "EntityByIdBlock",

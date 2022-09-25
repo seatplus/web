@@ -1,6 +1,6 @@
 <template>
-  <div class="flex items-center flex-shrink-0">
-    <div class="flex-shrink-0">
+  <div class="flex items-center shrink-0">
+    <div class="shrink-0">
       <span class="inline-block relative">
         <EveImage
           :object="character"
@@ -10,15 +10,15 @@
         <!--        <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />-->
         <div
           class="absolute bottom-0 right-0 flex items-center justify-center h-3 w-3 ring-2 ring-white rounded-full"
-          :class="hasMissing > 0 ? 'bg-red-400' : 'bg-green-400'"
+          :class="hasMissing > 0 ? 'bg-red-400' : 'bg-emerald-400'"
         >
-          <XIcon
+          <XMarkIcon
             v-if="hasMissing > 0"
             class="h-2 w-2 text-red-900"
           />
           <CheckIcon
             v-else
-            class="h-2 w-2 text-green-900"
+            class="h-2 w-2 text-emerald-900"
           />
 
         </div>
@@ -33,12 +33,12 @@
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage";
-import { XIcon, CheckIcon } from '@heroicons/vue/outline'
+import EveImage from "@/Shared/EveImage.vue";
+import { XMarkIcon, CheckIcon } from '@heroicons/vue/24/outline'
 import {computed} from "vue";
 export default {
     name: "CharacterComplianceElement",
-    components: {EveImage, XIcon, CheckIcon },
+    components: {EveImage, XMarkIcon, CheckIcon },
     props: {
         character: {
             required: true,

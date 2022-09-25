@@ -6,7 +6,7 @@
     <div class="px-3 py-4 sm:py-1 self-center whitespace-normal">
       <CheckCircleIcon
         v-if="isOk"
-        class="h-5 w-5 text-green-500"
+        class="h-5 w-5 text-emerald-500"
       />
       <XCircleIcon
         v-else
@@ -58,10 +58,10 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/solid'
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import Time from "@/Shared/Time";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/vue/20/solid'
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import Time from "@/Shared/Time.vue";
 export default {
     name: "MemberTrackingListElement",
     components: {Time, EntityByIdBlock, EntityBlock, CheckCircleIcon, XCircleIcon},

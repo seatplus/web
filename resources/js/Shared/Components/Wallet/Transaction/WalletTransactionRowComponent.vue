@@ -21,7 +21,7 @@
         v-if="entry.type"
         class="flex items-center"
       >
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <EveImage
             :object="entry.type"
             :size="256"
@@ -74,55 +74,12 @@
       :entry="entry"
     />
   </li>
-<!--    <Fragment>
-        <TableRow :class="even ? 'bg-gray-50' : 'bg-white'">
-            <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
-                <Time :timestamp="entry.date"></Time>
-            </DataCell>
-            <DataCell class="px-6 py-4 whitespace-normal text-sm text-gray-500">
-                {{ entry.is_buy ? 'Bought' : 'Sold' }}
-            </DataCell>
-            <DataCell class="px-6 py-4 whitespace-normal overflow-hidden overflow-clip text-right text-sm text-gray-500">
-                <div v-if="entry.type" class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <EveImage :object="entry.type" :size="256" tailwind_class="h-12 w-12 rounded-full"/>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="leading-6 font-medium text-gray-900">
-                            {{  entry.type.name }}
-                        </h3>
-                        <p v-if="entry.type.group || entry.type.category" class="text-sm text-gray-500 truncate">
-                            {{ getTypeDescription }}
-                        </p>
-                    </div>
-                </div>
-            </DataCell>
-            <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
-                {{ getTotal() }}
-            </DataCell>
-            <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
-                <button type="button" @click="toggle"
-                        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']">
-
-                    <svg :class="['h-5 w-5 transform transition ease-in-out duration-200', expanded ? 'rotate-180' : 'rotate-0']" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                    </svg>
-
-                </button>
-            </DataCell>
-        </TableRow>
-        <TableRow v-if="expanded" :class="even ? 'bg-gray-50' : 'bg-white'">
-            <DataCell colspan="5" class="px-6 pb-4 whitespace-nowrap text-sm text-gray-500">
-                <ExtendedWalletTransactionRowComponent :entry="entry" />
-            </DataCell>
-        </TableRow>
-    </Fragment>-->
 </template>
 
 <script>
-import EveImage from "@/Shared/EveImage"
-import Time from "@/Shared/Time";
-import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent";
+import EveImage from "@/Shared/EveImage.vue"
+import Time from "@/Shared/Time.vue";
+import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent.vue";
 
 export default {
     name: "WalletTransactionRowComponent",

@@ -13,7 +13,7 @@
       >
         <div :class="[settingIdx === 0 ? 'rounded-tl-md rounded-tr-md' : '', settingIdx === options.length - 1 ? 'rounded-bl-md rounded-br-md' : '', checked ? 'bg-indigo-50 border-indigo-200 z-10' : 'border-gray-200', 'relative border p-4 flex cursor-pointer focus:outline-none']">
           <span
-            :class="[checked ? 'bg-indigo-600 border-transparent' : 'bg-white border-gray-300', active ? 'ring-2 ring-offset-2 ring-indigo-500' : '', 'h-4 w-4 mt-0.5 cursor-pointer rounded-full border flex items-center justify-center flex-shrink-0']"
+            :class="[checked ? 'bg-indigo-600 border-transparent' : 'bg-white border-gray-300', active ? 'ring-2 ring-offset-2 ring-indigo-500' : '', 'h-4 w-4 mt-0.5 cursor-pointer rounded-full border flex items-center justify-center shrink-0']"
             aria-hidden="true"
           >
             <span class="rounded-full bg-white w-1.5 h-1.5" />
@@ -51,10 +51,6 @@ export default {
         RadioGroupOption,
     },
     props: {
-        title: {
-            type: String,
-            default: 'Default'
-        },
         options: {
             type: Array,
             default: () => [

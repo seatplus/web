@@ -24,7 +24,7 @@
 <script>
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
-import Enlistment from "./Enlistment";
+import Enlistment from "./Enlistment.vue";
 export default {
     name: "Enlistments",
     components: {Enlistment},

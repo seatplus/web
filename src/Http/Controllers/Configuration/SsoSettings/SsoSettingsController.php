@@ -31,7 +31,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
 use Seatplus\Web\Services\SsoSettings\GetSsoScopeEntries;
-use Seatplus\Web\Services\SsoSettings\SearchCorporationOrAlliance;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SsoSettingsController extends Controller
@@ -47,11 +46,6 @@ class SsoSettingsController extends Controller
             'entries' => $sso_scopes_entries,
             'active' => $entity_id,
         ]);
-    }
-
-    public function searchAllianceCorporations($searchParam): array
-    {
-        return (new SearchCorporationOrAlliance($searchParam))->search();
     }
 
     public function index(?int $entity_id = null)

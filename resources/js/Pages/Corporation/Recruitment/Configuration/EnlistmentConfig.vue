@@ -16,7 +16,7 @@
         <div class="mt-1 sm:mt-0 sm:col-span-2">
           <Autosuggest
             v-if="!enlistment"
-            route="get.affiliated.corporations"
+            route-name="get.affiliated.corporations"
             :route-parameters="{ permission: 'can open or close corporations for recruitment' }"
             placeholder="Search for corporation"
             @selectedObject="selection => form.corporation = selection"
@@ -45,11 +45,11 @@
           Typ
         </label>
         <div class="mt-1 sm:mt-0 sm:col-span-2 space-y-2">
-          <div class="flex flex-shrink-0 items-center space-x-2">
+          <div class="flex shrink-0 items-center space-x-2">
             <SimpleToggle v-model="isUserType" />
             <span class="text-sm font-medium text-gray-900">User Type</span>
           </div>
-          <div class="flex flex-shrink-0 items-center space-x-2">
+          <div class="flex shrink-0 items-center space-x-2">
             <SimpleToggle v-model="isCharacterType" />
             <span class="text-sm font-medium text-gray-900">Character Type</span>
           </div>
@@ -91,16 +91,14 @@
 <script>
 import {useForm} from "@inertiajs/inertia-vue3";
 import {computed} from "vue";
-import SimpleToggle from "@/Shared/SimpleToggle";
-import Autosuggest from "@/Shared/Components/Autosuggest";
-import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction";
-import route from 'ziggy'
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import SimpleToggle from "@/Shared/SimpleToggle.vue";
+import Autosuggest from "@/Shared/Components/Autosuggest.vue";
+import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 
 export default {
     name: "EnlistmentConfig",
-    components: {EntityByIdBlock, EntityBlock, TwoColumnCardWithSubmitAction, Autosuggest, SimpleToggle},
+    components: {EntityByIdBlock, TwoColumnCardWithSubmitAction, Autosuggest, SimpleToggle},
     props: {
         enlistment: {
             required: false,

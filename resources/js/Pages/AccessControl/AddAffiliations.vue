@@ -56,7 +56,7 @@
 </template>
 
 <script>
-    import SeatPlusSelect from "@/Shared/SeatPlusSelect"
+    import SeatPlusSelect from "@/Shared/SeatPlusSelect.vue"
     export default {
         name: "AddAffiliations",
         components: {SeatPlusSelect},

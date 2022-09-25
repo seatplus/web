@@ -38,7 +38,7 @@
 
       <template #lower_left>
         <svg
-          class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
+          class="shrink-0 mr-1.5 h-5 w-5 text-gray-400"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -61,7 +61,7 @@
 
       <template #lower_right>
         <svg
-          class="flex-shrink-0 mr-1.5 h-5 w-5"
+          class="shrink-0 mr-1.5 h-5 w-5"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -77,7 +77,7 @@
       <template #navigation>
         <Link
           v-if="asset.content[0]"
-          :href="$route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id})"
+          :href="route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id})"
           preserve-state
           preserve-scroll
         >
@@ -100,10 +100,10 @@
 
 <script>
 
-  import EveImage from "@/Shared/EveImage"
+  import EveImage from "@/Shared/EveImage.vue"
   import { prefix } from 'metric-prefix'
-  import WideListElement from "@/Shared//WideListElement";
-  import CompactAssetListComponent from "./CompactAssetListComponent";
+  import WideListElement from "@/Shared//WideListElement.vue";
+  import CompactAssetListComponent from "./CompactAssetListComponent.vue";
   import { Link } from '@inertiajs/inertia-vue3'
 
   export default {
@@ -126,7 +126,7 @@
             },
             hasOwnerPicture() {
 
-                let selectedCharacterIds = _.get(this.$route().params, 'character_ids', null)
+                let selectedCharacterIds = _.get(route().params, 'character_ids', null)
 
                 if (_.size(selectedCharacterIds) > 1)
                     return true
@@ -140,7 +140,7 @@
                 return prefix(numeric_value, {precision: 3, unit: 'm³'})
             },
             url(asset) {
-                return asset.content[0] ? this.$route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
+                return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
             },
         }
   }

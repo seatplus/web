@@ -56,20 +56,20 @@
 </template>
 
 <script>
-import {CheckIcon} from "@heroicons/vue/solid";
+import {CheckIcon} from "@heroicons/vue/20/solid";
 import {
     Listbox,
     ListboxOptions,
     ListboxOption,
     ListboxLabel
 } from '@headlessui/vue'
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 
 export default {
     name: "Autosuggest",
     components: {EntityBlock, Listbox, ListboxOptions, ListboxOption, CheckIcon, ListboxLabel},
     props: {
-        route: {
+        routeName: {
             required: true,
             type: String
         },
@@ -125,7 +125,7 @@ export default {
 
             //let $queryParams = _.merge({search: query}, this.routeParameters)
 
-            return axios.get(this.$route(this.route, {search: query, ...this.routeParameters}))
+            return axios.get(route(this.routeName, {search: query, ...this.routeParameters}))
                 .then((result) => {
                     self.suggestions = result.data
 

@@ -14,7 +14,7 @@
       <div class="relative inline-block text-left">
         <svg
           v-if="isSelected"
-          class="h-8 w-8 text-green-400"
+          class="h-8 w-8 text-emerald-400"
           fill="none"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 export default {
     name: "SelectionEntity",
     components: {EntityBlock},

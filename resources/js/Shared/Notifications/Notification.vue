@@ -1,12 +1,12 @@
 <template>
-  <div :class="['shadow-lg rounded-lg pointer-events-auto border', {'bg-gray-50' : isDefault, 'bg-blue-50': isType('info'), 'bg-yellow-50': isType('warning'), 'bg-red-50': isType('error'), 'bg-green-50': isType('success')}]">
+  <div :class="['shadow-lg rounded-lg pointer-events-auto border', {'bg-gray-50' : isDefault, 'bg-blue-50': isType('info'), 'bg-amber-50': isType('warning'), 'bg-red-50': isType('error'), 'bg-emerald-50': isType('success')}]">
     <div class="rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
       <div class="p-4">
         <div class="flex items-start">
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <svg
               v-if="isDefault === 'outline'"
-              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]"
+              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-amber-400': isType('warning'), 'text-red-400': isType('error'), 'text-emerald-400': isType('success')}]"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 24 24"
@@ -14,17 +14,17 @@
             />
             <svg
               v-else
-              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-yellow-400': isType('warning'), 'text-red-400': isType('error'), 'text-green-400': isType('success')}]"
+              :class="['h-6 w-6', {'text-gray-400' : isDefault, 'text-blue-400': isType('info'), 'text-amber-400': isType('warning'), 'text-red-400': isType('error'), 'text-emerald-400': isType('success')}]"
               fill="currentColor"
               viewBox="0 0 20 20"
               v-html="icon"
             />
           </div>
           <div class="ml-3 w-0 flex-1 pt-0.5">
-            <p :class="['text-sm leading-5 font-medium', {'text-gray-800' : isDefault, 'text-blue-800': isType('info'), 'text-yellow-800': isType('warning'), 'text-red-800': isType('error'), 'text-green-800': isType('success')}]">
+            <p :class="['text-sm leading-5 font-medium', {'text-gray-800' : isDefault, 'text-blue-800': isType('info'), 'text-amber-800': isType('warning'), 'text-red-800': isType('error'), 'text-emerald-800': isType('success')}]">
               {{ title }}
             </p>
-            <p :class="['mt-1 text-sm leading-5', {'text-gray-700' : isDefault, 'text-blue-700': isType('info'), 'text-yellow-700': isType('warning'), 'text-red-700': isType('error'), 'text-green-700': isType('success')}]">
+            <p :class="['mt-1 text-sm leading-5', {'text-gray-700' : isDefault, 'text-blue-700': isType('info'), 'text-amber-700': isType('warning'), 'text-red-700': isType('error'), 'text-emerald-700': isType('success')}]">
               {{ text }}
             </p>
             <div
@@ -47,9 +47,9 @@
               </Link>
             </div>
           </div>
-          <div class="ml-4 flex-shrink-0 flex">
+          <div class="ml-4 shrink-0 flex">
             <button
-              :class="['inline-flex focus:outline-none transition ease-in-out duration-150', {'text-gray-400 focus:text-gray-700' : isDefault, 'text-blue-400 focus:text-blue-700': isType('info'), 'text-yellow-400 focus:text-yellow-700': isType('warning'), 'text-red-400 focus:text-red-700': isType('error'), 'text-green-400 focus:text-green-700': isType('success')}]"
+              :class="['inline-flex focus:outline-none transition ease-in-out duration-150', {'text-gray-400 focus:text-gray-700' : isDefault, 'text-blue-400 focus:text-blue-700': isType('info'), 'text-amber-400 focus:text-amber-700': isType('warning'), 'text-red-400 focus:text-red-700': isType('error'), 'text-emerald-400 focus:text-emerald-700': isType('success')}]"
               @click="$emit('remove', id)"
             >
               <svg

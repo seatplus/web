@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline";
+import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import {computed, ref} from "vue";
-import ContractComponent from "@/Shared/Components/Contracts/ContractComponent";
+import ContractComponent from "@/Shared/Components/Contracts/ContractComponent.vue";
 
 let raw_tabs = [
     {id: 1, name: 'Watchlisted Contracts'},

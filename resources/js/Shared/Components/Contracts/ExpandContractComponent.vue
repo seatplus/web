@@ -4,8 +4,8 @@
     :href="url"
     @click.stop.prevent="open()"
   >
-    <ArrowsExpandIcon
-      class="flex-shrink-0 h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-400"
+    <ArrowsPointingOutIcon
+      class="shrink-0 h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-400"
     />
   </a>
   <teleport to="#destination">
@@ -28,18 +28,17 @@
   </teleport>
 </template>
 <script>
-import {ArrowsExpandIcon} from "@heroicons/vue/solid";
+import {ArrowsPointingOutIcon} from "@heroicons/vue/20/solid";
 import {ref} from "vue";
-import route from 'ziggy'
-import WithDismissButtonModal from "../../Modals/WithDismissButtonModal";
+import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";
-import ContractDetailsComponent from "./ContractDetailsComponent";
+import ContractDetailsComponent from "./ContractDetailsComponent.vue";
 
 export default {
     name: "ExpandContractComponent",
     components: {
         ContractDetailsComponent,
-        WithDismissButtonModal, ArrowsExpandIcon, DialogTitle},
+        WithDismissButtonModal, ArrowsPointingOutIcon, DialogTitle},
     props: {
         contract: {
             required: true,

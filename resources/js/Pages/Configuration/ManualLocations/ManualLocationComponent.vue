@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription";
+import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -112,7 +112,7 @@ export default {
         submit() {
             let self = this;
 
-            return this.form.post(this.$route('accept.manuel_locations'), {
+            return this.form.post(route('accept.manuel_locations'), {
                 onSuccess: () => {
                     self.$emit('onSubmittedSuggestion')
                 }

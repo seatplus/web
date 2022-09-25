@@ -6,12 +6,13 @@
 
     <div class="grid grid-cols-2 gap-6">
       <div>
-        <SearchCorpOrAlliance
-          v-model="affiliations"
-          class="mt-6"
-        >
-          Search for corporation or alliance that you wish to affiliate
-        </SearchCorpOrAlliance>
+        <EsiAutosuggest
+          label="Search for Corporation or Alliance"
+          :categories="['corporation', 'alliance']"
+          placeholder="corporation or alliance name"
+          :reset-after-select="true"
+          @selected-object="(selectedOption) => affiliations.push(selectedOption)"
+        />
         <Affiliations
           v-model="affiliations"
           two-columns
@@ -53,15 +54,15 @@
 </template>
 
 <script>
-import SearchCorpOrAlliance from "@/Shared/SearchCorpOrAlliance"
-import Members from "./Members"
-import Affiliations from "./Affiliations"
-import Applicants from "./Applicants"
-import Users from "./Users"
-import Moderators from "./Moderators"
+import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
+import Members from "./Members.vue"
+import Affiliations from "./Affiliations.vue"
+import Applicants from "./Applicants.vue"
+import Users from "./Users.vue"
+import Moderators from "./Moderators.vue"
 export default {
     name: "OnRequestControlGroup",
-    components: {Moderators, Users, Applicants, Affiliations, Members, SearchCorpOrAlliance},
+    components: {Moderators, Users, Applicants, Affiliations, Members, EsiAutosuggest},
     props: {
         modelValue: {}
     },

@@ -25,12 +25,11 @@
 </template>
 
 <script>
-import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning";
-import PageHeader from "@/Shared/Layout/PageHeader";
-import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton";
-import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton";
-import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
-import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout";
+import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
+import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent.vue";
 export default {
     name: "Index",
     components: {SkillsComponent, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},

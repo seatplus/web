@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {LineChart, useLineChart } from "vue-chart-3";
 import {computed} from "vue";
@@ -51,7 +51,7 @@ export default {
     },
     setup(props) {
 
-        let route = props.division? 'corporation.balance' : 'character.balance'
+        let routeName = props.division? 'corporation.balance' : 'character.balance'
         let routeParameters = props.division ? {
             corporation_id: props.id,
             division_id: props.division.division_id
@@ -81,7 +81,7 @@ export default {
             }
         }
 
-        const {results} = useLoadCompleteResource(route, routeParameters)
+        const {results} = useLoadCompleteResource(routeName, routeParameters)
 
         const chartData = computed(() => {
             return {

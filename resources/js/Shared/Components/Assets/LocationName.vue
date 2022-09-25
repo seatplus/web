@@ -28,7 +28,7 @@ export default {
     },
     created() {
         if(_.isNull(this.location.location))
-            axios.get(this.$route('get.manual_location', this.location.location_id))
+            axios.get(route('get.manual_location', this.location.location_id))
                 .then((result) => {
                         this.result = result.data
                 })

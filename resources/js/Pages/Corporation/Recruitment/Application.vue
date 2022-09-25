@@ -163,11 +163,11 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import HeaderButton from "@/Shared/Layout/HeaderButton";
-import TabComponent from "./TabComponent";
-import {IdentificationIcon} from '@heroicons/vue/outline'
-import UpdateCharacterComponent from "./UpdateCharacterComponent";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
+import TabComponent from "./TabComponent.vue";
+import {IdentificationIcon} from '@heroicons/vue/24/outline'
+import UpdateCharacterComponent from "./UpdateCharacterComponent.vue";
 
 export default {
     name: "Application",
@@ -215,10 +215,10 @@ export default {
     },
     methods: {
         impersonate() {
-            return this.$inertia.visit(this.$route('impersonate.recruit', this.application.id))
+            return this.$inertia.visit(route('impersonate.recruit', this.application.id))
         },
         submit() {
-            return this.$inertia.post(this.$route('review.application', this.application.id), this.form);
+            return this.$inertia.post(route('review.application', this.application.id), this.form);
         }
     }
 }

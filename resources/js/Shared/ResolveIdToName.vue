@@ -11,7 +11,6 @@
 
 <script>
 import {onMounted, onUnmounted, ref} from "vue";
-import route from 'ziggy'
 
 export default {
     name: "ResolveIdToName",

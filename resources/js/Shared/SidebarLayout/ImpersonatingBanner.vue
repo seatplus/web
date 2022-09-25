@@ -26,10 +26,10 @@
                 <span class="hidden md:inline">You experience everything exactly as if you were {{ name }}. </span>
               </p>
             </div>
-            <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
+            <div class="order-3 mt-2 shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
               <div class="rounded-md shadow-sm">
                 <Link
-                  :href="$route('impersonate.stop')"
+                  :href="route('impersonate.stop')"
                   class="flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500 focus:outline-none focus:ring transition ease-in-out duration-150"
                 >
                   Stop
@@ -39,7 +39,7 @@
                 </Link>
               </div>
             </div>
-            <!--<div class="order-2 flex-shrink-0 sm:order-3 sm:ml-2">
+            <!--<div class="order-2 shrink-0 sm:order-3 sm:ml-2">
                             <button type="button" class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:bg-indigo-500 transition ease-in-out duration-150" aria-label="Dismiss">
                                 <svg class="h-6 w-6 text-white" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

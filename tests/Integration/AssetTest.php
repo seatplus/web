@@ -101,6 +101,8 @@ test('load asset in system', function () {
             'systems' => $system->system_id,
         ]));
 
+    //dd($response->original, $system->system_id, $asset->location->locatable);
+
     expect($response->original)->toHaveCount(1);
 
     $response = test()->actingAs(test()->test_user)

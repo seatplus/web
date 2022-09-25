@@ -107,17 +107,14 @@
 </template>
 
 <script>
-import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent";
-import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent";
-import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart";
-import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent";
-import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent";
-import MobileMailList from "@/Shared/Components/Mails/MobileMailList";
-import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent";
-import AssetTab from "./Tabs/AssetTab";
-import ContractTab from "./Tabs/ContractTab";
-import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab";
-import WalletTab from "./Tabs/WalletTab";
+import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent.vue";
+import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent.vue";
+import MobileMailList from "@/Shared/Components/Mails/MobileMailList.vue";
+import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent.vue";
+import AssetTab from "./Tabs/AssetTab.vue";
+import ContractTab from "./Tabs/ContractTab.vue";
+import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
+import WalletTab from "./Tabs/WalletTab.vue";
 
 const tabs = [
     'Log',
@@ -140,10 +137,8 @@ export default {
         CharacterContactsComponent,
         MobileMailList,
         SkillsComponent,
-        CorporationHistoryComponent,
-        WalletJournalBalanceChart,
-        WalletJournalComponent,
-        WalletTransactionComponent},
+        CorporationHistoryComponent
+        },
     props: {
         recruit: {
             type: Object,

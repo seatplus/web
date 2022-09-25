@@ -1,6 +1,6 @@
 <template>
   <li
-    :class="even ? (has_standing_offset ? 'bg-yellow-100' :'bg-gray-50') : (has_standing_offset ? 'bg-yellow-50' :'bg-white')"
+    :class="even ? (has_standing_offset ? 'bg-amber-100' :'bg-gray-50') : (has_standing_offset ? 'bg-amber-50' :'bg-white')"
     class="grid grid-cols-2 sm:grid-cols-6 sm:gap-x-0 sm:gap-y-1 grid-flow-row text-sm text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500"
   >
     <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal sm:col-span-2">
@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 export default {
     name: "CharacterContactsRowComponent",
     components: {EntityByIdBlock},

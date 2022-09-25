@@ -40,7 +40,7 @@
             <div class="flex justify-end">
               <Button
                 button-size="xs"
-                :href="$route('get.application', applicant.application_id)"
+                :href="route('get.application', applicant.application_id)"
               >
                 Review
               </Button>
@@ -53,12 +53,12 @@
 </template>
 
 <script>
-import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable";
-import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow";
-import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell";
-import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock";
-import CharacterComplianceElement from "@/Pages/Corporation/MemberCompliance/CharacterComplianceElement";
-import Button from "@/Shared/Layout/Button";
+import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
+import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow.vue";
+import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
+import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import CharacterComplianceElement from "@/Pages/Corporation/MemberCompliance/CharacterComplianceElement.vue";
+import Button from "@/Shared/Layout/Button.vue";
 
 let headerTitles = [
     {title: 'Main Character', columnSpan: 3},

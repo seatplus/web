@@ -22,9 +22,9 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader";
-import ComplianceTabs from "./ComplianceTabs";
-import ComplianceComponent from "./ComplianceComponent";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import ComplianceTabs from "./ComplianceTabs.vue";
+import ComplianceComponent from "./ComplianceComponent.vue";
 
 export default {
     name: "MemberCompliance",
@@ -58,11 +58,11 @@ export default {
   methods: {
     getCharacterComplianceUrl(corporation_id) {
 
-      return this.$route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
+      return route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
     },
     getUserComplianceUrl(corporation_id) {
 
-      return this.$route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
+      return route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
     }
   }
 }

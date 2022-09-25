@@ -26,10 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Type;
@@ -69,44 +72,27 @@ class HelperController extends Controller
         return (new GetEntityFromId($id))->execute();
     }
 
-    public function findSolarSystem(string $search)
+    public function token()
     {
-        $ids_to_resolve = (new SearchService)->execute('solar_system', $search);
+        $token = $this->getEsiSearchToken();
 
-        // get names for IDs
-        if (empty($ids_to_resolve)) {
-            return $ids_to_resolve;
-        }
-
-        $esi_results = (new GetNamesFromIdsService)->execute($ids_to_resolve);
-
-        return $esi_results;
+        return $token ? 1 : 0;
     }
 
-    public function systems()
+    public function esiSearch(Request $request)
     {
-        $query = request()->get('search');
+        $validated_data = $request->validate([
+            'search' => ['required', 'string', 'min:3'],
+            'categories' => ['required','array'],
+        ]);
 
-        if (Str::length($query) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
+        $token = $this->getEsiSearchToken();
 
-        $system_ids = (new SearchService)->execute('solar_system', $query);
+        throw_if(! $token, new \Exception('No ESI Search Token found, at least one character needs to have the scope esi-search.search_structures.v1'));
 
-        return (new GetNamesFromIdsService)->execute(array_slice($system_ids, 0, 15));
-    }
+        $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
 
-    public function regions()
-    {
-        $query = request()->get('search');
-
-        if (Str::length($query) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        $region_ids = (new SearchService)->execute('region', $query);
-
-        return (new GetNamesFromIdsService)->execute(array_slice($region_ids, 0, 15));
+        return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
     }
 
     public function typesOrGroupsOrCategories()
@@ -190,5 +176,10 @@ class HelperController extends Controller
         cache(['market_prices' => $prices], now()->addDay());
 
         return $prices->toJson();
+    }
+
+    private function getEsiSearchToken() : ?RefreshToken
+    {
+        return SearchService::getTokenFromCurrentUser();
     }
 }

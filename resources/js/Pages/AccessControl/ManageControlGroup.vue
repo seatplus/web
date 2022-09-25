@@ -86,12 +86,12 @@
       >
         <div
           v-if="changed"
-          class="bg-yellow-50 border-l-4 border-yellow-400 p-4 hidden sm:block"
+          class="bg-amber-50 border-l-4 border-amber-400 p-4 hidden sm:block"
         >
           <div class="flex">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <svg
-                class="h-5 w-5 text-yellow-400"
+                class="h-5 w-5 text-amber-400"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -103,7 +103,7 @@
               </svg>
             </div>
             <div class="ml-3">
-              <p class="text-sm leading-5 text-yellow-700">
+              <p class="text-sm leading-5 text-amber-700">
                 You have unsaved changes. Press save to store the unsaved changes
               </p>
             </div>
@@ -169,7 +169,7 @@
                     </span>
                   </p>
                 </div>
-                <div class="order-3 mt-2 flex-shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
+                <div class="order-3 mt-2 shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
                   <button
                     class="flex w-full cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50"
                     @click="store"
@@ -177,7 +177,7 @@
                     Save
                   </button>
                 </div>
-                <div class="order-2 flex-shrink-0 sm:order-3 sm:ml-2">
+                <div class="order-2 shrink-0 sm:order-3 sm:ml-2">
                   <button
                     type="button"
                     class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white"
@@ -211,13 +211,12 @@
 </template>
 
 <script>
-import PageHeader from "@/Shared/Layout/PageHeader"
-import HeaderButton from "@/Shared/Layout/HeaderButton"
-import Manual from "./AclTypes/Manual"
-import AutomaticRole from "./AclTypes/AutomaticRole"
-import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup"
-import OptInControlGroup from "./AclTypes/OptInControlGroup"
-import Layout from "@/Shared/SidebarLayout/Layout";
+import PageHeader from "@/Shared/Layout/PageHeader.vue"
+import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
+import Manual from "./AclTypes/Manual.vue"
+import AutomaticRole from "./AclTypes/AutomaticRole.vue"
+import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup.vue"
+import OptInControlGroup from "./AclTypes/OptInControlGroup.vue"
 import {useForm} from "@inertiajs/inertia-vue3/src";
 
 export default {
@@ -251,7 +250,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Control Group',
-                    route: this.$route('acl.groups')
+                    route: route('acl.groups')
                 }
             ],
             updated: false
@@ -289,7 +288,7 @@ export default {
         },
         store: function () {
 
-            this.form.post(this.$route('update.acl.affiliations', this.role.id),{
+            this.form.post(route('update.acl.affiliations', this.role.id),{
                 onSuccess: () => {
                     this.$inertia.reload({
                         preserveState: false
