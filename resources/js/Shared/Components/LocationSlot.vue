@@ -95,6 +95,7 @@ import WideLists from "../WideLists.vue";
 import WideListElement from "../WideListElement.vue";
 import EveImage from "../EveImage.vue"
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import { prefix } from "metric-prefix";
 
 export default {
     name: "LocationSlot",
@@ -124,13 +125,11 @@ export default {
     methods: {
         getMetricPrefix(numeric_value) {
 
-            const {prefix} = require('metric-prefix')
-
             return prefix(numeric_value, {precision: 3, unit: 'm³'})
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '' : route('character.item', asset.item_id)
+            return _.isEmpty(asset.content) ? '' : route('character.item', {'item_id': asset.item_id, 'character_id': asset.owner.character_id})
         },
         hasContent(content) {
             return !_.isEmpty(content)
