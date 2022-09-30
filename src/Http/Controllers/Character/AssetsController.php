@@ -102,7 +102,7 @@ class AssetsController extends Controller
     {
         $query = EveApiAsset::with([
             'location', 'type', 'type.group', 'container',
-            'content' => ['content', 'type', 'type.group', 'assetable']
+            'content' => ['content', 'type', 'type.group', 'assetable'],
         ])
             ->where('assetable_id', $character_id)
             ->where('assetable_type', CharacterInfo::class)
