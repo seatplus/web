@@ -3,11 +3,8 @@
 
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Universe\Category;
-use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
-use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Models\Asset\Asset;
 
 test('is protected by authentication', function () {
@@ -248,13 +245,15 @@ test('load asset on watchlist', function () {
     // only two should be in the result
     expect($response->original)->toHaveCount(1);
 
-    $response->assertJson(fn(\Illuminate\Testing\Fluent\AssertableJson $json) => $json
+    $response->assertJson(
+        fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
         ->count('data', 1)
-        ->has('data.0', fn($json) => $json
+        ->has(
+            'data.0',
+            fn ($json) => $json
             ->where('location_id', $asset->location_id)
             ->etc()
         )
         ->etc()
     );
-
 });

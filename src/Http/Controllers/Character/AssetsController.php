@@ -68,8 +68,7 @@ class AssetsController extends Controller
             ->groupBy('location_id', 'assetable_id')
             ->orderBy('location_id', 'asc');
 
-        if($request->has('withUnknownLocations')) {
-
+        if ($request->has('withUnknownLocations')) {
             $query = WebAssetAlias::query()
                 ->whereIn('assetable_id', $character_ids)
                 ->where('assetable_type', CharacterInfo::class)
