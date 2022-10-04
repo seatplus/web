@@ -57,20 +57,28 @@ class AssetsController extends Controller
         abort_unless($character_ids, 404);
 
         $query = WebAssetAlias::query()
-            ->with('location')
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->whereIn('assetable_id', $character_ids)
             ->where('assetable_type', CharacterInfo::class)
+            ->when($request->has('search'), fn ($query) => $query->search($request->get('search')))
+            ->handleWatchlist($request)
+            ->withRecursiveContent()
+            ->with('location')
             ->select('location_id', 'assetable_id')
+            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
             ->groupBy('location_id', 'assetable_id')
             ->orderBy('location_id', 'asc');
 
-        $request->whenHas('search', fn ($term) => $query->search($term));
+        if($request->has('withUnknownLocations')) {
 
-        $this->handleWatchlist($query, $request);
-
-        if ($request->has('withUnknownLocations')) {
-            $query = $query->withUnknownLocations();
+            $query = WebAssetAlias::query()
+                ->whereIn('assetable_id', $character_ids)
+                ->where('assetable_type', CharacterInfo::class)
+                ->withUnknownLocations()
+                ->with('location')
+                ->select('location_id', 'assetable_id')
+                ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
+                ->groupBy('location_id', 'assetable_id')
+                ->orderBy('location_id', 'asc');
         }
 
         return AssetResource::collection(
@@ -84,14 +92,14 @@ class AssetsController extends Controller
 
         abort_unless($character_ids, 404);
 
-        $query = EveApiAsset::with(['assetable', 'type', 'type.group', 'content'])
+        $query = WebAssetAlias::query()
             ->whereIn('assetable_id', $character_ids)
             ->where('assetable_type', CharacterInfo::class)
-            ->where('location_id', $location_id);
-
-        $request->whenHas('search', fn ($term) => $query->search($term));
-
-        $this->handleWatchlist($query, $request);
+            ->when($request->has('search'), fn ($query) => $query->search($request->get('search')))
+            ->handleWatchlist($request)
+            ->withRecursiveContent()
+            ->where('location_id', $location_id)
+            ->with(['assetable', 'type', 'type.group', 'content', 'location']);
 
         return AssetResource::collection(
             $query->paginate()
