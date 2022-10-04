@@ -29,9 +29,12 @@ namespace Seatplus\Web\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Web\Models\ManualLocation;
+use Seatplus\Web\Traits\HasWatchlist;
 
 class Asset extends EveApiAsset
 {
+    use HasWatchlist;
+
     protected $table = 'assets';
 
     public function manual_location()

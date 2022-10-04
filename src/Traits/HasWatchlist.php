@@ -44,4 +44,11 @@ trait HasWatchlist
             });
         });
     }
+
+    public function scopeHandleWatchlist(Builder $query, Request $request)
+    {
+        $this->handleWatchlist($query, $request);
+
+        return $query;
+    }
 }
