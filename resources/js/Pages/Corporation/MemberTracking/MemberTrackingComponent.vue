@@ -72,7 +72,7 @@ export default {
     },
     setup(props) {
 
-        return useInfinityScrolling('get.corporation.member_tracking', props.corporation.corporation_id)
+        return useInfinityScrolling('get.corporation.member_tracking', {corporation_id: props.corporation.corporation_id})
     }
 }
 </script>
