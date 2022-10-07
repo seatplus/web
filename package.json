@@ -13,7 +13,7 @@
         "@vue/compiler-sfc": "^3.0.7",
         "acorn": "^8.0",
         "autoprefixer": "^10.4.8",
-        "axios": "^0.25.0",
+        "axios": "^1.1.2",
         "eslint": "8.22.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-import": "^2.26.0",
