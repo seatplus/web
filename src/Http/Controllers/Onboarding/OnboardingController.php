@@ -12,7 +12,6 @@ class OnboardingController extends Controller
 {
     public function index(Request $request)
     {
-
         throw_unless(config('web.config.ONBOARDING'), 'Onboarding is disabled');
 
         $user = User::query()
@@ -25,13 +24,12 @@ class OnboardingController extends Controller
             'mainCharacterId' => $user->main_character_id,
             'enlistments' => Enlistment::query()
                 ->with(['corporation' => ['alliance']])
-                ->get()
+                ->get(),
         ]);
     }
 
     public function complete()
     {
-
         // create onboarding record
         Onboarding::query()->create([
             'user_id' => auth()->user()->getAuthIdentifier(),

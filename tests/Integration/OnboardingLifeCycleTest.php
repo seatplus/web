@@ -1,7 +1,7 @@
 <?php
 
-use Seatplus\Web\Models\Onboarding;
 use function Pest\Laravel\actingAs;
+use Seatplus\Web\Models\Onboarding;
 
 it('throws error when turned off and navigated to onboarding if turned off', function () {
     config()->set('web.config.ONBOARDING', false);
@@ -9,7 +9,6 @@ it('throws error when turned off and navigated to onboarding if turned off', fun
     actingAs($this->test_user);
 
     $response = $this->get(route('onboarding'))->assertStatus(500);
-
 });
 
 it('redirects to onboarding if turned on', function () {
@@ -21,7 +20,6 @@ it('redirects to onboarding if turned on', function () {
 
     $response = $this->get(route('home'))
         ->assertRedirect(route('onboarding'));
-
 });
 
 it('does not redirect to onboarding if user has been created longer then an hour ago', function () {
@@ -61,7 +59,6 @@ it('shows onboarding page', function () {
 
     $response->assertOk()
         ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page->component('Onboarding/Index'));
-
 });
 
 it('completes onboarding', function () {

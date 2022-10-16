@@ -29,8 +29,6 @@ namespace Seatplus\Web\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Universe\Location;
-use Seatplus\Eveapi\Models\Universe\System;
 
 class Onboarding extends Model
 {
