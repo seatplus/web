@@ -24,33 +24,20 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class UserRessource extends JsonResource
+return new class extends Migration
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+
+    public function up()
     {
-        return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => $this->characters
-                ->map(fn ($character) => [
-                    'character_id' => $character->character_id,
-                    'name' => $character->name,
-                    'corporation' => $character->corporation,
-                    'alliance' => $character->alliance,
-                    'scopes' => $character->refresh_token?->scopes,
-                ]),
-            'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status),
-        ];
+        Schema::create('onboardings', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
-}
+
+};

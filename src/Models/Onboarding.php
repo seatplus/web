@@ -24,33 +24,25 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Resources;
+namespace Seatplus\Web\Models;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Seatplus\Auth\Models\User;
 
-class UserRessource extends JsonResource
+class Onboarding extends Model
 {
+    use HasFactory;
+
     /**
-     * Transform the resource into an array.
+     * The attributes that aren't mass assignable.
      *
-     * @param  \Illuminate\Http\Request
-     * @return array
+     * @var array
      */
-    public function toArray($request)
+    protected $guarded = [];
+
+    public function user()
     {
-        return [
-            'id' => $this->id,
-            'main_character' => $this->main_character,
-            'characters' => $this->characters
-                ->map(fn ($character) => [
-                    'character_id' => $character->character_id,
-                    'name' => $character->name,
-                    'corporation' => $character->corporation,
-                    'alliance' => $character->alliance,
-                    'scopes' => $character->refresh_token?->scopes,
-                ]),
-            'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status),
-        ];
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -29,10 +29,11 @@ use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
 use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
+use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 
 Route::middleware('web')
     ->group(function () {
-        Route::middleware(['auth', CheckRequiredScopes::class])
+        Route::middleware(['auth', CheckRequiredScopes::class, OnboardingMiddleware::class])
             ->group(function () {
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
                 Route::get('/enlistments', [HomeController::class, 'getEnlistments'])->name('list.open.enlistments');
@@ -70,6 +71,11 @@ Route::middleware('web')
                         include __DIR__ . '/Routes/Corporation/MemberTracking.php';
                         include __DIR__ . '/Routes/Corporation/Recruitment.php';
                         include __DIR__ . '/Routes/Corporation/MemberCompliance.php';
+                    });
+
+                Route::prefix('onboarding')
+                    ->group(function () {
+                        include __DIR__ . '/Routes/Onboarding/Onboarding.php';
                     });
 
                 Route::prefix('acl')
