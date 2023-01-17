@@ -30,7 +30,7 @@
         "laravel/socialite": "^5.0",
         "seatplus/eveapi": "^2.0",
         "seatplus/auth": "^2.0",
-        "inertiajs/inertia-laravel": "^0.5.4",
+        "inertiajs/inertia-laravel": "^0.6.9",
         "tightenco/ziggy": "^1.0.4",
         "spatie/laravel-permission": "^5.4",
         "spatie/data-transfer-object": "^3.7",
