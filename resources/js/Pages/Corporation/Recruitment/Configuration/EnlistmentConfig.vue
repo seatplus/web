@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import {useForm} from "@inertiajs/inertia-vue3";
+import { useForm } from "@inertiajs/vue3";
 import {computed} from "vue";
 import SimpleToggle from "@/Shared/SimpleToggle.vue";
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";

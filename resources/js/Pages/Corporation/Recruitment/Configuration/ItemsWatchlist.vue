@@ -44,7 +44,7 @@ import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWi
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import {ref, watch} from "vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
-import {useForm} from "@inertiajs/inertia-vue3";
+import { useForm } from "@inertiajs/vue3";
 
 export default {
     name: "ItemsWatchlist",

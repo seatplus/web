@@ -65,7 +65,7 @@
 <script>
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3'
 export default {
   name: "CreateGroupButton",
   components: {ModalWithFooter, HeaderButton, Link},

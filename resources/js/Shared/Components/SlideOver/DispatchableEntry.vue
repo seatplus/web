@@ -55,9 +55,9 @@
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
-import {computed, onBeforeMount, onUnmounted, ref, watch} from "vue";
+import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import axios from "axios";
-import {usePage} from "@inertiajs/inertia-vue3";
+import { usePage } from "@inertiajs/vue3";
 
 export default {
     name: "DispatchableEntry",
@@ -72,7 +72,7 @@ export default {
         const status = ref(_.get(props.entry, 'batch.state'))
         const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
         const updateStatus = ref()
-        const dispatch_transfer_object = computed(() => usePage().props.value.dispatchTransferObject)
+        const dispatch_transfer_object = computed(() => usePage().props.dispatchTransferObject)
         const url = computed(() => route('dispatch.job', {
             character_id: props.entry.character_id,
             corporation_id: props.entry.corporation_id,

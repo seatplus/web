@@ -86,7 +86,7 @@ import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3';
 
 export default {
     name: "Enlistment",

@@ -68,6 +68,7 @@
 
 <script>
   import EveImage from "@/Shared/EveImage.vue"
+  import {router} from "@inertiajs/vue3";
 
 
   export default {
@@ -111,7 +112,7 @@
           },
           removeMember(member) {
 
-              this.$inertia.delete(route('acl.leave', [member.role_id, member.user_id]), {
+              router.delete(route('acl.leave', [member.role_id, member.user_id]), {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,
@@ -125,7 +126,7 @@
                   role_id: member.role_id
               };
 
-              this.$inertia.post(route('acl.join'), data, {
+              router.post(route('acl.join'), data, {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,

@@ -134,7 +134,7 @@ import EveImage from "@/Shared/EveImage.vue"
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link, router } from '@inertiajs/vue3';
 
 export default {
     name: "ScopeSettings",
@@ -230,7 +230,7 @@ export default {
                 }
             }
 
-            return this.$inertia.post(url, data)
+            return router.post(url, data)
         }
     }
 }

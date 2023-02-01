@@ -64,7 +64,7 @@
 <script>
 import Commands from "@/Pages/Configuration/Commands.vue"
 import HorizonStats from "./HorizonStats.vue"
-import {Inertia} from "@inertiajs/inertia"
+import { router } from '@inertiajs/vue3'
 
 export default {
     name: "Settings",
@@ -108,7 +108,7 @@ export default {
 
             const url = route(name)
 
-            Inertia.visit(url,{
+            router.visit(url,{
                 method: 'get',
                 preserveScroll: true
             })
