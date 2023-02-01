@@ -168,6 +168,7 @@ import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
 import TabComponent from "./TabComponent.vue";
 import {IdentificationIcon} from '@heroicons/vue/24/outline'
 import UpdateCharacterComponent from "./UpdateCharacterComponent.vue";
+import {router} from "@inertiajs/vue3";
 
 export default {
     name: "Application",
@@ -215,10 +216,10 @@ export default {
     },
     methods: {
         impersonate() {
-            return this.$inertia.visit(route('impersonate.recruit', this.application.id))
+            return router.visit(route('impersonate.recruit', this.application.id))
         },
         submit() {
-            return this.$inertia.post(route('review.application', this.application.id), this.form);
+            return router.post(route('review.application', this.application.id), this.form);
         }
     }
 }

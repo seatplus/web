@@ -12,13 +12,15 @@
 
 <script>
 
+  import { router } from "@inertiajs/vue3";
+
   export default {
     name: "Commands",
 
     methods: {
 
       clearCache() {
-        this.$inertia.post(route('cache.clear')).
+        router.post(route('cache.clear')).
         catch(function (error) {
           console.log(error)
         })

@@ -217,7 +217,7 @@ import Manual from "./AclTypes/Manual.vue"
 import AutomaticRole from "./AclTypes/AutomaticRole.vue"
 import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup.vue"
 import OptInControlGroup from "./AclTypes/OptInControlGroup.vue"
-import {useForm} from "@inertiajs/inertia-vue3/src";
+import { router, useForm } from "@inertiajs/vue3";
 
 export default {
     name      : "ManageControlGroup",
@@ -290,7 +290,7 @@ export default {
 
             this.form.post(route('update.acl.affiliations', this.role.id),{
                 onSuccess: () => {
-                    this.$inertia.reload({
+                    router.reload({
                         preserveState: false
                     })
                 }

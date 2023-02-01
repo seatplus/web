@@ -285,7 +285,7 @@ import {
     TransitionChild,
     TransitionRoot
 } from '@headlessui/vue'
-import {usePage, Link } from "@inertiajs/inertia-vue3";
+import {usePage, Link } from "@inertiajs/vue3";
 import ImpersonatingBanner from "./ImpersonatingBanner.vue";
 import Notifications from "../Notifications/Notifications.vue";
 import EveImage from "@/Shared/EveImage.vue"
@@ -299,14 +299,14 @@ import EveImage from "@/Shared/EveImage.vue"
 
   const sidebarOpen = ref(false)
 
-  const logo = usePage().props.value.images.logo
-  const main = _.get(usePage().props.value.user, 'data.main_character')
+  const logo = usePage().props.images.logo
+  const main = _.get(usePage().props.user, 'data.main_character')
   const component = usePage().component
   const navigation = ref([])
 
   const buildNavigation = function () {
 
-      const sidebar = usePage().props.value.sidebar
+      const sidebar = usePage().props.sidebar
 
       return _.map(sidebar, (category) => {
 

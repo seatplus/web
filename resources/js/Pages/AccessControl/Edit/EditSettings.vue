@@ -207,7 +207,7 @@ import SimpleToggle from "@/Shared/SimpleToggle.vue";
 import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
 import {TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from '@heroicons/vue/20/solid';
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from '@inertiajs/vue3';
 
 export default {
     name: "EditSettings",

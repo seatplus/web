@@ -83,7 +83,7 @@ export default {
 <script setup>
 
 import { computed } from "vue";
-import { Link } from "@inertiajs/inertia-vue3";
+import { Link } from '@inertiajs/vue3';
 import OnboardingEnlistment from "@/Pages/Onboarding/OnboardingEnlistment.vue";
 import Introduction from "@/Pages/Onboarding/Introduction.vue";
 import AddCharacters from "@/Pages/Onboarding/AddCharacters.vue";

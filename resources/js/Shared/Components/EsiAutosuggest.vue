@@ -101,7 +101,7 @@
 
 <script setup>
 import {CheckIcon, ExclamationTriangleIcon} from '@heroicons/vue/20/solid';
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3';
 import {
     Listbox,
     ListboxOptions,

@@ -89,8 +89,8 @@
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
 import EditSettings from "./Edit/EditSettings.vue";
-import {useForm} from "@inertiajs/inertia-vue3/src";
-import {ref} from "vue";
+import { ref } from "vue";
+import { router, useForm } from "@inertiajs/vue3";
 
 export default {
     name: "EditGroup",
@@ -142,7 +142,7 @@ export default {
 
         const remove = function () {
 
-            this.$inertia.delete(route('acl.delete', props.role.id), {
+            router.delete(route('acl.delete', props.role.id), {
                 replace: false,
                 preserveState: false,
                 preserveScroll: false,

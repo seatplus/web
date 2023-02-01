@@ -76,6 +76,7 @@ import EnlistmentConfig from "./EnlistmentConfig.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import ItemsWatchlist from "./ItemsWatchlist.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import {router, useForm} from "@inertiajs/vue3";
 
 export default {
     name: "Index",
@@ -98,7 +99,7 @@ export default {
                     route: route('corporation.recruitment')
                 }
             ],
-            form: this.$inertia.form({
+            form: useForm({
                 systems: this.watched.systems,
                 regions: this.watched.regions
             }),
@@ -106,7 +107,7 @@ export default {
     },
     methods: {
         submit() {
-            this.$inertia.post(route('update.watchlist', this.corporationId), this.form)
+          router.post(route('update.watchlist', this.corporationId), this.form)
         }
     }
 }

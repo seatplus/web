@@ -49,8 +49,7 @@
 <script>
 import EveImage from "@/Shared/EveImage.vue"
 import {computed, ref} from "vue";
-import {usePage} from "@inertiajs/inertia-vue3";
-import { Inertia } from '@inertiajs/inertia'
+import { router, usePage } from '@inertiajs/vue3'
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 
 export default {
@@ -70,7 +69,7 @@ export default {
 
         const applications = ref(props.applicationResults)
 
-        const ownedCharacters = computed(() => usePage().props.value.user.data.characters)
+        const ownedCharacters = computed(() => usePage().props.user.data.characters)
         const applicants = computed(() => {
 
             if(!hasApplications.value || props.enlistment.type !== 'character')
@@ -83,7 +82,7 @@ export default {
         
         const hasApplied = (character_id) =>  _.findIndex(applicants.value, {character_id: character_id}) > -1
 
-        const apply = (character_id) => Inertia.post(route('post.application'), {
+        const apply = (character_id) => router.post(route('post.application'), {
             corporation_id: props.enlistment.corporation_id,
             character_id: character_id
         }, {

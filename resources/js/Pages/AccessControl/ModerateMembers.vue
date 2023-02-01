@@ -142,6 +142,7 @@
     import AvatarGroupTopToBottom from "@/Shared/AvatarGroupTopToBottom.vue"
     import PageHeader from "@/Shared/Layout/PageHeader.vue";
     import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+    import {router} from "@inertiajs/vue3";
     export default {
         name: "ModerateMembers",
         components: {
@@ -174,7 +175,7 @@
                     role_id: this.role.id
                 };
 
-                this.$inertia.post(route('acl.join'), data, {
+                router.post(route('acl.join'), data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -183,7 +184,7 @@
             },
             removeMember(member) {
 
-                this.$inertia.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
+                router.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,

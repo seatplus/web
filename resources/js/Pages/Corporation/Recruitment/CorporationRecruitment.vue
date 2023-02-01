@@ -52,7 +52,7 @@
 
 <script>
 
-import {Link} from "@inertiajs/inertia-vue3";
+import { Link } from "@inertiajs/vue3";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import PendingTable from "./ApplicationsTable/PendingTable.vue";
