@@ -89,7 +89,7 @@
 <script>
 import Settings from "@/Pages/Configuration/Settings.vue"
 import WideListElement from "@/Shared/WideListElement.vue"
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3';
 export default {
     name: "SchedulesIndex",
     components: {Settings, WideListElement, Link},

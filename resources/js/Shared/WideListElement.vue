@@ -75,7 +75,8 @@
 </template>
 
 <script>
-import { Link } from '@inertiajs/inertia-vue3'
+import { Link } from '@inertiajs/vue3';
+import {router} from "@inertiajs/vue3";
 export default {
     name: "WideListElement",
     components: {Link},
@@ -85,18 +86,6 @@ export default {
             required: false,
             default: ''
         },
-    },
-    computed: {
-        hasUrl() {
-            return !!this.url;
-        }
-    },
-    methods: {
-        visit() {
-
-            if (this.url)
-                return this.$inertia.visit(this.url)
-        }
     }
 }
 </script>

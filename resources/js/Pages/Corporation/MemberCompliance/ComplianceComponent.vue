@@ -114,7 +114,6 @@ export default {
 
             return rawUsers.value
         })
-        //const canReview = computed(() => usePage().props.value.canReview)
 
         watch(search,(newValue) => {
             newValue.length >= 3 ? urlParams.value.search = newValue : delete urlParams.value.search

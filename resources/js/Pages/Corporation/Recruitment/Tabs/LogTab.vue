@@ -152,7 +152,7 @@ import { ChatBubbleBottomCenterTextIcon } from '@heroicons/vue/20/solid'
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time.vue";
-import {useForm, usePage} from "@inertiajs/inertia-vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 
 export default {
     name: "LogTab",
@@ -210,7 +210,7 @@ export default {
 
             return activity
         })
-        const user = usePage().props.value.user.data
+        const user = usePage().props.user.data
 
         return {
             activity,
