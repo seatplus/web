@@ -115,5 +115,11 @@ return [
             'route' => 'manage.manual_locations',
             'icon' => 'MapIcon',
         ],
+        [
+            'name'  => 'Server Performance',
+            'permission' => 'superuser',
+            'route' => 'performance.index',
+            'icon' => 'FireIcon',
+        ],
     ],
 ];
