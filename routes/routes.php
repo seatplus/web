@@ -52,6 +52,7 @@ Route::middleware('web')
                         Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->group(function () {
                             include __DIR__ . '/Routes/Configuration/Schedules.php';
                         });
+                        include __DIR__ . '/Routes/Configuration/Performance.php';
                     });
 
                 Route::prefix('character')
