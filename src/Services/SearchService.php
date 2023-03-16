@@ -36,23 +36,21 @@ class SearchService
 {
     public function execute(RefreshToken $token, array $categories, string $term)
     {
-        $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v3',
-            'endpoint' => '/characters/{character_id}/search/',
-            'path_values' => [
+        $container = new EsiRequestContainer(
+            method: 'get',
+            version: 'v3',
+            endpoint: '/characters/{character_id}/search/',
+            refresh_token: $token,
+            path_values: [
                 'character_id' => $token->character_id,
             ],
-            'refresh_token' => $token,
-            'query_parameters' => [
+            query_parameters: [
                 'categories' => implode(',', $categories),
                 'search' => $term,
-            ],
-        ]);
+            ]
+        );
 
         return RetrieveEsiData::execute($container);
-
-        return count($categories) === 1 ? ($result->$categories[0] ?? []) : collect($result)->toArray();
     }
 
     public static function getTokenFromCurrentUser(): ?RefreshToken

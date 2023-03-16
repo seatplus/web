@@ -55,12 +55,12 @@ class GetNamesFromIdsService
             return $this->result;
         }
 
-        $container = new EsiRequestContainer([
-            'method' => 'post',
-            'version' => 'v3',
-            'endpoint' => '/universe/names/',
-            'request_body' => [...$ids_to_resolve->toArray()],
-        ]);
+        $container = new EsiRequestContainer(
+            method: 'post',
+            version: 'v3',
+            endpoint: '/universe/names/',
+            request_body: [...$ids_to_resolve->toArray()],
+        );
 
         $esi_results = RetrieveEsiData::execute($container);
 

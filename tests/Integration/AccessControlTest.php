@@ -7,6 +7,8 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
+uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
+
 it('has control groups', function () {
     assignPermissionToTestUser(['view access control']);
 

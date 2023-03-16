@@ -11,6 +11,8 @@ use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
+uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
+
 it('stores resolved id to cache', function () {
     $id = test()->test_character->character_id;
 
@@ -187,11 +189,11 @@ test('one can get resource variants via http and cache', function () {
 });
 
 test('one can get market prices', function () {
-    $container = new EsiRequestContainer([
-        'method' => 'get',
-        'version' => 'v1',
-        'endpoint' => '/markets/prices/',
-    ]);
+    $container = new EsiRequestContainer(
+        method: 'get',
+        version: 'v1',
+        endpoint: '/markets/prices/',
+    );
 
     test()->mockRetrieveEsiDataAction([
         (object) [

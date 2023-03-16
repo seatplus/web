@@ -31,9 +31,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
-use Seatplus\Eveapi\Containers\JobContainer;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
+use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\DispatchIndividualJob;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
@@ -42,26 +42,29 @@ class DispatchJobController extends Controller
 {
     protected array $dispatch_transfer_object;
 
+    public function __construct(
+        private WebJobsRepository $web_jobs
+    )
+    {
+    }
+
     public function dispatch(DispatchIndividualJob $job)
     {
         $this->dispatch_transfer_object = $job->get('dispatch_transfer_object');
 
         $id = $job->get('character_id') ?? $job->get('corporation_id');
+        $manual_job = Arr::get($this->dispatch_transfer_object, 'manual_job');
 
-        $cache_key = $this->getCacheKey(Arr::get($this->dispatch_transfer_object, 'manual_job'), $id);
+        $cache_key = "${manual_job}:${id}";
 
         if (cache($cache_key)) {
             return redirect()->back()->with('error', 'job was already queued');
         }
 
-        $hydrate_job_string = config('web.jobs.' . Arr::get($this->dispatch_transfer_object, 'manual_job'));
-        $job_container = new JobContainer(['refresh_token' => $this->getRefreshToken($job)]);
-
-        $hydrate_job = new $hydrate_job_string($job_container);
         $batch_name = sprintf('Manual batch update of %s', $cache_key);
 
         $batch_id = (new ManualDispatchedJob)
-            ->setJobs([$hydrate_job])
+            ->setJobs($this->web_jobs->getConstructedJobs($manual_job, $this->getRefreshToken($job)))
             ->setName($batch_name)
             ->handle();
 
