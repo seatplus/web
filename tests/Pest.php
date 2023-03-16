@@ -19,7 +19,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 /** @link https://pestphp.com/docs/underlying-test-case */
 uses(TestCase::class)->in('Integration', 'Unit');
-//uses(TestCase::class)->in('Unit');
+//uses(TestCase::class);
 
 /*
 |--------------------------------------------------------------------------

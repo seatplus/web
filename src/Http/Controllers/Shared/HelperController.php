@@ -163,11 +163,11 @@ class HelperController extends Controller
             return $prices->toJson();
         }
 
-        $container = new EsiRequestContainer([
-            'method' => 'get',
-            'version' => 'v1',
-            'endpoint' => '/markets/prices/',
-        ]);
+        $container = new EsiRequestContainer(
+            method: 'get',
+            version: 'v1',
+            endpoint: '/markets/prices/',
+        );
 
         $esi_results = RetrieveEsiData::execute($container);
 

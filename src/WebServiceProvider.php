@@ -33,6 +33,7 @@ use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
 use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
 use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
+use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\CheckACLPermission;
@@ -82,6 +83,7 @@ class WebServiceProvider extends ServiceProvider
         $this->mergeConfigurations();
 
         $this->app->singleton(ExceptionHandler::class, Handler::class);
+        $this->app->singleton(WebJobsRepository::class);
     }
 
     private function addPublications()
