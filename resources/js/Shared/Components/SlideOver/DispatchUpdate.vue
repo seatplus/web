@@ -23,14 +23,6 @@ import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 export default {
     name: "DispatchUpdate",
     components: {InfiniteLoadingHelper, DispatchableEntry},
-    data: function () {
-        return {
-            //job_name: this.$page.props.dispatch_transfer_object.manual_job,
-            //dispatch_transfer_object: this.$page.props.dispatch_transfer_object,
-            entities: [],
-            infiniteId: new Date()
-        }
-    },
     computed: {
         dispatch_transfer_object() {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
@@ -38,13 +30,6 @@ export default {
         job_name() {
             return _.get(this.dispatch_transfer_object, 'manual_job')
         }
-    },
-    created() {
-
-        /*if(!this.dispatch_transfer_object)
-            this.dispatch_transfer_object = this.$page.props.dispatchTransferObject*/
-
-        this.getEntities();
     },
     methods: {
         dispatchJob(entity) {
@@ -58,14 +43,7 @@ export default {
             }), {
                 dispatch_transfer_object: this.dispatch_transfer_object
             })
-
-            setTimeout(() => this.getEntities(), 100)
-
         }
     }
 }
 </script>
-
-<style scoped>
-
-</style>
