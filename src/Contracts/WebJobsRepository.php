@@ -2,7 +2,6 @@
 
 namespace Seatplus\Web\Contracts;
 
-
 use Seatplus\Eveapi\Jobs\Assets\CharacterAssetJob;
 use Seatplus\Eveapi\Jobs\Assets\CharacterAssetsNameJob;
 use Seatplus\Eveapi\Jobs\Contacts\AllianceContactJob;
@@ -30,19 +29,17 @@ class WebJobsRepository
     {
         $this->jobs = [
             // Character
-            'contacts' =>  fn(RefreshToken $refresh_token) => $this->getContactJobs($refresh_token),
-            'assets' => fn(RefreshToken $refresh_token) => $this->getAssetJobs($refresh_token),
-            'wallet' => fn(RefreshToken $refresh_token) => $this->getWalletJobs($refresh_token),
-            'contract' => fn(RefreshToken $refresh_token) => $this->getContractJobs($refresh_token),
-            'skills' => fn(RefreshToken $refresh_token) => $this->getSkillsJobs($refresh_token),
-            'mails' => fn(RefreshToken $refresh_token) => $this->getMailsJobs($refresh_token),
+            'contacts' => fn (RefreshToken $refresh_token) => $this->getContactJobs($refresh_token),
+            'assets' => fn (RefreshToken $refresh_token) => $this->getAssetJobs($refresh_token),
+            'wallet' => fn (RefreshToken $refresh_token) => $this->getWalletJobs($refresh_token),
+            'contract' => fn (RefreshToken $refresh_token) => $this->getContractJobs($refresh_token),
+            'skills' => fn (RefreshToken $refresh_token) => $this->getSkillsJobs($refresh_token),
+            'mails' => fn (RefreshToken $refresh_token) => $this->getMailsJobs($refresh_token),
             // Corporation
-            'corporation.wallet' => fn(RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
-            'membertracking' => fn(RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
+            'corporation.wallet' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
+            'membertracking' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
         ];
     }
-
-
 
     public function addJob(string $key, \Closure $build_function): void
     {
@@ -66,7 +63,6 @@ class WebJobsRepository
 
     private function getContactJobs(RefreshToken $refresh_token): array
     {
-
         $jobs = [];
 
         // if refresh token has scope for reading contacts add the job to the jobs array
@@ -81,7 +77,7 @@ class WebJobsRepository
         if ($refresh_token->hasScope('esi-corporations.read_contacts.v1')) {
             $jobs[] = [
                 new CorporationContactJob($refresh_token->character_id),
-                new CorporationContactLabelJob($refresh_token->character_id)
+                new CorporationContactLabelJob($refresh_token->character_id),
             ];
         }
 
@@ -89,7 +85,7 @@ class WebJobsRepository
         if ($refresh_token->hasScope('esi-alliances.read_contacts.v1')) {
             $jobs[] = [
                 new AllianceContactJob($refresh_token->character_id),
-                new AllianceContactLabelJob($refresh_token->character_id)
+                new AllianceContactLabelJob($refresh_token->character_id),
             ];
         }
 
@@ -117,7 +113,7 @@ class WebJobsRepository
         return [
             new CharacterWalletJournalJob($refresh_token->character_id),
             new CharacterWalletTransactionJob($refresh_token->character_id),
-            new CharacterBalanceJob($refresh_token->character_id)
+            new CharacterBalanceJob($refresh_token->character_id),
         ];
     }
 
@@ -162,7 +158,7 @@ class WebJobsRepository
 
         return [
             new CorporationWalletJournalJob($refresh_token->corporation_id),
-            new CorporationBalanceJob($refresh_token->corporation_id)
+            new CorporationBalanceJob($refresh_token->corporation_id),
         ];
     }
 

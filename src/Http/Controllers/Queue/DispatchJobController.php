@@ -44,8 +44,7 @@ class DispatchJobController extends Controller
 
     public function __construct(
         private WebJobsRepository $web_jobs
-    )
-    {
+    ) {
     }
 
     public function dispatch(DispatchIndividualJob $job)
