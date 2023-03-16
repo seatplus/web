@@ -38,6 +38,5 @@ class DispatchCorporationOrAllianceInfoJob
             AllianceInfo::class => AllianceInfoJob::dispatchSync($id),
             default => CorporationInfoJob::dispatchSync($id),
         };
-
     }
 }
