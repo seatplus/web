@@ -3,7 +3,6 @@
     v-slot="{results}"
     route-name="get.mail.headers"
     :params="{character_ids: characterIds}"
-    @result="assignResult"
   >
     <ul class="divide-y divide-gray-200">
       <Disclosure
