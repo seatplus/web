@@ -36,7 +36,7 @@ class GetCharacterAffiliations
     {
         $character_affiliation_container = new EsiRequestContainer(
             method: 'post',
-            version: 'v1',
+            version: 'v2',
             endpoint: '/characters/affiliation/',
             request_body: $character_ids,
         );
