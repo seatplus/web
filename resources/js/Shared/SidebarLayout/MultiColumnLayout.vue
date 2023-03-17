@@ -21,21 +21,15 @@
   </DarkSidebar>
 </template>
 
-<script>
+<script setup>
 import DarkSidebar from "./DarkSidebar.vue";
-export default {
-    name: "MultiColumnLayout",
-    components: {DarkSidebar},
-    props: {
-        hideOnSmallerScreens: {
-            required: false,
-            type: Boolean,
-            default: () => true
-        }
-    }
-}
+
+defineProps({
+  hideOnSmallerScreens: {
+    required: false,
+    type: Boolean,
+    default: () => true
+  }
+});
 </script>
 
-<style scoped>
-
-</style>
