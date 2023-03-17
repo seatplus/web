@@ -11,7 +11,7 @@ class PerformanceController extends Controller
     public function index()
     {
         return inertia('Configuration/Performance/Overview', [
-            'data' => Inertia::lazy(fn () => BatchStatistic::paginate(50)),
+            'data' => Inertia::lazy(fn () => BatchStatistic::query()->orderBy('finished_at','desc')->paginate(50)),
         ]);
     }
 }

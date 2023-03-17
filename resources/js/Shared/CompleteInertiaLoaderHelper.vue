@@ -26,13 +26,13 @@
           loading resource
         </span>
   </div>
-  <slot v-if="data.length > 0" :data="data" />
+  <slot v-if="is_complete" :data="data" />
 </template>
 
 <script setup>
 
 import {onMounted, onUnmounted, ref} from "vue";
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 
 const data = ref([])
 const is_complete = ref(false)
@@ -67,7 +67,7 @@ function loadMore() {
     return
   }
 
-  router.visit(props.href, {
+  router.visit(next_page_url.value, {
     method: props.method,
     preserveState: true,
     preserveScroll: true,
@@ -77,6 +77,7 @@ function loadMore() {
     },
     onSuccess: (page) => {
       data.value = data.value.concat(page.props[props.only].data)
+      window.history.replaceState({}, usePage().props.title, initialUrl)
       next_page_url.value = page.props[props.only].next_page_url
       is_complete.value = !next_page_url.value
 
