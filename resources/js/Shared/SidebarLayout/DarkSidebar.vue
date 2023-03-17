@@ -293,7 +293,8 @@ import EveImage from "@/Shared/EveImage.vue"
   const props = defineProps({
       activeSidebarElement: {
           type: String,
-          required: true
+          required: false,
+          default: () => route().current()
       },
   })
 
