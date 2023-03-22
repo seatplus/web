@@ -65,7 +65,7 @@ it('has list affiliated character list route', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.affiliated.characters', [
             'permission' => 'assets',
-            'search' => substr(test()->test_character->name, 5),
+            'search' => substr((string) test()->test_character->name, 5),
         ]));
     //->assertOk();
 

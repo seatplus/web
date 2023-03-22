@@ -43,7 +43,7 @@ class DispatchJobController extends Controller
     protected array $dispatch_transfer_object;
 
     public function __construct(
-        private WebJobsRepository $web_jobs
+        private readonly WebJobsRepository $web_jobs
     ) {
     }
 

@@ -35,7 +35,7 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
-    private array $sidebar;
+    private readonly array $sidebar;
 
     public function __construct(
         private ?User $user = null

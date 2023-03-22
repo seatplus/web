@@ -103,7 +103,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                 ->has(
                     'data.0',
                     fn (AssertableJson $json) =>
-                    $json->where('corporation_standing', json_decode(json_encode($corp_standing, JSON_THROW_ON_ERROR), null, 512, JSON_THROW_ON_ERROR))
+                    $json->where('corporation_standing', json_decode(json_encode($corp_standing, JSON_NUMERIC_CHECK), null, 512, JSON_NUMERIC_CHECK))
                     ->etc()
                 )
                 ->etc()

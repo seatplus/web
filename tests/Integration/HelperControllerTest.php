@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use function Pest\Laravel\get;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -98,9 +99,10 @@ test('one can search existing systems', function () {
 
     System::factory()->count(4)->create();
 
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
-        ->assertInvalid(['search' => 'The search must be at least 3 characters.']);
+    test()->actingAs(test()->test_user);
+
+    get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
+        ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
 
     RetrieveEsiData::shouldReceive('execute')
         ->twice()

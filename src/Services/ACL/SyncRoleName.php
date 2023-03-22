@@ -33,7 +33,7 @@ class SyncRoleName
     /**
      * SyncRoleName constructor.
      */
-    public function __construct(private Role $role)
+    public function __construct(private readonly Role $role)
     {
     }
 

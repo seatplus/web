@@ -59,7 +59,7 @@ class GetRefTypesAction
 
     private function alphabetToNumber($string): float
     {
-        $string = strtoupper($string);
+        $string = strtoupper((string) $string);
         $length = strlen($string);
         $number = 0;
         $level = 1;

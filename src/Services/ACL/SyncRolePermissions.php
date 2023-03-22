@@ -33,14 +33,14 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SyncRolePermissions
 {
-    private \Illuminate\Support\Collection $current_permissions;
+    private readonly \Illuminate\Support\Collection $current_permissions;
 
-    private \Illuminate\Support\Collection $target_permissions;
+    private readonly \Illuminate\Support\Collection $target_permissions;
 
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-        private Role $role
+        private readonly Role $role
     ) {
         $this->current_permissions = $role->permissions()->pluck('name');
         $this->target_permissions = collect();
