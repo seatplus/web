@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use function Pest\Laravel\get;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -10,7 +11,6 @@ use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use function Pest\Laravel\get;
 
 uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
 
