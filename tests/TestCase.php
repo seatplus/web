@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\ServiceProvider as InertiaServiceProviderAlias;
 use Laravel\Horizon\HorizonServiceProvider;
@@ -17,6 +18,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Middleware\Authenticate;
+use Seatplus\Web\Models\Asset\Asset;
 use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
@@ -37,7 +39,11 @@ abstract class TestCase extends OrchestraTestCase
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Seatplus\\Web\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => match (true) {
+                Str::startsWith($modelName, 'Seatplus\Auth') => 'Seatplus\\Auth\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+                Str::startsWith($modelName, 'Seatplus\Eveapi'), Asset::class === $modelName => 'Seatplus\\Eveapi\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+                Str::startsWith($modelName, 'Seatplus\Web') => 'Seatplus\\Web\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            }
         );
 
         //Setup Inertia Root View

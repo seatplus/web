@@ -10,6 +10,7 @@ use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use function Pest\Laravel\get;
 
 uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
 
@@ -98,9 +99,10 @@ test('one can search existing systems', function () {
 
     System::factory()->count(4)->create();
 
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
-        ->assertInvalid(['search' => 'The search must be at least 3 characters.']);
+    test()->actingAs(test()->test_user);
+
+    get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
+        ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
 
     RetrieveEsiData::shouldReceive('execute')
         ->twice()
