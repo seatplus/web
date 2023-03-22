@@ -42,7 +42,7 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
 class CreateDispatchTransferObject
 {
-    private array $transferObjectArray;
+    private readonly array $transferObjectArray;
 
     private bool $isCharacter = true;
 

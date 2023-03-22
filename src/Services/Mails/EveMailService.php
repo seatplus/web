@@ -34,9 +34,9 @@ use Seatplus\Web\Services\GetIdsFromNamesService;
 
 class EveMailService
 {
-    private Collection $namesToResolve;
+    private readonly Collection $namesToResolve;
 
-    public function __construct(private Mail $mail)
+    public function __construct(private readonly Mail $mail)
     {
         $this->namesToResolve = collect();
     }

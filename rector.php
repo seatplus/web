@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
+use Rector\Php81\Rector\Array_\FirstClassCallableRector;
 use Rector\Set\ValueObject\SetList;
 use RectorLaravel\Set\LaravelSetList;
 
@@ -24,7 +25,11 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->phpVersion(PhpVersion::PHP_81);
 
     $rectorConfig->skip([
-        RemoveExtraParametersRector::class => [ __DIR__ . '/src/Services/SsoSettings/UpdateOrCreateSsoSettings.php']
+        RemoveExtraParametersRector::class => [ __DIR__ . '/src/Services/SsoSettings/UpdateOrCreateSsoSettings.php'],
+        FirstClassCallableRector::class => [
+            __DIR__ . '/src/Http/Controllers/AccessControl/ControlGroupsController.php',
+            __DIR__ . '/src/Http/Controllers/Shared/ManualLocationController.php',
+    ]
     ]);
 
     // register single rule

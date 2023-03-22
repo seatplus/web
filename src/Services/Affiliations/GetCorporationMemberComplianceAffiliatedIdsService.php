@@ -11,7 +11,7 @@ use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 class GetCorporationMemberComplianceAffiliatedIdsService
 {
     public function __construct(
-        private AffiliationsDto $affiliationsDto
+        private readonly AffiliationsDto $affiliationsDto
     ) {
     }
 

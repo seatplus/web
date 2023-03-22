@@ -41,12 +41,12 @@ class UpdateOrCreateSsoSettings
      */
     private Collection $selected_scopes;
 
-    private Collection $entities;
+    private readonly Collection $entities;
 
-    private string $type;
+    private readonly string $type;
 
     public function __construct(
-        private array $request
+        private readonly array $request
     ) {
         $this->buildSelectedScopes();
 
@@ -90,7 +90,7 @@ class UpdateOrCreateSsoSettings
         $this->selected_scopes = collect();
 
         collect(Arr::get($this->request, 'selectedScopes'))
-            ->flatMap(fn ($scope) => explode(',', $scope))
+            ->flatMap(fn ($scope) => explode(',', (string) $scope))
             ->each(function ($scope) {
                 // If it is a corporation scope, we need to know the characters role
                 if (Str::of($scope)->contains('corporation')) {

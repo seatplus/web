@@ -37,12 +37,12 @@ class SyncRoleAffiliations
 {
     private $current_affiliations;
 
-    private \Illuminate\Support\Collection $target_affiliations;
+    private readonly \Illuminate\Support\Collection $target_affiliations;
 
     public function __construct(/**
      * @var \Seatplus\Auth\Models\Permissions\Role
      */
-        private Role $role
+        private readonly Role $role
     ) {
         $this->current_affiliations = $role->affiliations;
         $this->target_affiliations = collect();

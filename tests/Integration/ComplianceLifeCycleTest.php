@@ -89,7 +89,7 @@ it('is possible to search for a character', function () {
         ->getJson(route('corporation.compliance', [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
             'type' => 'default',
-            'search' => substr(test()->secondary_character->name, 5),
+            'search' => substr((string) test()->secondary_character->name, 5),
         ]))
         ->assertOk();
 

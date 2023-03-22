@@ -9,7 +9,7 @@ it('has journalType autosuggest endpoint', function () {
     assignPermissionToTestUser('superuser');
 
     test()->actingAs(test()->test_user)
-        ->get(route('wallet.journalTypes', ['search' => substr($journal->ref_type, 0, -5)]))
+        ->get(route('wallet.journalTypes', ['search' => substr((string) $journal->ref_type, 0, -5)]))
         ->assertJson(
             fn (AssertableJson $json) => $json
             ->has(1)

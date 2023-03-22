@@ -33,13 +33,13 @@ class GetEntityFromId
 {
     private string $type;
 
-    private Collection $names;
+    private readonly Collection $names;
 
-    private GetNamesFromIdsService $get_names_from_ids_service;
+    private readonly GetNamesFromIdsService $get_names_from_ids_service;
 
-    private string $cache_key;
+    private readonly string $cache_key;
 
-    private ?array $cached_affiliation;
+    private readonly ?array $cached_affiliation;
 
     public function __construct(public int $id)
     {

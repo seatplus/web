@@ -32,7 +32,7 @@ use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class GetNamesFromIdsService
 {
-    private Collection $result;
+    private readonly Collection $result;
 
     public function __construct()
     {
