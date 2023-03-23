@@ -103,7 +103,13 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                 ->has(
                     'data.0',
                     fn (AssertableJson $json) =>
-                    $json->where('corporation_standing', json_decode(json_encode($corp_standing, JSON_NUMERIC_CHECK), null, 512, JSON_NUMERIC_CHECK))
+                    // Here we have a problem. The $corp_standing is a float, but in the json it is a string.
+                    // the json_encode is storing decimal values as string.
+                    // The json_decode is not converting the string to a float if the value is not decimal, but an integer.
+                    // hence we convert the value and the expected value to a string with fix precision and compare them.
+                    $json->where('corporation_standing', fn ($standing) => number_format($standing, 2) === number_format($corp_standing, 2))
+                        ->where('standing', fn ($standing) => number_format($standing, 2) === number_format(10, 2))
+                        ->etc()
                     ->etc()
                 )
                 ->etc()
