@@ -36,9 +36,6 @@ class ControlGroupUpdateData
         public ?array $affiliations = null,
         public ?array $members = null,
         public ?array $moderators = null,
-    )
-    {
+    ) {
     }
-
-
 }
