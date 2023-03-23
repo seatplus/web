@@ -52,7 +52,7 @@
 
 <script>
     import Pagination from "@/Shared/Pagination.vue"
-    import {Inertia} from "@inertiajs/inertia"
+    import { router } from '@inertiajs/vue3'
     import Settings from "./Settings.vue"
     import UserListElement from "./UserListElement.vue";
 
@@ -90,7 +90,7 @@
 
                 let url_name = route().current()
 
-                Inertia.visit(route(url_name, params), {
+                router.visit(route(url_name, params), {
                     preserveScroll: true,
                     preserveState: true,
                     only: ['users'],

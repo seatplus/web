@@ -55,6 +55,7 @@ import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.v
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
+import { useForm } from "@inertiajs/vue3";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime)
@@ -73,7 +74,7 @@ export default {
     },
     data() {
         return {
-            form: this.$inertia.form({
+            form: useForm({
                 id: null,
                 location_id: this.location.location_id
             })

@@ -104,7 +104,7 @@
   import { prefix } from 'metric-prefix'
   import WideListElement from "@/Shared//WideListElement.vue";
   import CompactAssetListComponent from "./CompactAssetListComponent.vue";
-  import { Link } from '@inertiajs/inertia-vue3'
+  import { Link } from '@inertiajs/vue3';
 
   export default {
     name: "ItemList",

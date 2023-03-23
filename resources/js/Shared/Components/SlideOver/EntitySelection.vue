@@ -24,6 +24,7 @@
 import SelectionEntity from "./SelectionEntity.vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import {computed, ref, watch} from "vue";
+import {router} from "@inertiajs/vue3";
 
 export default {
     name: "EntitySelection",
@@ -91,11 +92,11 @@ export default {
         let routeName = route().current()
 
         if(_.isEmpty(this.selected_ids))
-            return this.$inertia.get(route(routeName))
+            return router.get(route(routeName))
 
         let queryParameter = this.type === 'character' ? { character_ids: this.selected_ids } : {corporation_ids: this.selected_ids}
 
-        this.$inertia.get(route(routeName, {_query: queryParameter}))
+        router.get(route(routeName, {_query: queryParameter}))
     },
 }
 </script>

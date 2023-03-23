@@ -84,7 +84,6 @@ export default {
         }))
 
         const compliantCharacters = computed(() => _.filter(characters.value, (character) => character.missing_scopes.length === 0))
-        //const canReview = computed(() => usePage().props.value.canReview)
 
         return {
             characters,

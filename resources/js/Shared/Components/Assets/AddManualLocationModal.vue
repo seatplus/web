@@ -107,6 +107,7 @@
 <script>
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
+import {useForm} from "@inertiajs/vue3";
 
 export default {
     name: "AddManualLocationModal",
@@ -128,24 +129,11 @@ emits: ['update:modelValue'],
             query: '',
             suggestions: [],
             showSuggestions: false,
-            form: this.$inertia.form({
+            form: useForm({
                 name: '',
                 solar_system_id: null,
             })
         }
-    },
-    computed: {
-        /*filteredSuggestions() {
-            return [
-                {
-                    data: this.suggestions.filter(item => {
-                        return (
-                            item.name.toLowerCase().indexOf(this.query.toLowerCase()) > -1
-                        );
-                    })
-                }
-            ];
-        }*/
     },
     watch: {
       modelValue(newVal) {
