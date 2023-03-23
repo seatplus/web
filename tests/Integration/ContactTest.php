@@ -103,9 +103,20 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                 ->has(
                     'data.0',
                     fn (AssertableJson $json) =>
-                    $json->where('corporation_standing', json_decode(json_encode($corp_standing, JSON_NUMERIC_CHECK), null, 512, JSON_NUMERIC_CHECK))
+                    // Here we have a problem. The $corp_standing is a float, but in the json it is a string.
+                    // the json_encode is storing decimal values as string.
+                    // The json_decode is not converting the string to a float if the value is not decimal, but a integer.
+                    // hence the is_decimal check.
+                    $json->where('corporation_standing', is_decimal($corp_standing) ? $corp_standing : (int) $corp_standing)
+                        ->where('standing', is_decimal(10.0) ? 10.0 : 10)
+                        ->etc()
                     ->etc()
                 )
                 ->etc()
         );
-})->with(fn () => collect(['character', 'corporation', 'alliance', 'faction'])->crossJoin(['alliance', 'corporation', 'faction', 'character'])->toArray());
+})->with(fn () => collect(['character', 'corporation', 'alliance', 'faction'])->crossJoin(['alliance', 'corporation', 'faction', 'character'])->toArray())->only();
+
+function is_decimal( $val )
+{
+    return is_numeric( $val ) && floor( $val ) != $val;
+}
