@@ -27,17 +27,18 @@
 namespace Seatplus\Web\Container;
 
 use Seatplus\Auth\Models\Permissions\Role;
-use Spatie\DataTransferObject\DataTransferObject;
 
-class ControlGroupUpdateData extends DataTransferObject
+class ControlGroupUpdateData
 {
-    public Role $role;
+    public function __construct(
+        public Role $role,
+        public string $role_type,
+        public ?array $affiliations = null,
+        public ?array $members = null,
+        public ?array $moderators = null,
+    )
+    {
+    }
 
-    public string $role_type;
 
-    public ?array $affiliations = null;
-
-    public ?array $members = null;
-
-    public ?array $moderators = null;
 }
