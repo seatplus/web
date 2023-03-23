@@ -114,9 +114,4 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                 )
                 ->etc()
         );
-})->with(fn () => collect(['character', 'corporation', 'alliance', 'faction'])->crossJoin(['alliance', 'corporation', 'faction', 'character'])->toArray())->only();
-
-function is_decimal($val)
-{
-    return is_numeric($val) && floor($val) != $val;
-}
+})->with(fn () => collect(['character', 'corporation', 'alliance', 'faction'])->crossJoin(['alliance', 'corporation', 'faction', 'character'])->toArray());
