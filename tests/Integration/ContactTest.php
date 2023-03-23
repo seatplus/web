@@ -107,8 +107,8 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                     // the json_encode is storing decimal values as string.
                     // The json_decode is not converting the string to a float if the value is not decimal, but an integer.
                     // hence we convert the value and the expected value to a string with fix precision and compare them.
-                    $json->where('corporation_standing', fn($standing) => number_format($standing,2) === number_format($corp_standing,2))
-                        ->where('standing', fn($standing) => number_format($standing,2) === number_format(10,2))
+                    $json->where('corporation_standing', fn ($standing) => number_format($standing, 2) === number_format($corp_standing, 2))
+                        ->where('standing', fn ($standing) => number_format($standing, 2) === number_format(10, 2))
                         ->etc()
                     ->etc()
                 )
