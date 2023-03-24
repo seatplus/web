@@ -112,7 +112,6 @@ abstract class TestCase extends OrchestraTestCase
      */
     protected function getEnvironmentSetUp($app) : void
     {
-
         config(['app.debug' => true]);
 
         $app['router']->aliasMiddleware('auth', Authenticate::class);
