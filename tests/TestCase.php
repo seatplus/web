@@ -52,10 +52,6 @@ abstract class TestCase extends OrchestraTestCase
         //Do not use the queue
         Queue::fake();
 
-        // setup database
-        $this->setupDatabase($this->app);
-
-        /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
         $this->test_user = Event::fakeFor(fn () => User::factory()->create());
 
         $this->test_character = $this->test_user->characters->first();
@@ -90,13 +86,13 @@ abstract class TestCase extends OrchestraTestCase
     }
 
     /**
-     * Get application providers.
+     * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
      *
-     * @return array
+     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             WebServiceProvider::class,
@@ -109,29 +105,14 @@ abstract class TestCase extends OrchestraTestCase
     }
 
     /**
-     * @param \Illuminate\Foundation\Application  $app
-     */
-    private function setupDatabase($app)
-    {
-        // Path to our migrations to load
-        //$this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->artisan('migrate');
-    }
-
-    /**
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app) : void
     {
-        // Use memory SQLite, cleans it self up
-        $app['config']->set('database.default', 'mysql');
-
-
         config(['app.debug' => true]);
-        config(['activitylog.table_name' => 'activity_log']);
 
         $app['router']->aliasMiddleware('auth', Authenticate::class);
 
