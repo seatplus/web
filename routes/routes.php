@@ -31,6 +31,10 @@ use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 
+Route::get('/', function () {
+    return redirect('home');
+});
+
 Route::middleware('web')
     ->group(function () {
         Route::middleware(['auth', CheckRequiredScopes::class, OnboardingMiddleware::class])
