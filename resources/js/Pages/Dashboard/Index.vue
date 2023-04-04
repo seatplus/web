@@ -8,12 +8,17 @@
       {{ pageTitle }}
     </PageHeader>
 
-    <Characters
-      :characters="characters"
-      class="mb-4"
-    />
+    <div class="divide-y">
+      <Characters
+        :characters="characters"
+        class="py-4"
+      />
 
-    <Enlistments :key="timestamp" />
+      <Enlistments
+        :key="timestamp"
+        class="py-4"
+      />
+    </div>
   </div>
 </template>
 

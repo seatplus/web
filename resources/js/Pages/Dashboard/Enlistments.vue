@@ -1,7 +1,7 @@
 <template>
   <div
-    v-show="enlistments"
-    class="pb-5 border-b border-gray-200 space-y-2"
+    v-show="enlistments.length > 0"
+    class="py-5 border-b border-gray-200 space-y-2"
   >
     <h3 class="text-lg leading-6 font-medium text-gray-900">
       Job Postings
@@ -21,23 +21,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import Enlistment from "./Enlistment.vue";
-export default {
-    name: "Enlistments",
-    components: {Enlistment},
-    setup() {
-        const completeResource = useLoadCompleteResource('list.open.enlistments')
 
-        const enlistments = computed(() => completeResource.results.value)
+const completeResource = useLoadCompleteResource('list.open.enlistments')
 
-        return {
-            enlistments
-        }
-    },
-}
+const enlistments = computed(() => completeResource.results.value)
+
 </script>
 
 <style scoped>
