@@ -38,11 +38,37 @@
   </RadioGroup>
 </template>
 
-<script>
+<script setup>
 import {ref, watch} from 'vue'
 import { RadioGroup, RadioGroupDescription, RadioGroupLabel, RadioGroupOption } from '@headlessui/vue'
+import {findIndex} from "lodash";
 
-export default {
+const props = defineProps({
+  options: {
+    type: Array,
+    default: () => [
+      {title: 'Title', description: 'description'},
+      {title: 'Title1', description: 'description'},
+      {title: 'Title2', description: 'description'}
+    ]
+  },
+  modelValue: {
+    type: Number,
+    default: 0
+  }
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const selected = ref(props.options[props.modelValue])
+
+watch(selected, (newValue) => {
+  // get the index of the selected option
+  // and emit it to the parent component
+  emit('update:modelValue', findIndex(props.options, newValue))
+})
+
+/*export default {
     name: "RadioListWithDescription",
     components: {
         RadioGroup,
@@ -50,38 +76,13 @@ export default {
         RadioGroupLabel,
         RadioGroupOption,
     },
-    props: {
-        options: {
-            type: Array,
-            default: () => [
-                {title: 'Title', description: 'description'},
-                {title: 'Title1', description: 'description'},
-                {title: 'Title2', description: 'description'}
-            ]
-        },
-        modelValue: {
-            type: Number,
-            default: 0
-        }
-    },
-    emits: ['update:modelValue'],
-    setup(props, {emit}) {
-        const selected = ref(props.options[props.modelValue])
 
-        watch(selected, (newValue) => {
-            emit('update:modelValue', props.options.indexOf(newValue))
-        })
-
-        return {
-            selected,
-        }
-    },
     watch: {
         active() {
             this.$emit('update:modelValue', this.id)
         }
     },
-}
+}*/
 </script>
 
 <style scoped>
