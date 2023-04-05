@@ -37,12 +37,22 @@ const reset = () => infiniteId.value++
 
 // create function groupSuggestions that will be called when the data is loaded
 const groupSuggestions = (suggestions) => {
-  return _.filter(_.map(_.groupBy(suggestions, 'location_id'), (value, prop) => (
+
+  // group the suggestions by location_id
+  let groupedSuggestions = _.groupBy(suggestions, 'location_id')
+
+  // map the grouped suggestions
+  let mappedSuggestions = _.map(groupedSuggestions, (value, prop) => (
       {
         location_id: _.toInteger(prop),
         data: value,
         selected: _.filter(value, 'selected')
       }
-  )), location => location.data.length > 1 || _.isEmpty(location.selected))
+  ))
+
+  // sort the mapped suggestions by selected where unselcted are first
+  // return the sorted suggestions
+  return _.sortBy(mappedSuggestions, 'selected')
+
 }
 </script>

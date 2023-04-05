@@ -56,7 +56,7 @@ import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {useForm} from "@inertiajs/vue3";
-import {computed} from "vue";
+import {computed, watchEffect} from "vue";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime)
@@ -75,6 +75,8 @@ const props = defineProps({
 const emit = defineEmits(['onSubmittedSuggestion'])
 
 const form = useForm({
+  // if location is already selected, preselect it by getting the index of the selected location inside the options
+  //id: props.location.selected.length > 0 ? _.findIndex(options.value, {id: props.location.selected[0].id}) : null,
   id: null,
   location_id: props.location.location_id
 })
@@ -104,6 +106,17 @@ const options = computed( () => {
       description: `Submitted by ${main_character} (${characters}) ${timeFromNow}`
     }
   })
+})
+
+// watch for changes in theoptions and update the form id if the selected location is already in the options
+watchEffect(() => {
+  if (props.location.selected.length > 0) {
+    const selected = _.head(props.location.selected)
+    const index = _.findIndex(options.value, {id: selected.id})
+
+    if (index > -1)
+      form.id = index
+  }
 })
 
 const currentSelected = computed(() =>  {

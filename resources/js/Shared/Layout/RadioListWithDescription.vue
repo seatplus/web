@@ -67,22 +67,6 @@ watch(selected, (newValue) => {
   // and emit it to the parent component
   emit('update:modelValue', findIndex(props.options, newValue))
 })
-
-/*export default {
-    name: "RadioListWithDescription",
-    components: {
-        RadioGroup,
-        RadioGroupDescription,
-        RadioGroupLabel,
-        RadioGroupOption,
-    },
-
-    watch: {
-        active() {
-            this.$emit('update:modelValue', this.id)
-        }
-    },
-}*/
 </script>
 
 <style scoped>
