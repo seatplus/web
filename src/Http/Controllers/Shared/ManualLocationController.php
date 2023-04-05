@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -39,7 +40,11 @@ class ManualLocationController extends Controller
 {
     public function index()
     {
-        return inertia('Configuration/ManualLocations/ManualLocation');
+        return inertia('Configuration/ManualLocations/ManualLocation', [
+            'data' => Inertia::lazy(
+                fn () => $this->getSuggestions(),
+            ),
+        ]);
     }
 
     public function getSuggestions()
@@ -73,7 +78,7 @@ class ManualLocationController extends Controller
 
         ManualLocation::where('location_id', $validated['location_id'])->where('id', '<>', $validated['id'])->delete();
 
-        return redirect()->action([self::class, 'index']);
+        return to_route('manage.manual_locations');
     }
 
     public function getLocation(int $location_id)

@@ -50,81 +50,84 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { useForm } from "@inertiajs/vue3";
+import {useForm} from "@inertiajs/vue3";
+import {computed, watchEffect} from "vue";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime)
-export default {
-    name: "ManualLocationComponent",
-    components: {RadioListWithDescription},
-    props: {
-        index: {
-            required: true,
-            type: Number
-        },
-        location: {
-            required: true,
-            type: Object
-        }
+
+const props = defineProps({
+    index: {
+        required: true,
+        type: Number
     },
-    data() {
-        return {
-            form: useForm({
-                id: null,
-                location_id: this.location.location_id
-            })
-        }
-    },
-    computed: {
-        options() {
-            return _.map(this.location.data, suggestion => {
-                let main_character = _.get(suggestion, 'user.main_character.name')
-                let characters = _.map(
-                    (main_character
-                            ? _.filter(_.get(suggestion, 'user.characters', []), character => character.name !== main_character)
-                            : _.get(suggestion, 'user.characters', [])
-                    ) , character => character.name).join(', ')
-                let timeFromNow = dayjs(suggestion.created_at).fromNow()
-
-                return {
-                    id: suggestion.id,
-                    title: _.get(suggestion, 'system.name', '?') + ' - ' + suggestion.name,
-                    description: `Submitted by ${main_character} (${characters}) ${timeFromNow}`
-                }
-            })
-        },
-        currentSelected() {
-            const current = _.head(_.filter(this.location.data, 'selected'))
-
-            if (_.isUndefined(current))
-                return `Unknown (${this.form.location_id})`
-
-            let current_system = _.get(current, 'system.name', '?');
-
-            return `${current_system} - ${current.name} (${current.location_id})`
-        }
-    },
-    methods: {
-        submit() {
-            let self = this;
-
-            return this.form.post(route('accept.manuel_locations'), {
-                onSuccess: () => {
-                    self.$emit('onSubmittedSuggestion')
-                }
-            })
-
-
-        }
+    location: {
+        required: true,
+        type: Object
     }
+})
+
+const emit = defineEmits(['onSubmittedSuggestion'])
+
+const form = useForm({
+  // if location is already selected, preselect it by getting the index of the selected location inside the options
+  //id: props.location.selected.length > 0 ? _.findIndex(options.value, {id: props.location.selected[0].id}) : null,
+  id: null,
+  location_id: props.location.location_id
+})
+
+const submit = () => {
+  form.transform((data) => ({
+    ...data,
+    id: options.value[form.id].id
+  })).post(route('accept.manuel_locations'), {
+    onSuccess: () => emit('onSubmittedSuggestion')
+  })
 }
+
+const options = computed( () => {
+  return _.map(props.location.data, suggestion => {
+    let main_character = _.get(suggestion, 'user.main_character.name')
+    let characters = _.map(
+        (main_character
+                ? _.filter(_.get(suggestion, 'user.characters', []), character => character.name !== main_character)
+                : _.get(suggestion, 'user.characters', [])
+        ) , character => character.name).join(', ')
+    let timeFromNow = dayjs(suggestion.created_at).fromNow()
+
+    return {
+      id: suggestion.id,
+      title: _.get(suggestion, 'system.name', '?') + ' - ' + suggestion.name,
+      description: `Submitted by ${main_character} (${characters}) ${timeFromNow}`
+    }
+  })
+})
+
+// watch for changes in theoptions and update the form id if the selected location is already in the options
+watchEffect(() => {
+  if (props.location.selected.length > 0) {
+    const selected = _.head(props.location.selected)
+    const index = _.findIndex(options.value, {id: selected.id})
+
+    if (index > -1)
+      form.id = index
+  }
+})
+
+const currentSelected = computed(() =>  {
+  const current = _.head(_.filter(props.location.data, 'selected'))
+
+  if (_.isUndefined(current))
+    return `Unknown (${form.location_id})`
+
+  let current_system = _.get(current, 'system.name', '?');
+
+  return `${current_system} - ${current.name} (${current.location_id})`
+})
+
 </script>
-
-<style scoped>
-
-</style>
