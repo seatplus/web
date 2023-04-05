@@ -62,7 +62,8 @@ import {prefix} from "metric-prefix";
 
 export default {
     name: "LocationComponent",
-    components: {CompleteLoadingHelper, AddManualLocationModal, ItemList, LocationName, WideLists},
+    components: {
+      CompleteLoadingHelper, AddManualLocationModal, ItemList, LocationName, WideLists},
     props: {
         location: {
             required: true,
