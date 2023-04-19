@@ -8,7 +8,6 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Jobs\Seatplus\Batch\CharacterBatchJob;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
@@ -659,7 +658,7 @@ test('junior hr can dispatch update batch and get status', function () {
         ->post(route('dispatch.batch_update', test()->secondary_character->character_id))
         ->assertOk();
 
-    Queue::assertPushedOn('high', UpdateCharacter::class );
+    Queue::assertPushedOn('high', UpdateCharacter::class);
 
     BatchUpdate::firstOrCreate([
          'batchable_id' => test()->secondary_character->character_id,
