@@ -192,7 +192,7 @@ class ApplicationsController extends Controller
 
         abort_if(is_null($refresh_token), 500, 'refresh_token could not be found');
 
-        UpdateCharacter::dispatchAfterResponse($refresh_token);
+        UpdateCharacter::dispatchAfterResponse($refresh_token)->onQueue('high');
 
         return response('success');
     }
