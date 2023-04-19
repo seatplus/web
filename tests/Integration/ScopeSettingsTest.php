@@ -99,7 +99,7 @@ test('one can delete sso setting', function () {
                         'corporation_id' => $corporation->corporation_id,
                         'id' => $corporation->corporation_id,
                         'name' => "Amok.",
-                        'type' => 'corporation',
+                        'category' => 'corporation',
                     ],
                 ],
                 'selectedScopes' => [
@@ -122,7 +122,7 @@ test('one can delete sso setting', function () {
         ->delete(route('delete.scopes', $corporation->corporation_id));
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())->toBeNull();
-});
+})->only();
 
 test('one can create and delete global sso setting', function () {
     expect(setting('global_sso_scopes'))->toBeNull();

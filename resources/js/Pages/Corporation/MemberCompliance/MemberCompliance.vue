@@ -7,9 +7,26 @@
     <PageHeader>
       {{ pageTitle }}
       <template #primary>
-        <ComplianceTabs v-model="queryParam" />
+        <ComplianceTabs
+          v-if="corporations.length > 0"
+          v-model="queryParam"
+        />
       </template>
     </PageHeader>
+
+    <div
+      v-if="corporations.length === 0"
+      class="text-center"
+    >
+      <ArchiveBoxXMarkIcon class="mx-auto h-12 w-12 text-gray-400" />
+      
+      <h3 class="mt-2 text-sm font-semibold text-gray-900">
+        No corporation or alliance sso scopes found.
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        Ask your admin, to configure corporation or alliance sso scopes to be used for compliance.
+      </p>
+    </div>
 
     <ComplianceComponent
       v-for="corporation of corporations"
@@ -21,51 +38,33 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ComplianceTabs from "./ComplianceTabs.vue";
 import ComplianceComponent from "./ComplianceComponent.vue";
+import {ref, watch} from "vue";
+import {ArchiveBoxXMarkIcon} from "@heroicons/vue/24/outline";
 
-export default {
-    name: "MemberCompliance",
-    components: {
-        ComplianceComponent,
-        ComplianceTabs,
-        PageHeader},
-    props: {
-        corporations: {
-            required: true,
-            type: Array
-        },
-        canReview: {
-            required: true,
-            type: Boolean
-        }
-    },
-    data() {
-        return {
-          pageTitle: 'Corporation Member Compliance',
-            selectedModula: 0,
-            queryParam: 'default'
-        }
-    },
-  watch: {
-      selectedModula() {
-
-          this.queryParam = this.selectedModula === 1 ? 'renegades' : this.selectedModula === 2 ? 'loyalists' : ''
-      }
+defineProps({
+  corporations: {
+    required: true,
+    type: Array,
   },
-  methods: {
-    getCharacterComplianceUrl(corporation_id) {
+  canReview: {
+    required: true,
+    type: Boolean,
+  },
+});
 
-      return route('character.compliance', {corporation_id: corporation_id, filter: this.parameter})
-    },
-    getUserComplianceUrl(corporation_id) {
+const pageTitle = 'Corporation Member Compliance';
+const selectedModula = ref(0);
+const queryParam = ref('default');
 
-      return route('user.compliance', {corporation_id: corporation_id, filter: this.parameter})
-    }
-  }
-}
+watch(selectedModula, () => {
+  queryParam.value = selectedModula.value === 1 ? 'renegades' : selectedModula.value === 2 ? 'loyalists' : ''
+})
+
+
 </script>
 
 <style scoped>
