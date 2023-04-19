@@ -16,7 +16,6 @@
       </template>
     </PageHeader>
 
-    <p>Test for something new</p>
     <CorporationRecruitment
       v-for="enlistment in enlistments"
       :key="enlistment"
