@@ -65,7 +65,7 @@ class UpdateOrCreateSsoSettings
             fn ($collection) => $collection
             ->each(function ($entity) {
                 $entity_id = Arr::get($entity, 'id');
-                $category = Arr::get($entity, 'type');
+                $category = Arr::get($entity, 'category');
 
                 $morphable_type = match ($category) {
                     'corporation' => CorporationInfo::class,

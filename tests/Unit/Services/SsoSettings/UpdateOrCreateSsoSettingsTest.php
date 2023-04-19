@@ -21,7 +21,7 @@ it('calls alliance info action', function () {
                 'alliance_id' => 1_354_830_081,
                 'id' => 1_354_830_081,
                 'name' => "Goonswarm Federation",
-                'type' => 'alliance',
+                'category' => 'alliance',
             ],
         ],
         'selectedScopes' => [
@@ -49,7 +49,7 @@ it('calls corporation info action', function () {
                 'corporation_id' => 1_184_675_423,
                 'id' => 1_184_675_423,
                 'name' => "Amok.",
-                'type' => 'corporation',
+                'category' => 'corporation',
             ],
 
         ],
@@ -80,7 +80,7 @@ it('creates sso settings', function () {
                 'corporation_id' => 1_184_675_423,
                 'id' => 1_184_675_423,
                 'name' => "Amok.",
-                'type' => 'corporation',
+                'category' => 'corporation',
             ],
         ],
         'selectedScopes' => [
