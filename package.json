@@ -14,7 +14,7 @@
         "@vue/compiler-sfc": "^3.0.7",
         "acorn": "^8.0",
         "autoprefixer": "^10.4.8",
-        "eslint": "8.22.0",
+        "eslint": "8.39.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-vue": "^9.4.0",
