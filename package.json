@@ -18,7 +18,7 @@
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-import": "^2.26.0",
         "eslint-plugin-vue": "^9.4.0",
-        "laravel-vite-plugin": "^0.6.0",
+        "laravel-vite-plugin": "^0.7.6",
         "postcss": "^8.4.16",
         "resolve-url-loader": "^5.0.0",
         "rollup-plugin-copy": "^3.4.0",
