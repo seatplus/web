@@ -1,8 +1,6 @@
 <template>
   <Settings>
-    <teleport to="#head">
-      <title>{{ title('Users') }}</title>
-    </teleport>
+    <AppHead app-title="Users" />
     <ul class="divide-y divide-gray-200">
       <li class="px-4 py-4 sm:px-6">
         <label
@@ -55,10 +53,11 @@
     import { router } from '@inertiajs/vue3'
     import Settings from "./Settings.vue"
     import UserListElement from "./UserListElement.vue";
+    import AppHead from "@/Shared/AppHead.vue";
 
     export default {
         name: "UserList",
-        components: {UserListElement, Settings, Pagination},
+        components: {AppHead, UserListElement, Settings, Pagination},
         props: {
             users: {
                 type: Object,

@@ -1,11 +1,6 @@
 <template>
   <div class="space-y-4">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-    <PageHeader :breadcrumbs="breadcrumbs">
-      {{ pageTitle }}
-    </PageHeader>
+    <PageHeader :page-title="pageTitle" :breadcrumbs="breadcrumbs" />
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <!--Header-->
       <div class="border-b border-gray-200 px-4 py-5 sm:px-6">

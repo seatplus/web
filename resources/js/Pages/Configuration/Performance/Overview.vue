@@ -1,12 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-
-    <PageHeader>
-      {{ pageTitle }}
-    </PageHeader>
+    <PageHeader :page-title="pageTitle" />
 
     <CompleteInertiaLoaderHelper v-slot="{data}">
       <Card>

@@ -1,11 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-    <PageHeader>
-      {{ pageTitle }}
-    </PageHeader>
+    <PageHeader :page-title="pageTitle" />
 
     <div class="bg-white shadow overflow-hidden sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
