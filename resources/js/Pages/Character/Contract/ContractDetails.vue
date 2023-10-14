@@ -1,12 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-    
-    <PageHeader :breadcrumbs="breadcrumbs">
-      Contract Details
-    </PageHeader>
+    <PageHeader :page-title="pageTitle" :breadcrumbs="breadcrumbs" />
 
     <ContractDetailsComponent
       v-if="contract.items.length > 0"

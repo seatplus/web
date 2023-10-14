@@ -1,8 +1,6 @@
 <template>
   <div>
-    <teleport to="#head">
-      <title>{{ title('Missing Characters Esi Scopes') }}</title>
-    </teleport>
+    <AppHead app-title="Missing Characters Esi Scopes" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
         {{ $I18n.trans('web::missing_required_scopes.title') }}
@@ -86,9 +84,10 @@
     import EveImage from "@/Shared/EveImage.vue"
     import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
     import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
+    import AppHead from "@/Shared/AppHead.vue";
     export default {
         name: "MissingRequiredScopes",
-        components: {ImpersonatingBanner, EveImage},
+        components: {AppHead, ImpersonatingBanner, EveImage},
         layout: (h, page) => h(EmptyLayout, [page]),
         props: {
             characters: {

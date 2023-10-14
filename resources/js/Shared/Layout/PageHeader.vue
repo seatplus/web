@@ -1,6 +1,31 @@
+<script setup>
+import { Link, Head, usePage } from '@inertiajs/vue3';
+import { defineProps, computed } from 'vue';
+import { last } from "lodash";
+import AppHead from "@/Shared/AppHead.vue";
+
+const props = defineProps({
+    breadcrumbs: {
+        type: Array,
+        default: () => []
+    },
+    pageTitle: {
+        type: String,
+        default: ''
+    }
+})
+
+const getBack = computed(() => {
+    return last(props.breadcrumbs)
+})
+
+</script>
+
 <template>
+  <AppHead v-if="pageTitle" :app-title="pageTitle" />
+
   <div>
-    <div v-if="breadcrumbs">
+    <div v-if="breadcrumbs.length > 0">
       <nav class="sm:hidden">
         <Link
           :href="getBack.route"
@@ -46,6 +71,7 @@
     <div class="mt-2 md:flex md:items-center md:justify-between">
       <div class="flex-1 min-w-0">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
+          {{ pageTitle }}
           <!--Page Header-->
           <slot />
         </h2>
@@ -59,21 +85,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import { Link } from '@inertiajs/vue3';
-  export default {
-      name: "PageHeader",
-      components: {Link},
-      props: ['breadcrumbs'],
-      computed: {
-          getBack() {
-              return _.last(this.breadcrumbs)
-          }
-      }
-  }
-</script>
-
-<style scoped>
-
-</style>
