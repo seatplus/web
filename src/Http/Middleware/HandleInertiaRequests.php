@@ -86,8 +86,8 @@ class HandleInertiaRequests extends Middleware
                 ? Session::get('errors')->getBag('default')->getMessages()
                 : (object) [],
             'images' => fn () => [
-                'logo' => asset('img/seat_plus.svg'),
-                'icon' => asset('img/seat_plus_logo.svg'),
+                'logo' => asset(config('web.images.logo')),
+                'icon' => asset(config('web.images.icon')),
             ],
         ]);
     }
