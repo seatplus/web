@@ -30,6 +30,7 @@
               <template #avatar>
                 <span class="inline-block relative">
                   <EveImage
+                          v-if="item.type"
                     :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'"
                     :object="item.type"
                     :size="128"
@@ -61,11 +62,11 @@
                   />
                 </svg>
 
-                <span class="truncate">{{ item.type.name }}</span>
+                <span class="truncate">{{ item.type?.name ?? 'Unknown' }}</span>
               </template>
 
               <template #upper_right>
-                {{ item.type.group.name }}
+                {{ item.type?.group.name ?? 'Unknown' }}
                 <span
                   v-if="isBPO(item)"
                   class="text-info"
@@ -98,7 +99,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {{ getMetricPrefix(item.quantity * item.type.volume) }}
+                {{ item.type ? getMetricPrefix(item.quantity * item.type.volume) : 'not available' }}
               </template>
             </wide-list-element>
           </template>
@@ -117,6 +118,7 @@
               <template #avatar>
                 <span class="inline-block relative">
                   <EveImage
+                          v-if="item.type"
                     :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'"
                     :object="item.type"
                     :size="128"
@@ -148,11 +150,11 @@
                   />
                 </svg>
 
-                <span class="truncate">{{ item.type.name }}</span>
+                <span class="truncate">{{ item.type?.name }}</span>
               </template>
 
               <template #upper_right>
-                {{ item.type.group.name }}
+                {{ item.type?.group.name }}
                 <span
                   v-if="isBPO(item)"
                   class="text-info"
@@ -185,7 +187,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {{ getMetricPrefix(item.quantity * item.type.volume) }}
+                {{ item.type ? getMetricPrefix(item.quantity * item.type.volume) : 'not available' }}
               </template>
             </wide-list-element>
           </template>
