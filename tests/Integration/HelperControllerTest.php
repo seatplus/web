@@ -171,7 +171,7 @@ test('one can get resource variants via http and cache', function () {
 
     $resource_type = 'types';
     $resource_id = 587;
-    $url = "https://images.evetech.net/${resource_type}/${resource_id}";
+    $url = "https://images.evetech.net/{$resource_type}/{$resource_id}";
     $expected_response = ["render", "icon"];
 
     Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
