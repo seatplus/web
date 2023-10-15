@@ -29,7 +29,7 @@ it('should call parent method on production environment', function () {
 
     test()->actingAs(test()->test_user);
     $user_id = test()->test_user->id;
-    $cache_key = "UserScopes:${user_id}";
+    $cache_key = "UserScopes:{$user_id}";
 
     // Cache missing scopes for a user
     Cache::shouldReceive('tags')
