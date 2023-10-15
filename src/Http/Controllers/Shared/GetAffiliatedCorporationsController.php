@@ -62,7 +62,6 @@ class GetAffiliatedCorporationsController extends Controller
             // Remove Doomheim corporation
             ->where('corporation_infos.corporation_id', '<>', 1_000_001)
             ->select('corporation_infos.*')
-            ->has($permission)
             ->when($search_param, fn ($query) => $query->where('name', 'like', "%${search_param}%"));
 
         $query = $owned_corporations
