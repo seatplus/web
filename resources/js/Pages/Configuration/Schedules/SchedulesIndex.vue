@@ -1,8 +1,6 @@
 <template>
   <Settings>
-    <teleport to="#head">
-      <title>{{ title('Schedules Settings') }}</title>
-    </teleport>
+    <AppHead app-title="Schedules Settings" />
     <ul class="divide-y divide-gray-200">
       <WideListElement
         v-for="schedule of schedules"
@@ -90,9 +88,10 @@
 import Settings from "@/Pages/Configuration/Settings.vue"
 import WideListElement from "@/Shared/WideListElement.vue"
 import { Link } from '@inertiajs/vue3';
+import AppHead from "@/Shared/AppHead.vue";
 export default {
     name: "SchedulesIndex",
-    components: {Settings, WideListElement, Link},
+    components: {AppHead, Settings, WideListElement, Link},
     props: {
         schedules: {
             type: Array,

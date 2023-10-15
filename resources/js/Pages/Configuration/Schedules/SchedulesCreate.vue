@@ -1,8 +1,6 @@
 <template>
   <div>
-    <teleport to="#head">
-      <title>{{ title('Create Schedule') }}</title>
-    </teleport>
+    <AppHead app-title="Create Schedule" />
 
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
@@ -64,9 +62,10 @@
     import InputGroup from "@/Shared/InputGroup.vue"
     import SeatPlusSelect from "@/Shared/SeatPlusSelect.vue"
     import { Link } from '@inertiajs/vue3';
+    import AppHead from "@/Shared/AppHead.vue";
     export default {
         name: "SchedulesCreate",
-        components: {SeatPlusSelect, InputGroup, Link},
+        components: {AppHead, SeatPlusSelect, InputGroup, Link},
         props: {
             cron: {
                 type: Object,

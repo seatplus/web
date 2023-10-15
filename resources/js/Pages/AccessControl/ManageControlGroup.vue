@@ -1,10 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-    <PageHeader :breadcrumbs="breadcrumbs">
-      {{ pageTitle }}
+    <PageHeader :page-title="pageTitle" :breadcrumbs="breadcrumbs">
       <template #primary>
         <HeaderButton @click="store">
           Save
@@ -246,7 +242,7 @@ export default {
     },
     data() {
         return {
-            pageTitle: `Manage ${this.role.name}`,
+            pageTitle: `Manage ${this.role.title}`,
             breadcrumbs: [
                 {
                     name: 'Control Group',

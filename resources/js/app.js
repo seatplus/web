@@ -32,7 +32,6 @@ createInertiaApp({
             .use(plugin)
             .use(ZiggyVue)
             .use(I18nPlugin)
-            .mixin({ methods: {title: title => `${title} - Seatplus`,}})
             .mount(el);
     },
     progress: {

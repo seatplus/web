@@ -1,8 +1,6 @@
 <template>
   <div>
-    <teleport to="#head">
-      <title>{{ title(object.name) }}</title>
-    </teleport>
+    <AppHead :app-title="object.name" />
     <PageHeader :breadcrumbs="breadcrumbs">
       <div class="flex items-center">
         <div class="shrink-0">
@@ -29,10 +27,11 @@ import EveImage from "@/Shared/EveImage.vue"
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ItemLayout from "@/Shared/Components/ItemLayout.vue";
 import { prefix } from "metric-prefix";
+import AppHead from "@/Shared/AppHead.vue";
 
 export default {
     name: "ItemDetails",
-    components : {ItemLayout, PageHeader, EveImage},
+    components : {AppHead, ItemLayout, PageHeader, EveImage},
     props: {
         item: {
             type    : Object,

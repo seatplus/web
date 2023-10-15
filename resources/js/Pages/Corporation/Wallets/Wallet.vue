@@ -1,12 +1,7 @@
 <template>
-  <teleport to="#head">
-    <title>{{ title(pageTitle) }}</title>
-  </teleport>
-
   <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
-  <PageHeader>
-    {{ pageTitle }}
+  <PageHeader :page-title="pageTitle">
     <template #primary>
       <DispatchUpdateButton />
     </template>

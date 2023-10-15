@@ -1,11 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-
-    <PageHeader>
-      Corporation Recruitment
+    <PageHeader :page-title="pageTitle">
       <template
         v-if="canManageRecruitment"
         #primary

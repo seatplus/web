@@ -1,8 +1,6 @@
 <template>
   <div>
-    <teleport to="#head">
-      <title>{{ title('Login') }}</title>
-    </teleport>
+    <AppHead app-title="Login" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div>
         <img
@@ -41,35 +39,16 @@
       </div>
     </div>
   </div>
-  <!--<div class="login-page" style="min-height: 512.8px;">
-    <div class="login-box">
-      <flash-messages/>
-      <div class="login-logo">
-        <b>SeAT</b>plus
-      </div>
-      &lt;!&ndash; /.login-logo &ndash;&gt;
-      <div class="card">
-
-        <div class="card-body login-card-body">
-          {{ $page.login_welcome }}
-          <div class="social-auth-links text-center mb-3">
-            <a :href="route('auth.eve')">
-                <b-img :src="$page.evesso_img_src" fluid />
-            </a>
-          </div>
-        </div>
-        &lt;!&ndash; /.login-card-body &ndash;&gt;
-      </div>
-    </div>
-  </div>-->
 </template>
 
 <script>
 
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
+import AppHead from "@/Shared/AppHead.vue";
 
 export default {
     name: "Login",
+    components: {AppHead},
     layout: (h, page) => h(EmptyLayout, [page]),
 
 }

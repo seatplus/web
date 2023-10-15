@@ -87,6 +87,7 @@ class HandleInertiaRequests extends Middleware
                 : (object) [],
             'images' => fn () => [
                 'logo' => asset('img/seat_plus.svg'),
+                'icon' => asset('img/seat_plus_logo.svg'),
             ],
         ]);
     }
