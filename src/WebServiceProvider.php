@@ -104,7 +104,7 @@ class WebServiceProvider extends ServiceProvider
             __DIR__ . '/../public/img' => public_path('img'),
             __DIR__ . '/../resources/js' => resource_path('js'),
             __DIR__ . '/../resources/css' => resource_path('css'),
-            // publish teh I18n vendor file too
+            // publish the I18n vendor file too
             base_path('vendor/conedevelopment/i18n/resources/js') => resource_path('js/vendor'),
         ], 'web');
     }
@@ -170,6 +170,11 @@ class WebServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__ . '/../config/web.jobs.php',
             'web.jobs'
+        );
+
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/web.images.php',
+            'web.images'
         );
     }
 

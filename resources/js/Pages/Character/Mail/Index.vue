@@ -1,15 +1,11 @@
 <template>
   <MultiColumnLayout>
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
     <div class="absolute inset-0 py-6 px-4 sm:px-6 lg:px-8">
       <div class="space-y-3">
         <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
 
-        <PageHeader class="">
-          {{ pageTitle }}
+        <PageHeader :page-title="pageTitle" class="">
           <template #primary>
             <DispatchUpdateButton />
           </template>
@@ -39,12 +35,6 @@
         v-model:selectedId="selectedId"
         :character-ids="characterIds"
       />
-      <!--      <div class="absolute inset-0 py-6 px-4 sm:px-6 lg:px-8 overflow-y-auto">
-        <MailList
-          v-model:selectedId="selectedId"
-          :character-ids="characterIds"
-        />
-      </div>-->
     </template>
   </MultiColumnLayout>
 </template>

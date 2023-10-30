@@ -1,8 +1,6 @@
 <template>
   <div>
-    <teleport to="#head">
-      <title>{{ title('Add Characters Esi Scopes') }}</title>
-    </teleport>
+    <AppHead app-title="Add Characters Esi Scopes" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
         Update characters ESI scopes
@@ -83,15 +81,16 @@
 </template>
 
 <script setup>
-    import EveImage from "@/Shared/EveImage.vue"
-    import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
+import EveImage from "@/Shared/EveImage.vue"
+import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
+import AppHead from "@/Shared/AppHead.vue";
 
-    defineProps({
-        characters: {
-            type: Array,
-            required: true
-        }
-    })
+defineProps({
+    characters: {
+        type: Array,
+        required: true
+    }
+})
     
 </script>
 

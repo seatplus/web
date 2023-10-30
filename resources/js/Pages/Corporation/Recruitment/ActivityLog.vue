@@ -1,12 +1,5 @@
 <template>
-  <div class="space-y-3">
-    <teleport to="#head">
-      <title> {{ title(pageTitle) }}</title>
-    </teleport>
-  </div>
-  <PageHeader>
-    {{ pageTitle }}
-  </PageHeader>
+  <PageHeader :page-title="pageTitle" />
 
   <LogTab :application="application" />
 </template>

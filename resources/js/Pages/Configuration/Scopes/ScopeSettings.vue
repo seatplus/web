@@ -1,12 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-
-
-    <PageHeader>
-      {{ creationMode ? 'Create ': 'Edit ' }} Scope Setting
+    <PageHeader :page-title="pageTitle">
       <template #primary>
         <Link
           :href="route('create.scopes')"

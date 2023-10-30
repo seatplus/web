@@ -1,8 +1,6 @@
 <template>
   <Settings>
-    <teleport to="#head">
-      <title>{{ title('SSO Settings') }}</title>
-    </teleport>
+    <AppHead app-title="SSO Settings" />
     <ul class="divide-y divide-gray-200">
       <WideListElement
         v-if="hasGlobalScopes"
@@ -118,10 +116,11 @@
     import WideListElement from "@/Shared/WideListElement.vue"
     import EveImage from "@/Shared/EveImage.vue"
     import { Link } from '@inertiajs/vue3';
+    import AppHead from "@/Shared/AppHead.vue";
 
     export default {
         name: "OverviewScopeSettings",
-        components: {WideListElement, EveImage, Settings, Link},
+        components: {AppHead, WideListElement, EveImage, Settings, Link},
         props: {
             available_scopes: {
                 type: Object,

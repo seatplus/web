@@ -1,11 +1,6 @@
 <template>
   <div class="space-y-3">
-    <teleport to="#head">
-      <title>{{ title(pageTitle) }}</title>
-    </teleport>
-
-    <PageHeader>
-      {{ pageTitle }}
+    <PageHeader :page-title="pageTitle">
       <template #primary>
         <ComplianceTabs
           v-if="corporations.length > 0"
