@@ -12,14 +12,17 @@ export default defineConfig(({mode}) => {
                     '**/node_modules/**',
                     '**/vendor/**',
                     '**/public/**',
-                    '!**/vendor/seatplus/web/**'
+                    '!**/vendor/seatplus/**',
                 ],
             }
         },
         plugins: [
             laravel({
                 input: 'resources/js/app.js',
-                refresh: ['resources/js/**', 'vendor/seatplus/web/resources/js/**'],
+                refresh: [
+                    'resources/js/**',
+                    'vendor/seatplus/**/resources/js/**',
+                ],
             }),
             vue({
                 template: {
@@ -34,7 +37,7 @@ export default defineConfig(({mode}) => {
                     startup: false,
                     name: 'copy vendor',
                     run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
-                    condition: (file) => file.includes('vendor/seatplus/web/resources/js/'),
+                    pattern: ['vendor/seatplus/**/resources/js/**']
                 }
             ])
         ],
