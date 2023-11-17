@@ -257,7 +257,7 @@
           </div>
         </div>
       </div>
-      <Notifications class="sm:mt-16 z-40" />
+      <Toasts class="z-40" />
       <slot />
       <ImpersonatingBanner v-if="$page.props.user.data.impersonating" />
     </div>
@@ -287,8 +287,8 @@ import {
 } from '@headlessui/vue'
 import {usePage, Link } from "@inertiajs/vue3";
 import ImpersonatingBanner from "./ImpersonatingBanner.vue";
-import Notifications from "../Notifications/Notifications.vue";
 import EveImage from "@/Shared/EveImage.vue"
+import Toasts from "@/Shared/Toasts/Toasts.vue";
 
   const props = defineProps({
       activeSidebarElement: {
