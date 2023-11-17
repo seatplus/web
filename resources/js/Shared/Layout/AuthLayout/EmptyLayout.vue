@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Notifications />
+    <Toasts />
     <div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <slot />
     </div>
@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import Notifications from "../../Notifications/Notifications.vue";
+import Toasts from "@/Shared/Toasts/Toasts.vue";
 
 export default {
     name: "EmptyLayout",
-    components: {Notifications}
+    components: {Toasts}
 }
 </script>
 
