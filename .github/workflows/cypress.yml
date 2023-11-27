@@ -37,12 +37,6 @@ jobs:
           BRANCH_NAME=$(echo ${{ github.head_ref || github.ref_name }})
           composer require seatplus/web:"dev-${BRANCH_NAME}"
 
-      - name: install laracasts/cypress
-        run: |
-          composer require laracasts/cypress --dev
-          npm install cypress --save-dev
-          php artisan cypress:boilerplate --force
-
       - name: setup Laravel
         run: |
           cp .env.example .env
@@ -52,6 +46,7 @@ jobs:
       - name: install laracasts/cypress
         run: |
           composer require laracasts/cypress --dev
+          npm install cypress --save-dev
           php artisan cypress:boilerplate --force
 
       - name: delete integration tests
