@@ -38,13 +38,10 @@ jobs:
           composer require seatplus/web:"dev-${BRANCH_NAME}"
 
       - name: install laracasts/cypress
-        run: composer require laracasts/cypress --dev
-
-      - name: install Cypress
-        run: npm install cypress --save-dev
-
-      - name: run cypress boilerplate
-        run: php artisan cypress:boilerplate --force
+        run: |
+          composer require laracasts/cypress --dev
+          npm install cypress --save-dev
+          php artisan cypress:boilerplate --force
 
       - name: setup Laravel
         run: |
