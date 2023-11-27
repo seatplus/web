@@ -107,6 +107,13 @@ class WebServiceProvider extends ServiceProvider
             // publish the I18n vendor file too
             base_path('vendor/conedevelopment/i18n/resources/js') => resource_path('js/vendor'),
         ], 'web');
+
+
+        // publish the cypress folder to the /tests folder of the core
+        // php artisan vendor:publish --tag=web-test-cypress --force
+        $this->publishes([
+            __DIR__ . '/../tests/cypress' => base_path('tests/cypress'),
+        ], 'web-test-cypress');
     }
 
     private function addMiddleware()

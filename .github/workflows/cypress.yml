@@ -55,6 +55,14 @@ jobs:
         run: rm -rf tests/cypress/integration
 
       - name: change base url in cypress.config.js
-        run: sed -i 's/localhost/localhost:8080' cypress.config.js
+        run: sed -i 's/localhost/localhost:8080/' cypress.config.js
+
+      - name: publish cypress tests
+        run: php artisan vendor:publish --tag=web-test-cypress --force
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          start: php artisan serve
 
 
