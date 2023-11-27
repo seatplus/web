@@ -1,0 +1,60 @@
+name: Cypress tests
+on: push
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: '8.1'
+          extensions: mbstring, dom, fileinfo
+          #coverage: xdebug #optional
+
+      - uses: getong/mariadb-action@v1.1
+        with:
+          #host port: 3308 # Optional, default value is 3306. The port of host
+          mariadb version: '10.7' # Optional, default value is "latest". The version of the MariaDB
+          mysql database: 'seatplus' # Optional, default value is "test". The specified database which will be create
+          mysql user: 'seatplus' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+          mysql password: 'secret' # Required if "mysql user" exists. The password for the "mysql user"
+      - name: Redis Server in GitHub Actions
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          # Redis version to use
+          redis-version: 5 # optional, default is latest
+
+      - name: Install core app
+        run: composer create-project seatplus/core . --prefer-dist --no-dev --no-ansi --no-interaction --no-scripts --no-progress
+
+      - name: change required seatplus/web package to use current branch
+        run: |
+          BRANCH_NAME=$(echo ${{ github.ref || github.head_ref }})
+          composer require seatplus/web:"dev-${BRANCH_NAME}"
+
+      - name: Use Node.js 21.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: '21.x'
+
+      - name: install Cypress
+        run: npm install cypress --save-dev
+
+      - name: setup Laravel
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
+
+      - name: install and run cypress boilerplate
+        run: |
+          composer require laracasts/cypress --dev
+          php artisan cypress:boilerplate --force
+
+      - name: delete integration tests
+        run: rm -rf tests/cypress/integration
+
+      - name: change base url in cypress.config.js
+        run: sed -i 's/localhost/localhost:8080' cypress.config.js
+
+
