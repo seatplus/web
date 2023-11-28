@@ -17,7 +17,7 @@ jobs:
           #coverage: xdebug #optional
 
       - name: Use Node.js 21.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '21.x'
 
@@ -120,7 +120,15 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: screenshots-in-chrome
-          path: examples/browser/cypress/screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      # report video size and store the videos as test artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: videos-in-chrome
+          path: cypress/videos
+          if-no-files-found: ignore
 
   ui-chrome-mobile-tests:
     timeout-minutes: 15
@@ -171,4 +179,12 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: screenshots-in-chrome-mobile
-          path: examples/browser/cypress/screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
+
+      # report video size and store the videos as test artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: videos-in-chrome-mobile
+          path: cypress/videos
+          if-no-files-found: ignore
