@@ -97,8 +97,10 @@ jobs:
 #          extensions: mbstring, dom, fileinfo
         #coverage: xdebug #optional
         run: |
-          apk update
-          apk add --no-cache php81 php81-mbstring php81-dom php81-fileinfo
+          apt update
+          apt install php8.1 php8.1-mbstring php8.1-dom php8.1-fileinfo
+          php -v
+          php -m | grep -E 'mbstring|dom|fileinfo'
 
       - uses: getong/mariadb-action@v1.1
         with:
