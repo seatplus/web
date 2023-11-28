@@ -1,8 +1,11 @@
 name: Cypress tests
 on: push
 jobs:
-  cypress:
+  install:
     runs-on: ubuntu-latest
+    container:
+      image: node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+      options: --user 1001
     steps:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
@@ -24,10 +27,10 @@ jobs:
           # Redis version to use
           redis-version: 5 # optional, default is latest
 
-      - name: Use Node.js 21.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: '21.x'
+#      - name: Use Node.js 21.x
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '21.x'
 
       - name: Install core app
         run: composer create-project seatplus/core . --prefer-dist --no-dev --no-ansi --no-interaction --no-scripts --no-progress
@@ -62,6 +65,33 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           build: npm run prod
+          runTests: false
+
+      - name: Save build folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          if-no-files-found: error
+          path: build
+
+
+  ui-chrome-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    container:
+      image: node-20.9.0-chrome-118.0.5993.88-1-ff-118.0.2-edge-118.0.2088.46-1
+      options: --user 1001
+    needs: install
+    steps:
+      - name: Download the build folders
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: build
+
+      - name: "UI Tests - Chrome"
+        uses: cypress-io/github-action@v6
+        with:
           start: php artisan serve
-
-
+          wait-on: http://localhost:8000
+          browser: chrome
