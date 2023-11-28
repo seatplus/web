@@ -61,9 +61,10 @@ jobs:
       - name: Save build folder
         uses: actions/upload-artifact@v3
         with:
-          name: build
+          name: SeatPlus
           if-no-files-found: error
-          path: build
+          path: ./
+          retention-days: 1
 
 
   ui-chrome-tests:
