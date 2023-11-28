@@ -58,14 +58,16 @@ jobs:
 #          build: npm run prod
 #          runTests: false
       - name: compress repo
-        run: tar -czf ../build.tar.gz ./
+        run: |
+          tar -czf ../build.tar.gz ./
+          mv ../build.tar.gz build.tar.gz
 
       - name: Save build folder
         uses: actions/upload-artifact@v3
         with:
           name: SeatPlus
           if-no-files-found: error
-          path: ../build.tar.gz
+          path: build.tar.gz
           retention-days: 1
 
 
