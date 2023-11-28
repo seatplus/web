@@ -83,10 +83,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: SeatPlus
-          path: build.tar.gz
 
-      - name: Extract the build folders
-        run: tar -xzf build.tar.gz
+      - name: uncompressed repo
+        run: |
+          ls -la
+          tar -xzf build.tar.gz
+          
 
       - name: PHP, Composer, Extensions, MariaDB, Redis
         uses: shivammathur/setup-php@v2
