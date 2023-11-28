@@ -57,13 +57,15 @@ jobs:
 #        with:
 #          build: npm run prod
 #          runTests: false
+      - name: compress repo
+        run: tar -czf build.tar.gz ./
 
       - name: Save build folder
         uses: actions/upload-artifact@v3
         with:
           name: SeatPlus
           if-no-files-found: error
-          path: ./
+          path: build.tar.gz
           retention-days: 1
 
 
@@ -78,8 +80,11 @@ jobs:
       - name: Download the build folders
         uses: actions/download-artifact@v3
         with:
-          name: build
-          path: build
+          name: SeatPlus
+          path: build.tar.gz
+
+      - name: Extract the build folders
+        run: tar -xzf build.tar.gz
 
       - name: PHP, Composer, Extensions, MariaDB, Redis
         uses: shivammathur/setup-php@v2
