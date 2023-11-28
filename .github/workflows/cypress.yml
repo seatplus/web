@@ -33,7 +33,6 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          php artisan migrate --force
 
       - name: install laracasts/cypress
         run: |
@@ -98,6 +97,9 @@ jobs:
         with:
           # Redis version to use
           redis-version: 5 # optional, default is latest
+
+      - name: run migrations
+        run: php artisan migrate --force
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
