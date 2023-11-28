@@ -116,4 +116,4 @@ jobs:
           start: php artisan serve
           wait-on: http://localhost:8000
           browser: chrome
-          config: "'{"e2e":{"viewportWidth":375,"viewportHeight":667}}"
+          config: viewportWidth=375,viewportHeight=667
