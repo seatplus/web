@@ -1,5 +1,7 @@
 name: Cypress tests
 on: push
+env:
+  PHP_VERSION: '8.1'
 jobs:
   install:
     runs-on: ubuntu-latest
@@ -10,35 +12,22 @@ jobs:
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
         with:
-          php-version: '8.1'
+          php-version: ${{ env.PHP_VERSION }}
           extensions: mbstring, dom, fileinfo
           #coverage: xdebug #optional
 
-      - uses: getong/mariadb-action@v1.1
+      - name: Use Node.js 21.x
+        uses: actions/setup-node@v2
         with:
-          #host port: 3308 # Optional, default value is 3306. The port of host
-          mariadb version: '10.7' # Optional, default value is "latest". The version of the MariaDB
-          mysql database: 'seatplus' # Optional, default value is "test". The specified database which will be create
-          mysql user: 'seatplus' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-          mysql password: 'secret' # Required if "mysql user" exists. The password for the "mysql user"
-      - name: Redis Server in GitHub Actions
-        uses: supercharge/redis-github-action@1.1.0
-        with:
-          # Redis version to use
-          redis-version: 5 # optional, default is latest
-
-#      - name: Use Node.js 21.x
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '21.x'
+          node-version: '21.x'
 
       - name: Install core app
-        run: composer create-project seatplus/core . --prefer-dist --no-dev --no-ansi --no-interaction --no-scripts --no-progress
+        run: composer create-project seatplus/core . --prefer-dist --no-dev --no-ansi --no-interaction --no-scripts --no-progress --ignore-platform-reqs
 
       - name: change required seatplus/web package to use current branch
         run: |
           BRANCH_NAME=$(echo ${{ github.head_ref || github.ref_name }})
-          composer require seatplus/web:"dev-${BRANCH_NAME}"
+          composer require seatplus/web:"dev-${BRANCH_NAME}" --ignore-platform-reqs
 
       - name: setup Laravel
         run: |
@@ -48,7 +37,7 @@ jobs:
 
       - name: install laracasts/cypress
         run: |
-          composer require laracasts/cypress --dev
+          composer require laracasts/cypress --dev --ignore-platform-reqs
           npm install cypress --save-dev
           php artisan cypress:boilerplate --force
 
@@ -61,11 +50,14 @@ jobs:
       - name: publish cypress tests
         run: php artisan vendor:publish --tag=web-test-cypress --force
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          build: npm run prod
-          runTests: false
+      - name: install npm dependencies and build assets
+        run: npm install && npm run prod
+
+#      - name: Cypress run
+#        uses: cypress-io/github-action@v6
+#        with:
+#          build: npm run prod
+#          runTests: false
 
       - name: Save build folder
         uses: actions/upload-artifact@v3
@@ -88,6 +80,24 @@ jobs:
         with:
           name: build
           path: build
+
+      - name: PHP, Composer, Extensions, MariaDB, Redis
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, dom, fileinfo
+          #coverage: xdebug #optional
+      - uses: getong/mariadb-action@v1.1
+        with:
+          #host port: 3308 # Optional, default value is 3306. The port of host
+          mariadb version: '10.7' # Optional, default value is "latest". The version of the MariaDB
+          mysql database: 'seatplus' # Optional, default value is "test". The specified database which will be create
+          mysql user: 'seatplus' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+          mysql password: 'secret' # Required if "mysql user" exists. The password for the "mysql user"
+      - uses: supercharge/redis-github-action@1.1.0
+        with:
+          # Redis version to use
+          redis-version: 5 # optional, default is latest
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
