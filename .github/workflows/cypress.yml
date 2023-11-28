@@ -91,11 +91,15 @@ jobs:
           
 
       - name: PHP, Composer, Extensions, MariaDB, Redis
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: mbstring, dom, fileinfo
-          #coverage: xdebug #optional
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: ${{ env.PHP_VERSION }}
+#          extensions: mbstring, dom, fileinfo
+        #coverage: xdebug #optional
+        run: |
+          apk update
+          apk add --no-cache php81 php81-mbstring php81-dom php81-fileinfo
+
       - uses: getong/mariadb-action@v1.1
         with:
           #host port: 3308 # Optional, default value is 3306. The port of host
