@@ -105,7 +105,9 @@ jobs:
           redis-version: 5 # optional, default is latest
 
       - name: run migrations
-        run: php artisan migrate --force
+        run: |
+          sleep 15
+          php artisan migrate --force
 
       - name: "UI Tests - Chrome"
         uses: cypress-io/github-action@v6
@@ -153,7 +155,9 @@ jobs:
           redis-version: 5 # optional, default is latest
 
       - name: run migrations
-        run: php artisan migrate --force
+        run: |
+          sleep 15
+          php artisan migrate --force
 
       - name: "UI Tests - Chrome Mobile"
         uses: cypress-io/github-action@v6
