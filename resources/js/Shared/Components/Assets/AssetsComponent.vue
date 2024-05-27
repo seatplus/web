@@ -10,7 +10,6 @@
         <LocationComponent
           v-for="location in results"
           :key="location.location_id"
-          :query-parameters="parameters"
           :location="location"
           :context="context"
           :compact="compact"
@@ -67,7 +66,3 @@ export default {
     },
 }
 </script>
-
-<style scoped>
-
-</style>

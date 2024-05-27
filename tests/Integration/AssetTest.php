@@ -1,11 +1,13 @@
 <?php
 
 
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
-use Seatplus\Web\Models\Asset\Asset;
+use Seatplus\Eveapi\Models\Universe\Structure;
 
 test('is protected by authentication', function () {
     $response = test()->followingRedirects()
@@ -28,7 +30,6 @@ test('requires character_ids parameter', function (string $route) {
     $response->assertStatus(403);
 })->with([
     '/locations' => 'get.character.assets.locations',
-    '/location/{location_id}' => 'location.assets',
 ]);
 
 test('load asset', function () {
@@ -72,188 +73,102 @@ it('has list affiliated character list route', function () {
     $response->assertOk();
 });
 
-test('load asset in system', function () {
-    $asset = Asset::factory()
-        ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar',
-        ]);
-
-    $system = $asset->location->locatable->system;
-
-    // call without filter
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-        ]))
-        ->assertOk();
-
-    expect($response->original)->toHaveCount(1);
-
-    // call with system_id filter
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'systems' => $system->system_id,
-        ]));
-
-    //dd($response->original, $system->system_id, $asset->location->locatable);
-
-    expect($response->original)->toHaveCount(1);
-
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'systems' => [$system->system_id],
-        ]));
-
-    expect($response->original)->toHaveCount(1);
-
-    // call with system_id + 1 filter and expect no assets to be found
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'systems' => $system->system_id + 1,
-        ]));
-
-    expect($response->original)->toHaveCount(0);
-});
-
-test('load asset in region', function () {
-    $asset = Asset::factory()
-        ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar',
-        ]);
-
-    $region = $asset->location->locatable->system->region;
-
-
-    // call without filter
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-        ]))
-        ->assertOk();
-
-    expect($response->original)->toHaveCount(1);
-
-    // call with system_id filter
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'regions' => $region->region_id,
-        ]));
-
-    expect($response->original)->toHaveCount(1);
-
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'regions' => [$region->region_id],
-        ]));
-
-    expect($response->original)->toHaveCount(1);
-
-    // call with system_id + 1 filter and expect no assets to be found
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'systems' => $region->region_id + 1,
-        ]));
-
-    expect($response->original)->toHaveCount(0);
-});
-
 test('load asset in unknown location', function () {
-    // 1. create asset with location
-    $asset = Asset::factory()
-        ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar',
-        ]);
 
-    test()->assertNotNull($asset->location);
+    // Arrange
+    $unknown_location = Location::factory()->create();
+    $known_location = Location::factory()->for(Station::factory(), 'locatable')->create();
 
-    // 2. create asset without location (unknown)
-    $asset = Asset::factory()
-        ->create([
-            'assetable_id' => test()->test_character->character_id,
-            'location_id' => 12345,
-            'location_flag' => 'Hangar',
-        ]);
 
-    expect($asset->location)->toBeNull();
-    expect($asset->manual_location)->toBeNull();
+    foreach ([$known_location, $unknown_location] as $location) {
+        Asset::factory()
+            ->create([
+                'assetable_id' => test()->test_character->character_id,
+                'location_id' => $location->location_id,
+                'location_flag' => 'Hangar',
+            ]);
+    }
+
+    // Act
 
     // 3. call normally
-    $response = test()->actingAs(test()->test_user)
+    $response_all = test()->actingAs(test()->test_user)
         ->get(route('get.character.assets.locations', [
             'character_ids' => [test()->test_character->character_id],
-        ]));
-
-    // 4. expect 2 assets
-    expect($response->original)->toHaveCount(2);
+        ]))
+        ->assertOk();
 
     // 5. call only unknown locations
-    $response = test()->actingAs(test()->test_user)
+    $response_only_unknown = test()->actingAs(test()->test_user)
         ->get(route('get.character.assets.locations', [
             'character_ids' => [test()->test_character->character_id],
-            'withUnknownLocations' => true,
-        ]));
+            'only_unknown_locations' => true,
+        ]))
+        ->assertOk();
 
-    // 6. expect only one
-    expect($response->original)->toHaveCount(1);
+    // Assert
+    expect($response_all->original)->toHaveCount(2)
+        ->and($response_only_unknown->original)->toHaveCount(1);
 
-    // call with unknown locations
 });
 
 test('load asset on watchlist', function () {
-    // Prepare
+
+    // Arrange
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+
     $asset = Asset::factory()
         ->create([
             'assetable_id' => test()->test_character->character_id,
+            'location_id' => $location->location_id,
             'location_flag' => 'Hangar',
         ]);
 
-    expect($asset->location)->toBeNull();
-
-    $asset2 = Asset::factory()
+    $content = Asset::factory()
         ->create([
             'assetable_id' => test()->test_character->character_id,
-            'location_id' => Location::factory()->for(Station::factory(), 'locatable'),
-            'location_flag' => 'Hangar',
+            'location_id' => $asset->item_id,
         ]);
 
-    expect($asset2->location)->not()->toBeNull();
+    $content_content = Asset::factory()
+        ->create([
+            'assetable_id' => test()->test_character->character_id,
+            'location_id' => $content->item_id,
+            'type_id' => \Seatplus\Eveapi\Models\Universe\Type::factory(),
+            'group_id' => \Seatplus\Eveapi\Models\Universe\Group::factory(),
+            'category_id' => \Seatplus\Eveapi\Models\Universe\Category::factory(),
+        ]);
 
-    // Act
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.assets.locations', [
-            'character_ids' => [test()->test_character->character_id],
-            'withUnknownLocations' => true,
-        ]));
+    $propertyMapping = [
+        'systems' => [$location->locatable->system->system_id],
+        'regions' => [$location->locatable->system->region->region_id],
+        'types' => [$asset->type_id],
+        'groups' => [$content->group_id],
+        'categories' => [$content_content->category_id]
+    ];
 
-    // we expect a total of 3 assets
-    expect(Asset::all())->toHaveCount(2);
+    foreach ($propertyMapping as $key => $value) {
+        // Act
+        $response = test()->actingAs(test()->test_user)
+            ->get(route('get.character.assets.locations', [
+                'character_ids' => [test()->test_character->character_id],
+                $key => $value,
+            ]))
+            ->assertOk();
 
-    // we execpt no location
+        // Assert
+        expect($response->original)->toHaveCount(1);
 
-    // only two should be in the result
-    expect($response->original)->toHaveCount(1);
-
-    $response->assertJson(
-        fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
-        ->count('data', 1)
-        ->has(
-            'data.0',
-            fn ($json) => $json
-            ->where('location_id', $asset->location_id)
-            ->etc()
-        )
-        ->etc()
-    );
+        $response->assertJson(
+            fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
+                ->count('data', 1)
+                ->has(
+                    'data.0',
+                    fn ($json) => $json
+                        ->where('location_id', $location->location_id)
+                        ->etc()
+                )
+                ->etc()
+        );
+    }
 });

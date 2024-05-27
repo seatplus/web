@@ -1,6 +1,6 @@
 <template>
   <WideListElement
-    v-for="asset in props.items"
+    v-for="asset in items"
     :key="asset.item_id"
     :url="url(asset)"
   >
@@ -12,11 +12,10 @@
           :object="asset.type"
           :size="128"
         />
-        <div v-else>
-          <span class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500">
-            <span class="text-xl font-medium leading-none text-white">N/A</span>
+          <span v-else class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500">
+              <span class="text-xl font-medium leading-none text-white">N/A</span>
           </span>
-        </div>
+
         <span
           v-if="asset.quantity > 1"
           class="absolute bottom-0 right-0 inline-flex items-center justify-center h-3 w-3 rounded-full text-white shadow-solid bg-gray-400"
@@ -27,7 +26,7 @@
       <EveImage
         v-if="hasOwnerPicture"
         :tailwind_class="'-ml-1 inline-block h-12 w-12 rounded-full text-white shadow-solid'"
-        :object="asset.owner"
+        :object="ownerObject(asset)"
         :size="128"
       />
     </template>
@@ -51,29 +50,23 @@
 
     <template #lower_right>
       <ScaleIcon class="shrink-0 mr-1.5 h-5 w-5" />
-      <span v-if="asset.type">{{ getMetricPrefix(asset.quantity * asset.type.volume) }}</span>
+      <span v-if="asset.volume">{{ getMetricPrefix(asset.volume) }}</span>
       <span v-else>N/A</span>
     </template>
 
     <template #navigation>
       <Link
         v-if="asset.content[0]"
-        :href="route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id})"
+        :href="asset.url"
         preserve-state
         preserve-scroll
       >
-        <svg
-          :class="[{'text-gray-400' : asset.content[0], 'text-transparent' : !asset.content[0]},'h-5 w-5']"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-            clip-rule="evenodd"
-          />
-        </svg>
+          <ChevronRightIcon class="h-5 w-5 text-gray-400" />
       </Link>
+        <ChevronRightIcon
+          v-else
+          class="h-5 w-5 text-transparent"
+        />
     </template>
   </WideListElement>
 </template>
@@ -85,7 +78,7 @@ import EveImage from "@/Shared/EveImage.vue";
 import {Link, usePage} from '@inertiajs/vue3';
 import { prefix } from 'metric-prefix'
 import {computed} from "vue";
-import {TagIcon, ScaleIcon} from "@heroicons/vue/20/solid";
+import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
 
 const props = defineProps({
   items: {
@@ -105,13 +98,11 @@ const hasOwnerPicture = computed(() => {
 })
 
 const getMetricPrefix = function (numeric_value) {
-
-  return prefix(numeric_value, {precision: 3, unit: 'm³'})
+    return prefix(numeric_value, {precision: 3, unit: 'm³'})
 }
 
 const url = function (asset) {
-
-  return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner.character_id}) : ''
+    return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner_id}) : ''
 }
 
 const getType = function (asset) {
@@ -131,8 +122,12 @@ const getType = function (asset) {
   return type
 }
 
+const ownerObject = function (asset) {
+
+  return {
+      character_id: asset.owner_id,
+      name: 'n/a'
+  }
+}
+
 </script>
-
-<style scoped>
-
-</style>

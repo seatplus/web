@@ -2,40 +2,31 @@
   <div class="divide-y divide-gray-200">
     <CompactAssetListComponent
       v-if="compact"
-      :items="uniqueItems"
+      :items="items"
     />
     <WideAssetListComponent
-      v-else
-      :items="uniqueItems"
+        v-else
+      :items="items"
     />
   </div>
 </template>
 
-<script>
+<script setup>
 
   import CompactAssetListComponent from "./CompactAssetListComponent.vue";
   import WideAssetListComponent from "./WideAssetListComponent.vue";
 
-  export default {
-    name: "ItemList",
-        components: {CompactAssetListComponent, WideAssetListComponent},
-        props: {
-            compact: {
-                required: true,
-                default: false,
-                type: Boolean
-            },
-            items: {
-                required: true,
-                type: Array
-            }
-        },
-        computed: {
-            uniqueItems() {
-                return _.uniqBy(this.items, 'item_id')
-            },
-        },
-  }
+  const props = defineProps({
+    items: {
+      required: true,
+      type: Array
+    },
+    compact: {
+      required: true,
+      default: false,
+      type: Boolean
+    }
+  })
 </script>
 
 <style scoped>
