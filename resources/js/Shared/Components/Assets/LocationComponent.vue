@@ -46,10 +46,8 @@
 
 <script setup>
 import WideLists from "../../WideLists.vue";
-import LocationName from "./LocationName.vue";
 import ItemList from "./ItemList.vue";
 import AddManualLocationModal from "./AddManualLocationModal.vue";
-import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper.vue";
 import {computed, ref} from "vue";
 import {prefix} from "metric-prefix";
 

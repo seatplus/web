@@ -34,11 +34,12 @@ use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Traits\HasWatchlist;
+use Seatplus\Web\Services\Query\LocationWatchListScope;
+use Seatplus\Web\Services\Query\TypeWatchListScope;
 
 class ContractsController extends Controller
 {
-    use HasWatchlist;
+
 
     public function index()
     {
@@ -71,9 +72,9 @@ class ContractsController extends Controller
     public function getCharacterContractsDetails(int $character_id, Request $request)
     {
         $query = Contract::whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
-            ->with(['items', 'items.type', 'items.type.group', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation']);
-
-        $this->handleWatchlist($query, $request);
+            ->with(['items', 'items.type', 'items.type.group', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation'])
+            ->tap(new LocationWatchListScope($request->all()))
+            ->tap(new TypeWatchListScope($request->all()));
 
         return ContractRessource::collection($query->paginate());
     }
