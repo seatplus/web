@@ -176,8 +176,8 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         ->assertOk();
 
     // check that there are no suggestions
-    expect(json_decode((string) $response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0);
-    expect(ManualLocation::all())->toBeEmpty();
+    expect(json_decode((string)$response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0)
+        ->and(ManualLocation::all())->toBeEmpty();
 });
 
 test('if location does not have system dispatch job', function () {
