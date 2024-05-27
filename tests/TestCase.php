@@ -23,7 +23,6 @@ use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
-use Staudenmeir\LaravelCte\DatabaseServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
@@ -97,7 +96,6 @@ abstract class TestCase extends OrchestraTestCase
         return [
             WebServiceProvider::class,
             EveapiServiceProvider::class,
-            DatabaseServiceProvider::class,
             HorizonServiceProvider::class,
             AuthenticationServiceProvider::class,
             InertiaServiceProviderAlias::class,
