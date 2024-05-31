@@ -36,9 +36,9 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
-use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
+use Seatplus\Web\Http\Actions\Recruitment\DeleteCharacterApplicationAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
@@ -53,13 +53,9 @@ class ApplicationsController extends Controller
         return back()->with('success', 'Application submitted');
     }
 
-    public function pullCharacterApplication(int $character_id)
+    public function pullCharacterApplication(int $character_id, DeleteCharacterApplicationAction $action)
     {
-        $user_owns_character_id = in_array($character_id, (new GetOwnedIds)->execute());
-
-        abort_unless($user_owns_character_id, 403, 'submitted character_id does not belong to user');
-
-        CharacterInfo::find($character_id)->application()->delete();
+        $action->execute($character_id);
 
         return back()->with('success', 'Application deleted');
     }

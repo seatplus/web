@@ -98,14 +98,15 @@ test('secondary user can apply as character', function () {
         ->post(route('post.application'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
             'character_id' => test()->secondary_character->character_id,
-        ]);
+        ])->assertRedirect();
 
     test()->assertNotNull(test()->secondary_character->refresh()->application);
     expect(test()->secondary_character->refresh()->application instanceof Application)->toBeTrue();
 
     // Pull application
     $response = test()->actingAs(test()->secondary_user)
-        ->delete(route('delete.character.application', test()->secondary_character->character_id));
+        ->delete(route('delete.character.application', test()->secondary_character->character_id))
+        ->assertRedirect();
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
 });

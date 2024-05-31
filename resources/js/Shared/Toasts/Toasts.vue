@@ -36,7 +36,7 @@ const handleFlashMessages = async (flash) => {
     await nextTick(() => {
         for (const [key, value] of Object.entries(flash)) {
             if(toasts.types.includes(key) && value) {
-                addToast(value, {appearance: key})
+                toasts.addToast(value, {appearance: key})
             }
         }
     })

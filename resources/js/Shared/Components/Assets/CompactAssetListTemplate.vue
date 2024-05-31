@@ -24,7 +24,7 @@
           <EveImage
             v-if="hasOwnerPicture"
             :tailwind_class="'relative z-0 inline-block h-5 w-5 rounded-full text-white shadow-solid'"
-            :object="entry.owner"
+            :object="{character_id: entry.owner_id, name: 'N/A'}"
             :size="128"
           />
         </div>
@@ -40,7 +40,7 @@
       <label class="block text-sm font-medium text-gray-700 sm:hidden">
         Volume
       </label>
-      {{ volume }}
+      {{ getMetricPrefix(entry.volume) }}
     </div>
 
     <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal sm:col-span-2">
@@ -52,79 +52,64 @@
 
     <div class="px-6 sm:px-3 py-4 sm:py-1 self-center truncate text-right sm:col-span-1 justify-self-end">
       <span class="sr-only">Expand</span>
-      <ChevronRightIcon 
-        v-if="hasContent" 
+      <ChevronRightIcon
+        v-if="hasContent"
         class="text-gray-400 h-5 w-5 justify-self-end"
       />
     </div>
   </li>
 </template>
 
-<script>
+<script setup>
 import {prefix} from "metric-prefix";
 import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import EveImage from "@/Shared/EveImage.vue"
-export default {
-    name: "CompactAssetListTemplate",
-    components: {EveImage, ChevronRightIcon},
-    props: {
-        entry: {
-            required: true,
-            type: Object
-        },
-        even: {
-            required: true,
-            type: Number
-        }
+import {get} from "lodash";
+import {computed} from "vue";
+import {usePage} from "@inertiajs/vue3";
+
+const props = defineProps({
+    entry: {
+        required: true,
+        type: Object
     },
-    computed: {
-        name() {
-
-            let type_name = _.get(this.entry, 'type.name', 'missing type information')
-
-            return this.entry.name ? `${this.entry.name} (${type_name})` : type_name
-        },
-        type() {
-
-            let type = this.entry.type
-
-            type.name = this.name
-
-            return type
-        },
-        volume() {
-            let quantity = this.entry.quantity
-            let volume = _.get(this.entry, 'type.volume', 0)
-
-            return this.getMetricPrefix(volume * quantity)
-        },
-        group() {
-            let group_name =  _.get(this.entry, 'type.group.name', 'missing group information')
-
-            return this.entry.is_singleton ? group_name : `${group_name} (packaged)`
-        },
-        hasContent() {
-            return _.size(this.entry.content) > 0
-        },
-        hasOwnerPicture() {
-
-            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
-
-            if (_.size(selectedCharacterIds) > 1)
-                return true
-
-            return !selectedCharacterIds && this.$page.props.user.data.characters.length > 1;
-        }
-    },
-    methods: {
-        getMetricPrefix(numeric_value) {
-
-            return prefix(numeric_value, {precision: 3, unit: 'm³'})
-        },
+    even: {
+        required: true,
+        type: Number
     }
+})
+
+const type_name = get(props.entry, 'type.name', 'missing type information')
+const name = props.entry.name ? `${props.entry.name} (${type_name})` : type_name
+const type = {
+    ...props.entry.type,
+    name: name
+}
+
+
+const group = computed(() => {
+    let group_name =  get(props.entry, 'type.group.name', 'missing group information')
+
+    return props.entry.is_singleton ? group_name : `${group_name} (packaged)`
+})
+
+const hasContent = computed(() => {
+    return _.size(props.entry.content) > 0
+})
+
+const hasOwnerPicture = computed(() => {
+
+    let selectedCharacterIds = get(route().params, 'character_ids', null)
+
+    if (_.size(selectedCharacterIds) > 1)
+        return true
+
+    return !selectedCharacterIds && usePage().props.user.data.characters.length > 1;
+})
+
+// Methods
+const getMetricPrefix = function (numeric_value) {
+
+    return prefix(numeric_value, {precision: 3, unit: 'm³'})
 }
 </script>
-
-<style scoped>
-
-</style>

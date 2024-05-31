@@ -36,7 +36,6 @@ Route::prefix('assets')
         Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Asset::class)))
             ->group(function () {
                 Route::get('locations', 'getLocations')->name('get.character.assets.locations');
-                Route::get('/location/{location_id}', 'loadLocation')->name('location.assets');
                 Route::get('/{character_id}/item/{item_id}', 'item')->name('character.item');
             });
 

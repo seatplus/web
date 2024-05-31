@@ -26,20 +26,18 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\GetAssetLocationsRequest;
 use Seatplus\Web\Http\Resources\AssetResource;
-use Seatplus\Web\Models\Asset\Asset as WebAssetAlias;
+use Seatplus\Web\Http\Resources\LocationRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Traits\HasWatchlist;
 
 class AssetsController extends Controller
 {
-    use HasWatchlist;
-
     public function index()
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
@@ -50,58 +48,14 @@ class AssetsController extends Controller
         ]);
     }
 
-    public function getLocations(Request $request)
+    public function getLocations(GetAssetLocationsRequest $request, GetCharacterAssetLocationAction $action)
     {
-        $character_ids = $request->get('character_ids');
+        $validated = $request->all();
 
-        abort_unless($character_ids, 404);
+        $lengthAwarePaginator = $action->execute($validated);
 
-        $query = WebAssetAlias::query()
-            ->whereIn('assetable_id', $character_ids)
-            ->where('assetable_type', CharacterInfo::class)
-            ->when($request->has('search'), fn ($query) => $query->search($request->get('search')))
-            ->handleWatchlist($request)
-            ->withRecursiveContent()
-            ->with('location')
-            ->select('location_id', 'assetable_id')
-            ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-            ->groupBy('location_id', 'assetable_id')
-            ->orderBy('location_id', 'asc');
-
-        if ($request->has('withUnknownLocations')) {
-            $query = WebAssetAlias::query()
-                ->whereIn('assetable_id', $character_ids)
-                ->where('assetable_type', CharacterInfo::class)
-                ->withUnknownLocations()
-                ->with('location')
-                ->select('location_id', 'assetable_id')
-                ->whereIn('location_flag', ['Hangar', 'AssetSafety', 'Deliveries'])
-                ->groupBy('location_id', 'assetable_id')
-                ->orderBy('location_id', 'asc');
-        }
-
-        return AssetResource::collection(
-            $query->paginate(5)
-        );
-    }
-
-    public function loadLocation(int $location_id, Request $request)
-    {
-        $character_ids = $request->get('character_ids');
-
-        abort_unless($character_ids, 404);
-
-        $query = WebAssetAlias::query()
-            ->whereIn('assetable_id', $character_ids)
-            ->where('assetable_type', CharacterInfo::class)
-            ->when($request->has('search'), fn ($query) => $query->search($request->get('search')))
-            ->handleWatchlist($request)
-            ->withRecursiveContent()
-            ->where('location_id', $location_id)
-            ->with(['assetable', 'type', 'type.group', 'content', 'location']);
-
-        return AssetResource::collection(
-            $query->paginate()
+        return LocationRessource::collection(
+            $lengthAwarePaginator
         );
     }
 

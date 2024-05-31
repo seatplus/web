@@ -26,32 +26,31 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;
 
 class AssetResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'item_id' => $this->item_id,
+            'owner_id' => $this->assetable_id,
             'quantity' => $this->quantity,
             'type_id' => $this->type_id,
             'type' => TypeResource::make($this->whenLoaded('type')),
+            'volume' => $this->whenLoaded('type', fn () => $this->type->volume * $this->quantity),
             'name' => $this->name,
             'location_id' => $this->location_id,
-            'location' => $this->whenLoaded('location'),
             'location_flag' => $this->location_flag,
             'is_singleton' => $this->is_singleton,
             'is_blueprint_copy' => $this->is_blueprint_copy,
             'content' => $this::collection($this->whenLoaded('content')),
-            'owner' => $this->whenLoaded('assetable'),
+            'url' => route('character.item', [
+                'character_id' => $this->assetable_id,
+                'item_id' => $this->item_id,
+            ]),
         ];
     }
 }

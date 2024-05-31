@@ -28,11 +28,14 @@ namespace Seatplus\Web\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Universe\LocatableInterface;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\System;
 
-class ManualLocation extends Model
+class ManualLocation extends Model implements LocatableInterface
 {
     use HasFactory;
 
@@ -43,12 +46,12 @@ class ManualLocation extends Model
      */
     protected $guarded = [];
 
-    public function location()
+    public function location(): MorphOne
     {
-        return $this->belongsTo(Location::class, 'location_id', 'location_id');
+        return $this->morphOne(Location::class, 'locatable');
     }
 
-    public function system()
+    public function system(): BelongsTo
     {
         return $this->belongsTo(System::class, 'solar_system_id', 'system_id');
     }
