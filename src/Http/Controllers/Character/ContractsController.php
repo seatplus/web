@@ -39,8 +39,6 @@ use Seatplus\Web\Services\Query\TypeWatchListScope;
 
 class ContractsController extends Controller
 {
-
-
     public function index()
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()

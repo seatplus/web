@@ -2,8 +2,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Request;
 
-
-
 use Illuminate\Foundation\Http\FormRequest;
 
 class GetAssetLocationsRequest extends FormRequest
@@ -25,8 +23,7 @@ class GetAssetLocationsRequest extends FormRequest
             'types' => 'array',
             'groups' => 'array',
             'categories' => 'array',
-            'withUnknownLocations' => 'missing'
+            'withUnknownLocations' => 'missing',
         ];
     }
-
 }

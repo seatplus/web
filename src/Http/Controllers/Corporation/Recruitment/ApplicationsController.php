@@ -36,7 +36,6 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
-use Seatplus\Eveapi\Services\GetOwnedIds;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
 use Seatplus\Web\Http\Actions\Recruitment\DeleteCharacterApplicationAction;

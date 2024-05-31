@@ -38,7 +38,6 @@ use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 class AssetsController extends Controller
 {
-
     public function index()
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();

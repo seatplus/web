@@ -43,7 +43,6 @@ class HandleApplicationAction
         $this->user = auth()->user();
     }
 
-
     public function execute(array $data)
     {
         $this->corporation_id = Arr::get($data, 'corporation_id');

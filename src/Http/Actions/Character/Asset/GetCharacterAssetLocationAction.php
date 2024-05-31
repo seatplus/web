@@ -17,11 +17,11 @@ class GetCharacterAssetLocationAction
 {
     const ASSETRELATIONS = [
         'type' => [
-            'group'
+            'group',
         ],
         'content' => [
-            'content'
-        ]
+            'content',
+        ],
     ];
     private array $validated = [];
 
@@ -85,14 +85,15 @@ class GetCharacterAssetLocationAction
             ->isNotEmpty();
     }
 
-    function filterAssets($assets): Collection
+    public function filterAssets($assets): Collection
     {
-        return $assets->filter(fn($asset) => $this->filterAssetsLogic($asset))
+        return $assets->filter(fn ($asset) => $this->filterAssetsLogic($asset))
             ->map(function ($asset) {
                 if ($asset->content) {
                     $filtered_content = $this->filterContent($asset->content);
                     $asset->setRelation('content', $filtered_content);
                 }
+
                 return $asset;
             })
             ->values();
@@ -105,12 +106,13 @@ class GetCharacterAssetLocationAction
 
     private function filterContent($content): Collection
     {
-        return $content->filter(fn($asset) => $this->filterAssetsLogic($asset))
+        return $content->filter(fn ($asset) => $this->filterAssetsLogic($asset))
             ->map(function ($asset) {
                 if ($asset->relationLoaded('content') && $asset->content) {
                     $filtered_content = $this->filterContent($asset->content);
                     $asset->setRelation('content', $filtered_content);
                 }
+
                 return $asset;
             });
     }
@@ -127,7 +129,7 @@ class GetCharacterAssetLocationAction
 
         if ($asset_safety->isNotEmpty()) {
             $asset_safety_location = new Location([
-                'location_id' => Asset::ASSET_SAFETY
+                'location_id' => Asset::ASSET_SAFETY,
             ]);
 
             $asset_safety_location->setRelation('assets', $asset_safety);
@@ -146,16 +148,19 @@ class GetCharacterAssetLocationAction
             ->with([
                 'assets' => self::ASSETRELATIONS,
                 'locatable' => [
-                    'system'
-                ]
+                    'system',
+                ],
             ])
-            ->with('assets', fn($query) => $query->whereIn('assetable_id', $character_ids)->where('assetable_type', CharacterInfo::class))
-            ->where(fn($query) => $query
+            ->with('assets', fn ($query) => $query->whereIn('assetable_id', $character_ids)->where('assetable_type', CharacterInfo::class))
+            ->where(
+                fn ($query) => $query
                 ->whereHas('assets', $this->getAssetQuery())
                 ->orWhereHas('assets.content', $this->getAssetQuery())
                 ->orWhereHas('assets.content.content', $this->getAssetQuery())
             )
-            ->when(data_get($this->validated, 'only_unknown_locations'), fn($query) => $query
+            ->when(
+                data_get($this->validated, 'only_unknown_locations'),
+                fn ($query) => $query
                 ->doesntHaveMorph('locatable', [Station::class, Structure::class])
                 ->orWhereNull('locatable_type')
             )
@@ -174,6 +179,7 @@ class GetCharacterAssetLocationAction
             ->map(function ($location) {
                 $filtered_assets = $this->filterAssets($location->assets);
                 $location->setRelation('assets', $filtered_assets);
+
                 return $location;
             });
     }

@@ -49,5 +49,4 @@ class DeleteCharacterApplicationAction
     {
         CharacterInfo::find($this->character_id)->application()->delete();
     }
-
 }

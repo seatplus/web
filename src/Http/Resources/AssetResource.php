@@ -49,7 +49,7 @@ class AssetResource extends JsonResource
             'content' => $this::collection($this->whenLoaded('content')),
             'url' => route('character.item', [
                 'character_id' => $this->assetable_id,
-                'item_id' => $this->item_id
+                'item_id' => $this->item_id,
             ]),
         ];
     }

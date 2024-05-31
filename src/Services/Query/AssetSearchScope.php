@@ -41,6 +41,7 @@ class AssetSearchScope
                         ->orWhere('category_name_normalized', 'like', $term);
                 });
         });
+
         return true;
     }
 
@@ -59,12 +60,11 @@ class AssetSearchScope
             $item->name_normalized,
             $item->type_name_normalized,
             $item->group_name_normalized,
-            $item->category_name_normalized
+            $item->category_name_normalized,
         ])->filter()
-            ->map(fn($name) => Str::lower($name))
-            ->filter(fn($name) => Str::startsWith($name, $terms))
+            ->map(fn ($name) => Str::lower($name))
+            ->filter(fn ($name) => Str::startsWith($name, $terms))
             ->isNotEmpty();
 
     }
-
 }

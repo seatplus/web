@@ -71,14 +71,14 @@ it('has watchlist scope', function () {
 
     $category = Category::factory()->create();
     $group = Group::factory()->create([
-        'category_id' => $category->category_id
+        'category_id' => $category->category_id,
     ]);
     $type = Type::factory()->create([
-        'group_id' => $group->group_id
+        'group_id' => $group->group_id,
     ]);
     ContractItem::factory()->create([
         'contract_id' => $contract->contract_id,
-        'type_id' => $type->type_id
+        'type_id' => $type->type_id,
     ]);
 
     $propertyMap = [
@@ -86,7 +86,7 @@ it('has watchlist scope', function () {
         'regions' => [$location->locatable->system->region->region_id],
         'types' => [$type->type_id],
         'groups' => [$group->group_id],
-        'categories' => [$category->category_id]
+        'categories' => [$category->category_id],
     ];
 
     foreach ($propertyMap as $key => $value) {

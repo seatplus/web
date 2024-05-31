@@ -3,11 +3,7 @@
 namespace Seatplus\Web\Services\Query;
 
 use Illuminate\Database\Eloquent\Builder;
-use Seatplus\Eveapi\Models\Assets\Asset;
-use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\LocationWatchListInterface;
-use Seatplus\Eveapi\Models\TypeWatchListInterface;
-use Seatplus\Eveapi\Models\Universe\Location;
 
 class LocationWatchListScope
 {

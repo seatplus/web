@@ -1,13 +1,11 @@
 <?php
 
 
-use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
-use Seatplus\Eveapi\Models\Universe\Structure;
 
 test('is protected by authentication', function () {
     $response = test()->followingRedirects()
@@ -144,7 +142,7 @@ test('load asset on watchlist', function () {
         'regions' => [$location->locatable->system->region->region_id],
         'types' => [$asset->type_id],
         'groups' => [$content->group_id],
-        'categories' => [$content_content->category_id]
+        'categories' => [$content_content->category_id],
     ];
 
     foreach ($propertyMapping as $key => $value) {

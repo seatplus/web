@@ -60,7 +60,7 @@ class TypeWatchListScope
         ];
 
         // if no property is set, return true
-        if (!collect($propertyMapping)->filter(fn($assetProperty, $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
+        if (! collect($propertyMapping)->filter(fn ($assetProperty, $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
             return true;
         }
 
