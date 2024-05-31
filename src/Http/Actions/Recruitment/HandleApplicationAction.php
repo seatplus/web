@@ -27,29 +27,58 @@
 namespace Seatplus\Web\Http\Actions\Recruitment;
 
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
+use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Services\GetOwnedIds;
 
 class HandleApplicationAction
 {
+    private User $user;
+    private ?int $corporation_id = null;
+    private ?int $character_id = null;
+
+    public function __construct()
+    {
+        $this->user = auth()->user();
+    }
+
+
     public function execute(array $data)
     {
-        Arr::get($data, 'character_id', false) ? $this->handleCharacterApplication($data) : $this->handleUserApplication($data);
+        $this->corporation_id = Arr::get($data, 'corporation_id');
+        $this->character_id = Arr::get($data, 'character_id');
+
+        $this->character_id ? $this->handleCharacterApplication() : $this->handleUserApplication();
     }
 
-    private function handleUserApplication(array $application_request): void
+    private function handleUserApplication(): void
     {
-        auth()->user()->application()->create(['corporation_id' => Arr::get($application_request, 'corporation_id')]);
+        $this->user->application()->create(['corporation_id' => $this->corporation_id]);
     }
 
-    private function handleCharacterApplication(array $application_request): void
+    private function handleCharacterApplication(): void
     {
-        $character_id = Arr::get($application_request, 'character_id');
+        abort_unless($this->characterIdBelongsToUser(), 403, 'submitted character_id does not belong to user');
 
-        $user_owns_character_id = in_array($character_id, (new GetOwnedIds)->execute());
+        CharacterInfo::find($this->character_id)->application()->create(['corporation_id' => $this->corporation_id]);
+    }
 
-        abort_unless($user_owns_character_id, 403, 'submitted character_id does not belong to user');
+    private function characterIdBelongsToUser(): bool
+    {
+        return in_array($this->character_id, $this->getOwnedIds());
+    }
 
-        CharacterInfo::find($character_id)->application()->create(['corporation_id' => Arr::get($application_request, 'corporation_id')]);
+    private function getOwnedIds(): array
+    {
+        $dto = new AffiliationsDto(
+            permissions: [''],
+            user: $this->user
+        );
+
+        return GetOwnedAffiliatedIdsService::make($dto)
+            ->getQuery()
+            ->pluck('affiliated_id')
+            ->toArray();
     }
 }
