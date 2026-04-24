@@ -59,7 +59,7 @@ class LeaveControlGroupController extends Controller
     {
         match ($this->role->type->value) {
             'on-request' => (new OptOutAction(new BaseRoleService))->execute($this->role->id, $this->user->id),
-            'opt-in'     => (new LeaveAction)->execute($this->role->id, $this->user->id),
+            'opt-in' => (new LeaveAction)->execute($this->role->id, $this->user->id),
         };
     }
 

@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;

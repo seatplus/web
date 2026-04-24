@@ -42,7 +42,9 @@ class ListMembersController extends Controller
         abort_unless(auth()->user()->can('superuser') || (new BaseRoleService)->for($role)->canModerate(auth()->user()), 403);
 
         $users = User::query()
-            ->join('role_memberships', fn ($join) => $join
+            ->join(
+                'role_memberships',
+                fn ($join) => $join
                 ->on('users.id', '=', 'role_memberships.entity_id')
                 ->where('role_memberships.entity_type', User::class)
                 ->where('role_memberships.role_id', $role_id)

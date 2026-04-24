@@ -6,7 +6,6 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\OnRequestRoleService;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 beforeEach(function () {
     Queue::fake();
