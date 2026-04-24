@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Seatplus\Auth\Http\Middleware\CheckRequiredScopes as CheckRequiredScopesMiddleware;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -44,9 +43,9 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
         return parent::handle($request, $next);
     }
 
-    protected function redirectTo(Collection $missing_character_scopes)
+    protected function redirectTo(array $missing_character_scopes)
     {
-        $missing_character = $missing_character_scopes->map(function ($missing) {
+        $missing_character = collect($missing_character_scopes)->map(function ($missing) {
             $missing = (object) $missing;
 
             return [
