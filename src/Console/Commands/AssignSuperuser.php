@@ -30,6 +30,7 @@ use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -57,8 +58,9 @@ class AssignSuperuser extends Command
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct(
+        private BaseRoleService $role_service
+    ) {
         parent::__construct();
     }
 
@@ -115,29 +117,21 @@ class AssignSuperuser extends Command
             return;
         }
 
-        $role = $this->createRole();
-        $this->assignPermissionToRole($role);
-
-        $manualRoleService = new ManualRoleService($role);
-
-        $manualRoleService->addMember($this->user);
-        $manualRoleService->handleMembers();
+        $this->createRole();
     }
 
-    private function createRole(): Role
+    private function createRole(): void
     {
         $role = Role::findOrCreate('Superuser');
 
         assert($role instanceof Role);
 
-        return $role;
-    }
+        $role->givePermissionTo(Permission::findOrCreate('superuser'));
 
-    private function assignPermissionToRole(Role $role): void
-    {
-        $permission = Permission::findOrCreate('superuser');
+        $manualRoleService = new ManualRoleService($role);
 
-        $role->givePermissionTo($permission);
+        $manualRoleService->addMember($this->user);
+        $manualRoleService->handleMembers();
     }
 
     private function hasAlreadyRun(): bool

@@ -69,6 +69,7 @@ class MailsController extends Controller
 
     public function getMail(int $mail_id): Collection
     {
+
         $userIsSuperuser = auth()->user()->can('superuser');
 
         $mail = Mail::query()

@@ -27,66 +27,59 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Http\RedirectResponse;
-use Seatplus\Auth\Http\Actions\Roles\OnRequest\OptOutAction;
-use Seatplus\Auth\Http\Actions\Roles\OptIn\LeaveAction;
-use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
-use Seatplus\Web\Http\Controllers\Controller;
 
-class LeaveControlGroupController extends Controller
+class LeaveControlGroupController
 {
-    private Role $role;
+    private const ERROR_INVALID_GROUP_TYPE = 'This action is not allowed on this access control group';
 
-    private User $user;
+    private const ERROR_UNAUTHORIZED = 'You are not allowed to perform this action';
+
+    private const ALLOWED_ROLE_TYPES = [RoleType::OPT_IN, RoleType::ON_REQUEST];
 
     public function __construct(
-        private readonly OptOutAction $optOutAction,
-        private readonly LeaveAction $leaveAction,
-        private readonly BaseRoleService $baseRoleService,
+        private BaseRoleService $roleService
     ) {}
 
     public function __invoke(int $role_id, int $user_id): RedirectResponse
     {
-        $this->role = Role::find($role_id);
-        $this->user = User::find($user_id);
+        $user = User::query()->findOrFail($user_id);
+        $this->roleService = $this->roleService->for($role_id);
 
-        if (! in_array($this->role->type->value, ['opt-in', 'on-request'])) {
-            return abort(403, 'This action is not allowed on this access control group');
-        }
+        $this->validateRequest($user);
 
-        $this->isActionOnYourself()
-            ? $this->removeMember()
-            : ($this->isSuperuserOrModerator() ? $this->removeMember() : $this->illegalAction());
+        $this->processLeaveRequest($user);
+
+        session()->flash('success');
 
         return redirect()->back();
     }
 
-    private function removeMember(): void
+    private function validateRequest(User $user): void
     {
-        match ($this->role->type->value) {
-            'on-request' => $this->optOutAction->execute($this->role->id, $this->user->id),
-            'opt-in' => $this->leaveAction->execute($this->role->id, $this->user->id),
-            default => null,
+        abort_if(in_array($this->roleService->getType(), self::ALLOWED_ROLE_TYPES), 403, self::ERROR_INVALID_GROUP_TYPE);
+
+        abort_unless($this->isAuthorized($user), 403, self::ERROR_UNAUTHORIZED);
+    }
+
+    private function isAuthorized(User $user): bool
+    {
+        $authenticatedUser = auth()->user();
+
+        return $authenticatedUser->id === $user->id
+            || $authenticatedUser->can('superuser')
+            || $this->roleService->canModerate($authenticatedUser);
+    }
+
+    private function processLeaveRequest(User $user): void
+    {
+        $roleType = $this->roleService->getType();
+        match ($roleType) {
+            RoleType::OPT_IN => $this->roleService->optIn()->leaveRole($user),
+            RoleType::ON_REQUEST => $this->roleService->onRequest()->removeApplication($user),
+            default => throw new \InvalidArgumentException(self::ERROR_INVALID_GROUP_TYPE)
         };
-
-        $this->baseRoleService->for($this->role)->handleMembers();
-    }
-
-    private function isSuperuserOrModerator(): bool
-    {
-        return auth()->user()->can('superuser') || $this->baseRoleService->for($this->role)->canModerate(auth()->user());
-    }
-
-    private function isActionOnYourself(): bool
-    {
-        session()->flash('success');
-
-        return auth()->user()->getAuthIdentifier() === $this->user->id;
-    }
-
-    private function illegalAction(): never
-    {
-        abort(403, 'You are not allowed to perform this action');
     }
 }
