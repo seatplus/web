@@ -75,7 +75,7 @@ class GetCharacterAssetLocationAction
         }
 
         // if $query is an Asset, wrap it in a collection
-        if($asset instanceof Asset) {
+        if ($asset instanceof Asset) {
             $asset = collect([$asset]);
         }
 

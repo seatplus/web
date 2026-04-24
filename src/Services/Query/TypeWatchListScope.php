@@ -34,7 +34,7 @@ class TypeWatchListScope
     {
         $model_class = get_class($query->getModel());
 
-        if(! new $model_class instanceof TypeWatchListInterface) {
+        if (! new $model_class instanceof TypeWatchListInterface) {
             return false;
         }
 

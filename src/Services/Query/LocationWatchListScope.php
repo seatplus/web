@@ -20,7 +20,7 @@ class LocationWatchListScope
     {
         $model_class = get_class($query->getModel());
 
-        if(! new $model_class instanceof LocationWatchListInterface) {
+        if (! new $model_class instanceof LocationWatchListInterface) {
             return;
         }
 

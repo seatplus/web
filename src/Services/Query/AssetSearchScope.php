@@ -17,11 +17,11 @@ class AssetSearchScope
 
     public function __invoke(Builder|Asset $arg): bool
     {
-        if(! $this->search_query) {
+        if (! $this->search_query) {
             return true;
         }
 
-        if($arg instanceof Builder) {
+        if ($arg instanceof Builder) {
             return $this->handleBuilder($arg);
         }
 
