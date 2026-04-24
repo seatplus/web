@@ -26,8 +26,11 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Seatplus\Auth\Http\Actions\Roles\OnRequest\OptOutAction;
+use Seatplus\Auth\Http\Actions\Roles\OptIn\LeaveAction;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class LeaveControlGroupController extends Controller
@@ -41,7 +44,7 @@ class LeaveControlGroupController extends Controller
         $this->role = Role::find($role_id);
         $this->user = User::find($user_id);
 
-        if (! in_array($this->role->type, ['opt-in', 'on-request'])) {
+        if (! in_array($this->role->type->value, ['opt-in', 'on-request'])) {
             return abort(403, 'This action is not allowed on this access control group');
         }
 
@@ -54,12 +57,15 @@ class LeaveControlGroupController extends Controller
 
     private function removeMember()
     {
-        $this->role->removeMember($this->user);
+        match ($this->role->type->value) {
+            'on-request' => (new OptOutAction(new BaseRoleService))->execute($this->role->id, $this->user->id),
+            'opt-in'     => (new LeaveAction)->execute($this->role->id, $this->user->id),
+        };
     }
 
     private function isSuperuserOrModerator(): bool
     {
-        return auth()->user()->can('superuser') || $this->role->isModerator(auth()->user());
+        return auth()->user()->can('superuser') || (new BaseRoleService)->for($this->role)->canModerate(auth()->user());
     }
 
     private function isActionOnYourself(): bool

@@ -28,7 +28,9 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ControlGroupUpdate;
@@ -68,12 +70,12 @@ class UpdateControlGroupController extends Controller
 
     private function updateType(ControlGroupUpdateData $data): void
     {
-        if ($data->role->type === $data->role_type) {
+        $newType = RoleType::from($data->role_type);
+
+        if ($data->role->type === $newType) {
             return;
         }
 
-        $role = $data->role;
-        $role->type = $data->role_type;
-        $role->save();
+        BaseRoleService::make($data->role)->getTypeService()->setRoleType($newType);
     }
 }

@@ -9,7 +9,7 @@ use Spatie\Permission\PermissionRegistrar;
 beforeEach(function () {
     //Permission::findOrCreate('superuser');
     test()->test_character->roles()->update(['roles' => ['']]);
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
 });
 
 test('user without superuser does not see access control', function () {

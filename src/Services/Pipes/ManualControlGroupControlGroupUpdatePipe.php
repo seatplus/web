@@ -27,11 +27,12 @@
 namespace Seatplus\Web\Services\Pipes;
 
 use Closure;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class ManualControlGroupControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next)
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): mixed
     {
         if ($control_group_update_data->role_type === 'manual') {
             $this->update($control_group_update_data);
@@ -40,11 +41,13 @@ class ManualControlGroupControlGroupUpdatePipe extends AbstractControlGroupUpdat
         return $next($control_group_update_data);
     }
 
-    private function update(ControlGroupUpdateData $data)
+    private function update(ControlGroupUpdateData $data): void
     {
         $this->handleMember($data);
 
         $this->cleanWaitlist($data);
         $this->removeModerators($data);
+
+        (new ManualRoleService($data->role))->handleMembers();
     }
 }

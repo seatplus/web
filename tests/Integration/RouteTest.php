@@ -22,7 +22,7 @@ it('allows superuser on protected access control routes', function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.groups'))

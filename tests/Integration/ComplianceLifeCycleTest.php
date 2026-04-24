@@ -7,6 +7,7 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
@@ -23,7 +24,7 @@ beforeEach(function () {
         $user->givePermissionTo($permission);
 
         // now re-register all the roles and permissions
-        app()->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
 
         return $user;
     });
@@ -36,7 +37,7 @@ test('user without permission fails to see compliance', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        app()->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
     }
 
     $response = test()->actingAs(test()->secondary_user)
@@ -49,7 +50,7 @@ test('user with permission sees component', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        app()->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
     }
 
     $response = test()->actingAs(test()->test_user)
@@ -263,7 +264,7 @@ it('allows user with review permission to review corporation member', function (
     $permission = Permission::create(['name' => 'member compliance: review user']);
 
     $role->givePermissionTo($permission);
-    $role->activateMember(test()->test_user);
+    (new ManualRoleService($role))->addMember(test()->test_user);
 
     // check if test user has permission
     expect(test()->test_user->can('member compliance: review user'))->toBeTrue();

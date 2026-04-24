@@ -14,7 +14,7 @@ test('if post cache clear clears cache', function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
 
     \Illuminate\Support\Facades\Artisan::shouldReceive('call')
         ->once()

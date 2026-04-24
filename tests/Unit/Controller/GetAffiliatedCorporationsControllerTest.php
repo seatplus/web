@@ -12,7 +12,7 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
+    app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
 });
 
 it('get affiliated corporations', function () {

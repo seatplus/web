@@ -24,7 +24,7 @@ test('get mail headers of secondary user', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        app()->make(PermissionRegistrar::class)->registerPermissions();
+        app()->make(PermissionRegistrar::class)->registerPermissions(app(IlluminateContractsAuthAccessGate::class));
     }
 
     $response = test()->actingAs(test()->test_user)

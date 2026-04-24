@@ -5,6 +5,8 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
 uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
@@ -209,11 +211,7 @@ test('moderator can manage applications', function () {
 
     assignPermissionToTestUser(['view access control']);
 
-    $role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_user->id,
-        'affiliatable_type' => User::class,
-        'can_moderate' => true,
-    ]);
+    (new OnRequestRoleService($role))->setModerator(test()->test_user);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('manage.acl.members', ['role_id' => $role->id]));
@@ -280,10 +278,10 @@ test('setup on request group and save twice', function () {
             ],
         ]);
 
-    expect($role->refresh()->moderators->isNotEmpty())->toBeTrue();
+    expect($role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 
     // check if secondary user is moderator
-    expect($role->refresh()->isModerator($secondary_user))->toBeTrue();
+    expect((new BaseRoleService)->for($role->refresh())->canModerate($secondary_user))->toBeTrue();
 
     // reassure moderator does now see control group in sidebar
     $sidebar = (new SidebarEntries($secondary_user))->filter();

@@ -27,11 +27,12 @@
 namespace Seatplus\Web\Services\Pipes;
 
 use Closure;
+use Seatplus\Auth\Services\Roles\OptInRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class OptInControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next)
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): mixed
     {
         if ($control_group_update_data->role_type === 'opt-in') {
             $this->update($control_group_update_data);
@@ -40,12 +41,22 @@ class OptInControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         return $next($control_group_update_data);
     }
 
-    private function update(ControlGroupUpdateData $control_group_update_data)
+    private function update(ControlGroupUpdateData $data): void
     {
-        $this->handleAffiliations($control_group_update_data);
-        $this->removeUnaffiliatedUsers($control_group_update_data);
+        $service = new OptInRoleService($data->role);
 
-        $this->cleanWaitlist($control_group_update_data);
-        $this->removeModerators($control_group_update_data);
+        $this->handleAffiliations($data);
+
+        $criteria = collect($data->affiliations ?? [])
+            ->map(fn ($affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->values()
+            ->toArray();
+
+        $service->addCriteriaForRole($criteria);
+
+        $this->cleanWaitlist($data);
+        $this->removeModerators($data);
+
+        $service->handleMembers();
     }
 }

@@ -30,6 +30,7 @@ use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class AssignSuperuser extends Command
@@ -113,7 +114,7 @@ class AssignSuperuser extends Command
         $role = $this->createRole();
         $this->assignPermissionToRole($role);
 
-        $role->activateMember($this->user);
+        (new ManualRoleService($role))->addMember($this->user);
     }
 
     private function createRole(): Role
