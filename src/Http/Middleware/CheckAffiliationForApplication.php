@@ -36,8 +36,7 @@ class CheckAffiliationForApplication
 {
     public function __construct(
         private GetAffiliatedIds $getAffiliatedIdsService,
-    ) {
-    }
+    ) {}
 
     public function handle(Request $request, Closure $next, string $permission): Response
     {

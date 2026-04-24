@@ -2,12 +2,14 @@
 
 namespace Seatplus\Web\Http\Controllers\Auth;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LoginController
 {
-    public function __invoke(): \Inertia\Response|\Illuminate\Http\RedirectResponse
+    public function __invoke(): Response|RedirectResponse
     {
         // redirect to /home when authenticated
 
