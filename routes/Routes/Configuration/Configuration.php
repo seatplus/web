@@ -25,20 +25,20 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Configuration\CommandsController;
 use Seatplus\Web\Http\Controllers\Configuration\SeatPlusController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\OverviewController;
 use Seatplus\Web\Http\Controllers\Configuration\SsoSettings\SsoSettingsController;
 
-Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->group(function () {
+Route::middleware([CheckAuthorization::class.':superuser'])->group(function () {
     Route::get('/settings', [SeatPlusController::class, 'settings'])->name('server.settings');
 
     Route::post('/cache/clear', [CommandsController::class, 'clear'])->name('cache.clear');
 
     Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
 
-    //TODO: create own controller for server
+    // TODO: create own controller for server
     Route::get('/settings/navigation', [SeatPlusController::class, 'navigation'])->name('settings.navigation');
 
     Route::get('/settings/scopes/overview', OverviewController::class)->name('settings.scopes');

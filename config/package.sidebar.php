@@ -25,9 +25,9 @@
  */
 
 return [
-    'home'     => [
+    'home' => [
         [
-            'name'  => 'Home',
+            'name' => 'Home',
             'route' => 'home',
             'icon' => 'HomeIcon',
         ],
@@ -104,19 +104,19 @@ return [
     ],
     'settings' => [
         [
-            'name'  => 'Server Settings',
+            'name' => 'Server Settings',
             'permission' => 'superuser',
             'route' => 'server.settings',
             'icon' => 'CogIcon',
         ],
         [
-            'name'  => 'Manual Locations',
+            'name' => 'Manual Locations',
             'permission' => 'manage manual locations',
             'route' => 'manage.manual_locations',
             'icon' => 'MapIcon',
         ],
         [
-            'name'  => 'Server Performance',
+            'name' => 'Server Performance',
             'permission' => 'superuser',
             'route' => 'performance.index',
             'icon' => 'FireIcon',

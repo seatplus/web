@@ -25,17 +25,21 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Eveapi\Models\Skills\Skill;
-use Seatplus\Web\Http\Controllers\Character\MailsController;
-use Seatplus\Web\Http\Controllers\Character\SkillsController;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Web\Http\Controllers\Character\MailsController;
 
 Route::prefix('mails')
     ->group(callback: function () {
         Route::get('', [MailsController::class, 'index'])->name('character.mails');
         Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
 
-        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Mail::class)))
+        $mailPermission = sprintf('%s:%s',
+            CheckAuthorization::class,
+            config('eveapi.permissions.'.Mail::class)
+        );
+
+        Route::middleware($mailPermission)
             ->group(function () {
                 Route::get('/headers/', [MailsController::class, 'mailHeaders'])->name('get.mail.headers');
             });

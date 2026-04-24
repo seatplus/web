@@ -25,12 +25,18 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
 
+$corporationHistoryPermission = sprintf('%s:%s',
+    CheckAuthorization::class,
+    config('eveapi.permissions.'.CorporationHistory::class)
+);
+
 Route::prefix('corporation_history')
-    ->middleware(sprintf('permission:%s', config('eveapi.permissions.' . CorporationHistory::class)))
+    ->middleware($corporationHistoryPermission)
     ->group(function () {
         Route::get('/{character_id}', [CorporationHistoryController::class, 'index'])->name('corporation.history');
     });

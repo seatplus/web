@@ -25,31 +25,28 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Corporation\MemberCompliance\MemberComplianceController;
-use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 
 Route::prefix('compliance')
-    //->middleware(['permission:view member compliance,director'])
+    // ->middleware(['permission:view member compliance,director'])
     ->group(function () {
 
-        Route::middleware(CheckPermissionOrCorporationRole::class . ':view member compliance,director')
+        Route::middleware(CheckAuthorization::class.':view member compliance,director')
             ->group(function () {
 
                 Route::get('', [MemberComplianceController::class, 'index'])->name('corporation.member_compliance');
             });
 
-        Route::middleware(CheckPermissionAndAffiliation::class . ':view member compliance,director')
+        Route::middleware(CheckAuthorization::class.':view member compliance,director')
             ->group(function () {
 
                 Route::get('/{corporation_id}/{type}', [MemberComplianceController::class, 'getCorporationCompliance'])
                     ->name('corporation.compliance');
 
                 Route::get('{corporation_id}/review/{user}', [MemberComplianceController::class, 'reviewUser'])
-                    ->middleware(CheckPermissionOrCorporationRole::class . ':member compliance: review user')
+                    ->middleware(CheckAuthorization::class.':member compliance: review user')
                     ->name('corporation.review.user');
             });
-
-
 
     });
