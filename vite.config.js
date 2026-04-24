@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
 import run from 'vite-plugin-run';
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 
 export default defineConfig(({mode}) => {
     return {
@@ -17,6 +18,7 @@ export default defineConfig(({mode}) => {
             }
         },
         plugins: [
+            wayfinder(),
             laravel({
                 input: 'resources/js/app.js',
                 refresh: [
@@ -44,6 +46,8 @@ export default defineConfig(({mode}) => {
         resolve: {
             alias: {
                 '@': '/resources/js',
+                "@actions/": "./resources/js/actions",
+                "@routes/": "./resources/js/routes",
             },
         },
     }
