@@ -43,6 +43,6 @@ class ImpersonateRecruit extends Controller
 
         (new ImpersonateService)->impersonateUser($application->applicationable);
 
-        return redirect()->route('home')->with('success', 'Impersonating ' . $application->applicationable->main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$application->applicationable->main_character->name);
     }
 }

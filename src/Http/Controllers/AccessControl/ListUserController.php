@@ -40,11 +40,11 @@ class ListUserController extends Controller
             ->when(
                 request()->has('name'),
                 fn (Builder $query) => $query
-                ->whereHas(
-                    'characters',
-                    fn (Builder $query) => $query
-                    ->where('name', 'like', "%${name_lookup}%")
-                )
+                    ->whereHas(
+                        'characters',
+                        fn (Builder $query) => $query
+                            ->where('name', 'like', "%${name_lookup}%")
+                    )
             )
             ->paginate();
     }

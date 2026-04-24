@@ -27,11 +27,12 @@
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Web\Http\Resources\UserRessource;
 
 class UserSettingsController
 {
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('Configuration/UserSettings', [
             'user' => UserRessource::make(auth()->user()),

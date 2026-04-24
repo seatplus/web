@@ -28,8 +28,11 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
@@ -46,28 +49,28 @@ use Seatplus\Web\Http\Resources\ApplicationRessource;
 
 class ApplicationsController extends Controller
 {
-    public function apply(ApplicationRequest $application_request)
+    public function apply(ApplicationRequest $application_request): RedirectResponse
     {
         (new HandleApplicationAction)->execute($application_request->all());
 
         return back()->with('success', 'Application submitted');
     }
 
-    public function pullCharacterApplication(int $character_id, DeleteCharacterApplicationAction $action)
+    public function pullCharacterApplication(int $character_id, DeleteCharacterApplicationAction $action): RedirectResponse
     {
         $action->execute($character_id);
 
         return back()->with('success', 'Application deleted');
     }
 
-    public function pullUserApplication()
+    public function pullUserApplication(): RedirectResponse
     {
         auth()->user()->application()->delete();
 
         return back()->with('success', 'Application deleted');
     }
 
-    public function getOpenCorporationApplications(int $corporation_id, int $decision_count)
+    public function getOpenCorporationApplications(int $corporation_id, int $decision_count): AnonymousResourceCollection
     {
         $query = Application::query()
             ->with('log_entries')
@@ -80,7 +83,7 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($query->paginate());
     }
 
-    public function getClosedCorporationApplications(int $corporation_id)
+    public function getClosedCorporationApplications(int $corporation_id): AnonymousResourceCollection
     {
         $applications = Application::query()->ofCorporation($corporation_id)
             ->latest('updated_at')
@@ -89,7 +92,7 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getApplication(string $application_id, WatchlistArrayAction $action)
+    public function getApplication(string $application_id, WatchlistArrayAction $action): Response
     {
         $application = Application::query()
             ->with([
@@ -122,7 +125,7 @@ class ApplicationsController extends Controller
         ]);
     }
 
-    public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action)
+    public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action): RedirectResponse
     {
         $request->validate([
             'decision' => ['required', Rule::in(['rejected', 'accepted'])],
@@ -153,7 +156,7 @@ class ApplicationsController extends Controller
             }, $request->get('decision')));
     }
 
-    public function addComment(string $application_id, Request $request, CreateApplicationLogEntryAction $action)
+    public function addComment(string $application_id, Request $request, CreateApplicationLogEntryAction $action): RedirectResponse
     {
         $request->validate(['comment' => ['required', 'string']]);
 
@@ -165,7 +168,7 @@ class ApplicationsController extends Controller
         return back()->with('success', 'comment created');
     }
 
-    public function getActivityLog(string $application_id)
+    public function getActivityLog(string $application_id): mixed
     {
         return Application::query()
             ->with([
@@ -182,7 +185,7 @@ class ApplicationsController extends Controller
             ->find($application_id);
     }
 
-    public function dispatchBatchUpdate(int $character_id)
+    public function dispatchBatchUpdate(int $character_id): \Illuminate\Http\Response
     {
         $refresh_token = RefreshToken::find($character_id);
 
@@ -193,7 +196,7 @@ class ApplicationsController extends Controller
         return response('success');
     }
 
-    public function getBatchUpdate(int $character_id)
+    public function getBatchUpdate(int $character_id): string
     {
         return BatchUpdate::query()
             ->where('batchable_id', $character_id)

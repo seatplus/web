@@ -26,19 +26,21 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\MemberTrackingResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\DispatchTransferObject;
 
 class MemberTrackingController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->setIsCharacter(false)
@@ -50,7 +52,7 @@ class MemberTrackingController extends Controller
         ]);
     }
 
-    public function getMemberTracking(int $corporation_id)
+    public function getMemberTracking(int $corporation_id): AnonymousResourceCollection
     {
         $corporation = CorporationInfo::find($corporation_id);
         $sso_scopes = collect([
@@ -64,32 +66,26 @@ class MemberTrackingController extends Controller
         return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
     }
 
-    private function getAffiliatedCorporations(object $dispatchTransferObject)
+    private function getAffiliatedCorporations(DispatchTransferObject $dispatchTransferObject): Collection
     {
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user(),
-            corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
-        );
 
-        $owned_corporations = GetOwnedAffiliatedIdsService::make($affiliations_dto)
-            ->getQuery();
+        $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
 
         return CorporationInfo::query()
+            ->whereIn('corporation_id', $affiliatedIds)
             ->with('alliance')
             ->where(
-                fn ($query) => $query
-                ->has('alliance.ssoScopes')
-                ->orHas('ssoScopes')
+                fn (mixed $query) => $query
+                    ->has('alliance.ssoScopes')
+                    ->orHas('ssoScopes')
             )
             ->has('members')
             ->addSelect([
                 'corporation_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.corporation_id')->limit(1),
                 'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1),
             ])
-            ->whereAffiliatedCorporations($affiliations_dto)
             ->get()
-            ->map(function ($corporation) {
+            ->map(function (mixed $corporation) {
                 $corporation->required_scopes = collect([
                     json_decode((string) $corporation->corporation_scopes, true),
                     json_decode((string) $corporation->alliance_scopes, true),

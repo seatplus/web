@@ -56,7 +56,7 @@ class ManualLocation extends Model implements LocatableInterface
         return $this->belongsTo(System::class, 'solar_system_id', 'system_id');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

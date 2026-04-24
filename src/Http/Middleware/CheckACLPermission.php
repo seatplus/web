@@ -27,41 +27,54 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Seatplus\Auth\Models\Permissions\Role;
+use Illuminate\Support\Collection;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\User;
 
 class CheckACLPermission
 {
-    /**
-     * @param  string|null  $character_role
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, string $permission)
+    private const PERMISSION_DENIED_MESSAGE = 'You do not have the necessary permission to perform this action.';
+
+    public function handle(Request $request, Closure $next): mixed
     {
-        if (auth()->user()->can('superuser') || auth()->user()->can($permission)) {
+        if ($this->hasAdministrativeAccess()) {
             return $next($request);
         }
 
-        $moderated_role_ids = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph(
-            'affiliatable',
-            [User::class],
-            fn ($query) => $query->whereId(auth()->user()->getAuthIdentifier())
-        ))->pluck('id');
+        $requestedRoleId = $request->route()->parameter('role_id');
+        $moderatedRoleIds = $this->getModeratedRoleIds();
 
-        $url_parameters = $request->route()->parameters();
-
-        $requested_id = Arr::get($url_parameters, 'role_id');
-
-        if (! $requested_id) {
-            abort_unless($moderated_role_ids->isNotEmpty(), 403, 'You do not have the necessary permission to perform this action.');
-
-            return $next($request);
+        if (! $this->hasRequiredPermissions($requestedRoleId, $moderatedRoleIds)) {
+            abort(403, self::PERMISSION_DENIED_MESSAGE);
         }
-
-        abort_unless(in_array($requested_id, $moderated_role_ids->toArray()), 403, 'You do not have the necessary permission to perform this action.');
 
         return $next($request);
+    }
+
+    private function hasAdministrativeAccess(): bool
+    {
+        return auth()->user()->can('superuser') ||
+               auth()->user()->can('view access control');
+    }
+
+    private function getModeratedRoleIds(): Collection
+    {
+        $userId = auth()->user()->getAuthIdentifier();
+
+        return RoleMembership::query()
+            ->where('can_moderate', true)
+            ->whereHasMorph('entity', [User::class], fn (Builder $query) => $query->whereId($userId))
+            ->pluck('role_id');
+    }
+
+    private function hasRequiredPermissions(?int $requestedRoleId, Collection $moderatedRoleIds): bool
+    {
+        if (! $requestedRoleId) {
+            return $moderatedRoleIds->isNotEmpty();
+        }
+
+        return in_array($requestedRoleId, $moderatedRoleIds->toArray());
     }
 }

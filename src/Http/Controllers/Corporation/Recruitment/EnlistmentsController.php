@@ -26,6 +26,8 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\UpdateWatchlistAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -35,7 +37,7 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class EnlistmentsController extends Controller
 {
-    public function create(CreateOpenRecruitmentRequest $request)
+    public function create(CreateOpenRecruitmentRequest $request): RedirectResponse
     {
         $enlistment = Enlistment::query()->updateOrCreate(
             ['corporation_id' => data_get($request->validated(), 'corporation_id')],
@@ -48,14 +50,14 @@ class EnlistmentsController extends Controller
         return redirect()->back()->with('success', $enlistment->wasRecentlyCreated ? 'Enlistment Created' : 'Enlistment Updated');
     }
 
-    public function delete(int $corporation_id)
+    public function delete(int $corporation_id): RedirectResponse
     {
         Enlistment::where('corporation_id', $corporation_id)->delete();
 
         return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'corporation is closed for recruitment');
     }
 
-    public function edit(int $corporation_id, WatchedArrayAction $action)
+    public function edit(int $corporation_id, WatchedArrayAction $action): Response
     {
         return inertia('Corporation/Recruitment/Configuration/Index', [
             'activeSidebarElement' => 'corporation.recruitment',
@@ -65,7 +67,7 @@ class EnlistmentsController extends Controller
         ]);
     }
 
-    public function updateWatchlist(int $corporation_id, UpdateWatchlistRequest $request, UpdateWatchlistAction $action)
+    public function updateWatchlist(int $corporation_id, UpdateWatchlistRequest $request, UpdateWatchlistAction $action): RedirectResponse
     {
         $action->execute($corporation_id, $request->validated());
 

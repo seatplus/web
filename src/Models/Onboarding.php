@@ -28,6 +28,7 @@ namespace Seatplus\Web\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Seatplus\Auth\Models\User;
 
 class Onboarding extends Model
@@ -41,7 +42,7 @@ class Onboarding extends Model
      */
     protected $guarded = [];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

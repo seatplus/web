@@ -36,9 +36,6 @@ use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
 
 class UpdateOrCreateSsoSettings
 {
-    /**
-     * @var \Illuminate\Support\Collection
-     */
     private Collection $selected_scopes;
 
     private readonly Collection $entities;
@@ -54,34 +51,34 @@ class UpdateOrCreateSsoSettings
         $this->type = Arr::get($this->request, 'type');
     }
 
-    public function execute()
+    public function execute(): void
     {
         $this->entities->whenEmpty(
-            function () {
+            function (mixed $collection) {
                 if ($this->type === 'global') {
                     SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
                 }
             },
-            fn ($collection) => $collection
-            ->each(function ($entity) {
-                $entity_id = Arr::get($entity, 'id');
-                $category = Arr::get($entity, 'category');
+            fn (mixed $collection) => $collection
+                ->each(function (mixed $entity) {
+                    $entity_id = Arr::get($entity, 'id');
+                    $category = Arr::get($entity, 'category');
 
-                $morphable_type = match ($category) {
-                    'corporation' => CorporationInfo::class,
-                    'alliance' => AllianceInfo::class,
-                };
+                    $morphable_type = match ($category) {
+                        'corporation' => CorporationInfo::class,
+                        'alliance' => AllianceInfo::class,
+                    };
 
-                (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
+                    (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
-                SsoScopes::updateOrCreate([
-                    'morphable_id' => $entity_id,
-                ], [
-                    'selected_scopes' => $this->selected_scopes->unique(),
-                    'morphable_type' => $morphable_type,
-                    'type' => $this->type,
-                ]);
-            })
+                    SsoScopes::updateOrCreate([
+                        'morphable_id' => $entity_id,
+                    ], [
+                        'selected_scopes' => $this->selected_scopes->unique(),
+                        'morphable_type' => $morphable_type,
+                        'type' => $this->type,
+                    ]);
+                })
         );
     }
 
@@ -90,8 +87,8 @@ class UpdateOrCreateSsoSettings
         $this->selected_scopes = collect();
 
         collect(Arr::get($this->request, 'selectedScopes'))
-            ->flatMap(fn ($scope) => explode(',', (string) $scope))
-            ->each(function ($scope) {
+            ->flatMap(fn (mixed $scope) => explode(',', (string) $scope))
+            ->each(function (mixed $scope) {
                 // If it is a corporation scope, we need to know the characters role
                 if (Str::of($scope)->contains('corporation')) {
                     $this->selected_scopes->push('esi-characters.read_corporation_roles.v1');

@@ -10,7 +10,9 @@ use Seatplus\Eveapi\Models\TypeWatchListInterface;
 class TypeWatchListScope
 {
     private ?array $type_ids = null;
+
     private ?array $group_ids = null;
+
     private ?array $category_ids = null;
 
     public function __construct(array $request)
@@ -22,7 +24,7 @@ class TypeWatchListScope
 
     public function __invoke(Builder|TypeWatchListInterface $arg): bool
     {
-        return match(true) {
+        return match (true) {
             $arg instanceof Builder => $this->handleBuilder($arg),
             $arg instanceof Asset => $this->handleAsset($arg),
             $arg instanceof Contract => throw new \Exception('Not implemented yet'),
@@ -38,12 +40,12 @@ class TypeWatchListScope
             return false;
         }
 
-        $query->where(function ($query) {
-            $query->where(function ($query) {
+        $query->where(function (mixed $query) {
+            $query->where(function (mixed $query) {
 
-                $query->when($this->type_ids, fn ($query) => $query->filterByTypeIds($this->type_ids));
-                $query->when($this->group_ids, fn ($query) => $query->filterByGroupIds($this->group_ids));
-                $query->when($this->category_ids, fn ($query) => $query->filterByCategoryIds($this->category_ids));
+                $query->when($this->type_ids, fn (mixed $query) => $query->filterByTypeIds($this->type_ids));
+                $query->when($this->group_ids, fn (mixed $query) => $query->filterByGroupIds($this->group_ids));
+                $query->when($this->category_ids, fn (mixed $query) => $query->filterByCategoryIds($this->category_ids));
             });
 
         });
@@ -51,7 +53,7 @@ class TypeWatchListScope
         return true;
     }
 
-    private function handleAsset(Asset $asset): bool //TODO WatchListInterface $asset
+    private function handleAsset(Asset $asset): bool // TODO WatchListInterface $asset
     {
         $propertyMapping = [
             'type_ids' => 'type_id',
@@ -60,10 +62,9 @@ class TypeWatchListScope
         ];
 
         // if no property is set, return true
-        if (! collect($propertyMapping)->filter(fn ($assetProperty, $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
+        if (! collect($propertyMapping)->filter(fn (mixed $assetProperty, mixed $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
             return true;
         }
-
 
         foreach ($propertyMapping as $requestProperty => $assetProperty) {
             if ($this->$requestProperty && in_array($asset->$assetProperty, $this->$requestProperty)) {

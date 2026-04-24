@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Services\ACL;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -35,12 +36,12 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class SyncRoleAffiliations
 {
-    private $current_affiliations;
+    private \Illuminate\Database\Eloquent\Collection $current_affiliations;
 
-    private readonly \Illuminate\Support\Collection $target_affiliations;
+    private readonly Collection $target_affiliations;
 
     public function __construct(/**
-     * @var \Seatplus\Auth\Models\Permissions\Role
+     * @var Role
      */
         private readonly Role $role
     ) {
@@ -48,19 +49,19 @@ class SyncRoleAffiliations
         $this->target_affiliations = collect();
     }
 
-    public function sync(array $validated_data)
+    public function sync(array $validated_data): void
     {
         if (Arr::has($validated_data, 'affiliations')) {
             collect(data_get($validated_data, 'affiliations', []))
                 ->each(
-                    fn ($affiliation) => $this
-                    ->target_affiliations
-                    ->push(Affiliation::firstOrCreate([
-                        'role_id' => $this->role->id,
-                        'affiliatable_id' => data_get($affiliation, 'id'),
-                        'affiliatable_type' => $this->getAffiliatableType($affiliation),
-                        'type' => data_get($affiliation, 'type'),
-                    ]))
+                    fn (mixed $affiliation) => $this
+                        ->target_affiliations
+                        ->push(Affiliation::firstOrCreate([
+                            'role_id' => $this->role->id,
+                            'affiliatable_id' => data_get($affiliation, 'id'),
+                            'affiliatable_type' => $this->getAffiliatableType($affiliation),
+                            'type' => data_get($affiliation, 'type'),
+                        ]))
                 );
         }
 
@@ -76,9 +77,9 @@ class SyncRoleAffiliations
         };
     }
 
-    private function removeUnassignedAffiliations()
+    private function removeUnassignedAffiliations(): void
     {
-        $this->current_affiliations->reject(fn ($current_affiliation) => $this->target_affiliations->contains($current_affiliation))->each(function ($affiliation) {
+        $this->current_affiliations->reject(fn (mixed $current_affiliation) => $this->target_affiliations->contains($current_affiliation))->each(function (mixed $affiliation) {
             Affiliation::where([
                 'role_id' => $affiliation->role_id,
                 'affiliatable_id' => $affiliation->affiliatable_id,

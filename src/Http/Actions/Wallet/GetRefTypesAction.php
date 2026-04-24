@@ -36,8 +36,8 @@ class GetRefTypesAction
     public function execute(string $term): Collection
     {
         return $this->getRefTypes()
-            ->filter(fn ($type) => Str::contains($type->ref_type, $term))
-            ->map(fn ($group, $index) => [
+            ->filter(fn (mixed $type) => Str::contains($type->ref_type, $term))
+            ->map(fn (mixed $group, mixed $index) => [
                 'id' => $this->alphabetToNumber($group->ref_type),
                 'name' => $group->ref_type,
                 'hasEveImage' => false,
@@ -51,13 +51,13 @@ class GetRefTypesAction
             'ref_types',
             now()->addDay(),
             fn () => WalletJournal::query()
-            ->select('ref_type')
-            ->groupBy('ref_type')
-            ->get()
+                ->select('ref_type')
+                ->groupBy('ref_type')
+                ->get()
         );
     }
 
-    private function alphabetToNumber($string): float
+    private function alphabetToNumber(mixed $string): float
     {
         $string = strtoupper((string) $string);
         $length = strlen($string);

@@ -50,7 +50,7 @@ class AssignSuperuser extends Command
      */
     protected $description = 'Assign superuser permission to a user, search by character name';
 
-    private ?\Seatplus\Auth\Models\User $user = null;
+    private ?User $user = null;
 
     /**
      * Create a new command instance.
@@ -62,7 +62,7 @@ class AssignSuperuser extends Command
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         if ($this->hasAlreadyRun()) {
             $this->warn('Superuser has already been assigned, ask any of the following users to help you out:');
@@ -70,7 +70,7 @@ class AssignSuperuser extends Command
             $users = User::with('characters')
                 ->permission('superuser')
                 ->get()
-                ->map(fn ($user) => [
+                ->map(fn (mixed $user) => [
                     'id' => $user->id,
                     'characters' => $user->characters->implode('name', ', '),
                 ]);
@@ -87,7 +87,7 @@ class AssignSuperuser extends Command
         $users = User::with('characters')
             ->search($character_name)
             ->get()
-            ->map(fn ($user) => [
+            ->map(fn (mixed $user) => [
                 'id' => $user->id,
                 'characters' => $user->characters->implode('name', ', '),
             ])
@@ -114,7 +114,10 @@ class AssignSuperuser extends Command
         $role = $this->createRole();
         $this->assignPermissionToRole($role);
 
-        (new ManualRoleService($role))->addMember($this->user);
+        $manualRoleService = new ManualRoleService($role);
+
+        $manualRoleService->addMember($this->user);
+        $manualRoleService->handleMembers();
     }
 
     private function createRole(): Role
@@ -122,14 +125,14 @@ class AssignSuperuser extends Command
         return Role::findOrCreate('Superuser');
     }
 
-    private function assignPermissionToRole(Role $role)
+    private function assignPermissionToRole(Role $role): void
     {
         $permission = Permission::findOrCreate('superuser');
 
         $role->givePermissionTo($permission);
     }
 
-    private function hasAlreadyRun()
+    private function hasAlreadyRun(): bool
     {
         try {
             return User::permission('superuser')->get()->isNotEmpty();

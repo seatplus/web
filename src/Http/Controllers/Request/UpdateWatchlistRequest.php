@@ -33,30 +33,26 @@ class UpdateWatchlistRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'systems' => ['array'],
             'regions' => ['array'],
             'items' => [
                 'array',
-                function ($attribute, $items_array, $fail) {
+                function (mixed $attribute, mixed $items_array, mixed $fail) {
                     foreach ($items_array as $item) {
                         if (! Arr::has($item, ['watchable_id', 'watchable_type'])) {
-                            $fail('The ' . $attribute . ' is invalid. Missing watchable_id and/or watchable_type');
+                            $fail('The '.$attribute.' is invalid. Missing watchable_id and/or watchable_type');
                         }
                     }
                 },

@@ -7,7 +7,7 @@ use Seatplus\Web\Services\SearchService;
 
 class EnableEsiSearchController
 {
-    public function __invoke()
+    public function __invoke(): mixed
     {
         // First check if user has already an esi search token
         if (SearchService::getTokenFromCurrentUser()) {
@@ -25,7 +25,7 @@ class EnableEsiSearchController
             ->find(auth()->user()->getAuthIdentifier());
 
         return inertia('EnableEsiSearch', [
-            'characters' => $user->characters->map(fn ($character) => [
+            'characters' => $user->characters->map(fn (mixed $character) => [
                 'character_id' => $character->character_id,
                 'name' => $character->name,
                 'corporation' => $character->corporation->name ?? 'Unknown Corporation',

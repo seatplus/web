@@ -24,31 +24,21 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Queue;
+namespace Seatplus\Web\Http\Controllers\Auth;
 
-use Laravel\Horizon\Contracts\JobRepository;
-use Laravel\Horizon\Contracts\MasterSupervisorRepository;
-use Laravel\Horizon\Contracts\WorkloadRepository;
-use Seatplus\Web\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class QueueController extends Controller
+class LogoutController
 {
-    public function __invoke(): array
+    public function __invoke(Request $request): RedirectResponse
     {
-        return [
-            'queue_count' => collect(resolve(WorkloadRepository::class)->get())
-                ->sum('length'),
-            'error_count' => app(JobRepository::class)->countRecentlyFailed(),
-            'status' => $this->currentStatus(),
-        ];
-    }
+        Auth::logout();
 
-    private function currentStatus(): string
-    {
-        if (! $masters = app(MasterSupervisorRepository::class)->all()) {
-            return 'inactive';
-        }
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        return collect($masters)->contains(fn (mixed $master) => $master->status === 'paused') ? 'paused' : 'running';
+        return redirect('/');
     }
 }

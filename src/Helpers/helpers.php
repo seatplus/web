@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 /*
  * MIT License
  *
@@ -27,11 +29,8 @@
 if (! function_exists('number_roman')) {
     /**
      * Converts an integer to a roman numberal representation.
-     *
-     * @param  int  $number
-     * @return string
      */
-    function number_roman($number)
+    function number_roman(int $number): string
     {
         $map = [
             'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90, 'L' => 50,
@@ -60,14 +59,13 @@ if (! function_exists('carbon')) {
      * A helper to get a fresh instance of Carbon.
      *
      * @param  null  $data
-     * @return \Carbon\Carbon
      */
-    function carbon($data = null)
+    function carbon(mixed $data = null): Carbon
     {
         if (! is_null($data)) {
-            return new \Carbon\Carbon($data);
+            return new Carbon($data);
         }
 
-        return new \Carbon\Carbon;
+        return new Carbon;
     }
 }

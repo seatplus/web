@@ -2,7 +2,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Onboarding;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\Onboarding;
@@ -10,7 +12,7 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class OnboardingController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         throw_unless(config('web.config.ONBOARDING'), 'Onboarding is disabled');
 
@@ -28,7 +30,7 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function complete()
+    public function complete(): RedirectResponse
     {
         // create onboarding record
         Onboarding::query()->create([

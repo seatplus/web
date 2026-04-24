@@ -39,14 +39,14 @@ class GetIdsFromNamesService
         $this->result = collect();
     }
 
-    public static function make()
+    public static function make(): static
     {
-        return new static();
+        return new static;
     }
 
     public function execute(array $names): Collection
     {
-        $names_to_resolve = collect($names)->filter(function ($name) {
+        $names_to_resolve = collect($names)->filter(function (mixed $name) {
             if (! cache()->has(sprintf('id:%s', $name))) {
                 return true;
             }
@@ -69,7 +69,7 @@ class GetIdsFromNamesService
 
         $esi_results = RetrieveEsiData::execute($container);
 
-        return collect($esi_results)->flatten()->each(fn ($esi_result) => cache([sprintf('id:%s', $esi_result->name) => $esi_result], now()->addDay()))
+        return collect($esi_results)->flatten()->each(fn (mixed $esi_result) => cache([sprintf('id:%s', $esi_result->name) => $esi_result], now()->addDay()))
             ->merge($this->result);
     }
 }

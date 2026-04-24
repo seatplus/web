@@ -24,31 +24,16 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Queue;
+namespace Seatplus\Web\Services\Controller;
 
-use Laravel\Horizon\Contracts\JobRepository;
-use Laravel\Horizon\Contracts\MasterSupervisorRepository;
-use Laravel\Horizon\Contracts\WorkloadRepository;
-use Seatplus\Web\Http\Controllers\Controller;
-
-class QueueController extends Controller
+class DispatchTransferObject
 {
-    public function __invoke(): array
-    {
-        return [
-            'queue_count' => collect(resolve(WorkloadRepository::class)->get())
-                ->sum('length'),
-            'error_count' => app(JobRepository::class)->countRecentlyFailed(),
-            'status' => $this->currentStatus(),
-        ];
-    }
-
-    private function currentStatus(): string
-    {
-        if (! $masters = app(MasterSupervisorRepository::class)->all()) {
-            return 'inactive';
-        }
-
-        return collect($masters)->contains(fn (mixed $master) => $master->status === 'paused') ? 'paused' : 'running';
+    public function __construct(
+        public string $manual_job,
+        public string $permission,
+        public array $required_scopes,
+        public ?array $required_corporation_role
+    ) {
+        $this->required_corporation_role ??= [];
     }
 }

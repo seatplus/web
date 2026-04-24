@@ -56,16 +56,18 @@ class JoinControlGroupController extends Controller
         return redirect()->back();
     }
 
-    private function becomeMember()
+    private function becomeMember(): void
     {
         match ($this->role->type->value) {
             'on-request' => (new ApproveAction)->execute($this->role->id, $this->user->id),
             'opt-in' => (new JoinAction)->execute($this->role->id, $this->user->id),
         };
+
+        (new BaseRoleService)->for($this->role)->handleMembers();
     }
 
-    private function joinWaitlist()
+    private function joinWaitlist(): void
     {
-        (new ApplyAction)->execute($this->role->id, $this->user->id);
+        app(ApplyAction::class)->execute($this->role->id, $this->user->id);
     }
 }

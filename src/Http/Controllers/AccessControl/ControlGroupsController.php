@@ -26,12 +26,14 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -44,14 +46,14 @@ use Seatplus\Web\Services\SearchService;
 
 class ControlGroupsController
 {
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('AccessControl/ControlGroupsIndex', [
             'activeSidebarElement' => 'acl.groups',
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         $name = $request->input('name');
 
@@ -62,13 +64,13 @@ class ControlGroupsController
             ->with('success', 'Role was created');
     }
 
-    public function edit(int $role_id)
+    public function edit(int $role_id): Response
     {
         $role = Role::findById($role_id);
 
         $permissions = fn () => array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
 
-        $existing_affiliations = fn () => $role->affiliations->map(fn ($affiliation) => [
+        $existing_affiliations = fn () => $role->affiliations->map(fn (mixed $affiliation) => [
             'id' => $affiliation->affiliatable_id,
             'category' => $affiliation->affiliatable_type,
             'type' => $affiliation->type,
@@ -83,7 +85,7 @@ class ControlGroupsController
         ]);
     }
 
-    public function update(UpdateControlGroup $request, int $role_id)
+    public function update(UpdateControlGroup $request, int $role_id): RedirectResponse
     {
         $validated_data = $request->all();
 
@@ -102,7 +104,7 @@ class ControlGroupsController
             ->with('success', 'Access control group updated');
     }
 
-    public function search()
+    public function search(): LengthAwarePaginator
     {
         $query = request()->get('query');
 
@@ -112,15 +114,15 @@ class ControlGroupsController
 
         return $this->paginate(
             collect($result)
-                ->flatMap(fn ($result, $category) => collect($result)
-                    ->map(fn ($res) => [
+                ->flatMap(fn (mixed $result, mixed $category) => collect($result)
+                    ->map(fn (mixed $res) => [
                         'id' => $res,
                         'category' => $category,
                     ]))
         );
     }
 
-    private function paginate(array|Collection $items, int $perPage = 15, ?int $page = null, array $options = [])
+    private function paginate(array|Collection $items, int $perPage = 15, ?int $page = null, array $options = []): LengthAwarePaginator
     {
         $page = $page ?: (Paginator::resolveCurrentPage() ?: 1);
 

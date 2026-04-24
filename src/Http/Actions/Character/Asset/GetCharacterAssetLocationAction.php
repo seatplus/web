@@ -23,6 +23,7 @@ class GetCharacterAssetLocationAction
             'content',
         ],
     ];
+
     private array $validated = [];
 
     public function execute(array $validated): LengthAwarePaginator
@@ -61,7 +62,7 @@ class GetCharacterAssetLocationAction
     {
         $character_ids = $this->validated['character_ids'];
 
-        return fn ($query) => $query
+        return fn (mixed $query) => $query
             ->whereIn('assetable_id', $character_ids)
             ->where('assetable_type', CharacterInfo::class)
             ->tap(new AssetSearchScope($this->validated))
@@ -85,10 +86,10 @@ class GetCharacterAssetLocationAction
             ->isNotEmpty();
     }
 
-    public function filterAssets($assets): Collection
+    public function filterAssets(mixed $assets): Collection
     {
-        return $assets->filter(fn ($asset) => $this->filterAssetsLogic($asset))
-            ->map(function ($asset) {
+        return $assets->filter(fn (mixed $asset) => $this->filterAssetsLogic($asset))
+            ->map(function (mixed $asset) {
                 if ($asset->content) {
                     $filtered_content = $this->filterContent($asset->content);
                     $asset->setRelation('content', $filtered_content);
@@ -99,15 +100,15 @@ class GetCharacterAssetLocationAction
             ->values();
     }
 
-    private function filterAssetsLogic($asset): bool
+    private function filterAssetsLogic(mixed $asset): bool
     {
         return $this->filterAsset($asset) || $this->filterAsset(data_get($asset, 'content')) || $this->filterAsset(data_get($asset, 'content.content'));
     }
 
-    private function filterContent($content): Collection
+    private function filterContent(mixed $content): Collection
     {
-        return $content->filter(fn ($asset) => $this->filterAssetsLogic($asset))
-            ->map(function ($asset) {
+        return $content->filter(fn (mixed $asset) => $this->filterAssetsLogic($asset))
+            ->map(function (mixed $asset) {
                 if ($asset->relationLoaded('content') && $asset->content) {
                     $filtered_content = $this->filterContent($asset->content);
                     $asset->setRelation('content', $filtered_content);
@@ -117,11 +118,7 @@ class GetCharacterAssetLocationAction
             });
     }
 
-    /**
-     * @param $locationCollection
-     * @return void
-     */
-    public function addAssetSafety($locationCollection): void
+    public function addAssetSafety(mixed $locationCollection): void
     {
         $asset_safety = Asset::where('location_id', Asset::ASSET_SAFETY)
             ->with(self::ASSETRELATIONS)
@@ -137,9 +134,6 @@ class GetCharacterAssetLocationAction
         }
     }
 
-    /**
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
     public function getPaginatedLocations(): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $character_ids = $this->validated['character_ids'];
@@ -151,32 +145,28 @@ class GetCharacterAssetLocationAction
                     'system',
                 ],
             ])
-            ->with('assets', fn ($query) => $query->whereIn('assetable_id', $character_ids)->where('assetable_type', CharacterInfo::class))
+            ->with('assets', fn (mixed $query) => $query->whereIn('assetable_id', $character_ids)->where('assetable_type', CharacterInfo::class))
             ->where(
-                fn ($query) => $query
-                ->whereHas('assets', $this->getAssetQuery())
-                ->orWhereHas('assets.content', $this->getAssetQuery())
-                ->orWhereHas('assets.content.content', $this->getAssetQuery())
+                fn (mixed $query) => $query
+                    ->whereHas('assets', $this->getAssetQuery())
+                    ->orWhereHas('assets.content', $this->getAssetQuery())
+                    ->orWhereHas('assets.content.content', $this->getAssetQuery())
             )
             ->when(
                 data_get($this->validated, 'only_unknown_locations'),
-                fn ($query) => $query
-                ->doesntHaveMorph('locatable', [Station::class, Structure::class])
-                ->orWhereNull('locatable_type')
+                fn (mixed $query) => $query
+                    ->doesntHaveMorph('locatable', [Station::class, Structure::class])
+                    ->orWhereNull('locatable_type')
             )
             ->tap(new LocationWatchListScope($this->validated))
             ->orderBy('location_id')
             ->paginate();
     }
 
-    /**
-     * @param $locationCollection
-     * @return mixed
-     */
-    public function filterLocationAssets($locationCollection): mixed
+    public function filterLocationAssets(mixed $locationCollection): mixed
     {
         return $locationCollection
-            ->map(function ($location) {
+            ->map(function (mixed $location) {
                 $filtered_assets = $this->filterAssets($location->assets);
                 $location->setRelation('assets', $filtered_assets);
 

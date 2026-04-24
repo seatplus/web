@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -35,7 +36,7 @@ use Seatplus\Web\Http\Resources\UserRessource;
 
 class ListMembersController extends Controller
 {
-    public function __invoke(int $role_id)
+    public function __invoke(int $role_id): AnonymousResourceCollection
     {
         $role = Role::find($role_id);
 
@@ -44,10 +45,10 @@ class ListMembersController extends Controller
         $users = User::query()
             ->join(
                 'role_memberships',
-                fn ($join) => $join
-                ->on('users.id', '=', 'role_memberships.entity_id')
-                ->where('role_memberships.entity_type', User::class)
-                ->where('role_memberships.role_id', $role_id)
+                fn (mixed $join) => $join
+                    ->on('users.id', '=', 'role_memberships.entity_id')
+                    ->where('role_memberships.entity_type', User::class)
+                    ->where('role_memberships.role_id', $role_id)
             )
             ->addSelect([
                 'status' => RoleMembership::select('status')

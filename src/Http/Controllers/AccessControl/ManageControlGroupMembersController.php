@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -35,7 +36,7 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class ManageControlGroupMembersController
 {
-    public function index($role_id)
+    public function index(int $role_id): Response
     {
         $role = Role::whereId($role_id)
             ->with(
@@ -51,7 +52,7 @@ class ManageControlGroupMembersController
             'id' => $role->id,
             'type' => $role->type->value,
             'acl' => [
-                'affiliations' => $role->affiliations->map(fn ($affiliation) => [
+                'affiliations' => $role->affiliations->map(fn (mixed $affiliation) => [
                     'id' => $affiliation->affiliatable_id,
                     'type' => [
                         CorporationInfo::class => 'corporation',

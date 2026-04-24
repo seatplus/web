@@ -9,9 +9,9 @@ use Seatplus\Web\Models\Onboarding;
 
 class OnboardingMiddleware
 {
-    private $user;
+    private ?User $user = null;
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         // if onboarding is disabled, skip middleware
         if (! config('web.config.ONBOARDING')) {

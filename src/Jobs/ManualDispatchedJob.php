@@ -41,7 +41,7 @@ class ManualDispatchedJob
         return $this;
     }
 
-    public function handle()
+    public function handle(): string
     {
         $success_message = sprintf('Manual update batch of %s processed!', $this->name);
 

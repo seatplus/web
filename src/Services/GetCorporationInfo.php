@@ -31,7 +31,7 @@ use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class GetCorporationInfo
 {
-    public function execute($corporation_id)
+    public function execute(int $corporation_id): mixed
     {
         $corporation_info_container = new EsiRequestContainer(
             method: 'get',

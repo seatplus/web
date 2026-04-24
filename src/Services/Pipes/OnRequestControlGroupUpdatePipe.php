@@ -49,15 +49,15 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         $this->handleAffiliations($data);
 
         $criteria = collect($data->affiliations ?? [])
-            ->map(fn ($affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->map(fn (mixed $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
             ->values()
             ->toArray();
 
         $service->addCriteriaForRoleApplication($criteria);
 
-        $this->handleModerators($data, $service);
-
         $service->handleMembers();
+
+        $this->handleModerators($data, $service);
     }
 
     private function handleModerators(ControlGroupUpdateData $data, OnRequestRoleService $service): void
@@ -67,6 +67,6 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
         // Re-assign moderators from request
         collect($data->moderators ?? [])
-            ->each(fn ($moderator) => $service->setModerator(User::findOrFail((int) $moderator['id'])));
+            ->each(fn (mixed $moderator) => $service->setModerator(User::findOrFail((int) $moderator['id'])));
     }
 }

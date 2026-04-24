@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
@@ -35,10 +36,9 @@ class ContactResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
-     * @return array
+     * @param  Request
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         $corpAllianceContacts = $request->session()->get('contacts');
 

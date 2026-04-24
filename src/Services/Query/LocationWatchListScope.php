@@ -8,6 +8,7 @@ use Seatplus\Eveapi\Models\LocationWatchListInterface;
 class LocationWatchListScope
 {
     private ?array $system_ids = null;
+
     private ?array $region_ids = null;
 
     public function __construct(array $request)
@@ -24,11 +25,11 @@ class LocationWatchListScope
             return;
         }
 
-        $query->where(function ($query) {
-            $query->where(function ($query) {
+        $query->where(function (mixed $query) {
+            $query->where(function (mixed $query) {
 
-                $query->when($this->system_ids, fn ($query) => $query->filterBySystemIds($this->system_ids));
-                $query->when($this->region_ids, fn ($query) => $query->filterByRegionIds($this->region_ids));
+                $query->when($this->system_ids, fn (mixed $query) => $query->filterBySystemIds($this->system_ids));
+                $query->when($this->region_ids, fn (mixed $query) => $query->filterByRegionIds($this->region_ids));
             });
 
         });

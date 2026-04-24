@@ -26,40 +26,71 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Collection;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Services\Controller\DispatchTransferObject;
+use Seatplus\Web\Services\GetAffiliatedIds;
 
 class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    protected function getCharacterIds(object $dispatchTransferObject, string $character_relation): Collection
-    {
-        return $this->getCharacters($dispatchTransferObject, $character_relation)
-            ->pluck('character_id');
+    private const CHARACTER_IDS_FILTER = 'character_ids';
+
+    public function __construct(
+        protected readonly Request $request,
+        protected readonly GetAffiliatedIds $getAffiliatedIds
+    ) {}
+
+    protected function getCharacterIds(
+        DispatchTransferObject $dispatchTransferObject,
+        ?string $characterRelation = null
+    ): Collection {
+        $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
+        $filteredIds = $this->filterByRequestedCharacterIds($affiliatedIds);
+
+        return $this->fetchAffiliatedCharacterIdsWithRelation($filteredIds, $characterRelation);
     }
 
-    protected function getCharacters(object $dispatchTransferObject, string $character_relation): Builder
-    {
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user(),
-            corporation_roles: data_get($dispatchTransferObject, 'corporation_roles')
-        );
-
-        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)->getQuery();
-
+    protected function fetchAffiliatedCharacterIdsWithRelation(
+        array $characterIds,
+        ?string $characterRelation = null
+    ): \Illuminate\Database\Eloquent\Collection {
         return CharacterInfo::query()
-            ->has($character_relation)
+            ->select('character_id')
+            ->whereIn('character_id', $characterIds)
             ->when(
-                request()->has('character_ids'),
-                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'owned_characters.affiliated_id', '=', 'character_infos.character_id')
+                $characterRelation,
+                fn (mixed $query) => $query->with($characterRelation),
+            )
+            ->get();
+    }
+
+    protected function getAffiliatedIds(DispatchTransferObject $dispatchTransferObject): array
+    {
+        return $this->getAffiliatedIds->get(
+            $dispatchTransferObject->permission,
+            $dispatchTransferObject->required_corporation_role
+        );
+    }
+
+    protected function getOwnedCharacterIds(): array
+    {
+        return auth()->user()->characters->pluck('character_id')->toArray();
+    }
+
+    private function filterByRequestedCharacterIds(array $affiliatedIds): array
+    {
+        if ($this->request->has(self::CHARACTER_IDS_FILTER)) {
+            return array_intersect(
+                $affiliatedIds,
+                $this->request->get(self::CHARACTER_IDS_FILTER)
             );
+        }
+
+        return $affiliatedIds;
     }
 }

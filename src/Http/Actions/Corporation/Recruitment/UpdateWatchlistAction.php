@@ -40,9 +40,10 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 class UpdateWatchlistAction
 {
     private Enlistment $enlistment;
+
     private array $validatedData;
 
-    public function execute(int $corporation_id, array $validated_data)
+    public function execute(int $corporation_id, array $validated_data): void
     {
         $this->enlistment = Enlistment::find($corporation_id);
         $this->validatedData = $validated_data;
@@ -52,7 +53,7 @@ class UpdateWatchlistAction
         $this->handleItems();
     }
 
-    private function handleSystems()
+    private function handleSystems(): void
     {
         if (! Arr::has($this->validatedData, 'systems')) {
             // return early if systems is not part of the validated data, f.e. when updating items only
@@ -64,10 +65,10 @@ class UpdateWatchlistAction
 
         collect($system_ids)
             ->diff(System::whereIn('system_id', $system_ids)->select('system_id')->pluck('system_id'))
-            ->each(fn ($system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
+            ->each(fn (mixed $system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
     }
 
-    private function handleRegions()
+    private function handleRegions(): void
     {
         if (! Arr::has($this->validatedData, 'regions')) {
             // return early if systems is not part of the validated data, f.e. when updating items only
@@ -79,10 +80,10 @@ class UpdateWatchlistAction
 
         collect($region_ids)
             ->diff(Region::whereIn('region_id', $region_ids)->select('region_id')->pluck('region_id'))
-            ->each(fn ($region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
+            ->each(fn (mixed $region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
     }
 
-    private function handleItems()
+    private function handleItems(): void
     {
         if (! Arr::has($this->validatedData, 'items')) {
             // return early if systems is not part of the validated data, f.e. when updating regions
@@ -99,7 +100,7 @@ class UpdateWatchlistAction
 
                 return $collection;
             })
-            ->each(fn ($items, $category) => match ($category) {
+            ->each(fn (mixed $items, mixed $category) => match ($category) {
                 Type::class => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
                 Group::class => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
                 Category::class => $this->enlistment->categories()->sync(data_get($items, '*.watchable_id')),

@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\User;
@@ -36,10 +37,9 @@ class RoleRessource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
-     * @return array
+     * @param  Request
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'name' => $this->name,

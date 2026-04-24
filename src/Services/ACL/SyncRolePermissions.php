@@ -27,18 +27,19 @@
 namespace Seatplus\Web\Services\ACL;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SyncRolePermissions
 {
-    private readonly \Illuminate\Support\Collection $current_permissions;
+    private readonly Collection $current_permissions;
 
-    private readonly \Illuminate\Support\Collection $target_permissions;
+    private readonly Collection $target_permissions;
 
     public function __construct(/**
-     * @var \Seatplus\Auth\Models\Permissions\Role
+     * @var Role
      */
         private readonly Role $role
     ) {
@@ -46,7 +47,7 @@ class SyncRolePermissions
         $this->target_permissions = collect();
     }
 
-    public function sync(array $validated_data)
+    public function sync(array $validated_data): void
     {
         $permissions = Arr::get($validated_data, 'permissions', null);
 
@@ -69,8 +70,8 @@ class SyncRolePermissions
         $this->removeUnassignedPermissions();
     }
 
-    private function removeUnassignedPermissions()
+    private function removeUnassignedPermissions(): void
     {
-        $this->current_permissions->diff($this->target_permissions)->each(fn ($to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
+        $this->current_permissions->diff($this->target_permissions)->each(fn (mixed $to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
     }
 }

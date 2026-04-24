@@ -26,7 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateSsoScopeSettingsValidation;
@@ -35,7 +37,7 @@ use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 class SsoSettingsController extends Controller
 {
-    public function scopeSettings(?int $entity_id = null)
+    public function scopeSettings(?int $entity_id = null): Response
     {
         $available_scopes = config('eveapi.scopes');
 
@@ -48,7 +50,7 @@ class SsoSettingsController extends Controller
         ]);
     }
 
-    public function index(?int $entity_id = null)
+    public function index(?int $entity_id = null): Response
     {
         $available_scopes = config('eveapi.scopes');
 
@@ -63,21 +65,21 @@ class SsoSettingsController extends Controller
         ]);
     }
 
-    public function create(CreateSsoScopeSettingsValidation $validation)
+    public function create(CreateSsoScopeSettingsValidation $validation): RedirectResponse
     {
         (new UpdateOrCreateSsoSettings($validation->all()))->execute();
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
     }
 
-    public function deleteSsoScopeSetting(?int $entity_id = null)
+    public function deleteSsoScopeSetting(?int $entity_id = null): RedirectResponse
     {
         is_null($entity_id) ? SsoScopes::global()->delete() : SsoScopes::where('morphable_id', $entity_id)->delete();
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
     }
 
-    private function getEntity(?int $entity_id = null)
+    private function getEntity(?int $entity_id = null): mixed
     {
         if (is_null($entity_id)) {
             return SsoScopes::global()->first() ?? (object) [];

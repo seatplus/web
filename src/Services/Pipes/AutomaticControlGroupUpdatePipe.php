@@ -46,7 +46,7 @@ class AutomaticControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         $this->handleAffiliations($data);
 
         $criteria = collect($data->affiliations ?? [])
-            ->map(fn ($affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->map(fn (mixed $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
             ->values()
             ->toArray();
 

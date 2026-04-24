@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MemberTrackingResource extends JsonResource
@@ -33,10 +34,9 @@ class MemberTrackingResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
-     * @return array
+     * @param  Request
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'corporation_id' => $this->corporation_id,

@@ -24,31 +24,22 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Queue;
+namespace Seatplus\Web\Http\Controllers\Auth;
 
-use Laravel\Horizon\Contracts\JobRepository;
-use Laravel\Horizon\Contracts\MasterSupervisorRepository;
-use Laravel\Horizon\Contracts\WorkloadRepository;
-use Seatplus\Web\Http\Controllers\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 
-class QueueController extends Controller
+class LoginController
 {
-    public function __invoke(): array
+    public function __invoke(): Response
     {
-        return [
-            'queue_count' => collect(resolve(WorkloadRepository::class)->get())
-                ->sum('length'),
-            'error_count' => app(JobRepository::class)->countRecentlyFailed(),
-            'status' => $this->currentStatus(),
-        ];
-    }
-
-    private function currentStatus(): string
-    {
-        if (! $masters = app(MasterSupervisorRepository::class)->all()) {
-            return 'inactive';
+        if (strlen((string) config('web.config.EVE_CLIENT_ID')) < 5 || strlen((string) config('web.config.EVE_CLIENT_SECRET')) < 5) {
+            session()->flash('warning', trans('web::auth.sso_config_warning'));
         }
 
-        return collect($masters)->contains(fn (mixed $master) => $master->status === 'paused') ? 'paused' : 'running';
+        return Inertia::render('Auth/Login', [
+            'login_welcome' => trans('web::auth.login_welcome'),
+            'evesso_img_src' => asset('img/evesso.png'),
+        ]);
     }
 }

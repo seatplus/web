@@ -26,22 +26,21 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\BuildCharacterScopesArray;
-use Seatplus\Auth\Services\BuildUserLevelRequiredScopes;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Services\Recruitment\GetApplicationCharacterScopesService;
 
 class ApplicationRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
-     * @return array
+     * @param  Request
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         $is_user = $this->applicationable_type === User::class;
 
@@ -57,28 +56,11 @@ class ApplicationRessource extends JsonResource
 
     private function buildCharacterArray(CharacterInfo $character): array
     {
-        $user = ! $this->applicationable instanceof User
-            ? null
-            : $this->applicationable->loadMissing(
-                'characters.alliance.ssoScopes',
-                'characters.corporation.ssoScopes',
-                'characters.alliance.ssoScopes',
-                'characters.application.corporation.ssoScopes',
-                'characters.application.corporation.alliance.ssoScopes',
-                'characters.refresh_token',
-                'application.corporation.ssoScopes',
-                'application.corporation.alliance.ssoScopes'
-            );
+        $withApplicationScopes = $this->applicationable instanceof User;
 
-        // Get user level required scopes
-        $user_scopes = $user ? BuildUserLevelRequiredScopes::get($user) : [];
+        $scopeData = (new GetApplicationCharacterScopesService($withApplicationScopes))->get($character);
 
-        $character_scopes_array = BuildCharacterScopesArray::make()
-            ->setCharacter($character)
-            ->setUserScopes($user_scopes)
-            ->get();
-
-        return array_merge($character_scopes_array, $character->toArray());
+        return array_merge($scopeData, $character->toArray());
     }
 
     private function getCharacters(): array
@@ -86,7 +68,7 @@ class ApplicationRessource extends JsonResource
         if ($this->applicationable instanceof User) {
             return $this->applicationable
                 ->characters
-                ->map(fn ($character) => $this->buildCharacterArray($character))
+                ->map(fn (mixed $character) => $this->buildCharacterArray($character))
                 ->toArray();
         }
 

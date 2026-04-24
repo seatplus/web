@@ -27,6 +27,8 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -34,7 +36,7 @@ use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 class SkillsController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
@@ -46,7 +48,7 @@ class SkillsController extends Controller
         ]);
     }
 
-    public function skills(int $character_id)
+    public function skills(int $character_id): LengthAwarePaginator
     {
         return Skill::query()
             ->with('type.group')
@@ -54,15 +56,15 @@ class SkillsController extends Controller
             ->paginate();
     }
 
-    public function skillQueue(int $character_id)
+    public function skillQueue(int $character_id): LengthAwarePaginator
     {
         return SkillQueue::query()
             ->with('type.group')
             ->where('character_id', $character_id)
             ->where(
                 fn (Builder $query) => $query
-                ->where('finish_date', '>=', now())
-                ->orWhereNull('finish_date')
+                    ->where('finish_date', '>=', now())
+                    ->orWhereNull('finish_date')
             )
             ->orderBy('queue_position', 'asc')
             ->paginate();

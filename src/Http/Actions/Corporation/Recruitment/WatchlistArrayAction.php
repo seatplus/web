@@ -30,7 +30,7 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class WatchlistArrayAction
 {
-    public function execute($corporation_id): array
+    public function execute(int $corporation_id): array
     {
         $enlistment = Enlistment::with('systems', 'regions', 'types', 'groups', 'categories')->find($corporation_id);
 

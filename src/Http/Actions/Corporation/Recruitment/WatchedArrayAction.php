@@ -56,9 +56,9 @@ class WatchedArrayAction
         return $this->watched;
     }
 
-    private function handleSystems()
+    private function handleSystems(): void
     {
-        $entries = $this->enlistment->systems->map(function ($system) {
+        $entries = $this->enlistment->systems->map(function (mixed $system) {
             $system->id = $system->system_id;
 
             return $system;
@@ -67,25 +67,25 @@ class WatchedArrayAction
         data_set($this->watched, 'systems', $entries);
     }
 
-    private function handleItems()
+    private function handleItems(): void
     {
-        $types = $this->enlistment->types->map(fn ($type) => [
-            'id' => intval(1 . $type->type_id),
-            'name' => $type->name . ' (type)',
+        $types = $this->enlistment->types->map(fn (mixed $type) => [
+            'id' => intval(1 .$type->type_id),
+            'name' => $type->name.' (type)',
             'watchable_id' => $type->type_id,
             'watchable_type' => Type::class,
         ]) ?? [];
 
-        $groups = $this->enlistment->groups->map(fn ($group) => [
-            'id' => intval(1 . $group->group_id),
-            'name' => $group->name . ' (group)',
+        $groups = $this->enlistment->groups->map(fn (mixed $group) => [
+            'id' => intval(1 .$group->group_id),
+            'name' => $group->name.' (group)',
             'watchable_id' => $group->group_id,
             'watchable_type' => Group::class,
         ]) ?? [];
 
-        $categories = $this->enlistment->categories->map(fn ($category) => [
-            'id' => intval(1 . $category->category_id),
-            'name' => $category->name . ' (category)',
+        $categories = $this->enlistment->categories->map(fn (mixed $category) => [
+            'id' => intval(1 .$category->category_id),
+            'name' => $category->name.' (category)',
             'watchable_id' => $category->category_id,
             'watchable_type' => Category::class,
         ]) ?? [];
@@ -93,9 +93,9 @@ class WatchedArrayAction
         data_set($this->watched, 'items', [...$types, ...$groups, ...$categories]);
     }
 
-    private function handleRegions()
+    private function handleRegions(): void
     {
-        $entries = $this->enlistment->regions->map(function ($region) {
+        $entries = $this->enlistment->regions->map(function (mixed $region) {
             $region->id = $region->region_id;
 
             return $region;

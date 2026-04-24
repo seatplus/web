@@ -26,35 +26,39 @@
 
 namespace Seatplus\Web\Http\Controllers\Queue;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\DispatchIndividualJob;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
+use Seatplus\Web\Services\GetAffiliatedIds;
 
 class DispatchJobController extends Controller
 {
     protected array $dispatch_transfer_object;
 
     public function __construct(
-        private readonly WebJobsRepository $web_jobs
+        Request $request,
+        GetAffiliatedIds $getAffiliatedIds,
+        private readonly WebJobsRepository $web_jobs,
     ) {
+        parent::__construct($request, $getAffiliatedIds);
     }
 
-    public function dispatch(DispatchIndividualJob $job)
+    public function dispatch(DispatchIndividualJob $job): mixed
     {
         $this->dispatch_transfer_object = $job->get('dispatch_transfer_object');
 
         $id = $job->get('character_id') ?? $job->get('corporation_id');
         $manual_job = Arr::get($this->dispatch_transfer_object, 'manual_job');
 
-        $cache_key = "${manual_job}:${id}";
+        $cache_key = "{$manual_job}:{$id}";
 
         if (cache($cache_key)) {
             return redirect()->back()->with('error', 'job was already queued');
@@ -72,35 +76,37 @@ class DispatchJobController extends Controller
         return $batch_id;
     }
 
-    public function getEntities(Request $request)
+    public function getEntities(Request $request): LengthAwarePaginator
     {
         $validated_data = $request->validate([
-            'manual_job' => ['required', fn ($attribute, $value, $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute . ' is invalid.')],
+            'manual_job' => ['required', fn (mixed $attribute, mixed $value, mixed $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
             'permission' => ['required'],
             'required_scopes' => ['required', 'array'],
             'required_corporation_role' => ['nullable', 'string'],
         ]);
 
-        $affiliationsDto = new AffiliationsDto(
-            user: auth()->user(),
-            permissions: [data_get($validated_data, 'permission')],
-            corporation_roles:  data_get($validated_data, 'required_corporation_role') ? [ data_get($validated_data, 'required_corporation_role') ] : null,
+        $permission = data_get($validated_data, 'permission');
+        $corporation_role = data_get($validated_data, 'required_corporation_role');
+
+        $isCorporationScope = (bool) $corporation_role;
+
+        $affiliated_ids = $this->getAffiliatedIds->get(
+            permissions: [$permission],
+            corporationRoles: $isCorporationScope ? [$corporation_role] : [],
         );
 
-        $isCorporationScope = ! ! $affiliationsDto->corporation_roles;
-
         $tokens = RefreshToken::query()
-            ->whereHas('character', fn ($query) => $query->whereAffiliatedCharacters($affiliationsDto))
+            ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
-            ->filter(fn ($token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
+            ->filter(fn (mixed $token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
             ->when(
                 $isCorporationScope,
-                fn ($tokens) => $tokens
-                ->filter(fn ($token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
-                ->unique(fn ($token) => $token->corporation_id)
+                fn (mixed $tokens) => $tokens
+                    ->filter(fn (mixed $token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
+                    ->unique(fn (mixed $token) => $token->corporation_id)
             )
-            ->map(fn ($token) => collect([
+            ->map(fn (mixed $token) => collect([
                 'character_id' => $isCorporationScope ? null : $token->character_id,
                 'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
                 'name' => $isCorporationScope ? $token->corporation->name : $token->character->name,
@@ -108,10 +114,10 @@ class DispatchJobController extends Controller
             ])->filter()->toArray())
             ->values();
 
-        return new LengthAwarePaginator($tokens, $tokens->count(), $tokens->count());
+        return new LengthAwarePaginator($tokens, $tokens->count(), $request->get('per_page', 10));
     }
 
-    private function getRefreshToken(DispatchIndividualJob $job)
+    private function getRefreshToken(DispatchIndividualJob $job): mixed
     {
         if ($job->get('character_id')) {
             return RefreshToken::find($job->get('character_id'));
@@ -129,7 +135,7 @@ class DispatchJobController extends Controller
         return sprintf('%s:%s', $job_name, $id);
     }
 
-    public function getBatchStatus(?string $batch_id)
+    public function getBatchStatus(?string $batch_id): mixed
     {
         if (is_null($batch_id)) {
             return [

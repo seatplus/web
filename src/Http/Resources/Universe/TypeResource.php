@@ -26,11 +26,12 @@
 
 namespace Seatplus\Web\Http\Resources\Universe;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class TypeResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'type_id' => $this->type_id,

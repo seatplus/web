@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Http\RedirectResponse;
 use Seatplus\Auth\Http\Actions\Roles\OnRequest\OptOutAction;
 use Seatplus\Auth\Http\Actions\Roles\OptIn\LeaveAction;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -39,7 +40,7 @@ class LeaveControlGroupController extends Controller
 
     private User $user;
 
-    public function __invoke(int $role_id, int $user_id)
+    public function __invoke(int $role_id, int $user_id): RedirectResponse
     {
         $this->role = Role::find($role_id);
         $this->user = User::find($user_id);
@@ -55,12 +56,14 @@ class LeaveControlGroupController extends Controller
         return redirect()->back();
     }
 
-    private function removeMember()
+    private function removeMember(): void
     {
         match ($this->role->type->value) {
             'on-request' => (new OptOutAction(new BaseRoleService))->execute($this->role->id, $this->user->id),
             'opt-in' => (new LeaveAction)->execute($this->role->id, $this->user->id),
         };
+
+        (new BaseRoleService)->for($this->role)->handleMembers();
     }
 
     private function isSuperuserOrModerator(): bool
@@ -75,8 +78,8 @@ class LeaveControlGroupController extends Controller
         return auth()->user()->getAuthIdentifier() === $this->user->id;
     }
 
-    private function illegalAction()
+    private function illegalAction(): never
     {
-        return abort(403, 'You are not allowed to perform this action');
+        abort(403, 'You are not allowed to perform this action');
     }
 }

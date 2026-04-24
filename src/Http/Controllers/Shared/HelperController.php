@@ -46,44 +46,44 @@ use Seatplus\Web\Services\SearchService;
 
 class HelperController extends Controller
 {
-    public function ids()
+    public function ids(): string
     {
         $result = (new GetNamesFromIdsService)->execute(request()->all());
 
         return $result->toJson();
     }
 
-    public function characterAffiliations()
+    public function characterAffiliations(): string
     {
-        $result = (new GetCharacterAffiliations())->execute(request()->all());
+        $result = (new GetCharacterAffiliations)->execute(request()->all());
 
         return $result->toJson();
     }
 
-    public function getCorporationInfo(int $corporation_id)
+    public function getCorporationInfo(int $corporation_id): string
     {
-        $result = (new GetCorporationInfo())->execute($corporation_id);
+        $result = (new GetCorporationInfo)->execute($corporation_id);
 
         return collect($result)->toJson();
     }
 
-    public function getEntityFromId(int $id)
+    public function getEntityFromId(int $id): mixed
     {
         return (new GetEntityFromId($id))->execute();
     }
 
-    public function token()
+    public function token(): int
     {
         $token = $this->getEsiSearchToken();
 
         return $token ? 1 : 0;
     }
 
-    public function esiSearch(Request $request)
+    public function esiSearch(Request $request): mixed
     {
         $validated_data = $request->validate([
             'search' => ['required', 'string', 'min:3'],
-            'categories' => ['required','array'],
+            'categories' => ['required', 'array'],
         ]);
 
         $token = $this->getEsiSearchToken();
@@ -95,7 +95,7 @@ class HelperController extends Controller
         return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
     }
 
-    public function typesOrGroupsOrCategories()
+    public function typesOrGroupsOrCategories(): mixed
     {
         $term = request()->get('search');
 
@@ -105,19 +105,19 @@ class HelperController extends Controller
 
         $typeQuery = Type::query()
             ->select(['type_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'type' as category"))
             ->getQuery();
 
         $groupQuery = Group::query()
             ->select(['group_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'group' as category"))
             ->getQuery();
 
         $categoryQuery = Category::query()
             ->select(['category_id as id', 'name'])
-            ->where('name', 'like', $term . '%')
+            ->where('name', 'like', $term.'%')
             ->addSelect(DB::raw("'category' as category"));
 
         return $categoryQuery
@@ -125,12 +125,12 @@ class HelperController extends Controller
             ->union($typeQuery)
             ->limit(15)
             ->get()
-            ->map(fn ($entry) => [
+            ->map(fn (mixed $entry) => [
                 'id' => intval(match ($entry->category) {
                     'type' => 1,
                     'group' => 2,
                     'category' => 3,
-                } . $entry->id),
+                }.$entry->id),
                 'name' => sprintf('%s (%s)', $entry->name, $entry->category),
                 'watchable_id' => intval($entry->id),
                 'watchable_type' => match ($entry->category) {
@@ -141,7 +141,7 @@ class HelperController extends Controller
             ]);
     }
 
-    public function getResourceVariants(string $resource_type, int $resource_id)
+    public function getResourceVariants(string $resource_type, int $resource_id): mixed
     {
         $url = "https://images.evetech.net/${resource_type}/${resource_id}";
 
@@ -150,14 +150,14 @@ class HelperController extends Controller
         if (! $image_variants) {
             $image_variants = Http::get(sprintf('https://images.evetech.net/%s/%s', $resource_type, $resource_id))->json();
 
-            //Cache::put($url, $image_variants, now()->addDay());
+            // Cache::put($url, $image_variants, now()->addDay());
             cache([$url => $image_variants], now()->addDay());
         }
 
         return $image_variants;
     }
 
-    public function getMarketsPrices()
+    public function getMarketsPrices(): string
     {
         if ($prices = cache('market_prices')) {
             return $prices->toJson();
@@ -178,7 +178,7 @@ class HelperController extends Controller
         return $prices->toJson();
     }
 
-    private function getEsiSearchToken() : ?RefreshToken
+    private function getEsiSearchToken(): ?RefreshToken
     {
         return SearchService::getTokenFromCurrentUser();
     }

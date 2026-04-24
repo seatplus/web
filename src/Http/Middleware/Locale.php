@@ -27,18 +27,19 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Seatplus\Web\Exceptions\SettingException;
 
 class Locale
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     * @throws \Seatplus\Web\Exceptions\SettingException
+     *
+     * @throws SettingException
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         App::setLocale(setting('language'));
 

@@ -38,14 +38,14 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
     public function handleMember(ControlGroupUpdateData $data): void
     {
         $service = new ManualRoleService($data->role);
-        $member_ids = collect($data->members)->pluck('id')->map(fn ($id) => (int) $id);
+        $member_ids = collect($data->members)->pluck('id')->map(fn (mixed $id) => (int) $id);
 
         // Remove members no longer selected
         $data->role->role_memberships()
             ->where('entity_type', User::class)
             ->whereNotIn('entity_id', $member_ids->toArray())
             ->cursor()
-            ->each(fn ($membership) => $service->removeMember(User::find($membership->entity_id)));
+            ->each(fn (mixed $membership) => $service->removeMember(User::find($membership->entity_id)));
 
         // Add new members (skip those already present)
         $current_member_ids = $data->role->fresh()
@@ -54,15 +54,15 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
             ->pluck('entity_id');
 
         collect($data->members)
-            ->reject(fn ($member) => in_array((int) Arr::get($member, 'id'), $current_member_ids->toArray()))
-            ->reject(fn ($member) => Arr::has($member, 'status') && $member['status'] !== 'member')
-            ->each(fn ($member) => $service->addMember(User::find((int) Arr::get($member, 'id'))));
+            ->reject(fn (mixed $member) => in_array((int) Arr::get($member, 'id'), $current_member_ids->toArray()))
+            ->reject(fn (mixed $member) => Arr::has($member, 'status') && $member['status'] !== 'member')
+            ->each(fn (mixed $member) => $service->addMember(User::find((int) Arr::get($member, 'id'))));
     }
 
     public function handleAffiliations(ControlGroupUpdateData $data): void
     {
         $entity_sets = collect($data->affiliations ?? [])
-            ->map(fn ($affiliation) => [
+            ->map(fn (mixed $affiliation) => [
                 (int) $affiliation['id'],
                 $affiliation['category'],
                 'allowed',
