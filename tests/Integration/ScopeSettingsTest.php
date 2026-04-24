@@ -3,18 +3,13 @@
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
     test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
 });
 
 it('has scope settings', function () {
@@ -30,16 +25,16 @@ it('has scope settings', function () {
  * @preserveGlobalState disabled
  */
 test('one can create sso setting', function () {
-    $corporation = CorporationInfo::factory()->make();
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
-    $response = new EsiResponse(
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
         json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200
     );
 
-    RetrieveEsiData::shouldReceive('execute')
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
         ->andReturn($response);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
@@ -75,16 +70,16 @@ test('one can create sso setting', function () {
  * @preserveGlobalState disabled
  */
 test('one can delete sso setting', function () {
-    $corporation = CorporationInfo::factory()->make();
+    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
 
-    $response = new EsiResponse(
+    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
         json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200
     );
 
-    RetrieveEsiData::shouldReceive('execute')
+    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
         ->andReturn($response);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())

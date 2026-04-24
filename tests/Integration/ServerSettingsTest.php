@@ -9,8 +9,6 @@ beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
     test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
 });
 
 it('has users list', function () {

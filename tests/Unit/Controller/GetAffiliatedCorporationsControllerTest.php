@@ -1,7 +1,6 @@
 <?php
 
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
@@ -9,12 +8,10 @@ beforeEach(function () {
     $permission = Permission::findOrCreate('can accept or deny applications');
 
     test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
 });
 
 it('get affiliated corporations', function () {
-    CharacterRole::updateOrCreate([
+    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
         'character_id' => test()->test_character->character_id,
     ], [
         'roles' => ['Director'],

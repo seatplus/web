@@ -1,6 +1,5 @@
 <?php
 
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Services\GetRecruitIdsService;
@@ -9,8 +8,8 @@ it('returns recruit ids and caches values', function () {
     assignPermissionToTestUser('superuser');
 
     Application::factory()->count(5)->create([
-        'applicationable_type' => User::class,
-        'applicationable_id' => User::factory(),
+        'applicationable_type' => \Seatplus\Auth\Models\User::class,
+        'applicationable_id' => \Seatplus\Auth\Models\User::factory(),
     ]);
 
     cache()->flush();
@@ -32,8 +31,8 @@ it('returns recruit ids and caches values', function () {
 
 it('returns recruit ids for directors', function () {
     Application::factory()->count(5)->create([
-        'applicationable_type' => User::class,
-        'applicationable_id' => User::factory(),
+        'applicationable_type' => \Seatplus\Auth\Models\User::class,
+        'applicationable_id' => \Seatplus\Auth\Models\User::factory(),
         'corporation_id' => test()->test_character->corporation->corporation_id,
     ]);
 

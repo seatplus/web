@@ -33,5 +33,8 @@ test('logout if authorized', function () {
         ->followingRedirects()
         ->post(route('logout'));
 
+    // $response->assertRedirect('auth/login');
+    // $response->assertViewIs('web::auth.login');
+
     expect(auth()->check())->toBeFalse();
 });

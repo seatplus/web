@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Mockery\MockInterface;
 use Seatplus\Auth\Services\SsoScopes\IsUserCompliantService;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
@@ -10,8 +8,6 @@ beforeEach(function () {
     test()->request = Mockery::mock(Request::class);
     test()->next = function ($request) {
         $request->forward();
-
-        return new Response;
     };
 });
 
@@ -35,7 +31,7 @@ it('should call parent method on production environment', function () {
 
     test()->request->shouldReceive('user')->andReturn(test()->test_user);
 
-    $middleware = Mockery::mock(CheckRequiredScopes::class, [mock(IsUserCompliantService::class, function (MockInterface $mock) {
+    $middleware = Mockery::mock(CheckRequiredScopes::class, [mock(IsUserCompliantService::class, function (\Mockery\MockInterface $mock) {
         $mock->shouldReceive('check')->andReturnFalse();
         $mock->shouldReceive('getMissingScopes')->andReturn(['foo' => 'bar']);
     })])
@@ -46,3 +42,7 @@ it('should call parent method on production environment', function () {
 
     $middleware->handle(test()->request, test()->next);
 });
+
+it('redirects to render action', function () {})->todo(
+    'Need to figure out how to test this'
+);

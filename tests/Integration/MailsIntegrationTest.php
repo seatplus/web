@@ -21,8 +21,6 @@ test('see component', function () {
 test('get mail headers of secondary user', function () {
     if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
-
-        // now re-register all the roles and permissions
     }
 
     $response = test()->actingAs(test()->test_user)

@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -15,8 +14,6 @@ beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
     test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
 });
 
 test('has dispatchable job', function () {
@@ -97,7 +94,7 @@ it('has watchlist scope', function () {
             ->assertOk();
 
         $response->assertJson(
-            fn (AssertableJson $json) => $json
+            fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
                 ->count('data', 1)
                 ->has(
                     'data.0',

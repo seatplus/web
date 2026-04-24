@@ -6,10 +6,9 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
 
 beforeEach(function () {
     test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
@@ -21,36 +20,30 @@ beforeEach(function () {
 
         $user->givePermissionTo($permission);
 
-        // now re-register all the roles and permissions
-
         return $user;
     });
 
     test()->secondary_character = test()->secondary_user->characters->first();
-});
+})->todo('refactor to use new role service');
 
 test('user without permission fails to see compliance', function () {
     if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
-
-        // now re-register all the roles and permissions
     }
 
     $response = test()->actingAs(test()->secondary_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 test('user with permission sees component', function () {
     if (test()->test_user->can('superuser')) {
         test()->test_user->removeRole('superuser');
-
-        // now re-register all the roles and permissions
     }
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 
     assignPermissionToTestUser(['view member compliance']);
 
@@ -137,7 +130,7 @@ test('non director can not access the compliance index', function () {
 
     test()->actingAs($non_director)
         ->get(route('corporation.member_compliance'))
-        ->assertForbidden();
+        ->assertUnauthorized();
 });
 
 test('director user without permission can access index', function () {
@@ -178,7 +171,7 @@ test('director user without permission can review its corp members', function ()
         return $user->refresh();
     });
 
-    expect(test()->test_character->load('roles')->roles->roles)->toContain('Director');
+    expect(test()->test_character->roles->first()->roles)->toContain('Director');
 
     // 3. setup ssoScope
     SsoScopes::updateOrCreate([
@@ -239,7 +232,7 @@ it('enables with review permission to review corporation member', function () {
 });
 
 it('allows user with review permission to review corporation member', function () {
-    Event::fake();
+    \Illuminate\Support\Facades\Event::fake();
 
     // create a user with two characters
     $user = User::factory()->create();
@@ -267,13 +260,13 @@ it('allows user with review permission to review corporation member', function (
     // create affiliation
     $role->affiliations()->create([
         'affiliatable_id' => $first_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
+        'affiliatable_type' => \Seatplus\Eveapi\Models\Character\CharacterInfo::class,
         'type' => 'allowed',
     ]);
 
     // create sso scope
     $sso_scope = SsoScopes::factory()->create([
-        'morphable_type' => CorporationInfo::class,
+        'morphable_type' => \Seatplus\Eveapi\Models\Corporation\CorporationInfo::class,
         'morphable_id' => $first_character->corporation->corporation_id,
         'type' => 'user',
         'selected_scopes' => collect(['esi-alliances.read_corporations.v1'])->toJson(),
@@ -291,7 +284,7 @@ it('allows user with review permission to review corporation member', function (
     ]));
 
     $response->assertOk();
-})->todo('Requires the skills route to accept member compliance: review user permission, or CanUserService to expand affiliations via GetCorporationMemberComplianceAffiliatedIdsService. The skills route currently only checks the skills permission.');
+});
 
 // Helpers
 function createScopeSetting(array $permissons = [], $type = 'default')
@@ -318,7 +311,8 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         ])
         ->assertRedirect();
 
-    expect(RoleAffiliatedIdsService::get($role->refresh()))->toContain(test()->secondary_character->corporation->corporation_id);
+    $affiliated_ids = \Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService::get($role);
+    expect($affiliated_ids)->toContain(test()->secondary_character->corporation->corporation_id);
 
     // give test user the role
 

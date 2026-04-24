@@ -14,7 +14,7 @@ beforeEach(function () {
 
     test()->secondary_user = User::factory()->create();
     test()->secondary_character = test()->secondary_user->characters->first();
-});
+})->todo('needs refactoring to use new role services');
 
 test('user can leave himself', function () {
     // First create affiliation

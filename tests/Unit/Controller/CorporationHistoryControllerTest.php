@@ -6,8 +6,6 @@ beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
     test()->test_user->givePermissionTo($permission);
-
-    // now re-register all the roles and permissions
 });
 
 test('one can corporation history endpoint', function () {
