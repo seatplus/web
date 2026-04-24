@@ -102,13 +102,17 @@ class AssignSuperuser extends Command
         $this->user = User::find($user_id);
 
         if (! $this->user) {
-            return $this->alert('illegal user_id selected');
+            $this->alert('illegal user_id selected');
+
+            return;
         }
 
         $this->info('Please note after setting a superuser via console, you are only able to set another via web ui.');
 
         if (! $this->confirm('Do you wish to a continue?')) {
-            return $this->error('aborted');
+            $this->error('aborted');
+
+            return;
         }
 
         $role = $this->createRole();

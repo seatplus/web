@@ -28,7 +28,6 @@ namespace Seatplus\Web\Exception;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Throwable;
@@ -68,7 +67,7 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      */
-    public function render(Request $request, Throwable $exception): mixed
+    public function render(mixed $request, Throwable $exception): mixed
     {
         Inertia::share((new HandleInertiaRequests)->share($request));
 
