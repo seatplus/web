@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -24,7 +23,9 @@ test('user can leave himself', function () {
     ]);
 
     // Second make test character member
-    (new ManualRoleService(test()->role))->addMember(test()->test_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->test_user);
+    $service->handleMembers();
 
     expect(test()->test_user->hasRole(test()->role))->toBeTrue();
 
@@ -46,7 +47,9 @@ test('user can kick other user as superuser', function () {
     ]);
 
     // Second make secondary character member
-    (new ManualRoleService(test()->role))->addMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
 
     expect(test()->test_user->hasRole(test()->role))->toBeFalse();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
@@ -71,10 +74,10 @@ test('user can kick other user as moderator', function () {
     ]);
 
     // Second make secondary character member
-    (new ManualRoleService(test()->role))->addMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
-
-    // Thirdly make primary user moderator
     expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
     (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
     expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
@@ -101,7 +104,9 @@ test('user can not kick other user as vanilla user', function () {
     ]);
 
     // Second make secondary character member
-    (new ManualRoleService(test()->role))->addMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);

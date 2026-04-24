@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -50,13 +49,13 @@ it('assigns super user to user', function () {
 });
 
 test('a second super user can not be assigned', function () {
-    //1. give test user superuser
+    // 1. give test user superuser
     $role = Role::findOrCreate('Superuser');
     $permission = Permission::findOrCreate('superuser');
     $role->givePermissionTo($permission);
     test()->test_user->assignRole($role);
 
-    $secondary_user = Event::fakeFor(fn () => User::factory()->create()) ;
+    $secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
     test()->artisan('seatplus:assign:superuser', ['characterName' => $secondary_user->main_character])
         ->expectsOutput('Superuser has already been assigned, ask any of the following users to help you out:')

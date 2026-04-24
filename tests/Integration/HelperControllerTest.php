@@ -1,9 +1,7 @@
 <?php
 
-
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use function Pest\Laravel\get;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -11,26 +9,29 @@ use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
-uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
+use function Pest\Laravel\get;
+
+uses(MockRetrieveEsiDataAction::class);
 
 it('stores resolved id to cache', function () {
     $id = test()->test_character->character_id;
 
     $esi_mock_return_data = [
-       'id' => $id,
-       'name' => test()->test_character->name,
-       'category' => 'character',
-   ];
+        'id' => $id,
+        'name' => test()->test_character->name,
+        'category' => 'character',
+    ];
 
     test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
 
     $result = test()->actingAs(test()->test_user)
-       ->post(route('resolve.ids'), [$id]);
+        ->post(route('resolve.ids'), [$id]);
 
     $result->assertJson([
-       $esi_mock_return_data,
-   ]);
+        $esi_mock_return_data,
+    ]);
 
     $cache_value = cache(sprintf('name:%s', $id));
     expect($cache_value->name)->toEqual(test()->test_character->name);
@@ -125,7 +126,6 @@ test('one can search existing systems', function () {
         ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
         ->assertOk();
 
-
     expect($result->original)->toHaveCount(1);
 });
 
@@ -172,7 +172,7 @@ test('one can get resource variants via http and cache', function () {
     $resource_type = 'types';
     $resource_id = 587;
     $url = "https://images.evetech.net/{$resource_type}/{$resource_id}";
-    $expected_response = ["render", "icon"];
+    $expected_response = ['render', 'icon'];
 
     Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
 
@@ -199,17 +199,17 @@ test('one can get market prices', function () {
 
     test()->mockRetrieveEsiDataAction([
         (object) [
-            "adjusted_price" => 0,
-            "average_price" => 31_214_609.93,
-            "type_id" => 43691,
+            'adjusted_price' => 0,
+            'average_price' => 31_214_609.93,
+            'type_id' => 43691,
         ],
-        (object) [ "adjusted_price" => 1_005_248.1289155,
-            "average_price" => 1_002_393.46,
-            "type_id" => 32772,
+        (object) ['adjusted_price' => 1_005_248.1289155,
+            'average_price' => 1_002_393.46,
+            'type_id' => 32772,
         ],
-        (object) [ "adjusted_price" => 111879.41656101559,
-            "average_price" => 104750.07,
-            "type_id" => 32774,
+        (object) ['adjusted_price' => 111879.41656101559,
+            'average_price' => 104750.07,
+            'type_id' => 32774,
         ],
     ]);
 

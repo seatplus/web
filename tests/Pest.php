@@ -61,7 +61,7 @@ function assignPermissionToTestUser(array|string $permission_strings)
     }
 }
 
-function updateRefreshTokenWithScopes(\Seatplus\Eveapi\Models\RefreshToken $refreshToken, array $scopes): RefreshToken
+function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes): RefreshToken
 {
     $helper_token = RefreshToken::factory()->scopes($scopes)->make([
         'character_id' => $refreshToken->character_id,

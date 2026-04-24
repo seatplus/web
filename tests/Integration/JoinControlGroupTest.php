@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\RoleMembershipStatus;
 use Seatplus\Auth\Enums\RoleType;
@@ -26,8 +25,8 @@ test('user can join waitlist', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'on-request',
+            'acl' => [
+                'type' => 'on-request',
                 'affiliations' => [
                     [
                         'category' => 'corporation',
@@ -48,6 +47,7 @@ test('user can join waitlist', function () {
             'role_id' => test()->role->id,
         ]);
 
+    $response->assertRedirect();
 
     expect(test()->test_user->hasRole(test()->role))->toBeFalse();
 
@@ -70,8 +70,8 @@ test('superuser can join immediately', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'on-request',
+            'acl' => [
+                'type' => 'on-request',
                 'affiliations' => [
                     [
                         'category' => 'corporation',
@@ -91,7 +91,6 @@ test('superuser can join immediately', function () {
             'user_id' => test()->test_user->id,
             'role_id' => test()->role->id,
         ]);
-
 
     expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 

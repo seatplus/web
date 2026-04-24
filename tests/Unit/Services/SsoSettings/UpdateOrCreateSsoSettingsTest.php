@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Bus;
 use Seatplus\Eveapi\Jobs\Alliances\AllianceInfoJob;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
@@ -20,12 +19,12 @@ it('calls alliance info action', function () {
             [
                 'alliance_id' => 1_354_830_081,
                 'id' => 1_354_830_081,
-                'name' => "Goonswarm Federation",
+                'name' => 'Goonswarm Federation',
                 'category' => 'alliance',
             ],
         ],
         'selectedScopes' => [
-            "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+            'esi-assets.read_assets.v1,esi-universe.read_structures.v1',
             'publicData',
         ],
         'type' => 'default',
@@ -38,6 +37,7 @@ it('calls alliance info action', function () {
 
 /**
  * @runInSeparateProcess
+ *
  * @preserveGlobalState disabled
  */
 it('calls corporation info action', function () {
@@ -48,13 +48,13 @@ it('calls corporation info action', function () {
             [
                 'corporation_id' => 1_184_675_423,
                 'id' => 1_184_675_423,
-                'name' => "Amok.",
+                'name' => 'Amok.',
                 'category' => 'corporation',
             ],
 
         ],
         'selectedScopes' => [
-            "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+            'esi-assets.read_assets.v1,esi-universe.read_structures.v1',
             'publicData',
         ],
         'type' => 'default',
@@ -69,6 +69,7 @@ it('calls corporation info action', function () {
 
 /**
  * @runInSeparateProcess
+ *
  * @preserveGlobalState disabled
  */
 it('creates sso settings', function () {
@@ -79,12 +80,12 @@ it('creates sso settings', function () {
             [
                 'corporation_id' => 1_184_675_423,
                 'id' => 1_184_675_423,
-                'name' => "Amok.",
+                'name' => 'Amok.',
                 'category' => 'corporation',
             ],
         ],
         'selectedScopes' => [
-            "esi-assets.read_assets.v1,esi-universe.read_structures.v1",
+            'esi-assets.read_assets.v1,esi-universe.read_structures.v1',
             'publicData',
         ],
         'type' => 'default',

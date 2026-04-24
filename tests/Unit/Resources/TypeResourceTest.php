@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Event;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;

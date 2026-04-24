@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -25,8 +24,8 @@ test('on can update role type', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'automatic',
+            'acl' => [
+                'type' => 'automatic',
                 'affiliations' => [],
                 'members' => [],
             ],
@@ -45,8 +44,8 @@ test('manual control group adds member', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type' => 'manual',
                 'affiliations' => [],
                 'members' => [
                     [
@@ -61,7 +60,9 @@ test('manual control group adds member', function () {
 });
 
 test('manual control group removes member', function () {
-    (new ManualRoleService(test()->role))->addMember(test()->test_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->test_user);
+    $service->handleMembers();
 
     expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
 
@@ -72,8 +73,8 @@ test('manual control group removes member', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'manual',
+            'acl' => [
+                'type' => 'manual',
                 'affiliations' => [],
                 'members' => [],
             ],
@@ -92,8 +93,8 @@ test('automatic control group adds affiliation', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'automatic',
+            'acl' => [
+                'type' => 'automatic',
                 'affiliations' => [
                     [
                         'category' => 'corporation',
@@ -123,11 +124,11 @@ test('automatic control group removes affiliation', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-           "acl" => [
-               "type" => 'automatic',
-               'affiliations' => [],
-               'members' => [],
-           ],
+            'acl' => [
+                'type' => 'automatic',
+                'affiliations' => [],
+                'members' => [],
+            ],
         ]);
 
     expect(test()->role->refresh()->affiliations->isEmpty())->toBeTrue();
@@ -143,8 +144,8 @@ test('on request control group adds and removes moderators', function () {
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            "acl" => [
-                "type" => 'on-request',
+            'acl' => [
+                'type' => 'on-request',
                 'moderators' => [
                     [
                         'id' => test()->test_user->id,
