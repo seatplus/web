@@ -31,6 +31,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Auth\Http\Middleware\CheckRequiredScopes as CheckRequiredScopesMiddleware;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 {
@@ -43,7 +44,7 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
         return parent::handle($request, $next);
     }
 
-    protected function redirectTo(array $missing_character_scopes)
+    protected function redirectTo(array $missing_character_scopes): Response
     {
         $missing_character = collect($missing_character_scopes)->map(function ($missing) {
             $missing = (object) $missing;
