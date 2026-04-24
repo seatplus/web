@@ -1,10 +1,10 @@
 <?php
 
 use Inertia\Testing\AssertableInertia;
-use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
-use Seatplus\Web\Models\Onboarding;
-
 use function Pest\Laravel\actingAs;
+use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
+
+use Seatplus\Web\Models\Onboarding;
 
 it('throws error when turned off and navigated to onboarding if turned off', function () {
     config()->set('web.config.ONBOARDING', false);

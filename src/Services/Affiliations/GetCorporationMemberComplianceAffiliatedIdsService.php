@@ -11,7 +11,8 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 {
     public function __construct(
         private readonly GetAffiliatedIds $getAffiliatedIds
-    ) {}
+    ) {
+    }
 
     public static function make(): self
     {
@@ -31,7 +32,8 @@ class GetCorporationMemberComplianceAffiliatedIdsService
             ->whereHas(
                 'characters',
                 fn (Builder $query) => $query
-                    ->where(fn (Builder $q) => $q
+                    ->where(
+                        fn (Builder $q) => $q
                         ->whereHas('corporation', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                         ->orWhereHas('alliance', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                     )

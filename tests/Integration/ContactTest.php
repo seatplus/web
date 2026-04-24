@@ -24,7 +24,8 @@ it('has details', function () {
             uri: route('character.contacts.detail', test()->test_character->character_id),
             data: [
                 'target_corporation_id' => test()->test_character->corporation->corporation_id,
-            ]);
+            ]
+        );
 
     $response->assertOk();
 });
