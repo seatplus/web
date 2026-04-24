@@ -3,8 +3,7 @@ name: Laravel
 on:
   push:
     branches: [ "4.x", "5.x" ]
-  pull_request:
-    branches: [ "4.x", "5.x" ]
+  pull_request: # all branches
 
 jobs:
   laravel:
