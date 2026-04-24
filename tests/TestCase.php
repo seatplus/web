@@ -1,9 +1,9 @@
 <?php
 
-
 namespace Seatplus\Web\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -22,11 +22,12 @@ use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
+use Spatie\Permission\PermissionServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use MockRetrieveEsiDataAction;
     use LazilyRefreshDatabase;
+    use MockRetrieveEsiDataAction;
 
     public User $test_user;
 
@@ -36,25 +37,27 @@ abstract class TestCase extends OrchestraTestCase
     {
         parent::setUp();
 
+        Model::shouldBeStrict();
+
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => match (true) {
-                Str::startsWith($modelName, 'Seatplus\Auth') => 'Seatplus\\Auth\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
-                Str::startsWith($modelName, 'Seatplus\Eveapi') => 'Seatplus\\Eveapi\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
-                Str::startsWith($modelName, 'Seatplus\Web') => 'Seatplus\\Web\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+                Str::startsWith($modelName, 'Seatplus\Auth') => 'Seatplus\\Auth\\Database\\Factories\\'.class_basename($modelName).'Factory',
+                Str::startsWith($modelName, 'Seatplus\Eveapi') => 'Seatplus\\Eveapi\\Database\\Factories\\'.class_basename($modelName).'Factory',
+                Str::startsWith($modelName, 'Seatplus\Web') => 'Seatplus\\Web\\Database\\Factories\\'.class_basename($modelName).'Factory',
             }
         );
 
-        //Setup Inertia Root View
+        // Setup Inertia Root View
         Inertia::setRootView('web::app');
 
-        //Do not use the queue
+        // Do not use the queue
         Queue::fake();
 
         $this->test_user = Event::fakeFor(fn () => User::factory()->create());
 
         $this->test_character = $this->test_user->characters->first();
 
-        $this->app->instance('path.public', __DIR__ .'/Stubs');
+        $this->app->instance('path.public', __DIR__.'/Stubs');
 
         Permission::findOrCreate('superuser');
 
@@ -87,17 +90,17 @@ abstract class TestCase extends OrchestraTestCase
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     *
      * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected function getPackageProviders($app): array
     {
         return [
-            WebServiceProvider::class,
+            AuthenticationServiceProvider::class,
             EveapiServiceProvider::class,
             HorizonServiceProvider::class,
-            AuthenticationServiceProvider::class,
             InertiaServiceProviderAlias::class,
+            PermissionServiceProvider::class,
+            WebServiceProvider::class,
         ];
     }
 
@@ -105,9 +108,8 @@ abstract class TestCase extends OrchestraTestCase
      * Define environment setup.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
-    protected function getEnvironmentSetUp($app) : void
+    protected function getEnvironmentSetUp($app): void
     {
         config(['app.debug' => true]);
 
@@ -118,12 +120,12 @@ abstract class TestCase extends OrchestraTestCase
 
         $app['config']->set('cache.prefix', 'seatplus_tests---');
 
-        //Setup Inertia for package development
+        // Setup Inertia for package development
         config()->set('inertia.testing.page_paths', array_merge(
             config()->get('inertia.testing.page_paths', []),
             [
-                realpath(__DIR__ . '/../resources/js/Pages'),
-                realpath(__DIR__ . '/../resources/js/Shared'),
+                realpath(__DIR__.'/../resources/js/Pages'),
+                realpath(__DIR__.'/../resources/js/Shared'),
             ],
         ));
     }

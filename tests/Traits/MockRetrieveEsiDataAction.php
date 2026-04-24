@@ -1,14 +1,13 @@
 <?php
 
-
 namespace Seatplus\Web\Tests\Traits;
 
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
-trait MockRetrieveEsiDataAction
+trait MockRetrieveEsiDataAction // TODO Rename to MockRetrieveEsiData to match the class name
 {
-    public function mockRetrieveEsiDataAction(array $body) : void
+    public function mockRetrieveEsiDataAction(array $body): void
     {
         $response = $this->mockEsiResponse($body);
 
@@ -17,12 +16,12 @@ trait MockRetrieveEsiDataAction
             ->andReturn($response);
     }
 
-    public function assertRetrieveEsiDataIsNotCalled() : void
+    public function assertRetrieveEsiDataIsNotCalled(): void
     {
         RetrieveEsiData::shouldReceive('execute')->never();
     }
 
-    public function mockEsiResponse(array $body) : EsiResponse
+    public function mockEsiResponse(array $body): EsiResponse
     {
         $data = json_encode($body, JSON_THROW_ON_ERROR);
 
