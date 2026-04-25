@@ -3,13 +3,13 @@
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use function Pest\Laravel\get;
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
-
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+
+use function Pest\Laravel\get;
 
 test('see component', function () {
     $response = test()->actingAs(test()->test_user)
