@@ -44,7 +44,8 @@ class GetRecruitIdsService
 
     private function __construct(
         private readonly GetAffiliatedIds $affiliatedIdsService
-    ) {}
+    ) {
+    }
 
     public static function get(?GetAffiliatedIds $getAffiliatedIds = null): array
     {

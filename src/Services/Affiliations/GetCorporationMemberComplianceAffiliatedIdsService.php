@@ -11,7 +11,8 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 {
     public function __construct(
         private readonly GetAffiliatedIds $getAffiliatedIds
-    ) {}
+    ) {
+    }
 
     public static function make(): self
     {
