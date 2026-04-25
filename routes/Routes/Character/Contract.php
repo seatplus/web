@@ -33,10 +33,7 @@ Route::prefix('contracts')
     ->group(function () {
         Route::get('', [ContractsController::class, 'index'])->name('character.contracts');
 
-        $contractPermission = sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.Contract::class)
-        );
+        $contractPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Contract::class);
 
         Route::middleware($contractPermission)
             ->group(function () {

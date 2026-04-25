@@ -30,10 +30,7 @@ use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
 
-$corporationHistoryPermission = sprintf('%s:%s',
-    CheckAuthorization::class,
-    config('eveapi.permissions.'.CorporationHistory::class)
-);
+$corporationHistoryPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.CorporationHistory::class);
 
 Route::prefix('corporation_history')
     ->middleware($corporationHistoryPermission)

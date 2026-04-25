@@ -70,7 +70,7 @@ class AssignSuperuser extends Command
             $users = User::with('characters')
                 ->permission('superuser')
                 ->get()
-                ->map(fn (mixed $user) => [
+                ->map(fn (User $user) => [
                     'id' => $user->id,
                     'characters' => $user->characters->implode('name', ', '),
                 ]);
@@ -87,7 +87,7 @@ class AssignSuperuser extends Command
         $users = User::with('characters')
             ->search($character_name)
             ->get()
-            ->map(fn (mixed $user) => [
+            ->map(fn (User $user) => [
                 'id' => $user->id,
                 'characters' => $user->characters->implode('name', ', '),
             ])

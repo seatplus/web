@@ -29,7 +29,6 @@ use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Corporation\MemberCompliance\MemberComplianceController;
 
 Route::prefix('compliance')
-    // ->middleware(['permission:view member compliance,director'])
     ->group(function () {
 
         Route::middleware(CheckAuthorization::class.':view member compliance,director')

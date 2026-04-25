@@ -33,10 +33,7 @@ Route::prefix('skills')
     ->group(function () {
         Route::get('', [SkillsController::class, 'index'])->name('character.skills');
 
-        $skillPermission = sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.Skill::class)
-        );
+        $skillPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Skill::class);
 
         Route::middleware($skillPermission)
             ->group(function () {

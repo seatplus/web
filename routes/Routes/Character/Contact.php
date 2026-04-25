@@ -33,7 +33,7 @@ Route::prefix('contacts')
     ->group(function () {
         Route::get('', [ContactsController::class, 'index'])->name('character.contacts');
 
-        Route::middleware(sprintf('%s:%s', CheckAuthorization::class, config('eveapi.permissions.'.Contact::class)))
+        Route::middleware(CheckAuthorization::class.':'.config('eveapi.permissions.'.Contact::class))
             ->group(function () {
                 Route::post('/{character_id}', [ContactsController::class, 'getContacts'])->name('character.contacts.detail');
             });

@@ -34,10 +34,7 @@ Route::prefix('assets')
     ->group(function () {
         Route::get('', 'index')->name('character.assets');
 
-        $assetPermission = sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.Asset::class)
-        );
+        $assetPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Asset::class);
 
         Route::middleware($assetPermission)
             ->group(function () {

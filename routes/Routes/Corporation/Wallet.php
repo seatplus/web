@@ -31,24 +31,16 @@ use Seatplus\Web\Http\Controllers\Corporation\Wallet\CorporationWalletController
 Route::prefix('wallet')
     ->group(function () {
         Route::middleware([
-            sprintf('%s:%s,%s',
-                CheckAuthorization::class,
-                config('eveapi.permissions.'.WalletJournal::class),
-                'Accountant|Junior_Accountant'
-            ),
+            CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class).',Accountant|Junior_Accountant',
         ])->get('', [CorporationWalletController::class, 'index'])->name('corporation.wallet');
 
         Route::middleware([
-            sprintf('%s:%s,%s',
-                CheckAuthorization::class,
-                config('eveapi.permissions.'.WalletJournal::class),
-                'Accountant|Junior_Accountant'
-            ),
+            CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class).',Accountant|Junior_Accountant',
         ])->group(function () {
 
             Route::get('/{corporation_id}/journal/{division_id}', [CorporationWalletController::class, 'journal'])->name('corporation.wallet_journal.detail');
-            Route::get('/{corporation_id}/balance/{division_id}', [CorporationWalletController::class, 'balance'])->name('corporation.balance'); // does not work
-            Route::get('/{corporation_id}/transaction/{division_id}', [CorporationWalletController::class, 'transaction'])->name('corporation.wallet_transaction.detail'); // works
+            Route::get('/{corporation_id}/balance/{division_id}', [CorporationWalletController::class, 'balance'])->name('corporation.balance');
+            Route::get('/{corporation_id}/transaction/{division_id}', [CorporationWalletController::class, 'transaction'])->name('corporation.wallet_transaction.detail');
         });
 
     });

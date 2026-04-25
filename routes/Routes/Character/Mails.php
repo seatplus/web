@@ -34,10 +34,7 @@ Route::prefix('mails')
         Route::get('', [MailsController::class, 'index'])->name('character.mails');
         Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
 
-        $mailPermission = sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.Mail::class)
-        );
+        $mailPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Mail::class);
 
         Route::middleware($mailPermission)
             ->group(function () {

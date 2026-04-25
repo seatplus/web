@@ -34,10 +34,7 @@ Route::prefix('wallets')
     ->group(function () {
         Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
 
-        $walletJournalPermission = sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.WalletJournal::class)
-        );
+        $walletJournalPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class);
 
         Route::middleware($walletJournalPermission)
             ->group(function () {
@@ -47,10 +44,7 @@ Route::prefix('wallets')
                 Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
             });
 
-        Route::middleware(sprintf('%s:%s',
-            CheckAuthorization::class,
-            config('eveapi.permissions.'.WalletJournal::class)
-        ))
+        Route::middleware(CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class))
             ->get('/ref_type', 'journalTypes')->name('wallet.journalTypes');
 
     });
