@@ -19,6 +19,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\EveapiServiceProvider;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
@@ -61,6 +62,14 @@ abstract class TestCase extends OrchestraTestCase
         $this->test_user = Event::fakeFor(fn () => User::factory()->create());
 
         $this->test_character = $this->test_user->characters->first();
+
+        // Ensure the test character has no in-game EVE corporation roles by default.
+        // CharacterInfoFactory assigns random roles (possibly Director) which bypasses
+        // all permission checks in CanUserService. Tests that need specific roles set them explicitly.
+        CharacterRole::updateOrCreate(
+            ['character_id' => $this->test_character->character_id],
+            ['roles' => [], 'roles_at_base' => null, 'roles_at_hq' => null, 'roles_at_other' => null]
+        );
 
         $this->app->instance('path.public', __DIR__.'/Stubs');
 
