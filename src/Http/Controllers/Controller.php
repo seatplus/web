@@ -43,7 +43,8 @@ class Controller extends BaseController
     public function __construct(
         protected readonly Request $request,
         protected readonly GetAffiliatedIds $getAffiliatedIds
-    ) {}
+    ) {
+    }
 
     protected function getCharacterIds(
         DispatchTransferObject $dispatchTransferObject,
