@@ -28,13 +28,14 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\Recruitment\GetApplicationCharacterScopesService;
 
 class CorporationComplianceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $characters = $this->characters->map(fn (mixed $character) => [
+        $characters = $this->characters->map(fn (CharacterInfo $character) => [
             'character_id' => $character->character_id,
             'name' => $character->name,
             'missing_scopes' => array_values($this->getMissingScopes($character)),
@@ -44,13 +45,13 @@ class CorporationComplianceResource extends JsonResource
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => $characters,
-            'count_missing' => collect($characters)->filter(fn (mixed $character) => data_get($character, 'missing_scopes'))->count(),
-            'count_complete' => collect($characters)->reject(fn (mixed $character) => data_get($character, 'missing_scopes'))->count(),
+            'count_missing' => collect($characters)->filter(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
+            'count_complete' => collect($characters)->reject(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
             'count_total' => collect($characters)->count(),
         ];
     }
 
-    private function getMissingScopes(mixed $character): array
+    private function getMissingScopes(CharacterInfo $character): array
     {
         $result = (new GetApplicationCharacterScopesService)->get($character);
 

@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Response;
@@ -65,7 +66,7 @@ class WalletsController extends Controller
         return $query->paginate();
     }
 
-    public function journalTypes(GetRefTypesAction $action): mixed
+    public function journalTypes(GetRefTypesAction $action): \Illuminate\Http\Response|Collection
     {
         $term = request()->get('search');
 

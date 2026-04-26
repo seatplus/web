@@ -30,6 +30,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Seatplus\Web\Exceptions\SettingException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Locale
 {
@@ -39,7 +40,7 @@ class Locale
      *
      * @throws SettingException
      */
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         App::setLocale(setting('language'));
 

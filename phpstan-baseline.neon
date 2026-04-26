@@ -91,7 +91,7 @@ parameters:
 			path: src/Http/Actions/Character/Asset/GetCharacterAssetLocationAction.php
 
 		-
-			message: "#^Match expression does not handle remaining values\\: \\(int\\|string\\)$#"
+			message: "#^Match expression does not handle remaining value\\: string$#"
 			count: 1
 			path: src/Http/Actions/Corporation/Recruitment/UpdateWatchlistAction.php
 
@@ -609,26 +609,6 @@ parameters:
 			message: "#^PHPDoc type array of property Seatplus\\\\Web\\\\Models\\\\Onboarding\\:\\:\\$guarded is not covariant with PHPDoc type array\\<string\\>\\|bool of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$guarded\\.$#"
 			count: 1
 			path: src/Models/Onboarding.php
-
-		-
-			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$affiliatable_id\\.$#"
-			count: 1
-			path: src/Services/ACL/SyncRoleAffiliations.php
-
-		-
-			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$role_id\\.$#"
-			count: 1
-			path: src/Services/ACL/SyncRoleAffiliations.php
-
-		-
-			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$type\\.$#"
-			count: 1
-			path: src/Services/ACL/SyncRoleAffiliations.php
-
-		-
-			message: "#^Match expression does not handle remaining value\\: mixed$#"
-			count: 1
-			path: src/Services/ACL/SyncRoleAffiliations.php
 
 		-
 			message: "#^Class Seatplus\\\\Eveapi\\\\Jobs\\\\Hydrate\\\\Character\\\\CharacterAssetsHydrateBatch not found\\.$#"

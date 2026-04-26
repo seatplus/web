@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -45,7 +46,7 @@ class ListMembersController extends Controller
         $users = User::query()
             ->join(
                 'role_memberships',
-                fn (mixed $join) => $join
+                fn (JoinClause $join) => $join
                     ->on('users.id', '=', 'role_memberships.entity_id')
                     ->where('role_memberships.entity_type', User::class)
                     ->where('role_memberships.role_id', $role_id)

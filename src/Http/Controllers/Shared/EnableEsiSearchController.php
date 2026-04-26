@@ -2,12 +2,15 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\SearchService;
 
 class EnableEsiSearchController
 {
-    public function __invoke(): mixed
+    public function __invoke(): RedirectResponse|Response
     {
         // First check if user has already an esi search token
         if (SearchService::getTokenFromCurrentUser()) {
@@ -25,7 +28,7 @@ class EnableEsiSearchController
             ->find(auth()->user()->getAuthIdentifier());
 
         return inertia('EnableEsiSearch', [
-            'characters' => $user->characters->map(fn (mixed $character) => [
+            'characters' => $user->characters->map(fn (CharacterInfo $character) => [
                 'character_id' => $character->character_id,
                 'name' => $character->name,
                 'corporation' => $character->corporation->name ?? 'Unknown Corporation',

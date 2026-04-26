@@ -32,7 +32,7 @@ use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class ManualControlGroupControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): mixed
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): ControlGroupUpdateData
     {
         if ($control_group_update_data->role_type === 'manual') {
             $this->update($control_group_update_data);

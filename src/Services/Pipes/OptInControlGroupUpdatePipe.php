@@ -32,7 +32,7 @@ use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class OptInControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): mixed
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): ControlGroupUpdateData
     {
         if ($control_group_update_data->role_type === 'opt-in') {
             $this->update($control_group_update_data);
@@ -48,7 +48,7 @@ class OptInControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         $this->handleAffiliations($data);
 
         $criteria = collect($data->affiliations ?? [])
-            ->map(fn (mixed $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->map(fn (array $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
             ->values()
             ->toArray();
 

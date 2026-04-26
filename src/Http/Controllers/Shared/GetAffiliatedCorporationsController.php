@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -41,7 +42,7 @@ class GetAffiliatedCorporationsController extends Controller
         $query = CorporationInfo::query()
             ->whereIn('corporation_id', $affiliatedIds)
             ->select('corporation_infos.*')
-            ->when($searchParam, fn (mixed $query) => $query->where('name', 'like', "%{$searchParam}%"))
+            ->when($searchParam, fn (Builder $query) => $query->where('name', 'like', "%{$searchParam}%"))
             ->with('alliance');
 
         return CorporationInfoRessource::collection(

@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Services\Sidebar;
 
+use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Permissions\CanUserService;
@@ -54,7 +55,7 @@ class SidebarPermissionChecker
     {
         return RoleMembership::query()
             ->where('can_moderate', true)
-            ->whereHasMorph('entity', [User::class], fn (mixed $query) => $query->whereId($this->user->getAuthIdentifier()))
+            ->whereHasMorph('entity', [User::class], fn (Builder $query) => $query->whereId($this->user->getAuthIdentifier()))
             ->exists();
     }
 
@@ -67,9 +68,9 @@ class SidebarPermissionChecker
         $array = is_array($input) ? $input : [$input];
 
         return collect($array)
-            ->flatMap(fn (mixed $item) => is_string($item) ? explode(',', $item) : [$item])
-            ->flatMap(fn (mixed $item) => is_string($item) ? explode('|', $item) : [$item])
-            ->map(fn (mixed $item) => is_string($item) ? trim($item) : $item)
+            ->flatMap(fn (string|array $item) => is_string($item) ? explode(',', $item) : [$item])
+            ->flatMap(fn (string|array $item) => is_string($item) ? explode('|', $item) : [$item])
+            ->map(fn (string|array $item) => is_string($item) ? trim($item) : $item)
             ->filter()
             ->unique()
             ->values()

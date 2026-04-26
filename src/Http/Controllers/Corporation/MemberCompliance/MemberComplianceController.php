@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberCompliance;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
@@ -77,8 +78,8 @@ class MemberComplianceController
             ->whereHas('characters.corporation', fn (Builder $query) => $query
                 ->where('corporation_infos.corporation_id', $corporation_id))
             ->with([
-                'characters' => fn (mixed $query) => $query->select('character_infos.character_id', 'character_infos.name')
-                    ->when($isCharacterType, fn (mixed $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
                 'main_character',
                 'characters.corporation.ssoScopes',
                 'characters.alliance.ssoScopes',
@@ -99,8 +100,8 @@ class MemberComplianceController
 
         $member = $user
             ->loadMissing([
-                'characters' => fn (mixed $query) => $query->select('character_infos.character_id', 'character_infos.name')
-                    ->when($isCharacterType, fn (mixed $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
                 'main_character',
             ]);
 

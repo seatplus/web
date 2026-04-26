@@ -32,12 +32,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\User;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckACLPermission
 {
     private const PERMISSION_DENIED_MESSAGE = 'You do not have the necessary permission to perform this action.';
 
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         if ($this->hasAdministrativeAccess()) {
             return $next($request);

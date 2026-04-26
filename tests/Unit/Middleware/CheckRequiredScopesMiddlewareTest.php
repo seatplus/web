@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Mockery\MockInterface;
 use Seatplus\Auth\Services\SsoScopes\IsUserCompliantService;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
@@ -9,6 +10,8 @@ beforeEach(function () {
     test()->request = Mockery::mock(Request::class);
     test()->next = function ($request) {
         $request->forward();
+
+        return new Response;
     };
 });
 

@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -89,7 +90,7 @@ class ManualLocationController extends Controller
         return to_route('manage.manual_locations');
     }
 
-    public function getLocation(int $location_id): mixed
+    public function getLocation(int $location_id): Collection|ManualLocation|null
     {
         if ($location_id === 2004) {
             return collect(['name' => 'Asset Safety']);
@@ -145,6 +146,6 @@ class ManualLocationController extends Controller
             return;
         }
 
-        $entries->each(fn (mixed $manual_location) => ResolveUniverseSystemBySystemIdJob::dispatch($manual_location->solar_system_id)->onQueue('low'));
+        $entries->each(fn (ManualLocation $manual_location) => ResolveUniverseSystemBySystemIdJob::dispatch($manual_location->solar_system_id)->onQueue('low'));
     }
 }

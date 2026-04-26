@@ -30,6 +30,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Web\Services\GetAffiliatedIds;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckAffiliationForApplication
 {
@@ -37,7 +38,7 @@ class CheckAffiliationForApplication
         private GetAffiliatedIds $getAffiliatedIdsService,
     ) {}
 
-    public function handle(Request $request, Closure $next, string $permission): mixed
+    public function handle(Request $request, Closure $next, string $permission): Response
     {
         if ($request->user()->can('superuser')) {
             return $next($request);

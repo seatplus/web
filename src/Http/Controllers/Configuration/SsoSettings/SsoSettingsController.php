@@ -79,7 +79,7 @@ class SsoSettingsController extends Controller
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
     }
 
-    private function getEntity(?int $entity_id = null): mixed
+    private function getEntity(?int $entity_id = null): SsoScopes|\stdClass
     {
         if (is_null($entity_id)) {
             return SsoScopes::global()->first() ?? (object) [];

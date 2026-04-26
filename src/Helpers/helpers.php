@@ -60,7 +60,7 @@ if (! function_exists('carbon')) {
      *
      * @param  null  $data
      */
-    function carbon(mixed $data = null): Carbon
+    function carbon(string|int|null $data = null): Carbon
     {
         if (! is_null($data)) {
             return new Carbon($data);

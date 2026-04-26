@@ -54,13 +54,13 @@ class UpdateOrCreateSsoSettings
     public function execute(): void
     {
         $this->entities->whenEmpty(
-            function (mixed $collection) {
+            function (Collection $collection) {
                 if ($this->type === 'global') {
                     SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
                 }
             },
-            fn (mixed $collection) => $collection
-                ->each(function (mixed $entity) {
+            fn (Collection $collection) => $collection
+                ->each(function (array $entity) {
                     $entity_id = Arr::get($entity, 'id');
                     $category = Arr::get($entity, 'category');
 
@@ -87,8 +87,8 @@ class UpdateOrCreateSsoSettings
         $this->selected_scopes = collect();
 
         collect(Arr::get($this->request, 'selectedScopes'))
-            ->flatMap(fn (mixed $scope) => explode(',', (string) $scope))
-            ->each(function (mixed $scope) {
+            ->flatMap(fn (string $scope) => explode(',', (string) $scope))
+            ->each(function (string $scope) {
                 // If it is a corporation scope, we need to know the characters role
                 if (Str::of($scope)->contains('corporation')) {
                     $this->selected_scopes->push('esi-characters.read_corporation_roles.v1');

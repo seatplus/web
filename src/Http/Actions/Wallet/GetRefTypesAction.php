@@ -36,8 +36,8 @@ class GetRefTypesAction
     public function execute(string $term): Collection
     {
         return $this->getRefTypes()
-            ->filter(fn (mixed $type) => Str::contains($type->ref_type, $term))
-            ->map(fn (mixed $group, mixed $index) => [
+            ->filter(fn (WalletJournal $type) => Str::contains($type->ref_type, $term))
+            ->map(fn (WalletJournal $group, int $index) => [
                 'id' => $this->alphabetToNumber($group->ref_type),
                 'name' => $group->ref_type,
                 'hasEveImage' => false,
@@ -57,7 +57,7 @@ class GetRefTypesAction
         );
     }
 
-    private function alphabetToNumber(mixed $string): float
+    private function alphabetToNumber(string $string): float
     {
         $string = strtoupper((string) $string);
         $length = strlen($string);

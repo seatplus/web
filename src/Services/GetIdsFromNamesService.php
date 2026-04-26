@@ -46,7 +46,7 @@ class GetIdsFromNamesService
 
     public function execute(array $names): Collection
     {
-        $names_to_resolve = collect($names)->filter(function (mixed $name) {
+        $names_to_resolve = collect($names)->filter(function (string $name) {
             if (! cache()->has(sprintf('id:%s', $name))) {
                 return true;
             }
@@ -69,7 +69,7 @@ class GetIdsFromNamesService
 
         $esi_results = RetrieveEsiData::execute($container);
 
-        return collect($esi_results)->flatten()->each(fn (mixed $esi_result) => cache([sprintf('id:%s', $esi_result->name) => $esi_result], now()->addDay()))
+        return collect($esi_results)->flatten()->each(fn (object $esi_result) => cache([sprintf('id:%s', $esi_result->name) => $esi_result], now()->addDay()))
             ->merge($this->result);
     }
 }

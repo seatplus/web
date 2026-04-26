@@ -34,6 +34,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -70,7 +71,7 @@ class ControlGroupsController
 
         $permissions = fn () => array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
 
-        $existing_affiliations = fn () => $role->affiliations->map(fn (mixed $affiliation) => [
+        $existing_affiliations = fn () => $role->affiliations->map(fn (Affiliation $affiliation) => [
             'id' => $affiliation->affiliatable_id,
             'category' => $affiliation->affiliatable_type,
             'type' => $affiliation->type,
@@ -114,8 +115,8 @@ class ControlGroupsController
 
         return $this->paginate(
             collect($result)
-                ->flatMap(fn (mixed $result, mixed $category) => collect($result)
-                    ->map(fn (mixed $res) => [
+                ->flatMap(fn (array $result, string $category) => collect($result)
+                    ->map(fn (int $res) => [
                         'id' => $res,
                         'category' => $category,
                     ]))

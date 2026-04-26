@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
@@ -75,7 +76,7 @@ class MemberTrackingController extends Controller
             ->whereIn('corporation_id', $affiliatedIds)
             ->with('alliance')
             ->where(
-                fn (mixed $query) => $query
+                fn (Builder $query) => $query
                     ->has('alliance.ssoScopes')
                     ->orHas('ssoScopes')
             )
@@ -85,7 +86,7 @@ class MemberTrackingController extends Controller
                 'alliance_scopes' => SsoScopes::select('selected_scopes')->whereColumn('morphable_id', 'corporation_infos.alliance_id')->limit(1),
             ])
             ->get()
-            ->map(function (mixed $corporation) {
+            ->map(function (CorporationInfo $corporation) {
                 $corporation->required_scopes = collect([
                     json_decode((string) $corporation->corporation_scopes, true),
                     json_decode((string) $corporation->alliance_scopes, true),

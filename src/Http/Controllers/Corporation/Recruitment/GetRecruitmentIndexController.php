@@ -74,14 +74,14 @@ class GetRecruitmentIndexController extends Controller
                 ->with('corporation.alliance')
                 ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
                 ->get()
-                ->map(fn (mixed $enlistment) => $enlistment->setAttribute('can_manage', true));
+                ->map(fn (Enlistments $enlistment) => $enlistment->setAttribute('can_manage', true));
 
             $recruitable = Enlistments::query()
                 ->with('corporation.alliance')
                 ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $recruiterIds))
                 ->whereNotIn('corporation_id', $manageableIds)
                 ->get()
-                ->map(fn (mixed $enlistment) => $enlistment->setAttribute('can_manage', false));
+                ->map(fn (Enlistments $enlistment) => $enlistment->setAttribute('can_manage', false));
 
             return $manageable->concat($recruitable);
         });

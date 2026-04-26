@@ -28,13 +28,15 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
+use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 class SearchService
 {
-    public function execute(RefreshToken $token, array $categories, string $term): mixed
+    public function execute(RefreshToken $token, array $categories, string $term): EsiResponse
     {
         $container = new EsiRequestContainer(
             method: 'get',
@@ -62,9 +64,9 @@ class SearchService
                 ->with('characters.refresh_token')
                 ->find(auth()->user()->getAuthIdentifier());
 
-            $tokens = $user->characters->map(fn (mixed $character) => $character->refresh_token)->filter();
+            $tokens = $user->characters->map(fn (CharacterInfo $character) => $character->refresh_token)->filter();
 
-            return $tokens->firstWhere(fn (mixed $token) => in_array('esi-search.search_structures.v1', $token->scopes));
+            return $tokens->firstWhere(fn (RefreshToken $token) => in_array('esi-search.search_structures.v1', $token->scopes));
         });
     }
 }

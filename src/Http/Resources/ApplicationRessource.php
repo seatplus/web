@@ -68,7 +68,7 @@ class ApplicationRessource extends JsonResource
         if ($this->applicationable instanceof User) {
             return $this->applicationable
                 ->characters
-                ->map(fn (mixed $character) => $this->buildCharacterArray($character))
+                ->map(fn (CharacterInfo $character) => $this->buildCharacterArray($character))
                 ->toArray();
         }
 

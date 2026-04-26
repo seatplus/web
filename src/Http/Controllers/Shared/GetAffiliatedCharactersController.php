@@ -71,7 +71,7 @@ class GetAffiliatedCharactersController extends Controller
     {
         return CharacterInfo::query()
             ->whereIn('character_id', $ids)
-            ->when($search_param, fn (mixed $query) => $query->where('character_infos.name', 'like', "%{$search_param}%"))
+            ->when($search_param, fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search_param}%"))
             ->orderBy('character_infos.name');
     }
 }

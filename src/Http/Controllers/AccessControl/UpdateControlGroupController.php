@@ -63,7 +63,11 @@ class UpdateControlGroupController extends Controller
         app(Pipeline::class)
             ->send($control_group_update_data)
             ->through($this->pipes)
-            ->then(fn () => logger()->info('Control group updated'));
+            ->then(function (ControlGroupUpdateData $data): ControlGroupUpdateData {
+                logger()->info('Control group updated');
+
+                return $data;
+            });
 
         return redirect()->route('acl.manage', $role_id)->with('success', 'updated');
     }

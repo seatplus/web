@@ -102,12 +102,12 @@ class CreateDispatchTransferObject
         return array_search($needle, config('web.jobs'));
     }
 
-    private function getPermission(string $class): mixed
+    private function getPermission(string $class): ?string
     {
         return config(sprintf('eveapi.permissions.%s', $class));
     }
 
-    private function getRequiredScopes(string $scope): mixed
+    private function getRequiredScopes(string $scope): ?array
     {
         return config(
             sprintf(

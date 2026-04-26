@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 {
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         if (! app()->environment('production')) {
             return $next($request);
@@ -46,7 +46,7 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 
     protected function redirectTo(array $missing_character_scopes): Response
     {
-        $missing_character = collect($missing_character_scopes)->map(function (mixed $missing) {
+        $missing_character = collect($missing_character_scopes)->map(function (array $missing) {
             $missing = (object) $missing;
 
             return [

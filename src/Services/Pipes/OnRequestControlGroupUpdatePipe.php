@@ -33,7 +33,7 @@ use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): mixed
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): ControlGroupUpdateData
     {
         if ($control_group_update_data->role_type === 'on-request') {
             $this->update($control_group_update_data);
@@ -49,7 +49,7 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         $this->handleAffiliations($data);
 
         $criteria = collect($data->affiliations ?? [])
-            ->map(fn (mixed $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->map(fn (array $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
             ->values()
             ->toArray();
 
@@ -67,6 +67,6 @@ class OnRequestControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 
         // Re-assign moderators from request
         collect($data->moderators ?? [])
-            ->each(fn (mixed $moderator) => $service->setModerator(User::findOrFail((int) $moderator['id'])));
+            ->each(fn (array $moderator) => $service->setModerator(User::findOrFail((int) $moderator['id'])));
     }
 }

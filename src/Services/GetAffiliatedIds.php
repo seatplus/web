@@ -85,9 +85,9 @@ class GetAffiliatedIds
         $array = is_array($input) ? $input : [$input];
 
         return collect($array)
-            ->flatMap(fn (mixed $item) => is_string($item) ? explode(',', $item) : [$item])
-            ->flatMap(fn (mixed $item) => is_string($item) ? explode('|', $item) : [$item])
-            ->map(fn (mixed $item) => is_string($item) ? trim($item) : $item)
+            ->flatMap(fn (string|array $item) => is_string($item) ? explode(',', $item) : [$item])
+            ->flatMap(fn (string|array $item) => is_string($item) ? explode('|', $item) : [$item])
+            ->map(fn (string|array $item) => is_string($item) ? trim($item) : $item)
             ->filter()
             ->unique()
             ->values()
@@ -98,10 +98,10 @@ class GetAffiliatedIds
      * @param  array<int,string>  $permissions
      * @return array<int,int>
      */
-    private function getPermissionBasedIds(array $permissions, mixed $userPermission): array
+    private function getPermissionBasedIds(array $permissions, array $userPermission): array
     {
         return collect($permissions)
-            ->map(fn (mixed $permission) => data_get($userPermission, "permissions.$permission", []))
+            ->map(fn (string $permission) => data_get($userPermission, "permissions.$permission", []))
             ->collapse()
             ->toArray();
     }
@@ -110,10 +110,10 @@ class GetAffiliatedIds
      * @param  array<int,string>  $corporation_role
      * @return array<int,int>
      */
-    private function getCorporationRoleBasedIds(array $corporation_role, mixed $userPermission): array
+    private function getCorporationRoleBasedIds(array $corporation_role, array $userPermission): array
     {
         return collect($corporation_role)
-            ->map(fn (mixed $corporation_role) => data_get($userPermission, "corporation_roles.$corporation_role", []))
+            ->map(fn (string $corporation_role) => data_get($userPermission, "corporation_roles.$corporation_role", []))
             ->collapse()
             ->toArray();
     }

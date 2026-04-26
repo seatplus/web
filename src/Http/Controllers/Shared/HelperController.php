@@ -27,6 +27,8 @@
 namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -67,7 +69,7 @@ class HelperController extends Controller
         return collect($result)->toJson();
     }
 
-    public function getEntityFromId(int $id): mixed
+    public function getEntityFromId(int $id): array
     {
         return (new GetEntityFromId($id))->execute();
     }
@@ -79,7 +81,7 @@ class HelperController extends Controller
         return $token ? 1 : 0;
     }
 
-    public function esiSearch(Request $request): mixed
+    public function esiSearch(Request $request): Collection
     {
         $validated_data = $request->validate([
             'search' => ['required', 'string', 'min:3'],
@@ -95,7 +97,7 @@ class HelperController extends Controller
         return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
     }
 
-    public function typesOrGroupsOrCategories(): mixed
+    public function typesOrGroupsOrCategories(): Response|Collection
     {
         $term = request()->get('search');
 
@@ -125,7 +127,7 @@ class HelperController extends Controller
             ->union($typeQuery)
             ->limit(15)
             ->get()
-            ->map(fn (mixed $entry) => [
+            ->map(fn (object $entry) => [
                 'id' => intval(match ($entry->category) {
                     'type' => 1,
                     'group' => 2,
@@ -141,7 +143,7 @@ class HelperController extends Controller
             ]);
     }
 
-    public function getResourceVariants(string $resource_type, int $resource_id): mixed
+    public function getResourceVariants(string $resource_type, int $resource_id): array|string|null
     {
         $url = "https://images.evetech.net/${resource_type}/${resource_id}";
 

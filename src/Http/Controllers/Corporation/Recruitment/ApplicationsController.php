@@ -168,7 +168,7 @@ class ApplicationsController extends Controller
         return back()->with('success', 'comment created');
     }
 
-    public function getActivityLog(string $application_id): mixed
+    public function getActivityLog(string $application_id): ?Application
     {
         return Application::query()
             ->with([

@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -64,7 +65,7 @@ class Controller extends BaseController
             ->whereIn('character_id', $characterIds)
             ->when(
                 $characterRelation,
-                fn (mixed $query) => $query->with($characterRelation),
+                fn (Builder $query) => $query->with($characterRelation),
             )
             ->get();
     }

@@ -27,10 +27,12 @@
 namespace Seatplus\Web\Http\Controllers\Queue;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\LazyCollection;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
 use Seatplus\Web\Contracts\WebJobsRepository;
@@ -51,7 +53,7 @@ class DispatchJobController extends Controller
         parent::__construct($request, $getAffiliatedIds);
     }
 
-    public function dispatch(DispatchIndividualJob $job): mixed
+    public function dispatch(DispatchIndividualJob $job): RedirectResponse|string
     {
         $this->dispatch_transfer_object = $job->get('dispatch_transfer_object');
 
@@ -79,7 +81,7 @@ class DispatchJobController extends Controller
     public function getEntities(Request $request): LengthAwarePaginator
     {
         $validated_data = $request->validate([
-            'manual_job' => ['required', fn (mixed $attribute, mixed $value, mixed $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
+            'manual_job' => ['required', fn (string $attribute, mixed $value, \Closure $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
             'permission' => ['required'],
             'required_scopes' => ['required', 'array'],
             'required_corporation_role' => ['nullable', 'string'],
@@ -99,14 +101,14 @@ class DispatchJobController extends Controller
             ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
-            ->filter(fn (mixed $token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
+            ->filter(fn (RefreshToken $token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
             ->when(
                 $isCorporationScope,
-                fn (mixed $tokens) => $tokens
-                    ->filter(fn (mixed $token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
-                    ->unique(fn (mixed $token) => $token->corporation_id)
+                fn (LazyCollection $tokens) => $tokens
+                    ->filter(fn (RefreshToken $token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
+                    ->unique(fn (RefreshToken $token) => $token->corporation_id)
             )
-            ->map(fn (mixed $token) => collect([
+            ->map(fn (RefreshToken $token) => collect([
                 'character_id' => $isCorporationScope ? null : $token->character_id,
                 'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
                 'name' => $isCorporationScope ? $token->corporation->name : $token->character->name,
@@ -117,7 +119,7 @@ class DispatchJobController extends Controller
         return new LengthAwarePaginator($tokens, $tokens->count(), $request->get('per_page', 10));
     }
 
-    private function getRefreshToken(DispatchIndividualJob $job): mixed
+    private function getRefreshToken(DispatchIndividualJob $job): ?RefreshToken
     {
         if ($job->get('character_id')) {
             return RefreshToken::find($job->get('character_id'));
@@ -135,7 +137,7 @@ class DispatchJobController extends Controller
         return sprintf('%s:%s', $job_name, $id);
     }
 
-    public function getBatchStatus(?string $batch_id): mixed
+    public function getBatchStatus(?string $batch_id): array|string
     {
         if (is_null($batch_id)) {
             return [

@@ -26,10 +26,12 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\RoleRessource;
@@ -39,25 +41,25 @@ class ListControlGroupsController extends Controller
     public function __invoke(): AnonymousResourceCollection
     {
         $userId = auth()->user()->getAuthIdentifier();
-        $character_ids = auth()->user()->characters->map(fn (mixed $character) => $character->character_id)->toArray();
+        $character_ids = auth()->user()->characters->map(fn (CharacterInfo $character) => $character->character_id)->toArray();
 
         $query = Role::query()
             ->when(
                 auth()->user()->can('superuser'),
-                fn (mixed $query) => $query->orWhereNotIn('id', []),
-                fn (mixed $query) => $query
+                fn (Builder $query) => $query->orWhereNotIn('id', []),
+                fn (Builder $query) => $query
                     // user is an active member
-                    ->whereHas('role_memberships', fn (mixed $q) => $q
+                    ->whereHas('role_memberships', fn (Builder $q) => $q
                         ->where('entity_type', User::class)
                         ->where('entity_id', $userId))
                     // user is affiliated (corp or alliance scope matches their characters)
-                    ->orWhereHas('affiliations', fn (mixed $q) => $q->whereHasMorph(
+                    ->orWhereHas('affiliations', fn (Builder $q) => $q->whereHasMorph(
                         'affiliatable',
                         [CorporationInfo::class, AllianceInfo::class],
-                        fn (mixed $q) => $q->whereHas('characters', fn (mixed $q) => $q->whereIn('character_infos.character_id', $character_ids))
+                        fn (Builder $q) => $q->whereHas('characters', fn (Builder $q) => $q->whereIn('character_infos.character_id', $character_ids))
                     ))
                     // user is a moderator
-                    ->orWhereHas('role_memberships', fn (mixed $q) => $q
+                    ->orWhereHas('role_memberships', fn (Builder $q) => $q
                         ->where('entity_type', User::class)
                         ->where('entity_id', $userId)
                         ->where('can_moderate', true))

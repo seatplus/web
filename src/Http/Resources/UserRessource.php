@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class UserRessource extends JsonResource
 {
@@ -42,7 +43,7 @@ class UserRessource extends JsonResource
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => $this->characters
-                ->map(fn (mixed $character) => [
+                ->map(fn (CharacterInfo $character) => [
                     'character_id' => $character->character_id,
                     'name' => $character->name,
                     'corporation' => $character->corporation,

@@ -40,12 +40,12 @@ class TypeWatchListScope
             return false;
         }
 
-        $query->where(function (mixed $query) {
-            $query->where(function (mixed $query) {
+        $query->where(function (Builder $query) {
+            $query->where(function (Builder $query) {
 
-                $query->when($this->type_ids, fn (mixed $query) => $query->filterByTypeIds($this->type_ids));
-                $query->when($this->group_ids, fn (mixed $query) => $query->filterByGroupIds($this->group_ids));
-                $query->when($this->category_ids, fn (mixed $query) => $query->filterByCategoryIds($this->category_ids));
+                $query->when($this->type_ids, fn (Builder $query) => $query->filterByTypeIds($this->type_ids));
+                $query->when($this->group_ids, fn (Builder $query) => $query->filterByGroupIds($this->group_ids));
+                $query->when($this->category_ids, fn (Builder $query) => $query->filterByCategoryIds($this->category_ids));
             });
 
         });
@@ -62,7 +62,7 @@ class TypeWatchListScope
         ];
 
         // if no property is set, return true
-        if (! collect($propertyMapping)->filter(fn (mixed $assetProperty, mixed $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
+        if (! collect($propertyMapping)->filter(fn (string $assetProperty, string $requestProperty) => $this->$requestProperty)->isNotEmpty()) {
             return true;
         }
 

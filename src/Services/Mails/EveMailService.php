@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Services\Mails;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -52,11 +53,11 @@ class EveMailService
 
         // now split the clean body into threads
         return collect(explode('--------------------------------<br>', $clean_body))
-            ->map(fn (mixed $mail, mixed $index) => $index === 0 ? $this->handleFirstMail($mail) : $this->handleMail($mail))
+            ->map(fn (string $mail, int $index) => $index === 0 ? $this->handleFirstMail($mail) : $this->handleMail($mail))
             ->pipe(function (Collection $collection) {
                 $resolved_names = $this->resolveNames();
 
-                return $collection->map(fn (mixed $mail, mixed $index) => $index === 0 ? $mail : $this->enrichMail($mail, $resolved_names));
+                return $collection->map(fn (array $mail, int $index) => $index === 0 ? $mail : $this->enrichMail($mail, $resolved_names));
             });
     }
 
@@ -71,7 +72,7 @@ class EveMailService
     {
         return [
             'from' => ['id' => $this->mail->from],
-            'recipients' => $this->mail->recipients->map(fn (mixed $recipient) => ['id' => $recipient->receivable_id]),
+            'recipients' => $this->mail->recipients->map(fn (Model $recipient) => ['id' => $recipient->receivable_id]),
             'timestamp' => carbon($this->mail->timestamp),
             'subject' => $this->mail->subject,
             'body' => $mail,

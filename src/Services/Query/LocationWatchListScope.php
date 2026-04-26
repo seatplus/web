@@ -25,11 +25,11 @@ class LocationWatchListScope
             return;
         }
 
-        $query->where(function (mixed $query) {
-            $query->where(function (mixed $query) {
+        $query->where(function (Builder $query) {
+            $query->where(function (Builder $query) {
 
-                $query->when($this->system_ids, fn (mixed $query) => $query->filterBySystemIds($this->system_ids));
-                $query->when($this->region_ids, fn (mixed $query) => $query->filterByRegionIds($this->region_ids));
+                $query->when($this->system_ids, fn (Builder $query) => $query->filterBySystemIds($this->system_ids));
+                $query->when($this->region_ids, fn (Builder $query) => $query->filterByRegionIds($this->region_ids));
             });
 
         });

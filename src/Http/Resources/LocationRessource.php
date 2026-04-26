@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -29,6 +30,6 @@ class LocationRessource extends JsonResource
 
     private function calculateVolume(Collection $assets): float|int
     {
-        return $assets->reduce(fn (mixed $carry, mixed $asset) => $carry + data_get($asset, 'type.volume', 0) * $asset->quantity, 0);
+        return $assets->reduce(fn (int|float $carry, Model $asset) => $carry + data_get($asset, 'type.volume', 0) * $asset->quantity, 0);
     }
 }

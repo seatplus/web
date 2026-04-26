@@ -30,6 +30,7 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Inertia\Inertia;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -67,7 +68,7 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      */
-    public function render(mixed $request, Throwable $exception): mixed
+    public function render(mixed $request, Throwable $exception): Response
     {
         Inertia::share((new HandleInertiaRequests)->share($request));
 

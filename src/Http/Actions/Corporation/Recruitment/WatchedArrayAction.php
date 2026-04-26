@@ -28,6 +28,8 @@ namespace Seatplus\Web\Http\Actions\Corporation\Recruitment;
 
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
+use Seatplus\Eveapi\Models\Universe\Region;
+use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
@@ -58,7 +60,7 @@ class WatchedArrayAction
 
     private function handleSystems(): void
     {
-        $entries = $this->enlistment->systems->map(function (mixed $system) {
+        $entries = $this->enlistment->systems->map(function (System $system) {
             $system->id = $system->system_id;
 
             return $system;
@@ -69,21 +71,21 @@ class WatchedArrayAction
 
     private function handleItems(): void
     {
-        $types = $this->enlistment->types->map(fn (mixed $type) => [
+        $types = $this->enlistment->types->map(fn (Type $type) => [
             'id' => intval(1 .$type->type_id),
             'name' => $type->name.' (type)',
             'watchable_id' => $type->type_id,
             'watchable_type' => Type::class,
         ]) ?? [];
 
-        $groups = $this->enlistment->groups->map(fn (mixed $group) => [
+        $groups = $this->enlistment->groups->map(fn (Group $group) => [
             'id' => intval(1 .$group->group_id),
             'name' => $group->name.' (group)',
             'watchable_id' => $group->group_id,
             'watchable_type' => Group::class,
         ]) ?? [];
 
-        $categories = $this->enlistment->categories->map(fn (mixed $category) => [
+        $categories = $this->enlistment->categories->map(fn (Category $category) => [
             'id' => intval(1 .$category->category_id),
             'name' => $category->name.' (category)',
             'watchable_id' => $category->category_id,
@@ -95,7 +97,7 @@ class WatchedArrayAction
 
     private function handleRegions(): void
     {
-        $entries = $this->enlistment->regions->map(function (mixed $region) {
+        $entries = $this->enlistment->regions->map(function (Region $region) {
             $region->id = $region->region_id;
 
             return $region;

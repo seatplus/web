@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
@@ -66,7 +67,7 @@ class MailsController extends Controller
             ->paginate();
     }
 
-    public function getMail(int $mail_id): mixed
+    public function getMail(int $mail_id): Collection
     {
         $userIsSuperuser = auth()->user()->can('superuser');
 

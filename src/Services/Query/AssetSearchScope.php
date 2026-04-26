@@ -30,9 +30,9 @@ class AssetSearchScope
 
     private function handleBuilder(Builder $query): bool
     {
-        $query->when($this->search_query, function (mixed $query) {
+        $query->when($this->search_query, function (Builder $query) {
             collect(str_getcsv($this->search_query, ' ', '"'))->filter()
-                ->each(function (mixed $term) use ($query) {
+                ->each(function (string $term) use ($query) {
                     $term = $term.'%';
 
                     $query->where('name_normalized', 'like', $term)
@@ -49,7 +49,7 @@ class AssetSearchScope
     {
         $terms = collect(str_getcsv($this->search_query, ' ', '"'))
             ->filter()
-            ->map(fn (mixed $term) => Str::lower($term))
+            ->map(fn (string $term) => Str::lower($term))
             ->toArray();
 
         return collect([
@@ -58,8 +58,8 @@ class AssetSearchScope
             $item->group_name_normalized,
             $item->category_name_normalized,
         ])->filter()
-            ->map(fn (mixed $name) => Str::lower($name))
-            ->filter(fn (mixed $name) => Str::startsWith($name, $terms))
+            ->map(fn (string $name) => Str::lower($name))
+            ->filter(fn (string $name) => Str::startsWith($name, $terms))
             ->isNotEmpty();
 
     }

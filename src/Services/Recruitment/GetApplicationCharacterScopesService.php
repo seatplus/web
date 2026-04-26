@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Services\Recruitment;
 
+use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\SsoScopes\GlobalSsoScopesService;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -53,7 +54,7 @@ class GetApplicationCharacterScopesService
             'refresh_token',
         ]);
 
-        $user = User::whereHas('characters', fn (mixed $q) => $q->where('character_infos.character_id', $character->character_id))
+        $user = User::whereHas('characters', fn (Builder $q) => $q->where('character_infos.character_id', $character->character_id))
             ->with([
                 'characters.corporation',
                 'characters.alliance',

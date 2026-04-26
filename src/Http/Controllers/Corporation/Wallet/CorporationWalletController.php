@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -94,8 +95,8 @@ class CorporationWalletController extends Controller
             ->where('division_type', 'wallet')
             ->when(
                 request()->has('corporation_ids'),
-                fn (mixed $query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
-                fn (mixed $query) => $query->whereIn('corporation_id', $affiliated_ids)
+                fn (Builder $query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
+                fn (Builder $query) => $query->whereIn('corporation_id', $affiliated_ids)
             )
             ->select('corporation_divisions.*')
             ->distinct()

@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -52,7 +53,7 @@ class ManageControlGroupMembersController
             'id' => $role->id,
             'type' => $role->type->value,
             'acl' => [
-                'affiliations' => $role->affiliations->map(fn (mixed $affiliation) => [
+                'affiliations' => $role->affiliations->map(fn (Affiliation $affiliation) => [
                     'id' => $affiliation->affiliatable_id,
                     'type' => [
                         CorporationInfo::class => 'corporation',

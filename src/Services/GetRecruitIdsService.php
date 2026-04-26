@@ -92,13 +92,13 @@ class GetRecruitIdsService
             ->where('status', 'open')
             ->get()
             ->map(
-                fn (mixed $recruit) => $recruit->applicationable->characters
+                fn (Application $recruit) => $recruit->applicationable->characters
                     ? $recruit->applicationable->characters->pluck('character_id')
                     : $recruit->applicationable->character_id
             )
             ->flatten()
             ->unique()
-            ->map(fn (mixed $recruitId) => intval($recruitId))
+            ->map(fn (int|string $recruitId) => intval($recruitId))
             ->filter()
             ->toArray();
     }

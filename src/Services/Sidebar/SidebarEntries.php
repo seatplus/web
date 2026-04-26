@@ -50,7 +50,7 @@ class SidebarEntries
 
     public function getFilteredEntries(): Collection
     {
-        return collect($this->sidebar)->map(function (mixed $entries, mixed $category) {
+        return collect($this->sidebar)->map(function (array $entries, string $category) {
             $availableEntries = $this->getAvailableEntries($entries, $category);
 
             if (empty($availableEntries)) {
@@ -66,7 +66,7 @@ class SidebarEntries
 
     private function getAvailableEntries(array $entries, string $category): array
     {
-        return collect($entries)->filter(function (mixed $entry) use ($category) {
+        return collect($entries)->filter(function (array $entry) use ($category) {
             $permissionString = Arr::get($entry, 'permission');
             $character_role = Arr::get($entry, 'character_role', '');
 
@@ -101,8 +101,8 @@ class SidebarEntries
     {
         $sidebar = config('package.sidebar');
 
-        return collect($sidebar)->map(function (mixed $entries, mixed $category) {
-            return collect($entries)->map(function (mixed $entry) {
+        return collect($sidebar)->map(function (array $entries, string $category) {
+            return collect($entries)->map(function (array $entry) {
                 $entry['uri'] = route($entry['route']);
 
                 return $entry;

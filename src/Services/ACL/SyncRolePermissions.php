@@ -72,6 +72,6 @@ class SyncRolePermissions
 
     private function removeUnassignedPermissions(): void
     {
-        $this->current_permissions->diff($this->target_permissions)->each(fn (mixed $to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
+        $this->current_permissions->diff($this->target_permissions)->each(fn (string $to_be_removed_permissions) => $this->role->revokePermissionTo($to_be_removed_permissions));
     }
 }

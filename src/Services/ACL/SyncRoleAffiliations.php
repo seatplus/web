@@ -54,7 +54,7 @@ class SyncRoleAffiliations
         if (Arr::has($validated_data, 'affiliations')) {
             collect(data_get($validated_data, 'affiliations', []))
                 ->each(
-                    fn (mixed $affiliation) => $this
+                    fn (array $affiliation) => $this
                         ->target_affiliations
                         ->push(Affiliation::firstOrCreate([
                             'role_id' => $this->role->id,
@@ -74,12 +74,13 @@ class SyncRoleAffiliations
             'character' => CharacterInfo::class,
             'corporation' => CorporationInfo::class,
             'alliance' => AllianceInfo::class,
+            default => throw new \InvalidArgumentException('Unknown affiliation category: '.data_get($affiliation, 'category')),
         };
     }
 
     private function removeUnassignedAffiliations(): void
     {
-        $this->current_affiliations->reject(fn (mixed $current_affiliation) => $this->target_affiliations->contains($current_affiliation))->each(function (mixed $affiliation) {
+        $this->current_affiliations->reject(fn (Affiliation $current_affiliation) => $this->target_affiliations->contains($current_affiliation))->each(function (Affiliation $affiliation) {
             Affiliation::where([
                 'role_id' => $affiliation->role_id,
                 'affiliatable_id' => $affiliation->affiliatable_id,

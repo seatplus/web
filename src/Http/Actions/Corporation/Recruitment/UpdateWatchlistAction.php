@@ -65,7 +65,7 @@ class UpdateWatchlistAction
 
         collect($system_ids)
             ->diff(System::whereIn('system_id', $system_ids)->select('system_id')->pluck('system_id'))
-            ->each(fn (mixed $system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
+            ->each(fn (int $system_id) => ResolveUniverseSystemBySystemIdJob::dispatchSync($system_id));
     }
 
     private function handleRegions(): void
@@ -80,7 +80,7 @@ class UpdateWatchlistAction
 
         collect($region_ids)
             ->diff(Region::whereIn('region_id', $region_ids)->select('region_id')->pluck('region_id'))
-            ->each(fn (mixed $region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
+            ->each(fn (int $region_id) => ResolveUniverseRegionByRegionIdJob::dispatchSync($region_id));
     }
 
     private function handleItems(): void
@@ -94,13 +94,13 @@ class UpdateWatchlistAction
             ->groupBy('watchable_type')->pipe(function (Collection $collection) {
                 foreach ([Type::class, Group::class, Category::class] as $key) {
                     if (! $collection->has($key)) {
-                        $collection = $collection->mergeRecursive([$key => []]);
+                        $collection = $collection->put($key, collect());
                     }
                 }
 
                 return $collection;
             })
-            ->each(fn (mixed $items, mixed $category) => match ($category) {
+            ->each(fn (Collection $items, string $category) => match ($category) {
                 Type::class => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
                 Group::class => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
                 Category::class => $this->enlistment->categories()->sync(data_get($items, '*.watchable_id')),
