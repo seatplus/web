@@ -1,16 +1,20 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 beforeEach(function () {
+    $dto = CreateDispatchTransferObject::new()->create(Contact::class);
+
     test()->dispatch_transfer_object = [
-        'manual_job' => array_search(ContactHydrateBatch::class, config('web.jobs')),
-        'permission' => config('eveapi.permissions.'.Contact::class),
-        'required_scopes' => config('eveapi.scopes.character.contacts'),
+        'manual_job' => $dto->manual_job,
+        'permission' => $dto->permission,
+        'required_scopes' => $dto->required_scopes,
         'required_corporation_role' => '',
     ];
 
@@ -72,7 +76,7 @@ test('one get dispatchable corporation entities', function () {
 
     expect($dispatch_transfer_object)->toBeArray();
 
-    $dispatch_transfer_object = \Illuminate\Support\Arr::set($dispatch_transfer_object, 'required_corporation_role', 'Director');
+    $dispatch_transfer_object = Arr::set($dispatch_transfer_object, 'required_corporation_role', 'Director');
 
     // make test character a director of the corporation
     Event::fakeFor(function () {
@@ -90,7 +94,7 @@ test('one get dispatchable corporation entities', function () {
     // create contact for the corporation
     Contact::factory()->create([
         'contactable_id' => test()->test_character->corporation->corporation_id,
-        'contactable_type' => \Seatplus\Eveapi\Models\Corporation\CorporationInfo::class,
+        'contactable_type' => CorporationInfo::class,
     ]);
 
     expect(test()->test_character->corporation->contacts()->count())->toBeGreaterThan(0);

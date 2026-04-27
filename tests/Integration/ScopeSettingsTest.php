@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
@@ -25,16 +28,16 @@ it('has scope settings', function () {
  * @preserveGlobalState disabled
  */
 test('one can create sso setting', function () {
-    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
+    $corporation = CorporationInfo::factory()->make();
 
-    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+    $response = new EsiResponse(
         json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200
     );
 
-    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+    RetrieveEsiData::shouldReceive('execute')
         ->andReturn($response);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
@@ -70,16 +73,16 @@ test('one can create sso setting', function () {
  * @preserveGlobalState disabled
  */
 test('one can delete sso setting', function () {
-    $corporation = \Seatplus\Eveapi\Models\Corporation\CorporationInfo::factory()->make();
+    $corporation = CorporationInfo::factory()->make();
 
-    $response = new \Seatplus\EsiClient\DataTransferObjects\EsiResponse(
+    $response = new EsiResponse(
         json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
         [],
         11,
         200
     );
 
-    \Seatplus\Eveapi\Services\Facade\RetrieveEsiData::shouldReceive('execute')
+    RetrieveEsiData::shouldReceive('execute')
         ->andReturn($response);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())

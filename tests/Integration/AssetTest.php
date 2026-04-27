@@ -1,10 +1,14 @@
 <?php
 
+use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
+use Seatplus\Eveapi\Models\Universe\Type;
 
 test('is protected by authentication', function () {
     $response = test()->followingRedirects()
@@ -130,9 +134,9 @@ test('load asset on watchlist', function () {
         ->create([
             'assetable_id' => test()->test_character->character_id,
             'location_id' => $content->item_id,
-            'type_id' => \Seatplus\Eveapi\Models\Universe\Type::factory(),
-            'group_id' => \Seatplus\Eveapi\Models\Universe\Group::factory(),
-            'category_id' => \Seatplus\Eveapi\Models\Universe\Category::factory(),
+            'type_id' => Type::factory(),
+            'group_id' => Group::factory(),
+            'category_id' => Category::factory(),
         ]);
 
     $propertyMapping = [
@@ -156,7 +160,7 @@ test('load asset on watchlist', function () {
         expect($response->original)->toHaveCount(1);
 
         $response->assertJson(
-            fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
+            fn (AssertableJson $json) => $json
                 ->count('data', 1)
                 ->has(
                     'data.0',

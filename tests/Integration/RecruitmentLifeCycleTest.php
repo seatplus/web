@@ -1,7 +1,10 @@
 <?php
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -11,11 +14,13 @@ use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
 beforeEach(function () {
     /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
@@ -46,11 +51,11 @@ test('user without permission fails to create enlistment', function () {
 });
 
 test('user with permission and affiliations succeeds to create enlistment', function () {
-    expect(\Seatplus\Web\Models\Recruitment\Enlistment::all())->toHaveCount(0);
+    expect(Enlistment::all())->toHaveCount(0);
 
     createEnlistment();
 
-    expect(\Seatplus\Web\Models\Recruitment\Enlistment::all())->toHaveCount(1);
+    expect(Enlistment::all())->toHaveCount(1);
 })->todo('adapt to new role management');
 
 test('user with permission and affiliations can delete enlistment', function () {
@@ -601,7 +606,7 @@ test('recruiter can comment on application', function () {
         ->put(route('comment.application', $application->id), ['comment' => $comment])
         ->assertRedirect();
 
-    expect(\Seatplus\Eveapi\Models\Recruitment\ApplicationLogs::all())->toHaveCount(1);
+    expect(ApplicationLogs::all())->toHaveCount(1);
 
     $response = test()->actingAs($recruiter)
         ->get(route('get.application', $application->id))
@@ -668,7 +673,7 @@ test('junior hr can dispatch update batch and get status', function () {
 
 it('returns activity log entries for closed applications', function () {
     $application = Event::fakeFor(fn () => Application::factory()->create([
-        'id' => \Illuminate\Support\Str::uuid(),
+        'id' => Str::uuid(),
         'status' => 'rejected',
     ]));
 
@@ -690,7 +695,7 @@ it('returns activity log entries for closed applications', function () {
                 ->where('status', 'rejected')
                 ->where(
                     'log_entries',
-                    fn (\Illuminate\Support\Collection $collection) => \Illuminate\Support\Arr::has($collection->first(), 'causer')
+                    fn (Collection $collection) => Arr::has($collection->first(), 'causer')
                 )
                 ->etc()
         );

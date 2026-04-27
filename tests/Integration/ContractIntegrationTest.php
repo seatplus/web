@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -94,7 +95,7 @@ it('has watchlist scope', function () {
             ->assertOk();
 
         $response->assertJson(
-            fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
+            fn (AssertableJson $json) => $json
                 ->count('data', 1)
                 ->has(
                     'data.0',

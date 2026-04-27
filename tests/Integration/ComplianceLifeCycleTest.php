@@ -6,6 +6,8 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
@@ -232,7 +234,7 @@ it('enables with review permission to review corporation member', function () {
 });
 
 it('allows user with review permission to review corporation member', function () {
-    \Illuminate\Support\Facades\Event::fake();
+    Event::fake();
 
     // create a user with two characters
     $user = User::factory()->create();
@@ -260,13 +262,13 @@ it('allows user with review permission to review corporation member', function (
     // create affiliation
     $role->affiliations()->create([
         'affiliatable_id' => $first_character->character_id,
-        'affiliatable_type' => \Seatplus\Eveapi\Models\Character\CharacterInfo::class,
+        'affiliatable_type' => CharacterInfo::class,
         'type' => 'allowed',
     ]);
 
     // create sso scope
     $sso_scope = SsoScopes::factory()->create([
-        'morphable_type' => \Seatplus\Eveapi\Models\Corporation\CorporationInfo::class,
+        'morphable_type' => CorporationInfo::class,
         'morphable_id' => $first_character->corporation->corporation_id,
         'type' => 'user',
         'selected_scopes' => collect(['esi-alliances.read_corporations.v1'])->toJson(),
@@ -311,7 +313,7 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         ])
         ->assertRedirect();
 
-    $affiliated_ids = \Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService::get($role);
+    $affiliated_ids = RoleAffiliatedIdsService::get($role);
     expect($affiliated_ids)->toContain(test()->secondary_character->corporation->corporation_id);
 
     // give test user the role

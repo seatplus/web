@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Seatplus\Auth\Models\Permissions\Permission;
 
 test('if post cache clear clears cache', function () {
@@ -12,7 +13,7 @@ test('if post cache clear clears cache', function () {
 
     test()->test_user->givePermissionTo($permission);
 
-    \Illuminate\Support\Facades\Artisan::shouldReceive('call')
+    Artisan::shouldReceive('call')
         ->once()
         ->with('seatplus:cache:clear --force')
         ->andReturn(1);
