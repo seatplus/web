@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Testing\Fluent\AssertableJson;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -10,7 +9,7 @@ use Seatplus\Web\Jobs\ManualDispatchedJob;
 
 beforeEach(function () {
     test()->dispatch_transfer_object = [
-        'manual_job' => array_search(ContactHydrateBatch::class, config('web.jobs')),
+        'manual_job' => 'contacts',
         'permission' => config('eveapi.permissions.'.Contact::class),
         'required_scopes' => config('eveapi.scopes.character.contacts'),
         'required_corporation_role' => '',

@@ -156,11 +156,6 @@ class WebServiceProvider extends ServiceProvider
         );
 
         $this->mergeConfigFrom(
-            __DIR__.'/../config/web.jobs.php',
-            'web.jobs'
-        );
-
-        $this->mergeConfigFrom(
             __DIR__.'/../config/web.images.php',
             'web.images'
         );

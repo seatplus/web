@@ -26,12 +26,6 @@
 
 namespace Seatplus\Web\Services\Controller;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\MailsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -53,54 +47,49 @@ class CreateDispatchTransferObject
     {
         return match ($class) {
             Contract::class => new DispatchTransferObject(
-                $this->getManualJob(SkillsHydrateBatch::class),
+                'contract',
                 $this->getPermission(Contract::class),
                 $this->getRequiredScopes('contracts'),
                 null
             ),
             Asset::class => new DispatchTransferObject(
-                $this->getManualJob(CharacterAssetsHydrateBatch::class),
+                'assets',
                 $this->getPermission(Asset::class),
                 $this->getRequiredScopes('assets'),
                 null
             ),
             WalletJournal::class => new DispatchTransferObject(
-                $this->getManualJob(WalletHydrateBatch::class),
+                $this->isCharacter() ? 'wallet' : 'corporation.wallet',
                 $this->getPermission(WalletJournal::class),
                 $this->isCharacter() ? $this->getRequiredScopes('wallet') : [...$this->getRequiredScopes('wallet'), 'esi-characters.read_corporation_roles.v1'],
                 $this->isCharacter() ? null : ['Accountant', 'Junior_Accountant']
             ),
             Contact::class => new DispatchTransferObject(
-                $this->getManualJob(ContactHydrateBatch::class),
+                'contacts',
                 $this->getPermission(Contact::class),
                 $this->getRequiredScopes('contacts'),
                 null
             ),
             CorporationMemberTracking::class => new DispatchTransferObject(
-                $this->getManualJob(CorporationMemberTrackingHydrateBatch::class),
+                'membertracking',
                 $this->getPermission(CorporationMemberTracking::class),
                 $this->getRequiredScopes('membertracking'),
                 ['Director']
             ),
             Skill::class => new DispatchTransferObject(
-                $this->getManualJob(SkillsHydrateBatch::class),
+                'skills',
                 $this->getPermission(Skill::class),
                 $this->getRequiredScopes('skills'),
                 null
             ),
             Mail::class => new DispatchTransferObject(
-                $this->getManualJob(MailsHydrateBatch::class),
+                'mails',
                 $this->getPermission(Mail::class),
                 $this->getRequiredScopes('mails'),
                 null
             ),
             default => throw new \InvalidArgumentException("Unsupported class: {$class}"),
         };
-    }
-
-    private function getManualJob(string $needle): string
-    {
-        return array_search($needle, config('web.jobs'));
     }
 
     private function getPermission(string $class): ?string

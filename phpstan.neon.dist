@@ -18,11 +18,6 @@ parameters:
         # Old middleware + pipeline files that extend removed auth 3.x base classes.
         # These files are dead code scheduled for removal in PR 1-B.
 
-        # HydrateBatch classes are not yet present in eveapi; these are planned stubs.
-        -
-            message: "#^Class Seatplus\\\\Eveapi\\\\Jobs\\\\Hydrate\\\\(Character|Corporation)\\\\.*HydrateBatch not found\\.$#"
-            path: src/Services/Controller/CreateDispatchTransferObject.php
-
         # filterBy*Ids methods are Eloquent query scopes exposed via Builder macro magic;
         # PHPStan cannot see them on the raw Builder type.
         -

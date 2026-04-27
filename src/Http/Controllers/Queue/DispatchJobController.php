@@ -81,7 +81,7 @@ class DispatchJobController extends Controller
     public function getEntities(Request $request): LengthAwarePaginator
     {
         $validated_data = $request->validate([
-            'manual_job' => ['required', fn (string $attribute, mixed $value, \Closure $fail) => Arr::has(config('web.jobs'), $value) ?: $fail($attribute.' is invalid.')],
+            'manual_job' => ['required', fn (string $attribute, mixed $value, \Closure $fail) => in_array($value, $this->web_jobs->getJobKeys()) ?: $fail($attribute.' is invalid.')],
             'permission' => ['required'],
             'required_scopes' => ['required', 'array'],
             'required_corporation_role' => ['nullable', 'string'],

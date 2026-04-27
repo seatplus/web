@@ -30,12 +30,11 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
 class DispatchIndividualJob extends FormRequest
 {
-    private const JOBS_CONFIG_KEY = 'web.jobs';
-
     private const PERMISSIONS_CONFIG_KEY = 'eveapi.permissions';
 
     /**
@@ -70,7 +69,7 @@ class DispatchIndividualJob extends FormRequest
 
     private function getDispatchObjectRules(): array
     {
-        $availableJobs = array_keys(config(self::JOBS_CONFIG_KEY));
+        $availableJobs = app(WebJobsRepository::class)->getJobKeys();
 
         return [
             'dispatch_transfer_object.manual_job' => ['required', Rule::in($availableJobs)],

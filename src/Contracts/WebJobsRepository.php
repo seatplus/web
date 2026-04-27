@@ -37,7 +37,7 @@ class WebJobsRepository
             'mails' => fn (RefreshToken $refresh_token) => $this->getMailsJobs($refresh_token),
             // Corporation
             'corporation.wallet' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
-            'membertracking' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
+            'membertracking' => fn (RefreshToken $refresh_token) => $this->getCorporationMemberTrackingJobs($refresh_token),
         ];
     }
 

@@ -7,6 +7,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 
@@ -238,16 +239,58 @@ it('enables with review permission to review corporation member', function () {
 });
 
 it('allows user with review permission to review corporation member', function () {
-    createScopeSetting(['view member compliance', 'member compliance: review user']);
-    expect(test()->test_user)
-        ->can('superuser')->toBeFalse()
-        ->can('member compliance: review user')->toBeTrue()
-        ->can('view member compliance')->toBeTrue();
-    test()->actingAs(test()->test_user)
-        ->getJson(route('corporation.review.user', [
-            'corporation_id' => test()->secondary_character->corporation->corporation_id,
-            'user' => test()->secondary_user->id,
-        ]));
+    Event::fake();
+
+    // create a user with two characters
+    $user = User::factory()->create();
+    $secondary_character = CharacterUser::factory()->make();
+
+    $user->character_users()->save($secondary_character);
+
+    expect($user->characters->count())->toEqual(2);
+
+    $first_character = $user->characters->first();
+    $second_character = $user->characters->last();
+
+    expect($first_character->character_id)->not()->toEqual($second_character->character_id);
+
+    // create role
+    $role = Role::create(['name' => faker()->name]);
+    $permission = Permission::create(['name' => 'member compliance: review user']);
+
+    $role->givePermissionTo($permission);
+    $role->activateMember(test()->test_user);
+
+    // check if test user has permission
+    expect(test()->test_user->can('member compliance: review user'))->toBeTrue();
+
+    // create affiliation
+    $role->affiliations()->create([
+        'affiliatable_id' => $first_character->character_id,
+        'affiliatable_type' => CharacterInfo::class,
+        'type' => 'allowed',
+    ]);
+
+    // create sso scope
+    $sso_scope = SsoScopes::factory()->create([
+        'morphable_type' => CorporationInfo::class,
+        'morphable_id' => $first_character->corporation->corporation_id,
+        'type' => 'user',
+        'selected_scopes' => collect(['esi-alliances.read_corporations.v1'])->toJson(),
+    ]);
+
+    \Pest\Laravel\actingAs(test()->test_user);
+    $affiliated_ids = GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery()->get();
+
+    expect($affiliated_ids)->toHaveCount(2)
+        ->and($affiliated_ids->first()->affiliated_id)->toEqual($first_character->character_id)
+        ->and($affiliated_ids->last()->affiliated_id)->toEqual($second_character->character_id);
+
+    $response = test()->actingAs(test()->test_user)->get(route('get.character.skills', [
+        'character_id' => $second_character->character_id,
+    ]));
+
+    $response->assertOk();
 })->todo('Requires the skills route to accept member compliance: review user permission, or CanUserService to expand affiliations via GetCorporationMemberComplianceAffiliatedIdsService. The skills route currently only checks the skills permission.');
 
 // Helpers
