@@ -30,15 +30,17 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Services\Recruitment\GetApplicationCharacterScopesService;
 
+/**
+ * @mixin Application
+ */
 class ApplicationRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  Request
      */
     public function toArray(Request $request): array
     {
@@ -48,7 +50,7 @@ class ApplicationRessource extends JsonResource
             'application_id' => $this->id,
             'is_user' => $is_user,
             $this->mergeWhen($is_user, ['user' => $this->applicationable]),
-            'main_character' => $is_user ? $this->applicationable->main_character : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', $this->applicationable->character_id)->user->main_character,
+            'main_character' => $is_user ? data_get($this->applicationable, 'main_character') : CharacterUser::query()->with('user.main_character')->firstWhere('character_id', data_get($this->applicationable, 'character_id'))?->user?->main_character,
             'characters' => $this->getCharacters(),
             'decision_count' => $this->decision_count,
         ];

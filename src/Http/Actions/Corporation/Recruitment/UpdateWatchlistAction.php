@@ -104,6 +104,7 @@ class UpdateWatchlistAction
                 Type::class => $this->enlistment->types()->sync(data_get($items, '*.watchable_id')),
                 Group::class => $this->enlistment->groups()->sync(data_get($items, '*.watchable_id')),
                 Category::class => $this->enlistment->categories()->sync(data_get($items, '*.watchable_id')),
+                default => null,
             });
     }
 }

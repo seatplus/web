@@ -28,14 +28,16 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
+/**
+ * @mixin User
+ */
 class UserRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  Request
      */
     public function toArray(Request $request): array
     {

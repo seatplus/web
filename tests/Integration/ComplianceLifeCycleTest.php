@@ -237,8 +237,18 @@ it('enables with review permission to review corporation member', function () {
         ->assertInertia(fn (Assert $page) => $page->component('Corporation/MemberCompliance/ReviewUser'));
 });
 
-it('allows user with review permission to review corporation member')
-    ->todo('Requires the skills route to accept member compliance: review user permission, or CanUserService to expand affiliations via GetCorporationMemberComplianceAffiliatedIdsService. The skills route currently only checks the skills permission.');
+it('allows user with review permission to review corporation member', function () {
+    createScopeSetting(['view member compliance', 'member compliance: review user']);
+    expect(test()->test_user)
+        ->can('superuser')->toBeFalse()
+        ->can('member compliance: review user')->toBeTrue()
+        ->can('view member compliance')->toBeTrue();
+    test()->actingAs(test()->test_user)
+        ->getJson(route('corporation.review.user', [
+            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'user' => test()->secondary_user->id,
+        ]));
+})->todo('Requires the skills route to accept member compliance: review user permission, or CanUserService to expand affiliations via GetCorporationMemberComplianceAffiliatedIdsService. The skills route currently only checks the skills permission.');
 
 // Helpers
 function createScopeSetting(array $permissons = [], $type = 'default')

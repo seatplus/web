@@ -60,6 +60,7 @@ class HomeController extends Controller
                 match ($type) {
                     User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
                     CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
+                    default => null,
                 };
 
                 $query->where('status', 'open');

@@ -29,7 +29,7 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Seatplus\Web\Exceptions\SettingException;
+use Seatplus\Eveapi\Exceptions\SettingException;
 use Symfony\Component\HttpFoundation\Response;
 
 class Locale

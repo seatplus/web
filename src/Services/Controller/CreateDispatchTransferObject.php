@@ -93,7 +93,8 @@ class CreateDispatchTransferObject
                 $this->getPermission(Mail::class),
                 $this->getRequiredScopes('mails'),
                 null
-            )
+            ),
+            default => throw new \InvalidArgumentException("Unsupported class: {$class}"),
         };
     }
 

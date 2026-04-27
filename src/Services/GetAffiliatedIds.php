@@ -85,9 +85,9 @@ class GetAffiliatedIds
         $array = is_array($input) ? $input : [$input];
 
         return collect($array)
-            ->flatMap(fn (string|array $item) => is_string($item) ? explode(',', $item) : [$item])
-            ->flatMap(fn (string|array $item) => is_string($item) ? explode('|', $item) : [$item])
-            ->map(fn (string|array $item) => is_string($item) ? trim($item) : $item)
+            ->flatMap(fn (string $item) => explode(',', $item))
+            ->flatMap(fn (string $item) => explode('|', $item))
+            ->map(fn (string $item) => trim($item))
             ->filter()
             ->unique()
             ->values()

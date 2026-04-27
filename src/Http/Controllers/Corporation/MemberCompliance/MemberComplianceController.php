@@ -95,7 +95,7 @@ class MemberComplianceController
 
     public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action): Response
     {
-        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->pluck('type')->first();
+        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->value('type');
         $isCharacterType = $type === 'default';
 
         $member = $user

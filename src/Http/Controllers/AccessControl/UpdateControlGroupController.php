@@ -30,6 +30,7 @@ use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Services\Roles\AbstractRoleService;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -80,6 +81,8 @@ class UpdateControlGroupController extends Controller
             return;
         }
 
-        BaseRoleService::make($data->role)->getTypeService()->setRoleType($newType);
+        /** @var AbstractRoleService $typeService */
+        $typeService = BaseRoleService::make($data->role)->getTypeService();
+        $typeService->setRoleType($newType);
     }
 }

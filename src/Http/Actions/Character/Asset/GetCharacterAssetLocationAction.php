@@ -92,7 +92,7 @@ class GetCharacterAssetLocationAction
     {
         return $assets->filter(fn (Asset $asset) => $this->filterAssetsLogic($asset))
             ->map(function (Asset $asset) {
-                if ($asset->relationLoaded('content')) {
+                if ($asset->relationLoaded('content') && $asset->content->isNotEmpty()) {
                     $filtered_content = $this->filterContent($asset->content);
                     $asset->setRelation('content', $filtered_content);
                 }
@@ -136,7 +136,7 @@ class GetCharacterAssetLocationAction
         }
     }
 
-    public function getPaginatedLocations(): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function getPaginatedLocations(): LengthAwarePaginator
     {
         $character_ids = $this->validated['character_ids'];
 

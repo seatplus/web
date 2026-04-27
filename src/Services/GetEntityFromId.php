@@ -182,7 +182,7 @@ class GetEntityFromId
         ];
 
         if ($character_affiliation->alliance_id) {
-            $character['alliance'] = ['name' => $character_affiliation?->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->allince_id)];
+            $character['alliance'] = ['name' => $character_affiliation?->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->alliance_id)];
         }
 
         return $character;

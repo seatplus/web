@@ -61,10 +61,10 @@ class WatchedArrayAction
     private function handleSystems(): void
     {
         $entries = $this->enlistment->systems->map(function (System $system) {
-            $system->id = $system->system_id;
+            $system->setAttribute('id', $system->system_id);
 
             return $system;
-        }) ?? [];
+        });
 
         data_set($this->watched, 'systems', $entries);
     }
@@ -76,21 +76,21 @@ class WatchedArrayAction
             'name' => $type->name.' (type)',
             'watchable_id' => $type->type_id,
             'watchable_type' => Type::class,
-        ]) ?? [];
+        ]);
 
         $groups = $this->enlistment->groups->map(fn (Group $group) => [
             'id' => intval(1 .$group->group_id),
             'name' => $group->name.' (group)',
             'watchable_id' => $group->group_id,
             'watchable_type' => Group::class,
-        ]) ?? [];
+        ]);
 
         $categories = $this->enlistment->categories->map(fn (Category $category) => [
             'id' => intval(1 .$category->category_id),
             'name' => $category->name.' (category)',
             'watchable_id' => $category->category_id,
             'watchable_type' => Category::class,
-        ]) ?? [];
+        ]);
 
         data_set($this->watched, 'items', [...$types, ...$groups, ...$categories]);
     }
@@ -98,10 +98,10 @@ class WatchedArrayAction
     private function handleRegions(): void
     {
         $entries = $this->enlistment->regions->map(function (Region $region) {
-            $region->id = $region->region_id;
+            $region->setAttribute('id', $region->region_id);
 
             return $region;
-        }) ?? [];
+        });
 
         data_set($this->watched, 'regions', $entries);
     }

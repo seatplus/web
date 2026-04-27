@@ -41,8 +41,11 @@ class ImpersonateRecruit extends Controller
 
         abort_unless($application?->applicationable_type === User::class, 403, 'This action is not allowed');
 
-        (new ImpersonateService)->impersonateUser($application->applicationable);
+        /** @var User $applicant */
+        $applicant = $application->applicationable;
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$application->applicationable->main_character->name);
+        (new ImpersonateService)->impersonateUser($applicant);
+
+        return redirect()->route('home')->with('success', 'Impersonating '.$applicant->main_character->name);
     }
 }

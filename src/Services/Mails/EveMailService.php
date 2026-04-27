@@ -42,9 +42,9 @@ class EveMailService
         $this->namesToResolve = collect();
     }
 
-    public static function make(Mail $mail): static
+    public static function make(Mail $mail): self
     {
-        return new static($mail);
+        return new self($mail);
     }
 
     public function getThreads(): Collection

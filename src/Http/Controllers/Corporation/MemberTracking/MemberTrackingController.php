@@ -87,10 +87,12 @@ class MemberTrackingController extends Controller
             ])
             ->get()
             ->map(function (CorporationInfo $corporation) {
-                $corporation->required_scopes = collect([
-                    json_decode((string) $corporation->corporation_scopes, true),
-                    json_decode((string) $corporation->alliance_scopes, true),
+                $required_scopes = collect([
+                    json_decode((string) $corporation->getAttribute('corporation_scopes'), true),
+                    json_decode((string) $corporation->getAttribute('alliance_scopes'), true),
                 ])->flatten()->filter()->unique()->toArray();
+
+                $corporation->setAttribute('required_scopes', $required_scopes);
 
                 return $corporation;
             });

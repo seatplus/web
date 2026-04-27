@@ -37,11 +37,15 @@ use Seatplus\Web\Http\Resources\UserRessource;
 
 class ListMembersController extends Controller
 {
+    public function __construct(
+        private readonly BaseRoleService $baseRoleService,
+    ) {}
+
     public function __invoke(int $role_id): AnonymousResourceCollection
     {
         $role = Role::find($role_id);
 
-        abort_unless(auth()->user()->can('superuser') || (new BaseRoleService)->for($role)->canModerate(auth()->user()), 403);
+        abort_unless(auth()->user()->can('superuser') || $this->baseRoleService->for($role)->canModerate(auth()->user()), 403);
 
         $users = User::query()
             ->join(

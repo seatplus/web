@@ -49,17 +49,17 @@ class ListControlGroupsController extends Controller
                 fn (Builder $query) => $query->orWhereNotIn('id', []),
                 fn (Builder $query) => $query
                     // user is an active member
-                    ->whereHas('role_memberships', fn (Builder $q) => $q
+                    ->whereHas('role_memberships', fn (Builder $query) => $query
                         ->where('entity_type', User::class)
                         ->where('entity_id', $userId))
                     // user is affiliated (corp or alliance scope matches their characters)
-                    ->orWhereHas('affiliations', fn (Builder $q) => $q->whereHasMorph(
+                    ->orWhereHas('affiliations', fn (Builder $query) => $query->whereHasMorph(
                         'affiliatable',
                         [CorporationInfo::class, AllianceInfo::class],
-                        fn (Builder $q) => $q->whereHas('characters', fn (Builder $q) => $q->whereIn('character_infos.character_id', $character_ids))
+                        fn (Builder $query) => $query->whereHas('characters', fn (Builder $query) => $query->whereIn('character_infos.character_id', $character_ids))
                     ))
                     // user is a moderator
-                    ->orWhereHas('role_memberships', fn (Builder $q) => $q
+                    ->orWhereHas('role_memberships', fn (Builder $query) => $query
                         ->where('entity_type', User::class)
                         ->where('entity_id', $userId)
                         ->where('can_moderate', true))

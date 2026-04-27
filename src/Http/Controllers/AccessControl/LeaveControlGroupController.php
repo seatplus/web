@@ -40,6 +40,12 @@ class LeaveControlGroupController extends Controller
 
     private User $user;
 
+    public function __construct(
+        private readonly OptOutAction $optOutAction,
+        private readonly LeaveAction $leaveAction,
+        private readonly BaseRoleService $baseRoleService,
+    ) {}
+
     public function __invoke(int $role_id, int $user_id): RedirectResponse
     {
         $this->role = Role::find($role_id);
@@ -59,16 +65,17 @@ class LeaveControlGroupController extends Controller
     private function removeMember(): void
     {
         match ($this->role->type->value) {
-            'on-request' => (new OptOutAction(new BaseRoleService))->execute($this->role->id, $this->user->id),
-            'opt-in' => (new LeaveAction)->execute($this->role->id, $this->user->id),
+            'on-request' => $this->optOutAction->execute($this->role->id, $this->user->id),
+            'opt-in' => $this->leaveAction->execute($this->role->id, $this->user->id),
+            default => null,
         };
 
-        (new BaseRoleService)->for($this->role)->handleMembers();
+        $this->baseRoleService->for($this->role)->handleMembers();
     }
 
     private function isSuperuserOrModerator(): bool
     {
-        return auth()->user()->can('superuser') || (new BaseRoleService)->for($this->role)->canModerate(auth()->user());
+        return auth()->user()->can('superuser') || $this->baseRoleService->for($this->role)->canModerate(auth()->user());
     }
 
     private function isActionOnYourself(): bool

@@ -67,6 +67,7 @@ class ControlGroupsController
 
     public function edit(int $role_id): Response
     {
+        /** @var Role $role */
         $role = Role::findById($role_id);
 
         $permissions = fn () => array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));

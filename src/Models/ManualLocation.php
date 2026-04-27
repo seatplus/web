@@ -42,7 +42,7 @@ class ManualLocation extends Model implements LocatableInterface
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var array
+     * @var array<string>|bool
      */
     protected $guarded = [];
 

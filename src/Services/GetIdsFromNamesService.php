@@ -39,9 +39,9 @@ class GetIdsFromNamesService
         $this->result = collect();
     }
 
-    public static function make(): static
+    public static function make(): self
     {
-        return new static;
+        return new self;
     }
 
     public function execute(array $names): Collection

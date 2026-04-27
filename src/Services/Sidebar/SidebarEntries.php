@@ -28,9 +28,7 @@ namespace Seatplus\Web\Services\Sidebar;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
@@ -84,17 +82,6 @@ class SidebarEntries
 
             return false;
         })->toArray();
-    }
-
-    private function checkPermission(string $permission): bool
-    {
-        try {
-            return $this->user->can($permission);
-        } catch (PermissionDoesNotExist) {
-            Permission::create(['name' => $permission]);
-
-            return $this->checkPermission($permission);
-        }
     }
 
     private function initializeSidebar(): array

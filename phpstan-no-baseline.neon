@@ -1,6 +1,7 @@
 includes:
     - vendor/larastan/larastan/extension.neon
 
+
 parameters:
     databaseMigrationsPath:
         - database/migrations
@@ -17,22 +18,7 @@ parameters:
     ignoreErrors:
         # Old middleware + pipeline files that extend removed auth 3.x base classes.
         # These files are dead code scheduled for removal in PR 1-B.
-
-        # HydrateBatch classes are not yet present in eveapi; these are planned stubs.
-        -
-            message: "#^Class Seatplus\\\\Eveapi\\\\Jobs\\\\Hydrate\\\\(Character|Corporation)\\\\.*HydrateBatch not found\\.$#"
-            path: src/Services/Controller/CreateDispatchTransferObject.php
-
-        # filterBy*Ids methods are Eloquent query scopes exposed via Builder macro magic;
-        # PHPStan cannot see them on the raw Builder type.
-        -
-            message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(System|Region)Ids\\(\\)\\.$#"
-            path: src/Services/Query/LocationWatchListScope.php
-        -
-            message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
-            path: src/Services/Query/TypeWatchListScope.php
     excludePaths:
-        - config/web.jobs.php
         - src/Http/Middleware/CheckContactsAndAffiliation.php
         - src/Http/Middleware/CheckPermissionAndAffiliation.php
         - src/Http/Pipelines/CheckCharacterAffiliationsAffiliatedIdPipe.php

@@ -126,7 +126,11 @@ class AssignSuperuser extends Command
 
     private function createRole(): Role
     {
-        return Role::findOrCreate('Superuser');
+        $role = Role::findOrCreate('Superuser');
+
+        assert($role instanceof Role);
+
+        return $role;
     }
 
     private function assignPermissionToRole(Role $role): void
@@ -139,7 +143,7 @@ class AssignSuperuser extends Command
     private function hasAlreadyRun(): bool
     {
         try {
-            return User::permission('superuser')->get()->isNotEmpty();
+            return User::permission('superuser')->exists();
         } catch (PermissionDoesNotExist) {
             return false;
         }

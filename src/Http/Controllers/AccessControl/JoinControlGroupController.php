@@ -61,6 +61,7 @@ class JoinControlGroupController extends Controller
         match ($this->role->type->value) {
             'on-request' => (new ApproveAction)->execute($this->role->id, $this->user->id),
             'opt-in' => (new JoinAction)->execute($this->role->id, $this->user->id),
+            default => null,
         };
 
         (new BaseRoleService)->for($this->role)->handleMembers();

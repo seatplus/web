@@ -127,18 +127,20 @@ class HelperController extends Controller
             ->union($typeQuery)
             ->limit(15)
             ->get()
-            ->map(fn (object $entry) => [
-                'id' => intval(match ($entry->category) {
+            ->map(fn (Category $entry) => [
+                'id' => intval(match ((string) $entry->getAttribute('category')) {
                     'type' => 1,
                     'group' => 2,
                     'category' => 3,
-                }.$entry->id),
-                'name' => sprintf('%s (%s)', $entry->name, $entry->category),
-                'watchable_id' => intval($entry->id),
-                'watchable_type' => match ($entry->category) {
+                    default => 0,
+                }.(int) $entry->getAttribute('id')),
+                'name' => sprintf('%s (%s)', $entry->name, $entry->getAttribute('category')),
+                'watchable_id' => intval($entry->getAttribute('id')),
+                'watchable_type' => match ((string) $entry->getAttribute('category')) {
                     'type' => Type::class,
                     'group' => Group::class,
                     'category' => Category::class,
+                    default => Type::class,
                 },
             ]);
     }

@@ -114,7 +114,8 @@ class ApplicationsController extends Controller
             CharacterInfo::class => collect([
                 'main_character' => $application->applicationable,
                 'characters' => [$application->applicationable],
-            ])
+            ]),
+            default => collect([]),
         };
 
         return inertia('Corporation/Recruitment/Application', [
@@ -152,7 +153,8 @@ class ApplicationsController extends Controller
         return redirect()->route('corporation.recruitment')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
                 User::class => 'User',
-                CharacterInfo::class => 'Character'
+                CharacterInfo::class => 'Character',
+                default => 'Applicant',
             }, $request->get('decision')));
     }
 

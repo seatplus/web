@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class GetRecruitIdsService
 {
@@ -91,11 +92,19 @@ class GetRecruitIdsService
             )
             ->where('status', 'open')
             ->get()
-            ->map(
-                fn (Application $recruit) => $recruit->applicationable->characters
-                    ? $recruit->applicationable->characters->pluck('character_id')
-                    : $recruit->applicationable->character_id
-            )
+            ->map(function (Application $recruit) {
+                $applicationable = $recruit->applicationable;
+
+                if ($applicationable instanceof User) {
+                    return $applicationable->characters->pluck('character_id');
+                }
+
+                if ($applicationable instanceof CharacterInfo) {
+                    return collect([$applicationable->character_id]);
+                }
+
+                return collect();
+            })
             ->flatten()
             ->unique()
             ->map(fn (int|string $recruitId) => intval($recruitId))
