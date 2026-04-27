@@ -1,10 +1,9 @@
 <?php
 
-
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
-use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('can accept or deny applications');
@@ -12,11 +11,10 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
 });
 
 it('get affiliated corporations', function () {
-    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+    CharacterRole::updateOrCreate([
         'character_id' => test()->test_character->character_id,
     ], [
         'roles' => ['Director'],

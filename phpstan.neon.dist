@@ -1,0 +1,35 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    databaseMigrationsPath:
+        - database/migrations
+        - vendor/seatplus/auth/database/migrations
+        - vendor/seatplus/eveapi/database/migrations
+    level: 4
+    paths:
+        - src
+        - config
+        - database
+    tmpDir: build/phpstan
+    checkOctaneCompatibility: true
+    checkModelProperties: true
+    ignoreErrors:
+        # Old middleware + pipeline files that extend removed auth 3.x base classes.
+        # These files are dead code scheduled for removal in PR 1-B.
+
+        # filterBy*Ids methods are Eloquent query scopes exposed via Builder macro magic;
+        # PHPStan cannot see them on the raw Builder type.
+        -
+            message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(System|Region)Ids\\(\\)\\.$#"
+            path: src/Services/Query/LocationWatchListScope.php
+        -
+            message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
+            path: src/Services/Query/TypeWatchListScope.php
+    excludePaths:
+        - config/web.jobs.php
+        - src/Http/Middleware/CheckContactsAndAffiliation.php
+        - src/Http/Middleware/CheckPermissionAndAffiliation.php
+        - src/Http/Pipelines/CheckCharacterAffiliationsAffiliatedIdPipe.php
+        - src/Http/Pipelines/CheckCorporationMemberComplianceAffiliatedIdPipe.php
+        - src/Http/Pipelines/CheckRecruitsAffiliatedIdPipe.php

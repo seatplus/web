@@ -4,7 +4,6 @@ use Faker\Factory;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Tests\TestCase;
-use Spatie\Permission\PermissionRegistrar;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +18,7 @@ use Spatie\Permission\PermissionRegistrar;
 
 /** @link https://pestphp.com/docs/underlying-test-case */
 uses(TestCase::class)->in('Integration', 'Unit');
-//uses(TestCase::class);
+// uses(TestCase::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +45,6 @@ uses(TestCase::class)->in('Integration', 'Unit');
 */
 
 /** @link https://pestphp.com/docs/helpers */
-
 function faker()
 {
     return Factory::create();
@@ -61,12 +59,9 @@ function assignPermissionToTestUser(array|string $permission_strings)
 
         test()->test_user->givePermissionTo($permission);
     }
-
-    // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
 }
 
-function updateRefreshTokenWithScopes(\Seatplus\Eveapi\Models\RefreshToken $refreshToken, array $scopes): RefreshToken
+function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes): RefreshToken
 {
     $helper_token = RefreshToken::factory()->scopes($scopes)->make([
         'character_id' => $refreshToken->character_id,

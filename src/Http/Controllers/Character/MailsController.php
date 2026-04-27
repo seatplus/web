@@ -28,16 +28,19 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\DispatchTransferObject;
 use Seatplus\Web\Services\Mails\EveMailService;
 
 class MailsController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
@@ -49,7 +52,7 @@ class MailsController extends Controller
         ]);
     }
 
-    public function mailHeaders(Request $request)
+    public function mailHeaders(Request $request): LengthAwarePaginator
     {
         $character_ids = $request->get('character_ids');
 
@@ -64,22 +67,17 @@ class MailsController extends Controller
             ->paginate();
     }
 
-    public function getMail(int $mail_id)
+    public function getMail(int $mail_id): Collection
     {
-        $dispatchTransferObject = $this->getDispatchTransferObject();
-
-        $affiliationsDto = new AffiliationsDto(
-            user: auth()->user(),
-            permissions: [data_get($dispatchTransferObject, 'permission')]
-        );
+        $userIsSuperuser = auth()->user()->can('superuser');
 
         $mail = Mail::query()
             ->with(['recipients'])
-            ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+            ->when(! $userIsSuperuser, fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn (Builder $query) => $query->whereAffiliatedCharacters($affiliationsDto)
-            ))
+                fn (Builder $query) => $query->where('character_id', $this->getAuthorizedMailCharacterIds())
+            )))
             ->firstWhere('id', $mail_id);
 
         abort_unless($mail, 404, 'Mail not found');
@@ -87,8 +85,15 @@ class MailsController extends Controller
         return EveMailService::make($mail)->getThreads();
     }
 
-    private function getDispatchTransferObject(): object
+    private function getDispatchTransferObject(): DispatchTransferObject
     {
         return CreateDispatchTransferObject::new()->create(Mail::class);
+    }
+
+    private function getAuthorizedMailCharacterIds(): array
+    {
+        $dispatchTransferObject = $this->getDispatchTransferObject();
+
+        return $this->getAffiliatedIds($dispatchTransferObject);
     }
 }

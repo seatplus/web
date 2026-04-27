@@ -1,6 +1,5 @@
 <?php
 
-
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
@@ -11,10 +10,7 @@ test('has dispatchable job', function () {
     test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->get(route('corporation.member_tracking'))
-        ->assertUnauthorized();
-
-
-
+        ->assertForbidden();
 
     test()->assignPermissionToTestUser('view member tracking');
 

@@ -1,16 +1,15 @@
 <?php
 
-
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use function Pest\Laravel\get;
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use Spatie\Permission\PermissionRegistrar;
+
+use function Pest\Laravel\get;
 
 test('see component', function () {
     $response = test()->actingAs(test()->test_user)
@@ -24,7 +23,6 @@ test('get mail headers of secondary user', function () {
         test()->test_user->removeRole('superuser');
 
         // now re-register all the roles and permissions
-        app()->make(PermissionRegistrar::class)->registerPermissions();
     }
 
     $response = test()->actingAs(test()->test_user)
@@ -49,28 +47,27 @@ test('get mail body test', function () {
         'receivable_type' => CharacterInfo::class,
     ]));
 
-
-    //Prepare ESI Response of GetIdsFromNamesService
+    // Prepare ESI Response of GetIdsFromNamesService
     $data = [
         [
-            "id" => 91_356_804,
-            "name" => "Steel Roamer",
+            'id' => 91_356_804,
+            'name' => 'Steel Roamer',
         ],
         [
-            "id" => 98_467_521,
-            "name" => "ShekelSquad",
+            'id' => 98_467_521,
+            'name' => 'ShekelSquad',
         ],
         [
             'id' => 95_002_093,
-            "name" => "Rory Wolf",
+            'name' => 'Rory Wolf',
         ],
         [
             'id' => 94_159_646,
-            "name" => "evillady Lennelluc",
+            'name' => 'evillady Lennelluc',
         ],
     ];
 
-    //Mock EsiResponse
+    // Mock EsiResponse
     $response = new EsiResponse(json_encode($data), [], 'now', 200);
 
     RetrieveEsiData::shouldReceive('execute')

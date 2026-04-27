@@ -27,102 +27,73 @@
 namespace Seatplus\Web\Services\Sidebar;
 
 use Illuminate\Support\Arr;
-use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Auth\Models\Permissions\Role;
+use Illuminate\Support\Collection;
 use Seatplus\Auth\Models\User;
-use Seatplus\Web\Services\HasCharacterNecessaryRole;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class SidebarEntries
 {
-    private readonly array $sidebar;
+    private const CATEGORY_ACCESS_CONTROL = 'Access Control';
+
+    private array $sidebar;
+
+    private readonly SidebarPermissionChecker $permissionChecker;
 
     public function __construct(
         private ?User $user = null
     ) {
         $this->user ??= auth()->user();
-        $this->sidebar = config('package.sidebar');
+        $this->permissionChecker = new SidebarPermissionChecker($this->user);
+        $this->sidebar = $this->initializeSidebar();
     }
 
-    public function filter()
+    public function getFilteredEntries(): Collection
     {
-        $categories = array_keys($this->sidebar);
+        return collect($this->sidebar)->map(function (array $entries, string $category) {
+            $availableEntries = $this->getAvailableEntries($entries, $category);
 
-        return collect($categories)->mapWithKeys(function ($category) {
-            $entries = $this->buildAvailableSidebarEntriesArray($category);
+            if (empty($availableEntries)) {
+                return null;
+            }
 
-            return empty($entries)
-                ? [$category => null]
-                : [
-                    $category => [
-                        'name' => $category,
-                        'entries' => $entries,
-                    ],
-                ];
-        })->filter();
+            return [
+                'name' => ucfirst($category),
+                'entries' => $availableEntries,
+            ];
+        })->filter()->values();
     }
 
-    private function checkPermission(string $permission): bool
+    private function getAvailableEntries(array $entries, string $category): array
     {
-        try {
-            return $this->user->can($permission);
-        } catch (PermissionDoesNotExist) {
-            Permission::create(['name' => $permission]);
+        return collect($entries)->filter(function (array $entry) use ($category) {
+            $permissionString = Arr::get($entry, 'permission');
+            $character_role = Arr::get($entry, 'character_role', '');
 
-            return $this->checkPermission($permission);
-        }
-    }
-
-    private function buildAvailableSidebarEntriesArray(string $category): array
-    {
-        $entries = Arr::get($this->sidebar, $category);
-
-        return collect($entries)->filter(function ($entry) use ($category) {
-            $permission_string = Arr::get($entry, 'permission');
-            $character_role = Arr::get($entry, 'character_role');
-
-            // if entry has no required permission show it to the user
-            if (is_null($permission_string)) {
+            if (is_null($permissionString)) {
                 return true;
             }
 
-            $permissions = explode('|', $permission_string);
-
-            foreach ($permissions as $permission) {
-                // if user has required permission show element
-                if ($this->checkPermission($permission)) {
-                    return true;
-                }
+            if ($this->permissionChecker->hasPermissionOrCorporationRole($permissionString, $character_role)) {
+                return true;
             }
 
-            // Moderators of roles should see the access control link even without the permission
-            if ($category === 'Access Control') {
-                $roles = Role::whereHas('moderators', fn ($query) => $query->whereHasMorph(
-                    'affiliatable',
-                    [User::class],
-                    fn ($query) => $query->whereId($this->user->getAuthIdentifier())
-                ))->get();
-
-                if ($roles->isNotEmpty()) {
-                    return true;
-                }
+            if ($category === self::CATEGORY_ACCESS_CONTROL && $this->permissionChecker->isRoleModerator()) {
+                return true;
             }
 
-            // if user does not have permission but got necessary character_role show element
-            return is_string($character_role) ? $this->hasUserCharacterRole($character_role) : false;
+            return false;
         })->toArray();
     }
 
-    /*
-    * Checks if user has required role
-    */
-    private function hasUserCharacterRole(string $character_role): bool
+    private function initializeSidebar(): array
     {
-        return $this->user
-            ->loadMissing('characters.roles')
-            ->characters
-            ->map(fn ($character) => HasCharacterNecessaryRole::check($character, $character_role))
-            ->filter()
-            ->isNotEmpty();
+        $sidebar = config('package.sidebar');
+
+        return collect($sidebar)->map(function (array $entries, string $category) {
+            return collect($entries)->map(function (array $entry) {
+                $entry['uri'] = route($entry['route']);
+
+                return $entry;
+            })->toArray();
+        })->toArray();
     }
 }

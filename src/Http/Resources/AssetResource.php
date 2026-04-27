@@ -28,8 +28,12 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;
 
+/**
+ * @mixin Asset
+ */
 class AssetResource extends JsonResource
 {
     public function toArray(Request $request): array

@@ -1,10 +1,8 @@
 <?php
 
-
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Schedules;
-use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
@@ -12,7 +10,6 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
 });
 
 it('has scope settings', function () {

@@ -1,9 +1,9 @@
 <?php
 
-
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -53,13 +53,13 @@ test('one get own suggestion', function () {
 test('one get suggestion of other user', function () {
     ManualLocation::factory()->count(5)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
         'created_at' => carbon()->subDay(),
     ]);
 
     $manual_loaction = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
     ]);
 
     test()->actingAs(test()->test_user)
@@ -71,13 +71,13 @@ test('one get suggestion of other user', function () {
 test('admin can accept suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
         'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
     ]);
 
     test()->assignPermissionToTestUser(['manage manual locations']);
@@ -121,12 +121,12 @@ test('admin can accept suggestion', function () {
 test('one get accepted suggestion', function () {
     ManualLocation::factory()->count(4)->create([
         'location_id' => 12345,
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
         'created_at' => carbon()->subDay(),
     ]);
 
     $manual_location = ManualLocation::factory()->create([
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
         'location_id' => 12345,
     ]);
 
@@ -155,7 +155,7 @@ test('one get accepted suggestion', function () {
 
 test('if location is resolved via jobs delete manual suggestions', function () {
     $manual_location = ManualLocation::factory()->create([
-        'user_id' => \Seatplus\Auth\Models\User::factory(),
+        'user_id' => User::factory(),
     ]);
 
     $station = Station::factory()->create([
@@ -176,7 +176,7 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         ->assertOk();
 
     // check that there are no suggestions
-    expect(json_decode((string)$response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0)
+    expect(json_decode((string) $response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0)
         ->and(ManualLocation::all())->toBeEmpty();
 });
 

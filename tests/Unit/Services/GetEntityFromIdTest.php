@@ -1,6 +1,5 @@
 <?php
 
-
 use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -134,7 +133,6 @@ test('unknown character id', function () {
     RetrieveEsiData::shouldReceive('execute')
         ->twice()
         ->andReturn($response);
-
 
     $expected_result = [
         'id' => $character->character_id,

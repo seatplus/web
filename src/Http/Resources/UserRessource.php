@@ -26,23 +26,26 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
+/**
+ * @mixin User
+ */
 class UserRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => $this->characters
-                ->map(fn ($character) => [
+                ->map(fn (CharacterInfo $character) => [
                     'character_id' => $character->character_id,
                     'name' => $character->name,
                     'corporation' => $character->corporation,
@@ -50,7 +53,6 @@ class UserRessource extends JsonResource
                     'scopes' => $character->refresh_token?->scopes,
                 ]),
             'impersonating' => $this->when(session('impersonation_origin'), true),
-            'status' => $this->when($this->status ? true : false, $this->status),
         ];
     }
 }

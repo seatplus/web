@@ -26,12 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Artisan;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class CommandsController extends Controller
 {
-    public function clear()
+    public function clear(): Response
     {
         Artisan::call('seatplus:cache:clear --force');
 

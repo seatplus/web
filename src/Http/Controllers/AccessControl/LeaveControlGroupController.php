@@ -26,8 +26,12 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Http\RedirectResponse;
+use Seatplus\Auth\Http\Actions\Roles\OnRequest\OptOutAction;
+use Seatplus\Auth\Http\Actions\Roles\OptIn\LeaveAction;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class LeaveControlGroupController extends Controller
@@ -36,12 +40,18 @@ class LeaveControlGroupController extends Controller
 
     private User $user;
 
-    public function __invoke(int $role_id, int $user_id)
+    public function __construct(
+        private readonly OptOutAction $optOutAction,
+        private readonly LeaveAction $leaveAction,
+        private readonly BaseRoleService $baseRoleService,
+    ) {}
+
+    public function __invoke(int $role_id, int $user_id): RedirectResponse
     {
         $this->role = Role::find($role_id);
         $this->user = User::find($user_id);
 
-        if (! in_array($this->role->type, ['opt-in', 'on-request'])) {
+        if (! in_array($this->role->type->value, ['opt-in', 'on-request'])) {
             return abort(403, 'This action is not allowed on this access control group');
         }
 
@@ -52,14 +62,20 @@ class LeaveControlGroupController extends Controller
         return redirect()->back();
     }
 
-    private function removeMember()
+    private function removeMember(): void
     {
-        $this->role->removeMember($this->user);
+        match ($this->role->type->value) {
+            'on-request' => $this->optOutAction->execute($this->role->id, $this->user->id),
+            'opt-in' => $this->leaveAction->execute($this->role->id, $this->user->id),
+            default => null,
+        };
+
+        $this->baseRoleService->for($this->role)->handleMembers();
     }
 
     private function isSuperuserOrModerator(): bool
     {
-        return auth()->user()->can('superuser') || $this->role->isModerator(auth()->user());
+        return auth()->user()->can('superuser') || $this->baseRoleService->for($this->role)->canModerate(auth()->user());
     }
 
     private function isActionOnYourself(): bool
@@ -69,8 +85,8 @@ class LeaveControlGroupController extends Controller
         return auth()->user()->getAuthIdentifier() === $this->user->id;
     }
 
-    private function illegalAction()
+    private function illegalAction(): never
     {
-        return abort(403, 'You are not allowed to perform this action');
+        abort(403, 'You are not allowed to perform this action');
     }
 }

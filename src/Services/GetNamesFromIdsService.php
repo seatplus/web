@@ -41,7 +41,7 @@ class GetNamesFromIdsService
 
     public function execute(array $ids): Collection
     {
-        $ids_to_resolve = collect($ids)->filter(function ($id) {
+        $ids_to_resolve = collect($ids)->filter(function (int $id) {
             if (! cache()->has(sprintf('name:%s', $id))) {
                 return true;
             }
@@ -65,15 +65,15 @@ class GetNamesFromIdsService
         $esi_results = RetrieveEsiData::execute($container);
 
         return collect($esi_results)
-            ->map(function ($esi_result) {
+            ->map(function (object $esi_result) {
                 match ($esi_result->category) {
-                    'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category . "_id", $esi_result->id),
+                    'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category.'_id', $esi_result->id),
                     default => $esi_result,
                 };
 
                 return $esi_result;
             })
-            ->each(fn ($esi_result) => cache([sprintf('name:%s', $esi_result->id) => $esi_result], now()->addDay()))
+            ->each(fn (object $esi_result) => cache([sprintf('name:%s', $esi_result->id) => $esi_result], now()->addDay()))
             ->merge($this->result);
     }
 }

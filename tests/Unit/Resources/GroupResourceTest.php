@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Event;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Web\Http\Resources\Universe\GroupResource;

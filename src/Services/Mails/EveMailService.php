@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Services\Mails;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -41,22 +42,22 @@ class EveMailService
         $this->namesToResolve = collect();
     }
 
-    public static function make(Mail $mail)
+    public static function make(Mail $mail): self
     {
-        return new static($mail);
+        return new self($mail);
     }
 
     public function getThreads(): Collection
     {
         $clean_body = $this->stripTags($this->mail->body ?? 'mail body has not been fetched yet.');
 
-        //now split the clean body into threads
+        // now split the clean body into threads
         return collect(explode('--------------------------------<br>', $clean_body))
-            ->map(fn ($mail, $index) => $index === 0 ? $this->handleFirstMail($mail) : $this->handleMail($mail))
+            ->map(fn (string $mail, int $index) => $index === 0 ? $this->handleFirstMail($mail) : $this->handleMail($mail))
             ->pipe(function (Collection $collection) {
                 $resolved_names = $this->resolveNames();
 
-                return $collection->map(fn ($mail, $index) => $index === 0 ? $mail : $this->enrichMail($mail, $resolved_names));
+                return $collection->map(fn (array $mail, int $index) => $index === 0 ? $mail : $this->enrichMail($mail, $resolved_names));
             });
     }
 
@@ -67,18 +68,18 @@ class EveMailService
         return strip_tags($body, '<br>');
     }
 
-    private function handleFirstMail(string $mail)
+    private function handleFirstMail(string $mail): array
     {
         return [
             'from' => ['id' => $this->mail->from],
-            'recipients' => $this->mail->recipients->map(fn ($recipient) => ['id' => $recipient->receivable_id]),
+            'recipients' => $this->mail->recipients->map(fn (Model $recipient) => ['id' => $recipient->receivable_id]),
             'timestamp' => carbon($this->mail->timestamp),
             'subject' => $this->mail->subject,
             'body' => $mail,
         ];
     }
 
-    private function handleMail(string $mail)
+    private function handleMail(string $mail): array
     {
         $mail = $this->stripTags($mail);
 
@@ -111,12 +112,12 @@ class EveMailService
         return $recipients;
     }
 
-    private function resolveNames()
+    private function resolveNames(): Collection
     {
         return GetIdsFromNamesService::make()->execute($this->namesToResolve->flatten()->unique()->toArray());
     }
 
-    private function enrichMail(array $mail, Collection $resolved_names)
+    private function enrichMail(array $mail, Collection $resolved_names): array
     {
         $mail['from'] = $resolved_names->firstWhere('name', $mail['from']);
 

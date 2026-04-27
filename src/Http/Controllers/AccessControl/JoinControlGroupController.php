@@ -26,8 +26,12 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Seatplus\Auth\Http\Actions\Roles\OnRequest\ApplyAction;
+use Seatplus\Auth\Http\Actions\Roles\OnRequest\ApproveAction;
+use Seatplus\Auth\Http\Actions\Roles\OptIn\JoinAction;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\JoinControlGroup;
 
@@ -42,23 +46,29 @@ class JoinControlGroupController extends Controller
         $this->role = Role::find($request->role_id);
         $this->user = User::find($request->user_id ?? auth()->user()->getAuthIdentifier());
 
-        if (! in_array($this->role->type, ['opt-in', 'on-request'])) {
+        if (! in_array($this->role->type->value, ['opt-in', 'on-request'])) {
             return abort(403);
         }
 
-        (auth()->user()->can('superuser') || $this->role->isModerator(auth()->user()))
+        (auth()->user()->can('superuser') || (new BaseRoleService)->for($this->role)->canModerate(auth()->user()))
             ? $this->becomeMember() : $this->joinWaitlist();
 
         return redirect()->back();
     }
 
-    private function becomeMember()
+    private function becomeMember(): void
     {
-        $this->role->activateMember($this->user);
+        match ($this->role->type->value) {
+            'on-request' => (new ApproveAction)->execute($this->role->id, $this->user->id),
+            'opt-in' => (new JoinAction)->execute($this->role->id, $this->user->id),
+            default => null,
+        };
+
+        (new BaseRoleService)->for($this->role)->handleMembers();
     }
 
-    private function joinWaitlist()
+    private function joinWaitlist(): void
     {
-        $this->role->joinWaitlist($this->user);
+        app(ApplyAction::class)->execute($this->role->id, $this->user->id);
     }
 }

@@ -82,6 +82,5 @@ it('can search existing system', function () {
         ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
         ->assertOk();
 
-
     expect($result->original)->toHaveCount(1);
 });

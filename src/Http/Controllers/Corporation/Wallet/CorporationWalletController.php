@@ -26,10 +26,11 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
@@ -38,7 +39,7 @@ use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 class CorporationWalletController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->setIsCharacter(false)
@@ -50,7 +51,7 @@ class CorporationWalletController extends Controller
         ]);
     }
 
-    public function journal(int $corporation_id, int $division_id)
+    public function journal(int $corporation_id, int $division_id): LengthAwarePaginator
     {
         return WalletJournal::where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
@@ -59,11 +60,11 @@ class CorporationWalletController extends Controller
             ->paginate();
     }
 
-    public function balance(int $corporation_id, int $division_id)
+    public function balance(int $corporation_id, int $division_id): LengthAwarePaginator
     {
         $entries = WalletJournal::query()
             ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
-            ->orderByDesc('date')
+            ->orderByDesc('x')
             ->where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
             ->groupBy('x')
@@ -73,7 +74,7 @@ class CorporationWalletController extends Controller
         return new LengthAwarePaginator($entries, 30, 30);
     }
 
-    public function transaction(int $corporation_id, int $division_id)
+    public function transaction(int $corporation_id, int $division_id): LengthAwarePaginator
     {
         return WalletTransaction::where('wallet_transactionable_id', $corporation_id)
             ->where('division', $division_id)
@@ -82,24 +83,20 @@ class CorporationWalletController extends Controller
             ->paginate();
     }
 
-    private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject)
+    private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject): Collection
     {
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user(),
-            corporation_roles: data_get($dispatchTransferObject, 'required_corporation_role')
+
+        $affiliated_ids = $this->getAffiliatedIds->get(
+            $dispatchTransferObject->permission,
+            $dispatchTransferObject->required_corporation_role
         );
 
-        $owned_corporations = GetOwnedAffiliatedIdsService::make($affiliations_dto)
-            ->getQuery();
-
-        //whereIn('corporation_id', $ids)
         return CorporationDivision::query()
             ->where('division_type', 'wallet')
             ->when(
                 request()->has('corporation_ids'),
-                fn ($query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
-                fn ($query) => $query->joinSub($owned_corporations, 'owned_corporations', 'owned_corporations.affiliated_id', '=', 'corporation_divisions.corporation_id')
+                fn (Builder $query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
+                fn (Builder $query) => $query->whereIn('corporation_id', $affiliated_ids)
             )
             ->select('corporation_divisions.*')
             ->distinct()

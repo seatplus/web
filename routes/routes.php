@@ -25,7 +25,9 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
+use Seatplus\Web\Http\Controllers\Auth\LoginController;
+use Seatplus\Web\Http\Controllers\Auth\LogoutController;
 use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
@@ -37,6 +39,10 @@ Route::get('/', function () {
 
 Route::middleware('web')
     ->group(function () {
+
+        Route::get('login', LoginController::class)->name('login');
+        Route::post('logout', LogoutController::class)->name('logout');
+
         Route::middleware(['auth', CheckRequiredScopes::class, OnboardingMiddleware::class])
             ->group(function () {
                 Route::get('/home', [HomeController::class, 'home'])->name('home');
@@ -45,53 +51,53 @@ Route::middleware('web')
 
                 Route::prefix('queue')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Queue/Queue.php';
+                        include __DIR__.'/Routes/Queue/Queue.php';
                     });
 
                 Route::prefix('configuration')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Configuration/Configuration.php';
-                        include __DIR__ . '/Routes/Configuration/UserSettings.php';
-                        include __DIR__ . '/Routes/Configuration/ManualLocations.php';
-                        Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])->group(function () {
-                            include __DIR__ . '/Routes/Configuration/Schedules.php';
+                        include __DIR__.'/Routes/Configuration/Configuration.php';
+                        include __DIR__.'/Routes/Configuration/UserSettings.php';
+                        include __DIR__.'/Routes/Configuration/ManualLocations.php';
+                        Route::middleware([CheckAuthorization::class.':superuser'])->group(function () {
+                            include __DIR__.'/Routes/Configuration/Schedules.php';
                         });
-                        include __DIR__ . '/Routes/Configuration/Performance.php';
+                        include __DIR__.'/Routes/Configuration/Performance.php';
                     });
 
                 Route::prefix('character')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Character/Assets.php';
-                        include __DIR__ . '/Routes/Character/Contact.php';
-                        include __DIR__ . '/Routes/Character/Wallet.php';
-                        include __DIR__ . '/Routes/Character/Contract.php';
-                        include __DIR__ . '/Routes/Character/CorporationHistory.php';
-                        include __DIR__ . '/Routes/Character/Skills.php';
-                        include __DIR__ . '/Routes/Character/Mails.php';
+                        include __DIR__.'/Routes/Character/Assets.php';
+                        include __DIR__.'/Routes/Character/Contact.php';
+                        include __DIR__.'/Routes/Character/Wallet.php';
+                        include __DIR__.'/Routes/Character/Contract.php';
+                        include __DIR__.'/Routes/Character/CorporationHistory.php';
+                        include __DIR__.'/Routes/Character/Skills.php';
+                        include __DIR__.'/Routes/Character/Mails.php';
                     });
 
                 Route::prefix('corporation')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Corporation/Wallet.php';
-                        include __DIR__ . '/Routes/Corporation/MemberTracking.php';
-                        include __DIR__ . '/Routes/Corporation/Recruitment.php';
-                        include __DIR__ . '/Routes/Corporation/MemberCompliance.php';
+                        include __DIR__.'/Routes/Corporation/Wallet.php';
+                        include __DIR__.'/Routes/Corporation/MemberTracking.php';
+                        include __DIR__.'/Routes/Corporation/Recruitment.php';
+                        include __DIR__.'/Routes/Corporation/MemberCompliance.php';
                     });
 
                 Route::prefix('onboarding')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Onboarding/Onboarding.php';
+                        include __DIR__.'/Routes/Onboarding/Onboarding.php';
                     });
 
                 Route::prefix('acl')
-                    ->middleware(['acl-permission:view access control'])
+                    ->middleware(['acl-permission'])
                     ->group(function () {
-                        include __DIR__ . '/Routes/AccessControl/View.php';
+                        include __DIR__.'/Routes/AccessControl/View.php';
                     });
 
                 Route::prefix('shared')
                     ->group(function () {
-                        include __DIR__ . '/Routes/Shared/Shared.php';
+                        include __DIR__.'/Routes/Shared/Shared.php';
                     });
             });
 

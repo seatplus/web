@@ -33,7 +33,7 @@ use Seatplus\Web\Http\Controllers\Controller;
 
 class QueueController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'queue_count' => collect(resolve(WorkloadRepository::class)->get())
@@ -43,15 +43,12 @@ class QueueController extends Controller
         ];
     }
 
-    /**
-     * @return string
-     */
-    private function currentStatus()
+    private function currentStatus(): string
     {
         if (! $masters = app(MasterSupervisorRepository::class)->all()) {
             return 'inactive';
         }
 
-        return collect($masters)->contains(fn ($master) => $master->status === 'paused') ? 'paused' : 'running';
+        return collect($masters)->contains(fn (object $master) => $master->status === 'paused') ? 'paused' : 'running';
     }
 }

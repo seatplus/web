@@ -26,8 +26,8 @@
 
 return [
     // Notifications
-    'error'   => 'Error',
+    'error' => 'Error',
     'success' => 'Success',
     'warning' => 'Warning',
-    'info'    => 'Info',
+    'info' => 'Info',
 ];

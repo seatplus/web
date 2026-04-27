@@ -27,13 +27,12 @@
 namespace Seatplus\Web\Services\Pipes;
 
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
-use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\AutomaticRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class AutomaticControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
 {
-    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next)
+    public function handle(ControlGroupUpdateData $control_group_update_data, Closure $next): ControlGroupUpdateData
     {
         if ($control_group_update_data->role_type === 'automatic') {
             $this->update($control_group_update_data);
@@ -42,30 +41,18 @@ class AutomaticControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         return $next($control_group_update_data);
     }
 
-    private function update(ControlGroupUpdateData $control_group_update_data)
+    private function update(ControlGroupUpdateData $data): void
     {
-        $this->handleAffiliations($control_group_update_data);
+        $this->handleAffiliations($data);
 
-        $this->addAffiliatedUsers($control_group_update_data);
-        $this->removeUnaffiliatedUsers($control_group_update_data);
+        $criteria = collect($data->affiliations ?? [])
+            ->map(fn (array $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
+            ->values()
+            ->toArray();
 
-        $this->cleanWaitlist($control_group_update_data);
-        $this->removeModerators($control_group_update_data);
-    }
+        (new AutomaticRoleService($data->role))->automaticallyAssignRoleTo($criteria);
 
-    private function addAffiliatedUsers(ControlGroupUpdateData $control_group_update_data)
-    {
-        $acl_affiliated_ids = $control_group_update_data->role->acl_affiliated_ids;
-
-        $users = User::query()
-            ->whereHas('character_users', function (Builder $query) use ($acl_affiliated_ids) {
-                $query->whereIn('character_id', $acl_affiliated_ids);
-            })
-            ->whereDoesntHave('roles', fn ($query) => $query->whereId($control_group_update_data->role->id))
-            ->cursor();
-
-        foreach ($users as $user) {
-            $control_group_update_data->role->activateMember($user);
-        }
+        $this->cleanWaitlist($data);
+        $this->removeModerators($data);
     }
 }

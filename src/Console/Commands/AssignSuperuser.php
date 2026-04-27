@@ -30,6 +30,7 @@ use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 class AssignSuperuser extends Command
@@ -49,7 +50,7 @@ class AssignSuperuser extends Command
      */
     protected $description = 'Assign superuser permission to a user, search by character name';
 
-    private ?\Seatplus\Auth\Models\User $user = null;
+    private ?User $user = null;
 
     /**
      * Create a new command instance.
@@ -61,7 +62,7 @@ class AssignSuperuser extends Command
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         if ($this->hasAlreadyRun()) {
             $this->warn('Superuser has already been assigned, ask any of the following users to help you out:');
@@ -69,7 +70,7 @@ class AssignSuperuser extends Command
             $users = User::with('characters')
                 ->permission('superuser')
                 ->get()
-                ->map(fn ($user) => [
+                ->map(fn (User $user) => [
                     'id' => $user->id,
                     'characters' => $user->characters->implode('name', ', '),
                 ]);
@@ -86,7 +87,7 @@ class AssignSuperuser extends Command
         $users = User::with('characters')
             ->search($character_name)
             ->get()
-            ->map(fn ($user) => [
+            ->map(fn (User $user) => [
                 'id' => $user->id,
                 'characters' => $user->characters->implode('name', ', '),
             ])
@@ -101,37 +102,48 @@ class AssignSuperuser extends Command
         $this->user = User::find($user_id);
 
         if (! $this->user) {
-            return $this->alert('illegal user_id selected');
+            $this->alert('illegal user_id selected');
+
+            return;
         }
 
         $this->info('Please note after setting a superuser via console, you are only able to set another via web ui.');
 
         if (! $this->confirm('Do you wish to a continue?')) {
-            return $this->error('aborted');
+            $this->error('aborted');
+
+            return;
         }
 
         $role = $this->createRole();
         $this->assignPermissionToRole($role);
 
-        $role->activateMember($this->user);
+        $manualRoleService = new ManualRoleService($role);
+
+        $manualRoleService->addMember($this->user);
+        $manualRoleService->handleMembers();
     }
 
     private function createRole(): Role
     {
-        return Role::findOrCreate('Superuser');
+        $role = Role::findOrCreate('Superuser');
+
+        assert($role instanceof Role);
+
+        return $role;
     }
 
-    private function assignPermissionToRole(Role $role)
+    private function assignPermissionToRole(Role $role): void
     {
         $permission = Permission::findOrCreate('superuser');
 
         $role->givePermissionTo($permission);
     }
 
-    private function hasAlreadyRun()
+    private function hasAlreadyRun(): bool
     {
         try {
-            return User::permission('superuser')->get()->isNotEmpty();
+            return User::permission('superuser')->exists();
         } catch (PermissionDoesNotExist) {
             return false;
         }

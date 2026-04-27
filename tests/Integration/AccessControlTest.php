@@ -1,13 +1,15 @@
 <?php
 
-
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
-uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
+uses(MockRetrieveEsiDataAction::class);
 
 it('has control groups', function () {
     assignPermissionToTestUser(['view access control']);
@@ -37,14 +39,14 @@ it('has edit control groups', function () {
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "affiliations" => [
+            'affiliations' => [
                 [
-                    "category" => 'character',
-                    "id" => test()->test_character->character_id,
-                    "type" => "allowed",
+                    'category' => 'character',
+                    'id' => test()->test_character->character_id,
+                    'type' => 'allowed',
                 ],
             ],
-            "roleName" => $role->name,
+            'roleName' => $role->name,
         ])
         ->assertRedirect();
 
@@ -52,8 +54,8 @@ it('has edit control groups', function () {
         ->get(route('acl.edit', ['role_id' => $role->id]))
         ->assertInertia(
             fn (Assert $page) => $page
-            ->component('AccessControl/EditGroup')
-            ->has('affiliations', 1)
+                ->component('AccessControl/EditGroup')
+                ->has('affiliations', 1)
         );
 });
 
@@ -103,20 +105,20 @@ it('updates permissions', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "roleName" => $name,
-            "permissions" => ["character.assets", "superuser"],
+            'roleName' => $name,
+            'permissions' => ['character.assets', 'superuser'],
         ]);
 
     \Pest\Laravel\assertDatabaseHas('permissions', [
         'name' => 'character.assets',
     ]);
 
-    $permission = Permission::findByName("character.assets");
+    $permission = Permission::findByName('character.assets');
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "roleName" => $name,
-            "permissions" => ["superuser"],
+            'roleName' => $name,
+            'permissions' => ['superuser'],
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('role_has_permissions', [
@@ -138,14 +140,14 @@ it('updates affiliations', function () {
     // Adding Affiliation
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "affiliations" => [
+            'affiliations' => [
                 [
-                    "category" => 'character',
-                    "id" => 95_725_047,
-                    "type" => "allowed",
+                    'category' => 'character',
+                    'id' => 95_725_047,
+                    'type' => 'allowed',
                 ],
             ],
-            "roleName" => $name,
+            'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseHas('affiliations', [
@@ -156,8 +158,8 @@ it('updates affiliations', function () {
     // Delete Affiliation
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "allowed" => [],
-            "roleName" => $name,
+            'allowed' => [],
+            'roleName' => $name,
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('affiliations', [
@@ -178,14 +180,14 @@ it('updates name', function () {
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            "allowed" => [
+            'allowed' => [
                 [
-                    "character_id" => 95_725_047,
-                    "id" => 95_725_047,
-                    "name" => "Herpaderp Aldent",
+                    'character_id' => 95_725_047,
+                    'id' => 95_725_047,
+                    'name' => 'Herpaderp Aldent',
                 ],
             ],
-            "roleName" => 'someOtherName',
+            'roleName' => 'someOtherName',
         ]);
 
     \Pest\Laravel\assertDatabaseMissing('roles', [
@@ -209,11 +211,7 @@ test('moderator can manage applications', function () {
 
     assignPermissionToTestUser(['view access control']);
 
-    $role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_user->id,
-        'affiliatable_type' => User::class,
-        'can_moderate' => true,
-    ]);
+    (new OnRequestRoleService($role))->setModerator(test()->test_user);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('manage.acl.members', ['role_id' => $role->id]));
@@ -237,7 +235,7 @@ test('setup on request group and save twice', function () {
     $secondary_user = User::factory()->create();
 
     // secondary user does not see control group in sidebar
-    $sidebar = (new SidebarEntries($secondary_user))->filter();
+    $sidebar = (new SidebarEntries($secondary_user))->getFilteredEntries();
 
     expect(data_get($sidebar, 'Access Control.entries.*.route'))->toBeNull();
 
@@ -251,27 +249,27 @@ test('setup on request group and save twice', function () {
         ->get(route('acl.manage', $role->id))
         ->assertInertia(
             fn (Assert $page) => $page
-            ->component('AccessControl/ManageControlGroup')
-            ->has(
-                'role',
-                fn (Assert $page) => $page
-                ->where('id', $role->id)
+                ->component('AccessControl/ManageControlGroup')
                 ->has(
-                    'acl',
+                    'role',
                     fn (Assert $page) => $page
-                    ->where('moderators', [])
-                    ->etc()
+                        ->where('id', $role->id)
+                        ->has(
+                            'acl',
+                            fn (Assert $page) => $page
+                                ->where('moderators', [])
+                                ->etc()
+                        )
+                        ->etc()
                 )
-                ->etc()
-            )
         );
 
     // assign secondary user as moderator
     test()->actingAs(test()->test_user)
         ->followingRedirects()
         ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            "acl" => [
-                "type" => 'on-request',
+            'acl' => [
+                'type' => 'on-request',
                 'moderators' => [
                     [
                         'id' => $secondary_user->id,
@@ -280,15 +278,15 @@ test('setup on request group and save twice', function () {
             ],
         ]);
 
-    expect($role->refresh()->moderators->isNotEmpty())->toBeTrue();
+    expect($role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 
     // check if secondary user is moderator
-    expect($role->refresh()->isModerator($secondary_user))->toBeTrue();
+    expect((new BaseRoleService)->for($role->refresh())->canModerate($secondary_user))->toBeTrue();
 
     // reassure moderator does now see control group in sidebar
-    $sidebar = (new SidebarEntries($secondary_user))->filter();
+    $sidebar = (new SidebarEntries($secondary_user))->getFilteredEntries();
 
-    test()->assertNotNull(data_get($sidebar, 'Access Control.entries.*.route'));
+    test()->assertNotNull($sidebar->firstWhere('name', 'Access Control'));
 
     // Try moderating
     $response = test()->actingAs($secondary_user)

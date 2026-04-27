@@ -26,9 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -38,7 +42,7 @@ use Seatplus\Web\Models\ManualLocation;
 
 class ManualLocationController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         return inertia('Configuration/ManualLocations/ManualLocation', [
             'data' => Inertia::lazy(
@@ -47,7 +51,7 @@ class ManualLocationController extends Controller
         ]);
     }
 
-    public function getSuggestions()
+    public function getSuggestions(): LengthAwarePaginator
     {
 
         $location_subquery = Location::query()
@@ -63,7 +67,7 @@ class ManualLocationController extends Controller
             ->paginate();
     }
 
-    public function acceptSuggestion(Request $request)
+    public function acceptSuggestion(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'location_id' => ['required'],
@@ -86,7 +90,7 @@ class ManualLocationController extends Controller
         return to_route('manage.manual_locations');
     }
 
-    public function getLocation(int $location_id)
+    public function getLocation(int $location_id): Collection|ManualLocation|null
     {
         if ($location_id === 2004) {
             return collect(['name' => 'Asset Safety']);
@@ -113,7 +117,7 @@ class ManualLocationController extends Controller
         return $entries->firstWhere('user_id', auth()->user()->getAuthIdentifier()) ?? $entries->first();
     }
 
-    public function create(Request $request)
+    public function create(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string'],
@@ -142,6 +146,6 @@ class ManualLocationController extends Controller
             return;
         }
 
-        $entries->each(fn ($manual_location) => ResolveUniverseSystemBySystemIdJob::dispatch($manual_location->solar_system_id)->onQueue('low'));
+        $entries->each(fn (ManualLocation $manual_location) => ResolveUniverseSystemBySystemIdJob::dispatch($manual_location->solar_system_id)->onQueue('low'));
     }
 }

@@ -25,7 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ApplicationsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\EnlistmentsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\GetRecruitmentIndexController;
@@ -39,7 +39,7 @@ Route::prefix('recruitment')
         Route::delete('/application/user/', [ApplicationsController::class, 'pullUserApplication'])->name('delete.user.application');
 
         /* Senior HR */
-        Route::middleware(['permission:can open or close corporations for recruitment,director'])
+        Route::middleware([CheckAuthorization::class.':can open or close corporations for recruitment,director'])
             ->controller(EnlistmentsController::class)
             ->group(function () {
                 Route::post('/', 'create')->name('create.corporation.recruitment');
@@ -50,21 +50,24 @@ Route::prefix('recruitment')
             });
 
         /* Junior HR */
-        Route::middleware(CheckPermissionOrCorporationRole::class . ':can open or close corporations for recruitment|can accept or deny applications,director')
+        Route::middleware(CheckAuthorization::class.':can open or close corporations for recruitment|can accept or deny applications,director')
             ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
         Route::controller(ApplicationsController::class)
             ->group(function () {
-                Route::middleware('permission:can accept or deny applications')
+                Route::middleware(CheckAuthorization::class.':can accept or deny applications')
                     ->group(function () {
                         Route::get('/applications/{corporation_id}/open/{decision_count}', 'getOpenCorporationApplications')->name('open.corporation.applications');
                         Route::get('/applications/{corporation_id}/closed', 'getClosedCorporationApplications')->name('closed.corporation.applications');
+                    });
 
+                Route::middleware('permission:can accept or deny applications')
+                    ->group(function () {
                         Route::get('/update/{character_id}', 'getBatchUpdate')->name('get.batch_update');
                         Route::post('/update/{character_id}', 'dispatchBatchUpdate')->name('dispatch.batch_update');
                     });
 
-                Route::middleware(CheckAffiliationForApplication::class . ':can accept or deny applications')
+                Route::middleware(CheckAffiliationForApplication::class.':can accept or deny applications')
                     ->group(function () {
                         Route::get('/application/{application_id}', [ApplicationsController::class, 'getApplication'])->name('get.application');
                         Route::post('/application/{application_id}', [ApplicationsController::class, 'reviewApplication'])->name('review.application');
@@ -74,7 +77,7 @@ Route::prefix('recruitment')
                     });
             });
 
-        Route::middleware(CheckPermissionOrCorporationRole::class . ':can accept or deny applications')
+        Route::middleware(CheckAuthorization::class.':can accept or deny applications')
             ->get('/impersonate/{application_id}', ImpersonateRecruit::class)
             ->name('impersonate.recruit');
     });

@@ -25,6 +25,7 @@
  */
 
 use Illuminate\Support\Facades\Route;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Web\Http\Controllers\Character\AssetsController;
 
@@ -33,7 +34,9 @@ Route::prefix('assets')
     ->group(function () {
         Route::get('', 'index')->name('character.assets');
 
-        Route::middleware(sprintf('permission:%s', config('eveapi.permissions.' . Asset::class)))
+        $assetPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Asset::class);
+
+        Route::middleware($assetPermission)
             ->group(function () {
                 Route::get('locations', 'getLocations')->name('get.character.assets.locations');
                 Route::get('/{character_id}/item/{item_id}', 'item')->name('character.item');

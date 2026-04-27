@@ -24,22 +24,22 @@
  * SOFTWARE.
  */
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContractHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\MailsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationWalletHydrateBatch;
+namespace Seatplus\Web\Http\Controllers\Auth;
 
-return [
-    'contacts' => ContactHydrateBatch::class,
-    'membertracking' => CorporationMemberTrackingHydrateBatch::class,
-    'assets' => CharacterAssetsHydrateBatch::class,
-    'wallet' => WalletHydrateBatch::class,
-    'contract' => ContractHydrateBatch::class,
-    'corporation.wallet' => CorporationWalletHydrateBatch::class,
-    'skills' => SkillsHydrateBatch::class,
-    'mails' => MailsHydrateBatch::class,
-];
+use Inertia\Inertia;
+use Inertia\Response;
+
+class LoginController
+{
+    public function __invoke(): Response
+    {
+        if (strlen((string) config('web.config.EVE_CLIENT_ID')) < 5 || strlen((string) config('web.config.EVE_CLIENT_SECRET')) < 5) {
+            session()->flash('warning', trans('web::auth.sso_config_warning'));
+        }
+
+        return Inertia::render('Auth/Login', [
+            'login_welcome' => trans('web::auth.login_welcome'),
+            'evesso_img_src' => asset('img/evesso.png'),
+        ]);
+    }
+}

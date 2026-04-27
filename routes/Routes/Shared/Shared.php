@@ -44,17 +44,16 @@ Route::post('/location/', [ManualLocationController::class, 'create'])->name('po
 
 Route::controller(HelperController::class)
     ->prefix('autosuggest')
-    ->group(function() {
+    ->group(function () {
         Route::get('search', 'esiSearch')->name('autosuggestion.search');
         Route::get('typesOrGroupOrCategories', 'typesOrGroupsOrCategories')->name('autosuggestion.typesOrGroupOrCategories');
     });
 
 Route::prefix('esi-search')
-    ->group(function() {
+    ->group(function () {
         Route::get('enable_esi_search', EnableEsiSearchController::class)->name('enable_esi_search');
         Route::get('token', [HelperController::class, 'token'])->name('autosuggestion.token');
     });
-
 
 Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
 Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');

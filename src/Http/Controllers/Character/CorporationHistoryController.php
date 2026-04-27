@@ -26,12 +26,13 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class CorporationHistoryController extends Controller
 {
-    public function index(int $character_id)
+    public function index(int $character_id): LengthAwarePaginator
     {
         return CorporationHistory::where('character_id', $character_id)
             ->orderByDesc('record_id')

@@ -28,17 +28,19 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class GetRecruitmentIndexController extends Controller
 {
     final public const MANAGEPERMISSION = 'can open or close corporations for recruitment';
+
     final public const RECRUITERPERMISSION = 'can accept or deny applications';
 
-    public function __invoke()
+    public function __invoke(): Response
     {
         $can_manage_recruitment = auth()->user()->can(self::MANAGEPERMISSION);
 
@@ -49,31 +51,39 @@ class GetRecruitmentIndexController extends Controller
         ]);
     }
 
-    private function getEnlistments()
+    private function getEnlistments(): Collection
     {
-        $manageable_enlistments = Enlistments::query()
-            ->with('corporation.alliance')
-            ->whereHas('corporation', function (Builder $query) {
-                $query->whereAffiliatedCorporations(new AffiliationsDto(
-                    permissions: [self::MANAGEPERMISSION],
-                    user: auth()->user(),
-                    corporation_roles: ['Director']
-                ));
-            })
-            ->select(['*', DB::raw("'true' as can_manage")]);
 
-        $recruitable_enlistments = Enlistments::query()
-            ->with('corporation.alliance')
-            ->whereNotIn('corporation_id', fn ($query) => $query->select('corporation_id')->from($manageable_enlistments))
-            ->whereHas('corporation', function (Builder $query) {
-                $query->whereAffiliatedCorporations(new AffiliationsDto(
-                    permissions: [self::RECRUITERPERMISSION],
-                    user: auth()->user(),
-                    corporation_roles: ['Director']
-                ));
-            })
-            ->select(['*', DB::raw("'false' as can_manage")]);
+        $isSuperuser = auth()->user()->can('superuser');
 
-        return $manageable_enlistments->union($recruitable_enlistments)->get();
+        $manageableIds = $this->getAffiliatedIds->get(
+            permissions: [self::MANAGEPERMISSION],
+            corporationRoles: ['Director'],
+            user: auth()->user()
+        );
+
+        $recruiterIds = $this->getAffiliatedIds->get(
+            permissions: [self::RECRUITERPERMISSION],
+            corporationRoles: ['Director'],
+            user: auth()->user()
+        );
+
+        return DB::transaction(function () use ($isSuperuser, $manageableIds, $recruiterIds) {
+
+            $manageable = Enlistments::query()
+                ->with('corporation.alliance')
+                ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
+                ->get()
+                ->map(fn (Enlistments $enlistment) => $enlistment->setAttribute('can_manage', true));
+
+            $recruitable = Enlistments::query()
+                ->with('corporation.alliance')
+                ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $recruiterIds))
+                ->whereNotIn('corporation_id', $manageableIds)
+                ->get()
+                ->map(fn (Enlistments $enlistment) => $enlistment->setAttribute('can_manage', false));
+
+            return $manageable->concat($recruitable);
+        });
     }
 }

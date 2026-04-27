@@ -25,10 +25,10 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Shared\ManualLocationController;
 
-Route::middleware([CheckPermissionOrCorporationRole::class . ':manage manual locations'])
+Route::middleware([CheckAuthorization::class.':manage manual locations'])
     ->prefix('manual_locations')
     ->group(function () {
         Route::get('', [ManualLocationController::class, 'index'])->name('manage.manual_locations');

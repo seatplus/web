@@ -28,27 +28,34 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Web\Services\GetAffiliatedIds;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckAffiliationForApplication
 {
-    public function handle(Request $request, Closure $next, $permission)
+    public function __construct(
+        private GetAffiliatedIds $getAffiliatedIdsService,
+    ) {}
+
+    public function handle(Request $request, Closure $next, string $permission): Response
     {
+        if ($request->user()->can('superuser')) {
+            return $next($request);
+        }
+
         $application_id = $request->application_id;
 
         abort_unless($application_id, 404, 'required url parameter application_id is missing');
 
-        $application = Application::query()
-            ->whereHas('corporation', function ($query) use ($permission) {
-                $affiliationsDto = new AffiliationsDto(
-                    user: auth()->user(),
-                    permissions: [$permission],
-                    corporation_roles: ['director'],
-                );
+        $affiliatedIds = $this->getAffiliatedIdsService->get(
+            permissions: [$permission],
+            corporationRoles: ['director'],
+            user: auth()->user(),
+        );
 
-                return $query->whereAffiliatedCorporations($affiliationsDto);
-            })
+        $application = Application::query()
+            ->whereIn('corporation_id', $affiliatedIds)
             ->where('id', $application_id)
             ->with(['applicationable', 'corporation'])
             ->exists();

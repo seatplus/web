@@ -26,7 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\UserRessource;
@@ -34,14 +36,14 @@ use Seatplus\Web\Services\ImpersonateService;
 
 class SeatPlusController extends Controller
 {
-    public function navigation()
+    public function navigation(): string
     {
         $navigation_tabs = config('web.settings');
 
         return collect($navigation_tabs)->toJson();
     }
 
-    public function settings()
+    public function settings(): Response
     {
         $validatedData = request()->validate([
             'search_param' => 'string',
@@ -63,12 +65,12 @@ class SeatPlusController extends Controller
         ]);
     }
 
-    public function impersonate($user_id)
+    public function impersonate(int $user_id): RedirectResponse
     {
         $impersonated_user = User::find($user_id);
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
 
-        return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$impersonated_user->main_character->name);
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
@@ -21,9 +20,12 @@ it('has details', function () {
     $contact = test()->test_character->contacts->first();
 
     $response = test()->actingAs(test()->test_user)
-        ->post(route('character.contacts.detail', test()->test_character->character_id), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
-        ]);
+        ->post(
+            uri: route('character.contacts.detail', test()->test_character->character_id),
+            data: [
+                'target_corporation_id' => test()->test_character->corporation->corporation_id,
+            ]
+        );
 
     $response->assertOk();
 });
@@ -51,7 +53,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
 
     expect($contact)->affiliation->not()->toBeNull();
 
-    $getCorpStanding = function (CharacterAffiliation $affiliation) use ($corp_contact_level) : float {
+    $getCorpStanding = function (CharacterAffiliation $affiliation) use ($corp_contact_level): float {
         $corp_standing = null;
 
         $contacts_array = match ($corp_contact_level) {
@@ -94,11 +96,10 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
 
     test()->actingAs(test()->test_user)
         ->post(route('character.contacts.detail', test()->test_character->character_id), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'target_corporation_id' => test()->test_character->corporation->corporation_id,
         ])
         ->assertJson(
-            fn (AssertableJson $json) =>
-            $json->has(3)
+            fn (AssertableJson $json) => $json->has(3)
                 ->has('data', 1)
                 ->has(
                     'data.0',
@@ -110,7 +111,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                     $json->where('corporation_standing', fn ($standing) => number_format($standing, 2) === number_format($corp_standing, 2))
                         ->where('standing', fn ($standing) => number_format($standing, 2) === number_format(10, 2))
                         ->etc()
-                    ->etc()
+                        ->etc()
                 )
                 ->etc()
         );

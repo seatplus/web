@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Configuration\PerformanceController;
 
-Route::middleware([CheckPermissionOrCorporationRole::class . ':superuser'])
+Route::middleware([CheckAuthorization::class.':superuser'])
     ->prefix('performance')
     ->controller(PerformanceController::class)
     ->group(function () {

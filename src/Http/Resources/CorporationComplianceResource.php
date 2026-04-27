@@ -26,14 +26,20 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Auth\Services\BuildCharacterScopesArray;
+use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Services\Recruitment\GetApplicationCharacterScopesService;
 
+/**
+ * @mixin User
+ */
 class CorporationComplianceResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
-        $characters = $this->characters->map(fn ($character) => [
+        $characters = $this->characters->map(fn (CharacterInfo $character) => [
             'character_id' => $character->character_id,
             'name' => $character->name,
             'missing_scopes' => array_values($this->getMissingScopes($character)),
@@ -43,18 +49,16 @@ class CorporationComplianceResource extends JsonResource
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => $characters,
-            'count_missing' => collect($characters)->filter(fn ($character) => data_get($character, 'missing_scopes'))->count(),
-            'count_complete' => collect($characters)->reject(fn ($character) => data_get($character, 'missing_scopes'))->count(),
+            'count_missing' => collect($characters)->filter(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
+            'count_complete' => collect($characters)->reject(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
             'count_total' => collect($characters)->count(),
         ];
     }
 
-    private function getMissingScopes($character): array
+    private function getMissingScopes(CharacterInfo $character): array
     {
-        $character_scopes_array = BuildCharacterScopesArray::make()
-            ->setCharacter($character)
-            ->get();
+        $result = (new GetApplicationCharacterScopesService)->get($character);
 
-        return data_get($character_scopes_array, 'missing_scopes', []);
+        return data_get($result, 'missing_scopes', []);
     }
 }

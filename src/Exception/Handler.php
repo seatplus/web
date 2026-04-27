@@ -30,6 +30,7 @@ use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Inertia\Inertia;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -37,7 +38,7 @@ class Handler extends ExceptionHandler
     /**
      * A list of the exception types that are not reported.
      *
-     * @var array
+     * @var array<int, class-string<Throwable>>
      */
     protected $dontReport = [
 
@@ -46,7 +47,7 @@ class Handler extends ExceptionHandler
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $dontFlash = [
         'password',
@@ -56,10 +57,10 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @return void
+     *
      * @throws Exception
      */
-    public function report(Throwable $exception)
+    public function report(Throwable $exception): void
     {
         parent::report($exception);
     }
@@ -67,18 +68,18 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      */
-    public function render($request, Throwable $exception)
+    public function render(mixed $request, Throwable $exception): Response
     {
         Inertia::share((new HandleInertiaRequests)->share($request));
 
         $response = parent::render($request, $exception);
 
-        if (! app()->environment('local') && in_array($response->status(), [500, 503, 404, 403])) {
-            return inertia('Error', ['status' => $response->status()])
+        if (! app()->environment('local') && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+            return inertia('Error', ['status' => $response->getStatusCode()])
                 ->rootView('web::app')
                 ->toResponse($request)
-                ->setStatusCode($response->status());
-        } elseif ($response->status() === 419) {
+                ->setStatusCode($response->getStatusCode());
+        } elseif ($response->getStatusCode() === 419) {
             return back()->with([
                 'message' => 'The page expired, please try again.',
             ]);

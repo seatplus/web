@@ -1,6 +1,6 @@
 <?php
 
-
+use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -10,7 +10,6 @@ use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Eveapi\Models\Universe\Type;
-use Spatie\Permission\PermissionRegistrar;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
@@ -18,7 +17,6 @@ beforeEach(function () {
     test()->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
 });
 
 test('has dispatchable job', function () {
@@ -27,8 +25,8 @@ test('has dispatchable job', function () {
 
     $response->assertInertia(
         fn (Assert $page) => $page
-        ->component('Character/Contract/Index')
-        ->has('dispatchTransferObject')
+            ->component('Character/Contract/Index')
+            ->has('dispatchTransferObject')
     );
 });
 
@@ -52,8 +50,8 @@ test('one can call transaction endpoint', function () {
 
     $response->assertInertia(
         fn (Assert $page) => $page
-        ->component('Character/Contract/ContractDetails')
-        ->has('contract')
+            ->component('Character/Contract/ContractDetails')
+            ->has('contract')
     );
 });
 
@@ -94,12 +92,12 @@ it('has watchlist scope', function () {
         $response = test()->actingAs(test()->test_user)
             ->get(route('character.contracts.details', [
                 'character_id' => test()->test_character->character_id,
-                //$key => $value
+                // $key => $value
             ]))
             ->assertOk();
 
         $response->assertJson(
-            fn (\Illuminate\Testing\Fluent\AssertableJson $json) => $json
+            fn (AssertableJson $json) => $json
                 ->count('data', 1)
                 ->has(
                     'data.0',

@@ -28,7 +28,10 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Services\Roles\AbstractRoleService;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ControlGroupUpdate;
@@ -61,19 +64,25 @@ class UpdateControlGroupController extends Controller
         app(Pipeline::class)
             ->send($control_group_update_data)
             ->through($this->pipes)
-            ->then(fn () => logger()->info('Control group updated'));
+            ->then(function (ControlGroupUpdateData $data): ControlGroupUpdateData {
+                logger()->info('Control group updated');
+
+                return $data;
+            });
 
         return redirect()->route('acl.manage', $role_id)->with('success', 'updated');
     }
 
     private function updateType(ControlGroupUpdateData $data): void
     {
-        if ($data->role->type === $data->role_type) {
+        $newType = RoleType::from($data->role_type);
+
+        if ($data->role->type === $newType) {
             return;
         }
 
-        $role = $data->role;
-        $role->type = $data->role_type;
-        $role->save();
+        /** @var AbstractRoleService $typeService */
+        $typeService = BaseRoleService::make($data->role)->getTypeService();
+        $typeService->setRoleType($newType);
     }
 }

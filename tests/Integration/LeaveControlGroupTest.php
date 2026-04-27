@@ -1,10 +1,10 @@
 <?php
 
-
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
+use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -18,14 +18,14 @@ beforeEach(function () {
 
 test('user can leave himself', function () {
     // First create affiliation
-    test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->test_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
+        [test()->test_character->character_id, 'character', 'allowed'],
     ]);
 
-
     // Second make test character member
-    test()->role->activateMember(test()->test_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->test_user);
+    $service->handleMembers();
 
     expect(test()->test_user->hasRole(test()->role))->toBeTrue();
 
@@ -42,13 +42,14 @@ test('user can leave himself', function () {
 
 test('user can kick other user as superuser', function () {
     // First create affiliation
-    test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
+        [test()->secondary_character->character_id, 'character', 'allowed'],
     ]);
 
     // Second make secondary character member
-    test()->role->activateMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
 
     expect(test()->test_user->hasRole(test()->role))->toBeFalse();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
@@ -68,23 +69,18 @@ test('user can kick other user as superuser', function () {
 
 test('user can kick other user as moderator', function () {
     // First create affiliation
-    test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
+        [test()->secondary_character->character_id, 'character', 'allowed'],
     ]);
 
     // Second make secondary character member
-    test()->role->activateMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
-
-    // Thirdly make primary character moderator
-    expect(test()->role->moderators->isEmpty())->toBeTrue();
-    test()->role->moderators()->create([
-        'affiliatable_id' => test()->test_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
-        'can_moderate' => true,
-    ]);
-    expect(test()->role->refresh()->moderators->isNotEmpty())->toBeTrue();
+    expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
+    (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
+    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 
     // Apparently a moderator does not need to be member
     expect(test()->test_user->hasRole(test()->role))->toBeFalse();
@@ -103,13 +99,14 @@ test('user can kick other user as moderator', function () {
 
 test('user can not kick other user as vanilla user', function () {
     // First create affiliation
-    test()->role->acl_affiliations()->create([
-        'affiliatable_id' => test()->secondary_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
+        [test()->secondary_character->character_id, 'character', 'allowed'],
     ]);
 
     // Second make secondary character member
-    test()->role->activateMember(test()->secondary_user);
+    $service = new ManualRoleService(test()->role);
+    $service->addMember(test()->secondary_user);
+    $service->handleMembers();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
