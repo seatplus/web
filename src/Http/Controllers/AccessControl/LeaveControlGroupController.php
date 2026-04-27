@@ -59,7 +59,7 @@ class LeaveControlGroupController
 
     private function validateRequest(User $user): void
     {
-        abort_if(in_array($this->roleService->getType(), self::ALLOWED_ROLE_TYPES), 403, self::ERROR_INVALID_GROUP_TYPE);
+        abort_unless(in_array($this->roleService->getType(), self::ALLOWED_ROLE_TYPES), 403, self::ERROR_INVALID_GROUP_TYPE);
 
         abort_unless($this->isAuthorized($user), 403, self::ERROR_UNAUTHORIZED);
     }
@@ -81,5 +81,7 @@ class LeaveControlGroupController
             RoleType::ON_REQUEST => $this->roleService->onRequest()->removeApplication($user),
             default => throw new \InvalidArgumentException(self::ERROR_INVALID_GROUP_TYPE)
         };
+
+        $this->roleService->handleMembers();
     }
 }

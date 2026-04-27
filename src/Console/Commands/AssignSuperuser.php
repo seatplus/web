@@ -30,7 +30,6 @@ use Illuminate\Console\Command;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -58,9 +57,8 @@ class AssignSuperuser extends Command
      *
      * @return void
      */
-    public function __construct(
-        private BaseRoleService $role_service
-    ) {
+    public function __construct()
+    {
         parent::__construct();
     }
 
