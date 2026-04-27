@@ -32,7 +32,6 @@ use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
-use Seatplus\Web\Http\Middleware\CheckACLPermission;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -68,7 +67,6 @@ class WebServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        // $this->registerIntertiaJs();
 
         $this->mergeConfigurations();
 
@@ -119,7 +117,6 @@ class WebServiceProvider extends ServiceProvider
         $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add acl-permission Middelware
-        $router->aliasMiddleware('acl-permission', CheckACLPermission::class);
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
     }
 

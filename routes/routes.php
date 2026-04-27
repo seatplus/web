@@ -30,7 +30,6 @@ use Seatplus\Web\Http\Controllers\Auth\LoginController;
 use Seatplus\Web\Http\Controllers\Auth\LogoutController;
 use Seatplus\Web\Http\Controllers\HomeController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
-use Seatplus\Web\Http\Middleware\CheckACLPermission;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 
@@ -91,7 +90,6 @@ Route::middleware('web')
                     });
 
                 Route::prefix('acl')
-                    ->middleware([CheckACLPermission::class])
                     ->group(function () {
                         include __DIR__.'/Routes/AccessControl/View.php';
                     });
