@@ -51,8 +51,6 @@ class UpdateControlGroupController extends Controller
 
     public function __invoke(ControlGroupUpdate $control_group_update, int $role_id)
     {
-        dump('needs refactoring to use new role services');
-
         $control_group_update_data = new ControlGroupUpdateData(
             role: Role::findById($role_id),
             role_type: Arr::get($control_group_update, 'acl.type'),
