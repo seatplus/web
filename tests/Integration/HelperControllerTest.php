@@ -9,10 +9,11 @@ use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
 use function Pest\Laravel\get;
 
-uses(\Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction::class);
+uses(MockRetrieveEsiDataAction::class);
 
 it('stores resolved id to cache', function () {
     $id = test()->test_character->character_id;

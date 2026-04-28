@@ -2,10 +2,11 @@
 
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
 beforeEach(function () {
-    //Permission::findOrCreate('superuser');
+    // Permission::findOrCreate('superuser');
     test()->test_character->roles()->update(['roles' => ['']]);
 });
 
@@ -77,7 +78,7 @@ test('user with accountant role can see corporation wallet', function () {
     test()->assertFalse(in_array('Wallets', data_get($sidebar, 'corporation.entries.*.name', [])));
 
     // Now give user necessairy role
-    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+    CharacterRole::updateOrCreate([
         'character_id' => test()->test_character->character_id,
     ], [
         'roles' => ['Accountant'],
@@ -92,7 +93,7 @@ test('user with accountant role can see corporation wallet', function () {
     $corporation = $sidebar->firstWhere('name', 'Corporation');
     expect($corporation)->not()->toBeNull();
 
-    $entries = data_get($corporation, 'entries');;
+    $entries = data_get($corporation, 'entries');
     expect(collect($entries)->firstWhere('name', 'Wallets'))->not()->toBeNull();
 });
 
@@ -108,7 +109,7 @@ test('user with director role can see corporation wallet', function () {
     expect($corporation)->toBeNull();
 
     // Now give user necessairy role
-    \Seatplus\Eveapi\Models\Character\CharacterRole::updateOrCreate([
+    CharacterRole::updateOrCreate([
         'character_id' => test()->test_character->character_id,
     ], [
         'roles' => ['Director'],
@@ -123,6 +124,6 @@ test('user with director role can see corporation wallet', function () {
     $corporation = $sidebar->firstWhere('name', 'Corporation');
     expect($corporation)->not()->toBeNull();
 
-    $entries = data_get($corporation, 'entries');;
+    $entries = data_get($corporation, 'entries');
     expect(collect($entries)->firstWhere('name', 'Wallets'))->not()->toBeNull();
 });

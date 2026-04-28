@@ -1,5 +1,7 @@
 <?php
 
+use Inertia\Testing\AssertableInertia;
+use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 use Seatplus\Web\Models\Onboarding;
 
 use function Pest\Laravel\actingAs;
@@ -54,12 +56,12 @@ it('shows onboarding page', function () {
 
     actingAs($this->test_user);
 
-    $this->withoutMiddleware(\Seatplus\Web\Http\Middleware\OnboardingMiddleware::class);
+    $this->withoutMiddleware(OnboardingMiddleware::class);
 
     $response = $this->get(route('onboarding'));
 
     $response->assertOk()
-        ->assertInertia(fn (\Inertia\Testing\AssertableInertia $page) => $page->component('Onboarding/Index'));
+        ->assertInertia(fn (AssertableInertia $page) => $page->component('Onboarding/Index'));
 });
 
 it('completes onboarding', function () {
@@ -67,7 +69,7 @@ it('completes onboarding', function () {
 
     actingAs($this->test_user);
 
-    $this->withoutMiddleware(\Seatplus\Web\Http\Middleware\OnboardingMiddleware::class);
+    $this->withoutMiddleware(OnboardingMiddleware::class);
 
     expect(Onboarding::all())->toBeEmpty();
 
