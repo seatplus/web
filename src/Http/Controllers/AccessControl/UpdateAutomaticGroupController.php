@@ -53,7 +53,7 @@ class UpdateAutomaticGroupController extends Controller
         if ($affiliated = Arr::get($validated, 'affiliated')) {
             $roleService->syncAffiliateManyEntities(
                 collect($affiliated)
-                    ->map(fn (array $a) => [$a['entity_id'], $a['entity_type'], $a['affiliation_type']])
+                    ->map(fn (array $entity) => [$entity['entity_id'], $entity['entity_type'], $entity['affiliation_type']])
                     ->all()
             );
         }
@@ -61,7 +61,7 @@ class UpdateAutomaticGroupController extends Controller
         if ($assigned = Arr::get($validated, 'assigned')) {
             $roleService->automaticallyAssignRoleTo(
                 collect($assigned)
-                    ->map(fn (array $a) => [$a['entity_id'], $a['entity_type']])
+                    ->map(fn (array $entity) => [$entity['entity_id'], $entity['entity_type']])
                     ->all()
             );
         }
