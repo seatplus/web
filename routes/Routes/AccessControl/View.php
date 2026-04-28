@@ -35,7 +35,12 @@ use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
+use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateOptInGroupController;
 
 Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
@@ -59,4 +64,15 @@ Route::middleware([CheckAuthorization::class.':manage access control group|creat
     Route::post('/manage_control_group/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
 
     Route::get('/user', ListUserController::class)->name('list.users');
+});
+
+Route::get('/acl/{role_id}/detail', ShowControlGroupController::class)
+    ->middleware([CheckAuthorization::class.':manage access control group|create or update or delete access control group|administrate access control groups'])
+    ->name('acl.detail');
+
+Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
+    Route::post('/acl/{role_id}/automatic', UpdateAutomaticGroupController::class)->name('acl.update.automatic');
+    Route::post('/acl/{role_id}/manual', UpdateManualGroupController::class)->name('acl.update.manual');
+    Route::post('/acl/{role_id}/on-request', UpdateOnRequestGroupController::class)->name('acl.update.on-request');
+    Route::post('/acl/{role_id}/opt-in', UpdateOptInGroupController::class)->name('acl.update.opt-in');
 });
