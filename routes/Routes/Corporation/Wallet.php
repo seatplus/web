@@ -40,7 +40,7 @@ Route::prefix('wallet')
 
             Route::get('/{corporation_id}/journal/{division_id}', [CorporationWalletController::class, 'journal'])->name('corporation.wallet_journal.detail');
             Route::get('/{corporation_id}/balance/{division_id}', [CorporationWalletController::class, 'balance'])->name('corporation.balance');
-            Route::get('/{corporation_id}/transaction/{division_id}', [CorporationWalletController::class, 'transaction'])->name('corporation.wallet_transaction.detail');
+            Route::get('/{corporation_id}/transaction/{division_id}', [CorporationWalletController::class, 'transaction'])->name('corporation.wallet_transaction.detail'); // works
         });
 
     });

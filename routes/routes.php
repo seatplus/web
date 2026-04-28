@@ -90,7 +90,6 @@ Route::middleware('web')
                     });
 
                 Route::prefix('acl')
-                    ->middleware(['acl-permission'])
                     ->group(function () {
                         include __DIR__.'/Routes/AccessControl/View.php';
                     });
