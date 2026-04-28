@@ -60,6 +60,7 @@ class Controller extends BaseController
         array $characterIds,
         ?string $characterRelation = null
     ): \Illuminate\Database\Eloquent\Collection {
+
         return CharacterInfo::query()
             ->select('character_id')
             ->whereIn('character_id', $characterIds)
