@@ -8,6 +8,7 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 
@@ -27,6 +28,14 @@ beforeEach(function () {
     });
 
     test()->secondary_character = test()->secondary_user->characters->first();
+
+    // Ensure secondary_user's character has no EVE corporation roles (e.g. Director).
+    // CharacterInfoFactory creates CharacterRole with roles=[] by default, but stale records
+    // or Event::fakeFor interference can leave a role with Director, causing permission bypasses.
+    CharacterRole::updateOrCreate(
+        ['character_id' => test()->secondary_character->character_id],
+        ['roles' => [], 'roles_at_base' => null, 'roles_at_hq' => null, 'roles_at_other' => null]
+    );
 });
 
 test('user without permission fails to see compliance', function () {
