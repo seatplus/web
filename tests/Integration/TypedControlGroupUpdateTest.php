@@ -45,8 +45,6 @@ it('shows role detail page to admin with administrate permission', function () {
 });
 
 it('shows role detail page to on-request moderator', function () {
-    assignPermissionToTestUser('manage access control group');
-
     (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
 
     test()->actingAs(test()->test_user)

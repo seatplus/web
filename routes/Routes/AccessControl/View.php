@@ -65,7 +65,6 @@ Route::middleware([CheckAuthorization::class.':manage access control group|creat
 });
 
 Route::get('/acl/{role_id}/detail', ShowControlGroupController::class)
-    ->middleware([CheckAuthorization::class.':manage access control group|create or update or delete access control group|administrate access control groups'])
     ->name('acl.detail');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
