@@ -37,7 +37,6 @@ use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersControl
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOptInGroupController;
@@ -61,7 +60,6 @@ Route::middleware([CheckAuthorization::class.':create or update or delete access
 
 Route::middleware([CheckAuthorization::class.':manage access control group|create or update or delete access control group'])->group(function () {
     Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
-    Route::post('/manage_control_group/{role_id}', UpdateControlGroupController::class)->name('update.acl.affiliations');
 
     Route::get('/user', ListUserController::class)->name('list.users');
 });

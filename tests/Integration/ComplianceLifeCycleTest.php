@@ -6,6 +6,7 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
@@ -330,21 +331,9 @@ function createScopeSetting(array $permissons = [], $type = 'default')
     expect(RoleAffiliatedIdsService::get($role->refresh()))->toContain(test()->secondary_character->corporation->corporation_id);
 
     // give test user the role
-
-    $response = test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            'acl' => [
-                'type' => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'id' => test()->test_user->id,
-                        'user' => test()->test_user,
-                    ],
-                ],
-            ],
-        ])->assertOk();
+    $service = new ManualRoleService($role);
+    $service->addMember(test()->test_user);
+    test()->test_user->assignRole($role);
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 

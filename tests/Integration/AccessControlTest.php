@@ -265,18 +265,7 @@ test('setup on request group and save twice', function () {
         );
 
     // assign secondary user as moderator
-    test()->actingAs(test()->test_user)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            'acl' => [
-                'type' => 'on-request',
-                'moderators' => [
-                    [
-                        'id' => $secondary_user->id,
-                    ],
-                ],
-            ],
-        ]);
+    (new OnRequestRoleService($role))->setModerator($secondary_user);
 
     expect($role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 

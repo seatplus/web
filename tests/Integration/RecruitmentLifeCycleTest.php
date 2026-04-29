@@ -10,6 +10,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
@@ -507,20 +508,9 @@ test('recruiter can see corporation applications', function () {
 
     $role = Role::findByName('test');
 
-    $response = test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            'acl' => [
-                'type' => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'id' => $recruiter->id,
-                        'user' => $recruiter,
-                    ],
-                ],
-            ],
-        ])->assertOk();
+    $service = new ManualRoleService($role);
+    $service->addMember($recruiter);
+    $recruiter->assignRole($role);
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
@@ -570,20 +560,9 @@ test('recruiter can comment on application', function () {
 
     $role = Role::findByName('test');
 
-    $response = test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            'acl' => [
-                'type' => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'id' => $recruiter->id,
-                        'user' => $recruiter,
-                    ],
-                ],
-            ],
-        ])->assertOk();
+    $service = new ManualRoleService($role);
+    $service->addMember($recruiter);
+    $recruiter->assignRole($role);
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
@@ -735,21 +714,9 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
         ]);
 
     // give test user the role
-
-    $response = test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => $role->id]), [
-            'acl' => [
-                'type' => 'manual',
-                'affiliations' => [],
-                'members' => [
-                    [
-                        'id' => test()->test_user->id,
-                        'user' => test()->test_user,
-                    ],
-                ],
-            ],
-        ])->assertOk();
+    $service = new ManualRoleService($role);
+    $service->addMember(test()->test_user);
+    test()->test_user->assignRole($role);
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 

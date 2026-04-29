@@ -1,10 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Queue;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleMembershipStatus;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
+use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
+use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -22,20 +26,14 @@ test('user can join waitlist', function () {
 
     expect(test()->role->type)->toEqual(RoleType::MANUAL);
 
-    $response = test()->actingAs(test()->test_user)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            'acl' => [
-                'type' => 'on-request',
-                'affiliations' => [
-                    [
-                        'category' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id,
-                    ],
-                ],
-                'members' => [],
-            ],
-        ]);
+    $service = new OnRequestRoleService(test()->role);
+    $service->setRoleType(RoleType::ON_REQUEST);
+    $service->syncAffiliateManyEntities(
+        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
+    );
+    $service->addCriteriaForRoleApplication(
+        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
+    );
 
     expect(test()->role->refresh()->affiliations->isEmpty())->toBeFalse();
 
@@ -67,20 +65,14 @@ test('superuser can join immediately', function () {
 
     expect(test()->role->type)->toEqual(RoleType::MANUAL);
 
-    $response = test()->actingAs(test()->test_user)
-        ->followingRedirects()
-        ->json('POST', route('update.acl.affiliations', ['role_id' => test()->role->id]), [
-            'acl' => [
-                'type' => 'on-request',
-                'affiliations' => [
-                    [
-                        'category' => 'corporation',
-                        'id' => test()->test_character->corporation->corporation_id,
-                    ],
-                ],
-                'members' => [],
-            ],
-        ]);
+    $service = new OnRequestRoleService(test()->role);
+    $service->setRoleType(RoleType::ON_REQUEST);
+    $service->syncAffiliateManyEntities(
+        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
+    );
+    $service->addCriteriaForRoleApplication(
+        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
+    );
 
     expect(test()->role->refresh()->affiliations->isEmpty())->toBeFalse();
 
