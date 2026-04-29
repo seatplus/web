@@ -10,10 +10,19 @@ use Inertia\Response;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class ShowControlGroupController extends Controller
 {
+    private const ENTITY_TYPE_MAP = [
+        CorporationInfo::class => 'corporation',
+        AllianceInfo::class => 'alliance',
+        CharacterInfo::class => 'character',
+    ];
+
     public function __construct(
         private readonly BaseRoleService $baseRoleService,
     ) {}
@@ -25,12 +34,10 @@ class ShowControlGroupController extends Controller
 
         $user = auth()->user();
 
-        abort_unless(
-            $user->can('superuser')
-                || $user->can('administrate access control groups')
-                || $this->baseRoleService->for($role)->canModerate($user),
-            403
-        );
+        $canEdit = $user->can('superuser') || $user->can('administrate access control groups');
+        $canView = $canEdit || $this->baseRoleService->for($role)->canModerate($user);
+
+        abort_unless($canView, 403);
 
         return Inertia::render('AccessControl/RoleDetail', [
             'role' => [
@@ -39,11 +46,12 @@ class ShowControlGroupController extends Controller
                 'type' => $role->type->value,
                 'affiliations' => $role->affiliations->map(fn (Affiliation $affiliation) => [
                     'id' => $affiliation->affiliatable_id,
-                    'category' => $affiliation->affiliatable_type,
-                    'type' => $affiliation->type,
+                    'entity_type' => self::ENTITY_TYPE_MAP[$affiliation->affiliatable_type] ?? 'character',
+                    'affiliation_type' => $affiliation->type,
                 ]),
                 'permissions' => $role->permissions->pluck('name'),
             ],
+            'can_edit' => $canEdit,
             'activeSidebarElement' => 'acl.groups',
         ]);
     }

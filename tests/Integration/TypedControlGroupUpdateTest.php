@@ -37,7 +37,11 @@ it('shows role detail page to admin with administrate permission', function () {
     test()->actingAs(test()->test_user)
         ->get(route('acl.detail', test()->role->id))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('AccessControl/RoleDetail'));
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('AccessControl/RoleDetail')
+            ->where('can_edit', true)
+            ->has('role.affiliations')
+        );
 });
 
 it('shows role detail page to on-request moderator', function () {
@@ -48,7 +52,10 @@ it('shows role detail page to on-request moderator', function () {
     test()->actingAs(test()->test_user)
         ->get(route('acl.detail', test()->role->id))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('AccessControl/RoleDetail'));
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('AccessControl/RoleDetail')
+            ->where('can_edit', false)
+        );
 });
 
 // UpdateAutomaticGroupController
