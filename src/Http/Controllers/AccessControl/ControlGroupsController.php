@@ -70,7 +70,7 @@ class ControlGroupsController
         /** @var Role $role */
         $role = Role::findById($role_id);
 
-        $permissions = fn () => array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'));
+        $permissions = fn () => array_merge(Arr::flatten(config('eveapi.permissions')), config('web.permissions'), config('auth.permissions', []));
 
         $existing_affiliations = fn () => $role->affiliations->map(fn (Affiliation $affiliation) => [
             'id' => $affiliation->affiliatable_id,

@@ -22,6 +22,10 @@ class UpdateAutomaticGroupController extends Controller
         $validated = $request->validated();
         $roleService = $this->baseRoleService->for($role_id)->automatic();
 
+        // setRoleType first: if the type changes it resets role_memberships,
+        // so criteria writes below must happen after, not before.
+        $roleService->setRoleType(RoleType::AUTOMATIC);
+
         if ($name = Arr::get($validated, 'name')) {
             $roleService->updateRoleName($name);
         }
@@ -42,7 +46,7 @@ class UpdateAutomaticGroupController extends Controller
             );
         }
 
-        $roleService->setRoleType(RoleType::AUTOMATIC);
+        $roleService->handleMembers();
 
         return redirect()->route('acl.detail', $role_id)->with('success', 'updated');
     }

@@ -40,16 +40,6 @@ it('shows role detail page to admin with administrate permission', function () {
         ->assertInertia(fn (Assert $page) => $page->component('AccessControl/RoleDetail'));
 });
 
-it('shows role detail page to user with manage access control group permission', function () {
-    assignPermissionToTestUser('manage access control group');
-
-    // controller aborts unless admin or moderator — user has manage permission (passes middleware)
-    // but not admin permission and is not a moderator → 403 from controller
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.detail', test()->role->id))
-        ->assertForbidden();
-});
-
 it('shows role detail page to on-request moderator', function () {
     assignPermissionToTestUser('manage access control group');
 

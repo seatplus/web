@@ -22,6 +22,8 @@ class UpdateOnRequestGroupController extends Controller
         $validated = $request->validated();
         $roleService = $this->baseRoleService->for($role_id)->onRequest();
 
+        $roleService->setRoleType(RoleType::ON_REQUEST);
+
         if ($name = Arr::get($validated, 'name')) {
             $roleService->updateRoleName($name);
         }
@@ -43,6 +45,7 @@ class UpdateOnRequestGroupController extends Controller
         }
 
         $roleService->setRoleType(RoleType::ON_REQUEST);
+        $roleService->handleMembers();
 
         return redirect()->route('acl.detail', $role_id)->with('success', 'updated');
     }
