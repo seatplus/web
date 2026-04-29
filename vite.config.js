@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
-import run from 'vite-plugin-run';
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 
 export default defineConfig(({mode}) => {
     return {
@@ -32,14 +32,7 @@ export default defineConfig(({mode}) => {
                     },
                 },
             }),
-            run([
-                {
-                    startup: false,
-                    name: 'copy vendor',
-                    run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
-                    pattern: ['vendor/seatplus/**/resources/js/**']
-                }
-            ])
+            wayfinder(),
         ],
         resolve: {
             alias: {
