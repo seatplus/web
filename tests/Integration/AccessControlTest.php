@@ -25,7 +25,7 @@ it('has control groups', function () {
 it('has list control groups', function () {
     $role = Role::create(['name' => 'test']);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.acl'))
@@ -35,7 +35,7 @@ it('has list control groups', function () {
 it('has edit control groups', function () {
     $role = Role::create(['name' => 'test']);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
@@ -60,7 +60,7 @@ it('has edit control groups', function () {
 });
 
 it('create control groups', function () {
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     \Pest\Laravel\assertDatabaseMissing('roles', [
         'name' => 'test',
@@ -82,7 +82,7 @@ it('deletes control group', function () {
         'name' => 'test',
     ]);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     $response = test()->actingAs(test()->test_user)
         ->followingRedirects()
@@ -101,7 +101,7 @@ it('updates permissions', function () {
         'name' => 'character.assets',
     ]);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
@@ -135,7 +135,7 @@ it('updates affiliations', function () {
         'role_id' => $role->id,
     ]);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     // Adding Affiliation
     $response = test()->actingAs(test()->test_user)
@@ -176,7 +176,7 @@ it('updates name', function () {
         'name' => $name,
     ]);
 
-    assignPermissionToTestUser(['view access control', 'create or update or delete access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     $response = test()->actingAs(test()->test_user)
         ->json('POST', route('acl.update', ['role_id' => $role->id]), [
@@ -198,7 +198,7 @@ it('updates name', function () {
 test('one can manage control group members', function () {
     $role = Role::create(['name' => 'test']);
 
-    assignPermissionToTestUser(['view access control', 'manage access control group']);
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('acl.manage', ['role_id' => $role->id]));

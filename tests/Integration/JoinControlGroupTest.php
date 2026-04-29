@@ -22,7 +22,7 @@ beforeEach(function () {
 test('user can join waitlist', function () {
     expect(test()->role->affiliations->isEmpty())->toBeTrue();
 
-    assignPermissionToTestUser(['view access control', 'manage access control group']);
+    assignPermissionToTestUser(['view access control']);
 
     expect(test()->role->type)->toEqual(RoleType::MANUAL);
 

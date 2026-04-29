@@ -48,7 +48,7 @@ Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.mem
 Route::post('/', JoinControlGroupController::class)->name('acl.join');
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
-Route::middleware([CheckAuthorization::class.':create or update or delete access control group'])->group(function () {
+Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
     Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');
 
     Route::get('/acl/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
@@ -58,7 +58,7 @@ Route::middleware([CheckAuthorization::class.':create or update or delete access
     Route::get('/search', [ControlGroupsController::class, 'search'])->name('acl.search.affiliatable');
 });
 
-Route::middleware([CheckAuthorization::class.':manage access control group|create or update or delete access control group'])->group(function () {
+Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
     Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
 
     Route::get('/user', ListUserController::class)->name('list.users');
