@@ -141,6 +141,23 @@ it('sets manual role type when type was different', function () {
     expect(test()->role->fresh()->type)->toBe(RoleType::MANUAL);
 });
 
+it('updates manual role affiliations', function () {
+    assignPermissionToTestUser('administrate access control groups');
+
+    $corporation = CorporationInfo::factory()->create();
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.update.manual', test()->role->id), [
+            'affiliated' => [
+                ['entity_id' => $corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
+            ],
+        ])
+        ->assertRedirect(route('acl.detail', test()->role->id));
+
+    expect(test()->role->affiliations)->toHaveCount(1)
+        ->and(test()->role->affiliations->first()->affiliatable_id)->toBe($corporation->corporation_id);
+});
+
 // UpdateOnRequestGroupController
 
 it('denies UpdateOnRequestGroupController without permission', function () {
