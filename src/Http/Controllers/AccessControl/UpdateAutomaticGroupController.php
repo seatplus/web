@@ -6,8 +6,11 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
+use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ManageRoleRequest;
 
@@ -32,16 +35,23 @@ class UpdateAutomaticGroupController extends Controller
 
         if ($affiliated = Arr::get($validated, 'affiliated')) {
             $roleService->syncAffiliateManyEntities(
-                collect($affiliated)
-                    ->map(fn (array $entity) => [$entity['entity_id'], $entity['entity_type'], $entity['affiliation_type']])
+                ...collect($affiliated)
+                    ->map(fn (array $entity) => new AffiliationData(
+                        entity_id: $entity['entity_id'],
+                        entity_type: $entity['entity_type'],
+                        affiliation_type: AffiliationType::from($entity['affiliation_type']),
+                    ))
                     ->all()
             );
         }
 
         if ($assigned = Arr::get($validated, 'assigned')) {
             $roleService->automaticallyAssignRoleTo(
-                collect($assigned)
-                    ->map(fn (array $entity) => [$entity['entity_id'], $entity['entity_type']])
+                ...collect($assigned)
+                    ->map(fn (array $entity) => new CriteriaData(
+                        entity_id: $entity['entity_id'],
+                        entity_type: $entity['entity_type'],
+                    ))
                     ->all()
             );
         }

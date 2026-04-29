@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Queue;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
@@ -18,9 +20,9 @@ beforeEach(function () {
 
 test('user can leave himself', function () {
     // First create affiliation
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
-        [test()->test_character->character_id, 'character', 'allowed'],
-    ]);
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
+        new AffiliationData(test()->test_character->character_id, 'character', AffiliationType::ALLOWED),
+    );
 
     // Second make test character member
     $service = new ManualRoleService(test()->role);
@@ -42,9 +44,9 @@ test('user can leave himself', function () {
 
 test('user can kick other user as superuser', function () {
     // First create affiliation
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
-        [test()->secondary_character->character_id, 'character', 'allowed'],
-    ]);
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
+        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    );
 
     // Second make secondary character member
     $service = new ManualRoleService(test()->role);
@@ -69,9 +71,9 @@ test('user can kick other user as superuser', function () {
 
 test('user can kick other user as moderator', function () {
     // First create affiliation
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
-        [test()->secondary_character->character_id, 'character', 'allowed'],
-    ]);
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
+        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    );
 
     // Second make secondary character member
     $service = new ManualRoleService(test()->role);
@@ -99,9 +101,9 @@ test('user can kick other user as moderator', function () {
 
 test('user can not kick other user as vanilla user', function () {
     // First create affiliation
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
-        [test()->secondary_character->character_id, 'character', 'allowed'],
-    ]);
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
+        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    );
 
     // Second make secondary character member
     $service = new ManualRoleService(test()->role);

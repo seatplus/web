@@ -27,10 +27,12 @@
 namespace Seatplus\Web\Services\Pipes;
 
 use Illuminate\Support\Arr;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleMembershipStatus;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 
@@ -63,17 +65,16 @@ abstract class AbstractControlGroupUpdatePipe implements ControlGroupUpdatePipe
     public function handleAffiliations(ControlGroupUpdateData $data): void
     {
         $entity_sets = collect($data->affiliations ?? [])
-            ->map(fn (array $affiliation) => [
-                (int) $affiliation['id'],
-                $affiliation['category'],
-                'allowed',
-            ])
-            ->values()
-            ->toArray();
+            ->map(fn (array $affiliation) => new AffiliationData(
+                entity_id: (int) $affiliation['id'],
+                entity_type: $affiliation['category'],
+                affiliation_type: AffiliationType::ALLOWED,
+            ))
+            ->all();
 
         BaseRoleService::make($data->role)
             ->getTypeService()
-            ->syncAffiliateManyEntities($entity_sets);
+            ->syncAffiliateManyEntities(...$entity_sets);
     }
 
     public function cleanWaitlist(ControlGroupUpdateData $data): void

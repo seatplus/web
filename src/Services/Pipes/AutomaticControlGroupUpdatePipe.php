@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services\Pipes;
 
 use Closure;
 use Seatplus\Auth\Services\Roles\AutomaticRoleService;
+use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
 use Seatplus\Web\Container\ControlGroupUpdateData;
 
 class AutomaticControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
@@ -46,11 +47,13 @@ class AutomaticControlGroupUpdatePipe extends AbstractControlGroupUpdatePipe
         $this->handleAffiliations($data);
 
         $criteria = collect($data->affiliations ?? [])
-            ->map(fn (array $affiliation) => [(int) $affiliation['id'], $affiliation['category']])
-            ->values()
-            ->toArray();
+            ->map(fn (array $affiliation) => new CriteriaData(
+                entity_id: (int) $affiliation['id'],
+                entity_type: $affiliation['category'],
+            ))
+            ->all();
 
-        (new AutomaticRoleService($data->role))->automaticallyAssignRoleTo($criteria);
+        (new AutomaticRoleService($data->role))->automaticallyAssignRoleTo(...$criteria);
 
         $this->cleanWaitlist($data);
         $this->removeModerators($data);

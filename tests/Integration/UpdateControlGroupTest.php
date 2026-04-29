@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Queue;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
@@ -111,9 +113,9 @@ test('automatic control group adds affiliation', function () {
 test('automatic control group removes affiliation', function () {
     expect(test()->role->affiliations->isEmpty())->toBeTrue();
 
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities([
-        [CorporationInfo::factory()->create()->corporation_id, 'corporation', 'allowed'],
-    ]);
+    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
+        new AffiliationData(CorporationInfo::factory()->create()->corporation_id, 'corporation', AffiliationType::ALLOWED),
+    );
 
     test()->assertFalse(test()->role->refresh()->affiliations->isEmpty());
 
