@@ -36,6 +36,7 @@ use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\SetModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
@@ -72,4 +73,7 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
     Route::post('/acl/{role_id}/manual', UpdateManualGroupController::class)->name('acl.update.manual');
     Route::post('/acl/{role_id}/on-request', UpdateOnRequestGroupController::class)->name('acl.update.on-request');
     Route::post('/acl/{role_id}/opt-in', UpdateOptInGroupController::class)->name('acl.update.opt-in');
+
+    Route::post('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'add'])->name('acl.moderator.add');
+    Route::delete('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'remove'])->name('acl.moderator.remove');
 });

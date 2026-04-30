@@ -5,7 +5,6 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
@@ -211,7 +210,13 @@ test('moderator can manage applications', function () {
 
     assignPermissionToTestUser(['view access control']);
 
-    (new OnRequestRoleService($role))->setModerator(test()->test_user);
+    // An admin sets test_user as moderator via HTTP
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [$role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('manage.acl.members', ['role_id' => $role->id]));
@@ -264,8 +269,10 @@ test('setup on request group and save twice', function () {
                 )
         );
 
-    // assign secondary user as moderator
-    (new OnRequestRoleService($role))->setModerator($secondary_user);
+    // assign secondary user as moderator via HTTP
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.moderator.add', [$role->id, $secondary_user->id]))
+        ->assertRedirect();
 
     expect($role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 
