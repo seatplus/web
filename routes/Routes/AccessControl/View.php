@@ -26,9 +26,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
-use Seatplus\Web\Http\Controllers\AccessControl\ApplicationController;
+use Seatplus\Web\Http\Controllers\AccessControl\ApplyToRoleController;
+use Seatplus\Web\Http\Controllers\AccessControl\ApproveApplicationController;
 use Seatplus\Web\Http\Controllers\AccessControl\CreateControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\DenyApplicationController;
 use Seatplus\Web\Http\Controllers\AccessControl\EditControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
@@ -52,9 +54,9 @@ Route::get('/', ShowControlGroupsController::class)->name('acl.groups')
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
 Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
 Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');
-Route::post('/acl/{role_id}/apply', [ApplicationController::class, 'apply'])->name('acl.apply');
-Route::post('/acl/{role_id}/approve/{user_id}', [ApplicationController::class, 'approve'])->name('acl.approve');
-Route::delete('/acl/{role_id}/deny/{user_id}', [ApplicationController::class, 'deny'])->name('acl.deny');
+Route::post('/acl/{role_id}/apply', ApplyToRoleController::class)->name('acl.apply');
+Route::post('/acl/{role_id}/approve/{user_id}', ApproveApplicationController::class)->name('acl.approve');
+Route::delete('/acl/{role_id}/deny/{user_id}', DenyApplicationController::class)->name('acl.deny');
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
