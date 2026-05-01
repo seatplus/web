@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
@@ -45,7 +45,18 @@ it('shows role detail page to admin with administrate permission', function () {
 });
 
 it('shows role detail page to on-request moderator', function () {
-    (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+
+    // Set role type to on-request first (required for moderators)
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), ['name' => test()->role->name])
+        ->assertRedirect();
+
+    // Admin sets test_user as moderator via HTTP
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     test()->actingAs(test()->test_user)
         ->get(route('acl.detail', test()->role->id))
