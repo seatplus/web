@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -15,6 +16,7 @@ use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -701,17 +703,17 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     // affiliate secondary user to role
     $role = Role::findByName('test');
 
-    $response = test()->actingAs(test()->superuser)
-        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            'permissions' => ['can open or close corporations for recruitment', 'can accept or deny applications'],
-            'affiliations' => [
-                [
-                    'id' => test()->test_character->corporation->corporation_id,
-                    'category' => 'corporation',
-                    'type' => $affiliation,
-                ],
-            ],
-        ]);
+    Affiliation::create([
+        'role_id' => $role->id,
+        'affiliatable_id' => test()->test_character->corporation->corporation_id,
+        'affiliatable_type' => CorporationInfo::class,
+        'type' => $affiliation,
+    ]);
+
+    foreach (['can open or close corporations for recruitment', 'can accept or deny applications'] as $permName) {
+        $permission = Permission::findOrCreate($permName);
+        $role->givePermissionTo($permission);
+    }
 
     // give test user the role
     $service = new ManualRoleService($role);

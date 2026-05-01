@@ -72,7 +72,7 @@
       <Link
         v-if="isEditable"
         as="button"
-        :href="route('acl.edit', role.id)"
+        :href="route('acl.detail', role.id)"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg

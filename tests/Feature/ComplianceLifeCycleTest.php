@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -314,21 +315,23 @@ function createScopeSetting(array $permissons = [], $type = 'default')
     // affiliate secondary user to role
     $role = Role::findByName('test');
 
-    test()->actingAs(test()->superuser)
-        ->json('POST', route('acl.update', ['role_id' => $role->id]), [
-            'affiliations' => [
-                [
-                    'category' => 'corporation',
-                    'id' => test()->secondary_character->corporation->corporation_id,
-                    'type' => 'allowed',
-                ],
-            ],
-            'permissions' => $permissons,
-            'roleName' => $role->name,
-        ])
-        ->assertRedirect();
+    Affiliation::create([
+        'role_id' => $role->id,
+        'affiliatable_id' => test()->secondary_character->corporation->corporation_id,
+        'affiliatable_type' => CorporationInfo::class,
+        'type' => 'allowed',
+    ]);
 
-    expect(RoleAffiliatedIdsService::get($role->refresh()))->toContain(test()->secondary_character->corporation->corporation_id);
+    if (! empty($permissons)) {
+        foreach ($permissons as $permissionName) {
+            $permission = Permission::findOrCreate($permissionName);
+            $role->givePermissionTo($permission);
+        }
+    }
+
+    $role->refresh();
+
+    expect(RoleAffiliatedIdsService::get($role))->toContain(test()->secondary_character->corporation->corporation_id);
 
     // give test user the role
     $service = new ManualRoleService($role);

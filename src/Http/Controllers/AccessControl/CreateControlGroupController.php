@@ -17,7 +17,7 @@ class CreateControlGroupController
         $role = Role::create(['name' => $name]);
 
         return redirect()
-            ->route('acl.edit', $role->id)
+            ->route('acl.detail', $role->id)
             ->with('success', 'Role was created');
     }
 }
