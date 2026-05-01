@@ -43,7 +43,8 @@ use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOptInGroupController;
 
-Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
+Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups')
+    ->middleware([CheckAuthorization::class.':view access control']);
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
 Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
 Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');

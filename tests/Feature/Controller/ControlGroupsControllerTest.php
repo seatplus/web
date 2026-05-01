@@ -9,7 +9,15 @@ use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
 uses(MockRetrieveEsiDataAction::class);
 
-it('shows ControlGroupsIndex to any authenticated user', function () {
+it('denies ControlGroupsIndex to authenticated user without permission', function () {
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertForbidden();
+});
+
+it('shows ControlGroupsIndex to authenticated user with view access control permission', function () {
+    assignPermissionToTestUser(['view access control']);
+
     test()->actingAs(test()->test_user)
         ->get(route('acl.groups'))
         ->assertOk()
