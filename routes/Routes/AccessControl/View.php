@@ -26,17 +26,17 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
+use Seatplus\Web\Http\Controllers\AccessControl\ApplicationController;
 use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\JoinControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
-use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\SetModeratorController;
+use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
@@ -46,7 +46,9 @@ Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups');
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
 Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
 Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');
-Route::post('/', JoinControlGroupController::class)->name('acl.join');
+Route::post('/acl/{role_id}/apply', [ApplicationController::class, 'apply'])->name('acl.apply');
+Route::post('/acl/{role_id}/approve/{user_id}', [ApplicationController::class, 'approve'])->name('acl.approve');
+Route::delete('/acl/{role_id}/deny/{user_id}', [ApplicationController::class, 'deny'])->name('acl.deny');
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {

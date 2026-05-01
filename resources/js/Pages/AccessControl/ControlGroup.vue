@@ -24,9 +24,8 @@
       <Link
         v-if="isJoinable"
         as="button"
-        :href="route('acl.join')"
+        :href="route('acl.apply', role.id)"
         method="post"
-        :data="{ role_id: role.id }"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg

@@ -7,7 +7,6 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 use Illuminate\Http\RedirectResponse;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\AbstractRoleService;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\OnRequestRoleService;
@@ -33,7 +32,6 @@ class SetModeratorController extends Controller
     {
         $this->baseRoleService->for(Role::findOrFail($role_id));
 
-        /** @var OnRequestRoleService|ManualRoleService $roleService */
         $roleService = $this->baseRoleService->getTypeService();
 
         abort_unless(
@@ -42,6 +40,7 @@ class SetModeratorController extends Controller
             'Moderators can only be set on manual or on-request roles'
         );
 
+        /** @var OnRequestRoleService|ManualRoleService $roleService */
         $roleService->setModerator(User::findOrFail($user_id), $can_moderate);
 
         return redirect()->back()->with('success', $can_moderate ? 'Moderator added' : 'Moderator removed');
