@@ -39,15 +39,12 @@ use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
+use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
 use Seatplus\Web\Http\Controllers\AccessControl\SetModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupsController;
-use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\UpdateOptInGroupController;
 
 Route::get('/', ShowControlGroupsController::class)->name('acl.groups')
     ->middleware([CheckAuthorization::class.':view access control']);
@@ -79,10 +76,10 @@ Route::get('/acl/{role_id}/detail', ShowControlGroupController::class)
     ->name('acl.detail');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
-    Route::post('/acl/{role_id}/automatic', UpdateAutomaticGroupController::class)->name('acl.update.automatic');
-    Route::post('/acl/{role_id}/manual', UpdateManualGroupController::class)->name('acl.update.manual');
-    Route::post('/acl/{role_id}/on-request', UpdateOnRequestGroupController::class)->name('acl.update.on-request');
-    Route::post('/acl/{role_id}/opt-in', UpdateOptInGroupController::class)->name('acl.update.opt-in');
+    Route::post('/acl/{role_id}/automatic', ManageRoleController::class)->name('acl.update.automatic')->defaults('type', 'automatic');
+    Route::post('/acl/{role_id}/manual', ManageRoleController::class)->name('acl.update.manual')->defaults('type', 'manual');
+    Route::post('/acl/{role_id}/on-request', ManageRoleController::class)->name('acl.update.on-request')->defaults('type', 'on-request');
+    Route::post('/acl/{role_id}/opt-in', ManageRoleController::class)->name('acl.update.opt-in')->defaults('type', 'opt-in');
 
     Route::post('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'add'])->name('acl.moderator.add');
     Route::delete('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'remove'])->name('acl.moderator.remove');
