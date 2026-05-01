@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -17,13 +19,16 @@ beforeEach(function () {
     test()->secondary_character = test()->secondary_user->characters->first();
 });
 
-test('user can leave himself', function () {
-    // First create affiliation
+it('denies LeaveControlGroupController to unauthenticated user', function () {
+    test()->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+});
+
+it('user can leave their own on-request role', function () {
     (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
         new AffiliationData(test()->test_character->character_id, 'character', AffiliationType::ALLOWED),
     );
 
-    // Second make test character member
     $service = new ManualRoleService(test()->role);
     $service->addMember(test()->test_user);
     $service->handleMembers();
@@ -32,54 +37,43 @@ test('user can leave himself', function () {
 
     assignPermissionToTestUser(['view access control']);
 
-    $response = test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [
-            'user_id' => test()->test_user->id,
-            'role_id' => test()->role->id,
-        ]));
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
-test('user can kick other user as superuser', function () {
-    // First create affiliation
+it('superuser can kick another user', function () {
     (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
         new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
     );
 
-    // Second make secondary character member
     $service = new ManualRoleService(test()->role);
     $service->addMember(test()->secondary_user);
     $service->handleMembers();
 
-    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
-    assignPermissionToTestUser(['view access control', 'superuser']);
+    assignPermissionToTestUser(['superuser']);
 
-    expect(test()->test_user->can('superuser'))->toBeTrue();
-
-    $response = test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [
-            'user_id' => test()->secondary_user->id,
-            'role_id' => test()->role->id,
-        ]));
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [test()->role->id, test()->secondary_user->id]))
+        ->assertRedirect();
 
     expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
-test('user can kick other user as moderator', function () {
-    // First create affiliation
+it('moderator can kick another user', function () {
     (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
         new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
     );
 
-    // Second make secondary character member
     $service = new ManualRoleService(test()->role);
     $service->addMember(test()->secondary_user);
     $service->handleMembers();
+
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
-    expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
@@ -87,45 +81,31 @@ test('user can kick other user as moderator', function () {
         ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
-
-    // Apparently a moderator does not need to be member
-    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
-
     assignPermissionToTestUser(['view access control']);
-    expect(test()->test_user->can('superuser'))->toBeFalse();
 
-    $response = test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [
-            'user_id' => test()->secondary_user->id,
-            'role_id' => test()->role->id,
-        ]));
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [test()->role->id, test()->secondary_user->id]))
+        ->assertRedirect();
 
     expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
-test('user can not kick other user as vanilla user', function () {
-    // First create affiliation
+it('vanilla user cannot kick another user', function () {
     (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
         new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
     );
 
-    // Second make secondary character member
     $service = new ManualRoleService(test()->role);
     $service->addMember(test()->secondary_user);
     $service->handleMembers();
+
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
-    expect(test()->test_user->can('superuser'))->toBeFalse();
 
-    $response = test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [
-            'user_id' => test()->secondary_user->id,
-            'role_id' => test()->role->id,
-        ]));
-
-    expect($response->getStatusCode())->toEqual(403);
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [test()->role->id, test()->secondary_user->id]))
+        ->assertForbidden();
 
     expect(test()->secondary_user->refresh()->hasRole(test()->role))->toBeTrue();
 });

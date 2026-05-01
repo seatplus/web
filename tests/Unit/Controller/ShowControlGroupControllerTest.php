@@ -1,0 +1,62 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Queue;
+use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
+
+beforeEach(function () {
+    Queue::fake();
+
+    $role = Role::create(['name' => 'test']);
+    test()->role = Role::findById($role->id);
+});
+
+// ShowControlGroupController
+
+it('denies ShowControlGroupController to unauthenticated user', function () {
+    test()->get(route('acl.detail', test()->role->id))
+        ->assertRedirect();
+});
+
+it('denies ShowControlGroupController without required permission', function () {
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.detail', test()->role->id))
+        ->assertForbidden();
+});
+
+it('shows role detail page to admin with administrate permission', function () {
+    assignPermissionToTestUser('administrate access control groups');
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.detail', test()->role->id))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('AccessControl/RoleDetail')
+            ->where('can_edit', true)
+            ->has('role.affiliations')
+        );
+});
+
+it('shows role detail page to on-request moderator without edit permission', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), ['name' => test()->role->name])
+        ->assertRedirect();
+
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.detail', test()->role->id))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('AccessControl/RoleDetail')
+            ->where('can_edit', false)
+        );
+});

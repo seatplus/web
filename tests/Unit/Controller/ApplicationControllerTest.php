@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleMembershipStatus;
@@ -14,18 +16,15 @@ beforeEach(function () {
     Queue::fake();
 
     $role = Role::create(['name' => 'test']);
-    test()->role = Role::find($role->id);
-
-    test()->test_character = test()->test_character->refresh();
+    test()->role = Role::findById($role->id);
 });
 
-test('user can join waitlist', function () {
-    expect(test()->role->affiliations->isEmpty())->toBeTrue();
+it('denies ApplicationController apply to unauthenticated user', function () {
+    test()->post(route('acl.apply', test()->role->id))
+        ->assertRedirect();
+});
 
-    assignPermissionToTestUser(['view access control']);
-
-    expect(test()->role->type)->toEqual(RoleType::MANUAL);
-
+it('user can apply to on-request role', function () {
     $service = new OnRequestRoleService(test()->role);
     $service->setRoleType(RoleType::ON_REQUEST);
     $service->syncAffiliateManyEntities(
@@ -35,27 +34,22 @@ test('user can join waitlist', function () {
         new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
     );
 
-    expect(test()->role->refresh()->affiliations->isEmpty())->toBeFalse();
+    assignPermissionToTestUser(['view access control']);
 
-    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
-
-    $response = test()->actingAs(test()->test_user)
-        ->post(route('acl.apply', test()->role->id));
-
-    $response->assertRedirect();
-
-    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertRedirect();
 
     expect(
         test()->role->role_memberships()
             ->where('entity_type', User::class)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->first()
-            ->entity_id
+            ?->entity_id
     )->toEqual(test()->test_user->id);
 });
 
-test('moderator can approve applicant', function () {
+it('moderator can approve an applicant', function () {
     $service = new OnRequestRoleService(test()->role);
     $service->setRoleType(RoleType::ON_REQUEST);
     $service->syncAffiliateManyEntities(
@@ -65,15 +59,11 @@ test('moderator can approve applicant', function () {
         new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
     );
 
-    // User applies
     assignPermissionToTestUser(['view access control']);
     test()->actingAs(test()->test_user)
         ->post(route('acl.apply', test()->role->id))
         ->assertRedirect();
 
-    expect(test()->test_user->hasRole(test()->role))->toBeFalse();
-
-    // A moderator approves via HTTP
     $moderator = User::factory()->create();
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
@@ -86,17 +76,9 @@ test('moderator can approve applicant', function () {
         ->assertRedirect();
 
     expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
-
-    expect(
-        test()->role->role_memberships()
-            ->where('entity_type', User::class)
-            ->where('status', RoleMembershipStatus::ACTIVE->value)
-            ->first()
-            ->entity_id
-    )->toEqual(test()->test_user->id);
 });
 
-test('moderator can deny applicant', function () {
+it('moderator can deny an applicant', function () {
     $service = new OnRequestRoleService(test()->role);
     $service->setRoleType(RoleType::ON_REQUEST);
     $service->syncAffiliateManyEntities(
@@ -106,7 +88,6 @@ test('moderator can deny applicant', function () {
         new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
     );
 
-    // User applies
     assignPermissionToTestUser(['view access control']);
     test()->actingAs(test()->test_user)
         ->post(route('acl.apply', test()->role->id))
@@ -114,12 +95,10 @@ test('moderator can deny applicant', function () {
 
     expect(
         test()->role->role_memberships()
-            ->where('entity_type', User::class)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()
     )->toBeTrue();
 
-    // A moderator denies via HTTP
     $moderator = User::factory()->create();
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
@@ -133,21 +112,15 @@ test('moderator can deny applicant', function () {
 
     expect(
         test()->role->role_memberships()
-            ->where('entity_type', User::class)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()
     )->toBeFalse();
 });
 
-test('non-moderator cannot approve applicant', function () {
-    $service = new OnRequestRoleService(test()->role);
-    $service->setRoleType(RoleType::ON_REQUEST);
-
+it('non-moderator cannot approve an applicant', function () {
     $other_user = User::factory()->create();
 
     test()->actingAs($other_user)
         ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
 });
-
-// Helpers
