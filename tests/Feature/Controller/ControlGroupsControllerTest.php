@@ -9,9 +9,7 @@ use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
 uses(MockRetrieveEsiDataAction::class);
 
-it('shows ControlGroupsIndex to authenticated user with view permission', function () {
-    assignPermissionToTestUser(['view access control']);
-
+it('shows ControlGroupsIndex to any authenticated user', function () {
     test()->actingAs(test()->test_user)
         ->get(route('acl.groups'))
         ->assertOk()
@@ -38,6 +36,25 @@ it('denies creating a control group without permission', function () {
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'test']);
 });
 
+it('denies editing a control group without permission', function () {
+    $role = Role::create(['name' => 'test']);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.edit', ['role_id' => $role->id]))
+        ->assertForbidden();
+});
+
+it('edits a control group with permission', function () {
+    $role = Role::create(['name' => 'test']);
+
+    assignPermissionToTestUser(['administrate access control groups']);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.edit', ['role_id' => $role->id]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('AccessControl/EditGroup'));
+});
+
 it('deletes a control group', function () {
     $role = Role::create(['name' => 'test']);
 
@@ -50,6 +67,14 @@ it('deletes a control group', function () {
         ->delete(route('acl.delete', ['role_id' => $role->id]));
 
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'test']);
+});
+
+it('denies updating role permissions without permission', function () {
+    $role = Role::create(['name' => 'test']);
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.update', ['role_id' => $role->id]), ['roleName' => 'new name'])
+        ->assertForbidden();
 });
 
 it('updates role permissions', function () {
@@ -94,8 +119,14 @@ it('updates role name via acl.update', function () {
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'old name']);
 });
 
+it('denies affiliatable search without permission', function () {
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.search.affiliatable'))
+        ->assertForbidden();
+});
+
 it('searches for affiliatable entities', function () {
-    assignPermissionToTestUser(['superuser']);
+    assignPermissionToTestUser(['administrate access control groups']);
 
     test()->actingAs(test()->test_user)
         ->get(route('acl.search.affiliatable'))

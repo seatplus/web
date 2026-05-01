@@ -14,6 +14,11 @@ beforeEach(function () {
     test()->role = Role::findById($role->id);
 });
 
+it('denies UpdateAutomaticGroupController to unauthenticated user', function () {
+    test()->postJson(route('acl.update.automatic', test()->role->id), ['name' => 'renamed'])
+        ->assertUnauthorized();
+});
+
 it('denies UpdateAutomaticGroupController without permission', function () {
     test()->actingAs(test()->test_user)
         ->postJson(route('acl.update.automatic', test()->role->id), ['name' => 'renamed'])

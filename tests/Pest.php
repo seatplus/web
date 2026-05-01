@@ -18,7 +18,7 @@ use Seatplus\Web\Tests\TestCase;
 */
 
 /** @link https://pestphp.com/docs/underlying-test-case */
-uses(TestCase::class)->in('Integration', 'Unit');
+uses(TestCase::class)->in('Integration', 'Unit', 'Feature');
 // uses(TestCase::class);
 
 /*
