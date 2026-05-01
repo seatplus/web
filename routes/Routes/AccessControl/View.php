@@ -27,8 +27,9 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\AccessControl\ApplicationController;
-use Seatplus\Web\Http\Controllers\AccessControl\ControlGroupsController;
+use Seatplus\Web\Http\Controllers\AccessControl\CreateControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\EditControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
@@ -36,14 +37,17 @@ use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
+use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
 use Seatplus\Web\Http\Controllers\AccessControl\SetModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateAutomaticGroupController;
+use Seatplus\Web\Http\Controllers\AccessControl\UpdateControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateManualGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOnRequestGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\UpdateOptInGroupController;
 
-Route::get('/', [ControlGroupsController::class, 'index'])->name('acl.groups')
+Route::get('/', ShowControlGroupsController::class)->name('acl.groups')
     ->middleware([CheckAuthorization::class.':view access control']);
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
 Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
@@ -54,13 +58,13 @@ Route::delete('/acl/{role_id}/deny/{user_id}', [ApplicationController::class, 'd
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
-    Route::post('/create', [ControlGroupsController::class, 'create'])->name('acl.create');
+    Route::post('/create', CreateControlGroupController::class)->name('acl.create');
 
-    Route::get('/acl/{role_id}', [ControlGroupsController::class, 'edit'])->name('acl.edit');
-    Route::post('/acl/{role_id}', [ControlGroupsController::class, 'update'])->name('acl.update');
+    Route::get('/acl/{role_id}', EditControlGroupController::class)->name('acl.edit');
+    Route::post('/acl/{role_id}', UpdateControlGroupController::class)->name('acl.update');
     Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
 
-    Route::get('/search', [ControlGroupsController::class, 'search'])->name('acl.search.affiliatable');
+    Route::get('/search', SearchAffiliatableController::class)->name('acl.search.affiliatable');
 });
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
