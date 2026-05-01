@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
-use Seatplus\Auth\Services\Roles\ManualRoleService;
+use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
+use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -17,23 +16,47 @@ beforeEach(function () {
 
     test()->secondary_user = User::factory()->create();
     test()->secondary_character = test()->secondary_user->characters->first();
+
+    // Refresh to ensure corporation relation is loaded
+    test()->test_character = test()->test_character->refresh();
+    test()->secondary_character = test()->secondary_character->refresh();
 });
+
+/**
+ * Helper: add a user as an active on-request role member via the service.
+ */
+function makeOnRequestMember(Role $role, User $user, int $corporation_id): void
+{
+    $svc = new OnRequestRoleService($role->fresh());
+    $svc->addCriteriaForRoleApplication(new CriteriaData($corporation_id, 'corporation'));
+    $svc->submitApplicationForRole($user);
+    $svc->approveApplicationForRole($user);
+    $svc->handleMembers();
+}
 
 it('denies LeaveControlGroupController to unauthenticated user', function () {
     test()->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 });
 
+it('returns 403 when trying to leave a manual role', function () {
+    $manualRole = Role::create(['name' => 'manual-only']);
+
+    assignPermissionToTestUser(['view access control']);
+
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [$manualRole->id, test()->test_user->id]))
+        ->assertForbidden();
+});
+
 it('user can leave their own on-request role', function () {
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
-        new AffiliationData(test()->test_character->character_id, 'character', AffiliationType::ALLOWED),
+    makeOnRequestMember(
+        test()->role,
+        test()->test_user,
+        test()->test_character->corporation->corporation_id
     );
 
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->test_user);
-    $service->handleMembers();
-
-    expect(test()->test_user->hasRole(test()->role))->toBeTrue();
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
 
@@ -45,15 +68,13 @@ it('user can leave their own on-request role', function () {
 });
 
 it('superuser can kick another user', function () {
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
-        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    makeOnRequestMember(
+        test()->role,
+        test()->secondary_user,
+        test()->secondary_character->corporation->corporation_id
     );
 
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->secondary_user);
-    $service->handleMembers();
-
-    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
+    expect(test()->secondary_user->fresh()->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['superuser']);
 
@@ -65,15 +86,13 @@ it('superuser can kick another user', function () {
 });
 
 it('moderator can kick another user', function () {
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
-        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    makeOnRequestMember(
+        test()->role,
+        test()->secondary_user,
+        test()->secondary_character->corporation->corporation_id
     );
 
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->secondary_user);
-    $service->handleMembers();
-
-    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
+    expect(test()->secondary_user->fresh()->hasRole(test()->role))->toBeTrue();
 
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
@@ -91,15 +110,13 @@ it('moderator can kick another user', function () {
 });
 
 it('vanilla user cannot kick another user', function () {
-    (new ManualRoleService(test()->role))->syncAffiliateManyEntities(
-        new AffiliationData(test()->secondary_character->character_id, 'character', AffiliationType::ALLOWED),
+    makeOnRequestMember(
+        test()->role,
+        test()->secondary_user,
+        test()->secondary_character->corporation->corporation_id
     );
 
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->secondary_user);
-    $service->handleMembers();
-
-    expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
+    expect(test()->secondary_user->fresh()->hasRole(test()->role))->toBeTrue();
 
     assignPermissionToTestUser(['view access control']);
 

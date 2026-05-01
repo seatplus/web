@@ -30,6 +30,14 @@ it('creates a control group', function () {
     \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'test']);
 });
 
+it('denies creating a control group without permission', function () {
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.create'), ['name' => 'test'])
+        ->assertForbidden();
+
+    \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'test']);
+});
+
 it('deletes a control group', function () {
     $role = Role::create(['name' => 'test']);
 

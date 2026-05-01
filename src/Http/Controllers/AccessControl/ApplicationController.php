@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Http\RedirectResponse;
+use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Http\Actions\Roles\OnRequest\ApplyAction;
 use Seatplus\Auth\Http\Actions\Roles\OnRequest\ApproveAction;
 use Seatplus\Auth\Http\Actions\Roles\OnRequest\DenyAction;
@@ -21,6 +22,9 @@ class ApplicationController extends Controller
 
     public function apply(int $role_id): RedirectResponse
     {
+        $role = Role::findOrFail($role_id);
+        abort_unless($role->type === RoleType::ON_REQUEST, 403, 'Only on-request roles accept applications');
+
         /** @var User $user */
         $user = auth()->user();
 

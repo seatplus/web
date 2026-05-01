@@ -124,3 +124,36 @@ it('non-moderator cannot approve an applicant', function () {
         ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
 });
+
+it('returns 403 when applying to a manual role', function () {
+    // Role is MANUAL by default (created in beforeEach without type change)
+    assignPermissionToTestUser(['view access control']);
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertForbidden();
+});
+
+it('returns 403 when applying to an automatic role', function () {
+    assignPermissionToTestUser(['administrate access control groups', 'view access control']);
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.update.automatic', test()->role->id), [])
+        ->assertRedirect();
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertForbidden();
+});
+
+it('returns 403 when applying to an opt-in role', function () {
+    assignPermissionToTestUser(['administrate access control groups', 'view access control']);
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.update.opt-in', test()->role->id), [])
+        ->assertRedirect();
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertForbidden();
+});
