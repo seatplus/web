@@ -75,7 +75,11 @@ test('moderator can approve applicant', function () {
 
     // A moderator approves via HTTP
     $moderator = User::factory()->create();
-    $service->setModerator($moderator);
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+        ->assertRedirect();
 
     test()->actingAs($moderator)
         ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
@@ -117,7 +121,11 @@ test('moderator can deny applicant', function () {
 
     // A moderator denies via HTTP
     $moderator = User::factory()->create();
-    $service->setModerator($moderator);
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+        ->assertRedirect();
 
     test()->actingAs($moderator)
         ->delete(route('acl.deny', [test()->role->id, test()->test_user->id]))

@@ -58,23 +58,25 @@ test('automatic control group removes affiliation', function () {
     expect(test()->role->refresh()->affiliations->isEmpty())->toBeTrue();
 });
 
-test('on request control group sets moderator', function () {
+test('on request control group sets and removes moderator', function () {
     expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
 
-    // Set role type to on-request
-    test()->actingAs($admin)
-        ->postJson(route('acl.update.on-request', test()->role->id), ['name' => test()->role->name])
-        ->assertRedirect();
-
-    // Admin sets moderator via HTTP route
+    // Admin sets moderator via HTTP route (works on manual roles too)
     test()->actingAs($admin)
         ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 
     expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
+
+    // Admin removes moderator via HTTP route
+    test()->actingAs($admin)
+        ->delete(route('acl.moderator.remove', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 });
 
 // Helpers
