@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 beforeEach(function () {
@@ -56,7 +56,18 @@ test('automatic control group removes affiliation', function () {
 test('on request control group sets moderator', function () {
     expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 
-    (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+
+    // Set role type to on-request
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), ['name' => test()->role->name])
+        ->assertRedirect();
+
+    // Admin sets moderator via HTTP route
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 });

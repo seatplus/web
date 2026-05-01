@@ -6,7 +6,6 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -81,7 +80,13 @@ test('user can kick other user as moderator', function () {
     $service->handleMembers();
     expect(test()->secondary_user->hasRole(test()->role))->toBeTrue();
     expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
-    (new OnRequestRoleService(test()->role))->setModerator(test()->test_user);
+
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
     expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
 
     // Apparently a moderator does not need to be member
