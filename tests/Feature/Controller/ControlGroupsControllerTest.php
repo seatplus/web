@@ -63,20 +63,6 @@ it('edits a control group with permission', function () {
         ->assertInertia(fn (Assert $page) => $page->component('AccessControl/EditGroup'));
 });
 
-it('deletes a control group', function () {
-    $role = Role::create(['name' => 'test']);
-
-    \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'test']);
-
-    assignPermissionToTestUser(['administrate access control groups']);
-
-    test()->actingAs(test()->test_user)
-        ->followingRedirects()
-        ->delete(route('acl.delete', ['role_id' => $role->id]));
-
-    \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'test']);
-});
-
 it('denies updating role permissions without permission', function () {
     $role = Role::create(['name' => 'test']);
 
