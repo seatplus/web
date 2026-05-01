@@ -18,24 +18,29 @@ beforeEach(function () {
 test('manual control group adds member', function () {
     expect(test()->test_user->hasRole('test'))->toBeFalse();
 
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->test_user);
-    test()->test_user->assignRole(test()->role);
+    assignPermissionToTestUser(['administrate access control groups']);
 
-    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->refresh()->roles->isNotEmpty())->toBeTrue();
 });
 
 test('manual control group removes member', function () {
-    $service = new ManualRoleService(test()->role);
-    $service->addMember(test()->test_user);
-    test()->test_user->assignRole(test()->role);
+    assignPermissionToTestUser(['administrate access control groups']);
 
-    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
 
-    $service->removeMember(test()->test_user);
-    test()->test_user->removeRole(test()->role);
+    expect(test()->test_user->refresh()->roles->isNotEmpty())->toBeTrue();
 
-    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.member.remove', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->refresh()->roles->isEmpty())->toBeTrue();
 });
 
 test('automatic control group removes affiliation', function () {
