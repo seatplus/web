@@ -79,7 +79,7 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
 
     Route::post('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'add'])->name('acl.moderator.add');
     Route::delete('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'remove'])->name('acl.moderator.remove');
-
-    Route::post('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'add'])->name('acl.member.add');
-    Route::delete('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'remove'])->name('acl.member.remove');
 });
+
+Route::post('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'add'])->name('acl.member.add');
+Route::delete('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'remove'])->name('acl.member.remove');

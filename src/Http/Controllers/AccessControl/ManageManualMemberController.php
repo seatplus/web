@@ -18,6 +18,8 @@ class ManageManualMemberController extends Controller
     public function add(int $role_id, int $user_id): RedirectResponse
     {
         $service = $this->baseRoleService->for($role_id)->manual();
+        $this->authorizeModeration($service);
+
         $service->addMember(User::findOrFail($user_id));
         $this->baseRoleService->handleMembers();
 
@@ -27,9 +29,21 @@ class ManageManualMemberController extends Controller
     public function remove(int $role_id, int $user_id): RedirectResponse
     {
         $service = $this->baseRoleService->for($role_id)->manual();
+        $this->authorizeModeration($service);
+
         $service->removeMember(User::findOrFail($user_id));
         $this->baseRoleService->handleMembers();
 
         return redirect()->back();
+    }
+
+    private function authorizeModeration(mixed $service): void
+    {
+        $user = auth()->user();
+
+        abort_unless(
+            $user->can('administrate access control groups') || $service->canModerate($user),
+            403
+        );
     }
 }

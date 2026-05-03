@@ -78,8 +78,8 @@ it('full lifecycle: create affiliations add member kick member', function () {
     expect($member->fresh()->hasRole(test()->role))->toBeFalse();
 });
 
-it('moderator can view members but cannot add or remove', function () {
-    // Set up a moderator via service (admin action)
+it('moderator can add and remove members but cannot manage role settings', function () {
+    // Set up a moderator via admin action
     $moderator = User::factory()->create();
     test()->actingAs(test()->test_user)
         ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
@@ -87,14 +87,23 @@ it('moderator can view members but cannot add or remove', function () {
 
     $member = User::factory()->create();
 
-    // Moderator cannot add members (admin-only route)
+    // Moderator CAN add members
     test()->actingAs($moderator)
         ->post(route('acl.member.add', [test()->role->id, $member->id]))
-        ->assertForbidden();
+        ->assertRedirect();
 
-    // Moderator cannot remove members either
+    expect($member->fresh()->hasRole(test()->role))->toBeTrue();
+
+    // Moderator CAN remove members
     test()->actingAs($moderator)
         ->delete(route('acl.member.remove', [test()->role->id, $member->id]))
+        ->assertRedirect();
+
+    expect($member->fresh()->hasRole(test()->role))->toBeFalse();
+
+    // But moderator CANNOT change role type/affiliations (admin-only)
+    test()->actingAs($moderator)
+        ->postJson(route('acl.update.manual', test()->role->id), ['name' => 'renamed'])
         ->assertForbidden();
 
     // But moderator CAN view the members list
