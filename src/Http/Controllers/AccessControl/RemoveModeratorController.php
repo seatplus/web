@@ -26,7 +26,7 @@ class RemoveModeratorController extends Controller
         abort_unless(
             $roleService instanceof OnRequestRoleService || $roleService instanceof ManualRoleService,
             403,
-            'Moderators can only be set on manual or on-request roles'
+            'This role type does not support moderators'
         );
 
         /** @var OnRequestRoleService|ManualRoleService $roleService */
