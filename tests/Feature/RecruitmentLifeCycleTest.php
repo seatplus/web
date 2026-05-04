@@ -7,16 +7,13 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -510,9 +507,9 @@ test('recruiter can see corporation applications', function () {
 
     $role = Role::findByName('test');
 
-    $service = new ManualRoleService($role);
-    $service->addMember($recruiter);
-    $recruiter->assignRole($role);
+    test()->actingAs(test()->superuser)
+        ->post(route('acl.member.add', [$role->id, $recruiter->id]))
+        ->assertRedirect();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
@@ -562,9 +559,9 @@ test('recruiter can comment on application', function () {
 
     $role = Role::findByName('test');
 
-    $service = new ManualRoleService($role);
-    $service->addMember($recruiter);
-    $recruiter->assignRole($role);
+    test()->actingAs(test()->superuser)
+        ->post(route('acl.member.add', [$role->id, $recruiter->id]))
+        ->assertRedirect();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
@@ -700,25 +697,30 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
         ->followingRedirects()
         ->json('POST', route('acl.create'), ['name' => 'test']);
 
-    // affiliate secondary user to role
+    // affiliate test user's corporation to role via HTTP
     $role = Role::findByName('test');
 
-    Affiliation::create([
-        'role_id' => $role->id,
-        'affiliatable_id' => test()->test_character->corporation->corporation_id,
-        'affiliatable_type' => CorporationInfo::class,
-        'type' => $affiliation,
-    ]);
+    test()->actingAs(test()->superuser)
+        ->postJson(route('acl.update.manual', $role->id), [
+            'affiliated' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                    'affiliation_type' => $affiliation,
+                ],
+            ],
+        ])
+        ->assertRedirect();
 
     foreach (['can open or close corporations for recruitment', 'can accept or deny applications'] as $permName) {
         $permission = Permission::findOrCreate($permName);
         $role->givePermissionTo($permission);
     }
 
-    // give test user the role
-    $service = new ManualRoleService($role);
-    $service->addMember(test()->test_user);
-    test()->test_user->assignRole($role);
+    // give test user the role via HTTP
+    test()->actingAs(test()->superuser)
+        ->post(route('acl.member.add', [$role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 
