@@ -13,12 +13,12 @@ beforeEach(function () {
     test()->role = Role::findById($role->id);
 });
 
-it('denies manual member endpoints to unauthenticated user', function () {
+it('denies member endpoints to unauthenticated user', function () {
     test()->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 });
 
-it('denies manual member endpoints without permission', function () {
+it('denies member endpoints without permission', function () {
     test()->actingAs(test()->test_user)
         ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
@@ -52,6 +52,75 @@ it('removes a member from a manual role', function () {
     expect(test()->test_user->refresh()->roles->isEmpty())->toBeTrue();
 });
 
+it('admin can remove a member from an on-request role', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+
+    // Set up on-request role and get user to apply + be approved
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'assigned' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertRedirect();
+
+    test()->actingAs($admin)
+        ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
+
+    test()->actingAs($admin)
+        ->delete(route('acl.member.remove', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeFalse();
+});
+
+it('admin can remove a member from an opt-in role', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+
+    // Set up opt-in role with join criteria matching the test user's corporation
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.opt-in', test()->role->id), [
+            'assigned' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.join', test()->role->id))
+        ->assertRedirect();
+
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
+
+    test()->actingAs($admin)
+        ->delete(route('acl.member.remove', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeFalse();
+});
+
+it('returns 422 when trying to remove a member from an automatic role', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.automatic', test()->role->id), [])
+        ->assertRedirect();
+
+    test()->actingAs($admin)
+        ->delete(route('acl.member.remove', [test()->role->id, test()->test_user->id]))
+        ->assertStatus(422);
+});
+
 it('allows a moderator to add a member to a manual role', function () {
     $moderator = User::factory()->create();
 
@@ -81,14 +150,12 @@ it('allows a moderator to remove a member from a manual role', function () {
 
     $member = User::factory()->create();
 
-    // Admin adds the member first
     test()->actingAs(test()->test_user)
         ->post(route('acl.member.add', [test()->role->id, $member->id]))
         ->assertRedirect();
 
     expect($member->fresh()->hasRole(test()->role))->toBeTrue();
 
-    // Moderator removes them
     test()->actingAs($moderator)
         ->delete(route('acl.member.remove', [test()->role->id, $member->id]))
         ->assertRedirect();
@@ -101,5 +168,13 @@ it('denies a non-moderator non-admin from adding a member', function () {
 
     test()->actingAs($other)
         ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
+        ->assertForbidden();
+});
+
+it('denies a non-moderator non-admin from removing a member', function () {
+    $other = User::factory()->create();
+
+    test()->actingAs($other)
+        ->delete(route('acl.member.remove', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
 });
