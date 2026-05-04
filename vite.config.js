@@ -4,14 +4,46 @@ import vue from '@vitejs/plugin-vue';
 import run from 'vite-plugin-run';
 import { existsSync } from 'fs';
 
-// Detect monorepo (local dev) vs end-user install
+// In local dev (monorepo), packages/ exists. In end-user installs, it does not.
+// End users only run `npm run build` once — no dev server / file watchers needed.
 const isMonorepo = existsSync('./packages/web');
-const base = isMonorepo ? 'packages' : 'vendor/seatplus';
+
+const plugins = [
+    laravel({
+        input: 'resources/js/app.js',
+        refresh: ['resources/js/**'],
+    }),
+    vue({
+        template: {
+            transformAssetUrls: {
+                base: null,
+                includeAbsolute: false,
+            },
+        },
+    }),
+];
+
+if (isMonorepo) {
+    plugins.push(run([
+        {
+            startup: false,
+            name: 'copy vendor',
+            run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
+            pattern: ['packages/**/resources/js/**'],
+        },
+        {
+            startup: true,
+            name: 'wayfinder',
+            run: ['php', 'artisan', 'wayfinder:generate'],
+            pattern: ['packages/**/src/Http/**/*.php', 'packages/**/routes/**/*.php'],
+        },
+    ]));
+}
 
 export default defineConfig(({mode}) => {
     return {
         server: {
-            cors: mode === "development",
+            cors: mode === 'development',
             watch: {
                 ignored: [
                     '**/node_modules/**',
@@ -19,43 +51,13 @@ export default defineConfig(({mode}) => {
                     '**/public/**',
                     '!**/vendor/seatplus/**',
                 ],
-            }
+            },
         },
-        plugins: [
-            laravel({
-                input: 'resources/js/app.js',
-                refresh: [
-                    'resources/js/**',
-                    `${base}/**/resources/js/**`,
-                ],
-            }),
-            vue({
-                template: {
-                    transformAssetUrls: {
-                        base: null,
-                        includeAbsolute: false,
-                    },
-                },
-            }),
-            run([
-                {
-                    startup: false,
-                    name: 'copy vendor',
-                    run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
-                    pattern: [`${base}/**/resources/js/**`],
-                },
-                {
-                    startup: true,
-                    name: 'wayfinder',
-                    run: ['php', 'artisan', 'wayfinder:generate'],
-                    pattern: [`${base}/**/src/Http/**/*.php`, `${base}/**/routes/**/*.php`],
-                },
-            ]),
-        ],
+        plugins,
         resolve: {
             alias: {
                 '@': '/resources/js',
             },
         },
-    }
+    };
 });
