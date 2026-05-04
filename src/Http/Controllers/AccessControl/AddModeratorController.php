@@ -12,26 +12,15 @@ use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 
-class SetModeratorController extends Controller
+class AddModeratorController extends Controller
 {
     public function __construct(
         private readonly BaseRoleService $baseRoleService,
     ) {}
 
-    public function add(int $role_id, int $user_id): RedirectResponse
-    {
-        return $this->set($role_id, $user_id, true);
-    }
-
-    public function remove(int $role_id, int $user_id): RedirectResponse
-    {
-        return $this->set($role_id, $user_id, false);
-    }
-
-    private function set(int $role_id, int $user_id, bool $can_moderate): RedirectResponse
+    public function __invoke(int $role_id, int $user_id): RedirectResponse
     {
         $this->baseRoleService->for(Role::findOrFail($role_id));
-
         $roleService = $this->baseRoleService->getTypeService();
 
         abort_unless(
@@ -41,8 +30,8 @@ class SetModeratorController extends Controller
         );
 
         /** @var OnRequestRoleService|ManualRoleService $roleService */
-        $roleService->setModerator(User::findOrFail($user_id), $can_moderate);
+        $roleService->setModerator(User::findOrFail($user_id), true);
 
-        return redirect()->back()->with('success', $can_moderate ? 'Moderator added' : 'Moderator removed');
+        return redirect()->back()->with('success', 'Moderator added');
     }
 }

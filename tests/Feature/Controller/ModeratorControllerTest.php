@@ -13,12 +13,12 @@ beforeEach(function () {
     test()->role = Role::findById($role->id);
 });
 
-it('denies SetModeratorController to unauthenticated user', function () {
+it('denies moderator endpoints to unauthenticated user', function () {
     test()->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 });
 
-it('denies SetModeratorController without permission', function () {
+it('denies moderator endpoints without permission', function () {
     test()->actingAs(test()->test_user)
         ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();

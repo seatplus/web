@@ -26,6 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
+use Seatplus\Web\Http\Controllers\AccessControl\AddModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\ApplyToRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\ApproveApplicationController;
 use Seatplus\Web\Http\Controllers\AccessControl\CreateControlGroupController;
@@ -40,8 +41,8 @@ use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersControl
 use Seatplus\Web\Http\Controllers\AccessControl\ManageManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
+use Seatplus\Web\Http\Controllers\AccessControl\RemoveModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
-use Seatplus\Web\Http\Controllers\AccessControl\SetModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupsController;
 
@@ -79,8 +80,8 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
     Route::post('/acl/{role_id}/on-request', ManageRoleController::class)->name('acl.update.on-request')->defaults('type', 'on-request');
     Route::post('/acl/{role_id}/opt-in', ManageRoleController::class)->name('acl.update.opt-in')->defaults('type', 'opt-in');
 
-    Route::post('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'add'])->name('acl.moderator.add');
-    Route::delete('/acl/{role_id}/moderator/{user_id}', [SetModeratorController::class, 'remove'])->name('acl.moderator.remove');
+    Route::post('/acl/{role_id}/moderator/{user_id}', AddModeratorController::class)->name('acl.moderator.add');
+    Route::delete('/acl/{role_id}/moderator/{user_id}', RemoveModeratorController::class)->name('acl.moderator.remove');
 });
 
 Route::post('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'add'])->name('acl.member.add');
