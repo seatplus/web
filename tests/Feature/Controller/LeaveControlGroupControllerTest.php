@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -27,11 +25,27 @@ beforeEach(function () {
  */
 function makeOnRequestMember(Role $role, User $user, int $corporation_id): void
 {
-    $svc = new OnRequestRoleService($role->fresh());
-    $svc->addCriteriaForRoleApplication(new CriteriaData($corporation_id, 'corporation'));
-    $svc->submitApplicationForRole($user);
-    $svc->approveApplicationForRole($user);
-    $svc->handleMembers();
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+
+    // Set up on-request role with criteria
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', $role->id), [
+            'assigned' => [
+                ['entity_id' => $corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
+
+    // Apply as user
+    test()->actingAs($user)
+        ->post(route('acl.apply', $role->id))
+        ->assertRedirect();
+
+    // Approve as admin (superuser bypasses canModerate check; also calls handleMembers)
+    test()->actingAs($admin)
+        ->post(route('acl.approve', [$role->id, $user->id]))
+        ->assertRedirect();
 }
 
 it('denies LeaveControlGroupController to unauthenticated user', function () {

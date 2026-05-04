@@ -3,14 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleMembershipStatus;
-use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
-use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -25,14 +20,18 @@ it('denies ApplyToRoleController to unauthenticated user', function () {
 });
 
 it('user can apply to on-request role', function () {
-    $service = new OnRequestRoleService(test()->role);
-    $service->setRoleType(RoleType::ON_REQUEST);
-    $service->syncAffiliateManyEntities(
-        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
-    );
-    $service->addCriteriaForRoleApplication(
-        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
-    );
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'affiliated' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
+            ],
+            'assigned' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
 
     assignPermissionToTestUser(['view access control']);
 

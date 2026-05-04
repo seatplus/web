@@ -3,13 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Enums\AffiliationType;
-use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
-use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -32,14 +27,18 @@ it('non-moderator cannot approve an applicant', function () {
 });
 
 it('moderator can approve an applicant', function () {
-    $service = new OnRequestRoleService(test()->role);
-    $service->setRoleType(RoleType::ON_REQUEST);
-    $service->syncAffiliateManyEntities(
-        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
-    );
-    $service->addCriteriaForRoleApplication(
-        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
-    );
+    $setup_admin = User::factory()->create();
+    assignPermission($setup_admin, ['superuser']);
+    test()->actingAs($setup_admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'affiliated' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
+            ],
+            'assigned' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
 
     assignPermissionToTestUser(['view access control']);
     test()->actingAs(test()->test_user)
