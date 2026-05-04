@@ -38,7 +38,6 @@ class RemoveMemberController extends Controller
             RoleType::MANUAL => $roleService->manual()->removeMember($user),
             RoleType::ON_REQUEST => $roleService->onRequest()->removeApplication($user),
             RoleType::OPT_IN => $roleService->optIn()->leaveRole($user),
-            default => abort(422, 'Cannot remove members from automatic roles'),
         };
 
         $roleService->handleMembers();
