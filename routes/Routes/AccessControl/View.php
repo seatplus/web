@@ -26,6 +26,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
+use Seatplus\Web\Http\Controllers\AccessControl\AddManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\AddModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\ApplyToRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\ApproveApplicationController;
@@ -38,9 +39,9 @@ use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
-use Seatplus\Web\Http\Controllers\AccessControl\ManageManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
+use Seatplus\Web\Http\Controllers\AccessControl\RemoveManualMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
@@ -84,5 +85,5 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
     Route::delete('/acl/{role_id}/moderator/{user_id}', RemoveModeratorController::class)->name('acl.moderator.remove');
 });
 
-Route::post('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'add'])->name('acl.member.add');
-Route::delete('/acl/{role_id}/member/{user_id}', [ManageManualMemberController::class, 'remove'])->name('acl.member.remove');
+Route::post('/acl/{role_id}/member/{user_id}', AddManualMemberController::class)->name('acl.member.add');
+Route::delete('/acl/{role_id}/member/{user_id}', RemoveManualMemberController::class)->name('acl.member.remove');

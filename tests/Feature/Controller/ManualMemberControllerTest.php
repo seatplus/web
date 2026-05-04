@@ -13,12 +13,12 @@ beforeEach(function () {
     test()->role = Role::findById($role->id);
 });
 
-it('denies ManageManualMemberController to unauthenticated user', function () {
+it('denies manual member endpoints to unauthenticated user', function () {
     test()->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 });
 
-it('denies ManageManualMemberController without permission', function () {
+it('denies manual member endpoints without permission', function () {
     test()->actingAs(test()->test_user)
         ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
