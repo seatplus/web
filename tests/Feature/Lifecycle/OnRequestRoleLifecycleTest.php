@@ -8,9 +8,6 @@ use Seatplus\Auth\Enums\RoleMembershipStatus;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\AffiliationData;
-use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
-use Seatplus\Auth\Services\Roles\OnRequestRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -27,17 +24,27 @@ beforeEach(function () {
 });
 
 it('full lifecycle: configure apply set moderator approve leave', function () {
-    // 1. Set on-request type and criteria via service
-    $service = new OnRequestRoleService(test()->role);
-    $service->setRoleType(RoleType::ON_REQUEST);
-    $service->syncAffiliateManyEntities(
-        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
-    );
-    $service->addCriteriaForRoleApplication(
-        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
-    );
+    // 1. Set on-request type, affiliations and application criteria via HTTP
+    test()->actingAs(test()->admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'affiliated' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                    'affiliation_type' => AffiliationType::ALLOWED->value,
+                ],
+            ],
+            'assigned' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                ],
+            ],
+        ])
+        ->assertRedirect(route('acl.detail', test()->role->id));
 
-    expect(test()->role->fresh()->type)->toBe(RoleType::ON_REQUEST);
+    expect(test()->role->fresh()->type)->toBe(RoleType::ON_REQUEST)
+        ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 
     // 2. Applicant applies via HTTP
     assignPermissionToTestUser(['view access control']);
@@ -81,14 +88,24 @@ it('full lifecycle: configure apply set moderator approve leave', function () {
 });
 
 it('deny flow: configure apply set moderator deny', function () {
-    $service = new OnRequestRoleService(test()->role);
-    $service->setRoleType(RoleType::ON_REQUEST);
-    $service->syncAffiliateManyEntities(
-        new AffiliationData(test()->test_character->corporation->corporation_id, 'corporation', AffiliationType::ALLOWED)
-    );
-    $service->addCriteriaForRoleApplication(
-        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
-    );
+    // Set on-request type, affiliations and criteria via HTTP
+    test()->actingAs(test()->admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'affiliated' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                    'affiliation_type' => AffiliationType::ALLOWED->value,
+                ],
+            ],
+            'assigned' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                ],
+            ],
+        ])
+        ->assertRedirect(route('acl.detail', test()->role->id));
 
     assignPermissionToTestUser(['view access control']);
     test()->actingAs(test()->test_user)

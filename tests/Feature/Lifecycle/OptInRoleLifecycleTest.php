@@ -7,7 +7,6 @@ use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\DTO\CriteriaData;
 use Seatplus\Auth\Services\Roles\OptInRoleService;
 
 beforeEach(function () {
@@ -43,12 +42,19 @@ it('sets opt-in type and affiliations via HTTP', function () {
 });
 
 it('eligible user can join opt-in role via service and then leave via HTTP', function () {
-    // Set criteria via service (uses test_user's corporation)
-    $service = new OptInRoleService(test()->role);
-    $service->setRoleType(RoleType::OPT_IN);
-    $service->addCriteriaForRole(
-        new CriteriaData(test()->test_character->corporation->corporation_id, 'corporation')
-    );
+    // Set opt-in type and join criteria via HTTP
+    test()->actingAs(test()->admin)
+        ->postJson(route('acl.update.opt-in', test()->role->id), [
+            'assigned' => [
+                [
+                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                ],
+            ],
+        ])
+        ->assertRedirect(route('acl.detail', test()->role->id));
+
+    expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN);
 
     // Eligible user joins via service (no HTTP join route for opt-in)
     $optInService = new OptInRoleService(test()->role->fresh());
