@@ -1,7 +1,12 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
-import { wayfinder } from '@laravel/vite-plugin-wayfinder';
+import run from 'vite-plugin-run';
+import { existsSync } from 'fs';
+
+// Detect monorepo (local dev) vs end-user install
+const isMonorepo = existsSync('./packages/web');
+const base = isMonorepo ? 'packages' : 'vendor/seatplus';
 
 export default defineConfig(({mode}) => {
     return {
@@ -21,7 +26,7 @@ export default defineConfig(({mode}) => {
                 input: 'resources/js/app.js',
                 refresh: [
                     'resources/js/**',
-                    'vendor/seatplus/**/resources/js/**',
+                    `${base}/**/resources/js/**`,
                 ],
             }),
             vue({
@@ -32,7 +37,20 @@ export default defineConfig(({mode}) => {
                     },
                 },
             }),
-            wayfinder(),
+            run([
+                {
+                    startup: false,
+                    name: 'copy vendor',
+                    run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
+                    pattern: [`${base}/**/resources/js/**`],
+                },
+                {
+                    startup: true,
+                    name: 'wayfinder',
+                    run: ['php', 'artisan', 'wayfinder:generate'],
+                    pattern: [`${base}/**/src/Http/**/*.php`, `${base}/**/routes/**/*.php`],
+                },
+            ]),
         ],
         resolve: {
             alias: {
