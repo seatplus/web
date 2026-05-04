@@ -3,11 +3,9 @@
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
@@ -312,15 +310,22 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         ->followingRedirects()
         ->json('POST', route('acl.create'), ['name' => 'test']);
 
-    // affiliate secondary user to role
+    // affiliate secondary user's corporation to role via HTTP
     $role = Role::findByName('test');
 
-    Affiliation::create([
-        'role_id' => $role->id,
-        'affiliatable_id' => test()->secondary_character->corporation->corporation_id,
-        'affiliatable_type' => CorporationInfo::class,
-        'type' => 'allowed',
-    ]);
+    test()->actingAs(test()->superuser)
+        ->postJson(route('acl.update.manual', $role->id), [
+            'affiliated' => [
+                [
+                    'entity_id' => test()->secondary_character->corporation->corporation_id,
+                    'entity_type' => 'corporation',
+                    'affiliation_type' => 'allowed',
+                ],
+            ],
+        ])
+        ->assertRedirect();
+
+    $role->refresh();
 
     if (! empty($permissons)) {
         foreach ($permissons as $permissionName) {
@@ -329,14 +334,12 @@ function createScopeSetting(array $permissons = [], $type = 'default')
         }
     }
 
-    $role->refresh();
-
     expect(RoleAffiliatedIdsService::get($role))->toContain(test()->secondary_character->corporation->corporation_id);
 
-    // give test user the role
-    $service = new ManualRoleService($role);
-    $service->addMember(test()->test_user);
-    test()->test_user->assignRole($role);
+    // give test user the role via HTTP
+    test()->actingAs(test()->superuser)
+        ->post(route('acl.member.add', [$role->id, test()->test_user->id]))
+        ->assertRedirect();
 
     expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
 
