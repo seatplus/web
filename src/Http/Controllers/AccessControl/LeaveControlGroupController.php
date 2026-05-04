@@ -37,7 +37,7 @@ class LeaveControlGroupController
 
     private const ERROR_UNAUTHORIZED = 'You are not allowed to perform this action';
 
-    private const ALLOWED_ROLE_TYPES = [RoleType::OPT_IN, RoleType::ON_REQUEST];
+    private const ALLOWED_ROLE_TYPES = [RoleType::OPT_IN, RoleType::ON_REQUEST, RoleType::MANUAL];
 
     public function __construct(
         private BaseRoleService $roleService
@@ -79,6 +79,7 @@ class LeaveControlGroupController
         match ($roleType) {
             RoleType::OPT_IN => $this->roleService->optIn()->leaveRole($user),
             RoleType::ON_REQUEST => $this->roleService->onRequest()->removeApplication($user),
+            RoleType::MANUAL => $this->roleService->manual()->removeMember($user),
             default => throw new \InvalidArgumentException(self::ERROR_INVALID_GROUP_TYPE)
         };
 

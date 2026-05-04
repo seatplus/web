@@ -53,14 +53,38 @@ it('denies LeaveControlGroupController to unauthenticated user', function () {
         ->assertRedirect();
 });
 
-it('returns 403 when trying to leave a manual role', function () {
-    $manualRole = Role::create(['name' => 'manual-only']);
-
-    assignPermissionToTestUser(['view access control']);
+it('returns 403 when trying to leave an automatic role', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.automatic', test()->role->id), [])
+        ->assertRedirect();
 
     test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [$manualRole->id, test()->test_user->id]))
+        ->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
         ->assertForbidden();
+});
+
+it('user can leave a manual role they were assigned to', function () {
+    $admin = User::factory()->create();
+    assignPermission($admin, ['superuser']);
+
+    // Convert role to manual and add the user as a member
+    test()->actingAs($admin)
+        ->postJson(route('acl.update.manual', test()->role->id), [])
+        ->assertRedirect();
+
+    test()->actingAs($admin)
+        ->post(route('acl.member.add', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
+
+    test()->actingAs(test()->test_user)
+        ->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeFalse();
 });
 
 it('user can leave their own on-request role', function () {
