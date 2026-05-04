@@ -7,7 +7,6 @@ use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\OptInRoleService;
 
 beforeEach(function () {
     Queue::fake();
@@ -41,7 +40,7 @@ it('sets opt-in type and affiliations via HTTP', function () {
         ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 });
 
-it('eligible user can join opt-in role via service and then leave via HTTP', function () {
+it('eligible user can join opt-in role and then leave via HTTP', function () {
     // Set opt-in type and join criteria via HTTP
     test()->actingAs(test()->admin)
         ->postJson(route('acl.update.opt-in', test()->role->id), [
@@ -56,14 +55,14 @@ it('eligible user can join opt-in role via service and then leave via HTTP', fun
 
     expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN);
 
-    // Eligible user joins via service (no HTTP join route for opt-in)
-    $optInService = new OptInRoleService(test()->role->fresh());
-    $optInService->joinRole(test()->test_user);
-    $optInService->handleMembers();
+    // Eligible user joins via HTTP
+    assignPermissionToTestUser(['view access control']);
+
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.join', test()->role->id))
+        ->assertRedirect();
 
     expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
-
-    assignPermissionToTestUser(['view access control']);
 
     // Member leaves via HTTP
     test()->actingAs(test()->test_user)
