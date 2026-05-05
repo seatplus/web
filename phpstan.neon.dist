@@ -7,6 +7,7 @@ parameters:
         - vendor/seatplus/auth/database/migrations
         - vendor/seatplus/eveapi/database/migrations
     level: 4
+    reportUnmatchedIgnoredErrors: false
     paths:
         - src
         - config
