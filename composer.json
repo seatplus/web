@@ -44,20 +44,13 @@
         "laravel/pint": "^1.9",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-type-coverage": "^4",
-        "cweagans/composer-patches": "*",
-        "tomasvotruba/type-coverage": "^2.0"
+        "pestphp/pest-plugin-type-coverage": "^4"
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Seatplus\\Web\\WebServiceProvider"
             ]
-        },
-        "patches": {
-            "pestphp/pest-plugin-type-coverage": {
-                "Fix RuleErrorTransformer::transform() args (array/Node → string/int)": "patches/pest-plugin-type-coverage-fix-transform-args.patch"
-            }
         }
     },
     "scripts": {
@@ -76,8 +69,7 @@
     },
     "config": {
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "cweagans/composer-patches": true
+            "pestphp/pest-plugin": true
         }
     }
 }
