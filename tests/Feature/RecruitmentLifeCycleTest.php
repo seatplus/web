@@ -545,7 +545,7 @@ test('recruiter can see corporation applications', function () {
     test()->actingAs($recruiter)
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
         ->assertForbidden();
-})->todo('recruiter accessing applicant character data requires application-scoped authorization - to be implemented');
+});
 
 test('recruiter can comment on application', function () {
     // Create Enlistment

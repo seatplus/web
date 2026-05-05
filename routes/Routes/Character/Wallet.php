@@ -25,16 +25,16 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Http\Controllers\Character\WalletsController;
+use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('wallets')
     ->controller(WalletsController::class)
     ->group(function () {
         Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
 
-        $walletJournalPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class);
+        $walletJournalPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.WalletJournal::class);
 
         Route::middleware($walletJournalPermission)
             ->group(function () {
@@ -44,7 +44,7 @@ Route::prefix('wallets')
                 Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
             });
 
-        Route::middleware(CheckAuthorization::class.':'.config('eveapi.permissions.'.WalletJournal::class))
+        Route::middleware(CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.WalletJournal::class))
             ->get('/ref_type', 'journalTypes')->name('wallet.journalTypes');
 
     });

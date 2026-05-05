@@ -25,15 +25,15 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Character\ContractsController;
+use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('contracts')
     ->group(function () {
         Route::get('', [ContractsController::class, 'index'])->name('character.contracts');
 
-        $contractPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Contract::class);
+        $contractPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Contract::class);
 
         Route::middleware($contractPermission)
             ->group(function () {

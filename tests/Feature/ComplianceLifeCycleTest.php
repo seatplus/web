@@ -11,6 +11,7 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
 
 beforeEach(function () {
     test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
@@ -258,8 +259,8 @@ it('allows user with review permission to review corporation member', function (
 
     expect($user->characters->count())->toEqual(2);
 
-    $first_character = $user->characters->first();
-    $second_character = $user->characters->last();
+    $first_character = $user->characters()->with('corporation')->first();
+    $second_character = $user->characters()->with('corporation')->get()->last();
 
     expect($first_character->character_id)->not()->toEqual($second_character->character_id);
 
@@ -268,7 +269,7 @@ it('allows user with review permission to review corporation member', function (
     $permission = Permission::create(['name' => 'member compliance: review user']);
 
     $role->givePermissionTo($permission);
-    $role->activateMember(test()->test_user);
+    test()->test_user->assignRole($role);
 
     // check if test user has permission
     expect(test()->test_user->can('member compliance: review user'))->toBeTrue();
@@ -300,7 +301,7 @@ it('allows user with review permission to review corporation member', function (
     ]));
 
     $response->assertOk();
-})->todo('Requires the skills route to accept member compliance: review user permission, or CanUserService to expand affiliations via GetCorporationMemberComplianceAffiliatedIdsService. The skills route currently only checks the skills permission.');
+});
 
 // Helpers
 function createScopeSetting(array $permissons = [], $type = 'default')
