@@ -62,9 +62,6 @@ parameters:
             identifier: trait.unused
             path: src/Traits/HasWatchlist.php
     excludePaths:
-        - config/web.jobs.php (?)
-        - src/Http/Middleware/CheckContactsAndAffiliation.php (?)
-        - src/Http/Middleware/CheckPermissionAndAffiliation.php (?)
         - src/Http/Pipelines/CheckCharacterAffiliationsAffiliatedIdPipe.php
         - src/Http/Pipelines/CheckCorporationMemberComplianceAffiliatedIdPipe.php
         - src/Http/Pipelines/CheckRecruitsAffiliatedIdPipe.php
