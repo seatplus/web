@@ -25,9 +25,6 @@
  */
 
 return [
-    'create,update and delete access control group',
-    'manage access control group',
-
     'view member tracking',
     'view member compliance',
     'member compliance: review user',

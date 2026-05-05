@@ -2,6 +2,7 @@
 
 use Faker\Factory;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Tests\TestCase;
 
@@ -17,7 +18,7 @@ use Seatplus\Web\Tests\TestCase;
 */
 
 /** @link https://pestphp.com/docs/underlying-test-case */
-uses(TestCase::class)->in('Integration', 'Unit');
+uses(TestCase::class)->in('Feature', 'Unit');
 // uses(TestCase::class);
 
 /*
@@ -58,6 +59,15 @@ function assignPermissionToTestUser(array|string $permission_strings)
         $permission = Permission::findOrCreate($string);
 
         test()->test_user->givePermissionTo($permission);
+    }
+}
+
+function assignPermission(User $user, array|string $permission_strings): void
+{
+    $permission_strings = is_array($permission_strings) ? $permission_strings : [$permission_strings];
+
+    foreach ($permission_strings as $string) {
+        $user->givePermissionTo(Permission::findOrCreate($string));
     }
 }
 
