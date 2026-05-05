@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Eveapi\Models\Universe\Location;
 
 /**
  * @mixin CorporationMemberTracking
@@ -40,6 +41,9 @@ class MemberTrackingResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var Location|null $location */
+        $location = $this->location;
+
         return [
             'corporation_id' => $this->corporation_id,
             'character_id' => $this->character_id,
@@ -47,7 +51,7 @@ class MemberTrackingResource extends JsonResource
             'start_date' => $this->start_date,
             'logon_date' => $this->logon_date,
             'location_id' => $this->location_id,
-            'location' => $this->location?->locatable,
+            'location' => $location?->locatable,
             'ship_type_id' => $this->ship_type_id,
             'ship' => $this->whenLoaded('ship'),
         ];

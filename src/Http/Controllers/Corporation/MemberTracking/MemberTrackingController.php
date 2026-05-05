@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -55,10 +56,19 @@ class MemberTrackingController extends Controller
 
     public function getMemberTracking(int $corporation_id): AnonymousResourceCollection
     {
+        /** @var CorporationInfo|null $corporation */
         $corporation = CorporationInfo::find($corporation_id);
+
+        /** @var SsoScopes|null $corporation_sso_scopes */
+        $corporation_sso_scopes = $corporation?->ssoScopes;
+        /** @var AllianceInfo|null $alliance */
+        $alliance = $corporation?->alliance;
+        /** @var SsoScopes|null $alliance_sso_scopes */
+        $alliance_sso_scopes = $alliance?->ssoScopes;
+
         $sso_scopes = collect([
-            'corporation_scopes' => $corporation?->ssoScopes?->selected_scopes,
-            'alliance_scopes' => $corporation?->alliance?->ssoScopes?->selected_scopes,
+            'corporation_scopes' => $corporation_sso_scopes?->selected_scopes,
+            'alliance_scopes' => $alliance_sso_scopes?->selected_scopes,
         ])->flatten(1)->filter();
 
         $query = CorporationMemberTracking::where('corporation_id', $corporation_id)

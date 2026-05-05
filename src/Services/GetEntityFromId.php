@@ -27,7 +27,10 @@
 namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class GetEntityFromId
 {
@@ -140,8 +143,8 @@ class GetEntityFromId
             ? $this->buildCharacterResponse($character_affiliation)
             : (
                 $this->type === 'corporation'
-                ? $this->buildCorporationResponse($character_affiliation)
-                : $this->buildAllianceResponse($character_affiliation)
+                    ? $this->buildCorporationResponse($character_affiliation)
+                    : $this->buildAllianceResponse($character_affiliation)
             );
 
         cache([$this->cache_key => $affiliation], now()->addDay());
@@ -172,20 +175,24 @@ class GetEntityFromId
 
     private function buildCharacterResponse(CharacterAffiliation $character_affiliation): array
     {
+        /** @var CharacterInfo|null $character_model */
+        $character_model = $character_affiliation->character;
+        /** @var CorporationInfo|null $corporation_model */
+        $corporation_model = $character_affiliation->corporation;
+
         $character = [
             'id' => $this->id,
             'character_id' => $this->id,
-            // The ?-> guard is intentional: Larastan infers the relation as non-null,
-            // but on an in-memory CharacterAffiliation the relation is null when the
-            // related record is absent from the local DB. The ?? fallback uses $this->names.
-            'name' => $character_affiliation->character?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $character_model->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
             'corporation' => [
-                'name' => $character_affiliation->corporation?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->corporation_id)->name,
+                'name' => $corporation_model->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->corporation_id)->name,
             ],
         ];
 
         if ($character_affiliation->alliance_id) {
-            $character['alliance'] = ['name' => $character_affiliation->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->alliance_id)];
+            /** @var AllianceInfo|null $alliance_model */
+            $alliance_model = $character_affiliation->alliance;
+            $character['alliance'] = ['name' => $alliance_model->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->alliance_id)];
         }
 
         return $character;
@@ -193,10 +200,13 @@ class GetEntityFromId
 
     private function buildCorporationResponse(CharacterAffiliation $character_affiliation): array
     {
+        /** @var CorporationInfo|null $corporation_model */
+        $corporation_model = $character_affiliation->corporation;
+
         $corporation = [
             'id' => $this->id,
             'corporation_id' => $this->id,
-            'name' => $character_affiliation->corporation?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $corporation_model->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
         ];
 
         if ($character_affiliation->alliance_id) {
@@ -208,10 +218,13 @@ class GetEntityFromId
 
     private function buildAllianceResponse(CharacterAffiliation $character_affiliation): array
     {
+        /** @var AllianceInfo|null $alliance_model */
+        $alliance_model = $character_affiliation->alliance;
+
         return [
             'id' => $this->id,
             'alliance_id' => $this->id,
-            'name' => $character_affiliation->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $alliance_model->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
         ];
     }
 

@@ -34,17 +34,17 @@ class HasCharacterNecessaryRole
 {
     public static function check(CharacterInfo $character, string|array $roles): bool
     {
-        /** @var CharacterRole $characterRoles */
-        $characterRoles = $character->roles;
+        /** @var CharacterRole $character_role */
+        $character_role = $character->roles;
 
-        if ($characterRoles->hasRole('roles', 'Director')) {
+        if ($character_role->hasRole('roles', 'Director')) {
             return true;
         }
 
         $character_roles = is_string($roles) ? explode('|', $roles) : $roles;
 
         foreach ($character_roles as $role) {
-            if ($characterRoles->hasRole('roles', Str::ucfirst($role))) {
+            if ($character_role->hasRole('roles', Str::ucfirst($role))) {
                 return true;
             }
         }

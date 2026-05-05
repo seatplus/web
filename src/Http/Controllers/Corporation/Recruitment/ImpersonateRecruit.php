@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\ImpersonateService;
 
@@ -46,6 +47,9 @@ class ImpersonateRecruit extends Controller
 
         (new ImpersonateService)->impersonateUser($applicant);
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$applicant->main_character->name);
+        /** @var CharacterInfo $main_character */
+        $main_character = $applicant->main_character;
+
+        return redirect()->route('home')->with('success', 'Impersonating '.$main_character->name);
     }
 }

@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\RefreshToken;
 
 /**
  * @mixin User
@@ -45,13 +46,18 @@ class UserRessource extends JsonResource
             'id' => $this->id,
             'main_character' => $this->main_character,
             'characters' => $this->characters
-                ->map(fn (CharacterInfo $character) => [
-                    'character_id' => $character->character_id,
-                    'name' => $character->name,
-                    'corporation' => $character->corporation,
-                    'alliance' => $character->alliance,
-                    'scopes' => $character->refresh_token?->scopes,
-                ]),
+                ->map(function (CharacterInfo $character): array {
+                    /** @var RefreshToken|null $refresh_token */
+                    $refresh_token = $character->refresh_token;
+
+                    return [
+                        'character_id' => $character->character_id,
+                        'name' => $character->name,
+                        'corporation' => $character->corporation,
+                        'alliance' => $character->alliance,
+                        'scopes' => $refresh_token?->scopes,
+                    ];
+                }),
             'impersonating' => $this->when(session('impersonation_origin'), true),
         ];
     }
