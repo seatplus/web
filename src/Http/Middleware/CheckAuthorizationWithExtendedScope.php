@@ -56,7 +56,7 @@ class CheckAuthorizationWithExtendedScope
             return $next($request);
         }
 
-        // Extended scope only applies when a specific character_id is present in the route.
+        // Extended scope only applies when a specific charas present in the route.
         $routeCharacterId = $request->route('character_id');
         if (! is_numeric($routeCharacterId)) {
             abort(403);
