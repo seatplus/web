@@ -59,13 +59,11 @@ class GetRecruitmentIndexController extends Controller
         $manageableIds = $this->getAffiliatedIds->get(
             permissions: [self::MANAGEPERMISSION],
             corporationRoles: ['Director'],
-            user: auth()->user()
         );
 
         $recruiterIds = $this->getAffiliatedIds->get(
             permissions: [self::RECRUITERPERMISSION],
             corporationRoles: ['Director'],
-            user: auth()->user()
         );
 
         return DB::transaction(function () use ($isSuperuser, $manageableIds, $recruiterIds) {

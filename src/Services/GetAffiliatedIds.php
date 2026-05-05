@@ -49,15 +49,13 @@ class GetAffiliatedIds
     public function get(
         string|array $permissions,
         string|array $corporationRoles = [],
-        ?User $user = null
     ): array {
         $normalized_permissions = $this->normalizeInput($permissions);
         $normalizedRoles = $this->normalizeInput($corporationRoles);
+        // Director is always granted access in addition to explicit corporation roles
         $normalizedRoles[] = self::DIRECTOR_ROLE;
 
-        $this->user = $user ?? $this->user;
-
-        return (new self($user))->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
+        return (new self)->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
     }
 
     /**
