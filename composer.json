@@ -42,16 +42,21 @@
         "driftingly/rector-laravel": "^1.2",
         "larastan/larastan": "^2.9",
         "laravel/pint": "^1.9",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0",
-        "pestphp/pest-plugin-type-coverage": "3.5.1",
-        "phpstan/phpstan": "1.12.24"
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "pestphp/pest-plugin-type-coverage": "^4",
+        "cweagans/composer-patches": "*"
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Seatplus\\Web\\WebServiceProvider"
             ]
+        },
+        "patches": {
+            "pestphp/pest-plugin-type-coverage": {
+                "Fix RuleErrorTransformer::transform() args (array/Node → string/int)": "patches/pest-plugin-type-coverage-fix-transform-args.patch"
+            }
         }
     },
     "scripts": {
@@ -70,7 +75,8 @@
     },
     "config": {
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "cweagans/composer-patches": true
         }
     }
 }
