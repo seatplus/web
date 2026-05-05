@@ -175,14 +175,14 @@ class GetEntityFromId
         $character = [
             'id' => $this->id,
             'character_id' => $this->id,
-            'name' => $character_affiliation?->character?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $character_affiliation->character->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
             'corporation' => [
-                'name' => $character_affiliation?->corporation?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->corporation_id)->name,
+                'name' => $character_affiliation->corporation->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->corporation_id)->name,
             ],
         ];
 
         if ($character_affiliation->alliance_id) {
-            $character['alliance'] = ['name' => $character_affiliation?->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->alliance_id)];
+            $character['alliance'] = ['name' => $character_affiliation->alliance->name ?? $this->names->first(fn (object $name) => $name->id === $character_affiliation->alliance_id)];
         }
 
         return $character;
@@ -193,7 +193,7 @@ class GetEntityFromId
         $corporation = [
             'id' => $this->id,
             'corporation_id' => $this->id,
-            'name' => $character_affiliation?->corporation?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $character_affiliation->corporation->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
         ];
 
         if ($character_affiliation->alliance_id) {
@@ -208,7 +208,7 @@ class GetEntityFromId
         return [
             'id' => $this->id,
             'alliance_id' => $this->id,
-            'name' => $character_affiliation?->alliance?->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
+            'name' => $character_affiliation->alliance->name ?? $this->names->first(fn (object $name) => $name->id === $this->id)->name,
         ];
     }
 

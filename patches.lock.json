@@ -1,0 +1,17 @@
+{
+    "_hash": "0b3d3f77aab146806dc15844ddeede851c197e977fe593f00a88cb5e4c26ba01",
+    "patches": {
+        "pestphp/pest-plugin-type-coverage": [
+            {
+                "package": "pestphp/pest-plugin-type-coverage",
+                "description": "Fix RuleErrorTransformer::transform() args (array/Node → string/int)",
+                "url": "patches/pest-plugin-type-coverage-fix-transform-args.patch",
+                "sha256": "c23192ca26bc0d3ff2b1b5e3b45056ea9dd5755e17b90bf3bd3697c54f2b6c93",
+                "depth": 1,
+                "extra": {
+                    "provenance": "root"
+                }
+            }
+        ]
+    }
+}
