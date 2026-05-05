@@ -81,7 +81,7 @@
                         <button
                           type="button"
                           class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
-                          @click="denyMember(member)"
+                          @click="removeMember(member)"
                         >
                           <svg
                             class="-ml-1 mr-2 h-5 w-5 text-gray-400"
@@ -97,6 +97,7 @@
                           Deny
                         </button>
                       </span>
+                      <span
                         v-if="member.status === 'member'"
                         class="inline-flex rounded-md shadow-sm"
                       >
@@ -163,15 +164,13 @@
         },
         methods: {
             approve(member) {
-                router.post(route('acl.approve', { role_id: this.role.id, user_id: member.id }), {}, {
-                    replace: false,
-                    preserveState: false,
-                    preserveScroll: false,
-                    only: [],
-                })
-            },
-            denyMember(member) {
-                router.delete(route('acl.deny', { role_id: this.role.id, user_id: member.id }), {
+
+                let data = {
+                    user_id: member.id,
+                    role_id: this.role.id
+                };
+
+                router.post(route('acl.join'), data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -179,6 +178,7 @@
                 })
             },
             removeMember(member) {
+
                 router.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
                     replace: false,
                     preserveState: false,

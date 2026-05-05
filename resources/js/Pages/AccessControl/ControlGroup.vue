@@ -24,8 +24,9 @@
       <Link
         v-if="isJoinable"
         as="button"
-        :href="route('acl.apply', role.id)"
+        :href="route('acl.join')"
         method="post"
+        :data="{ role_id: role.id }"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg
@@ -72,7 +73,7 @@
       <Link
         v-if="isEditable"
         as="button"
-        :href="route('acl.detail', role.id)"
+        :href="route('acl.edit', role.id)"
         class="w-full flex justify-center py-4 px-4 text-sm leading-5 text-gray-700 font-medium"
       >
         <svg
