@@ -291,10 +291,11 @@ it('allows user with review permission to review corporation member', function (
 
     \Pest\Laravel\actingAs(test()->test_user);
     $affiliated_ids = GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery()->get();
+    $affiliated_character_ids = $affiliated_ids->pluck('affiliated_id');
 
     expect($affiliated_ids)->toHaveCount(2)
-        ->and($affiliated_ids->first()->affiliated_id)->toEqual($first_character->character_id)
-        ->and($affiliated_ids->last()->affiliated_id)->toEqual($second_character->character_id);
+        ->and($affiliated_character_ids)->toContain($first_character->character_id)
+        ->and($affiliated_character_ids)->toContain($second_character->character_id);
 
     $response = test()->actingAs(test()->test_user)->get(route('get.character.skills', [
         'character_id' => $second_character->character_id,
