@@ -7,6 +7,7 @@ parameters:
         - vendor/seatplus/auth/database/migrations
         - vendor/seatplus/eveapi/database/migrations
     level: 4
+    reportUnmatchedIgnoredErrors: false
     paths:
         - src
         - config
@@ -26,10 +27,42 @@ parameters:
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
+
+        # env() calls in package config files are intentional and correct;
+        # larastan 3.x cannot detect that these are config-directory files.
+        -
+            identifier: larastan.noEnvCallsOutsideOfConfig
+
+        # Polymorphic and cross-package Eloquent relations return generic Model;
+        # eveapi/auth models lack fully-generic HasOne/BelongsTo annotations.
+        # These are false positives — properties exist at runtime.
+        -
+            identifier: property.notFound
+            paths:
+                - src/Http/Resources/
+                - src/Http/Controllers/Configuration/SeatPlusController.php
+                - src/Http/Controllers/Corporation/MemberTracking/MemberTrackingController.php
+                - src/Http/Controllers/Corporation/Recruitment/ApplicationsController.php
+                - src/Http/Controllers/Corporation/Recruitment/ImpersonateRecruit.php
+                - src/Http/Controllers/Queue/DispatchJobController.php
+                - src/Services/Mails/EveMailService.php
+                # GetEntityFromId builds responses from stdClass objects returned by ESI —
+                # their properties (id, name, category) are not visible to PHPStan.
+                - src/Services/GetEntityFromId.php
+
+        # Larastan infers BelongsTo/HasOne as non-null on in-memory models; at runtime
+        # the relation IS null when the related record is absent in the local DB.
+        # The ?-> guard ensures the ?? fallback to $this->names is reachable.
+        -
+            identifier: nullsafe.neverNull
+            path: src/Services/GetEntityFromId.php
+
+        # HasWatchlist is only used by models loaded at runtime via ServiceProvider;
+        # PHPStan cannot detect runtime registration.
+        -
+            identifier: trait.unused
+            path: src/Traits/HasWatchlist.php
     excludePaths:
-        - config/web.jobs.php
-        - src/Http/Middleware/CheckContactsAndAffiliation.php
-        - src/Http/Middleware/CheckPermissionAndAffiliation.php
         - src/Http/Pipelines/CheckCharacterAffiliationsAffiliatedIdPipe.php
         - src/Http/Pipelines/CheckCorporationMemberComplianceAffiliatedIdPipe.php
         - src/Http/Pipelines/CheckRecruitsAffiliatedIdPipe.php

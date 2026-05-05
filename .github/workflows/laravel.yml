@@ -11,8 +11,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  laravel:
+  lint:
+    name: Lint & Static Analysis
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Check Coding Standards
+        run: composer run test:lint
+
+      - name: Static Analysis
+        run: composer run test:types
+
+      - name: Type Coverage
+        run: composer run test:type-coverage
+
+  test:
+    name: Tests (Shard ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     services:
       postgres:
@@ -59,14 +98,20 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      - name: Check Coding Standards
-        run: composer run test:lint
-
-      - name: Static Analysis
-        run: composer run test:types
-
-      - name: Type Coverage
-        run: composer run test:type-coverage
-
       - name: Run Tests
-        run: composer run test:unit
+        run: vendor/bin/pest --no-coverage --shard=${{ matrix.shard }}/4
+
+  laravel:
+    name: Laravel
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.test.result }}" != "success" ]]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          echo "All jobs passed"
+

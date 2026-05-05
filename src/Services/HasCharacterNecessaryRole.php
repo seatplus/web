@@ -28,19 +28,23 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
 
 class HasCharacterNecessaryRole
 {
     public static function check(CharacterInfo $character, string|array $roles): bool
     {
-        if ($character->roles->hasRole('roles', 'Director')) {
+        /** @var CharacterRole $characterRoles */
+        $characterRoles = $character->roles;
+
+        if ($characterRoles->hasRole('roles', 'Director')) {
             return true;
         }
 
         $character_roles = is_string($roles) ? explode('|', $roles) : $roles;
 
         foreach ($character_roles as $role) {
-            if ($character->roles->hasRole('roles', Str::ucfirst($role))) {
+            if ($characterRoles->hasRole('roles', Str::ucfirst($role))) {
                 return true;
             }
         }

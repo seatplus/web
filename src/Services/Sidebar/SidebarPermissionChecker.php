@@ -55,7 +55,7 @@ class SidebarPermissionChecker
     {
         return RoleMembership::query()
             ->where('can_moderate', true)
-            ->whereHasMorph('entity', [User::class], fn (Builder $query) => $query->whereId($this->user->getAuthIdentifier()))
+            ->whereHasMorph('entity', [User::class], fn (Builder $query) => $query->where('id', $this->user->getAuthIdentifier()))
             ->exists();
     }
 
