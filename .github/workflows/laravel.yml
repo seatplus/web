@@ -100,4 +100,4 @@ jobs:
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Run Tests
-        run: vendor/bin/pest --shard ${{ matrix.shard }}/4
+        run: vendor/bin/pest --no-coverage --shard ${{ matrix.shard }}/4
