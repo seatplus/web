@@ -72,7 +72,7 @@ class ContractsController extends Controller
     public function getContractDetails(int $character_id, int $contract_id): string|Response
     {
         $query = Contract::query()->whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
-            ->whereContractId($contract_id)
+            ->where('contract_id', $contract_id)
             ->with('items', 'items.type', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
 
         if (request()->header('X-Modal', false)) {
