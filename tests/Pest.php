@@ -99,15 +99,18 @@ function createRoleViaHttp(
     User $member,
     array $permissions = [],
     string $roleType = 'manual',
+    ?User $actor = null,
 ): Role {
-    test()->actingAs(test()->superuser)
+    $actor ??= test()->superuser;
+
+    test()->actingAs($actor)
         ->followingRedirects()
         ->postJson(route('acl.create'), ['name' => $roleName]);
 
     $role = Role::findByName($roleName);
 
     if (! empty($affiliations)) {
-        test()->actingAs(test()->superuser)
+        test()->actingAs($actor)
             ->postJson(route('acl.update.'.$roleType, $role->id), ['affiliated' => $affiliations])
             ->assertRedirect();
         $role->refresh();
@@ -117,7 +120,7 @@ function createRoleViaHttp(
         $role->givePermissionTo(Permission::findOrCreate($permissionName));
     }
 
-    test()->actingAs(test()->superuser)
+    test()->actingAs($actor)
         ->post(route('acl.member.add', [$role->id, $member->id]))
         ->assertRedirect();
 
