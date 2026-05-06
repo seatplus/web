@@ -2,6 +2,7 @@
 
 use Faker\Factory;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Tests\TestCase;
@@ -81,4 +82,44 @@ function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes)
     $refreshToken->save();
 
     return $refreshToken;
+}
+
+/**
+ * Create a role via HTTP, set its affiliations, optionally assign permissions, and add a member.
+ *
+ * Uses the ACL HTTP endpoints so tests exercise the real request/response cycle.
+ * Permissions are still assigned directly — no HTTP endpoint exists for that.
+ *
+ * @param  array<array{entity_id: int, entity_type: string, affiliation_type: string}>  $affiliations
+ * @param  string[]  $permissions
+ */
+function createRoleViaHttp(
+    string $roleName,
+    array $affiliations,
+    User $member,
+    array $permissions = [],
+    string $roleType = 'manual',
+): Role {
+    test()->actingAs(test()->superuser)
+        ->followingRedirects()
+        ->postJson(route('acl.create'), ['name' => $roleName]);
+
+    $role = Role::findByName($roleName);
+
+    if (! empty($affiliations)) {
+        test()->actingAs(test()->superuser)
+            ->postJson(route('acl.update.'.$roleType, $role->id), ['affiliated' => $affiliations])
+            ->assertRedirect();
+        $role->refresh();
+    }
+
+    foreach ($permissions as $permissionName) {
+        $role->givePermissionTo(Permission::findOrCreate($permissionName));
+    }
+
+    test()->actingAs(test()->superuser)
+        ->post(route('acl.member.add', [$role->id, $member->id]))
+        ->assertRedirect();
+
+    return $role->fresh();
 }

@@ -4,10 +4,7 @@ use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Roles\RoleAffiliatedIdsService;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -264,22 +261,22 @@ it('allows user with review permission to review corporation member', function (
 
     expect($first_character->character_id)->not()->toEqual($second_character->character_id);
 
-    // create role
-    $role = Role::create(['name' => faker()->name]);
-    $permission = Permission::create(['name' => 'member compliance: review user']);
-
-    $role->givePermissionTo($permission);
-    test()->test_user->assignRole($role);
+    // create role with affiliation and permission via HTTP
+    createRoleViaHttp(
+        roleName: faker()->name(),
+        affiliations: [
+            [
+                'entity_id' => $first_character->character_id,
+                'entity_type' => 'character',
+                'affiliation_type' => 'allowed',
+            ],
+        ],
+        member: test()->test_user,
+        permissions: ['member compliance: review user'],
+    );
 
     // check if test user has permission
-    expect(test()->test_user->can('member compliance: review user'))->toBeTrue();
-
-    // create affiliation
-    $role->affiliations()->create([
-        'affiliatable_id' => $first_character->character_id,
-        'affiliatable_type' => CharacterInfo::class,
-        'type' => 'allowed',
-    ]);
+    expect(test()->test_user->refresh()->can('member compliance: review user'))->toBeTrue();
 
     // create sso scope
     $sso_scope = SsoScopes::factory()->create([
@@ -307,52 +304,25 @@ it('allows user with review permission to review corporation member', function (
 // Helpers
 function createScopeSetting(array $permissons = [], $type = 'default')
 {
-    // create role
-    test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('acl.create'), ['name' => 'test']);
-
-    // affiliate secondary user's corporation to role via HTTP
-    $role = Role::findByName('test');
-
-    test()->actingAs(test()->superuser)
-        ->postJson(route('acl.update.manual', $role->id), [
-            'affiliated' => [
-                [
-                    'entity_id' => test()->secondary_character->corporation->corporation_id,
-                    'entity_type' => 'corporation',
-                    'affiliation_type' => 'allowed',
-                ],
+    createRoleViaHttp(
+        roleName: 'test',
+        affiliations: [
+            [
+                'entity_id' => test()->secondary_character->corporation->corporation_id,
+                'entity_type' => 'corporation',
+                'affiliation_type' => 'allowed',
             ],
-        ])
-        ->assertRedirect();
+        ],
+        member: test()->test_user,
+        permissions: $permissons,
+    );
 
-    $role->refresh();
-
-    if (! empty($permissons)) {
-        foreach ($permissons as $permissionName) {
-            $permission = Permission::findOrCreate($permissionName);
-            $role->givePermissionTo($permission);
-        }
-    }
-
-    expect(RoleAffiliatedIdsService::get($role))->toContain(test()->secondary_character->corporation->corporation_id);
-
-    // give test user the role via HTTP
-    test()->actingAs(test()->superuser)
-        ->post(route('acl.member.add', [$role->id, test()->test_user->id]))
-        ->assertRedirect();
-
-    expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
+    expect(test()->test_user->refresh()->hasRole('test'))->toBeTrue();
 
     expect(SsoScopes::all())->toBeEmpty();
 
-    // Create sso scope
-
     // Make sure secondary character is missing the required scope
     expect(in_array('esi-assets.read_assets.v1', test()->secondary_character->refresh_token->scopes))->toBeFalse();
-
-    // create scope setting
 
     SsoScopes::updateOrCreate([
         'morphable_id' => test()->secondary_character->corporation->corporation_id,
