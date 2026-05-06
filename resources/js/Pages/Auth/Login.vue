@@ -18,7 +18,7 @@
 
       <div class="mt-8">
         <a
-          :href="route('auth.eve')"
+          :href="eve().url"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           <span class="absolute left-0 inset-y pl-3">
@@ -45,6 +45,7 @@
 
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
+import { eve } from '@/routes/auth'
 
 export default {
     name: "Login",

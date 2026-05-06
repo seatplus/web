@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { manual_location as getManualLocation } from '@/routes/get'
 export default {
     name: "LocationName",
     props: {
@@ -28,7 +29,7 @@ export default {
     },
     created() {
         if(_.isNull(this.location.location))
-            axios.get(route('get.manual_location', this.location.location_id))
+            axios.get(getManualLocation(this.location.location_id).url)
                 .then((result) => {
                         this.result = result.data
                 })

@@ -46,7 +46,7 @@
                       You have no character refresh token with required scope.
                       {{ ' ' }}
                       <Link
-                        :href="route('enable_esi_search')"
+                        :href="enable_esi_search().url"
                         class="font-medium text-yellow-700 underline hover:text-yellow-600"
                       >
                         Upgrade one token to be able to use this search.
@@ -111,6 +111,8 @@ import {
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import {computed, ref, watch, watchEffect} from "vue";
 import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
+import { enable_esi_search } from '@/routes'
+import { search as autosuggestionSearch, token } from '@/routes/autosuggestion'
 
 const open = ref(false);
 const term = ref('');
@@ -159,7 +161,7 @@ const getStuggestions = async () => {
         return;
     }
 
-    await axios.get(route('autosuggestion.search', {search: term.value, categories: props.categories}))
+    await axios.get(autosuggestionSearch({ query: {search: term.value, categories: props.categories} }).url)
         .then((result) => {
             suggestions.value = result.data
 
@@ -176,7 +178,7 @@ const checkToken = async () => {
     // If hasToken is null, we don't know yet if the user has a token
     if (_.isNull(hasToken.value)) {
         // check if the user has a token with required scope
-        await axios.get(route('autosuggestion.token'))
+        await axios.get(token().url)
             .then(response => {
                 // if the user has a token, set hasToken to true
                 // we don't need to check again

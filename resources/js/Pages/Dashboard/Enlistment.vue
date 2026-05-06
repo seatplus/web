@@ -45,7 +45,7 @@
         >
           <Link
             v-if="hasApplications"
-            :href="route('delete.user.application')"
+            :href="deleteUserApplication().url"
             method="delete"
             :preserve-state="false"
             as="button"
@@ -59,7 +59,7 @@
           </Link>
           <Link
             v-else
-            :href="route('post.application')"
+            :href="postApplication().url"
             method="post"
             :preserve-state="false"
             as="button"
@@ -87,6 +87,8 @@ import CharacterApplication from "./CharacterApplication.vue";
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
+import { application as deleteUserApplication } from '@/routes/delete/user'
+import { application as postApplication } from '@/routes/post'
 
 export default {
     name: "Enlistment",

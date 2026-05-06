@@ -35,7 +35,7 @@
           <Link
             method="delete"
             as="button"
-            :href="route('schedules.delete', schedule.id)"
+            :href="scheduleDelete(schedule.id).url"
             class="text-right inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-indigo active:bg-red-700 transition duration-150 ease-in-out"
           >
             Delete
@@ -46,7 +46,7 @@
             as="button"
             :data="$data"
             preserve-state
-            :href="route('schedules.updateOrCreate')"
+            :href="updateOrCreate().url"
             class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
           >
             Save
@@ -62,6 +62,7 @@ import InputGroup from "@/Shared/InputGroup.vue"
 import SeatPlusSelect from "@/Shared/SeatPlusSelect.vue"
 import { Link } from '@inertiajs/vue3';
 import AppHead from "@/Shared/AppHead.vue";
+import { deleteMethod as scheduleDelete, updateOrCreate } from '@/routes/schedules'
 export default {
     name: "SchedulesDetails",
     components: {AppHead, SeatPlusSelect, InputGroup, Link},

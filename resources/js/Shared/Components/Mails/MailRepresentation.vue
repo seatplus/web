@@ -65,6 +65,7 @@
 import {onBeforeMount, ref} from "vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Time from "@/Shared/Time.vue";
+import { mail as getMail } from '@/routes/get'
 
 export default {
     name: "MailRepresentation",
@@ -80,7 +81,7 @@ export default {
 
         const fetchMails = async () => {
 
-            await axios.get(route('get.mail', props.mailId))
+            await axios.get(getMail(props.mailId).url)
                 .then(response => {
                     messages.value.push(...response.data);
                 })

@@ -40,7 +40,7 @@
             <div class="flex justify-end">
               <Button
                 button-size="xs"
-                :href="route('get.application', applicant.application_id)"
+                :href="getApplication(applicant.application_id).url"
               >
                 Review
               </Button>
@@ -59,6 +59,7 @@ import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import CharacterComplianceElement from "@/Pages/Corporation/MemberCompliance/CharacterComplianceElement.vue";
 import Button from "@/Shared/Layout/Button.vue";
+import { application as getApplication } from '@/routes/get'
 
 let headerTitles = [
     {title: 'Main Character', columnSpan: 3},

@@ -31,6 +31,7 @@ import {computed, ref, watchEffect} from "vue";
 import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import {DialogTitle} from "@headlessui/vue";
+import { log as activityLog } from '@/routes/get/activity'
 
 
 export default {
@@ -51,7 +52,7 @@ export default {
 
         watchEffect(() => {
             if(open.value && !isLoaded.value) {
-                axios.get(route('get.activity.log', props.applicationId))
+                axios.get(activityLog(props.applicationId).url)
                     .then(result => application.value = result.data)
                     .catch(error => console.log(error))
             }

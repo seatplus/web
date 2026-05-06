@@ -214,6 +214,8 @@ import AutomaticRole from "./AclTypes/AutomaticRole.vue"
 import OnRequestControlGroup from "./AclTypes/OnRequestControlGroup.vue"
 import OptInControlGroup from "./AclTypes/OptInControlGroup.vue"
 import { router, useForm } from "@inertiajs/vue3";
+import { groups } from '@/routes/acl'
+import { automatic, manual, onRequest, optIn } from '@/routes/acl/update'
 
 export default {
     name      : "ManageControlGroup",
@@ -246,7 +248,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Control Group',
-                    route: route('acl.groups')
+                    route: groups().url
                 }
             ],
             updated: false
@@ -283,8 +285,9 @@ export default {
             this.form.acl.type = type
         },
         store: function () {
+            const updateRouteByType = { automatic, manual, 'opt-in': optIn, 'on-request': onRequest }
 
-            this.form.post(route('update.acl.affiliations', this.role.id),{
+            this.form.post(updateRouteByType[this.form.acl.type](this.role.id).url,{
                 onSuccess: () => {
                     router.reload({
                         preserveState: false

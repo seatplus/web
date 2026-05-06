@@ -95,6 +95,7 @@ import SimpleToggle from "@/Shared/SimpleToggle.vue";
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import { recruitment as createRecruitment } from '@/routes/create/corporation'
 
 export default {
     name: "EnlistmentConfig",
@@ -122,7 +123,7 @@ export default {
         const submit = () => {
             form
                 .transform((data) => ({ ...data, corporation_id: data.corporation.corporation_id}))
-                .post(route('create.corporation.recruitment'), {
+                .post(createRecruitment().url, {
                 onSuccess: () => {
                     emit('onSuccess')
                 }

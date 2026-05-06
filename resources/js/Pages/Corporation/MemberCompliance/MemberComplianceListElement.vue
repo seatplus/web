@@ -37,7 +37,7 @@
       <div class="flex gap-x-2 flex-wrap">
         <Button
           button-size="xs"
-          :href="route('corporation.review.user', {'corporation_id': corporationId, 'user': user.id})"
+          :href="reviewUser({'corporation_id': corporationId, 'user': user.id}).url"
         >
           Review
         </Button>
@@ -51,6 +51,7 @@ import {computed} from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import CharacterComplianceElement from "./CharacterComplianceElement.vue";
 import Button from "@/Shared/Layout/Button.vue";
+import { user as reviewUser } from '@/routes/corporation/review'
 
 export default {
     name: "MemberComplianceListElement",

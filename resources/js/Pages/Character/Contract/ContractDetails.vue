@@ -12,6 +12,7 @@
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ContractDetailsComponent from "@/Shared/Components/Contracts/ContractDetailsComponent.vue";
+import { contracts } from '@/routes/character'
 export default {
     name: "ContractDetails",
     components: {
@@ -34,7 +35,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Character Contracts',
-                    route: route('character.contracts')
+                    route: contracts().url
                 }
             ]
         }

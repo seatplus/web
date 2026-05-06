@@ -2,7 +2,7 @@
   <Link
     v-if="hasContent"
     class="justify-self-end"
-    :href="route('character.item', {item_id: entry.item_id, character_id: entry.owner_id})"
+    :href="item({item_id: entry.item_id, character_id: entry.owner_id}).url"
     preserve-state
     preserve-scroll
   >
@@ -21,6 +21,7 @@
 <script>
 import CompactAssetListTemplate from "./CompactAssetListTemplate.vue";
 import { Link } from '@inertiajs/vue3';
+import { item } from '@/routes/character'
 export default {
     name: "CompactAssetListElement",
     components: {CompactAssetListTemplate, Link},

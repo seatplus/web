@@ -29,7 +29,7 @@
             <div class="order-3 mt-2 shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
               <div class="rounded-md shadow-sm">
                 <Link
-                  :href="route('impersonate.stop')"
+                  :href="impersonateStop().url"
                   class="flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500 focus:outline-none focus:ring transition ease-in-out duration-150"
                 >
                   Stop
@@ -55,6 +55,7 @@
 
 <script>
 import { Link } from '@inertiajs/vue3';
+  import { stop as impersonateStop } from '@/routes/impersonate'
   export default {
     name: "ImpersonatingBanner",
       components: {Link},

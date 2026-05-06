@@ -81,7 +81,7 @@
                         You have no character refresh token with required scope.
                         {{ ' ' }}
                         <Link
-                          :href="route('enable_esi_search')"
+                          :href="enable_esi_search().url"
                           class="font-medium text-yellow-700 underline hover:text-yellow-600"
                         >
                           Upgrade one token to be able to use this search.
@@ -208,6 +208,9 @@ import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
 import {TransitionRoot} from "@headlessui/vue";
 import {ExclamationTriangleIcon} from '@heroicons/vue/20/solid';
 import { Link } from '@inertiajs/vue3';
+import { enable_esi_search } from '@/routes'
+import { affiliatable } from '@/routes/acl/search'
+import { token } from '@/routes/autosuggestion'
 
 export default {
     name: "EditSettings",
@@ -229,7 +232,7 @@ export default {
 
         const fetchData = _.debounce(async () => {
 
-            await axios.get(route('acl.search.affiliatable', { query: query.value.length > 2 ? query.value : '' }))
+            await axios.get(affiliatable({ query: query.value.length > 2 ? query.value : '' }).url)
                 .then(result => {
 
                     entities.value = result.data.data
@@ -259,7 +262,7 @@ export default {
             // If hasToken is null, we don't know yet if the user has a token
             if (_.isNull(hasToken.value)) {
                 // check if the user has a token with required scope
-                await axios.get(route('autosuggestion.token'))
+                await axios.get(token().url)
                     .then(response => {
                         // if the user has a token, set hasToken to true
                         // we don't need to check again

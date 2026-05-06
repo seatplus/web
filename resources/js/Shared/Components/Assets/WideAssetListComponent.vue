@@ -78,6 +78,7 @@ import EveImage from "@/Shared/EveImage.vue";
 import {Link, usePage} from '@inertiajs/vue3';
 import { prefix } from 'metric-prefix'
 import {computed} from "vue";
+import { item } from '@/routes/character'
 import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
 
 const props = defineProps({
@@ -102,7 +103,7 @@ const getMetricPrefix = function (numeric_value) {
 }
 
 const url = function (asset) {
-    return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner_id}) : ''
+    return asset.content[0] ? item({item_id: asset.item_id, character_id: asset.owner_id}).url : ''
 }
 
 const getType = function (asset) {

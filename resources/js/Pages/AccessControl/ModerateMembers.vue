@@ -138,6 +138,7 @@
     import PageHeader from "@/Shared/Layout/PageHeader.vue";
     import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
     import {router} from "@inertiajs/vue3";
+    import { groups, join, leave } from '@/routes/acl'
     export default {
         name: "ModerateMembers",
         components: {
@@ -157,7 +158,7 @@
                 breadcrumbs: [
                     {
                         name: 'Control Group',
-                        route: route('acl.groups')
+                        route: groups().url
                     }
                 ]
             }
@@ -170,7 +171,7 @@
                     role_id: this.role.id
                 };
 
-                router.post(route('acl.join'), data, {
+                router.post(join(data.role_id).url, data, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,
@@ -179,7 +180,7 @@
             },
             removeMember(member) {
 
-                router.delete(route('acl.leave', { role_id: this.role.id, user_id: member.id}), {
+                router.delete(leave({ role_id: this.role.id, user_id: member.id}).url, {
                     replace: false,
                     preserveState: false,
                     preserveScroll: false,

@@ -6,7 +6,7 @@
         <!--TODO: Create Delete Button with confirmation dialog-->
         <span class="shadow-sm rounded-md">
           <Button
-            :href="route('delete.enlistment', enlistment.corporation_id)"
+            :href="deleteEnlistment(enlistment.corporation_id).url"
             method="delete"
           >
             Delete
@@ -77,6 +77,9 @@ import Button from "@/Shared/Layout/Button.vue";
 import ItemsWatchlist from "./ItemsWatchlist.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import {router, useForm} from "@inertiajs/vue3";
+import { recruitment as corporationRecruitment } from '@/routes/corporation'
+import { enlistment as deleteEnlistment } from '@/routes/delete'
+import { watchlist as updateWatchlist } from '@/routes/update'
 
 export default {
     name: "Index",
@@ -96,7 +99,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Corporation Recruitment',
-                    route: route('corporation.recruitment')
+                    route: corporationRecruitment().url
                 }
             ],
             form: useForm({
@@ -107,7 +110,7 @@ export default {
     },
     methods: {
         submit() {
-          router.post(route('update.watchlist', this.corporationId), this.form)
+          router.post(updateWatchlist(this.corporationId).url, this.form)
         }
     }
 }

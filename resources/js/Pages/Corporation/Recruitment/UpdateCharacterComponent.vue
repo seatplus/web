@@ -56,6 +56,8 @@ import Button from "@/Shared/Layout/Button.vue";
 import {computed, ref, watch} from "vue";
 import dayjs from "dayjs";
 import Time from "@/Shared/Time.vue";
+import { batch_update as getBatchUpdate } from '@/routes/get'
+import { batch_update as dispatchBatchUpdate } from '@/routes/dispatch'
 
 export default {
     name: "UpdateCharacterComponent",
@@ -74,7 +76,7 @@ export default {
 
         const canUpdate = computed(() => _.isNil(batchUpdate.value.finished_at) || dayjs(batchUpdate.value.finished_at).isBefore(dayjs().subtract(1,'hour')))
 
-        const getUpdate = async () => axios.get(route('get.batch_update', props.character.character_id))
+        const getUpdate = async () => axios.get(getBatchUpdate(props.character.character_id).url)
             .then((response) => {
                 batchUpdate.value = response.data
 
@@ -86,7 +88,7 @@ export default {
         const updateCharacter = function () {
             isUpdating.value = true;
 
-            axios.post(route('dispatch.batch_update', props.character.character_id))
+            axios.post(dispatchBatchUpdate(props.character.character_id).url)
         }
 
         watch(isUpdating,(newValue) => {

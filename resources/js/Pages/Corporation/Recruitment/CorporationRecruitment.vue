@@ -14,7 +14,7 @@
           <span class="inline-flex rounded-md shadow-sm">
 
             <Link
-              :href="route('edit.enlistment', enlistment.corporation_id)"
+              :href="editEnlistment(enlistment.corporation_id).url"
               method="get"
               as="button"
               type="button"
@@ -57,6 +57,7 @@ import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import PendingTable from "./ApplicationsTable/PendingTable.vue";
 import ClosedTable from "./ApplicationsTable/ClosedTable.vue";
+import { enlistment as editEnlistment } from '@/routes/edit'
 
 export default {
     name: "CorporationRecruitment",

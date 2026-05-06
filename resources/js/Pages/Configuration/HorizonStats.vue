@@ -39,7 +39,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="route('horizon.index')"
+              :href="horizonIndex().url"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -85,7 +85,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="route('horizon.index')"
+              :href="horizonIndex().url"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -125,7 +125,7 @@
         <div class="bg-gray-50 px-4 py-4 sm:px-6">
           <div class="text-sm leading-5">
             <a
-              :href="route('horizon.index')"
+              :href="horizonIndex().url"
               class="font-medium text-indigo-600 hover:text-indigo-500 transition ease-in-out duration-150"
             >
               View all
@@ -138,6 +138,7 @@
 </template>
 
 <script>
+    import { index as horizonIndex } from '@/routes/horizon'
     export default {
         name: "HorizonStats",
         data() {

@@ -91,6 +91,8 @@ import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
 import EditSettings from "./Edit/EditSettings.vue";
 import { ref } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
+import { groups, deleteMethod } from '@/routes/acl'
+import { automatic, manual, onRequest, optIn } from '@/routes/acl/update'
 
 export default {
     name: "EditGroup",
@@ -131,18 +133,20 @@ export default {
             permissions: _.map(props.permissions, (permission) => permission.name)
         })
 
+        const updateRouteByType = { automatic, manual, 'opt-in': optIn, 'on-request': onRequest }
+
         const store = function () {
 
             return form.transform((data) => ({
                     ...data,
                     affiliations: selectedAffiliations.value,
-            })).post(route('acl.update', props.role.id))
+            })).post(updateRouteByType[props.role.type](props.role.id).url)
 
         }
 
         const remove = function () {
 
-            router.delete(route('acl.delete', props.role.id), {
+            router.delete(deleteMethod(props.role.id).url, {
                 replace: false,
                 preserveState: false,
                 preserveScroll: false,
@@ -157,7 +161,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Control Group',
-                    route: route('acl.groups')
+                    route: groups().url
                 }
             ],
             remove

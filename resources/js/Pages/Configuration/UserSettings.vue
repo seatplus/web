@@ -118,7 +118,7 @@
     </div>
 
     <Link
-      :href="route('auth.logout')"
+      :href="logout().url"
       as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     >
@@ -133,6 +133,8 @@
     import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
     import { useForm, Link } from "@inertiajs/vue3";
+    import { logout } from '@/routes'
+    import { main_character } from '@/routes/change'
     
     export default {
         name: "UserSettings",
@@ -168,7 +170,7 @@
                 form.transform(() => ({
                     character_id: selected.value.character_id
                 }))
-                .post(route('change.main_character'))
+                .post(main_character(selected.value.character_id).url)
             })
 
             return {

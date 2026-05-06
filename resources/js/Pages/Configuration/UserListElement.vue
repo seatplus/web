@@ -16,7 +16,7 @@
         </div>
         <div>
           <Link
-            :href="route('impersonate.start', user.id)"
+            :href="impersonateStart(user.id).url"
             class="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
           >
             Impersonate
@@ -36,6 +36,7 @@
 <script>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { Link } from '@inertiajs/vue3';
+import { start as impersonateStart } from '@/routes/impersonate'
 export default {
     name: "UserListElement",
     components: {EntityBlock, Link},

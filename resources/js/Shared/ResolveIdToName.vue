@@ -11,6 +11,7 @@
 
 <script>
 import {onMounted, onUnmounted, ref} from "vue";
+import { id as resolveId } from '@/routes/resolve'
 
 export default {
     name: "ResolveIdToName",
@@ -39,7 +40,7 @@ export default {
 
             isLoading.value = true
 
-            await axios.get(route('resolve.id', props.id))
+            await axios.get(resolveId(props.id).url)
                 .then(result => {
                     name.value = result.data.name
                     isComplete.value = true

@@ -31,6 +31,7 @@
 import EveImage from "@/Shared/EveImage.vue"
 import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
+import { id as resolveId } from '@/routes/resolve'
 
 export default {
     name: "EntityByIdBlock",
@@ -62,7 +63,7 @@ export default {
         const entity = ref(null)
 
         const getEntity = async () => {
-            await axios.get(route('resolve.id', props.id))
+            await axios.get(resolveId(props.id).url)
                 .then((response) => {
 
                     entity.value = response.data

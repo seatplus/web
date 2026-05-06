@@ -27,6 +27,7 @@ import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelection
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
+import { details as contractDetails } from '@/routes/character/contracts'
 
 export default {
     name: "Index",
@@ -53,7 +54,7 @@ export default {
   },
   methods: {
     getUrl(character_id) {
-      return route('character.contracts.details', character_id)
+      return contractDetails(character_id).url
     }
   }
 }

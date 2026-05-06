@@ -69,6 +69,7 @@
 <script>
   import EveImage from "@/Shared/EveImage.vue"
   import {router} from "@inertiajs/vue3";
+  import { join, leave } from '@/routes/acl'
 
 
   export default {
@@ -112,7 +113,7 @@
           },
           removeMember(member) {
 
-              router.delete(route('acl.leave', [member.role_id, member.user_id]), {
+              router.delete(leave([member.role_id, member.user_id]).url, {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,
@@ -126,7 +127,7 @@
                   role_id: member.role_id
               };
 
-              router.post(route('acl.join'), data, {
+              router.post(join(member.role_id).url, data, {
                   replace: false,
                   preserveState: false,
                   preserveScroll: false,

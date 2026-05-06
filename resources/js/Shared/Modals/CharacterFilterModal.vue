@@ -56,6 +56,7 @@
 <script>
 import EveImage from "@/Shared/EveImage.vue"
   import Modal from "./Modal.vue"
+  import { characters as affiliatedCharacters } from '@/routes/get/affiliated'
   export default {
       name: "CharacterFilterModal",
       components: {Modal, EveImage},
@@ -71,7 +72,7 @@ import EveImage from "@/Shared/EveImage.vue"
               openModal: this.value.open,
               selected: this.value.selectedCharacters,
               characters: [],
-              routeName: route('get.affiliated.characters', this.permission),
+              routeName: affiliatedCharacters(this.permission).url,
               page: 1
           }
       },

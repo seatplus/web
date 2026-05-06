@@ -28,6 +28,7 @@ import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ItemLayout from "@/Shared/Components/ItemLayout.vue";
 import { prefix } from "metric-prefix";
 import AppHead from "@/Shared/AppHead.vue";
+import { assets, item } from '@/routes/character'
 
 export default {
     name: "ItemDetails",
@@ -44,7 +45,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Character Assets',
-                    route: route('character.assets')
+                    route: assets().url
                 }
             ]
         }
@@ -53,7 +54,7 @@ export default {
         if(this.object.container)
             this.breadcrumbs.push({
                 name: this.object.container.name,
-                route: route('character.item', this.object.container.item_id)
+                route: item(this.object.container.item_id).url
             })
     },
     methods: {
@@ -63,7 +64,7 @@ export default {
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '' : route('character.item', {'item_id': asset.item_id, 'character_id': asset.owner.character_id})
+            return _.isEmpty(asset.content) ? '' : item({'item_id': asset.item_id, 'character_id': asset.owner.character_id}).url
         },
         hasContent(content) {
             return !_.isEmpty(content)

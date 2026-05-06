@@ -4,7 +4,7 @@
     <ul class="divide-y divide-gray-200">
       <WideListElement
         v-if="hasGlobalScopes"
-        :url="route('view.global.scopes')"
+        :url="globalScopes().url"
       >
         <template #avatar>
           <svg
@@ -42,7 +42,7 @@
       <WideListElement
         v-for="(entry) in entities"
         :key="entry.selectedEntity.id"
-        :url="route('view.scopes.settings', entry.selectedEntity.id)"
+        :url="scopesSettings(entry.selectedEntity.id).url"
       >
         <template #avatar>
           <eve-image
@@ -71,7 +71,7 @@
       </WideListElement>
       <li>
         <Link
-          :href="route('view.create.scopes')"
+          :href="createScopes().url"
           class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
         >
           <div class="flex items-center px-4 py-4 sm:px-6">
@@ -117,6 +117,10 @@
     import EveImage from "@/Shared/EveImage.vue"
     import { Link } from '@inertiajs/vue3';
     import AppHead from "@/Shared/AppHead.vue";
+    import { scopes as globalScopes } from '@/routes/view/global'
+    import { settings as scopesSettings } from '@/routes/view/scopes'
+    import { scopes as createScopes } from '@/routes/view/create'
+    import { settings as serverSettings } from '@/routes/server'
 
     export default {
         name: "OverviewScopeSettings",
@@ -136,7 +140,7 @@
                 layoutObject: {
                     pageHeader: 'Server Settings',
                     pageDescription: 'Scope',
-                    activeSidebarElement: route('server.settings')
+                    activeSidebarElement: serverSettings().url
                 },
             }
         },

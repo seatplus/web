@@ -92,7 +92,7 @@
             </div>
             <div class="shrink-0 flex bg-gray-700 p-4">
               <Link
-                :href="route('user.settings')"
+                :href="userSettings().url"
                 class="shrink-0 group block"
               >
                 <div class="flex items-center">
@@ -195,7 +195,7 @@
           <!-- User Menu          -->
           <div class="shrink-0 flex bg-gray-700 p-4">
             <Link
-              :href="route('user.settings')"
+              :href="userSettings().url"
               class="shrink-0 w-full group block"
             >
               <div class="flex items-center">
@@ -266,6 +266,7 @@
 
 <script>
 import * as OutlineHeroicons from '@heroicons/vue/24/outline';
+import { settings as userSettings } from '@/routes/user'
 
 export default {
     components: {

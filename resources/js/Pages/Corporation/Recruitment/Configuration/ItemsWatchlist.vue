@@ -45,6 +45,7 @@ import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import {ref, watch} from "vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 import { useForm } from "@inertiajs/vue3";
+import { watchlist as updateWatchlist } from '@/routes/update'
 
 export default {
     name: "ItemsWatchlist",
@@ -69,7 +70,7 @@ export default {
 
         const select = (selection) => form.items.push(selection)
         const unselect = (id) => form.items = _.filter(form.items, (item) => item.id !== id)
-        const submit = () => form.post(route('update.watchlist', props.corporationId))
+        const submit = () => form.post(updateWatchlist(props.corporationId).url)
 
         watch(form.items, () => uniqueId.value++, {deep: true})
 

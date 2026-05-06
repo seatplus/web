@@ -49,7 +49,7 @@
           <Link
             method="post"
             as="button"
-            :href="route('acl.create')"
+            :href="create().url"
             :data="{name: name}"
             type="button"
             class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
@@ -66,6 +66,7 @@
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import { Link } from '@inertiajs/vue3'
+import { create } from '@/routes/acl'
 export default {
   name: "CreateGroupButton",
   components: {ModalWithFooter, HeaderButton, Link},

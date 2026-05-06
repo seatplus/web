@@ -65,6 +65,7 @@
 import Commands from "@/Pages/Configuration/Commands.vue"
 import HorizonStats from "./HorizonStats.vue"
 import { router } from '@inertiajs/vue3'
+import { navigation } from '@/routes/settings'
 
 export default {
     name: "Settings",
@@ -92,7 +93,7 @@ export default {
     },
     mounted() {
         this.$nextTick(function () {
-            axios.get(route('settings.navigation')).then(result => {
+            axios.get(navigation().url).then(result => {
                 this.navTabs = result.data
             })
         })

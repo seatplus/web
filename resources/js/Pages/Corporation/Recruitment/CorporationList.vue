@@ -74,6 +74,7 @@
 import EveImage from "@/Shared/EveImage.vue"
 import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
 import {router} from "@inertiajs/vue3";
+import { recruitment as createRecruitment } from '@/routes/create/corporation'
 export default {
   name: "CorporationList",
   components: {EveImage,
@@ -93,7 +94,7 @@ export default {
   methods: {
     create(corporation, type) {
 
-      router.post(route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
+      router.post(createRecruitment().url, {corporation_id: corporation.corporation_id, type: type})
     }
   }
 }
