@@ -33,6 +33,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\LazyCollection;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CharacterRole;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Services\FindCorporationRefreshToken;
 use Seatplus\Web\Contracts\WebJobsRepository;
@@ -105,15 +108,29 @@ class DispatchJobController extends Controller
             ->when(
                 $isCorporationScope,
                 fn (LazyCollection $tokens) => $tokens
-                    ->filter(fn (RefreshToken $token) => $token->character->roles->hasRole('roles', $request->get('required_corporation_role')))
+                    ->filter(function (RefreshToken $token) use ($request): bool {
+                        /** @var CharacterInfo $character */
+                        $character = $token->character;
+                        /** @var CharacterRole $roles */
+                        $roles = $character->roles;
+
+                        return $roles->hasRole('roles', $request->get('required_corporation_role'));
+                    })
                     ->unique(fn (RefreshToken $token) => $token->corporation_id)
             )
-            ->map(fn (RefreshToken $token) => collect([
-                'character_id' => $isCorporationScope ? null : $token->character_id,
-                'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
-                'name' => $isCorporationScope ? $token->corporation->name : $token->character->name,
-                'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $isCorporationScope ? $token->corporation_id : $token->character_id))),
-            ])->filter()->toArray())
+            ->map(function (RefreshToken $token) use ($isCorporationScope, $request): array {
+                /** @var CharacterInfo $character */
+                $character = $token->character;
+                /** @var CorporationInfo $corporation */
+                $corporation = $token->corporation;
+
+                return collect([
+                    'character_id' => $isCorporationScope ? null : $token->character_id,
+                    'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
+                    'name' => $isCorporationScope ? $corporation->name : $character->name,
+                    'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $isCorporationScope ? $token->corporation_id : $token->character_id))),
+                ])->filter()->toArray();
+            })
             ->values();
 
         return new LengthAwarePaginator($tokens, $tokens->count(), $request->get('per_page', 10));

@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 /**
@@ -44,7 +45,12 @@ class CorporationInfoRessource extends JsonResource
             'id' => $this->corporation_id,
             'corporation_id' => $this->corporation_id,
             'name' => $this->name,
-            'alliance' => $this->whenLoaded('alliance', fn () => $this->alliance->name),
+            'alliance' => $this->whenLoaded('alliance', function (): string {
+                /** @var AllianceInfo $alliance */
+                $alliance = $this->alliance;
+
+                return $alliance->name;
+            }),
             'hasEveImage' => true,
         ];
     }

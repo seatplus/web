@@ -30,6 +30,7 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\ImpersonateService;
@@ -67,10 +68,14 @@ class SeatPlusController extends Controller
 
     public function impersonate(int $user_id): RedirectResponse
     {
+        /** @var User $impersonated_user */
         $impersonated_user = User::find($user_id);
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$impersonated_user->main_character->name);
+        /** @var CharacterInfo $main_character */
+        $main_character = $impersonated_user->main_character;
+
+        return redirect()->route('home')->with('success', 'Impersonating '.$main_character->name);
     }
 }

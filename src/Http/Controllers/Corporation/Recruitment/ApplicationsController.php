@@ -38,6 +38,7 @@ use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
@@ -145,7 +146,10 @@ class ApplicationsController extends Controller
             $application->save();
         }
 
-        if ($request->get('decision') === 'accepted' && $application->enlistment->steps_count <= $application->decision_count) {
+        /** @var Enlistments $enlistment */
+        $enlistment = $application->enlistment;
+
+        if ($request->get('decision') === 'accepted' && $enlistment->steps_count <= $application->decision_count) {
             $application->status = 'accepted';
             $application->save();
         }

@@ -26,11 +26,11 @@
 
 namespace Seatplus\Web\Services\Mails;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Web\Services\GetIdsFromNamesService;
 
 class EveMailService
@@ -72,7 +72,7 @@ class EveMailService
     {
         return [
             'from' => ['id' => $this->mail->from],
-            'recipients' => $this->mail->recipients->map(fn (Model $recipient) => ['id' => $recipient->receivable_id]),
+            'recipients' => $this->mail->recipients->map(fn (MailRecipients $recipient) => ['id' => $recipient->receivable_id]),
             'timestamp' => carbon($this->mail->timestamp),
             'subject' => $this->mail->subject,
             'body' => $mail,

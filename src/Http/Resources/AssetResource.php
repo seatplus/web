@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Eveapi\Models\Assets\Asset;
+use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Resources\Universe\TypeResource;
 
 /**
@@ -44,7 +45,12 @@ class AssetResource extends JsonResource
             'quantity' => $this->quantity,
             'type_id' => $this->type_id,
             'type' => TypeResource::make($this->whenLoaded('type')),
-            'volume' => $this->whenLoaded('type', fn () => $this->type->volume * $this->quantity),
+            'volume' => $this->whenLoaded('type', function (): float {
+                /** @var Type $type */
+                $type = $this->type;
+
+                return $type->volume * $this->quantity;
+            }),
             'name' => $this->name,
             'location_id' => $this->location_id,
             'location_flag' => $this->location_flag,
