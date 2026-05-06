@@ -25,12 +25,12 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
+use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
-$corporationHistoryPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.CorporationHistory::class);
+$corporationHistoryPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.CorporationHistory::class);
 
 Route::prefix('corporation_history')
     ->middleware($corporationHistoryPermission)

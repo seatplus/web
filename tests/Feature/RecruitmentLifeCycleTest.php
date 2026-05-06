@@ -545,7 +545,7 @@ test('recruiter can see corporation applications', function () {
     test()->actingAs($recruiter)
         ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
         ->assertForbidden();
-})->todo('recruiter accessing applicant character data requires application-scoped authorization - to be implemented');
+});
 
 test('recruiter can comment on application', function () {
     // Create Enlistment
@@ -692,37 +692,20 @@ function applySecondary(bool $user = true)
 
 function createEnlistment($type = 'user', string $affiliation = 'allowed')
 {
-    // create role
-    test()->actingAs(test()->superuser)
-        ->followingRedirects()
-        ->json('POST', route('acl.create'), ['name' => 'test']);
-
-    // affiliate test user's corporation to role via HTTP
-    $role = Role::findByName('test');
-
-    test()->actingAs(test()->superuser)
-        ->postJson(route('acl.update.manual', $role->id), [
-            'affiliated' => [
-                [
-                    'entity_id' => test()->test_character->corporation->corporation_id,
-                    'entity_type' => 'corporation',
-                    'affiliation_type' => $affiliation,
-                ],
+    createRoleViaHttp(
+        roleName: 'test',
+        affiliations: [
+            [
+                'entity_id' => test()->test_character->corporation->corporation_id,
+                'entity_type' => 'corporation',
+                'affiliation_type' => $affiliation,
             ],
-        ])
-        ->assertRedirect();
+        ],
+        member: test()->test_user,
+        permissions: ['can open or close corporations for recruitment', 'can accept or deny applications'],
+    );
 
-    foreach (['can open or close corporations for recruitment', 'can accept or deny applications'] as $permName) {
-        $permission = Permission::findOrCreate($permName);
-        $role->givePermissionTo($permission);
-    }
-
-    // give test user the role via HTTP
-    test()->actingAs(test()->superuser)
-        ->post(route('acl.member.add', [$role->id, test()->test_user->id]))
-        ->assertRedirect();
-
-    expect(test()->test_user->refresh()->hasRole($role))->toBeTrue();
+    expect(test()->test_user->refresh()->hasRole('test'))->toBeTrue();
 
     // Create Enlistment
 

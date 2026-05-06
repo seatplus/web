@@ -25,16 +25,16 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Web\Http\Controllers\Character\AssetsController;
+use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('assets')
     ->controller(AssetsController::class)
     ->group(function () {
         Route::get('', 'index')->name('character.assets');
 
-        $assetPermission = CheckAuthorization::class.':'.config('eveapi.permissions.'.Asset::class);
+        $assetPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Asset::class);
 
         Route::middleware($assetPermission)
             ->group(function () {

@@ -26,7 +26,4 @@ parameters:
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
-    excludePaths:
-        - src/Http/Pipelines/CheckCharacterAffiliationsAffiliatedIdPipe.php
-        - src/Http/Pipelines/CheckCorporationMemberComplianceAffiliatedIdPipe.php
-        - src/Http/Pipelines/CheckRecruitsAffiliatedIdPipe.php
+
