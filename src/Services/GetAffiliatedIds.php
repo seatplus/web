@@ -37,7 +37,6 @@ class GetAffiliatedIds
         private ?User $user = null,
         private ?CanUserService $canUserService = null
     ) {
-        $this->user = $user ?? auth()->user();
         $this->canUserService = $canUserService ?? new CanUserService;
     }
 
@@ -65,7 +64,8 @@ class GetAffiliatedIds
      */
     private function collectAffiliatedIds(array $permissions, array $corporationRole): array
     {
-        $userPermission = $this->canUserService->getUserPermissionObject($this->user);
+        $user = $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
 
         return array_merge(
             $this->getPermissionBasedIds($permissions, $userPermission),

@@ -28,12 +28,14 @@ namespace Seatplus\Web;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\ServiceProvider;
+use Seatplus\Auth\Services\Permissions\CanUserService;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
+use Seatplus\Web\Services\GetAffiliatedIds;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
@@ -72,6 +74,9 @@ class WebServiceProvider extends ServiceProvider
 
         $this->app->singleton(ExceptionHandler::class, Handler::class);
         $this->app->singleton(WebJobsRepository::class);
+        // Prevent the DI container from auto-wiring an empty User model into GetAffiliatedIds.
+        // User resolution must be lazy (via auth()->user() at call time), not at construction time.
+        $this->app->bind(GetAffiliatedIds::class, fn () => new GetAffiliatedIds(canUserService: new CanUserService));
     }
 
     private function addPublications(): void
