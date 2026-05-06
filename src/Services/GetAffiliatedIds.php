@@ -55,7 +55,7 @@ class GetAffiliatedIds
         // Director is always granted access in addition to explicit corporation roles
         $normalizedRoles[] = self::DIRECTOR_ROLE;
 
-        return (new self)->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
+        return $this->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
     }
 
     /**
