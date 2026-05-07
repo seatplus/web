@@ -37,6 +37,8 @@ it('shows role detail page to admin with administrate permission', function () {
             ->component('AccessControl/RoleDetail')
             ->where('can_edit', true)
             ->has('role.affiliations')
+            ->has('role.members')
+            ->has('role.moderators')
         );
 });
 
