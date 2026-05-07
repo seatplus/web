@@ -29,7 +29,7 @@ const monorepoConfig = {
     serverWatch: { ignored: ['**/node_modules/**', '**/vendor/**', '**/public/**'] },
     runTasks: [
         {
-            startup: false,
+            startup: true,
             name: 'copy vendor',
             run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
             pattern: ['packages/web/resources/js/**'],
