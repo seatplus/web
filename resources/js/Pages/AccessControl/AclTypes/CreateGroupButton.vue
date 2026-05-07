@@ -76,6 +76,9 @@ export default {
       name: ''
     }
   }
+    setup() {
+        return { create }
+    },
 }
 </script>
 

@@ -108,6 +108,9 @@ export default {
             return _.invert(this.expressions)
         }
     }
+    setup() {
+        return { scheduleDetails, scheduleCreate }
+    },
 }
 </script>
 

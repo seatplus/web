@@ -58,6 +58,9 @@ export default {
             return _.join(_.map(this.characters, (character) => character.name), ', ')
         }
     }
+    setup() {
+        return { impersonateStart }
+    },
 }
 </script>
 

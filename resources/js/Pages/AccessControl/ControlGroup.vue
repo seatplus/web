@@ -162,6 +162,9 @@ export default {
             return {role_id: this.role.id, user_id: user_id}
         }
     }
+    setup() {
+        return { join, leave, manage, detail, manageAclMembers }
+    },
 }
 </script>
 

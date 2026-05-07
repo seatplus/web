@@ -51,7 +51,9 @@ export default {
     name: "Login",
     components: {AppHead},
     layout: (h, page) => h(EmptyLayout, [page]),
-
+    setup() {
+        return { eve }
+    },
 }
 </script>
 

@@ -105,6 +105,9 @@ export default {
             this.stepIndex = activeTab.id
         }
     }
+    setup() {
+        return { editEnlistment }
+    },
 }
 </script>
 

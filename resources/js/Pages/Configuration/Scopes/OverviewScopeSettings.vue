@@ -155,7 +155,10 @@
         methods: {
 
         },
-    }
+    setup() {
+        return { globalScopes }
+    },
+}
 </script>
 
 <style scoped>

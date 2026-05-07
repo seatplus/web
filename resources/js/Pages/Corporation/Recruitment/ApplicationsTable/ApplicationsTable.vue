@@ -80,7 +80,8 @@ export default {
     },
     setup() {
         return {
-            headerTitles
+            headerTitles,
+            getApplication,
         }
     }
 }

@@ -92,6 +92,9 @@ export default {
             compliantCharacters
         }
     }
+    setup() {
+        return { reviewUser }
+    },
 }
 </script>
 

@@ -113,6 +113,9 @@ export default {
           router.post(updateWatchlist(this.corporationId).url, this.form)
         }
     }
+    setup() {
+        return { deleteEnlistment }
+    },
 }
 </script>
 

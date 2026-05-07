@@ -94,7 +94,9 @@ export default {
             return !_.isEmpty(this.enlistments)
         }
     }
-
+    setup() {
+        return { eve }
+    },
 }
 </script>
 

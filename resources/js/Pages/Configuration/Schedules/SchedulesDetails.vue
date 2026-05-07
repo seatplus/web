@@ -92,6 +92,9 @@ export default {
         })
 
     }
+    setup() {
+        return { scheduleDelete, updateOrCreate }
+    },
 }
 </script>
 

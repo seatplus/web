@@ -87,7 +87,10 @@
                 job: ''
             }
         }
-    }
+    setup() {
+        return { updateOrCreate }
+    },
+}
 </script>
 
 <style scoped>
