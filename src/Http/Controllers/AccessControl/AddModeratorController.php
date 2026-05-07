@@ -10,6 +10,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Auth\Services\Roles\ManualRoleService;
 use Seatplus\Auth\Services\Roles\OnRequestRoleService;
+use Seatplus\Auth\Services\Roles\OptInRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class AddModeratorController extends Controller
@@ -24,12 +25,12 @@ class AddModeratorController extends Controller
         $roleService = $this->baseRoleService->getTypeService();
 
         abort_unless(
-            $roleService instanceof OnRequestRoleService || $roleService instanceof ManualRoleService,
+            $roleService instanceof OnRequestRoleService || $roleService instanceof ManualRoleService || $roleService instanceof OptInRoleService,
             403,
             'This role type does not support moderators'
         );
 
-        /** @var OnRequestRoleService|ManualRoleService $roleService */
+        /** @var OnRequestRoleService|ManualRoleService|OptInRoleService $roleService */
         $roleService->setModerator(User::findOrFail($user_id), true);
 
         return redirect()->back()->with('success', 'Moderator added');
