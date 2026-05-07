@@ -1,10 +1,11 @@
-// tailwind.config.js
+import defaultTheme from 'tailwindcss/defaultTheme.js'
+import forms from '@tailwindcss/forms'
+import typography from '@tailwindcss/typography'
+import aspectRatio from '@tailwindcss/aspect-ratio'
 
-const defaultTheme = require('tailwindcss/defaultTheme')
-
-module.exports = {
+export default {
     content: [
-      './resources/js/**/*.{js,vue}',
+        './resources/js/**/*.{js,vue}',
     ],
     theme: {
         extend: {
@@ -13,9 +14,6 @@ module.exports = {
             },
         },
     },
-    plugins: [
-        require('@tailwindcss/forms'),
-        require('@tailwindcss/typography'),
-        require('@tailwindcss/aspect-ratio'),
-    ]
+    plugins: [forms, typography, aspectRatio],
 }
+
