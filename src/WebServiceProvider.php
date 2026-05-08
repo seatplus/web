@@ -64,9 +64,14 @@ class WebServiceProvider extends ServiceProvider
         // Add commands
         $this->addCommands();
 
-        // Register Inertia error page handler
+        // Register Inertia error page handler.
+        // In local dev we skip 500/503 so Laravel's Ignition debug page is shown instead.
         Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
-            if (in_array($response->statusCode(), [403, 404, 500, 503])) {
+            $codes = app()->isLocal()
+                ? [403, 404]
+                : [403, 404, 500, 503];
+
+            if (in_array($response->statusCode(), $codes)) {
                 return $response
                     ->render('Error', ['status' => $response->statusCode()])
                     ->rootView('web::app')
