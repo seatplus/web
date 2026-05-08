@@ -3,8 +3,7 @@
     <InfiniteLoadingHelper
       :key="loadingHelperKey"
       v-slot="{results}"
-      :params="parameters"
-      route-name="get.character.assets.locations"
+      :url="locations({ query: parameters }).url"
     >
       <div class="space-y-2 sm:space-y-6">
         <LocationComponent
@@ -23,6 +22,7 @@
 import LocationComponent from "./LocationComponent.vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import { ref, watch } from "vue";
+import { locations } from '@/routes/get/character/assets'
 export default {
     name: "AssetsComponent",
     components: {
@@ -46,8 +46,7 @@ export default {
     },
     setup(props) {
 
-        const locations = ref([])
-        const loadingHelperKey = ref(+new Date() )
+        const loadingHelperKey = ref(+new Date())
 
         const debounce = _.debounce(() => loadingHelperKey.value++ , 350)
 

@@ -16,8 +16,7 @@
         <div class="mt-1 sm:mt-0 sm:col-span-2">
           <Autosuggest
             v-if="!enlistment"
-            route-name="get.affiliated.corporations"
-            :route-parameters="{ permission: 'can open or close corporations for recruitment' }"
+            :url-builder="(params) => affiliatedCorporations({ permission: 'can open or close corporations for recruitment' }, { query: params }).url"
             placeholder="Search for corporation"
             @selectedObject="selection => form.corporation = selection"
           />
@@ -96,6 +95,7 @@ import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import { recruitment as createRecruitment } from '@/routes/create/corporation'
+import { corporations as affiliatedCorporations } from '@/routes/get/affiliated'
 
 export default {
     name: "EnlistmentConfig",

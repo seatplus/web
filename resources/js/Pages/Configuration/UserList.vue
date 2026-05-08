@@ -71,25 +71,23 @@
         },
         computed: {
             searchparam() {
-                return route().params
+                return Object.fromEntries(new URLSearchParams(window.location.search))
             }
         },
         watch: {
             search() {
 
-                let params = route().params
+                const urlParams = new URLSearchParams(window.location.search)
 
-                if(_.has(params,'search_param') && this.search === '')
-                    _.unset(params, 'search_param')
+                if(urlParams.has('search_param') && this.search === '')
+                    urlParams.delete('search_param')
 
                 if(this.search)
-                    _.set(params,"search_param", this.search);
+                    urlParams.set('search_param', this.search)
 
-                _.set(params, 'page', 1)
+                urlParams.set('page', '1')
 
-                let url_name = route().current()
-
-                router.visit(route(url_name, params), {
+                router.visit(window.location.pathname + '?' + urlParams.toString(), {
                     preserveScroll: true,
                     preserveState: true,
                     only: ['users'],
@@ -105,9 +103,7 @@
                 })
             },
             getSearchParams() {
-                let params = route().params
-
-                return _.get(params, 'search_param', '')
+                return new URLSearchParams(window.location.search).get('search_param') ?? ''
             }
         }
     }

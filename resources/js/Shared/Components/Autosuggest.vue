@@ -69,9 +69,9 @@ export default {
     name: "Autosuggest",
     components: {EntityBlock, Listbox, ListboxOptions, ListboxOption, CheckIcon, ListboxLabel},
     props: {
-        routeName: {
+        urlBuilder: {
             required: true,
-            type: String
+            type: Function
         },
         label: {
             required: false,
@@ -81,12 +81,6 @@ export default {
             required: true,
             type: String
         },
-        routeParameters: {
-            required: false,
-            type: Object,
-            default: () => {
-            }
-        }
     },
     emits: ['selected', 'selectedObject'],
     data() {
@@ -125,7 +119,7 @@ export default {
 
             //let $queryParams = _.merge({search: query}, this.routeParameters)
 
-            return axios.get(route(this.routeName, {search: query, ...this.routeParameters}))
+            return axios.get(this.urlBuilder({search: query}))
                 .then((result) => {
                     self.suggestions = result.data
 

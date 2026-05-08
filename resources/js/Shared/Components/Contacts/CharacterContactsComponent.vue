@@ -41,8 +41,7 @@
       </div>
       <ul class="relative z-0 divide-y divide-gray-200">
         <CompleteLoadingHelper
-          route-name="character.contacts.detail"
-          :params="{character_id: character.character_id}"
+          :url="contactDetailUrl"
           :form-data="{corporation_id: corporation_id, alliance_id: alliance_id}"
           @results="(result) => contacts_raw = result"
         >
@@ -66,6 +65,7 @@ import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper.vue";
 import CharacterContactsRowComponent from "./CharacterContactsRowComponent.vue";
 import {computed, ref} from "vue";
 import SimpleInlineList from "../../Layout/SimpleInlineList.vue";
+import { detail as contactDetail } from '@/routes/character/contacts'
 
 export default {
     name: "CharacterContactsComponent",
@@ -89,7 +89,7 @@ export default {
             type: Number
         },
     },
-    setup() {
+    setup(props) {
 
         const contacts_raw = ref([])
         const selected_filter = ref('')
@@ -97,6 +97,8 @@ export default {
             {id: 'all', title: 'All contacts'},
             {id: 'standing', title: 'Only With Standing Offset'},
         ]
+
+        const contactDetailUrl = computed(() => contactDetail(props.character.character_id).url)
 
         const diff = (a,b) => a > b ? a - b : b - a
 
@@ -138,7 +140,8 @@ export default {
             contacts,
             options,
             selected_filter,
-            contacts_raw
+            contacts_raw,
+            contactDetailUrl
         }
     }
 }

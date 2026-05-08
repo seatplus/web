@@ -3,8 +3,7 @@
   <div class="absolute inset-0 overflow-y-auto">
     <InfiniteLoadingHelper
       v-slot="{results}"
-      route-name="get.mail.headers"
-      :params="{character_ids: characterIds}"
+      :url="headers({ query: {character_ids: characterIds} }).url"
     >
       <ul class="divide-y divide-gray-200">
         <li
@@ -46,6 +45,7 @@ import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
+import { headers } from '@/routes/get/mail'
 
 export default {
     name: "DesktopMailList",

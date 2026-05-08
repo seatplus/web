@@ -33,8 +33,7 @@
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
           v-slot="{results}"
-          :route-name="routeName"
-          :params="routeParameters"
+          :url="walletJournalUrl"
         >
           <WalletJournalRowComponent
             v-for="(entry, index) in results"
@@ -53,6 +52,8 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
+import { detail as corporationJournalDetail } from '@/routes/corporation/wallet_journal'
+import { detail as characterJournalDetail } from '@/routes/character/wallet_journal'
 
 export default {
     name: "WalletJournalComponent",
@@ -98,6 +99,15 @@ export default {
                 })
 
             return parameters
+        },
+        walletJournalUrl() {
+            if (this.division) {
+                return corporationJournalDetail(
+                    { corporation_id: this.division.corporation_id, division_id: this.division.division_id },
+                    { query: this.filters }
+                ).url
+            }
+            return characterJournalDetail(this.id, { query: this.filters }).url
         }
     },
     created() {

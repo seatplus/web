@@ -15,8 +15,7 @@
     <div class="relative max-h-96 overflow-y-auto">
       <InfiniteLoadingHelper
         v-slot="{results}"
-        route-name="character.contracts.details"
-        :params="parameters"
+        :url="contractsUrl"
       >
         <StickyHeaderTable
           :header-titles="[{title: 'Issuer', columnSpan: 2}, {title: 'Assignee', columnSpan: 2}, {title: 'Type', columnSpan: 2}, {title: 'Details', columnSpan: 4}, {title: 'Content', columnSpan: 1, srOnly: true}]"
@@ -87,6 +86,7 @@ import IssuerComponent from "./Cells/IssuerComponent.vue";
 import AssigneeComponent from "./Cells/AssigneeComponent.vue";
 import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
 import DetailsComponent from "./Cells/DetailsComponent.vue";
+import { details as contractDetails } from '@/routes/character/contracts'
  
 export default {
     name: "ContractComponent",
@@ -141,6 +141,9 @@ export default {
         },
         parameters() {
             return {...this.watchlist, character_id: this.id}
+        },
+        contractsUrl() {
+            return contractDetails(this.id, { query: this.watchlist }).url
         }
     }
 }

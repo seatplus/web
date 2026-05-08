@@ -1,14 +1,13 @@
-import {computed, onBeforeMount, onBeforeUnmount, ref} from "vue";
-import {useHydrateQueryParameters} from "./useHydrateQueryParameters";
+import {onBeforeMount, onBeforeUnmount, ref} from "vue";
 
-export function useLoadCompleteResource(routeName, params, formData = {}) {
+export function useLoadCompleteResource(url, formData = {}) {
 
-    const url = ref(route(routeName,useHydrateQueryParameters(params)))
+    const requestUrl = ref(url)
     const results = ref([])
     const isComplete = ref(true)
 
-    const method = computed(() => _.isEmpty(formData) ? 'get' : 'post')
-    const cleanFormData = computed(() => _.omitBy(formData, _.isNil))
+    const method = _.isEmpty(formData) ? 'get' : 'post'
+    const cleanFormData = _.omitBy(formData, _.isNil)
 
     const CancelToken = axios.CancelToken;
     let cancelTokens = [];
@@ -18,10 +17,10 @@ export function useLoadCompleteResource(routeName, params, formData = {}) {
         let last_page = 1
 
         await axios.request({
-            method: method.value,
-            url: url.value,
+            method: method,
+            url: requestUrl.value,
             params: { page: 1 },
-            data: cleanFormData.value
+            data: cleanFormData
         })
             .then(response => {
 
@@ -37,10 +36,10 @@ export function useLoadCompleteResource(routeName, params, formData = {}) {
 
         for(let i=2; i<= last_page; i++) {
             axiosRequests.push(axios.request({
-                method: method.value,
-                url: url.value,
+                method: method,
+                url: requestUrl.value,
                 params: { page: i },
-                data: cleanFormData.value,
+                data: cleanFormData,
                 cancelToken: new CancelToken(function executor(c) {
                     // An executor function receives a cancel function as a parameter
                     cancelTokens.push(c)

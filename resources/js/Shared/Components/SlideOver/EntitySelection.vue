@@ -4,10 +4,9 @@
     class="relative z-0 divide-y divide-gray-200 overflow-y-auto border-t"
   >
     <InfiniteLoadingHelper
-      :key="Object.values(params).join(',')"
+      :key="url"
       v-slot="{results}"
-      :route-name="routeName"
-      :params="params"
+      :url="url"
     >
       <SelectionEntity
         v-for="character in results"
@@ -24,7 +23,8 @@
 import SelectionEntity from "./SelectionEntity.vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import {computed, ref, watch} from "vue";
-import {router} from "@inertiajs/vue3";
+import {router, usePage} from "@inertiajs/vue3";
+import { characters as affiliatedCharacters, corporations as affiliatedCorporations } from '@/routes/get/affiliated'
 
 export default {
     name: "EntitySelection",
@@ -51,15 +51,24 @@ export default {
         )
 
         const search = computed(() => props.search)
-        const routeName = computed( () => props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations')
 
         watch(search,(newValue) => {
             newValue.length >= 3 ? params.value.search = newValue : delete params.value.search
         })
 
+        const url = computed(() => {
+            const { permission, corporation_role, search: searchTerm } = params.value
+            const queryOptions = searchTerm ? { query: { search: searchTerm } } : {}
+
+            if (props.type === 'character') {
+                return affiliatedCharacters(permission, queryOptions).url
+            }
+            return affiliatedCorporations({ permission, corporation_role }, queryOptions).url
+        })
+
         return {
-            routeName,
-            params
+            params,
+            url
         }
     },
     data() {
@@ -75,13 +84,14 @@ export default {
     },
     beforeMount() {
 
-        let ids = _.get(route().params, `${this.type}_ids`)
+        const urlParams = new URLSearchParams(window.location.search)
+        const ids = urlParams.getAll(`${this.type}_ids[]`)
 
-        if(!ids)
+        if(!ids.length)
             return
 
-        this.selected_ids = _.map(ids, (id) => parseInt(id))
-        this.initial_ids = _.map(ids, (id) => parseInt(id))
+        this.selected_ids = ids.map(id => parseInt(id))
+        this.initial_ids = ids.map(id => parseInt(id))
 
     },
     beforeUnmount() {
@@ -89,14 +99,16 @@ export default {
         if(!this.changed)
             return
 
-        let routeName = route().current()
+        const currentPath = usePage().url.split('?')[0]
 
         if(_.isEmpty(this.selected_ids))
-            return router.get(route(routeName))
+            return router.get(currentPath)
 
-        let queryParameter = this.type === 'character' ? { character_ids: this.selected_ids } : {corporation_ids: this.selected_ids}
+        const queryParameter = this.type === 'character'
+            ? { character_ids: this.selected_ids }
+            : { corporation_ids: this.selected_ids }
 
-        router.get(route(routeName, {_query: queryParameter}))
+        router.get(currentPath, queryParameter)
     },
 }
 </script>

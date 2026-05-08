@@ -1,8 +1,8 @@
 import { onMounted, onUnmounted, ref } from "vue";
 
-export function useInfinityScrolling(routeName, params, method = 'GET') {
+export function useInfinityScrolling(url, method = 'GET', postData = null) {
 
-    const url = ref(route(routeName,params))
+    const currentUrl = ref(url)
     const scrollComponent = ref(null)
     const result = ref([])
     const isLoading = ref(false)
@@ -13,17 +13,16 @@ export function useInfinityScrolling(routeName, params, method = 'GET') {
 
     const fetchData = function () {
 
-        if(isLoading.value || isComplete.value || _.isNil(url.value))
+        if(isLoading.value || isComplete.value || _.isNil(currentUrl.value))
             return
 
         const timeout = setTimeout(() => isLoading.value = true, 250)
 
         axios({
             method: method,
-            url: url.value,
-            data: method === 'POST' ? params : null,
+            url: currentUrl.value,
+            data: method === 'POST' ? postData : null,
             cancelToken: source.token,
-            params: params
         })
             .then(response => {
 
@@ -34,7 +33,7 @@ export function useInfinityScrolling(routeName, params, method = 'GET') {
                 }
 
                 result.value.push(...response.data.data);
-                url.value = response.data.links.next;
+                currentUrl.value = response.data.links.next;
             })
             .catch(error => {
                 console.log(error);

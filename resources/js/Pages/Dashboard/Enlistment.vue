@@ -89,6 +89,7 @@ import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
 import { application as deleteUserApplication } from '@/routes/delete/user'
 import { application as postApplication } from '@/routes/post'
+import { applications as listApplications } from '@/routes/list/existing'
 
 export default {
     name: "Enlistment",
@@ -101,7 +102,7 @@ export default {
     },
     setup(props) {
 
-        const applicationResults = useLoadCompleteResource('list.existing.applications', { corporation_id: props.enlistment.corporation_id })
+        const applicationResults = useLoadCompleteResource(listApplications(props.enlistment.corporation_id).url)
         const openModal = ref(false)
 
         const hasApplications = computed(() => !_.isEmpty(applicationResults.results.value))

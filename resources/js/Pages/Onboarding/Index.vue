@@ -87,6 +87,7 @@ import { Link } from '@inertiajs/vue3';
 import OnboardingEnlistment from "@/Pages/Onboarding/OnboardingEnlistment.vue";
 import Introduction from "@/Pages/Onboarding/Introduction.vue";
 import AddCharacters from "@/Pages/Onboarding/AddCharacters.vue";
+import { onboarding } from '@/routes'
 
 const props = defineProps({
     enlistments: {
@@ -117,14 +118,12 @@ const character_enlistments = computed(() => {
 
 const nextUrl = computed(() => {
 
-    let route_name = route().current()
-
     if(props.step === 1) {
-        return route(route_name, {step: user_enlistments.value.length > 0 ? 2 : 3})
+        return onboarding({ query: { step: user_enlistments.value.length > 0 ? 2 : 3 } }).url
     }
 
     if(props.step > 1) {
-        return route(route_name, {step: props.step + 1})
+        return onboarding({ query: { step: props.step + 1 } }).url
     }
 })
 

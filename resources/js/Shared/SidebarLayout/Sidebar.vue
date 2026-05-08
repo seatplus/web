@@ -7,8 +7,8 @@
       <Link
         v-for="(entry, index) in category.entries"
         :key="entry.name"
-        :href="route(entry.route)"
-        :class="[{'mt-1': index > 0, 'text-white bg-gray-900': isActive(entry.route), 'text-gray-300 hover:text-white hover:bg-gray-700 focus:text-white': !isActive(entry.route)},'group flex items-center px-2 py-2 md:text-sm text-base leading-5 md:leading-6 font-medium rounded-md focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150']"
+        :href="entry.uri"
+        :class="[{'mt-1': index > 0, 'text-white bg-gray-900': isActive(entry.uri), 'text-gray-300 hover:text-white hover:bg-gray-700 focus:text-white': !isActive(entry.uri)},'group flex items-center px-2 py-2 md:text-sm text-base leading-5 md:leading-6 font-medium rounded-md focus:outline-none focus:bg-gray-700 transition ease-in-out duration-150']"
       >
         <svg
           v-if="entry.content"
@@ -59,9 +59,8 @@
             }
         },
         methods: {
-            isActive(routeName) {
-
-                return this.activeEntryUrl === route(routeName)
+            isActive(uri) {
+                return this.activeEntryUrl === uri
             }
         }
     }

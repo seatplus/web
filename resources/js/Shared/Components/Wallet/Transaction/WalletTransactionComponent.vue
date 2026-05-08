@@ -34,8 +34,7 @@
       <ul class="relative z-0 divide-y divide-gray-200">
         <InfiniteLoadingHelper
           v-slot="{results}"
-          :route-name="routeName"
-          :params="routeParameters"
+          :url="walletTransactionUrl"
         >
           <WalletTransactionRowComponent
             v-for="(entry, index) in results"
@@ -54,6 +53,8 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import WalletTransactionRowComponent from "./WalletTransactionRowComponent.vue";
 import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
+import { detail as corporationTransactionDetail } from '@/routes/corporation/wallet_transaction'
+import { detail as characterTransactionDetail } from '@/routes/character/wallet_transaction'
 
 export default {
     name: "WalletTransactionComponent",
@@ -89,6 +90,12 @@ export default {
             } : {
                 character_id: this.id
             }
+        },
+        walletTransactionUrl() {
+            if (this.division) {
+                return corporationTransactionDetail({ corporation_id: this.id, division_id: this.division.division_id }).url
+            }
+            return characterTransactionDetail(this.id).url
         }
     },
     created() {

@@ -65,14 +65,9 @@ export default {
         TransitionRoot,
     },
     props: {
-        routeName: {
+        url: {
             type: String,
             required: true
-        },
-        params: {
-            required: false,
-            type: Object,
-            default: () => new Object()
         },
         formData: {
             required: false,
@@ -83,7 +78,7 @@ export default {
     emits: ['results'],
     setup(props, {emit}) {
 
-        const results = useLoadCompleteResource(props.routeName, props.params, props.formData)
+        const results = useLoadCompleteResource(props.url, props.formData)
 
         const values = computed(() => results.results.value)
         const shouldShow = computed(() => results.isComplete.value )

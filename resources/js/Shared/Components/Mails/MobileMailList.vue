@@ -1,8 +1,7 @@
 <template>
   <InfiniteLoadingHelper
     v-slot="{results}"
-    route-name="get.mail.headers"
-    :params="{character_ids: characterIds}"
+    :url="headers({ query: {character_ids: characterIds} }).url"
   >
     <ul class="divide-y divide-gray-200">
       <Disclosure
@@ -60,6 +59,7 @@ import ResolveIdToName from "../../ResolveIdToName.vue";
 import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
+import { headers } from '@/routes/get/mail'
 
 export default {
     name: "MobileMailList",

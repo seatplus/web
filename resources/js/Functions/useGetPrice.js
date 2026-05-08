@@ -1,5 +1,6 @@
 import {ls} from './useLocalStorage'
 import axios from "axios";
+import { prices as marketPrices } from '@/routes/get/markets'
 
 export function useGetPrice(type_id) {
 
@@ -11,7 +12,7 @@ export function useGetPrice(type_id) {
         if(prices)
             return prices
 
-        axios.get(route('get.markets.prices'))
+        axios.get(marketPrices().url)
             .then(response => {
                 ls.set('markets.prices', response.data, 86400000) // 24hrs
                 return response.data

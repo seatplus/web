@@ -66,6 +66,7 @@ import LeftAligned from "../../Layout/DataDisplay/LeftAligned.vue";
 import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData.vue";
 import {StarIcon} from "@heroicons/vue/20/solid";
 import {StarIcon as StarIconOutline} from "@heroicons/vue/24/outline";
+import { skills as characterSkills } from '@/routes/get/character'
 
 export default {
     name: "Skills",
@@ -78,7 +79,7 @@ export default {
     },
     setup(props) {
 
-        const results = useLoadCompleteResource('get.character.skills', {character_id: props.characterId});
+        const results = useLoadCompleteResource(characterSkills(props.characterId).url);
 
         const skills = computed(() => _.chain(results.results.value)
             .map((skill) => {

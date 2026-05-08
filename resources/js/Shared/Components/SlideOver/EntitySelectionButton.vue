@@ -68,9 +68,8 @@ export default {
     },
     computed: {
         has_selected() {
-            let ids = _.get(route().params, `${this.type}_ids`)
-
-            return !!ids
+            const urlParams = new URLSearchParams(window.location.search)
+            return urlParams.has(`${this.type}_ids[]`) || urlParams.has(`${this.type}_ids`)
         },
         dispatchTransferObject() {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject

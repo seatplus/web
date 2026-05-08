@@ -58,6 +58,7 @@ import {computed} from "vue";
 import { BookOpenIcon } from '@heroicons/vue/20/solid'
 import Time from "@/Shared/Time.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import { queue as skillQueue } from '@/routes/get/character/skill'
 
 export default {
     name: "SkillQueue",
@@ -69,7 +70,7 @@ export default {
         }
     },
     setup(props) {
-        const results = useLoadCompleteResource('get.character.skill.queue', { character_id: props.characterId })
+        const results = useLoadCompleteResource(skillQueue(props.characterId).url)
 
         const queue = computed(() => _.chain(results.results.value)
             .map((item) => {

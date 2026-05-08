@@ -2,7 +2,7 @@
   <div>
     <Autosuggest
       :key="uniqueID"
-      :route-name="routeName"
+      :url-builder="urlBuilder"
       :label="label"
       :placeholder="placeholder"
       @selectedObject="onSelected"
@@ -30,9 +30,9 @@ export default {
     modelValue: {
       required: true
     },
-    routeName: {
+    urlBuilder: {
       required: true,
-      type: String
+      type: Function
     },
     label: {
       required: true,

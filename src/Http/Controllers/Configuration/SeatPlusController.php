@@ -41,7 +41,9 @@ class SeatPlusController extends Controller
     {
         $navigation_tabs = config('web.settings');
 
-        return collect($navigation_tabs)->toJson();
+        return collect($navigation_tabs)
+            ->map(fn (array $tab) => array_merge($tab, ['uri' => route($tab['route'])]))
+            ->toJson();
     }
 
     public function settings(): Response

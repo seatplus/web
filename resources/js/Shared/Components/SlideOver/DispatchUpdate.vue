@@ -2,9 +2,9 @@
   <ul class="divide-y divide-gray-200 overflow-y-auto">
     <InfiniteLoadingHelper
       v-slot="{results}"
-      route-name="manual_job.entities"
+      :url="entities().url"
       method="POST"
-      :params="dispatch_transfer_object"
+      :post-data="dispatch_transfer_object"
     >
       <DispatchableEntry
         v-for="(entity, index) of results"
@@ -20,12 +20,13 @@
 import DispatchableEntry from "./DispatchableEntry.vue";
 import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 import { job as dispatchJob } from '@/routes/dispatch'
+import { entities } from '@/routes/manual_job'
 
 export default {
     name: "DispatchUpdate",
     components: {InfiniteLoadingHelper, DispatchableEntry},
     setup() {
-        return { dispatchJob }
+        return { dispatchJob, entities }
     },
     computed: {
         dispatch_transfer_object() {

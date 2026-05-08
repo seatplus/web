@@ -157,7 +157,7 @@ export default {
         return {
             selectedEntities: [],
             selected_scopes: _.toArray(_.get(this.entity, 'selected_scopes', {})),
-            creationMode: route().current() === 'view.create.scopes',
+            creationMode: window.location.pathname.endsWith('/create'),
             selectedModula: 0
         }
     },

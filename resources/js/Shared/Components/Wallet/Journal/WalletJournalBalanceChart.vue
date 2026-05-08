@@ -24,6 +24,8 @@ import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {Line} from 'vue-chartjs'
 import {computed} from "vue";
 import {CategoryScale, Chart, Colors, LinearScale, LineElement, PointElement, Tooltip} from 'chart.js';
+import { balance as corporationBalance } from '@/routes/corporation'
+import { balance as characterBalance } from '@/routes/character'
 
 Chart.register(
     CategoryScale,
@@ -46,13 +48,9 @@ const props = defineProps({
   }
 })
 
-let routeName = props.division? 'corporation.balance' : 'character.balance'
-let routeParameters = props.division ? {
-  corporation_id: props.id,
-  division_id: props.division.division_id
-} : {
-  character_id: props.id
-}
+const balanceUrl = props.division
+  ? corporationBalance({ corporation_id: props.id, division_id: props.division.division_id }).url
+  : characterBalance(props.id).url
 
 const chartOptions = {
   responsive: true,
@@ -79,7 +77,7 @@ const chartOptions = {
   }
 }
 
-const {results} = useLoadCompleteResource(routeName, routeParameters)
+const {results} = useLoadCompleteResource(balanceUrl)
 
 const chartData = computed(() => {
   return {

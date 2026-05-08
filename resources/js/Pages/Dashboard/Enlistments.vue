@@ -25,8 +25,9 @@
 import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {computed} from "vue";
 import Enlistment from "./Enlistment.vue";
+import { enlistments as listEnlistments } from '@/routes/list/open'
 
-const completeResource = useLoadCompleteResource('list.open.enlistments')
+const completeResource = useLoadCompleteResource(listEnlistments().url)
 
 const enlistments = computed(() => completeResource.results.value)
 

@@ -99,12 +99,13 @@ const hasContent = computed(() => {
 
 const hasOwnerPicture = computed(() => {
 
-    let selectedCharacterIds = get(route().params, 'character_ids', null)
+    const urlParams = new URLSearchParams(window.location.search)
+    const selectedCharacterIds = urlParams.getAll('character_ids[]')
 
-    if (_.size(selectedCharacterIds) > 1)
+    if (selectedCharacterIds.length > 1)
         return true
 
-    return !selectedCharacterIds && usePage().props.user.data.characters.length > 1;
+    return !selectedCharacterIds.length && usePage().props.user.data.characters.length > 1;
 })
 
 // Methods

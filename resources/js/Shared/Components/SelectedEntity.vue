@@ -25,9 +25,12 @@ export default {
     components: {EntityByIdBlock},
     computed: {
         selectedIds() {
-            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
+            const urlParams = new URLSearchParams(window.location.search)
+            const ids = urlParams.getAll('character_ids[]')
 
-            return _.map(selectedCharacterIds, (id) => parseInt(id))
+            if (!ids.length) return null
+
+            return ids.map(id => parseInt(id))
         }
     }
 }

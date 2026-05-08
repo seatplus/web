@@ -17,7 +17,7 @@
             >
               <option
                 v-for="navTab in navTabs"
-                :value="navTab.route"
+                :value="navTab.uri"
               >
                 {{ navTab.name }}
               </option>
@@ -30,11 +30,11 @@
                 <div
                   v-for="(navTab,index) in navTabs"
                   :key="index"
-                  :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 cursor-pointer']"
-                  @click="visitRoute(navTab.route)"
+                  :class="[{'ml-8': index >0}, isActive(navTab.uri) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 cursor-pointer']"
+                  @click="visitRoute(navTab.uri)"
                 >
                   <svg
-                    :class="['-ml-0.5 mr-2 h-5 w-5', isActive(navTab.route) ? 'text-indigo-500 group-focus:text-indigo-600' : 'text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600']"
+                    :class="['-ml-0.5 mr-2 h-5 w-5', isActive(navTab.uri) ? 'text-indigo-500 group-focus:text-indigo-600' : 'text-gray-400 group-hover:text-gray-500 group-focus:text-gray-600']"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     v-html="navTab.logo"
@@ -83,15 +83,15 @@ export default {
     watch: {
         navTabs(Tabs) {
             _.each(Tabs, navTab => {
-                if(this.isActive(navTab.route))
-                    this.currentRoute = navTab.route
+                if(this.isActive(navTab.uri))
+                    this.currentRoute = navTab.uri
             })
         },
-        currentRoute(currentRoute) {
-            if(this.isActive(currentRoute))
+        currentRoute(currentUri) {
+            if(this.isActive(currentUri))
                 return
 
-            this.visitRoute(currentRoute)
+            this.visitRoute(currentUri)
         }
     },
     mounted() {
@@ -102,17 +102,11 @@ export default {
         })
     },
     methods: {
-        isActive(string) {
-            return route().current(string);
+        isActive(uri) {
+            return window.location.pathname === new URL(uri, window.location.origin).pathname
         },
-        getRoute(name) {
-            return route(name)
-        },
-        visitRoute(name) {
-
-            const url = route(name)
-
-            router.visit(url,{
+        visitRoute(uri) {
+            router.visit(uri,{
                 method: 'get',
                 preserveScroll: true
             })

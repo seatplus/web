@@ -42,12 +42,13 @@ export default {
         },
         hasOwnerPicture() {
 
-            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
+            const urlParams = new URLSearchParams(window.location.search)
+            const selectedCharacterIds = urlParams.getAll('character_ids[]')
 
-            if (_.size(selectedCharacterIds) > 1)
+            if (selectedCharacterIds.length > 1)
                 return true
 
-            return !selectedCharacterIds && this.$page.props.user.data.characters.length > 1;
+            return !selectedCharacterIds.length && this.$page.props.user.data.characters.length > 1;
         }
     }
 }

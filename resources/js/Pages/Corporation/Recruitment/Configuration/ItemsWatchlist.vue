@@ -10,7 +10,7 @@
       <div>
         <Autosuggest
           :key="uniqueId"
-          route-name="autosuggestion.typesOrGroupOrCategories"
+          :url-builder="(params) => typesOrGroupOrCategories({ query: params }).url"
           label="Items"
           placeholder="Search for Items"
           @selectedObject="select"
@@ -46,6 +46,7 @@ import {ref, watch} from "vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 import { useForm } from "@inertiajs/vue3";
 import { watchlist as updateWatchlist } from '@/routes/update'
+import { typesOrGroupOrCategories } from '@/routes/autosuggestion'
 
 export default {
     name: "ItemsWatchlist",
