@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -48,27 +47,14 @@ class Controller extends BaseController
 
     protected function getCharacterIds(
         DispatchTransferObject $dispatchTransferObject,
-        ?string $characterRelation = null
     ): Collection {
         $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
         $filteredIds = $this->filterByRequestedCharacterIds($affiliatedIds);
 
-        return $this->fetchAffiliatedCharacterIdsWithRelation($filteredIds, $characterRelation);
-    }
-
-    protected function fetchAffiliatedCharacterIdsWithRelation(
-        array $characterIds,
-        ?string $characterRelation = null
-    ): \Illuminate\Database\Eloquent\Collection {
-
         return CharacterInfo::query()
             ->select('character_id')
-            ->whereIn('character_id', $characterIds)
-            ->when(
-                $characterRelation,
-                fn (Builder $query) => $query->with($characterRelation),
-            )
-            ->get();
+            ->whereIn('character_id', $filteredIds)
+            ->pluck('character_id');
     }
 
     protected function getAffiliatedIds(DispatchTransferObject $dispatchTransferObject): array
