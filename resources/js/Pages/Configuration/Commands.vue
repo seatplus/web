@@ -18,6 +18,9 @@
   export default {
     name: "Commands",
 
+    setup() {
+        return { clear }
+    },
     methods: {
 
       clearCache() {

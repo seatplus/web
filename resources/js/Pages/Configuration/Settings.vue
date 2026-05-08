@@ -70,6 +70,9 @@ import { navigation } from '@/routes/settings'
 export default {
     name: "Settings",
     components: {HorizonStats, Commands},
+    setup() {
+        return { navigation }
+    },
     data() {
         return {
             pageTitle: 'Server Settings',

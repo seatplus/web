@@ -123,6 +123,9 @@ export default {
         }
     },
 emits: ['update:modelValue'],
+    setup() {
+        return { postManualLocation }
+    },
     data() {
         return {
           open: this.modelValue,

@@ -40,6 +40,9 @@ export default {
             type: Object
         },
     },
+    setup() {
+        return { member_compliance }
+    },
     methods: {
         getCharacterNames(member) {
 

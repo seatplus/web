@@ -199,6 +199,9 @@ export default {
             type: String
         }
     },
+    setup() {
+        return { recruit, reviewApplication }
+    },
     data() {
         return {
             pageTitle: 'Application',

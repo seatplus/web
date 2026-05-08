@@ -76,6 +76,9 @@ export default {
             required: true
         }
     },
+    setup() {
+        return { home }
+    },
     computed: {
         title() {
             return {

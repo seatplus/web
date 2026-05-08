@@ -175,6 +175,7 @@
 
             return {
                 selected,
+                logout,
                 pageTitle: 'User Settings',
                 form,
                 options

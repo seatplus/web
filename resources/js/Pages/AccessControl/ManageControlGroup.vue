@@ -242,6 +242,9 @@ export default {
 
         return { form }
     },
+    setup() {
+        return { groups, automatic, manual, onRequest, optIn }
+    },
     data() {
         return {
             pageTitle: `Manage ${this.role.title}`,

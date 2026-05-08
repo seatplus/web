@@ -59,6 +59,9 @@ import { Link } from '@inertiajs/vue3';
   export default {
     name: "ImpersonatingBanner",
       components: {Link},
+      setup() {
+          return { impersonateStop }
+      },
       computed: {
         name() {
             return this.$page.props.user.data.main_character.name ?? 'Unknown'

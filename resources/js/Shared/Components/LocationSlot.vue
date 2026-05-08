@@ -115,6 +115,9 @@ export default {
             required: true
         }
     },
+    setup() {
+        return { item }
+    },
     computed: {
         filtered_items() {
             return _.sortBy(_.each(_.filter(this.items, (item) => this.slots.includes(item.location_flag)), (item) => item.index = this.slots.indexOf(item.location_flag)), 'index')

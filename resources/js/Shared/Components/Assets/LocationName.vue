@@ -14,6 +14,9 @@ export default {
             type: Object
         }
     },
+    setup() {
+        return { getManualLocation }
+    },
     data() {
         return {
             result: {}

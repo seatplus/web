@@ -277,6 +277,7 @@ export default {
 
 <script setup>
 import {computed, ref, watch} from 'vue'
+import { settings as userSettings } from '@/routes/user'
 import {
     Dialog,
     DialogOverlay,

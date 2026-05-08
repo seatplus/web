@@ -24,6 +24,9 @@ import { job as dispatchJob } from '@/routes/dispatch'
 export default {
     name: "DispatchUpdate",
     components: {InfiniteLoadingHelper, DispatchableEntry},
+    setup() {
+        return { dispatchJob }
+    },
     computed: {
         dispatch_transfer_object() {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject

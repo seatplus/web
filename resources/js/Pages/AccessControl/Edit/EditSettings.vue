@@ -330,6 +330,9 @@ export default {
         }
 
     },
+    setup() {
+        return { enable_esi_search }
+    },
     data() {
         return {
             search: null

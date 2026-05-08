@@ -35,6 +35,9 @@ export default {
             type: Number
         }
     },
+    setup() {
+        return { item }
+    },
     computed: {
         hasContent() {
             return _.size(this.entry.content) > 0

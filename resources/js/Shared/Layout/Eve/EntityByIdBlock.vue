@@ -101,6 +101,9 @@ export default {
         }
 
     },
+    setup() {
+        return { resolveId }
+    },
     computed: {
         subText() {
             return [_.get(this.entity, 'corporation.name'), _.get(this.entity, 'alliance.name')].filter( Boolean ).join(' | ')

@@ -29,6 +29,9 @@ export default {
             required: true
         }
     },
+    setup() {
+        return { contracts }
+    },
     data() {
         return {
             pageTitle: 'Contract Details',

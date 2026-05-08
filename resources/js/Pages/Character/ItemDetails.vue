@@ -39,6 +39,9 @@ export default {
             required: true
         },
     },
+    setup() {
+        return { assets, item }
+    },
     data() {
         return {
             object: _.first(this.item.data),
