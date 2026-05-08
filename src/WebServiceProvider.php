@@ -65,19 +65,31 @@ class WebServiceProvider extends ServiceProvider
         $this->addCommands();
 
         // Register Inertia error page handler.
-        // In local dev we skip 500/503 so Laravel's Ignition debug page is shown instead.
+        //
+        // Inertia v3 removed the v2 modal overlay for non-Inertia responses, so we must
+        // render Error.vue for Inertia navigation requests (X-Inertia header) in all envs.
+        //
+        // For initial page loads (no X-Inertia header) in local+debug mode we return null,
+        // which lets Laravel's Ignition page render for 500/503 — useful for development.
+        // In production, all 4xx/5xx render Error.vue.
         Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
-            $codes = app()->isLocal()
-                ? [403, 404]
-                : [403, 404, 500, 503];
+            $code = $response->statusCode();
 
-            if (in_array($response->statusCode(), $codes)) {
-                return $response
-                    ->render('Error', ['status' => $response->statusCode()])
-                    ->rootView('web::app')
-                    ->withSharedData()
-                    ->usingMiddleware(HandleInertiaRequests::class);
+            if (! in_array($code, [403, 404, 500, 503])) {
+                return;
             }
+
+            // Allow Ignition to handle 500/503 on initial page loads in local debug mode.
+            $isInertiaRequest = $response->request->hasHeader('X-Inertia');
+            if (! $isInertiaRequest && app()->isLocal() && config('app.debug') && in_array($code, [500, 503])) {
+                return;
+            }
+
+            return $response
+                ->render('Error', ['status' => $code])
+                ->rootView('web::app')
+                ->withSharedData()
+                ->usingMiddleware(HandleInertiaRequests::class);
         });
     }
 
