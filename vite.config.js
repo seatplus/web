@@ -17,6 +17,7 @@ const packageDevConfig = {
     runTasks: [
         {
             startup: true,
+            build: false,
             name: 'wayfinder',
             run: ['php', 'vendor/bin/testbench', 'wayfinder:generate', '--path=resources/js'],
             pattern: ['routes/**/*.php', 'src/Http/Controllers/**/*.php'],
@@ -30,12 +31,14 @@ const monorepoConfig = {
     runTasks: [
         {
             startup: true,
+            build: false,
             name: 'copy vendor',
             run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
             pattern: ['packages/web/resources/js/**'],
         },
         {
             startup: true,
+            build: false,
             name: 'wayfinder',
             run: ['php', 'artisan', 'wayfinder:generate'],
             pattern: ['packages/web/routes/**/*.php', 'packages/web/src/Http/Controllers/**/*.php'],
@@ -49,6 +52,7 @@ const endUserConfig = {
     runTasks: [
         {
             startup: true,
+            build: false,
             name: 'wayfinder',
             run: ['php', 'artisan', 'wayfinder:generate'],
             pattern: [],

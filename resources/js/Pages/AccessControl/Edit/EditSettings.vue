@@ -326,12 +326,10 @@ export default {
             addAffiliation,
             affiliationsValue,
             affiliateEverything,
-            showWarning
+            showWarning,
+            enable_esi_search
         }
 
-    },
-    setup() {
-        return { enable_esi_search }
     },
     data() {
         return {
