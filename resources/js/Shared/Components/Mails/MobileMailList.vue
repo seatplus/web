@@ -90,7 +90,8 @@ export default {
 
         return {
             emitSelection,
-            isSelected
+            isSelected,
+            headers
         }
     }
 }
