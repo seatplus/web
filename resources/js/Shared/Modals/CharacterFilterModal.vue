@@ -55,6 +55,7 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
+import { apiFetch } from "@/Functions/apiFetch";
   import Modal from "./Modal.vue"
   import { characters as affiliatedCharacters } from '@/routes/get/affiliated'
   export default {
@@ -126,11 +127,11 @@ import EveImage from "@/Shared/EveImage.vue"
               this.selected = _.remove(this.selected, (select) => select !== entity.character_id)
           },
           load: function () {
-              axios.get(this.routeName, {
+              apiFetch(this.routeName, {
                   params: {
                       page: this.page,
                   },
-              }).then(({data}) => {
+              }).then((data) => {
                   if (data.data.length) {
                       this.page += 1
                       this.characters.push(...data.data)

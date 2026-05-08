@@ -198,7 +198,6 @@
 </template>
 
 <script>
-import axios from "axios"
 import ListTransition from "@/Shared/Transitions/ListTransition.vue"
 import AffiliationList from "./AffiliationList.vue"
 import {computed, onBeforeMount, ref, watch, watchEffect} from "vue";
@@ -211,6 +210,7 @@ import { Link } from '@inertiajs/vue3';
 import { enable_esi_search } from '@/routes'
 import { affiliatable } from '@/routes/acl/search'
 import { token } from '@/routes/autosuggestion'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "EditSettings",
@@ -232,10 +232,10 @@ export default {
 
         const fetchData = _.debounce(async () => {
 
-            await axios.get(affiliatable({ query: query.value.length > 2 ? query.value : '' }).url)
-                .then(result => {
+            await apiFetch(affiliatable({ query: query.value.length > 2 ? query.value : '' }).url)
+                .then(data => {
 
-                    entities.value = result.data.data
+                    entities.value = data.data
                 })
                 .catch(error => console.log(error))
         }, 300)
@@ -262,12 +262,12 @@ export default {
             // If hasToken is null, we don't know yet if the user has a token
             if (_.isNull(hasToken.value)) {
                 // check if the user has a token with required scope
-                await axios.get(token().url)
-                    .then(response => {
+                await apiFetch(token().url)
+                    .then(data => {
                         // if the user has a token, set hasToken to true
                         // we don't need to check again
                         // we expect the response to be a 1 or 0 and turn it into a boolean
-                        hasToken.value = !!response.data;
+                        hasToken.value = !!data;
                     }).catch(error => {
                         console.log(error)
                     })
@@ -345,16 +345,15 @@ export default {
     },
     methods: {
         getInfo: async function (url, info = []) {
-            return await axios
-                .get(url)
-                .then((response) => {
+            return await apiFetch(url)
+                .then((data) => {
 
-                    response.data.data.forEach(object => info.push(object))
+                    data.data.forEach(object => info.push(object))
 
-                    if (_.isNull(response.data.links.next))
+                    if (_.isNull(data.links.next))
                         return info
 
-                    return this.getInfo(response.data.links.next, info)
+                    return this.getInfo(data.links.next, info)
                 })
                 .catch(error => console.log(error))
         },

@@ -29,9 +29,9 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
-import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
 import { id as resolveId } from '@/routes/resolve'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "EntityByIdBlock",
@@ -63,10 +63,10 @@ export default {
         const entity = ref(null)
 
         const getEntity = async () => {
-            await axios.get(resolveId(props.id).url)
-                .then((response) => {
+            await apiFetch(resolveId(props.id).url)
+                .then((data) => {
 
-                    entity.value = response.data
+                    entity.value = data
 
                    isReady.value = true
                 })

@@ -12,6 +12,7 @@
 <script>
 import {onMounted, onUnmounted, ref} from "vue";
 import { id as resolveId } from '@/routes/resolve'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "ResolveIdToName",
@@ -40,9 +41,9 @@ export default {
 
             isLoading.value = true
 
-            await axios.get(resolveId(props.id).url)
+            await apiFetch(resolveId(props.id).url)
                 .then(result => {
-                    name.value = result.data.name
+                    name.value = result.name
                     isComplete.value = true
                 })
                 .catch(error => console.log(error));

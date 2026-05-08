@@ -1,4 +1,5 @@
 import {onBeforeMount, onBeforeUnmount, ref} from "vue";
+import { apiFetch } from "@/Functions/apiFetch";
 
 export function useLoadCompleteResource(url, formData = {}) {
 
@@ -6,62 +7,59 @@ export function useLoadCompleteResource(url, formData = {}) {
     const results = ref([])
     const isComplete = ref(true)
 
-    const method = _.isEmpty(formData) ? 'get' : 'post'
+    const method = _.isEmpty(formData) ? 'GET' : 'POST'
     const cleanFormData = _.omitBy(formData, _.isNil)
 
-    const CancelToken = axios.CancelToken;
-    let cancelTokens = [];
+    let abortController = null
 
     const fetchData = async () => {
 
+        abortController = new AbortController()
+        const signal = abortController.signal
+
         let last_page = 1
 
-        await axios.request({
-            method: method,
-            url: requestUrl.value,
-            params: { page: 1 },
-            data: cleanFormData
-        })
-            .then(response => {
-
-                last_page = _.get(response, 'data.last_page', _.get(response, 'data.meta.last_page'))
-
-                if (response.data.data.length) {
-                    results.value.push(...response.data.data);
-                }
-            })
-            .catch(error => console.log(error))
-
-        const axiosRequests = []
-
-        for(let i=2; i<= last_page; i++) {
-            axiosRequests.push(axios.request({
-                method: method,
-                url: requestUrl.value,
-                params: { page: i },
+        try {
+            const response = await apiFetch(requestUrl.value, {
+                method,
+                params: { page: 1 },
                 data: cleanFormData,
-                cancelToken: new CancelToken(function executor(c) {
-                    // An executor function receives a cancel function as a parameter
-                    cancelTokens.push(c)
-                })
-            }))
+                signal,
+            })
+
+            last_page = _.get(response, 'last_page', _.get(response, 'meta.last_page', 1))
+
+            if (response.data.length) {
+                results.value.push(...response.data)
+            }
+        } catch (error) {
+            if (error.name !== 'AbortError') console.log(error)
+            return
         }
 
-        await Promise.all(axiosRequests)
-            .then(response => response.forEach(element => results.value.push(...element.data.data)))
-            .finally(() => isComplete.value = true)
-            .catch(error => console.log(error))
+        const requests = []
 
+        for (let i = 2; i <= last_page; i++) {
+            requests.push(
+                apiFetch(requestUrl.value, {
+                    method,
+                    params: { page: i },
+                    data: cleanFormData,
+                    signal,
+                }).then(response => results.value.push(...response.data))
+            )
+        }
+
+        await Promise.all(requests)
+            .catch(error => {
+                if (error.name !== 'AbortError') console.log(error)
+            })
+            .finally(() => isComplete.value = true)
     }
 
     onBeforeUnmount(() => {
-        cancelTokens.forEach(cancel => {
-            if (_.isFunction(cancel)) {
-                cancel('Load complete resource request canceled.')
-            }
-        })
+        if (abortController) abortController.abort()
     })
-
 
     onBeforeMount(async () => {
         await fetchData()

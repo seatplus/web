@@ -113,6 +113,7 @@ import {computed, ref, watch, watchEffect} from "vue";
 import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
 import { enable_esi_search } from '@/routes'
 import { search as autosuggestionSearch, token } from '@/routes/autosuggestion'
+import { apiFetch } from "@/Functions/apiFetch";
 
 const open = ref(false);
 const term = ref('');
@@ -161,9 +162,9 @@ const getStuggestions = async () => {
         return;
     }
 
-    await axios.get(autosuggestionSearch({ query: {search: term.value, categories: props.categories} }).url)
-        .then((result) => {
-            suggestions.value = result.data
+    await apiFetch(autosuggestionSearch({ query: {search: term.value, categories: props.categories} }).url)
+        .then((data) => {
+            suggestions.value = data
 
             // if previously the suggestions were not shown toggle them
             if (!open.value)
@@ -178,12 +179,12 @@ const checkToken = async () => {
     // If hasToken is null, we don't know yet if the user has a token
     if (_.isNull(hasToken.value)) {
         // check if the user has a token with required scope
-        await axios.get(token().url)
-            .then(response => {
+        await apiFetch(token().url)
+            .then(data => {
                 // if the user has a token, set hasToken to true
                 // we don't need to check again
                 // we expect the response to be a 1 or 0 and turn it into a boolean
-                hasToken.value = !!response.data;
+                hasToken.value = !!data;
             }).catch(error => {
                 console.log(error)
             })

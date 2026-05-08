@@ -6,6 +6,7 @@
 
 <script>
 import { manual_location as getManualLocation } from '@/routes/get'
+import { apiFetch } from "@/Functions/apiFetch";
 export default {
     name: "LocationName",
     props: {
@@ -32,9 +33,9 @@ export default {
     },
     created() {
         if(_.isNull(this.location.location))
-            axios.get(getManualLocation(this.location.location_id).url)
-                .then((result) => {
-                        this.result = result.data
+            apiFetch(getManualLocation(this.location.location_id).url)
+                .then((data) => {
+                        this.result = data
                 })
     }
 }

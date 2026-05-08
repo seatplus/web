@@ -64,6 +64,7 @@ import {
     ListboxLabel
 } from '@headlessui/vue'
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "Autosuggest",
@@ -119,9 +120,9 @@ export default {
 
             //let $queryParams = _.merge({search: query}, this.routeParameters)
 
-            return axios.get(this.urlBuilder({search: query}))
-                .then((result) => {
-                    self.suggestions = result.data
+            return apiFetch(this.urlBuilder({search: query}))
+                .then((data) => {
+                    self.suggestions = data
 
                     // if previously the suggestions were not shown toggle them
                     if (!this.open)

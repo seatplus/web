@@ -21,6 +21,7 @@ import DispatchableEntry from "./DispatchableEntry.vue";
 import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 import { job as dispatchJob } from '@/routes/dispatch'
 import { entities } from '@/routes/manual_job'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "DispatchUpdate",
@@ -42,11 +43,12 @@ export default {
             if(entity.batch !== 'ready')
                 return
 
-            axios.post(dispatchJob({ query: {
+            apiFetch(dispatchJob({ query: {
                 character_id: entity.character_id,
                 corporation_id: entity.corporation_id,
             }}).url, {
-                dispatch_transfer_object: this.dispatch_transfer_object
+                method: 'POST',
+                data: { dispatch_transfer_object: this.dispatch_transfer_object }
             })
         }
     }

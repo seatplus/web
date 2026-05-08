@@ -96,9 +96,16 @@ export default {
     },
     mounted() {
         this.$nextTick(function () {
-            axios.get(navigation().url).then(result => {
-                this.navTabs = result.data
+            fetch(navigation().url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                }
             })
+                .then(r => r.json())
+                .then(result => {
+                    this.navTabs = result
+                })
         })
     },
     methods: {

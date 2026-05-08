@@ -180,10 +180,15 @@
              * load stats
              */
             loadStats() {
-                return axios
-                    .get('/queue/status')
-                    .then( (response) => {
-                        this.stats = response.data;
+                return fetch('/queue/status', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        this.stats = data;
                     })
                     .catch(error => {
                         console.log(error);

@@ -1,4 +1,5 @@
 import { onMounted, onUnmounted, ref } from "vue";
+import { apiFetch } from "@/Functions/apiFetch";
 
 export function useInfinityScrolling(url, method = 'GET', postData = null) {
 
@@ -9,7 +10,7 @@ export function useInfinityScrolling(url, method = 'GET', postData = null) {
     const isComplete = ref(false)
     const isVisible = ref(null)
 
-    const source = axios.CancelToken.source()
+    let abortController = null
 
     const fetchData = function () {
 
@@ -18,11 +19,12 @@ export function useInfinityScrolling(url, method = 'GET', postData = null) {
 
         const timeout = setTimeout(() => isLoading.value = true, 250)
 
-        axios({
-            method: method,
-            url: currentUrl.value,
+        abortController = new AbortController()
+
+        apiFetch(currentUrl.value, {
+            method,
             data: method === 'POST' ? postData : null,
-            cancelToken: source.token,
+            signal: abortController.signal,
         })
             .then(response => {
 
@@ -32,11 +34,11 @@ export function useInfinityScrolling(url, method = 'GET', postData = null) {
                     isComplete.value = true;
                 }
 
-                result.value.push(...response.data.data);
-                currentUrl.value = response.data.links.next;
+                result.value.push(...response.data);
+                currentUrl.value = response.links.next;
             })
             .catch(error => {
-                console.log(error);
+                if (error.name !== 'AbortError') console.log(error)
             }).finally(() => {
                 isLoading.value = false;
             });
@@ -67,7 +69,7 @@ export function useInfinityScrolling(url, method = 'GET', postData = null) {
 
     onUnmounted(() => {
         observer.disconnect()
-        source.cancel()
+        if (abortController) abortController.abort()
     })
 
     return {

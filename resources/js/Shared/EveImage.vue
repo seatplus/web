@@ -26,6 +26,7 @@
 <script>
 import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import { variants as resourceVariants } from '@/routes/get/resource'
+import { apiFetch } from "@/Functions/apiFetch";
 
     export default {
         name: "EveImage",
@@ -65,16 +66,16 @@ import { variants as resourceVariants } from '@/routes/get/resource'
                 if ('corporation_id' in props.object || 'alliance_id' in props.object)
                     return resourceVariant.value = 'logo';
 
-                await axios.get(resourceVariants({
+                await apiFetch(resourceVariants({
                     resource_type: resourceType.value,
                     resource_id: resourceId.value
                 }).url).then(result => {
 
                     function getVariant() {
-                        if(props.bpo && _.has(_.invert(result.data), 'bp'))
+                        if(props.bpo && _.has(_.invert(result), 'bp'))
                             return 'bp'
 
-                        return result.data[0]
+                        return result[0]
                     }
 
                     resourceVariant.value = getVariant()

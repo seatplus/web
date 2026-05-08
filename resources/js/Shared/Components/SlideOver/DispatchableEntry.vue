@@ -56,10 +56,10 @@ import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
-import axios from "axios";
 import { usePage } from "@inertiajs/vue3";
-import { job as dispatchJob } from '@/routes/dispatch'
+import { job as jobRoute } from '@/routes/dispatch'
 import { batch_status as getBatchStatus } from '@/routes/get'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "DispatchableEntry",
@@ -75,16 +75,15 @@ export default {
         const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
         const updateStatus = ref()
         const dispatch_transfer_object = computed(() => usePage().props.dispatchTransferObject)
-        const url = computed(() => dispatchJob({ query: {
+        const url = computed(() => jobRoute({ query: {
             character_id: props.entry.character_id,
             corporation_id: props.entry.corporation_id,
         }}).url)
         const time = computed(() => _.get(props.entry, 'batch.time'))
 
         function getStatus() {
-            axios
-                .get(getBatchStatus(batch_id.value).url)
-                .then(result => status.value = result.data.state)
+            apiFetch(getBatchStatus(batch_id.value).url)
+                .then(data => status.value = data.state)
         }
 
         onBeforeMount(async () => {
@@ -104,10 +103,13 @@ export default {
                 clearInterval(updateStatus.value)
         })
 
-        const dispatchJob = async () => await axios.post(url.value, {dispatch_transfer_object: dispatch_transfer_object.value})
-            .then(response => {
+        const dispatchJob = async () => await apiFetch(url.value, {
+            method: 'POST',
+            data: {dispatch_transfer_object: dispatch_transfer_object.value}
+        })
+            .then(data => {
                 status.value = 'pending'
-                batch_id.value = response.data
+                batch_id.value = data
 
                 getStatus()
             })

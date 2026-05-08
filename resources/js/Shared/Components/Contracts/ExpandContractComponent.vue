@@ -34,6 +34,7 @@ import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";
 import ContractDetailsComponent from "./ContractDetailsComponent.vue";
 import { details as getContractDetailsUrl } from '@/routes/contract'
+import { apiFetch } from "@/Functions/apiFetch";
 
 export default {
     name: "ExpandContractComponent",
@@ -57,7 +58,7 @@ export default {
         const url = getContractDetailsUrl({character_id: props.characterId, contract_id: props.contract.contract_id}).url
 
         const fetchDetails = async () => {
-            await axios.get(url, {headers: {'X-Modal': true}}).then(response => contractDetails.value = response.data[0])
+            await apiFetch(url).then(data => contractDetails.value = data[0])
         }
 
         const open = () => {
