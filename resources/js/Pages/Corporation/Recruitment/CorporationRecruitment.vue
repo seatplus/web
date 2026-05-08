@@ -104,7 +104,7 @@ export default {
         changeActiveTab(activeTab) {
             this.stepIndex = activeTab.id
         }
-    }
+    },
     setup() {
         return { editEnlistment }
     },

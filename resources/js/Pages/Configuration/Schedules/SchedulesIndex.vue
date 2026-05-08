@@ -107,7 +107,7 @@ export default {
         inversedExpressions() {
             return _.invert(this.expressions)
         }
-    }
+    },
     setup() {
         return { scheduleDetails, scheduleCreate }
     },

@@ -91,7 +91,7 @@ export default {
             nonCompliantCharacters,
             compliantCharacters
         }
-    }
+    },
     setup() {
         return { reviewUser }
     },

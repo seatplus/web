@@ -86,7 +86,7 @@
                 expression: '',
                 job: ''
             }
-        }
+        },
     setup() {
         return { updateOrCreate }
     },

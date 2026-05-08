@@ -91,7 +91,7 @@ export default {
             this.expression = this.schedule.expression
         })
 
-    }
+    },
     setup() {
         return { scheduleDelete, updateOrCreate }
     },

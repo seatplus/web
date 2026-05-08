@@ -193,7 +193,7 @@
 
         beforeUnmount () {
             clearInterval(this.timer)
-        }
+        },
     setup() {
         return { horizonIndex }
     },

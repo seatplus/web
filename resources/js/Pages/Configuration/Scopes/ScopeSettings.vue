@@ -228,7 +228,7 @@ export default {
 
             return router.post(url, data)
         }
-    }
+    },
     setup() {
         return { createScopes }
     },

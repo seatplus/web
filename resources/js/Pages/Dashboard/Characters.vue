@@ -93,7 +93,7 @@ export default {
         hasOpenEnlistments() {
             return !_.isEmpty(this.enlistments)
         }
-    }
+    },
     setup() {
         return { eve }
     },

@@ -75,7 +75,7 @@ export default {
       open: false,
       name: ''
     }
-  }
+  },
     setup() {
         return { create }
     },
