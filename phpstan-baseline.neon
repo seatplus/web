@@ -1,0 +1,25 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined static method Inertia\\Inertia\:\:lazy\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/Configuration/PerformanceController.php
+
+		-
+			message: '#^Call to an undefined static method Inertia\\Inertia\:\:lazy\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/Shared/ManualLocationController.php
+
+		-
+			message: '#^PHPDoc type array\<string\>\|bool of property Seatplus\\Web\\Models\\ManualLocation\:\:\$guarded is not covariant with PHPDoc type array\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$guarded\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Models/ManualLocation.php
+
+		-
+			message: '#^PHPDoc type array\<string\>\|bool of property Seatplus\\Web\\Models\\Onboarding\:\:\$guarded is not covariant with PHPDoc type array\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$guarded\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Models/Onboarding.php
