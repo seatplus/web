@@ -24,31 +24,12 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/seatplus/auth.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/seatplus/eveapi.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/seatplus/esi-client.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/seatplus/esi-schema.git"
-        }
-    ],
     "require": {
         "php": "^8.5",
         "laravel/framework": "^13.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "dev-chore/laravel-13-upgrade as 4.1.0",
-        "seatplus/auth": "dev-chore/php-8.5-laravel-13-upgrade as 4.1.0",
-        "seatplus/esi-client": "dev-chore/php-8.5-upgrade as 4.1.0",
+        "seatplus/eveapi": "^4.1",
+        "seatplus/auth": "^4.0",
         "conedevelopment/i18n": "^1.1",
         "doctrine/dbal": "^3.0",
         "inertiajs/inertia-laravel": "^3.0",
@@ -89,12 +70,6 @@
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
-        },
-        "audit": {
-            "ignore": [
-                "PKSA-y2cr-5h3j-g3ys",
-                "PKSA-2kqm-ps5x-s4f5"
-            ]
         }
     }
 }
