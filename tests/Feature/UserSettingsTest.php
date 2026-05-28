@@ -21,7 +21,7 @@ test('one can update main character', function () {
 
     test()->actingAs(test()->test_user);
 
-    $response = test()->put(route('change.mainCharacter', [
+    $response = test()->put(route('change.main_character', [
         'new_character_id' => $secondary_character->character_id,
     ]));
 
