@@ -29,7 +29,7 @@ class ShowControlGroupController extends Controller
 
     public function __invoke(int $role_id): Response|RedirectResponse
     {
-        $role = Role::with('affiliations.affiliatable', 'role_memberships.entity', 'permissions')
+        $role = Role::with('affiliations.affiliatable', 'roleMemberships.entity', 'permissions')
             ->findOrFail($role_id);
 
         $user = auth()->user();

@@ -49,7 +49,7 @@ it('sets assigned criteria for automatic role via HTTP', function () {
 
     // Verify a role_membership criterion was created for the corporation
     expect(
-        test()->role->fresh()->role_memberships()
+        test()->role->fresh()->roleMemberships()
             ->where('entity_id', test()->test_character->corporation->corporation_id)
             ->exists()
     )->toBeTrue();

@@ -47,7 +47,7 @@ it('moderator can deny an applicant', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()
     )->toBeTrue();
@@ -64,7 +64,7 @@ it('moderator can deny an applicant', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()
     )->toBeFalse();

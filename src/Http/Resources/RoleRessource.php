@@ -50,7 +50,7 @@ class RoleRessource extends JsonResource
             'type' => $this->type,
             'can_edit' => $this->when(auth()->user()->can('create,update and delete access control group'), true),
             'can_moderate' => $this->when($this->canModerate(), true),
-            'status' => $this->role_memberships()
+            'status' => $this->roleMemberships()
                 ->where('entity_type', User::class)
                 ->where('entity_id', auth()->user()->getAuthIdentifier())
                 ->value('status') ?? false,

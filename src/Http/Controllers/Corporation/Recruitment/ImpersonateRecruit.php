@@ -47,9 +47,9 @@ class ImpersonateRecruit extends Controller
 
         (new ImpersonateService)->impersonateUser($applicant);
 
-        /** @var CharacterInfo $main_character */
-        $main_character = $applicant->main_character;
+        /** @var CharacterInfo $mainCharacter */
+        $mainCharacter = $applicant->mainCharacter;
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$mainCharacter->name);
     }
 }

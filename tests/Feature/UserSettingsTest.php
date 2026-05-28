@@ -15,13 +15,13 @@ it('has user settings', function () {
 test('one can update main character', function () {
     $secondary_character = Event::fakeFor(fn () => CharacterUser::factory()->make());
 
-    test()->test_user->character_users()->save($secondary_character);
+    test()->test_user->characterUsers()->save($secondary_character);
 
-    test()->assertNotEquals(test()->test_user->main_character, $secondary_character->character);
+    test()->assertNotEquals(test()->test_user->mainCharacter, $secondary_character->character);
 
     test()->actingAs(test()->test_user);
 
-    $response = test()->put(route('change.main_character', [
+    $response = test()->put(route('change.mainCharacter', [
         'new_character_id' => $secondary_character->character_id,
     ]));
 
@@ -29,5 +29,5 @@ test('one can update main character', function () {
 
     $user = test()->test_user->refresh();
 
-    expect($secondary_character->character)->toEqual($user->main_character);
+    expect($secondary_character->character)->toEqual($user->mainCharacter);
 });

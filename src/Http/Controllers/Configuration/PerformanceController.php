@@ -12,7 +12,7 @@ class PerformanceController extends Controller
     public function index(): Response
     {
         return inertia('Configuration/Performance/Overview', [
-            'data' => Inertia::lazy(
+            'data' => Inertia::defer(
                 fn () => BatchStatistic::query()
                     ->whereNotNull('finished_at')
                     ->orderBy('finished_at', 'desc')

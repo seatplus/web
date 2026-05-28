@@ -57,7 +57,7 @@ test('a second super user can not be assigned', function () {
 
     $secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
-    test()->artisan('seatplus:assign:superuser', ['characterName' => $secondary_user->main_character])
+    test()->artisan('seatplus:assign:superuser', ['characterName' => $secondary_user->mainCharacter])
         ->expectsOutput('Superuser has already been assigned, ask any of the following users to help you out:')
         ->assertExitCode(0);
 

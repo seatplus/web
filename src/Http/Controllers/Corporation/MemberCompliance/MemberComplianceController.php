@@ -80,7 +80,7 @@ class MemberComplianceController
             ->with([
                 'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
                     ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
-                'main_character',
+                'mainCharacter',
                 'characters.corporation.ssoScopes',
                 'characters.alliance.ssoScopes',
                 'characters.application.corporation.ssoScopes',
@@ -102,7 +102,7 @@ class MemberComplianceController
             ->loadMissing([
                 'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
                     ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
-                'main_character',
+                'mainCharacter',
             ]);
 
         return inertia('Corporation/MemberCompliance/ReviewUser', [

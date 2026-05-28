@@ -135,8 +135,8 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('cache.prefix', 'seatplus_tests---');
 
         // Setup Inertia for package development
-        config()->set('inertia.testing.page_paths', array_merge(
-            config()->get('inertia.testing.page_paths', []),
+        config()->set('inertia.pages.paths', array_merge(
+            config()->get('inertia.pages.paths', []),
             [
                 realpath(__DIR__.'/../resources/js/Pages'),
                 realpath(__DIR__.'/../resources/js/Shared'),

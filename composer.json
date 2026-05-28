@@ -29,7 +29,7 @@
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.0",
         "seatplus/eveapi": "^4.0",
-        "seatplus/auth": "^4.0.5",
+        "seatplus/auth": "dev-4.x-laravel11-quality as 4.0.6",
         "conedevelopment/i18n": "^1.1",
         "doctrine/dbal": "^3.0",
         "inertiajs/inertia-laravel": "^3.0",
@@ -53,6 +53,12 @@
             ]
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/seatplus/auth.git"
+        }
+    ],
     "scripts": {
         "lint": "vendor/bin/pint",
         "test:lint": "vendor/bin/pint --test",

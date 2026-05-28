@@ -45,7 +45,7 @@ class ManualLocationController extends Controller
     public function index(): Response
     {
         return inertia('Configuration/ManualLocations/ManualLocation', [
-            'data' => Inertia::lazy(
+            'data' => Inertia::defer(
                 fn () => $this->getSuggestions(),
             ),
         ]);
@@ -62,7 +62,7 @@ class ManualLocationController extends Controller
             ->whereIn('location_id', $location_subquery)
             ->delete();
 
-        return ManualLocation::with('system', 'user.main_character', 'user.characters')
+        return ManualLocation::with('system', 'user.mainCharacter', 'user.characters')
             ->orderByDesc('location_id')
             ->paginate();
     }

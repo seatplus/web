@@ -52,7 +52,7 @@ class SeatPlusController extends Controller
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'main_character.corporation');
+        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'mainCharacter.corporation');
 
         if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);
@@ -75,9 +75,9 @@ class SeatPlusController extends Controller
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
 
-        /** @var CharacterInfo $main_character */
-        $main_character = $impersonated_user->main_character;
+        /** @var CharacterInfo $mainCharacter */
+        $mainCharacter = $impersonated_user->mainCharacter;
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$mainCharacter->name);
     }
 }

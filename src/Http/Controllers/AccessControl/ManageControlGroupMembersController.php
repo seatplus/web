@@ -42,11 +42,11 @@ class ManageControlGroupMembersController
         $role = Role::whereId($role_id)
             ->with(
                 'affiliations.affiliatable',
-                'role_memberships.entity',
+                'roleMemberships.entity',
             )
             ->first();
 
-        $memberships = $role->role_memberships->where('entity_type', User::class);
+        $memberships = $role->roleMemberships->where('entity_type', User::class);
 
         $mappedRole = [
             'title' => $role->name,

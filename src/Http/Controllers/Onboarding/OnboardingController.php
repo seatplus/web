@@ -17,12 +17,12 @@ class OnboardingController extends Controller
         throw_unless(config('web.config.ONBOARDING'), 'Onboarding is disabled');
 
         $user = User::query()
-            ->with('character_users')
+            ->with('characterUsers')
             ->firstWhere('id', auth()->user()->getAuthIdentifier());
 
         return inertia('Onboarding/Index', [
             'step' => intval($request->query('step', 1)),
-            'characters' => $user->character_users,
+            'characters' => $user->characterUsers,
             'mainCharacterId' => $user->main_character_id,
             'enlistments' => Enlistment::query()
                 ->with(['corporation' => ['alliance']])
