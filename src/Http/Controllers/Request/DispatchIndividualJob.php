@@ -35,7 +35,7 @@ use Seatplus\Web\Services\GetAffiliatedIds;
 
 class DispatchIndividualJob extends FormRequest
 {
-    private const PERMISSIONS_CONFIG_KEY = 'eveapi.permissions';
+    private const string PERMISSIONS_CONFIG_KEY = 'eveapi.permissions';
 
     /**
      * Determine if the user is authorized to make this request.

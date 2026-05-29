@@ -31,7 +31,7 @@ use Seatplus\Auth\Services\Permissions\CanUserService;
 
 class GetAffiliatedIds
 {
-    private const DIRECTOR_ROLE = 'Director';
+    private const string DIRECTOR_ROLE = 'Director';
 
     public function __construct(
         private ?User $user = null,

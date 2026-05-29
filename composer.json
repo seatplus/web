@@ -42,7 +42,7 @@
         "laravel/pint": "^1.9",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-type-coverage": "^4"
+        "pestphp/pest-plugin-type-coverage": "4.x-dev"
     },
     "extra": {
         "laravel": {
@@ -65,6 +65,8 @@
             "@test:unit"
         ]
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
