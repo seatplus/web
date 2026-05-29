@@ -33,12 +33,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Type;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
@@ -66,7 +65,7 @@ class HelperController extends Controller
     {
         $result = (new GetCorporationInfo)->execute($corporation_id);
 
-        return collect($result)->toJson();
+        return collect([$result])->toJson();
     }
 
     public function getEntityFromId(int $id): array
@@ -167,15 +166,12 @@ class HelperController extends Controller
             return $prices->toJson();
         }
 
-        $container = new EsiRequestContainer(
+        $response = app(EsiClient::class)->invoke(
             method: 'get',
-            version: 'v1',
-            endpoint: '/markets/prices/',
+            path: '/markets/prices/',
         );
 
-        $esi_results = RetrieveEsiData::execute($container);
-
-        $prices = collect($esi_results);
+        $prices = collect((array) $response->data);
 
         cache(['market_prices' => $prices], now()->addDay());
 

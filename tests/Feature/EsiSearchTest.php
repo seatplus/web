@@ -1,8 +1,8 @@
 <?php
 
 use Inertia\Testing\AssertableInertia;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Universe\System;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 // First as vanilla user without necessairy 'esi-search.search_structures.v1' scope
 // try getting the token and fail to do so
@@ -61,7 +61,9 @@ it('can search existing system', function () {
         'name' => 'jita',
     ]);
 
-    RetrieveEsiData::shouldReceive('execute')
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('withToken')->andReturnSelf();
+    $mock->shouldReceive('invoke')
         ->twice()
         ->andReturn(
             test()->mockEsiResponse([
@@ -77,6 +79,7 @@ it('can search existing system', function () {
                 ],
             ])
         );
+    app()->instance(EsiClient::class, $mock);
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))

@@ -2,13 +2,13 @@
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\EsiClient\EsiClient;
+use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Region;
 use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
 use function Pest\Laravel\get;
@@ -81,7 +81,11 @@ it('resolves corporation info', function () {
 
     $esi_mock_return_data = test()->test_character->corporation->toArray();
 
-    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('invoke')->once()->andReturn(
+        new EsiRawResponse(data: (object) $esi_mock_return_data, isCachedLoad: false, pages: 1)
+    );
+    app()->instance(EsiClient::class, $mock);
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('resolve.corporation_info', $id));
@@ -105,7 +109,9 @@ test('one can search existing systems', function () {
     get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
         ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
 
-    RetrieveEsiData::shouldReceive('execute')
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('withToken')->andReturnSelf();
+    $mock->shouldReceive('invoke')
         ->twice()
         ->andReturn(
             test()->mockEsiResponse([
@@ -121,6 +127,7 @@ test('one can search existing systems', function () {
                 ],
             ])
         );
+    app()->instance(EsiClient::class, $mock);
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
@@ -142,7 +149,9 @@ test('one can search existing region', function () {
         ->get(route('autosuggestion.search', ['search' => 'D', 'categories' => ['region']]))
         ->assertInvalid(['search']);
 
-    RetrieveEsiData::shouldReceive('execute')
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('withToken')->andReturnSelf();
+    $mock->shouldReceive('invoke')
         ->twice()
         ->andReturn(
             test()->mockEsiResponse([
@@ -158,6 +167,7 @@ test('one can search existing region', function () {
                 ],
             ])
         );
+    app()->instance(EsiClient::class, $mock);
 
     $result = test()->actingAs(test()->test_user)
         ->get(route('autosuggestion.search', ['search' => 'Del', 'categories' => ['region']]))
@@ -191,12 +201,6 @@ test('one can get resource variants via http and cache', function () {
 });
 
 test('one can get market prices', function () {
-    $container = new EsiRequestContainer(
-        method: 'get',
-        version: 'v1',
-        endpoint: '/markets/prices/',
-    );
-
     test()->mockRetrieveEsiDataAction([
         (object) [
             'adjusted_price' => 0,

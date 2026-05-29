@@ -27,8 +27,7 @@
 namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\EsiClient\EsiClient;
 
 class GetNamesFromIdsService
 {
@@ -55,16 +54,13 @@ class GetNamesFromIdsService
             return $this->result;
         }
 
-        $container = new EsiRequestContainer(
+        $response = app(EsiClient::class)->invoke(
             method: 'post',
-            version: 'v3',
-            endpoint: '/universe/names/',
-            request_body: [...$ids_to_resolve->toArray()],
+            path: '/universe/names/',
+            requestBody: [...$ids_to_resolve->toArray()],
         );
 
-        $esi_results = RetrieveEsiData::execute($container);
-
-        return collect($esi_results)
+        return collect((array) $response->data)
             ->map(function (object $esi_result) {
                 match ($esi_result->category) {
                     'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category.'_id', $esi_result->id),

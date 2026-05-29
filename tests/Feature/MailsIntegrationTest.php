@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Event;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
+use Seatplus\EsiClient\EsiClient;
+use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 use function Pest\Laravel\get;
 
@@ -67,12 +67,16 @@ test('get mail body test', function () {
         ],
     ];
 
-    // Mock EsiResponse
-    $response = new EsiResponse(json_encode($data), [], 'now', 200);
-
-    RetrieveEsiData::shouldReceive('execute')
-        ->once()
-        ->andReturn($response);
+    // Mock EsiClient
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('invoke')->once()->andReturn(
+        new EsiRawResponse(
+            data: array_map(fn ($item) => (object) $item, $data),
+            isCachedLoad: false,
+            pages: 1,
+        )
+    );
+    app()->instance(EsiClient::class, $mock);
 
     // Give user superuser
     test()->assignPermissionToTestUser('superuser');

@@ -27,22 +27,18 @@
 namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\EsiClient\EsiClient;
 
 class GetCharacterAffiliations
 {
     public function execute(array $character_ids): Collection
     {
-        $character_affiliation_container = new EsiRequestContainer(
+        $response = app(EsiClient::class)->invoke(
             method: 'post',
-            version: 'v2',
-            endpoint: '/characters/affiliation/',
-            request_body: $character_ids,
+            path: '/characters/affiliation/',
+            requestBody: $character_ids,
         );
 
-        $character_affiliations = RetrieveEsiData::execute($character_affiliation_container);
-
-        return collect($character_affiliations);
+        return collect((array) $response->data);
     }
 }
