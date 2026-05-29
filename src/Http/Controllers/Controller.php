@@ -38,7 +38,7 @@ class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    private const CHARACTER_IDS_FILTER = 'character_ids';
+    private const string CHARACTER_IDS_FILTER = 'character_ids';
 
     public function __construct(
         protected readonly Request $request,
