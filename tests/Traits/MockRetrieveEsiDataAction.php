@@ -1,31 +1,41 @@
 <?php
 
-
 namespace Seatplus\Web\Tests\Traits;
 
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Mockery;
+use Seatplus\EsiClient\EsiClient;
+use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 
 trait MockRetrieveEsiDataAction
 {
-    public function mockRetrieveEsiDataAction(array $body) : void
+    public function mockRetrieveEsiDataAction(array $body): void
     {
-        $response = $this->mockEsiResponse($body);
+        $data = array_is_list($body)
+            ? array_map(fn ($item) => (object) (array) $item, $body)
+            : (object) $body;
+        $response = new EsiRawResponse(data: $data, isCachedLoad: false, pages: 1);
 
-        RetrieveEsiData::shouldReceive('execute')
-            ->once()
-            ->andReturn($response);
+        $mock = Mockery::mock(EsiClient::class);
+        $mock->shouldReceive('withToken')->andReturnSelf();
+        $mock->shouldReceive('invoke')->once()->andReturn($response);
+        $this->app->instance(EsiClient::class, $mock);
     }
 
-    public function assertRetrieveEsiDataIsNotCalled() : void
+    public function assertRetrieveEsiDataIsNotCalled(): void
     {
-        RetrieveEsiData::shouldReceive('execute')->never();
+        $mock = Mockery::mock(EsiClient::class);
+        $mock->shouldReceive('invoke')->never();
+        $this->app->instance(EsiClient::class, $mock);
     }
 
-    public function mockEsiResponse(array $body) : EsiResponse
+    public function mockEsiResponse(array $body): EsiRawResponse
     {
-        $data = json_encode($body, JSON_THROW_ON_ERROR);
+        if (! array_is_list($body)) {
+            $data = (object) $body;
+        } else {
+            $data = array_map(fn ($item) => (object) (array) $item, $body);
+        }
 
-        return new EsiResponse($data, [], 'now', 200);
+        return new EsiRawResponse(data: $data, isCachedLoad: false, pages: 1);
     }
 }

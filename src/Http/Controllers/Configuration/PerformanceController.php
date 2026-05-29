@@ -3,19 +3,20 @@
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\BatchStatistic;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class PerformanceController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         return inertia('Configuration/Performance/Overview', [
-            'data' => Inertia::lazy(
+            'data' => Inertia::defer(
                 fn () => BatchStatistic::query()
-                ->whereNotNull('finished_at')
-                ->orderBy('finished_at', 'desc')
-                ->paginate(50)
+                    ->whereNotNull('finished_at')
+                    ->orderBy('finished_at', 'desc')
+                    ->paginate(50)
             ),
         ]);
     }

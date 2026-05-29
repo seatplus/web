@@ -37,7 +37,7 @@ class WebJobsRepository
             'mails' => fn (RefreshToken $refresh_token) => $this->getMailsJobs($refresh_token),
             // Corporation
             'corporation.wallet' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
-            'membertracking' => fn (RefreshToken $refresh_token) => $this->getCorporationWalletJobs($refresh_token),
+            'membertracking' => fn (RefreshToken $refresh_token) => $this->getCorporationMemberTrackingJobs($refresh_token),
         ];
     }
 
@@ -76,17 +76,22 @@ class WebJobsRepository
         // if refresh token has scope for reading corporation contacts add the job to the jobs array
         if ($refresh_token->hasScope('esi-corporations.read_contacts.v1')) {
             $jobs[] = [
-                new CorporationContactJob($refresh_token->character_id),
-                new CorporationContactLabelJob($refresh_token->character_id),
+                new CorporationContactJob($refresh_token->corporation_id, $refresh_token->character_id),
+                new CorporationContactLabelJob($refresh_token->corporation_id, $refresh_token->character_id),
             ];
         }
 
         // if refresh token has scope for reading alliance contacts add the job to the jobs array
         if ($refresh_token->hasScope('esi-alliances.read_contacts.v1')) {
-            $jobs[] = [
-                new AllianceContactJob($refresh_token->character_id),
-                new AllianceContactLabelJob($refresh_token->character_id),
-            ];
+            /** @phpstan-ignore-next-line */
+            $alliance_id = (int) $refresh_token->alliance_id;
+
+            if ($alliance_id) {
+                $jobs[] = [
+                    new AllianceContactJob($alliance_id, $refresh_token->character_id),
+                    new AllianceContactLabelJob($alliance_id, $refresh_token->character_id),
+                ];
+            }
         }
 
         return $jobs;

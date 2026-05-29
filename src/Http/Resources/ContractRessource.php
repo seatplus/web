@@ -26,18 +26,26 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Contracts\Contract;
+use Seatplus\Eveapi\Models\Universe\Location;
 
+/**
+ * @mixin Contract
+ */
 class ContractRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
+        /** @var Location|null $start_location */
+        $start_location = $this->start_location;
+        /** @var Location|null $end_location */
+        $end_location = $this->end_location;
+
         return [
             'contract_id' => $this->contract_id,
             'issuer_id' => $this->issuer_id,
@@ -53,8 +61,8 @@ class ContractRessource extends JsonResource
             'reward' => $this->reward,
             'items' => $this->items->count(),
             'volume' => $this->volume,
-            'start_location' => $this->start_location?->locatable,
-            'end_location' => $this->end_location?->locatable,
+            'start_location' => $start_location?->locatable,
+            'end_location' => $end_location?->locatable,
         ];
     }
 }

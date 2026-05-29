@@ -28,6 +28,7 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Inertia\Inertia;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class ManageMembersController extends Controller
@@ -36,7 +37,7 @@ class ManageMembersController extends Controller
     {
         $role = Role::find($role_id);
 
-        abort_unless($role->isModerator(auth()->user()), 403);
+        abort_unless((new BaseRoleService)->for($role)->canModerate(auth()->user()), 403);
 
         return Inertia::render('AccessControl/ModerateMembers', [
             'role' => $role,

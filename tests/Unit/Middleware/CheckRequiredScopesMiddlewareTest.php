@@ -1,24 +1,30 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Mockery\MockInterface;
+use Seatplus\Auth\Services\SsoScopes\IsUserCompliantService;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 
 beforeEach(function () {
     test()->request = Mockery::mock(Request::class);
     test()->next = function ($request) {
         $request->forward();
-    };
 
-    test()->middleware = Mockery::mock(CheckRequiredScopes::class, [])
-        ->makePartial()
-        ->shouldAllowMockingProtectedMethods();
+        return new Response;
+    };
 });
 
 it('should skip handle if environment is not production', function () {
     test()->request->shouldReceive('forward')->times(1);
-    test()->middleware->shouldReceive('redirectTo')->times(0);
 
-    test()->middleware->handle(test()->request, test()->next);
+    $middleware = Mockery::mock(CheckRequiredScopes::class, [])
+        ->makePartial()
+        ->shouldAllowMockingProtectedMethods();
+
+    $middleware->shouldReceive('redirectTo')->times(0);
+
+    $middleware->handle(test()->request, test()->next);
 });
 
 it('should call parent method on production environment', function () {
@@ -27,18 +33,16 @@ it('should call parent method on production environment', function () {
         return 'production';
     });
 
-    test()->actingAs(test()->test_user);
-    $user_id = test()->test_user->id;
-    $cache_key = "UserScopes:{$user_id}";
+    test()->request->shouldReceive('user')->andReturn(test()->test_user);
 
-    // Cache missing scopes for a user
-    Cache::shouldReceive('tags')
-        ->with(['characters_with_missing_scopes', $user_id])
-        ->andReturnSelf();
+    $middleware = Mockery::mock(CheckRequiredScopes::class, [mock(IsUserCompliantService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('check')->andReturnFalse();
+        $mock->shouldReceive('getMissingScopes')->andReturn(['foo' => 'bar']);
+    })])
+        ->makePartial()
+        ->shouldAllowMockingProtectedMethods();
 
-    Cache::shouldReceive('get')->with($cache_key)->andReturn(collect(['foo' => 'bar']));
+    $middleware->shouldReceive('redirectTo')->times(1);
 
-    test()->middleware->shouldReceive('redirectTo')->times(1);
-
-    test()->middleware->handle(test()->request, test()->next);
+    $middleware->handle(test()->request, test()->next);
 });

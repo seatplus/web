@@ -26,12 +26,6 @@
 
 namespace Seatplus\Web\Services\Controller;
 
-use Seatplus\Eveapi\Jobs\Hydrate\Character\CharacterAssetsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\ContactHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\MailsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\SkillsHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Character\WalletHydrateBatch;
-use Seatplus\Eveapi\Jobs\Hydrate\Corporation\CorporationMemberTrackingHydrateBatch;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -42,74 +36,68 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
 class CreateDispatchTransferObject
 {
-    private readonly array $transferObjectArray;
-
     private bool $isCharacter = true;
 
-    public static function new()
+    public static function new(): CreateDispatchTransferObject
     {
-        return new static();
+        return new self;
     }
 
-    public function create(string $class): object
+    public function create(string $class): DispatchTransferObject
     {
-        return (object) match ($class) {
-            Contract::class => [
-                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
-                'permission' => $this->getPermission(Contract::class),
-                'required_scopes' => $this->getRequiredScopes('contracts'),
-                'required_corporation_role' => null,
-            ],
-            Asset::class => [
-                'manual_job' => $this->getManualJob(CharacterAssetsHydrateBatch::class),
-                'permission' => $this->getPermission(Asset::class),
-                'required_scopes' => $this->getRequiredScopes('assets'),
-                'required_corporation_role' => null,
-            ],
-            WalletJournal::class => [
-                'manual_job' => $this->getManualJob(WalletHydrateBatch::class),
-                'permission' => $this->getPermission(WalletJournal::class),
-                'required_scopes' => $this->isCharacter() ? $this->getRequiredScopes('wallet') : [...$this->getRequiredScopes('wallet'), 'esi-characters.read_corporation_roles.v1'],
-                'required_corporation_role' => $this->isCharacter() ? null : ['Accountant','Junior_Accountant'],
-            ],
-            Contact::class => [
-                'manual_job' => $this->getManualJob(ContactHydrateBatch::class),
-                'permission' => $this->getPermission(Contact::class),
-                'required_scopes' => $this->getRequiredScopes('contacts'),
-                'required_corporation_role' => null,
-            ],
-            CorporationMemberTracking::class => [
-                'manual_job' => $this->getManualJob(CorporationMemberTrackingHydrateBatch::class),
-                'permission' => $this->getPermission(CorporationMemberTracking::class),
-                'required_scopes' => $this->getRequiredScopes('membertracking'),
-                'required_corporation_role' => ['Director'],
-            ],
-            Skill::class => [
-                'manual_job' => $this->getManualJob(SkillsHydrateBatch::class),
-                'permission' => $this->getPermission(Skill::class),
-                'required_scopes' => $this->getRequiredScopes('skills'),
-                'required_corporation_role' => null,
-            ],
-            Mail::class => [
-                'manual_job' => $this->getManualJob(MailsHydrateBatch::class),
-                'permission' => $this->getPermission(Mail::class),
-                'required_scopes' => $this->getRequiredScopes('mails'),
-                'required_corporation_role' => null,
-            ]
+        return match ($class) {
+            Contract::class => new DispatchTransferObject(
+                'contract',
+                $this->getPermission(Contract::class),
+                $this->getRequiredScopes('contracts'),
+                null
+            ),
+            Asset::class => new DispatchTransferObject(
+                'assets',
+                $this->getPermission(Asset::class),
+                $this->getRequiredScopes('assets'),
+                null
+            ),
+            WalletJournal::class => new DispatchTransferObject(
+                $this->isCharacter() ? 'wallet' : 'corporation.wallet',
+                $this->getPermission(WalletJournal::class),
+                $this->isCharacter() ? $this->getRequiredScopes('wallet') : [...$this->getRequiredScopes('wallet'), 'esi-characters.read_corporation_roles.v1'],
+                $this->isCharacter() ? null : ['Accountant', 'Junior_Accountant']
+            ),
+            Contact::class => new DispatchTransferObject(
+                'contacts',
+                $this->getPermission(Contact::class),
+                $this->getRequiredScopes('contacts'),
+                null
+            ),
+            CorporationMemberTracking::class => new DispatchTransferObject(
+                'membertracking',
+                $this->getPermission(CorporationMemberTracking::class),
+                $this->getRequiredScopes('membertracking'),
+                ['Director']
+            ),
+            Skill::class => new DispatchTransferObject(
+                'skills',
+                $this->getPermission(Skill::class),
+                $this->getRequiredScopes('skills'),
+                null
+            ),
+            Mail::class => new DispatchTransferObject(
+                'mails',
+                $this->getPermission(Mail::class),
+                $this->getRequiredScopes('mails'),
+                null
+            ),
+            default => throw new \InvalidArgumentException("Unsupported class: {$class}"),
         };
     }
 
-    private function getManualJob(string $needle): string
-    {
-        return array_search($needle, config('web.jobs'));
-    }
-
-    private function getPermission(string $class)
+    private function getPermission(string $class): ?string
     {
         return config(sprintf('eveapi.permissions.%s', $class));
     }
 
-    private function getRequiredScopes(string $scope)
+    private function getRequiredScopes(string $scope): ?array
     {
         return config(
             sprintf(

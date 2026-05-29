@@ -26,27 +26,39 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
-use Seatplus\Auth\Models\AccessControl\AclMember;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\UserRessource;
 
 class ListMembersController extends Controller
 {
-    public function __invoke(int $role_id)
+    public function __construct(
+        private readonly BaseRoleService $baseRoleService,
+    ) {}
+
+    public function __invoke(int $role_id): AnonymousResourceCollection
     {
         $role = Role::find($role_id);
 
-        abort_unless(auth()->user()->can('superuser') || $role->isModerator(auth()->user()), 403);
+        abort_unless(auth()->user()->can('superuser') || $this->baseRoleService->for($role)->canModerate(auth()->user()), 403);
 
         $users = User::query()
-            ->join('acl_members', fn ($join) => (
-                $join->on('users.id', '=', 'acl_members.user_id')
-                ->where('acl_members.role_id', $role_id)
-            ))
+            ->join(
+                'role_memberships',
+                fn (JoinClause $join) => $join
+                    ->on('users.id', '=', 'role_memberships.entity_id')
+                    ->where('role_memberships.entity_type', User::class)
+                    ->where('role_memberships.role_id', $role_id)
+            )
             ->addSelect([
-                'status' => AclMember::select('status')->whereColumn('user_id', 'users.id')
+                'status' => RoleMembership::select('status')
+                    ->where('entity_type', User::class)
+                    ->whereColumn('entity_id', 'users.id')
                     ->where('role_id', '=', $role_id)
                     ->limit(1),
             ]);

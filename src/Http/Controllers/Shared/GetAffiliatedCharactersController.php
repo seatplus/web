@@ -26,65 +26,52 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Database\Query\JoinClause;
-use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\CharacterInfoRessource;
+use Seatplus\Web\Services\GetAffiliatedIds;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCharactersController extends Controller
 {
-    public function __invoke(string $permission)
+    public function __construct(
+        Request $request,
+        GetAffiliatedIds $getAffiliatedIds,
+    ) {
+        parent::__construct($request, $getAffiliatedIds);
+    }
+
+    public function __invoke(string $permission): AnonymousResourceCollection
     {
         $search_param = request()->get('search');
 
-        $affiliationsDto = new AffiliationsDto(
-            user: auth()->user(),
-            permissions: explode('|', $permission)
-        );
+        $affiliatedIds = $this->getAffiliatedIds->get($permission);
+        $user_character_ids = auth()->user()->characters->pluck('character_id')->toArray();
+        $recruit_ids = GetRecruitIdsService::get();
 
-        $owned_characters = CharacterInfo::query()
-            ->join(
-                'character_users',
-                fn (JoinClause $join) => $join
-                    ->on('character_infos.character_id', '=', 'character_users.character_id')
-                    ->where('character_users.user_id', $affiliationsDto->user->getAuthIdentifier())
-            )
-            ->whereNotNull('character_users.character_id')
-            ->when(
-                $search_param,
-                fn ($query) => $query
-                ->where('character_infos.name', 'like', "%${search_param}%")
-            )
-            ->select('character_infos.*');
-
-        $recruits = CharacterInfo::query()
-            ->whereIn('character_id', GetRecruitIdsService::get())
-            ->when($search_param, fn ($query) => $query->where('character_infos.name', 'like', "%${search_param}%"));
-
-        $affiliatables = CharacterInfo::query()
-            ->joinSub(
-                GetAffiliatedIdsService::make($affiliationsDto)->getQuery(),
-                'affiliatables',
-                'affiliatables.affiliated_id',
-                '=',
-                'character_infos.character_id'
-            )
-            ->when($search_param, fn ($query) => $query->where('character_infos.name', 'like', "%${search_param}%"))
-            ->select('character_infos.*');
+        $owned_characters = $this->getCharacterInfoQuery($affiliatedIds, $search_param);
+        $recruits = $this->getCharacterInfoQuery($recruit_ids, $search_param);
+        $affiliatables = $this->getCharacterInfoQuery($user_character_ids, $search_param);
 
         $query = $owned_characters
             ->union($recruits)
             ->union($affiliatables)
-            ->distinct();
-
-        $query = $query
-            ->with('corporation', 'alliance')
+            ->distinct()
+            ->with(['corporation', 'alliance'])
             ->has($permission)
             ->paginate();
 
         return CharacterInfoRessource::collection($query);
+    }
+
+    private function getCharacterInfoQuery(array $ids, ?string $search_param = null): Builder
+    {
+        return CharacterInfo::query()
+            ->whereIn('character_id', $ids)
+            ->when($search_param, fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search_param}%"))
+            ->orderBy('character_infos.name');
     }
 }

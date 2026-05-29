@@ -1,11 +1,10 @@
 <?php
 
-
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
+use Seatplus\EsiClient\EsiClient;
+use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 use Seatplus\Web\Services\GetEntityFromId;
 
 test('happy path', function () {
@@ -127,14 +126,14 @@ test('unknown character id', function () {
         ]),
     ];
 
-    $data = json_encode($body, JSON_THROW_ON_ERROR);
+    $data = array_map(fn ($item) => (object) $item, $body);
+    $response = new EsiRawResponse($data, isCachedLoad: false, pages: 1);
 
-    $response = new EsiResponse($data, [], 'now', 200);
-
-    RetrieveEsiData::shouldReceive('execute')
+    $mock = Mockery::mock(EsiClient::class);
+    $mock->shouldReceive('invoke')
         ->twice()
         ->andReturn($response);
-
+    app()->instance(EsiClient::class, $mock);
 
     $expected_result = [
         'id' => $character->character_id,

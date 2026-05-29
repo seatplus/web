@@ -27,77 +27,86 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Contracts\WebJobsRepository;
+use Seatplus\Web\Services\GetAffiliatedIds;
 
 class DispatchIndividualJob extends FormRequest
 {
-    protected array $dispatch_transfer_object = [];
-    protected AffiliationsDto $affiliationsDto;
+    private const string PERMISSIONS_CONFIG_KEY = 'eveapi.permissions';
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return ! auth()->guest();
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
-        $this->dispatch_transfer_object = $this->get('dispatch_transfer_object');
-
-        $jobs = array_keys(config('web.jobs'));
+        $dispatchData = $this->get('dispatch_transfer_object');
+        $affiliatedIds = $this->getAffiliatedIdsForDispatch($dispatchData);
 
         return [
-            'dispatch_transfer_object.manual_job' => ['required', Rule::in($jobs)],
-            'dispatch_transfer_object.permission' => ['required', Rule::in(config('eveapi.permissions'))],
-            'dispatch_transfer_object.required_corporation_role' => ['present'],
-            'character_id' => [Rule::requiredIf(fn () => ! $this->get('corporation_id')), Rule::in($this->getAffiliatedCharacterIds())],
-            'corporation_id' => [Rule::requiredIf(fn () => ! $this->get('character_id')), Rule::in($this->getAffiliatedCorporationIds())],
+            ...$this->getDispatchObjectRules(),
+            ...$this->getIdentificationRules($affiliatedIds),
         ];
     }
 
-    public function getAffiliationsDto(): AffiliationsDto
+    private function getAffiliatedIdsForDispatch(array $dispatchData): array
     {
-        if (! isset($this->affiliationsDto)) {
-            $this->affiliationsDto = new AffiliationsDto(
-                permissions: [Arr::get($this->dispatch_transfer_object, 'permission')],
-                user: auth()->user(),
-                corporation_roles: Arr::get($this->dispatch_transfer_object, 'required_corporation_role') ? [Arr::get($this->dispatch_transfer_object, 'required_corporation_role')] : null,
-            );
-        }
-
-        return $this->affiliationsDto;
+        return (new GetAffiliatedIds)->get(
+            permissions: data_get($dispatchData, 'permission'),
+            corporationRoles: data_get($dispatchData, 'required_corporation_role') ?? '',
+        );
     }
 
-    private function getAffiliatedCharacterIds(): array
+    private function getDispatchObjectRules(): array
     {
-        $affiliationsDto = $this->getAffiliationsDto();
+        $availableJobs = app(WebJobsRepository::class)->getJobKeys();
+
+        return [
+            'dispatch_transfer_object.manual_job' => ['required', Rule::in($availableJobs)],
+            'dispatch_transfer_object.permission' => ['required', Rule::in(config(self::PERMISSIONS_CONFIG_KEY))],
+            'dispatch_transfer_object.required_corporation_role' => ['present'],
+        ];
+    }
+
+    private function getIdentificationRules(array $affiliatedIds): array
+    {
+        return [
+            'character_id' => [
+                Rule::requiredIf(fn () => ! $this->get('corporation_id')),
+                Rule::in($this->getAffiliatedCharacterIds($affiliatedIds)),
+            ],
+            'corporation_id' => [
+                Rule::requiredIf(fn () => ! $this->get('character_id')),
+                Rule::in($this->getAffiliatedCorporationIds($affiliatedIds)),
+            ],
+        ];
+    }
+
+    private function getAffiliatedCharacterIds(array $affiliatedIds): array
+    {
 
         return CharacterInfo::query()
-            ->whereAffiliatedCharacters($affiliationsDto)
+            ->whereIn('character_id', $affiliatedIds)
             ->pluck('character_id')
             ->values()
             ->toArray();
     }
 
-    private function getAffiliatedCorporationIds(): array
+    private function getAffiliatedCorporationIds(array $affiliatedIds): array
     {
-        $affiliationsDto = $this->getAffiliationsDto();
 
         return CorporationInfo::query()
-            ->whereAffiliatedCorporations($affiliationsDto)
+            ->whereIn('corporation_id', $affiliatedIds)
             ->pluck('corporation_id')
             ->values()
             ->toArray();

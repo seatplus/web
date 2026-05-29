@@ -32,7 +32,7 @@ use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 
 class DispatchCorporationOrAllianceInfoJob
 {
-    public function handle(string $type, int $id)
+    public function handle(string $type, int $id): void
     {
         match ($type) {
             AllianceInfo::class => AllianceInfoJob::dispatchSync($id),

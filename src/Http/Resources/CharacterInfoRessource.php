@@ -26,17 +26,19 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
+/**
+ * @mixin CharacterInfo
+ */
 class CharacterInfoRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         $owned_character_ids = auth()->user()->characters->pluck('character_id');
 

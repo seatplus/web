@@ -27,18 +27,20 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Seatplus\Eveapi\Exceptions\SettingException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Locale
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     * @throws \Seatplus\Web\Exceptions\SettingException
+     *
+     * @throws SettingException
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         App::setLocale(setting('language'));
 

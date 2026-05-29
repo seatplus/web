@@ -27,8 +27,7 @@
 namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\EsiClient\EsiClient;
 
 class GetNamesFromIdsService
 {
@@ -41,7 +40,7 @@ class GetNamesFromIdsService
 
     public function execute(array $ids): Collection
     {
-        $ids_to_resolve = collect($ids)->filter(function ($id) {
+        $ids_to_resolve = collect($ids)->filter(function (int $id) {
             if (! cache()->has(sprintf('name:%s', $id))) {
                 return true;
             }
@@ -55,25 +54,22 @@ class GetNamesFromIdsService
             return $this->result;
         }
 
-        $container = new EsiRequestContainer(
+        $response = app(EsiClient::class)->invoke(
             method: 'post',
-            version: 'v3',
-            endpoint: '/universe/names/',
-            request_body: [...$ids_to_resolve->toArray()],
+            path: '/universe/names/',
+            requestBody: [...$ids_to_resolve->toArray()],
         );
 
-        $esi_results = RetrieveEsiData::execute($container);
-
-        return collect($esi_results)
-            ->map(function ($esi_result) {
+        return collect((array) $response->data)
+            ->map(function (object $esi_result) {
                 match ($esi_result->category) {
-                    'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category . "_id", $esi_result->id),
+                    'character', 'corporation', 'alliance', 'type' => data_set($esi_result, 'has_image', true) && data_set($esi_result, $esi_result->category.'_id', $esi_result->id),
                     default => $esi_result,
                 };
 
                 return $esi_result;
             })
-            ->each(fn ($esi_result) => cache([sprintf('name:%s', $esi_result->id) => $esi_result], now()->addDay()))
+            ->each(fn (object $esi_result) => cache([sprintf('name:%s', $esi_result->id) => $esi_result], now()->addDay()))
             ->merge($this->result);
     }
 }

@@ -26,9 +26,10 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -39,27 +40,18 @@ use Seatplus\Web\Services\Query\TypeWatchListScope;
 
 class ContractsController extends Controller
 {
-    public function index()
+    public function index(Request $request): Response
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contract::class);
 
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [data_get($dispatchTransferObject, 'permission')],
-            user: auth()->user()
-        );
-
-        $owned_characters = GetOwnedAffiliatedIdsService::make($affiliations_dto)
-            ->getQuery();
+        $character_ids = $request->get('character_ids') ?? $this->getOwnedCharacterIds();
 
         $characters = CharacterAffiliation::query()
-            ->when(
-                request()->has('character_ids'),
-                fn ($query) => $query->whereIn('character_id', request()->get('character_ids')),
-                fn ($query) => $query->joinSub($owned_characters, 'owned_characters', 'character_affiliations.character_id', '=', 'owned_characters.affiliated_id')
-            )
+            ->whereIn('character_id', $character_ids)
             ->has('character.contracts')
-            ->with('character.corporation', 'character.alliance')->get();
+            ->with(['character.corporation', 'character.alliance'])
+            ->get();
 
         return inertia('Character/Contract/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -67,9 +59,9 @@ class ContractsController extends Controller
         ]);
     }
 
-    public function getCharacterContractsDetails(int $character_id, Request $request)
+    public function getCharacterContractsDetails(int $character_id, Request $request): AnonymousResourceCollection
     {
-        $query = Contract::whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
+        $query = Contract::whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
             ->with(['items', 'items.type', 'items.type.group', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation'])
             ->tap(new LocationWatchListScope($request->all()))
             ->tap(new TypeWatchListScope($request->all()));
@@ -77,10 +69,10 @@ class ContractsController extends Controller
         return ContractRessource::collection($query->paginate());
     }
 
-    public function getContractDetails(int $character_id, int $contract_id)
+    public function getContractDetails(int $character_id, int $contract_id): string|Response
     {
-        $query = Contract::query()->whereHas('characters', fn ($query) => $query->whereCharacterId($character_id))
-            ->whereContractId($contract_id)
+        $query = Contract::query()->whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
+            ->where('contract_id', $contract_id)
             ->with('items', 'items.type', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
 
         if (request()->header('X-Modal', false)) {

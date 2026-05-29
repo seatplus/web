@@ -26,11 +26,16 @@
 
 namespace Seatplus\Web\Http\Resources\Universe;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Universe\Group;
 
+/**
+ * @mixin Group
+ */
 class GroupResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'name' => $this->name,

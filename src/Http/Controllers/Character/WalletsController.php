@@ -28,8 +28,10 @@ namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -40,11 +42,11 @@ use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 class WalletsController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'wallet_journals');
+        $ids = $this->getCharacterIds($dispatchTransferObject);
 
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -52,7 +54,7 @@ class WalletsController extends Controller
         ]);
     }
 
-    public function journal(int $character_id)
+    public function journal(int $character_id): LengthAwarePaginator
     {
         $query = WalletJournal::query()
             ->where('wallet_journable_id', $character_id)
@@ -64,7 +66,7 @@ class WalletsController extends Controller
         return $query->paginate();
     }
 
-    public function journalTypes(GetRefTypesAction $action)
+    public function journalTypes(GetRefTypesAction $action): \Illuminate\Http\Response|Collection
     {
         $term = request()->get('search');
 
@@ -75,7 +77,7 @@ class WalletsController extends Controller
         return $action->execute($term);
     }
 
-    public function balance(int $character_id)
+    public function balance(int $character_id): LengthAwarePaginator
     {
         $balance_part = Balance::query()
             ->whereHasMorph(
@@ -88,7 +90,7 @@ class WalletsController extends Controller
 
         $journal_entries = WalletJournal::query()
             ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
-            ->orderByDesc('date')
+            ->orderByDesc('x')
             ->where('wallet_journable_id', $character_id)
             ->groupBy('x')
             ->limit(30);
@@ -96,7 +98,7 @@ class WalletsController extends Controller
         return new LengthAwarePaginator($balance_part->union($journal_entries)->limit(30)->get(), 30, 30);
     }
 
-    public function transaction(int $character_id)
+    public function transaction(int $character_id): LengthAwarePaginator
     {
         return WalletTransaction::where('wallet_transactionable_id', $character_id)
             ->with('type', 'location')

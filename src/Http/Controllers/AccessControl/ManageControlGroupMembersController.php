@@ -27,41 +27,46 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Inertia\Inertia;
+use Inertia\Response;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class ManageControlGroupMembersController
 {
-    public function index($role_id)
+    public function index(int $role_id): Response
     {
         $role = Role::whereId($role_id)
             ->with(
-                'acl_affiliations.affiliatable',
-                'acl_members.user.characters',
-                'acl_members.user.main_character',
-                'moderators.affiliatable.main_character',
-                'moderators.affiliatable.characters'
+                'affiliations.affiliatable',
+                'roleMemberships.entity',
             )
             ->first();
+
+        $memberships = $role->roleMemberships->where('entity_type', User::class);
 
         $mappedRole = [
             'title' => $role->name,
             'id' => $role->id,
-            'type' => $role->type,
+            'type' => $role->type->value,
             'acl' => [
-                'affiliations' => $role->acl_affiliations->map(fn ($affiliation) => [
+                'affiliations' => $role->affiliations->map(fn (Affiliation $affiliation) => [
                     'id' => $affiliation->affiliatable_id,
                     'type' => [
                         CorporationInfo::class => 'corporation',
                         AllianceInfo::class => 'alliance',
                     ][$affiliation->affiliatable_type],
                 ]),
-                'moderators' => $role->moderators->map(fn ($affiliation) => $affiliation->affiliatable),
-                'members' => $role->acl_members->map(function ($member) {
-                    $member->id = $member->user_id;
+                'moderators' => $memberships
+                    ->where('can_moderate', true)
+                    ->map(fn (RoleMembership $membership) => $membership->entity),
+                'members' => $memberships->map(function (RoleMembership $membership) {
+                    $membership->id = $membership->entity_id;
 
-                    return $member;
+                    return $membership;
                 }),
             ],
         ];

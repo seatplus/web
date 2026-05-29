@@ -27,13 +27,13 @@
 use Illuminate\Support\Facades\Route;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Web\Http\Controllers\Character\ContactsController;
-use Seatplus\Web\Http\Middleware\CheckContactsAndAffiliation;
+use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('contacts')
     ->group(function () {
         Route::get('', [ContactsController::class, 'index'])->name('character.contacts');
 
-        Route::middleware(sprintf('%s:%s', CheckContactsAndAffiliation::class, config('eveapi.permissions.' . Contact::class)))
+        Route::middleware(CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Contact::class))
             ->group(function () {
                 Route::post('/{character_id}', [ContactsController::class, 'getContacts'])->name('character.contacts.detail');
             });

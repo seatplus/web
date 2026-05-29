@@ -28,14 +28,14 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Seatplus\Auth\Http\Middleware\CheckRequiredScopes as CheckRequiredScopesMiddleware;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (! app()->environment('production')) {
             return $next($request);
@@ -44,9 +44,9 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
         return parent::handle($request, $next);
     }
 
-    protected function redirectTo(Collection $missing_character_scopes)
+    protected function redirectTo(array $missing_character_scopes): Response
     {
-        $missing_character = $missing_character_scopes->map(function ($missing) {
+        $missing_character = collect($missing_character_scopes)->map(function (array $missing) {
             $missing = (object) $missing;
 
             return [
@@ -62,6 +62,6 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 
         return Inertia::render('Auth/MissingRequiredScopes', [
             'characters' => $missing_character,
-        ]);
+        ])->toResponse(request());
     }
 }

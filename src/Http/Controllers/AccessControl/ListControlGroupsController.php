@@ -26,37 +26,43 @@
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\RoleRessource;
 
 class ListControlGroupsController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): AnonymousResourceCollection
     {
-        $character_ids = auth()->user()->characters->map(fn ($character) => $character->character_id)->toArray();
+        $userId = auth()->user()->getAuthIdentifier();
+        $character_ids = auth()->user()->characters->map(fn (CharacterInfo $character) => $character->character_id)->toArray();
 
-        $query = Role::with('moderators.affiliatable.characters', 'acl_members')
+        $query = Role::query()
             ->when(
                 auth()->user()->can('superuser'),
-                // Condition if user has superuser
-                fn ($query) => $query->orWhereNotIn('id', []),
-                // if user does not have superuser
-                fn ($query) => $query
-                    ->whereHas('members', fn ($query) => $query->whereUserId(auth()->user()->getAuthIdentifier()))
-                    ->orWhereHas('acl_affiliations', fn ($query) => $query->whereHasMorph(
+                fn (Builder $query) => $query->orWhereNotIn('id', []),
+                fn (Builder $query) => $query
+                    // user is an active member
+                    ->whereHas('roleMemberships', fn (Builder $query) => $query
+                        ->where('entity_type', User::class)
+                        ->where('entity_id', $userId))
+                    // user is affiliated (corp or alliance scope matches their characters)
+                    ->orWhereHas('affiliations', fn (Builder $query) => $query->whereHasMorph(
                         'affiliatable',
                         [CorporationInfo::class, AllianceInfo::class],
-                        fn ($query) => $query->whereHas('characters', fn ($query) => $query->whereIn('character_infos.character_id', $character_ids))
+                        fn (Builder $query) => $query->whereHas('characters', fn (Builder $query) => $query->whereIn('character_infos.character_id', $character_ids))
                     ))
-                    ->orWhereHas('moderators', fn ($query) => $query->whereHasMorph(
-                        'affiliatable',
-                        [User::class],
-                        fn ($query) => $query->whereId(auth()->user()->getAuthIdentifier())
-                    ))
+                    // user is a moderator
+                    ->orWhereHas('roleMemberships', fn (Builder $query) => $query
+                        ->where('entity_type', User::class)
+                        ->where('entity_id', $userId)
+                        ->where('can_moderate', true))
             );
 
         return RoleRessource::collection(

@@ -6,12 +6,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Models\Onboarding;
+use Symfony\Component\HttpFoundation\Response;
 
 class OnboardingMiddleware
 {
-    private $user;
+    private ?User $user = null;
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // if onboarding is disabled, skip middleware
         if (! config('web.config.ONBOARDING')) {

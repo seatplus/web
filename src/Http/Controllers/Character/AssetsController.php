@@ -26,7 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
@@ -35,20 +37,21 @@ use Seatplus\Web\Http\Controllers\Request\GetAssetLocationsRequest;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Http\Resources\LocationRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\Controller\DispatchTransferObject;
 
 class AssetsController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characterIds' => $this->getCharacterIds($dispatchTransferObject, 'assets'),
+            'characterIds' => $this->getCharacterIds($dispatchTransferObject),
         ]);
     }
 
-    public function getLocations(GetAssetLocationsRequest $request, GetCharacterAssetLocationAction $action)
+    public function getLocations(GetAssetLocationsRequest $request, GetCharacterAssetLocationAction $action): AnonymousResourceCollection
     {
         $validated = $request->all();
 
@@ -59,7 +62,7 @@ class AssetsController extends Controller
         );
     }
 
-    public function item(int $character_id, int $item_id)
+    public function item(int $character_id, int $item_id): Response
     {
         $query = EveApiAsset::with([
             'location', 'type', 'type.group', 'container',
@@ -76,7 +79,7 @@ class AssetsController extends Controller
         ]);
     }
 
-    private function getDispatchTransferObject()
+    private function getDispatchTransferObject(): DispatchTransferObject
     {
         return CreateDispatchTransferObject::new()->create(EveApiAsset::class);
     }

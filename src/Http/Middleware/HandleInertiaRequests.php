@@ -35,8 +35,7 @@ use Seatplus\Web\Services\Sidebar\SidebarEntries;
 
 class HandleInertiaRequests extends Middleware
 {
-    // Set root template via method
-    public function rootView(Request $request)
+    public function rootView(Request $request): string
     {
         return 'web::app';
     }
@@ -45,10 +44,8 @@ class HandleInertiaRequests extends Middleware
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning
-     *
-     * @return string|null
      */
-    public function version(Request $request)
+    public function version(Request $request): ?string
     {
         return parent::version($request);
     }
@@ -57,10 +54,8 @@ class HandleInertiaRequests extends Middleware
      * Defines the props that are shared by default.
      *
      * @see https://inertiajs.com/shared-data
-     *
-     * @return array
      */
-    public function share(Request $request)
+    public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
             'activeSidebarElement' => $request->route()?->getName(),
@@ -70,10 +65,10 @@ class HandleInertiaRequests extends Middleware
                 'warning' => session()->pull('warning'),
                 'error' => session()->pull('error'),
             ],
-            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->filter(),
+            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->getFilteredEntries(),
             'user' => fn () => auth()->guest() ? '' : UserRessource::make(
                 User::with([
-                    'main_character',
+                    'mainCharacter',
                     'characters' => [
                         'corporation',
                         'refresh_token',

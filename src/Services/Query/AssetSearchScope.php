@@ -17,11 +17,11 @@ class AssetSearchScope
 
     public function __invoke(Builder|Asset $arg): bool
     {
-        if(! $this->search_query) {
+        if (! $this->search_query) {
             return true;
         }
 
-        if($arg instanceof Builder) {
+        if ($arg instanceof Builder) {
             return $this->handleBuilder($arg);
         }
 
@@ -30,9 +30,9 @@ class AssetSearchScope
 
     private function handleBuilder(Builder $query): bool
     {
-        $query->when($this->search_query, function ($query) {
+        $query->when($this->search_query, function (Builder $query) {
             collect(str_getcsv($this->search_query, ' ', '"'))->filter()
-                ->each(function ($term) use ($query) {
+                ->each(function (string $term) use ($query) {
                     $term = $term.'%';
 
                     $query->where('name_normalized', 'like', $term)
@@ -45,15 +45,11 @@ class AssetSearchScope
         return true;
     }
 
-    /**
-     * @param Asset|null $item
-     * @return bool
-     */
     public function handleAsset(?Asset $item): bool
     {
         $terms = collect(str_getcsv($this->search_query, ' ', '"'))
             ->filter()
-            ->map(fn ($term) => Str::lower($term))
+            ->map(fn (string $term) => Str::lower($term))
             ->toArray();
 
         return collect([
@@ -62,8 +58,8 @@ class AssetSearchScope
             $item->group_name_normalized,
             $item->category_name_normalized,
         ])->filter()
-            ->map(fn ($name) => Str::lower($name))
-            ->filter(fn ($name) => Str::startsWith($name, $terms))
+            ->map(fn (string $name) => Str::lower($name))
+            ->filter(fn (string $name) => Str::startsWith($name, $terms))
             ->isNotEmpty();
 
     }

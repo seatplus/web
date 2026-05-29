@@ -26,17 +26,22 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Auth\Enums\RoleType;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
+use Seatplus\Auth\Services\Roles\BaseRoleService;
 
+/**
+ * @mixin Role
+ */
 class RoleRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'name' => $this->name,
@@ -45,13 +50,16 @@ class RoleRessource extends JsonResource
             'type' => $this->type,
             'can_edit' => $this->when(auth()->user()->can('create,update and delete access control group'), true),
             'can_moderate' => $this->when($this->canModerate(), true),
-            'status' => $this->acl_members()->whereUserId(auth()->user()->getAuthIdentifier())->get()->first()->status ?? false,
+            'status' => $this->roleMemberships()
+                ->where('entity_type', User::class)
+                ->where('entity_id', auth()->user()->getAuthIdentifier())
+                ->value('status') ?? false,
         ];
     }
 
     private function canModerate(): bool
     {
-        if ($this->type !== 'on-request') {
+        if ($this->type !== RoleType::ON_REQUEST) {
             return false;
         }
 
@@ -59,6 +67,6 @@ class RoleRessource extends JsonResource
             return true;
         }
 
-        return $this->isModerator(auth()->user());
+        return (new BaseRoleService)->for($this->resource)->canModerate(auth()->user());
     }
 }

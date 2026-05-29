@@ -25,18 +25,17 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Auth\Http\Middleware\CheckPermissionOrCorporationRole;
+use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Corporation\MemberTracking\MemberTrackingController;
-use Seatplus\Web\Http\Middleware\CheckPermissionAndAffiliation;
 
 Route::prefix('tracking')
     ->group(function () {
 
-        Route::middleware(CheckPermissionOrCorporationRole::class . ':view member tracking,director')
+        Route::middleware(CheckAuthorization::class.':view member tracking,director')
             ->get('', [MemberTrackingController::class, 'index'])
             ->name('corporation.member_tracking');
 
-        Route::middleware(CheckPermissionAndAffiliation::class . ':view member tracking,director')
+        Route::middleware(CheckAuthorization::class.':view member tracking,director')
             ->get('/members/{corporation_id}', [MemberTrackingController::class, 'getMemberTracking'])
             ->name('get.corporation.member_tracking');
     });

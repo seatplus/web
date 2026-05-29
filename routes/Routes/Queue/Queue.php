@@ -29,7 +29,7 @@ use Seatplus\Web\Http\Controllers\Queue\DispatchJobController;
 use Seatplus\Web\Http\Controllers\Queue\QueueController;
 
 Route::get('status', [
-    'as'   => 'horizon.status',
+    'as' => 'horizon.status',
     'uses' => QueueController::class,
 ]);
 

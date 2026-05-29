@@ -26,17 +26,22 @@
 
 namespace Seatplus\Web\Http\Resources\Universe;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Universe\Type;
 
+/**
+ * @mixin Type
+ */
 class TypeResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'type_id' => $this->type_id,
             'volume' => $this->volume,
             'name' => $this->name,
-            'group' => GroupResource::make($this->whenLoaded('group')) ?? 'unknown',
+            'group' => GroupResource::make($this->whenLoaded('group')),
         ];
     }
 }

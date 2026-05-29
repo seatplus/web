@@ -36,15 +36,15 @@ class ListUserController extends Controller
     {
         $name_lookup = request()->get('name');
 
-        return User::with('main_character', 'characters')
+        return User::with('mainCharacter', 'characters')
             ->when(
                 request()->has('name'),
                 fn (Builder $query) => $query
-                ->whereHas(
-                    'characters',
-                    fn (Builder $query) => $query
-                    ->where('name', 'like', "%${name_lookup}%")
-                )
+                    ->whereHas(
+                        'characters',
+                        fn (Builder $query) => $query
+                            ->where('name', 'like', "%${name_lookup}%")
+                    )
             )
             ->paginate();
     }

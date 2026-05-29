@@ -28,43 +28,48 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\EsiClient\EsiClient;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\Eveapi\Services\Esi\GetUpToDateRefreshTokenService;
 
 class SearchService
 {
-    public function execute(RefreshToken $token, array $categories, string $term)
+    public function execute(RefreshToken $token, array $categories, string $term): object
     {
-        $container = new EsiRequestContainer(
-            method: 'get',
-            version: 'v3',
-            endpoint: '/characters/{character_id}/search/',
-            refresh_token: $token,
-            path_values: [
-                'character_id' => $token->character_id,
-            ],
-            query_parameters: [
-                'categories' => implode(',', $categories),
-                'search' => $term,
-            ]
-        );
+        $upToDateToken = app(GetUpToDateRefreshTokenService::class)->get($token);
+        $accessToken = $upToDateToken->getRawOriginal('token');
 
-        return RetrieveEsiData::execute($container);
+        $response = app(EsiClient::class)
+            ->withToken($accessToken)
+            ->invoke(
+                method: 'get',
+                path: '/characters/{character_id}/search/',
+                pathValues: ['character_id' => $token->character_id],
+                queryParams: [
+                    'categories' => implode(',', $categories),
+                    'search' => $term,
+                ],
+            );
+
+        return $response->data;
     }
 
     public static function getTokenFromCurrentUser(): ?RefreshToken
     {
         $user_id = auth()->user()->getAuthIdentifier();
 
-        return Cache::remember("esi-search:$user_id", now()->addHour()->diffInSeconds(), function () {
+        /** @var RefreshToken|null $token */
+        $token = Cache::remember("esi-search:$user_id", now()->addHour()->diffInSeconds(), function () {
             $user = User::query()
                 ->with('characters.refresh_token')
                 ->find(auth()->user()->getAuthIdentifier());
 
-            $tokens = $user->characters->map(fn ($character) => $character->refresh_token)->filter();
+            $tokens = $user->characters->map(fn (CharacterInfo $character) => $character->refresh_token)->filter();
 
-            return $tokens->firstWhere(fn ($token) => in_array('esi-search.search_structures.v1', $token->scopes));
+            return $tokens->firstWhere(fn (RefreshToken $token) => in_array('esi-search.search_structures.v1', $token->scopes));
         });
+
+        return $token;
     }
 }

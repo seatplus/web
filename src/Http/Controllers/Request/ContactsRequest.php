@@ -27,41 +27,27 @@
 namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 class ContactsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'corporation_id' => [
+            'target_corporation_id' => [
                 'required',
                 'integer',
             ],
-            'alliance_id' => [
-                'sometimes',
-                'required',
-                'integer',
-                function ($attribute, $value, $fail) {
-                    if ($value !== CorporationInfo::find($this->get('corporation_id'))->alliance_id) {
-                        $fail("The provided ${attribute} does not match the corporations ${attribute}");
-                    }
-                }, ],
         ];
     }
 }

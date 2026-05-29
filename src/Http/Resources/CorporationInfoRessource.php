@@ -26,23 +26,31 @@
 
 namespace Seatplus\Web\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
+/**
+ * @mixin CorporationInfo
+ */
 class CorporationInfoRessource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->corporation_id,
             'corporation_id' => $this->corporation_id,
             'name' => $this->name,
-            'alliance' => $this->whenLoaded('alliance', fn () => $this->alliance->name),
+            'alliance' => $this->whenLoaded('alliance', function (): string {
+                /** @var AllianceInfo $alliance */
+                $alliance = $this->alliance;
+
+                return $alliance->name;
+            }),
             'hasEveImage' => true,
         ];
     }

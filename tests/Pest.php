@@ -2,9 +2,10 @@
 
 use Faker\Factory;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Tests\TestCase;
-use Spatie\Permission\PermissionRegistrar;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +19,8 @@ use Spatie\Permission\PermissionRegistrar;
 */
 
 /** @link https://pestphp.com/docs/underlying-test-case */
-uses(TestCase::class)->in('Integration', 'Unit');
-//uses(TestCase::class);
+uses(TestCase::class)->in('Feature', 'Unit');
+// uses(TestCase::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +47,6 @@ uses(TestCase::class)->in('Integration', 'Unit');
 */
 
 /** @link https://pestphp.com/docs/helpers */
-
 function faker()
 {
     return Factory::create();
@@ -61,12 +61,18 @@ function assignPermissionToTestUser(array|string $permission_strings)
 
         test()->test_user->givePermissionTo($permission);
     }
-
-    // now re-register all the roles and permissions
-    app()->make(PermissionRegistrar::class)->registerPermissions();
 }
 
-function updateRefreshTokenWithScopes(\Seatplus\Eveapi\Models\RefreshToken $refreshToken, array $scopes): RefreshToken
+function assignPermission(User $user, array|string $permission_strings): void
+{
+    $permission_strings = is_array($permission_strings) ? $permission_strings : [$permission_strings];
+
+    foreach ($permission_strings as $string) {
+        $user->givePermissionTo(Permission::findOrCreate($string));
+    }
+}
+
+function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes): RefreshToken
 {
     $helper_token = RefreshToken::factory()->scopes($scopes)->make([
         'character_id' => $refreshToken->character_id,
@@ -76,4 +82,47 @@ function updateRefreshTokenWithScopes(\Seatplus\Eveapi\Models\RefreshToken $refr
     $refreshToken->save();
 
     return $refreshToken;
+}
+
+/**
+ * Create a role via HTTP, set its affiliations, optionally assign permissions, and add a member.
+ *
+ * Uses the ACL HTTP endpoints so tests exercise the real request/response cycle.
+ * Permissions are still assigned directly — no HTTP endpoint exists for that.
+ *
+ * @param  array<array{entity_id: int, entity_type: string, affiliation_type: string}>  $affiliations
+ * @param  string[]  $permissions
+ */
+function createRoleViaHttp(
+    string $roleName,
+    array $affiliations,
+    User $member,
+    array $permissions = [],
+    string $roleType = 'manual',
+    ?User $actor = null,
+): Role {
+    $actor ??= test()->superuser;
+
+    test()->actingAs($actor)
+        ->followingRedirects()
+        ->postJson(route('acl.create'), ['name' => $roleName]);
+
+    $role = Role::findByName($roleName);
+
+    if (! empty($affiliations)) {
+        test()->actingAs($actor)
+            ->postJson(route('acl.update.'.$roleType, $role->id), ['affiliated' => $affiliations])
+            ->assertRedirect();
+        $role->refresh();
+    }
+
+    foreach ($permissions as $permissionName) {
+        $role->givePermissionTo(Permission::findOrCreate($permissionName));
+    }
+
+    test()->actingAs($actor)
+        ->post(route('acl.member.add', [$role->id, $member->id]))
+        ->assertRedirect();
+
+    return $role->fresh();
 }

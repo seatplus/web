@@ -30,54 +30,85 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Affiliations\GetAffiliatedIdsService;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class GetRecruitIdsService
 {
-    public static function get(): array
-    {
-        $permission = 'can accept or deny applications';
+    private const string PERMISSION = 'can accept or deny applications';
 
-        $affiliations_dto = new AffiliationsDto(
-            permissions: [$permission],
-            user: auth()->user(),
-            corporation_roles: ['Director']
+    private const string CORPORATION_ROLE = 'Director';
+
+    private const int CACHE_DURATION_MINUTES = 15;
+
+    private static ?self $instance = null;
+
+    private function __construct(
+        private readonly GetAffiliatedIds $affiliatedIdsService
+    ) {}
+
+    public static function get(?GetAffiliatedIds $getAffiliatedIds = null): array
+    {
+        if (self::$instance === null) {
+            self::$instance = new self($getAffiliatedIds ?? new GetAffiliatedIds);
+        }
+
+        return self::$instance->fetchRecruits();
+    }
+
+    private function fetchRecruits(): array
+    {
+        $affiliated_ids = $this->affiliatedIdsService->get(
+            self::PERMISSION,
+            self::CORPORATION_ROLE,
+            auth()->user()
         );
 
-        $cache_key = hash('sha256', json_encode($affiliations_dto));
+        return $this->getCachedRecruits($affiliated_ids);
+    }
 
-        return Cache::remember($cache_key, now()->addMinutes(15), function () use ($affiliations_dto) {
-            $affiliated_ids = GetAffiliatedIdsService::make($affiliations_dto)->getQuery();
-            $owned_ids = GetOwnedAffiliatedIdsService::make($affiliations_dto)->getQuery();
+    private function getCachedRecruits(array $affiliatedIds): array
+    {
+        $cacheKey = hash('sha256', implode(', ', $affiliatedIds));
 
-            $affiliated = $affiliated_ids->union($owned_ids);
+        return Cache::remember(
+            $cacheKey,
+            now()->addMinutes(self::CACHE_DURATION_MINUTES),
+            fn () => $this->queryRecruits($affiliatedIds)
+        );
+    }
 
-            return Application::query()
-                ->with([
-                    'applicationable' => fn (MorphTo $morph_to) => $morph_to->morphWith([
-                        User::class => ['characters'],
-                    ]),
-                ])
-                ->when(
-                    ! $affiliations_dto->user->can('superuser'),
-                    fn (Builder $query) => $query
-                    ->joinSub($affiliated, 'affiliated', 'applications.corporation_id', '=', 'affiliated.affiliated_id')
-                )
-                ->where('status', 'open')
-                ->get()
-                ->map(
-                    fn ($recruit) => $recruit->applicationable->characters
-                        ? $recruit->applicationable->characters->pluck('character_id')
-                        : $recruit->applicationable->character_id
-                )
-                ->flatten()
-                ->unique()
-                ->map(fn ($recruit_id) => intval($recruit_id))
-                ->filter()
-                ->toArray();
-        });
+    private function queryRecruits(array $affiliatedIds): array
+    {
+        return Application::query()
+            ->with([
+                'applicationable' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+                    User::class => ['characters'],
+                ]),
+            ])
+            ->when(
+                ! auth()->user()->can('superuser'),
+                fn (Builder $query) => $query->whereIn('corporation_id', $affiliatedIds)
+            )
+            ->where('status', 'open')
+            ->get()
+            ->map(function (Application $recruit) {
+                $applicationable = $recruit->applicationable;
+
+                if ($applicationable instanceof User) {
+                    return $applicationable->characters->pluck('character_id');
+                }
+
+                if ($applicationable instanceof CharacterInfo) {
+                    return collect([$applicationable->character_id]);
+                }
+
+                return collect();
+            })
+            ->flatten()
+            ->unique()
+            ->map(fn (int|string $recruitId) => intval($recruitId))
+            ->filter()
+            ->toArray();
     }
 }

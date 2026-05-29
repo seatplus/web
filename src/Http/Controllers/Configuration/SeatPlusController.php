@@ -26,28 +26,33 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\ImpersonateService;
 
 class SeatPlusController extends Controller
 {
-    public function navigation()
+    public function navigation(): string
     {
         $navigation_tabs = config('web.settings');
 
-        return collect($navigation_tabs)->toJson();
+        return collect($navigation_tabs)
+            ->map(fn (array $tab) => array_merge($tab, ['uri' => route($tab['route'])]))
+            ->toJson();
     }
 
-    public function settings()
+    public function settings(): Response
     {
         $validatedData = request()->validate([
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'main_character.corporation');
+        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'mainCharacter.corporation');
 
         if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);
@@ -63,12 +68,16 @@ class SeatPlusController extends Controller
         ]);
     }
 
-    public function impersonate($user_id)
+    public function impersonate(int $user_id): RedirectResponse
     {
+        /** @var User $impersonated_user */
         $impersonated_user = User::find($user_id);
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
 
-        return redirect()->route('home')->with('success', 'Impersonating ' . $impersonated_user->main_character->name);
+        /** @var CharacterInfo $mainCharacter */
+        $mainCharacter = $impersonated_user->mainCharacter;
+
+        return redirect()->route('home')->with('success', 'Impersonating '.$mainCharacter->name);
     }
 }

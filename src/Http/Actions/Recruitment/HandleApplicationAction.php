@@ -28,14 +28,14 @@ namespace Seatplus\Web\Http\Actions\Recruitment;
 
 use Illuminate\Support\Arr;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HandleApplicationAction
 {
     private User $user;
+
     private ?int $corporation_id = null;
+
     private ?int $character_id = null;
 
     public function __construct()
@@ -43,7 +43,7 @@ class HandleApplicationAction
         $this->user = auth()->user();
     }
 
-    public function execute(array $data)
+    public function execute(array $data): void
     {
         $this->corporation_id = Arr::get($data, 'corporation_id');
         $this->character_id = Arr::get($data, 'character_id');
@@ -65,19 +65,6 @@ class HandleApplicationAction
 
     private function characterIdBelongsToUser(): bool
     {
-        return in_array($this->character_id, $this->getOwnedIds());
-    }
-
-    private function getOwnedIds(): array
-    {
-        $dto = new AffiliationsDto(
-            permissions: [''],
-            user: $this->user
-        );
-
-        return GetOwnedAffiliatedIdsService::make($dto)
-            ->getQuery()
-            ->pluck('affiliated_id')
-            ->toArray();
+        return in_array($this->character_id, $this->user->characters->pluck('character_id')->toArray());
     }
 }

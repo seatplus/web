@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Queue;
+use Seatplus\Auth\Enums\RoleMembershipStatus;
+use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
+
+beforeEach(function () {
+    Queue::fake();
+
+    $role = Role::create(['name' => 'test']);
+    test()->role = Role::findById($role->id);
+});
+
+it('denies DenyApplicationController to unauthenticated user', function () {
+    test()->delete(route('acl.deny', [test()->role->id, 1]))
+        ->assertRedirect();
+});
+
+it('non-moderator cannot deny an applicant', function () {
+    $other_user = User::factory()->create();
+
+    test()->actingAs($other_user)
+        ->delete(route('acl.deny', [test()->role->id, test()->test_user->id]))
+        ->assertForbidden();
+});
+
+it('moderator can deny an applicant', function () {
+    $setup_admin = User::factory()->create();
+    assignPermission($setup_admin, ['superuser']);
+    test()->actingAs($setup_admin)
+        ->postJson(route('acl.update.on-request', test()->role->id), [
+            'affiliated' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
+            ],
+            'assigned' => [
+                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
+
+    assignPermissionToTestUser(['view access control']);
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.apply', test()->role->id))
+        ->assertRedirect();
+
+    expect(
+        test()->role->roleMemberships()
+            ->where('status', RoleMembershipStatus::PENDING->value)
+            ->exists()
+    )->toBeTrue();
+
+    $moderator = User::factory()->create();
+    $admin = User::factory()->create();
+    assignPermission($admin, ['administrate access control groups']);
+    test()->actingAs($admin)
+        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+        ->assertRedirect();
+
+    test()->actingAs($moderator)
+        ->delete(route('acl.deny', [test()->role->id, test()->test_user->id]))
+        ->assertRedirect();
+
+    expect(
+        test()->role->roleMemberships()
+            ->where('status', RoleMembershipStatus::PENDING->value)
+            ->exists()
+    )->toBeFalse();
+});

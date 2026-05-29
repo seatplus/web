@@ -27,12 +27,13 @@
 namespace Seatplus\Web\Http\Controllers\Configuration\Schedules;
 
 use Inertia\Inertia;
+use Inertia\Response;
 use Seatplus\Eveapi\Models\Schedules;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class ScheduleDetail extends Controller
 {
-    public function __invoke($schedule_id)
+    public function __invoke(int $schedule_id): Response
     {
         return Inertia::render('Configuration/Schedules/SchedulesDetails', [
             'schedule' => Schedules::find($schedule_id),

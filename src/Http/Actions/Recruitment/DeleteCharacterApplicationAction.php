@@ -3,13 +3,12 @@
 namespace Seatplus\Web\Http\Actions\Recruitment;
 
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Affiliations\GetOwnedAffiliatedIdsService;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class DeleteCharacterApplicationAction
 {
     private User $user;
+
     private int $character_id;
 
     public function __construct()
@@ -19,7 +18,6 @@ class DeleteCharacterApplicationAction
 
     public function execute(int $character_id): void
     {
-
         $this->character_id = $character_id;
 
         abort_unless($this->characterIdBelongsToUser(), 403, 'submitted character_id does not belong to user');
@@ -34,15 +32,7 @@ class DeleteCharacterApplicationAction
 
     private function getOwnedIds(): array
     {
-        $dto = new AffiliationsDto(
-            permissions: [''],
-            user: $this->user
-        );
-
-        return GetOwnedAffiliatedIdsService::make($dto)
-            ->getQuery()
-            ->pluck('affiliated_id')
-            ->toArray();
+        return $this->user->characters->pluck('character_id')->toArray();
     }
 
     public function removeApplication(): void

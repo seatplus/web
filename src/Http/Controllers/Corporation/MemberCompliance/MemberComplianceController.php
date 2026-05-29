@@ -27,27 +27,37 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberCompliance;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Inertia\Response;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Dtos\AffiliationsDto;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
+use Seatplus\Web\Services\GetAffiliatedIds;
 
 class MemberComplianceController
 {
-    public function index()
+    public function index(): Response
     {
-        $affiliationsDto = new AffiliationsDto(
-            user: auth()->user(),
-            permissions: ['view member compliance'],
-            corporation_roles: ['director'],
-        );
+        /** @var User $user */
+        $user = auth()->user();
 
         $affiliated_corporations = CorporationInfo::query()
-            ->whereAffiliatedCorporations($affiliationsDto)
             ->has('ssoScopes')
             ->orHas('alliance.ssoScopes')
+            ->when(
+                ! $user->can('superuser'),
+                function (Builder $query) use ($user) {
+                    $affiliated_ids = (new GetAffiliatedIds($user))->get(
+                        permissions: 'view member compliance',
+                        corporationRoles: 'director'
+                    );
+
+                    $query->whereIn('corporation_infos.corporation_id', $affiliated_ids);
+                }
+            )
             ->select('name', 'corporation_id')
             ->addSelect(['type' => SsoScopes::whereColumn('morphable_id', 'corporation_id')->limit(1)->select('type')])
             ->get();
@@ -58,7 +68,7 @@ class MemberComplianceController
         ]);
     }
 
-    public function getCorporationCompliance(int $corporation_id, string $type)
+    public function getCorporationCompliance(int $corporation_id, string $type): AnonymousResourceCollection
     {
         $isCharacterType = $type === 'default';
         $search = request()->get('search');
@@ -68,9 +78,9 @@ class MemberComplianceController
             ->whereHas('characters.corporation', fn (Builder $query) => $query
                 ->where('corporation_infos.corporation_id', $corporation_id))
             ->with([
-                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
-                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
-                'main_character',
+                'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'mainCharacter',
                 'characters.corporation.ssoScopes',
                 'characters.alliance.ssoScopes',
                 'characters.application.corporation.ssoScopes',
@@ -83,16 +93,16 @@ class MemberComplianceController
         return CorporationComplianceResource::collection($users->paginate());
     }
 
-    public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action)
+    public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action): Response
     {
-        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->pluck('type')->first();
+        $type = SsoScopes::where('morphable_id', $corporation_id)->limit(1)->value('type');
         $isCharacterType = $type === 'default';
 
         $member = $user
             ->loadMissing([
-                'characters' => fn ($query) => $query->select('character_infos.character_id', 'character_infos.name')
-                    ->when($isCharacterType, fn ($query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
-                'main_character',
+                'characters' => fn (Relation $query) => $query->select('character_infos.character_id', 'character_infos.name')
+                    ->when($isCharacterType, fn (Builder $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))),
+                'mainCharacter',
             ]);
 
         return inertia('Corporation/MemberCompliance/ReviewUser', [

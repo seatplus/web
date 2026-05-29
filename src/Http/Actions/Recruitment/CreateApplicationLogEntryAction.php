@@ -75,7 +75,7 @@ class CreateApplicationLogEntryAction
         return $this;
     }
 
-    public function execute()
+    public function execute(): void
     {
         ApplicationLogs::query()->create([
             'application_id' => $this->getApplicationId(),

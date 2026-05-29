@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Seatplus\Web\Http\Controllers\AccessControl;
+
+use Illuminate\Http\RedirectResponse;
+use Seatplus\Auth\Http\Actions\Roles\ManageAutomaticRoleAction;
+use Seatplus\Auth\Http\Actions\Roles\Manual\ManageManualRoleAction;
+use Seatplus\Auth\Http\Actions\Roles\OnRequest\ManageOnRequestRoleAction;
+use Seatplus\Auth\Http\Actions\Roles\OptIn\ManageOptInRoleAction;
+use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Controllers\Request\ManageRoleRequest;
+
+class ManageRoleController extends Controller
+{
+    private const array TYPE_ACTION_MAP = [
+        'automatic' => ManageAutomaticRoleAction::class,
+        'manual' => ManageManualRoleAction::class,
+        'on-request' => ManageOnRequestRoleAction::class,
+        'opt-in' => ManageOptInRoleAction::class,
+    ];
+
+    public function __invoke(ManageRoleRequest $request, int $role_id): RedirectResponse
+    {
+        $type = $request->route('type');
+
+        abort_unless(array_key_exists($type, self::TYPE_ACTION_MAP), 404);
+
+        app(self::TYPE_ACTION_MAP[$type])->execute($request);
+
+        return redirect()->route('acl.detail', $role_id)->with('success', 'updated');
+    }
+}
