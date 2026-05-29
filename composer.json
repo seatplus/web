@@ -28,7 +28,7 @@
         "php": "^8.3",
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "dev-chore/code-quality as 4.0.7",
+        "seatplus/eveapi": "dev-4.x-laravel11-maincharacter as 4.0.1",
         "seatplus/auth": "dev-4.x-laravel11-quality as 4.0.6",
         "conedevelopment/i18n": "^1.1",
         "doctrine/dbal": "^3.0",
