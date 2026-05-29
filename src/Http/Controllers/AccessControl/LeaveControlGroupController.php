@@ -34,7 +34,9 @@ use Seatplus\Auth\Services\Roles\BaseRoleService;
 class LeaveControlGroupController
 {
     private const string ERROR_INVALID_GROUP_TYPE = 'This action is not allowed on this access control group';
+
     private const string ERROR_UNAUTHORIZED = 'You are not allowed to perform this action';
+
     private const array ALLOWED_ROLE_TYPES = [RoleType::OPT_IN, RoleType::ON_REQUEST, RoleType::MANUAL];
 
     public function __construct(

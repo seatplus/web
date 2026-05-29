@@ -36,7 +36,9 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 class GetRecruitIdsService
 {
     private const string PERMISSION = 'can accept or deny applications';
+
     private const string CORPORATION_ROLE = 'Director';
+
     private const int CACHE_DURATION_MINUTES = 15;
 
     private static ?self $instance = null;
