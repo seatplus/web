@@ -9,6 +9,8 @@ parameters:
         - database/migrations
         - vendor/seatplus/auth/database/migrations
         - vendor/seatplus/eveapi/database/migrations
+    stubFiles:
+        - phpstan/stubs.php
     level: 4
     paths:
         - src
@@ -26,15 +28,4 @@ parameters:
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
-        # Eloquent Attribute accessors (decisionCount, stepsCount, affiliation) are
-        # defined in eveapi vendor models without @property annotations; Larastan 3.x
-        # does not infer them from the new Attribute API style with closures.
-        -
-            message: "#^Access to an undefined property Seatplus\\\\Eveapi\\\\Models\\\\Application::\\$decision_count\\.$#"
-        -
-            message: "#^Access to an undefined property Seatplus\\\\Eveapi\\\\Models\\\\Recruitment\\\\Enlistments::\\$steps_count\\.$#"
-        -
-            message: "#^Access to an undefined property Seatplus\\\\Web\\\\Http\\\\Resources\\\\ApplicationRessource::\\$decision_count\\.$#"
-        -
-            message: "#^Access to an undefined property Seatplus\\\\Web\\\\Http\\\\Resources\\\\ContactResource::\\$affiliation\\.$#"
 
