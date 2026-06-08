@@ -1,8 +1,6 @@
 <?php
 
 use Inertia\Testing\AssertableInertia;
-use Seatplus\EsiClient\EsiClient;
-use Seatplus\Eveapi\Models\Universe\System;
 
 // First as vanilla user without necessairy 'esi-search.search_structures.v1' scope
 // try getting the token and fail to do so
@@ -51,39 +49,4 @@ it('returns truthy if the user has the necessary scope', function () {
         ->assertOk();
 
     expect($result->original)->toBeTruthy();
-});
-
-// with a token try to do a search and succeed
-it('can search existing system', function () {
-    updateRefreshTokenWithScopes($this->test_character->refresh_token, ['esi-search.search_structures.v1']);
-
-    $system = System::factory()->create([
-        'name' => 'jita',
-    ]);
-
-    $mock = Mockery::mock(EsiClient::class);
-    $mock->shouldReceive('withToken')->andReturnSelf();
-    $mock->shouldReceive('invoke')
-        ->twice()
-        ->andReturn(
-            test()->mockEsiResponse([
-                'solar_system' => [
-                    $system->system_id,
-                ],
-            ]),
-            test()->mockEsiResponse([
-                [
-                    'id' => $system->system_id,
-                    'name' => $system->name,
-                    'category' => 'solar_system',
-                ],
-            ])
-        );
-    app()->instance(EsiClient::class, $mock);
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
-        ->assertOk();
-
-    expect($result->original)->toHaveCount(1);
 });

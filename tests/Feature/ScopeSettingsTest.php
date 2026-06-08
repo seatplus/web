@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\EsiClient\EsiClient;
-use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -28,10 +27,7 @@ test('one can create sso setting', function () {
     $corporation = CorporationInfo::factory()->make();
 
     $mock = Mockery::mock(EsiClient::class);
-    $mock->shouldReceive('assertScope')->andReturnNull();
-    $mock->shouldReceive('invoke')->andReturn(
-        new EsiRawResponse(data: (object) $corporation->attributesToArray(), isCachedLoad: false, pages: 1)
-    );
+    mockEsiTransport($mock, makeEsiResult((object) $corporation->attributesToArray()));
     app()->instance(EsiClient::class, $mock);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())

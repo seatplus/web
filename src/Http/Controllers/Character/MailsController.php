@@ -31,6 +31,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Inertia\Response;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -67,7 +68,7 @@ class MailsController extends Controller
             ->paginate();
     }
 
-    public function getMail(int $mail_id): Collection
+    public function getMail(EsiClient $esi, int $mail_id): Collection
     {
 
         $userIsSuperuser = auth()->user()->can('superuser');
@@ -83,7 +84,7 @@ class MailsController extends Controller
 
         abort_unless($mail, 404, 'Mail not found');
 
-        return EveMailService::make($mail)->getThreads();
+        return EveMailService::make($mail)->getThreads($esi);
     }
 
     private function getDispatchTransferObject(): DispatchTransferObject

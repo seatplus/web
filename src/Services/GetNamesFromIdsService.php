@@ -38,7 +38,7 @@ class GetNamesFromIdsService
         $this->result = collect();
     }
 
-    public function execute(array $ids): Collection
+    public function execute(EsiClient $esi, array $ids): Collection
     {
         $ids_to_resolve = collect($ids)->filter(function (int $id) {
             if (! cache()->has(sprintf('name:%s', $id))) {
@@ -54,7 +54,7 @@ class GetNamesFromIdsService
             return $this->result;
         }
 
-        $response = app(EsiClient::class)->invoke(
+        $response = $esi->invoke(
             method: 'post',
             path: '/universe/names/',
             requestBody: [...$ids_to_resolve->toArray()],

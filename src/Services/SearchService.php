@@ -35,12 +35,12 @@ use Seatplus\Eveapi\Services\Esi\GetUpToDateRefreshTokenService;
 
 class SearchService
 {
-    public function execute(RefreshToken $token, array $categories, string $term): object
+    public function execute(EsiClient $esi, RefreshToken $token, array $categories, string $term): object
     {
         $upToDateToken = app(GetUpToDateRefreshTokenService::class)->get($token);
         $accessToken = $upToDateToken->getRawOriginal('token');
 
-        $response = app(EsiClient::class)
+        $response = $esi
             ->withToken($accessToken)
             ->invoke(
                 method: 'get',

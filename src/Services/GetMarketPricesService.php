@@ -29,14 +29,13 @@ namespace Seatplus\Web\Services;
 use Illuminate\Support\Collection;
 use Seatplus\EsiClient\EsiClient;
 
-class GetCharacterAffiliations
+class GetMarketPricesService
 {
-    public function execute(EsiClient $esi, array $character_ids): Collection
+    public function execute(EsiClient $esi): Collection
     {
         $response = $esi->invoke(
-            method: 'post',
-            path: '/characters/affiliation/',
-            requestBody: $character_ids,
+            method: 'get',
+            path: '/markets/prices/',
         );
 
         return collect((array) $response->data);

@@ -1,7 +1,6 @@
 <?php
 
 use Seatplus\EsiClient\EsiClient;
-use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -29,7 +28,7 @@ test('happy path', function () {
 
     $service = new GetEntityFromId($character_affiliation->character_id);
 
-    $result = $service->execute();
+    $result = $service->execute(Mockery::mock(EsiClient::class));
 
     expect($result)->toEqual($expected_result);
 
@@ -55,7 +54,7 @@ test('happy path without alliance', function () {
 
     $service = new GetEntityFromId($character_affiliation->character_id);
 
-    $result = $service->execute();
+    $result = $service->execute(Mockery::mock(EsiClient::class));
 
     expect($result)->toEqual($expected_result);
 });
@@ -76,7 +75,7 @@ test('happy path via corporation id', function () {
 
     $service = new GetEntityFromId($character_affiliation->corporation_id);
 
-    $result = $service->execute();
+    $result = $service->execute(Mockery::mock(EsiClient::class));
 
     expect($result)->toEqual($expected_result);
 });
@@ -94,7 +93,7 @@ test('happy path via alliance id', function () {
 
     $service = new GetEntityFromId($character_affiliation->alliance_id);
 
-    $result = $service->execute();
+    $result = $service->execute(Mockery::mock(EsiClient::class));
 
     expect($result)->toEqual($expected_result);
 });
@@ -119,21 +118,15 @@ test('unknown character id', function () {
     ];
 
     $body = [
-        array_merge($esi_mock_return_data, [
+        (object) array_merge($esi_mock_return_data, [
             'id' => $character->character_id,
             'name' => $character->name,
             'category' => 'character',
         ]),
     ];
 
-    $data = array_map(fn ($item) => (object) $item, $body);
-    $response = new EsiRawResponse($data, isCachedLoad: false, pages: 1);
-
-    $mock = Mockery::mock(EsiClient::class);
-    $mock->shouldReceive('invoke')
-        ->twice()
-        ->andReturn($response);
-    app()->instance(EsiClient::class, $mock);
+    $esi = Mockery::mock(EsiClient::class);
+    mockEsiTransport($esi, makeEsiResult($body));
 
     $expected_result = [
         'id' => $character->character_id,
@@ -149,7 +142,7 @@ test('unknown character id', function () {
 
     $service = new GetEntityFromId($character->character_id);
 
-    $result = $service->execute();
+    $result = $service->execute($esi);
 
     expect($result)->toEqual($expected_result);
 });

@@ -30,9 +30,9 @@ use Seatplus\EsiClient\EsiClient;
 
 class GetCorporationInfo
 {
-    public function execute(int $corporation_id): object
+    public function execute(EsiClient $esi, int $corporation_id): object
     {
-        $response = app(EsiClient::class)->invoke(
+        $response = $esi->invoke(
             method: 'get',
             path: '/corporations/{corporation_id}/',
             pathValues: ['corporation_id' => $corporation_id],

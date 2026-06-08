@@ -42,35 +42,36 @@ use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\GetCharacterAffiliations;
 use Seatplus\Web\Services\GetCorporationInfo;
 use Seatplus\Web\Services\GetEntityFromId;
+use Seatplus\Web\Services\GetMarketPricesService;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Services\SearchService;
 
 class HelperController extends Controller
 {
-    public function ids(): string
+    public function ids(EsiClient $esi): string
     {
-        $result = (new GetNamesFromIdsService)->execute(request()->all());
+        $result = (new GetNamesFromIdsService)->execute($esi, request()->all());
 
         return $result->toJson();
     }
 
-    public function characterAffiliations(): string
+    public function characterAffiliations(EsiClient $esi): string
     {
-        $result = (new GetCharacterAffiliations)->execute(request()->all());
+        $result = (new GetCharacterAffiliations)->execute($esi, request()->all());
 
         return $result->toJson();
     }
 
-    public function getCorporationInfo(int $corporation_id): string
+    public function getCorporationInfo(EsiClient $esi, int $corporation_id): string
     {
-        $result = (new GetCorporationInfo)->execute($corporation_id);
+        $result = (new GetCorporationInfo)->execute($esi, $corporation_id);
 
         return collect([$result])->toJson();
     }
 
-    public function getEntityFromId(int $id): array
+    public function getEntityFromId(EsiClient $esi, int $id): array
     {
-        return (new GetEntityFromId($id))->execute();
+        return (new GetEntityFromId($id))->execute($esi);
     }
 
     public function token(): int
@@ -80,7 +81,7 @@ class HelperController extends Controller
         return $token ? 1 : 0;
     }
 
-    public function esiSearch(Request $request): Collection
+    public function esiSearch(Request $request, EsiClient $esi): Collection
     {
         $validated_data = $request->validate([
             'search' => ['required', 'string', 'min:3'],
@@ -91,9 +92,9 @@ class HelperController extends Controller
 
         throw_if(! $token, new \Exception('No ESI Search Token found, at least one character needs to have the scope esi-search.search_structures.v1'));
 
-        $ids = (new SearchService)->execute($token, $validated_data['categories'], $validated_data['search']);
+        $ids = (new SearchService)->execute($esi, $token, $validated_data['categories'], $validated_data['search']);
 
-        return (new GetNamesFromIdsService)->execute(collect($ids)->flatten()->take(15)->toArray());
+        return (new GetNamesFromIdsService)->execute($esi, collect($ids)->flatten()->take(15)->toArray());
     }
 
     public function typesOrGroupsOrCategories(): Response|Collection
@@ -160,18 +161,13 @@ class HelperController extends Controller
         return $image_variants;
     }
 
-    public function getMarketsPrices(): string
+    public function getMarketsPrices(EsiClient $esi): string
     {
         if ($prices = cache('market_prices')) {
             return $prices->toJson();
         }
 
-        $response = app(EsiClient::class)->invoke(
-            method: 'get',
-            path: '/markets/prices/',
-        );
-
-        $prices = collect((array) $response->data);
+        $prices = (new GetMarketPricesService)->execute($esi);
 
         cache(['market_prices' => $prices], now()->addDay());
 

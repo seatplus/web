@@ -23,7 +23,6 @@ use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
-use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
@@ -31,7 +30,6 @@ use Spatie\Permission\PermissionServiceProvider;
 abstract class TestCase extends OrchestraTestCase
 {
     use LazilyRefreshDatabase;
-    use MockRetrieveEsiDataAction;
 
     public User $test_user;
 
