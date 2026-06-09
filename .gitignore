@@ -12,6 +12,7 @@ public/css/
 .php_cs
 .php_cs.cache
 .phpunit.result.cache
+.phpunit.cache/
 .php-cs-fixer.cache
 
 public/js/
