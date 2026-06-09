@@ -20,7 +20,7 @@
         "eslint-plugin-vue": "^9.26.0",
         "globals": "^15.3.0",
         "laravel-vite-plugin": "^0.8.1",
-        "postcss": "^8.4.16",
+        "postcss": "^8.5.15",
         "resolve-url-loader": "^5.0.0",
         "rollup-plugin-copy": "^3.4.0",
         "sass": "^1.32.5",
