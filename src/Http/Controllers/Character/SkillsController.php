@@ -40,7 +40,7 @@ class SkillsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
-        $ids = $this->getCharacterIds($dispatchTransferObject);
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'skills');
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

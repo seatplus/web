@@ -45,7 +45,7 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $ids = $this->getCharacterIds($dispatchTransferObject);
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'mails');
 
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
