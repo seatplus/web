@@ -9,8 +9,6 @@ parameters:
         - database/migrations
         - vendor/seatplus/auth/database/migrations
         - vendor/seatplus/eveapi/database/migrations
-    stubFiles:
-        - phpstan/stubs.php
     level: 4
     paths:
         - src
