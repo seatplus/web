@@ -36,7 +36,7 @@ class ListUserController extends Controller
     {
         $name_lookup = request()->get('name');
 
-        return User::with('main_character', 'characters')
+        return User::with('mainCharacter', 'characters')
             ->when(
                 request()->has('name'),
                 fn (Builder $query) => $query

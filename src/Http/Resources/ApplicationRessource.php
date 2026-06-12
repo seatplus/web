@@ -50,7 +50,7 @@ class ApplicationRessource extends JsonResource
             'application_id' => $this->id,
             'is_user' => $is_user,
             $this->mergeWhen($is_user, ['user' => $this->applicationable]),
-            'main_character' => $is_user ? data_get($this->applicationable, 'main_character') : $this->getMainCharacterFromCharacterId(data_get($this->applicationable, 'character_id')),
+            'mainCharacter' => $is_user ? data_get($this->applicationable, 'mainCharacter') : $this->getMainCharacterFromCharacterId(data_get($this->applicationable, 'character_id')),
             'characters' => $this->getCharacters(),
             'decision_count' => $this->decision_count,
         ];
@@ -60,16 +60,16 @@ class ApplicationRessource extends JsonResource
     {
         /** @var CharacterUser|null $character_user */
         $character_user = CharacterUser::query()
-            ->with('user.main_character')
+            ->with('user.mainCharacter')
             ->firstWhere('character_id', $character_id);
 
         /** @var User|null $user */
         $user = $character_user?->user;
 
-        /** @var CharacterInfo|null $main_character */
-        $main_character = $user?->main_character;
+        /** @var CharacterInfo|null $mainCharacter */
+        $mainCharacter = $user?->mainCharacter;
 
-        return $main_character;
+        return $mainCharacter;
     }
 
     private function buildCharacterArray(CharacterInfo $character): array

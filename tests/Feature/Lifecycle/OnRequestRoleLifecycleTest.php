@@ -53,7 +53,7 @@ it('full lifecycle: configure apply set moderator approve leave', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('entity_id', test()->test_user->id)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()
@@ -66,7 +66,7 @@ it('full lifecycle: configure apply set moderator approve leave', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('entity_id', $moderator->id)
             ->where('can_moderate', true)
             ->exists()
@@ -122,7 +122,7 @@ it('deny flow: configure apply set moderator deny', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('entity_id', test()->test_user->id)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->exists()

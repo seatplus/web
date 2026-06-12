@@ -39,7 +39,7 @@ class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    private const CHARACTER_IDS_FILTER = 'character_ids';
+    private const string CHARACTER_IDS_FILTER = 'character_ids';
 
     public function __construct(
         protected readonly Request $request,
@@ -60,7 +60,6 @@ class Controller extends BaseController
         array $characterIds,
         ?string $characterRelation = null
     ): \Illuminate\Database\Eloquent\Collection {
-
         return CharacterInfo::query()
             ->select('character_id')
             ->whereIn('character_id', $characterIds)

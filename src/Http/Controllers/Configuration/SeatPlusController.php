@@ -41,7 +41,9 @@ class SeatPlusController extends Controller
     {
         $navigation_tabs = config('web.settings');
 
-        return collect($navigation_tabs)->toJson();
+        return collect($navigation_tabs)
+            ->map(fn (array $tab) => array_merge($tab, ['uri' => route($tab['route'])]))
+            ->toJson();
     }
 
     public function settings(): Response
@@ -50,7 +52,7 @@ class SeatPlusController extends Controller
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'main_character.corporation');
+        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'mainCharacter.corporation');
 
         if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);
@@ -73,9 +75,9 @@ class SeatPlusController extends Controller
 
         (new ImpersonateService)->impersonateUser($impersonated_user);
 
-        /** @var CharacterInfo $main_character */
-        $main_character = $impersonated_user->main_character;
+        /** @var CharacterInfo $mainCharacter */
+        $mainCharacter = $impersonated_user->mainCharacter;
 
-        return redirect()->route('home')->with('success', 'Impersonating '.$main_character->name);
+        return redirect()->route('home')->with('success', 'Impersonating '.$mainCharacter->name);
     }
 }

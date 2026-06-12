@@ -23,7 +23,6 @@ use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Tests\Stubs\ConsoleKernel;
 use Seatplus\Web\Tests\Stubs\Kernel;
-use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 use Seatplus\Web\WebServiceProvider;
 use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\PermissionServiceProvider;
@@ -31,7 +30,6 @@ use Spatie\Permission\PermissionServiceProvider;
 abstract class TestCase extends OrchestraTestCase
 {
     use LazilyRefreshDatabase;
-    use MockRetrieveEsiDataAction;
 
     public User $test_user;
 
@@ -72,6 +70,10 @@ abstract class TestCase extends OrchestraTestCase
         );
 
         $this->app->instance('path.public', __DIR__.'/Stubs');
+
+        // Backend PR: Vue page files don't exist yet — skip physical file existence check.
+        // Controller tests still assert the correct component name and props are returned.
+        config(['inertia.testing.ensure_pages_exist' => false]);
 
         Permission::findOrCreate('superuser');
 
@@ -135,8 +137,8 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('cache.prefix', 'seatplus_tests---');
 
         // Setup Inertia for package development
-        config()->set('inertia.testing.page_paths', array_merge(
-            config()->get('inertia.testing.page_paths', []),
+        config()->set('inertia.pages.paths', array_merge(
+            config()->get('inertia.pages.paths', []),
             [
                 realpath(__DIR__.'/../resources/js/Pages'),
                 realpath(__DIR__.'/../resources/js/Shared'),

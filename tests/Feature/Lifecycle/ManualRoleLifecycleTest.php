@@ -52,7 +52,7 @@ it('full lifecycle: create affiliations add member kick member', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('can_moderate', true)
             ->where('entity_id', $moderator->id)
             ->exists()
@@ -64,7 +64,7 @@ it('full lifecycle: create affiliations add member kick member', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('can_moderate', true)
             ->where('entity_id', $moderator->id)
             ->exists()

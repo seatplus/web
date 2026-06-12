@@ -29,6 +29,7 @@ namespace Seatplus\Web\Services\Mails;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Web\Services\GetIdsFromNamesService;
@@ -47,15 +48,15 @@ class EveMailService
         return new self($mail);
     }
 
-    public function getThreads(): Collection
+    public function getThreads(EsiClient $esi): Collection
     {
         $clean_body = $this->stripTags($this->mail->body ?? 'mail body has not been fetched yet.');
 
         // now split the clean body into threads
         return collect(explode('--------------------------------<br>', $clean_body))
             ->map(fn (string $mail, int $index) => $index === 0 ? $this->handleFirstMail($mail) : $this->handleMail($mail))
-            ->pipe(function (Collection $collection) {
-                $resolved_names = $this->resolveNames();
+            ->pipe(function (Collection $collection) use ($esi) {
+                $resolved_names = $this->resolveNames($esi);
 
                 return $collection->map(fn (array $mail, int $index) => $index === 0 ? $mail : $this->enrichMail($mail, $resolved_names));
             });
@@ -112,9 +113,9 @@ class EveMailService
         return $recipients;
     }
 
-    private function resolveNames(): Collection
+    private function resolveNames(EsiClient $esi): Collection
     {
-        return GetIdsFromNamesService::make()->execute($this->namesToResolve->flatten()->unique()->toArray());
+        return GetIdsFromNamesService::make()->execute($esi, $this->namesToResolve->flatten()->unique()->toArray());
     }
 
     private function enrichMail(array $mail, Collection $resolved_names): array

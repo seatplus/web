@@ -7,6 +7,7 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -14,14 +15,14 @@ use Seatplus\Web\Services\SearchService;
 
 class SearchAffiliatableController
 {
-    public function __invoke(): LengthAwarePaginator
+    public function __invoke(EsiClient $esi): LengthAwarePaginator
     {
         $query = request()->get('query');
 
         $token = SearchService::getTokenFromCurrentUser();
 
         $result = $query
-            ? (new SearchService)->execute($token, ['character', 'corporation', 'alliance'], $query)
+            ? (new SearchService)->execute($esi, $token, ['character', 'corporation', 'alliance'], $query)
             : $this->getFirstSelection();
 
         return $this->paginate(

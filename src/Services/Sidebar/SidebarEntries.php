@@ -32,7 +32,7 @@ use Seatplus\Auth\Models\User;
 
 class SidebarEntries
 {
-    private const CATEGORY_ACCESS_CONTROL = 'Access Control';
+    private const string CATEGORY_ACCESS_CONTROL = 'Access Control';
 
     private array $sidebar;
 

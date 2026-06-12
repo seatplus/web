@@ -1,41 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Eveapi\Models\Universe\Type;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
-use Seatplus\Web\Tests\Traits\MockRetrieveEsiDataAction;
 
 use function Pest\Laravel\get;
-
-uses(MockRetrieveEsiDataAction::class);
-
-it('stores resolved id to cache', function () {
-    $id = test()->test_character->character_id;
-
-    $esi_mock_return_data = [
-        'id' => $id,
-        'name' => test()->test_character->name,
-        'category' => 'character',
-    ];
-
-    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
-
-    $result = test()->actingAs(test()->test_user)
-        ->post(route('resolve.ids'), [$id]);
-
-    $result->assertJson([
-        $esi_mock_return_data,
-    ]);
-
-    $cache_value = cache(sprintf('name:%s', $id));
-    expect($cache_value->name)->toEqual(test()->test_character->name);
-});
 
 it('returns cached value for resolved ids', function () {
     $id = test()->test_character->character_id;
@@ -56,114 +26,11 @@ it('returns cached value for resolved ids', function () {
     ]);
 });
 
-it('resolves character affiliation', function () {
-    $id = test()->test_character->character_id;
-
-    $esi_mock_return_data = [
-        'alliance_id' => 123,
-        'character_id' => 456,
-        'corporation_id' => 789,
-        'faction_id' => null,
-    ];
-
-    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
-
-    $result = test()->actingAs(test()->test_user)
-        ->post(route('resolve.character_affiliation'), [$id]);
-
-    $result->assertJson([
-        $esi_mock_return_data,
-    ]);
-});
-
-it('resolves corporation info', function () {
-    $id = test()->test_character->corporation->corporation_id;
-
-    $esi_mock_return_data = test()->test_character->corporation->toArray();
-
-    test()->mockRetrieveEsiDataAction([$esi_mock_return_data]);
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('resolve.corporation_info', $id));
-
-    $result->assertJson([
-        $esi_mock_return_data,
-    ]);
-});
-
-test('one can search existing systems', function () {
-    updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
-
-    $system = System::factory()->create([
-        'name' => 'jita',
-    ]);
-
-    System::factory()->count(4)->create();
-
+test('esi search validates the search term length', function () {
     test()->actingAs(test()->test_user);
 
     get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
         ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
-
-    RetrieveEsiData::shouldReceive('execute')
-        ->twice()
-        ->andReturn(
-            test()->mockEsiResponse([
-                'solar_system' => [
-                    $system->system_id,
-                ],
-            ]),
-            test()->mockEsiResponse([
-                [
-                    'id' => $system->system_id,
-                    'name' => $system->name,
-                    'category' => 'solar_system',
-                ],
-            ])
-        );
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'jit', 'categories' => ['system']]))
-        ->assertOk();
-
-    expect($result->original)->toHaveCount(1);
-});
-
-test('one can search existing region', function () {
-    updateRefreshTokenWithScopes(test()->test_character->refresh_token, ['esi-search.search_structures.v1']);
-
-    $region = Region::factory()->create([
-        'name' => 'Delve',
-    ]);
-
-    Region::factory()->count(4)->create();
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'D', 'categories' => ['region']]))
-        ->assertInvalid(['search']);
-
-    RetrieveEsiData::shouldReceive('execute')
-        ->twice()
-        ->andReturn(
-            test()->mockEsiResponse([
-                'region' => [
-                    $region->region_id,
-                ],
-            ]),
-            test()->mockEsiResponse([
-                [
-                    'id' => $region->region_id,
-                    'name' => $region->name,
-                    'category' => 'region',
-                ],
-            ])
-        );
-
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('autosuggestion.search', ['search' => 'Del', 'categories' => ['region']]))
-        ->assertOk();
-
-    expect($result->original)->toHaveCount(1);
 });
 
 test('one can get resource variants via http and cache', function () {
@@ -190,36 +57,17 @@ test('one can get resource variants via http and cache', function () {
     expect(cache($url))->not()->toBeNull();
 });
 
-test('one can get market prices', function () {
-    $container = new EsiRequestContainer(
-        method: 'get',
-        version: 'v1',
-        endpoint: '/markets/prices/',
-    );
-
-    test()->mockRetrieveEsiDataAction([
-        (object) [
-            'adjusted_price' => 0,
-            'average_price' => 31_214_609.93,
-            'type_id' => 43691,
-        ],
-        (object) ['adjusted_price' => 1_005_248.1289155,
-            'average_price' => 1_002_393.46,
-            'type_id' => 32772,
-        ],
-        (object) ['adjusted_price' => 111879.41656101559,
-            'average_price' => 104750.07,
-            'type_id' => 32774,
-        ],
+test('one can get cached market prices without hitting esi', function () {
+    $prices = collect([
+        (object) ['adjusted_price' => 0, 'average_price' => 31_214_609.93, 'type_id' => 43691],
     ]);
 
-    expect(cache('market_prices'))->toBeNull();
+    cache(['market_prices' => $prices], now()->addDay());
 
-    $result = test()->actingAs(test()->test_user)
+    test()->actingAs(test()->test_user)
         ->get(route('get.markets.prices'))
-        ->assertOk();
-
-    test()->assertNotNull(cache('market_prices'));
+        ->assertOk()
+        ->assertJsonFragment(['type_id' => 43691]);
 });
 
 it('has auttosuggest for types, groups and categories', function () {

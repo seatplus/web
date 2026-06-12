@@ -99,11 +99,11 @@ class ApplicationsController extends Controller
             ->with([
                 'corporation',
                 'log_entries.causer' => function (MorphTo $morphTo) {
-                    $morphTo->morphWith([User::class => ['main_character']]);
+                    $morphTo->morphWith([User::class => ['mainCharacter']]);
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['main_character', 'characters', 'characters.batch_update'],
+                        User::class => ['mainCharacter', 'characters', 'characters.batch_update'],
                         CharacterInfo::class => ['batch_update'],
                     ]);
                 },
@@ -113,7 +113,7 @@ class ApplicationsController extends Controller
         $recruit = match ($application->applicationable_type) {
             User::class => $application->applicationable,
             CharacterInfo::class => collect([
-                'main_character' => $application->applicationable,
+                'mainCharacter' => $application->applicationable,
                 'characters' => [$application->applicationable],
             ]),
             default => collect([]),
@@ -179,11 +179,11 @@ class ApplicationsController extends Controller
         return Application::query()
             ->with([
                 'log_entries.causer' => function (MorphTo $morphTo) {
-                    $morphTo->morphWith([User::class => ['main_character']]);
+                    $morphTo->morphWith([User::class => ['mainCharacter']]);
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['main_character', 'characters', 'characters.batch_update'],
+                        User::class => ['mainCharacter', 'characters', 'characters.batch_update'],
                         CharacterInfo::class => ['batch_update'],
                     ]);
                 },

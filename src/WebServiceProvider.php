@@ -26,11 +26,11 @@
 
 namespace Seatplus\Web;
 
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\ServiceProvider;
+use Inertia\ExceptionResponse;
+use Inertia\Inertia;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Contracts\WebJobsRepository;
-use Seatplus\Web\Exception\Handler;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\Locale;
@@ -63,14 +63,40 @@ class WebServiceProvider extends ServiceProvider
 
         // Add commands
         $this->addCommands();
+
+        // Register Inertia error page handler.
+        //
+        // Inertia v3 removed the v2 modal overlay for non-Inertia responses, so we must
+        // render Error.vue for Inertia navigation requests (X-Inertia header) in all envs.
+        //
+        // For initial page loads (no X-Inertia header) in local+debug mode we return null,
+        // which lets Laravel's Ignition page render for 500/503 — useful for development.
+        // In production, all 4xx/5xx render Error.vue.
+        Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
+            $code = $response->statusCode();
+
+            if (! in_array($code, [403, 404, 500, 503])) {
+                return;
+            }
+
+            // Allow Ignition to handle 500/503 on initial page loads in local debug mode.
+            $isInertiaRequest = $response->request->hasHeader('X-Inertia');
+            if (! $isInertiaRequest && app()->isLocal() && config('app.debug') && in_array($code, [500, 503])) {
+                return;
+            }
+
+            return $response
+                ->render('Error', ['status' => $code])
+                ->rootView('web::app')
+                ->withSharedData()
+                ->usingMiddleware(HandleInertiaRequests::class);
+        });
     }
 
     public function register(): void
     {
-
         $this->mergeConfigurations();
 
-        $this->app->singleton(ExceptionHandler::class, Handler::class);
         $this->app->singleton(WebJobsRepository::class);
     }
 

@@ -28,31 +28,31 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\RefreshToken;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\Eveapi\Services\Esi\GetUpToDateRefreshTokenService;
 
 class SearchService
 {
-    public function execute(RefreshToken $token, array $categories, string $term): EsiResponse
+    public function execute(EsiClient $esi, RefreshToken $token, array $categories, string $term): object
     {
-        $container = new EsiRequestContainer(
-            method: 'get',
-            version: 'v3',
-            endpoint: '/characters/{character_id}/search/',
-            refresh_token: $token,
-            path_values: [
-                'character_id' => $token->character_id,
-            ],
-            query_parameters: [
-                'categories' => implode(',', $categories),
-                'search' => $term,
-            ]
-        );
+        $upToDateToken = app(GetUpToDateRefreshTokenService::class)->get($token);
+        $accessToken = $upToDateToken->getRawOriginal('token');
 
-        return RetrieveEsiData::execute($container);
+        $response = $esi
+            ->withToken($accessToken)
+            ->invoke(
+                method: 'get',
+                path: '/characters/{character_id}/search/',
+                pathValues: ['character_id' => $token->character_id],
+                queryParams: [
+                    'categories' => implode(',', $categories),
+                    'search' => $term,
+                ],
+            );
+
+        return $response->data;
     }
 
     public static function getTokenFromCurrentUser(): ?RefreshToken

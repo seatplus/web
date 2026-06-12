@@ -17,7 +17,7 @@ use Seatplus\Web\Services\Query\TypeWatchListScope;
 
 class GetCharacterAssetLocationAction
 {
-    const ASSETRELATIONS = [
+    const array ASSETRELATIONS = [
         'type' => [
             'group',
         ],

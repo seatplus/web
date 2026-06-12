@@ -68,7 +68,7 @@ class HandleInertiaRequests extends Middleware
             'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->getFilteredEntries(),
             'user' => fn () => auth()->guest() ? '' : UserRessource::make(
                 User::with([
-                    'main_character',
+                    'mainCharacter',
                     'characters' => [
                         'corporation',
                         'refresh_token',

@@ -28,13 +28,13 @@ it('adds a moderator to a manual role', function () {
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
 
-    expect(test()->role->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
+    expect(test()->role->roleMemberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 
     test()->actingAs($admin)
         ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
+    expect(test()->role->refresh()->roleMemberships()->where('can_moderate', true)->exists())->toBeTrue();
 });
 
 it('removes a moderator from a manual role', function () {
@@ -45,13 +45,13 @@ it('removes a moderator from a manual role', function () {
         ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->exists())->toBeTrue();
+    expect(test()->role->refresh()->roleMemberships()->where('can_moderate', true)->exists())->toBeTrue();
 
     test()->actingAs($admin)
         ->delete(route('acl.moderator.remove', [test()->role->id, test()->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->role->refresh()->role_memberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
+    expect(test()->role->refresh()->roleMemberships()->where('can_moderate', true)->doesntExist())->toBeTrue();
 });
 
 it('rejects moderator assignment on automatic roles', function () {

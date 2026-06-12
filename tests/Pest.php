@@ -1,9 +1,12 @@
 <?php
 
 use Faker\Factory;
+use Mockery\MockInterface;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\EsiSchema\Contracts\EsiRawResponse;
+use Seatplus\EsiSchema\EsiResult;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Tests\TestCase;
 
@@ -50,6 +53,72 @@ uses(TestCase::class)->in('Feature', 'Unit');
 function faker()
 {
     return Factory::create();
+}
+
+/**
+ * Build a high-level EsiResult — the typed wrapper a Resource operation returns.
+ *
+ * Mirrors the helper of the same name in the eveapi package so ESI mocking reads
+ * identically across packages.
+ */
+function makeEsiResult(mixed $data, bool $isCachedLoad = false, int $pages = 1): EsiResult
+{
+    return new EsiResult(data: $data, pages: $pages, isCachedLoad: $isCachedLoad);
+}
+
+/**
+ * Convert an EsiResult (or raw object/value) into the transport EsiRawResponse
+ * that EsiClient::invoke() returns.
+ */
+function makeEsiRawResponse(mixed $result): EsiRawResponse
+{
+    if ($result instanceof EsiResult) {
+        return new EsiRawResponse(
+            data: $result->data,
+            isCachedLoad: $result->isCachedLoad,
+            pages: $result->pages,
+            rateLimitRemaining: $result->rateLimitRemaining,
+        );
+    }
+
+    $isCachedLoad = false;
+    $pages = 1;
+    $rateLimitRemaining = null;
+    $data = $result;
+
+    if (is_object($result)) {
+        $isCachedLoad = $result->isCachedLoad ?? false;
+        $pages = $result->pages ?? 1;
+        $rateLimitRemaining = $result->rateLimitRemaining ?? null;
+        $data = (object) collect(get_object_vars($result))
+            ->except(['isCachedLoad', 'pages', 'rateLimitRemaining'])
+            ->all();
+    }
+
+    return new EsiRawResponse(
+        data: $data,
+        isCachedLoad: $isCachedLoad,
+        pages: $pages,
+        rateLimitRemaining: $rateLimitRemaining,
+    );
+}
+
+/**
+ * Stub the EsiClient transport surface (withToken / assertScope / invoke) on a
+ * Mockery mock. Pass a Throwable to make invoke() throw instead of return.
+ */
+function mockEsiTransport(MockInterface $esi, mixed $result): void
+{
+    $esi->shouldReceive('withToken')->andReturnSelf();
+    $esi->shouldReceive('assertScope')->andReturnNull();
+
+    if ($result instanceof Throwable) {
+        $esi->shouldReceive('invoke')->andThrow($result);
+
+        return;
+    }
+
+    $esi->shouldReceive('invoke')->andReturn(makeEsiRawResponse($result));
 }
 
 function assignPermissionToTestUser(array|string $permission_strings)

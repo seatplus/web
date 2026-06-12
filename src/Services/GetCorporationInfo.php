@@ -26,20 +26,18 @@
 
 namespace Seatplus\Web\Services;
 
-use Seatplus\Eveapi\Containers\EsiRequestContainer;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
+use Seatplus\EsiClient\EsiClient;
 
 class GetCorporationInfo
 {
-    public function execute(int $corporation_id): object
+    public function execute(EsiClient $esi, int $corporation_id): object
     {
-        $corporation_info_container = new EsiRequestContainer(
+        $response = $esi->invoke(
             method: 'get',
-            version: 'v5',
-            endpoint: '/corporations/{corporation_id}/',
-            path_values: ['corporation_id' => $corporation_id],
+            path: '/corporations/{corporation_id}/',
+            pathValues: ['corporation_id' => $corporation_id],
         );
 
-        return RetrieveEsiData::execute($corporation_info_container);
+        return (object) $response->data;
     }
 }

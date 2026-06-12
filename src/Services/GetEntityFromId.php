@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -52,7 +53,7 @@ class GetEntityFromId
         $this->cached_affiliation = cache($this->cache_key);
     }
 
-    public function execute(): array
+    public function execute(EsiClient $esi): array
     {
         if ($this->cached_affiliation) {
             return $this->cached_affiliation;
@@ -69,15 +70,15 @@ class GetEntityFromId
         }
 
         if (! $character_affiliation) {
-            $character_affiliation = $this->makeCharacterAffiliation();
+            $character_affiliation = $this->makeCharacterAffiliation($esi);
         }
 
-        return $this->buildResponse($character_affiliation);
+        return $this->buildResponse($esi, $character_affiliation);
     }
 
-    private function makeCharacterAffiliation(): ?CharacterAffiliation
+    private function makeCharacterAffiliation(EsiClient $esi): ?CharacterAffiliation
     {
-        $this->convertIdsToNames([$this->id]);
+        $this->convertIdsToNames($esi, [$this->id]);
 
         $this->type = $this->names->first()->category;
 
@@ -88,7 +89,7 @@ class GetEntityFromId
         $character_affiliation = new CharacterAffiliation;
 
         if ($this->type === 'character') {
-            $response = (new GetCharacterAffiliations)->execute([$this->id])->first();
+            $response = (new GetCharacterAffiliations)->execute($esi, [$this->id])->first();
 
             $character_affiliation->character_id = $response->character_id;
             $character_affiliation->corporation_id = $response->corporation_id;
@@ -100,7 +101,7 @@ class GetEntityFromId
         }
 
         if ($this->type === 'corporation') {
-            $response = (new GetCorporationInfo)->execute($this->id);
+            $response = (new GetCorporationInfo)->execute($esi, $this->id);
 
             $character_affiliation->corporation_id = $this->id;
             $character_affiliation->alliance_id = optional($response)->alliance_id;
@@ -124,20 +125,20 @@ class GetEntityFromId
         }
     }
 
-    private function convertIdsToNames(array $ids): void
+    private function convertIdsToNames(EsiClient $esi, array $ids): void
     {
-        $result = $this->get_names_from_ids_service->execute($ids);
+        $result = $this->get_names_from_ids_service->execute($esi, $ids);
 
         $this->names->push(...$result->toArray());
     }
 
-    private function buildResponse(?CharacterAffiliation $character_affiliation): array
+    private function buildResponse(EsiClient $esi, ?CharacterAffiliation $character_affiliation): array
     {
         if (is_null($character_affiliation)) {
             return $this->buildUnknownResponse();
         }
 
-        $this->convertUnknownIdsToNames($character_affiliation);
+        $this->convertUnknownIdsToNames($esi, $character_affiliation);
 
         $affiliation = $this->type === 'character'
             ? $this->buildCharacterResponse($character_affiliation)
@@ -152,7 +153,7 @@ class GetEntityFromId
         return $affiliation;
     }
 
-    private function convertUnknownIdsToNames(CharacterAffiliation $character_affiliation): void
+    private function convertUnknownIdsToNames(EsiClient $esi, CharacterAffiliation $character_affiliation): void
     {
         $unknown_ids = collect();
 
@@ -169,7 +170,7 @@ class GetEntityFromId
         }
 
         if ($unknown_ids->isNotEmpty()) {
-            $this->convertIdsToNames($unknown_ids->filter()->unique()->toArray());
+            $this->convertIdsToNames($esi, $unknown_ids->filter()->unique()->toArray());
         }
     }
 

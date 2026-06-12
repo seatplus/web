@@ -44,7 +44,7 @@ class UserRessource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'main_character' => $this->main_character,
+            'mainCharacter' => $this->mainCharacter,
             'characters' => $this->characters
                 ->map(function (CharacterInfo $character): array {
                     /** @var RefreshToken|null $refresh_token */

@@ -47,7 +47,7 @@ class CorporationComplianceResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'main_character' => $this->main_character,
+            'mainCharacter' => $this->mainCharacter,
             'characters' => $characters,
             'count_missing' => collect($characters)->filter(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
             'count_complete' => collect($characters)->reject(fn (array $character) => data_get($character, 'missing_scopes'))->count(),

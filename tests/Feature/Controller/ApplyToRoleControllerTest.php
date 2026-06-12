@@ -40,7 +40,7 @@ it('user can apply to on-request role', function () {
         ->assertRedirect();
 
     expect(
-        test()->role->role_memberships()
+        test()->role->roleMemberships()
             ->where('entity_type', User::class)
             ->where('status', RoleMembershipStatus::PENDING->value)
             ->first()

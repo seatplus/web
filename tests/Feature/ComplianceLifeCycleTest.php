@@ -252,7 +252,7 @@ it('allows user with review permission to review corporation member', function (
     $user = User::factory()->create();
     $secondary_character = CharacterUser::factory()->make();
 
-    $user->character_users()->save($secondary_character);
+    $user->characterUsers()->save($secondary_character);
 
     expect($user->characters->count())->toEqual(2);
 

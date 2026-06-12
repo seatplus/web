@@ -3,11 +3,10 @@
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\EsiClient\DataTransferObjects\EsiResponse;
+use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
-use Seatplus\Eveapi\Services\Facade\RetrieveEsiData;
 
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
@@ -24,23 +23,12 @@ it('has scope settings', function () {
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
 });
 
-/**
- * @runInSeparateProcess
- *
- * @preserveGlobalState disabled
- */
 test('one can create sso setting', function () {
     $corporation = CorporationInfo::factory()->make();
 
-    $response = new EsiResponse(
-        json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
-        [],
-        11,
-        200
-    );
-
-    RetrieveEsiData::shouldReceive('execute')
-        ->andReturn($response);
+    $mock = Mockery::mock(EsiClient::class);
+    mockEsiTransport($mock, makeEsiResult((object) $corporation->attributesToArray()));
+    app()->instance(EsiClient::class, $mock);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
         ->toBeNull();
@@ -69,23 +57,8 @@ test('one can create sso setting', function () {
         ->toBeInstanceOf(SsoScopes::class);
 });
 
-/**
- * @runInSeparateProcess
- *
- * @preserveGlobalState disabled
- */
 test('one can delete sso setting', function () {
     $corporation = CorporationInfo::factory()->make();
-
-    $response = new EsiResponse(
-        json_encode($corporation->attributesToArray(), JSON_THROW_ON_ERROR),
-        [],
-        11,
-        200
-    );
-
-    RetrieveEsiData::shouldReceive('execute')
-        ->andReturn($response);
 
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
         ->toBeNull();
@@ -113,9 +86,6 @@ test('one can delete sso setting', function () {
 
     Bus::assertDispatched(CorporationInfoJob::class);
 
-    /*\Pest\Laravel\assertDatabaseHas('sso_scopes',[
-        'morphable_id' => $corporation->corporation_id
-    ]);*/
     expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
         ->not()->toBeNull()
         ->toBeInstanceOf(SsoScopes::class);
