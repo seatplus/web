@@ -42,9 +42,9 @@ class ContractRessource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var Location|null $start_location */
-        $start_location = $this->start_location;
+        $start_location = $this->startLocation;
         /** @var Location|null $end_location */
-        $end_location = $this->end_location;
+        $end_location = $this->endLocation;
 
         return [
             'contract_id' => $this->contract_id,

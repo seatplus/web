@@ -72,7 +72,7 @@ class MemberTrackingController extends Controller
         ])->flatten(1)->filter();
 
         $query = CorporationMemberTracking::where('corporation_id', $corporation_id)
-            ->with('character.refresh_token', 'location.locatable', 'ship');
+            ->with('character.refreshToken', 'location.locatable', 'ship');
 
         return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
     }

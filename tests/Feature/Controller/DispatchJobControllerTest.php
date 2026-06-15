@@ -46,7 +46,7 @@ it('dispatches job', function () {
 });
 
 test('one get dispatchable character entities', function () {
-    updateRefreshTokenWithScopes(test()->test_character->refresh_token, test()->dispatch_transfer_object['required_scopes']);
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
 
     expect(test()->test_character->contacts()->count())->toBeGreaterThan(0);
 
@@ -86,7 +86,7 @@ test('one get dispatchable corporation entities', function () {
     expect(test()->test_character->roles->hasRole('roles', 'Director'))->toBeTrue();
 
     // update the refresh token with the required scopes
-    updateRefreshTokenWithScopes(test()->test_character->refresh_token, $dispatch_transfer_object['required_scopes']);
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, $dispatch_transfer_object['required_scopes']);
 
     // create contact for the corporation
     Contact::factory()->create([

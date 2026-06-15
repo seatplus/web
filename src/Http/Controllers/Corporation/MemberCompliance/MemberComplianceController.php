@@ -85,7 +85,7 @@ class MemberComplianceController
                 'characters.alliance.ssoScopes',
                 'characters.application.corporation.ssoScopes',
                 'characters.application.corporation.alliance.ssoScopes',
-                'characters.refresh_token',
+                'characters.refreshToken',
                 'application.corporation.ssoScopes',
                 'application.corporation.alliance.ssoScopes',
             ]);

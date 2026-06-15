@@ -46,7 +46,7 @@ class WalletsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'wallet_journals');
+        $ids = $this->getCharacterIds($dispatchTransferObject, 'walletJournals');
 
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -58,7 +58,7 @@ class WalletsController extends Controller
     {
         $query = WalletJournal::query()
             ->where('wallet_journable_id', $character_id)
-            ->with('wallet_journable')
+            ->with('walletJournable')
             ->orderByDesc('date');
 
         request()->whenHas('ref_type', fn (array $types) => $query->whereIn('ref_type', $types));

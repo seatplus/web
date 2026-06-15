@@ -51,7 +51,7 @@ class GetApplicationCharacterScopesService
             'alliance.ssoScopes',
             'application.corporation.ssoScopes',
             'application.corporation.alliance.ssoScopes',
-            'refresh_token',
+            'refreshToken',
         ]);
 
         $user = User::whereHas('characters', fn (Builder $q) => $q->where('character_infos.character_id', $character->character_id))
@@ -72,7 +72,7 @@ class GetApplicationCharacterScopesService
             $this->getUserApplicationScopes($user),
         ));
 
-        $token_scopes = $character->refresh_token->scopes ?? [];
+        $token_scopes = $character->refreshToken->scopes ?? [];
         $missing_scopes = array_values(array_diff($required_scopes, $token_scopes));
 
         return [

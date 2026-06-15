@@ -79,7 +79,7 @@ class ContactsController extends Controller
             'alliance_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type === AllianceInfo::class),
         ]);
 
-        $query = Contact::with(['labels', 'character_affiliation', 'corporation_affiliation', 'alliance_affiliation', 'faction_affiliation'])
+        $query = Contact::with(['labels', 'characterAffiliation', 'corporationAffiliation', 'allianceAffiliation', 'factionAffiliation'])
             ->where('contactable_id', $character_id);
 
         return ContactResource::collection(

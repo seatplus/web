@@ -55,7 +55,7 @@ class CorporationWalletController extends Controller
     {
         return WalletJournal::where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
-            ->with('wallet_journable')
+            ->with('walletJournable')
             ->orderByDesc('date')
             ->paginate();
     }

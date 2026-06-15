@@ -62,10 +62,10 @@ class SearchService
         /** @var RefreshToken|null $token */
         $token = Cache::remember("esi-search:$user_id", now()->addHour()->diffInSeconds(), function () {
             $user = User::query()
-                ->with('characters.refresh_token')
+                ->with('characters.refreshToken')
                 ->find(auth()->user()->getAuthIdentifier());
 
-            $tokens = $user->characters->map(fn (CharacterInfo $character) => $character->refresh_token)->filter();
+            $tokens = $user->characters->map(fn (CharacterInfo $character) => $character->refreshToken)->filter();
 
             return $tokens->firstWhere(fn (RefreshToken $token) => in_array('esi-search.search_structures.v1', $token->scopes));
         });

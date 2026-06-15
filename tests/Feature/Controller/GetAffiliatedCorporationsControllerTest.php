@@ -31,7 +31,7 @@ it('get affiliated corporations', function () {
 
     expect(CorporationInfo::find(test()->test_character->corporation->corporation_id))
         ->not()->toBeNull()
-        ->wallet_journals->toHaveCount(5);
+        ->walletJournals->toHaveCount(5);
 
     $response = test()->actingAs(test()->test_user->refresh())
         ->get(route('get.affiliated.corporations', [

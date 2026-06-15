@@ -74,8 +74,8 @@ class ApplicationsController extends Controller
     public function getOpenCorporationApplications(int $corporation_id, int $decision_count): AnonymousResourceCollection
     {
         $query = Application::query()
-            ->with('log_entries')
-            ->whereHas('log_entries', function (Builder $query) {
+            ->with('logEntries')
+            ->whereHas('logEntries', function (Builder $query) {
                 $query->where('type', 'decision');
             }, '=', $decision_count)
             ->ofCorporation($corporation_id)
@@ -98,13 +98,13 @@ class ApplicationsController extends Controller
         $application = Application::query()
             ->with([
                 'corporation',
-                'log_entries.causer' => function (MorphTo $morphTo) {
+                'logEntries.causer' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([User::class => ['mainCharacter']]);
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['mainCharacter', 'characters', 'characters.batch_update'],
-                        CharacterInfo::class => ['batch_update'],
+                        User::class => ['mainCharacter', 'characters', 'characters.batchUpdate'],
+                        CharacterInfo::class => ['batchUpdate'],
                     ]);
                 },
             ])
@@ -178,13 +178,13 @@ class ApplicationsController extends Controller
     {
         return Application::query()
             ->with([
-                'log_entries.causer' => function (MorphTo $morphTo) {
+                'logEntries.causer' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([User::class => ['mainCharacter']]);
                 },
                 'applicationable' => function (MorphTo $morphTo) {
                     $morphTo->morphWith([
-                        User::class => ['mainCharacter', 'characters', 'characters.batch_update'],
-                        CharacterInfo::class => ['batch_update'],
+                        User::class => ['mainCharacter', 'characters', 'characters.batchUpdate'],
+                        CharacterInfo::class => ['batchUpdate'],
                     ]);
                 },
             ])

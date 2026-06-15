@@ -595,7 +595,7 @@ test('recruiter can comment on application', function () {
                     'application',
                     fn (Assert $page) => $page
                         ->has(
-                            'log_entries',
+                            'logEntries',
                             1,
                             fn (Assert $page) => $page
                                 ->where('comment', $comment)
@@ -655,7 +655,7 @@ it('returns activity log entries for closed applications', function () {
         'status' => 'rejected',
     ]));
 
-    $application->log_entries()->create([
+    $application->logEntries()->create([
         'causer_type' => CharacterInfo::class,
         'causer_id' => test()->test_character->character_id,
         'type' => faker()->randomElement(['decision', 'comment']),
@@ -672,7 +672,7 @@ it('returns activity log entries for closed applications', function () {
             fn (AssertableJson $json) => $json->where('id', $application->id)
                 ->where('status', 'rejected')
                 ->where(
-                    'log_entries',
+                    'logEntries',
                     fn (Collection $collection) => Arr::has($collection->first(), 'causer')
                 )
                 ->etc()

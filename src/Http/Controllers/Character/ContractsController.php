@@ -62,7 +62,7 @@ class ContractsController extends Controller
     public function getCharacterContractsDetails(int $character_id, Request $request): AnonymousResourceCollection
     {
         $query = Contract::whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
-            ->with(['items', 'items.type', 'items.type.group', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation'])
+            ->with(['items', 'items.type', 'items.type.group', 'startLocation', 'endLocation', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation'])
             ->tap(new LocationWatchListScope($request->all()))
             ->tap(new TypeWatchListScope($request->all()));
 
@@ -73,7 +73,7 @@ class ContractsController extends Controller
     {
         $query = Contract::query()->whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
             ->where('contract_id', $contract_id)
-            ->with('items', 'items.type', 'start_location', 'end_location', 'assignee_character', 'assignee_corporation', 'issuer_character', 'issuer_corporation');
+            ->with('items', 'items.type', 'startLocation', 'endLocation', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation');
 
         if (request()->header('X-Modal', false)) {
             return $query->get()->toJson();
