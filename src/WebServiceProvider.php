@@ -52,6 +52,12 @@ class WebServiceProvider extends ServiceProvider
         // Add views
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'web');
 
+        // Default the Inertia root view to this package's blade at the provider
+        // level (not only via HandleInertiaRequests::rootView()), so it applies
+        // even when the per-request middleware isn't run — e.g. Pest browser's
+        // in-process server, which doesn't apply provider-pushed group middleware.
+        Inertia::setRootView('web::app');
+
         // Add Migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations/');
 
