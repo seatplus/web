@@ -106,7 +106,7 @@ class WebServiceProvider extends ServiceProvider
             $this->getBaseFilePath().'package.json' => base_path('package.json'),
             $this->getBaseFilePath().'tailwind.config.js' => base_path('tailwind.config.js'),
             $this->getBaseFilePath().'postcss.config.js' => base_path('postcss.config.js'),
-            $this->getBaseFilePath().'vite.config.mjs' => base_path('vite.config.mjs'),
+            $this->getBaseFilePath().'vite.config.js' => base_path('vite.config.js'),
         ], 'web-static');
 
         /*
