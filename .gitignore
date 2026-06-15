@@ -5,7 +5,7 @@ build/
 node_modules/
 .idea
 
-vendor/
+/vendor/
 
 public/css/
 
