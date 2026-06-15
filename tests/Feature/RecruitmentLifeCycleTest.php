@@ -595,7 +595,7 @@ test('recruiter can comment on application', function () {
                     'application',
                     fn (Assert $page) => $page
                         ->has(
-                            'logEntries',
+                            'log_entries',
                             1,
                             fn (Assert $page) => $page
                                 ->where('comment', $comment)
@@ -672,7 +672,7 @@ it('returns activity log entries for closed applications', function () {
             fn (AssertableJson $json) => $json->where('id', $application->id)
                 ->where('status', 'rejected')
                 ->where(
-                    'logEntries',
+                    'log_entries',
                     fn (Collection $collection) => Arr::has($collection->first(), 'causer')
                 )
                 ->etc()
