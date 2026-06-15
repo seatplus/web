@@ -3,14 +3,13 @@
     <testsuites>
         <testsuite name="Seatplus Test Suite">
             <directory>tests</directory>
-            <!-- Browser smoke tests run in their own CI job (vendor/bin/pest tests/Browser);
-                 excluded here so the pest browser plugin (Playwright) isn't engaged during
-                 normal collection, which would throw PlaywrightNotInstalledException. -->
-            <exclude>tests/Browser</exclude>
         </testsuite>
     </testsuites>
     <php>
         <env name="APP_KEY" value="AckfSECXIvnK5r28GVIWUAxmbBSjTsmF"/>
+        <!-- Use array cache in tests so they don't depend on a DB `cache` table
+             (Laravel's default cache.default is `database` on L11+). -->
+        <env name="CACHE_STORE" value="array"/>
         <env name="REDIS_CLIENT" value="phpredis"/>
         <env name="REDIS_HOST" value="127.0.0.1"/>
         <env name="REDIS_PASSWORD" value="null"/>
