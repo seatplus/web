@@ -99,7 +99,7 @@ jobs:
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Run Tests
-        run: vendor/bin/pest --no-coverage --shard=${{ matrix.shard }}/4
+        run: vendor/bin/pest --no-coverage --shard=${{ matrix.shard }}/4 --exclude-group=browser
 
   frontend:
     name: Frontend Build & Lint
@@ -123,6 +123,76 @@ jobs:
       - name: Lint (advisory)
         run: npm run lint
         continue-on-error: true
+
+  browser:
+    name: Browser Smoke Tests
+    runs-on: ubuntu-latest
+    # Non-blocking for now (new harness): not part of the required `laravel` gate.
+    continue-on-error: true
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: seatplus
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seatplus -d laravel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Install Playwright (chromium + system deps)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: vendor/bin/pest --group=browser --no-coverage
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-screenshots
+          path: tests/Browser/screenshots/
+          if-no-files-found: ignore
 
   laravel:
     name: Laravel

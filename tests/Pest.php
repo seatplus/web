@@ -8,6 +8,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\EsiSchema\Contracts\EsiRawResponse;
 use Seatplus\EsiSchema\EsiResult;
 use Seatplus\Eveapi\Models\RefreshToken;
+use Seatplus\Web\Tests\Browser\BrowserTestCase;
 use Seatplus\Web\Tests\TestCase;
 
 /*
@@ -24,6 +25,10 @@ use Seatplus\Web\Tests\TestCase;
 /** @link https://pestphp.com/docs/underlying-test-case */
 uses(TestCase::class)->in('Feature', 'Unit');
 // uses(TestCase::class);
+
+// Browser smoke tests (Pest 4 + Playwright) — grouped so the normal suite can
+// exclude them; they need built assets + a browser and run in their own CI job.
+uses(BrowserTestCase::class)->group('browser')->in('Browser');
 
 /*
 |--------------------------------------------------------------------------
