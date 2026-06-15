@@ -18,4 +18,4 @@ public/css/
 public/js/
 
 # Pest browser test screenshots (CI artifacts; curated docs images committed separately)
-tests/Browser/screenshots/
+tests/Browser/Screenshots/
