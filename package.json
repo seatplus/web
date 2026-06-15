@@ -4,7 +4,8 @@
         "dev": "vite",
         "build": "vite build",
         "prod": "node --max-old-space-size=1024 ./node_modules/vite/bin/vite build",
-        "debug": "node --max-old-space-size=1024 ./node_modules/vite/bin/vite build --mode debug"
+        "debug": "node --max-old-space-size=1024 ./node_modules/vite/bin/vite build --mode debug",
+        "lint": "eslint resources/js"
     },
     "devDependencies": {
         "@eslint/js": "^9.4.0",
