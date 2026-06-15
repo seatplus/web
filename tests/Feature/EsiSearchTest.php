@@ -32,7 +32,7 @@ it('can navigate to the enabling ESI Search page', function () {
         );
 
     // pretent that the token has been created
-    updateRefreshTokenWithScopes($this->test_character->refresh_token, ['esi-search.search_structures.v1']);
+    updateRefreshTokenWithScopes($this->test_character->refreshToken, ['esi-search.search_structures.v1']);
 
     // now if we return to the page, we should get redirected
     test()->actingAs($this->test_user)
@@ -42,7 +42,7 @@ it('can navigate to the enabling ESI Search page', function () {
 
 // try get the token and succeed to do so
 it('returns truthy if the user has the necessary scope', function () {
-    updateRefreshTokenWithScopes($this->test_character->refresh_token, ['esi-search.search_structures.v1']);
+    updateRefreshTokenWithScopes($this->test_character->refreshToken, ['esi-search.search_structures.v1']);
 
     $result = $this->actingAs($this->test_user)
         ->get(route('autosuggestion.token'))

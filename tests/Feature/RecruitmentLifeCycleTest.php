@@ -655,7 +655,7 @@ it('returns activity log entries for closed applications', function () {
         'status' => 'rejected',
     ]));
 
-    $application->log_entries()->create([
+    $application->logEntries()->create([
         'causer_type' => CharacterInfo::class,
         'causer_id' => test()->test_character->character_id,
         'type' => faker()->randomElement(['decision', 'comment']),

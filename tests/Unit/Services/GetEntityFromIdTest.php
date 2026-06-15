@@ -9,7 +9,7 @@ use Seatplus\Web\Services\GetEntityFromId;
 test('happy path', function () {
     $character = CharacterInfo::factory()->create();
 
-    $character_affiliation = $character->character_affiliation;
+    $character_affiliation = $character->characterAffiliation;
 
     $expected_result = [
         'id' => $character_affiliation->character_id,
@@ -38,7 +38,7 @@ test('happy path', function () {
 test('happy path without alliance', function () {
     $character = CharacterInfo::factory()->create();
 
-    $character_affiliation = $character->character_affiliation;
+    $character_affiliation = $character->characterAffiliation;
 
     $character_affiliation->alliance_id = null;
     $character_affiliation->save();
@@ -62,7 +62,7 @@ test('happy path without alliance', function () {
 test('happy path via corporation id', function () {
     $character = CharacterInfo::factory()->create();
 
-    $character_affiliation = $character->character_affiliation;
+    $character_affiliation = $character->characterAffiliation;
 
     $expected_result = [
         'id' => $character_affiliation->corporation_id,
@@ -83,7 +83,7 @@ test('happy path via corporation id', function () {
 test('happy path via alliance id', function () {
     $character = CharacterInfo::factory()->create();
 
-    $character_affiliation = $character->character_affiliation;
+    $character_affiliation = $character->characterAffiliation;
 
     $expected_result = [
         'id' => $character_affiliation->alliance_id,

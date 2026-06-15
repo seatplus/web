@@ -48,7 +48,7 @@ class UserRessource extends JsonResource
             'characters' => $this->characters
                 ->map(function (CharacterInfo $character): array {
                     /** @var RefreshToken|null $refresh_token */
-                    $refresh_token = $character->refresh_token;
+                    $refresh_token = $character->refreshToken;
 
                     return [
                         'character_id' => $character->character_id,

@@ -71,9 +71,9 @@ class HandleInertiaRequests extends Middleware
                     'mainCharacter',
                     'characters' => [
                         'corporation',
-                        'refresh_token',
+                        'refreshToken',
                         'alliance',
-                        'character_affiliation',
+                        'characterAffiliation',
                     ],
                 ])
                     ->where('id', auth()->user()->getAuthIdentifier())

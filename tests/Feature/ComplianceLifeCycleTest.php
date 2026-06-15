@@ -191,7 +191,7 @@ test('director user without permission can review its corp members', function ()
     SsoScopes::updateOrCreate([
         'morphable_id' => test()->test_character->corporation->corporation_id,
     ], [
-        'selected_scopes' => test()->test_character->refresh_token->scopes,
+        'selected_scopes' => test()->test_character->refreshToken->scopes,
         'morphable_type' => CorporationInfo::class,
         'type' => 'default',
     ]);
@@ -322,7 +322,7 @@ function createScopeSetting(array $permissons = [], $type = 'default')
     expect(SsoScopes::all())->toBeEmpty();
 
     // Make sure secondary character is missing the required scope
-    expect(in_array('esi-assets.read_assets.v1', test()->secondary_character->refresh_token->scopes))->toBeFalse();
+    expect(in_array('esi-assets.read_assets.v1', test()->secondary_character->refreshToken->scopes))->toBeFalse();
 
     SsoScopes::updateOrCreate([
         'morphable_id' => test()->secondary_character->corporation->corporation_id,
