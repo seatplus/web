@@ -3,6 +3,10 @@
     <testsuites>
         <testsuite name="Seatplus Test Suite">
             <directory>tests</directory>
+            <!-- Browser smoke tests run in their own CI job (vendor/bin/pest tests/Browser);
+                 excluded here so the pest browser plugin (Playwright) isn't engaged during
+                 normal collection, which would throw PlaywrightNotInstalledException. -->
+            <exclude>tests/Browser</exclude>
         </testsuite>
     </testsuites>
     <php>

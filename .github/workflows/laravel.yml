@@ -108,6 +108,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -184,7 +194,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
-        run: vendor/bin/pest --group=browser --no-coverage
+        run: vendor/bin/pest tests/Browser --no-coverage
 
       - name: Upload screenshots
         if: always()
