@@ -8,7 +8,7 @@
         Main Character
       </label>
       <EntityBlock
-        :entity="user.main_character"
+        :entity="user.mainCharacter"
         :image-size="10"
       />
     </div>

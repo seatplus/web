@@ -97,7 +97,7 @@
                 <div class="shrink-0">
                   <div class="relative">
                     <EveImage
-                      :object="user.main_character"
+                      :object="user.mainCharacter"
                       :size="64"
                       tailwind_class="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white"
                     />

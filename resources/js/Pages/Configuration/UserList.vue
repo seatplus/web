@@ -100,8 +100,8 @@
             characterWithoutMain(user) {
 
                 return _.reject(user.characters, function (character) {
-                    const {main_character} = user
-                    return _.isEqual(character.character_id, main_character.character_id)
+                    const {mainCharacter} = user
+                    return _.isEqual(character.character_id, mainCharacter.character_id)
                 })
             },
             getSearchParams() {

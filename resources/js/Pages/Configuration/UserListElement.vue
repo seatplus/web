@@ -4,7 +4,7 @@
       <div class="flex items-center px-4 py-4 sm:px-6">
         <div class="min-w-0 flex-1 flex items-center">
           <div class="flex overflow-x-visible">
-            <EntityBlock :entity="user.main_character" />
+            <EntityBlock :entity="user.mainCharacter" />
           </div>
           <div class="min-w-0 flex-1 px-4 hidden md:grid md:grid-cols-2 md:gap-4">
             <EntityBlock
@@ -51,7 +51,7 @@ export default {
     },
     computed: {
         characters() {
-            return _.reject(this.user.characters, (character)  => _.isEqual(character.character_id, this.user.main_character.character_id))
+            return _.reject(this.user.characters, (character)  => _.isEqual(character.character_id, this.user.mainCharacter.character_id))
         },
         characterNames() {
             return _.join(_.map(this.characters, (character) => character.name), ', ')

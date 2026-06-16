@@ -145,12 +145,12 @@
         },
         setup(props) {
             const selected = ref({
-                character_id: _.get(props.user, 'data.main_character.character_id'),
-                name: _.get(props.user, 'data.main_character.name'),
+                character_id: _.get(props.user, 'data.mainCharacter.character_id'),
+                name: _.get(props.user, 'data.mainCharacter.name'),
             })
 
             const form = useForm({
-                character_id: _.get(props.user, 'data.main_character.character_id')
+                character_id: _.get(props.user, 'data.mainCharacter.character_id')
             })
 
             const options = computed(() => {
