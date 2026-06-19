@@ -40,6 +40,27 @@
               </ul>
             </dd>
           </div>
+          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">
+              Language
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <select
+                v-model="localeForm.locale"
+                class="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50"
+                :disabled="localeForm.processing"
+                @change="updateLocale"
+              >
+                <option
+                  v-for="(label, code) in locales"
+                  :key="code"
+                  :value="code"
+                >
+                  {{ label }}
+                </option>
+              </select>
+            </dd>
+          </div>
           <!--          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">
               Application for
@@ -132,7 +153,7 @@
     import SelectComponent from "@/Shared/Components/SelectComponent.vue";
     import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
-    import { useForm, Link } from "@inertiajs/vue3";
+    import { useForm, usePage, Link } from "@inertiajs/vue3";
     
     export default {
         name: "UserSettings",
@@ -171,11 +192,31 @@
                 .post(route('change.main_character'))
             })
 
+            const page = usePage()
+
+            const locales = computed(() => _.get(page.props, 'locales', {}))
+
+            const localeForm = useForm({
+                locale: _.get(page.props, 'locale'),
+            })
+
+            // A full reload re-runs the @translations blade directive so
+            // window.translations reflects the newly persisted locale.
+            const updateLocale = () => {
+                localeForm.post(route('user.settings.locale'), {
+                    preserveScroll: true,
+                    onSuccess: () => window.location.reload(),
+                })
+            }
+
             return {
                 selected,
                 pageTitle: 'User Settings',
                 form,
-                options
+                options,
+                locales,
+                localeForm,
+                updateLocale
             }
         }
     }

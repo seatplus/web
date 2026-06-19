@@ -27,6 +27,7 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
@@ -58,6 +59,11 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            // Resolved first (and lazily, when auth/session are safely available) so the
+            // app locale is set before the trans() closures below and the @translations
+            // blade directive in the Inertia root view render.
+            'locale' => fn () => $this->resolveLocale(),
+            'locales' => fn () => config('web.locales', []),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
@@ -93,5 +99,32 @@ class HandleInertiaRequests extends Middleware
                 'icon' => asset(config('web.images.icon')),
             ],
         ]);
+    }
+
+    /**
+     * Resolve the request locale (per-user preference → global setting → app default),
+     * set it on the application, and return it for the shared prop.
+     *
+     * Only a locale in the supported registry is honoured; anything else falls back to
+     * the app default. The per-user column is read only when present, to stay compatible
+     * with Model::shouldBeStrict() before the auth package ships the locale column.
+     */
+    private function resolveLocale(): string
+    {
+        $fallback = (string) config('app.locale');
+
+        $preferred = auth()->check() && array_key_exists('locale', auth()->user()->getAttributes())
+            ? auth()->user()->getAttribute('locale')
+            : null;
+
+        $locale = (string) ($preferred ?? setting('language') ?? $fallback);
+
+        if (! in_array($locale, array_keys(config('web.locales', [])), true)) {
+            $locale = $fallback;
+        }
+
+        App::setLocale($locale);
+
+        return $locale;
     }
 }

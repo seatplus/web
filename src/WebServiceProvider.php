@@ -30,6 +30,7 @@ use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
+use Seatplus\Web\Console\Commands\CheckTranslationKeys;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
@@ -188,6 +189,11 @@ class WebServiceProvider extends ServiceProvider
             __DIR__.'/../config/web.images.php',
             'web.images'
         );
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/web.locales.php',
+            'web.locales'
+        );
     }
 
     private function addCommands(): void
@@ -195,6 +201,7 @@ class WebServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AssignSuperuser::class,
+                CheckTranslationKeys::class,
             ]);
         }
     }

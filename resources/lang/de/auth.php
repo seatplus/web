@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-use Seatplus\Web\Http\Controllers\Configuration\UserSettingsController;
-
-Route::get('/settings/user', [UserSettingsController::class, 'index'])->name('user.settings');
-Route::post('/settings/user/locale', [UserSettingsController::class, 'updateLocale'])->name('user.settings.locale');
+return [
+    'sso_config_warning' => 'SSO scheint noch nicht konfiguriert zu sein. Bitte überprüfe deine .env-Datei.',
+    'login_welcome' => 'Willkommen, bitte melde dich über EVE Online SSO an',
+];

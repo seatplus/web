@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-use Seatplus\Web\Http\Controllers\Configuration\UserSettingsController;
-
-Route::get('/settings/user', [UserSettingsController::class, 'index'])->name('user.settings');
-Route::post('/settings/user/locale', [UserSettingsController::class, 'updateLocale'])->name('user.settings.locale');
+return [
+    'title' => 'ESI-Scopes der Charaktere aktualisieren',
+    'description' => 'Den unten aufgeführten Charakteren fehlen einige ESI-Scopes. Bitte aktualisiere sie.',
+];

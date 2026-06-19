@@ -26,6 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration;
 
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Web\Http\Resources\UserRessource;
@@ -37,5 +40,16 @@ class UserSettingsController
         return Inertia::render('Configuration/UserSettings', [
             'user' => UserRessource::make(auth()->user()),
         ]);
+    }
+
+    public function updateLocale(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'locale' => ['required', 'string', Rule::in(array_keys(config('web.locales', [])))],
+        ]);
+
+        auth()->user()->update(['locale' => $validated['locale']]);
+
+        return redirect()->back();
     }
 }
