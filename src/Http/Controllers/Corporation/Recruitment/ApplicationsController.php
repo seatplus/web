@@ -113,7 +113,9 @@ class ApplicationsController extends Controller
         $recruit = match ($application->applicationable_type) {
             User::class => $application->applicationable,
             CharacterInfo::class => collect([
-                'mainCharacter' => $application->applicationable,
+                // snake_case to match the raw User-model branch above (and the Vue read
+                // `recruit.main_character` in Pages/Corporation/Recruitment/Application.vue)
+                'main_character' => $application->applicationable,
                 'characters' => [$application->applicationable],
             ]),
             default => collect([]),

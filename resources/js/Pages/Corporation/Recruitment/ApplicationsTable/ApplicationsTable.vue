@@ -12,7 +12,7 @@
         >
           <div class="flex-shrink self-center">
             <EntityByIdBlock
-              :id="applicant.main_character.character_id"
+              :id="applicant.mainCharacter.character_id"
               class="flex gap-4 truncate"
               :image-size="10"
             />

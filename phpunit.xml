@@ -7,6 +7,9 @@
     </testsuites>
     <php>
         <env name="APP_KEY" value="AckfSECXIvnK5r28GVIWUAxmbBSjTsmF"/>
+        <!-- Use array cache in tests so they don't depend on a DB `cache` table
+             (Laravel's default cache.default is `database` on L11+). -->
+        <env name="CACHE_STORE" value="array"/>
         <env name="REDIS_CLIENT" value="phpredis"/>
         <env name="REDIS_HOST" value="127.0.0.1"/>
         <env name="REDIS_PASSWORD" value="null"/>

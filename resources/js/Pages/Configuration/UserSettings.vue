@@ -118,7 +118,7 @@
     </div>
 
     <Link
-      :href="route('auth.logout')"
+      :href="route('logout')"
       as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     >
@@ -145,12 +145,12 @@
         },
         setup(props) {
             const selected = ref({
-                character_id: _.get(props.user, 'data.main_character.character_id'),
-                name: _.get(props.user, 'data.main_character.name'),
+                character_id: _.get(props.user, 'data.mainCharacter.character_id'),
+                name: _.get(props.user, 'data.mainCharacter.name'),
             })
 
             const form = useForm({
-                character_id: _.get(props.user, 'data.main_character.character_id')
+                character_id: _.get(props.user, 'data.mainCharacter.character_id')
             })
 
             const options = computed(() => {

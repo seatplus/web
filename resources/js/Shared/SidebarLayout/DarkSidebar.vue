@@ -301,7 +301,7 @@ import Toasts from "@/Shared/Toasts/Toasts.vue";
   const sidebarOpen = ref(false)
 
   const logo = usePage().props.images.logo
-  const main = _.get(usePage().props.user, 'data.main_character')
+  const main = _.get(usePage().props.user, 'data.mainCharacter')
   const component = usePage().component
   const navigation = ref([])
 
@@ -331,7 +331,7 @@ import Toasts from "@/Shared/Toasts/Toasts.vue";
   }
 
   const mainCharacter = computed(() => {
-      return main !== null ? main : {name: 'unknown', character_id: null}
+      return main != null ? main : {name: 'unknown', character_id: null}
   })
 
   watch(() => props.activeSidebarElement,  () => navigation.value = buildNavigation(), {immediate: true})

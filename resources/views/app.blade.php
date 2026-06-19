@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="/img/seat_plus_logo.svg">
     @translations
+    @routes
     @vite('resources/js/app.js')
 </head>
 <body class="hold-transition sidebar-mini">
