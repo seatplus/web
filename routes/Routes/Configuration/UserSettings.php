@@ -27,4 +27,3 @@
 use Seatplus\Web\Http\Controllers\Configuration\UserSettingsController;
 
 Route::get('/settings/user', [UserSettingsController::class, 'index'])->name('user.settings');
-Route::post('/settings/user/locale', [UserSettingsController::class, 'updateLocale'])->name('user.settings.locale');

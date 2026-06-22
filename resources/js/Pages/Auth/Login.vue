@@ -37,6 +37,22 @@
           Sign in
         </a>
       </div>
+
+      <div class="mt-6 flex justify-center">
+        <select
+          v-model="selectedLocale"
+          class="rounded-md border-gray-300 text-sm text-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          @change="switchLocale"
+        >
+          <option
+            v-for="(label, code) in locales"
+            :key="code"
+            :value="code"
+          >
+            {{ label }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 </template>
@@ -45,12 +61,31 @@
 
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
+import { router } from "@inertiajs/vue3";
 
 export default {
     name: "Login",
     components: {AppHead},
     layout: (h, page) => h(EmptyLayout, [page]),
-
+    data() {
+        return {
+            selectedLocale: this.$page.props.locale,
+        }
+    },
+    computed: {
+        locales() {
+            return this.$page.props.locales || {}
+        }
+    },
+    methods: {
+        // A full reload re-runs the @translations blade directive for the chosen locale.
+        switchLocale() {
+            router.post(route('locale.update'), { locale: this.selectedLocale }, {
+                preserveScroll: true,
+                onSuccess: () => window.location.reload(),
+            })
+        }
+    }
 }
 </script>
 

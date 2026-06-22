@@ -29,6 +29,7 @@ use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Auth\LoginController;
 use Seatplus\Web\Http\Controllers\Auth\LogoutController;
 use Seatplus\Web\Http\Controllers\HomeController;
+use Seatplus\Web\Http\Controllers\LocaleController;
 use Seatplus\Web\Http\Controllers\Shared\StopImpersonateController;
 use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
@@ -42,6 +43,9 @@ Route::middleware('web')
 
         Route::get('login', LoginController::class)->name('login');
         Route::post('logout', LogoutController::class)->name('logout');
+
+        // Guest-allowed: stores the choice in the session (+ persists to the account when authed).
+        Route::post('locale', [LocaleController::class, 'update'])->name('locale.update');
 
         Route::middleware(['auth', CheckRequiredScopes::class, OnboardingMiddleware::class])
             ->group(function () {

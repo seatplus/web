@@ -62,7 +62,7 @@ class HandleInertiaRequests extends Middleware
             // Resolved first (and lazily, when auth/session are safely available) so the
             // app locale is set before the trans() closures below and the @translations
             // blade directive in the Inertia root view render.
-            'locale' => fn () => $this->resolveLocale(),
+            'locale' => fn () => $this->resolveLocale($request),
             'locales' => fn () => config('web.locales', []),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
@@ -102,29 +102,60 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Resolve the request locale (per-user preference → global setting → app default),
-     * set it on the application, and return it for the shared prop.
+     * Resolve the request locale, set it on the application, and return it for the prop.
      *
-     * Only a locale in the supported registry is honoured; anything else falls back to
-     * the app default. The per-user column is read only when present, to stay compatible
-     * with Model::shouldBeStrict() before the auth package ships the locale column.
+     * Resolution order (first hit wins): authenticated user preference → session pick
+     * (guests) → browser Accept-Language → global setting → app default. Only a locale in
+     * the supported registry is honoured; anything else falls back to the app default.
      */
-    private function resolveLocale(): string
+    private function resolveLocale(Request $request): string
     {
+        $supported = array_keys(config('web.locales', []));
         $fallback = (string) config('app.locale');
 
-        $preferred = auth()->check() && array_key_exists('locale', auth()->user()->getAttributes())
-            ? auth()->user()->getAttribute('locale')
-            : null;
+        $candidate = $this->userLocale()
+            ?? session('locale')
+            ?? $this->browserLocale($request, $supported)
+            ?? setting('language')
+            ?? $fallback;
 
-        $locale = (string) ($preferred ?? setting('language') ?? $fallback);
-
-        if (! in_array($locale, array_keys(config('web.locales', [])), true)) {
-            $locale = $fallback;
-        }
+        $locale = in_array($candidate, $supported, true) ? (string) $candidate : $fallback;
 
         App::setLocale($locale);
 
         return $locale;
+    }
+
+    /**
+     * The authenticated user's stored locale, or null. Read only when the column is loaded,
+     * to stay compatible with Model::shouldBeStrict() before the auth package ships it.
+     */
+    private function userLocale(): ?string
+    {
+        if (! auth()->check() || ! array_key_exists('locale', auth()->user()->getAttributes())) {
+            return null;
+        }
+
+        $locale = auth()->user()->getAttribute('locale');
+
+        return is_string($locale) ? $locale : null;
+    }
+
+    /**
+     * The first browser-preferred (Accept-Language) locale that we support, or null.
+     *
+     * @param  list<string>  $supported
+     */
+    private function browserLocale(Request $request, array $supported): ?string
+    {
+        foreach ($request->getLanguages() as $language) {
+            $code = strtolower(substr((string) $language, 0, 2));
+
+            if (in_array($code, $supported, true)) {
+                return $code;
+            }
+        }
+
+        return null;
     }
 }

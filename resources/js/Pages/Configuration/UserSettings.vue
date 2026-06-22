@@ -203,7 +203,7 @@
             // A full reload re-runs the @translations blade directive so
             // window.translations reflects the newly persisted locale.
             const updateLocale = () => {
-                localeForm.post(route('user.settings.locale'), {
+                localeForm.post(route('locale.update'), {
                     preserveScroll: true,
                     onSuccess: () => window.location.reload(),
                 })

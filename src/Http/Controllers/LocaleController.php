@@ -24,18 +24,28 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Configuration;
+namespace Seatplus\Web\Http\Controllers;
 
-use Inertia\Inertia;
-use Inertia\Response;
-use Seatplus\Web\Http\Resources\UserRessource;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
-class UserSettingsController
+class LocaleController
 {
-    public function index(): Response
+    public function update(Request $request): RedirectResponse
     {
-        return Inertia::render('Configuration/UserSettings', [
-            'user' => UserRessource::make(auth()->user()),
+        $validated = $request->validate([
+            'locale' => ['required', 'string', Rule::in(array_keys(config('web.locales', [])))],
         ]);
+
+        // Remember the choice for this session — covers guests and applies immediately.
+        session(['locale' => $validated['locale']]);
+
+        // Persist to the account so it follows an authenticated user across devices/sessions.
+        if (auth()->check()) {
+            auth()->user()->update(['locale' => $validated['locale']]);
+        }
+
+        return redirect()->back();
     }
 }
