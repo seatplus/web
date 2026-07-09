@@ -172,18 +172,19 @@ jobs:
           --health-retries 5
 
     steps:
-      # Check this PR out into ./web, then assemble a real core app around it.
-      - uses: actions/checkout@v4
+      # Assemble a real app: core at 5.x, with THIS PR checked out in place at
+      # core/packages/web (a path repo core resolves seatplus/web from).
+      - name: Checkout core
+        uses: actions/checkout@v4
         with:
-          path: web
+          repository: seatplus/core
+          ref: 5.x
+          path: core
 
-      - name: Clone core
-        run: git clone --depth 1 -b 5.x https://github.com/seatplus/core.git core
-
-      - name: Overlay this PR into core/packages/web
-        run: |
-          rm -rf core/packages/web
-          cp -R web core/packages/web
+      - name: Checkout this PR's web into core
+        uses: actions/checkout@v4
+        with:
+          path: core/packages/web
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -192,13 +193,15 @@ jobs:
           extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
           coverage: none
 
-      # Point core at the overlaid web via a path repo and alias the PR branch to a
-      # 5.x dev version so it satisfies core's `seatplus/web: ^5.0` constraint.
-      - name: Resolve core against the PR's web
+      # Give the overlaid path package an explicit version so core's
+      # `seatplus/web: ^5.0` resolves straight to it (a path repo is canonical /
+      # top-priority). Avoids the detached-checkout dev-<sha> version mismatch.
+      - name: Resolve core against the overlaid web
         working-directory: core
         run: |
+          python3 -c "import json; f='packages/web/composer.json'; d=json.load(open(f)); d['version']='5.99.99'; json.dump(d, open(f,'w'), indent=4)"
           composer config repositories.web '{"type":"path","url":"packages/web"}'
-          composer require "seatplus/web:dev-${{ github.head_ref }} as 5.99.99" -W --no-interaction --no-scripts
+          composer update seatplus/web -W --no-interaction --no-scripts
 
       - name: Prepare app env + publish assets
         working-directory: core
