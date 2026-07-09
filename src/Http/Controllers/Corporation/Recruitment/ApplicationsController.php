@@ -47,6 +47,7 @@ use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
+use Seatplus\Web\Support\Translations;
 
 class ApplicationsController extends Controller
 {
@@ -126,6 +127,7 @@ class ApplicationsController extends Controller
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
+            'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ]);
     }
 

@@ -31,6 +31,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Seatplus\Auth\Http\Middleware\CheckRequiredScopes as CheckRequiredScopesMiddleware;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Support\Translations;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRequiredScopes extends CheckRequiredScopesMiddleware
@@ -62,6 +63,7 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
 
         return Inertia::render('Auth/MissingRequiredScopes', [
             'characters' => $missing_character,
+            'pageTranslations' => Translations::gather(['web::missing_required_scopes']),
         ])->toResponse(request());
     }
 }

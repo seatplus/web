@@ -30,10 +30,11 @@ use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
+use Seatplus\Web\Console\Commands\CheckTranslationKeys;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
-use Seatplus\Web\Http\Middleware\Locale;
+use Seatplus\Web\Http\Middleware\SetLocale;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
@@ -124,8 +125,6 @@ class WebServiceProvider extends ServiceProvider
             __DIR__.'/../public/img' => public_path('img'),
             __DIR__.'/../resources/js' => resource_path('js'),
             __DIR__.'/../resources/css' => resource_path('css'),
-            // publish the I18n vendor file too
-            base_path('vendor/conedevelopment/i18n/resources/js') => resource_path('js/vendor'),
         ], 'web');
     }
 
@@ -140,9 +139,9 @@ class WebServiceProvider extends ServiceProvider
         $router->aliasMiddleware('auth', Authenticate::class);
 
         /*
-         * Localization support
+         * Localization: resolve + set the request locale before controllers/props run.
          */
-        $router->aliasMiddleware('locale', Locale::class);
+        $router->pushMiddlewareToGroup('web', SetLocale::class);
 
         // Inertia.JS adding
         // $router->pushMiddlewareToGroup('web', Middleware::class);
@@ -195,6 +194,7 @@ class WebServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AssignSuperuser::class,
+                CheckTranslationKeys::class,
             ]);
         }
     }

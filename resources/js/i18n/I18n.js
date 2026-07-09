@@ -1,47 +1,66 @@
+/**
+ * Pure translation formatter: lookup + placeholder replacement + pluralization over a
+ * translations object (the current-locale `translations` Inertia prop). Stateless — the
+ * caller passes the bag, so it stays reactive to locale/page changes.
+ *
+ * Structure it reads (matches the server-side Translations::gather output):
+ *   { 'web::': { auth: { login_welcome: '…' } }, validation: { required: '…' } }
+ */
 export default class I18n
 {
     /**
-     * Initialize a new translation instance.
-     *
-     * @param  {string}  key
-     * @return {void}
-     */
-    constructor(key = 'translations')
-    {
-        this.key = key;
-    }
-
-    /**
      * Get and replace the string of the given key.
      *
+     * @param  {object}  translations
      * @param  {string}  key
      * @param  {object}  replace
      * @return {string}
      */
-    trans(key, replace = {})
+    static trans(translations, key, replace = {})
     {
-        return this._replace(this._extract(key), replace);
+        return I18n._replace(I18n._extract(translations, key), replace);
     }
 
     /**
      * Get and pluralize the strings of the given key.
      *
+     * @param  {object}  translations
      * @param  {string}  key
      * @param  {number}  count
      * @param  {object}  replace
      * @return {string}
      */
-    trans_choice(key, count = 1, replace = {})
+    static trans_choice(translations, key, count = 1, replace = {})
     {
-        let translations = this._extract(key, '|').split('|'), translation;
+        let lines = I18n._extract(translations, key, '|').split('|'), translation;
 
-        translations.some(t => translation = this._match(t, count));
+        lines.some(t => translation = I18n._match(t, count));
 
-        translation = translation || (count > 1 ? translations[1] : translations[0]);
+        translation = translation || (count > 1 ? lines[1] : lines[0]);
 
         translation = translation.replace(/\[.*?\]|\{.*?\}/, '');
 
-        return this._replace(translation, replace);
+        return I18n._replace(translation, replace);
+    }
+
+    /**
+     * Merge translation bags (e.g. the shared baseline + a page's own groups) at the
+     * namespace level, combining their group sub-objects.
+     *
+     * @param  {...object}  bags
+     * @return {object}
+     */
+    static merge(...bags)
+    {
+        let merged = {};
+
+        for (let bag of bags) {
+            for (let namespace in (bag || {})) {
+                merged[namespace] = { ...(merged[namespace] || {}), ...bag[namespace] };
+            }
+        }
+
+        return merged;
     }
 
     /**
@@ -51,7 +70,7 @@ export default class I18n
      * @param  {number}  count
      * @return {string|null}
      */
-    _match(translation, count)
+    static _match(translation, count)
     {
         let match = translation.match(/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/);
 
@@ -79,7 +98,7 @@ export default class I18n
      * @param  {object}  replace
      * @return {string}
      */
-    _replace(translation, replace)
+    static _replace(translation, replace)
     {
         if (typeof translation === 'object') {
             return translation;
@@ -99,13 +118,14 @@ export default class I18n
     }
 
     /**
-     * Extract values from objects by dot notation.
+     * Extract values from the translations object by (namespaced) dot notation.
      *
+     * @param  {object}  translations
      * @param  {string}  key
      * @param  {mixed}  value
      * @return {mixed}
      */
-    _extract(key, value = null)
+    static _extract(translations, key, value = null)
     {
         let path = key.toString().split('::'),
             keys = path.pop().toString().split('.');
@@ -114,6 +134,6 @@ export default class I18n
             path[0] += '::';
         }
 
-        return path.concat(keys).reduce((t, i) => t[i] || (value || key), window[this.key]);
+        return path.concat(keys).reduce((t, i) => (t && t[i]) || (value || key), translations || {});
     }
 }

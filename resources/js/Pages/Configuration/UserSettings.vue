@@ -40,6 +40,27 @@
               </ul>
             </dd>
           </div>
+          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">
+              Language
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <select
+                v-model="localeForm.locale"
+                class="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50"
+                :disabled="localeForm.processing"
+                @change="updateLocale"
+              >
+                <option
+                  v-for="code in locales"
+                  :key="code"
+                  :value="code"
+                >
+                  {{ localeName(code) }}
+                </option>
+              </select>
+            </dd>
+          </div>
           <!--          <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">
               Application for
@@ -119,6 +140,7 @@
 
     <Link
       :href="route('logout')"
+      method="post"
       as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     >
@@ -132,7 +154,8 @@
     import SelectComponent from "@/Shared/Components/SelectComponent.vue";
     import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
-    import { useForm, Link } from "@inertiajs/vue3";
+    import { useForm, usePage, Link } from "@inertiajs/vue3";
+    import { localeName } from "@/i18n/localeName";
     
     export default {
         name: "UserSettings",
@@ -171,11 +194,31 @@
                 .post(route('change.main_character'))
             })
 
+            const page = usePage()
+
+            const locales = computed(() => _.get(page.props, 'locales', {}))
+
+            const localeForm = useForm({
+                locale: _.get(page.props, 'locale'),
+            })
+
+            // `translations` is a reactive Inertia prop now — the redirect back re-renders
+            // in the newly-selected language without a full page reload.
+            const updateLocale = () => {
+                localeForm.post(route('locale.update'), {
+                    preserveScroll: true,
+                })
+            }
+
             return {
                 selected,
                 pageTitle: 'User Settings',
                 form,
-                options
+                options,
+                locales,
+                localeForm,
+                updateLocale,
+                localeName
             }
         }
     }

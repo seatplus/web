@@ -6,11 +6,18 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/index';
 import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout.vue";
-import I18n from '@/vendor/I18n';
+import I18n from '@/i18n/I18n';
 
 const I18nPlugin = {
     install(app) {
-        app.config.globalProperties.$I18n = new I18n();
+        // Options-API global: translate against the current page's reactive `translations`
+        // prop. (`<script setup>` pages use the useTranslations() composable instead.)
+        app.config.globalProperties.$trans = function (key, replace = {}) {
+            return I18n.trans(I18n.merge(this.$page?.props?.translations, this.$page?.props?.pageTranslations), key, replace);
+        };
+        app.config.globalProperties.$trans_choice = function (key, count = 1, replace = {}) {
+            return I18n.trans_choice(I18n.merge(this.$page?.props?.translations, this.$page?.props?.pageTranslations), key, count, replace);
+        };
     }
 }
 

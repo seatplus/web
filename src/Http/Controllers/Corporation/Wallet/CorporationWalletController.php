@@ -36,6 +36,7 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Support\Translations;
 
 class CorporationWalletController extends Controller
 {
@@ -48,6 +49,7 @@ class CorporationWalletController extends Controller
         return inertia('Corporation/Wallets/Wallet', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
+            'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ]);
     }
 

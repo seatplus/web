@@ -12,7 +12,7 @@
           SeAT plus
         </h2>
         <p class="mt-2 text-center text-sm leading-5 text-gray-600 max-w">
-          {{ $I18n.trans('web::auth.login_welcome') }}
+          {{ $trans('web::auth.login_welcome') }}
         </p>
       </div>
 
@@ -37,6 +37,22 @@
           Sign in
         </a>
       </div>
+
+      <div class="mt-6 flex justify-center">
+        <select
+          v-model="selectedLocale"
+          class="rounded-md border-gray-300 text-sm text-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          @change="switchLocale"
+        >
+          <option
+            v-for="code in locales"
+            :key="code"
+            :value="code"
+          >
+            {{ localeName(code) }}
+          </option>
+        </select>
+      </div>
     </div>
   </div>
 </template>
@@ -45,12 +61,33 @@
 
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
+import { router } from "@inertiajs/vue3";
+import { localeName } from "@/i18n/localeName";
 
 export default {
     name: "Login",
     components: {AppHead},
     layout: (h, page) => h(EmptyLayout, [page]),
-
+    data() {
+        return {
+            selectedLocale: this.$page.props.locale,
+        }
+    },
+    computed: {
+        locales() {
+            return this.$page.props.locales || []
+        }
+    },
+    methods: {
+        localeName,
+        // `translations` is a reactive Inertia prop now — the redirect back re-renders
+        // in the newly-selected language without a full page reload.
+        switchLocale() {
+            router.post(route('locale.update'), { locale: this.selectedLocale }, {
+                preserveScroll: true,
+            })
+        }
+    }
 }
 </script>
 

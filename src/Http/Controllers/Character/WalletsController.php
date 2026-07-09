@@ -39,6 +39,7 @@ use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Actions\Wallet\GetRefTypesAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Support\Translations;
 
 class WalletsController extends Controller
 {
@@ -51,6 +52,7 @@ class WalletsController extends Controller
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'character_ids' => $ids,
+            'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ]);
     }
 

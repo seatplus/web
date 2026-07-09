@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Seatplus\Web\Support\Translations;
 
 class LoginController
 {
@@ -23,8 +24,8 @@ class LoginController
         }
 
         return Inertia::render('Auth/Login', [
-            'login_welcome' => trans('web::auth.login_welcome'),
             'evesso_img_src' => asset('img/evesso.png'),
+            'pageTranslations' => Translations::gather(['web::auth']),
         ]);
     }
 }

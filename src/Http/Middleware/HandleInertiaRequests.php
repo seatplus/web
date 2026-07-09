@@ -32,6 +32,8 @@ use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Seatplus\Web\Support\Locales;
+use Seatplus\Web\Support\Translations;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -58,6 +60,13 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            // Locale is resolved + set by the SetLocale middleware before controllers/props run.
+            'locale' => fn () => app()->getLocale(),
+            'locales' => fn () => Locales::available(),
+            // Shared chrome translations (baseline) — the notification labels the persistent
+            // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
+            // `pageTranslations` prop and are merged client-side.
+            'translations' => fn () => Translations::gather(['web::notifications']),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
@@ -79,12 +88,6 @@ class HandleInertiaRequests extends Middleware
                     ->where('id', auth()->user()->getAuthIdentifier())
                     ->first()
             ),
-            'translation' => fn () => [
-                'success' => trans('web::notifications.success'),
-                'info' => trans('web::notifications.info'),
-                'warning' => trans('web::notifications.warning'),
-                'error' => trans('web::notifications.error'),
-            ],
             'errors' => fn () => Session::get('errors')
                 ? Session::get('errors')->getBag('default')->getMessages()
                 : (object) [],

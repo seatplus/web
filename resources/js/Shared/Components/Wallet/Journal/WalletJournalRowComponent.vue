@@ -138,7 +138,7 @@ export default {
 
             let string = 'web::wallet_journal.' + _.toString(entry.ref_type)
 
-            return this.$I18n.trans(string)
+            return this.$trans(string)
         },
         toggle() {
             this.expanded = !this.expanded
