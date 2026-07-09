@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -79,7 +79,7 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -119,7 +119,7 @@ jobs:
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'npm'
@@ -133,15 +133,125 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  browser:
+    name: Browser (vs core)
+    runs-on: ubuntu-latest
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: laravel
+      DB_USERNAME: seatplus
+      DB_PASSWORD: secret
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: seatplus
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seatplus -d laravel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Assemble a real app: core at 5.x, with THIS PR checked out in place at
+      # core/packages/web (a path repo core resolves seatplus/web from).
+      - name: Checkout core
+        uses: actions/checkout@v7
+        with:
+          repository: seatplus/core
+          ref: 5.x
+          path: core
+
+      - name: Checkout this PR's web into core
+        uses: actions/checkout@v7
+        with:
+          path: core/packages/web
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
+          coverage: none
+
+      # Give the overlaid path package an explicit version so core's
+      # `seatplus/web: ^5.0` resolves straight to it (a path repo is canonical /
+      # top-priority). Avoids the detached-checkout dev-<sha> version mismatch.
+      - name: Resolve core against the overlaid web
+        working-directory: core
+        run: |
+          python3 -c "import json; f='packages/web/composer.json'; d=json.load(open(f)); d['version']='5.99.99'; json.dump(d, open(f,'w'), indent=4)"
+          composer config repositories.web '{"type":"path","url":"packages/web"}'
+          composer update seatplus/web -W --no-interaction --no-scripts
+
+      - name: Prepare app env + publish assets
+        working-directory: core
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan vendor:publish --tag=web-static --force
+          php artisan vendor:publish --tag=web --force
+
+      - name: Copy this PR's browser tests into core
+        working-directory: core
+        run: |
+          mkdir -p tests/Browser/web
+          cp -R packages/web/tests/Browser/. tests/Browser/web/
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Build assets + Playwright
+        working-directory: core
+        run: |
+          npm install
+          npm install --save-dev playwright
+          npm run build
+          npx playwright install --with-deps chromium
+
+      - name: Run browser tests
+        working-directory: core
+        run: vendor/bin/pest tests/Browser --no-coverage
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-browser-screenshots
+          path: core/tests/Browser/Screenshots/
+          if-no-files-found: warn
+          retention-days: 7
+
   laravel:
     name: Laravel
     runs-on: ubuntu-latest
-    needs: [lint, test, frontend]
+    needs: [lint, test, frontend, browser]
     if: always()
     steps:
       - name: Check all jobs passed
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.test.result }}" != "success" || "${{ needs.frontend.result }}" != "success" ]]; then
+          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.test.result }}" != "success" || "${{ needs.frontend.result }}" != "success" || "${{ needs.browser.result }}" != "success" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

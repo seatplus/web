@@ -22,3 +22,6 @@ public/js/
 /resources/js/routes/
 /resources/js/actions/
 /resources/js/wayfinder/
+
+# pest-plugin-browser screenshots (captured at test time, not committed)
+/tests/Browser/Screenshots/

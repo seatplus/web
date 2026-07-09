@@ -3,6 +3,10 @@
     <testsuites>
         <testsuite name="Seatplus Test Suite">
             <directory>tests</directory>
+            <!-- Browser tests run against a real assembled core app, not this
+                 Testbench harness. They live here so they're authored + shipped
+                 with the package, but core's browser CI executes them. -->
+            <exclude>tests/Browser</exclude>
         </testsuite>
     </testsuites>
     <php>
