@@ -1,5 +1,5 @@
 <template>
-  <div :class="['bg-white sm:rounded-md', {'shadow' : !isEmpty}]">
+  <div :class="['bg-white sm:rounded-md', {'shadow-sm' : !isEmpty}]">
     <ListTransition
       :entries="list"
       :class="'divide-y divide-grey-200'"
@@ -7,12 +7,12 @@
       <div
         v-for="(entity, index) of list"
         :key="index"
-        class="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out"
+        class="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out"
       >
         <EntityByIdBlock :id="entity.id" />
 
         <button
-          :class="['text-red-500 hover:bg-red-100 focus:bg-red-100','inline-flex rounded-md p-1.5 focus:outline-none transition ease-in-out duration-150']"
+          :class="['text-red-500 hover:bg-red-100 focus:bg-red-100','inline-flex rounded-md p-1.5 focus:outline-hidden transition ease-in-out duration-150']"
           @click="removeEntity(entity)"
         >
           <svg

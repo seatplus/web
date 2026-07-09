@@ -2,7 +2,7 @@
   <div>
     <AppHead app-title="Create Schedule" />
 
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <InputGroup
@@ -42,13 +42,13 @@
         </div>
       </div>
       <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
-        <span class="inline-flex rounded-md shadow-sm">
+        <span class="inline-flex rounded-md shadow-xs">
           <Link
             method="post"
             :data="$data"
             preserve-state
             :href="route('schedules.updateOrCreate')"
-            class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
+            class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
           >
             Save
           </Link>

@@ -69,7 +69,7 @@
             v-model="form.steps"
             name="steps"
             type="text"
-            class="block max-w-lg w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
+            class="block max-w-lg w-full shadow-xs focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md"
           >
           <span class="text-sm text-gray-500">F.e. first and second review. Separate Steps by semi-column. Leave blank if you do not plan to use a multi step review process</span>
         </div>
@@ -79,7 +79,7 @@
       <button
         :disabled="form.processing"
         type="submit"
-        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-xs text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         @click="submit()"
       >
         Save

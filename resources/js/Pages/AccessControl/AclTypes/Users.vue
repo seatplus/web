@@ -25,7 +25,7 @@
       <input
         id="search_field"
         v-model="search"
-        class="block w-full h-full pl-8 pr-3 py-2 rounded-md text-gray-900 placeholder-gray-500 border-gray-300 focus:outline-none focus:placeholder-gray-400 sm:text-sm"
+        class="block w-full h-full pl-8 pr-3 py-2 rounded-md text-gray-900 placeholder-gray-500 border-gray-300 focus:outline-hidden focus:placeholder-gray-400 sm:text-sm"
         placeholder="Search"
         type="search"
       >
@@ -41,7 +41,7 @@
         <li
           v-for="user of filterUsers(results)"
           :key="user.id"
-          class="col-span-1 bg-white rounded-lg shadow"
+          class="col-span-1 bg-white rounded-lg shadow-sm"
         >
           <div class="w-full flex items-center justify-between p-6 space-x-6">
             <div class="flex-1 truncate">
@@ -69,7 +69,7 @@
             <div class="-mt-px flex">
               <div class="w-0 flex-1 flex border-r border-gray-200">
                 <button
-                  class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-emerald-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-emerald-700 focus:outline-none focus:ring-blue focus:border-emerald-300 focus:z-10 transition ease-in-out duration-150"
+                  class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-emerald-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-emerald-700 focus:outline-hidden focus:ring-blue focus:border-emerald-300 focus:z-10 transition ease-in-out duration-150"
                   @click="addMember(user)"
                 >
                   <svg

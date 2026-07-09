@@ -2,7 +2,7 @@
   <div
     v-for="message in messages"
     :key="message.timestamp"
-    class="bg-white shadow overflow-hidden sm:rounded-lg"
+    class="bg-white shadow-sm overflow-hidden sm:rounded-lg"
   >
     <div class="px-4 py-5 sm:px-6">
       <h3 class="text-lg leading-6 font-medium text-gray-900">

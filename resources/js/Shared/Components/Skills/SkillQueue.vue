@@ -47,7 +47,7 @@
     </div>
   </CardWithHeader>
 
-<!--  <div class=" bg-white shadow overflow-hidden sm:rounded-lg">
+<!--  <div class=" bg-white shadow-sm overflow-hidden sm:rounded-lg">
 
   </div>-->
 </template>

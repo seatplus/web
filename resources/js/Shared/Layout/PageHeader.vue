@@ -78,7 +78,7 @@ const getBack = computed(() => {
       </div>
       <div class="mt-4 shrink-0 flex md:mt-0 md:ml-4 space-x-3">
         <slot name="secondary">
-          <span class="shadow-sm rounded-md" />
+          <span class="shadow-xs rounded-md" />
         </slot>
         <slot name="primary" />
       </div>

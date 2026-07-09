@@ -10,7 +10,7 @@
       <span class="pr-3 bg-gray-100 text-lg font-medium text-gray-900">
         <EntityByIdBlock
           :id="characterId"
-          class="flex-grow"
+          class="grow"
         />
       </span>
     </div>

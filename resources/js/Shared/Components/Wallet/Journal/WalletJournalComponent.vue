@@ -4,7 +4,7 @@
       <div class="flex">
         <EntityByIdBlock
           :id="id"
-          class="flex-grow"
+          class="grow"
         />
         <div class="flex-none text-right text-sm text-gray-500">
           Journal

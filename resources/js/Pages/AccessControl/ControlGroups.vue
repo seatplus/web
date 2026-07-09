@@ -3,7 +3,7 @@
     <li
       v-for="role in roles"
       :key="role.id"
-      class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow"
+      class="col-span-1 flex flex-col text-center bg-white rounded-lg shadow-sm"
     >
       <ControlGroup :role="role" />
     </li>

@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex">
         <EntityBlock
-          class="flex-grow"
+          class="grow"
           :entity="character"
         />
         <div class="flex-none text-right text-sm text-gray-500">

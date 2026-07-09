@@ -48,11 +48,11 @@
           </LeftAlignedData>
         </LeftAligned>
       </li>
-      <li class="col-span-1 bg-white rounded-lg shadow flex flex-wrap content-center">
+      <li class="col-span-1 bg-white rounded-lg shadow-sm flex flex-wrap content-center">
         <a
           :href="route('auth.eve')"
           type="button"
-          class="py-4 inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-sm text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="py-4 inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-xs text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           <!-- Heroicon name: solid/user-add -->
           <svg

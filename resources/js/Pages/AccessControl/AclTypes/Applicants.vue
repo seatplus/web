@@ -7,7 +7,7 @@
       <li
         v-for="member in filteredMembers"
         :key="member.user.id"
-        class="col-span-1 bg-white rounded-lg shadow"
+        class="col-span-1 bg-white rounded-lg shadow-sm"
       >
         <div class="w-full flex items-center justify-between p-6 space-x-6">
           <div class="flex-1 truncate">
@@ -31,7 +31,7 @@
           <div class="-mt-px flex">
             <div class="w-0 flex-1 flex border-r border-gray-200">
               <button
-                class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-emerald-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-emerald-700 focus:outline-none focus:ring-emerald focus:border-emerald-300 focus:z-10 transition ease-in-out duration-150"
+                class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-emerald-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-emerald-700 focus:outline-hidden focus:ring-emerald focus:border-emerald-300 focus:z-10 transition ease-in-out duration-150"
                 @click="addMember(member)"
               >
                 <svg
@@ -46,7 +46,7 @@
             </div>
             <div class="-ml-px w-0 flex-1 flex">
               <button
-                class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:bg-red-100 hover:text-red-700 focus:outline-none focus:ring-red focus:border-red-300 focus:z-10 transition ease-in-out duration-150"
+                class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:bg-red-100 hover:text-red-700 focus:outline-hidden focus:ring-red focus:border-red-300 focus:z-10 transition ease-in-out duration-150"
                 @click="removeMember(member)"
               >
                 <svg

@@ -1,7 +1,7 @@
 <template>
   <div class="absolute flex min-h-full min-w-full flex-col bg-white pt-16 pb-12">
-    <main class="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-center px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-shrink-0 justify-center">
+    <main class="mx-auto flex w-full max-w-7xl grow flex-col justify-center px-4 sm:px-6 lg:px-8">
+      <div class="flex shrink-0 justify-center">
         <a
           href="/"
           class="inline-flex"
@@ -37,7 +37,7 @@
         </div>
       </div>
     </main>
-    <footer class="mx-auto w-full max-w-7xl flex-shrink-0 px-4 sm:px-6 lg:px-8">
+    <footer class="mx-auto w-full max-w-7xl shrink-0 px-4 sm:px-6 lg:px-8">
       <nav class="flex justify-center space-x-4">
         <Link
           href="https://github.com/seatplus/seatplus/issues/new?assignees=&labels=&template=bug_report.md&title="

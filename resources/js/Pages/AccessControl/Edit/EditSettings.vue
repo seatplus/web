@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-3">
       <div class="px-4 py-5 sm:px-6">
         <!-- Content goes here -->
         <div class="md:flex md:items-center md:justify-between">
@@ -42,7 +42,7 @@
             <input
               id="search_field"
               v-model="query"
-              class="block w-full h-full pl-8 pr-3 py-2 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 sm:text-sm"
+              class="block w-full h-full pl-8 pr-3 py-2 rounded-md text-gray-900 placeholder-gray-500 focus:outline-hidden focus:placeholder-gray-400 sm:text-sm"
               placeholder="Search"
               type="search"
             >
@@ -70,7 +70,7 @@
                   class="border-l-4 border-yellow-400 bg-yellow-50 p-4"
                 >
                   <div class="flex">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                       <ExclamationTriangleIcon
                         class="h-5 w-5 text-yellow-400"
                         aria-hidden="true"
@@ -114,21 +114,21 @@
                   </span>
                   <button
                     type="button"
-                    class="relative inline-flex shadow-sm items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                    class="relative inline-flex shadow-xs items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                     @click="addAffiliation('allowed', entity)"
                   >
                     Allowed
                   </button>
                   <button
                     type="button"
-                    class="-ml-px relative inline-flex shadow-sm items-center px-4 py-2 border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                    class="-ml-px relative inline-flex shadow-xs items-center px-4 py-2 border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                     @click="addAffiliation('inverse', entity)"
                   >
                     Inverse
                   </button>
                   <button
                     type="button"
-                    class="-ml-px relative inline-flex shadow-sm items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                    class="-ml-px relative inline-flex shadow-xs items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                     @click="addAffiliation('forbidden', entity)"
                   >
                     Forbidden

@@ -8,7 +8,7 @@
       </template>
     </PageHeader>
 
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
       <div>
         <div class="sm:hidden">
           <label
@@ -17,12 +17,12 @@
           >
             Select role type
           </label>
-          <div class="mt-1 rounded-md shadow-sm">
+          <div class="mt-1 rounded-md shadow-xs">
             <select
               id="form.acl.type"
               v-model="form.acl.type"
               aria-label="Selected tab"
-              class="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:ring-blue focus:border-blue-300 sm:text-sm sm:leading-5 transition ease-in-out duration-150"
+              class="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-hidden focus:ring-blue focus:border-blue-300 sm:text-sm sm:leading-5 transition ease-in-out duration-150"
             >
               <option value="manual">
                 Manual
@@ -43,25 +43,25 @@
           <div class="px-4 sm:px-6 border-b border-gray-200">
             <nav class="-mb-px flex">
               <button
-                :class="[form.acl.type === 'manual' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-none']"
+                :class="[form.acl.type === 'manual' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-hidden']"
                 @click="form.acl.type = 'manual'"
               >
                 Manual
               </button>
               <button
-                :class="[form.acl.type === 'automatic' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-none']"
+                :class="[form.acl.type === 'automatic' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-hidden']"
                 @click="form.acl.type = 'automatic'"
               >
                 Automatic
               </button>
               <button
-                :class="[form.acl.type === 'opt-in' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-none']"
+                :class="[form.acl.type === 'opt-in' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-hidden']"
                 @click="form.acl.type = 'opt-in'"
               >
                 Opt In
               </button>
               <button
-                :class="[form.acl.type === 'on-request' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-none']"
+                :class="[form.acl.type === 'on-request' ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700': 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','ml-8 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm leading-5  focus:outline-hidden']"
                 @click="form.acl.type = 'on-request'"
               >
                 On Request
@@ -167,7 +167,7 @@
                 </div>
                 <div class="order-3 mt-2 shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
                   <button
-                    class="flex w-full cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50"
+                    class="flex w-full cursor-pointer items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-xs text-sm font-medium text-indigo-600 bg-white hover:bg-indigo-50"
                     @click="store"
                   >
                     Save
@@ -176,7 +176,7 @@
                 <div class="order-2 shrink-0 sm:order-3 sm:ml-2">
                   <button
                     type="button"
-                    class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-white"
+                    class="-mr-1 flex p-2 rounded-md hover:bg-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-white"
                   >
                     <span class="sr-only">Dismiss</span>
                     <!-- Heroicon name: outline/x -->

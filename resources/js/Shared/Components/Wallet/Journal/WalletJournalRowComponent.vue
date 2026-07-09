@@ -31,7 +31,7 @@
       <span class="sr-only">Expand</span>
       <button
         type="button"
-        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']"
+        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-xs focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']"
         @click="toggle"
       >
         <svg
@@ -79,7 +79,7 @@
     <DataCell class="px-6 py-4 whitespace-normal text-right text-sm text-gray-500">
       <button
         type="button"
-        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']"
+        :class="[expanded ? 'text-white bg-gray-500 hover:bg-gray-600': 'text-gray-500 hover:text-gray-600','inline-flex items-center p-1 border border-transparent rounded-full shadow-xs focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500', 'transition ease-in-out duration-200']"
         @click="toggle"
       >
         <svg

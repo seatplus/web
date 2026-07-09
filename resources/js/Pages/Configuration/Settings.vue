@@ -3,7 +3,7 @@
     <HorizonStats class="mb-3" />
     <Commands class="mb-3" />
 
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
       <div class="border-b border-gray-200 px-4 pt-5 sm:px-6">
         <!-- Content goes here -->
         <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -30,7 +30,7 @@
                 <div
                   v-for="(navTab,index) in navTabs"
                   :key="index"
-                  :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-none inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 cursor-pointer']"
+                  :class="[{'ml-8': index >0}, isActive(navTab.route) ? 'border-indigo-500 text-indigo-600 focus:text-indigo-800 focus:border-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:text-gray-700 focus:border-gray-300','group focus:outline-hidden inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm leading-5 cursor-pointer']"
                   @click="visitRoute(navTab.route)"
                 >
                   <svg

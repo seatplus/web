@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="mt-1 relative rounded-md shadow-sm">
+    <div class="mt-1 relative rounded-md shadow-xs">
       <select
         v-model="selection"
         :class="['form-select block w-full', error ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red' : '']"

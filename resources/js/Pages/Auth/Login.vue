@@ -19,7 +19,7 @@
       <div class="mt-8">
         <a
           :href="route('auth.eve')"
-          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
+          class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           <span class="absolute left-0 inset-y pl-3">
             <svg
@@ -41,7 +41,7 @@
       <div class="mt-6 flex justify-center">
         <select
           v-model="selectedLocale"
-          class="rounded-md border-gray-300 text-sm text-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          class="rounded-md border-gray-300 text-sm text-gray-600 shadow-xs focus:border-indigo-500 focus:ring-indigo-500"
           @change="switchLocale"
         >
           <option

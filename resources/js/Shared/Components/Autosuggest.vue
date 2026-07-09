@@ -11,7 +11,7 @@
       v-model="query"
       type="text"
       :name="label"
-      class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+      class="shadow-xs focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
       :placeholder="placeholder"
       @click="toggle"
       @keyup.delete="handleBackspace"
@@ -23,7 +23,7 @@
       />
       <ListboxOptions
         static
-        class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+        class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-hidden sm:text-sm"
       >
         <ListboxOption
           v-for="option in options"

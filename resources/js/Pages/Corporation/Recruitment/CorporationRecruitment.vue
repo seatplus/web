@@ -1,6 +1,6 @@
 <template>
   <!-- Be sure to use this with a layout container that is full-width on mobile -->
-  <div class="bg-white overflow-hidden shadow sm:rounded-lg my-5">
+  <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg my-5">
     <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
       <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
         <div class="ml-4 mt-4">
@@ -11,14 +11,14 @@
           v-if="enlistment.can_manage"
           class="ml-4 mt-4 shrink-0 flex space-x-3"
         >
-          <span class="inline-flex rounded-md shadow-sm">
+          <span class="inline-flex rounded-md shadow-xs">
 
             <Link
               :href="route('edit.enlistment', enlistment.corporation_id)"
               method="get"
               as="button"
               type="button"
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:border-indigo-300 focus:ring-offset-2 focus:ring-indigo active:bg-indigo-200"
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-50 focus:outline-hidden focus:ring-2 focus:border-indigo-300 focus:ring-offset-2 focus:ring-indigo active:bg-indigo-200"
             >
               Edit Enlistment
             </Link>
@@ -35,7 +35,7 @@
         @select="changeActiveTab"
       />
 
-      <div class="bg-white overflow-hidden shadow sm:rounded-lg relative max-h-96 overflow-y-auto">
+      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg relative max-h-96 overflow-y-auto">
         <PendingTable
           v-if="isPending"
           :step-count="stepIndex"

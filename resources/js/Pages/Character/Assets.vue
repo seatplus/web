@@ -25,7 +25,7 @@
               <input
                 id="search"
                 v-model="search"
-                class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                class="mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
               >
             </div>
 
@@ -59,7 +59,7 @@
                     v-slot="{ checked }"
                     v-model="switchValue"
                     as="button"
-                    class="relative inline-flex shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-none focus:shadow-outline"
+                    class="relative inline-flex shrink-0 h-6 transition-colors duration-200 ease-in-out border-2 border-transparent rounded-full cursor-pointer w-11 focus:outline-hidden focus:shadow-outline"
                     :class="switchValue ? 'bg-indigo-600' : 'bg-gray-200'"
                   >
                     <span

@@ -21,7 +21,7 @@
       <div class="ml-4 shrink-0">
         <button
           v-if="hasApplied(character.character_id)"
-          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red focus:border-red-700"
+          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-xs text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-red focus:border-red-700"
           @click="remove(character.character_id)"
         >
           <UserMinusIcon
@@ -32,7 +32,7 @@
         </button>
         <button
           v-else
-          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="inline-flex items-center px-1.5 py-1 border border-transparent shadow-xs text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           @click="apply(character.character_id)"
         >
           <UserPlusIcon

@@ -10,7 +10,7 @@
           :cell="columns[0]"
           class="sm:flex truncate"
         >
-          <div class="flex-shrink self-center">
+          <div class="shrink self-center">
             <EntityByIdBlock
               :id="applicant.mainCharacter.character_id"
               class="flex gap-4 truncate"
