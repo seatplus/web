@@ -1,26 +1,33 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Models\Onboarding;
 
 /*
  * Authenticated dashboard smoke test — runs against the real assembled core app.
  *
- * Logs in a factory user and loads /home, asserting the actual Dashboard renders
- * (PageHeader "Home") with no JS/console errors and styled — not just that some
- * page came back. In testing CheckRequiredScopes is skipped (non-production) and
- * ONBOARDING defaults off, so /home reaches Dashboard/Index; the Onboarding
- * record below keeps it passing even if onboarding is enabled.
+ * Logs in a user and loads /home, asserting the Dashboard actually renders
+ * (the visible "Characters" heading) with no JS/console errors — not just that
+ * some page came back.
  *
- * Factory-name guessing for the seatplus packages is set for the whole Browser
- * suite in core's tests/Pest.php.
+ * The user is created minimally (no characters) on purpose: User::factory()
+ * builds a multi-character graph whose CharacterInfo affiliations occasionally
+ * collide on character_affiliations (random ids), which is flaky here. A
+ * characterless user is deterministic and still reaches Dashboard/Index (an
+ * empty character list). In testing CheckRequiredScopes is skipped
+ * (non-production) and ONBOARDING defaults off; the Onboarding record keeps it
+ * passing even if onboarding is enabled.
  */
 
 uses(RefreshDatabase::class);
 
 it('renders the dashboard for an authenticated user', function () {
-    $user = User::factory()->create();
+    $user = new User();
+    $user->active = true;
+    $user->remember_token = Str::random(10);
+    $user->save();
 
     Onboarding::create(['user_id' => $user->getKey()]);
 
@@ -28,13 +35,7 @@ it('renders the dashboard for an authenticated user', function () {
 
     $page = visit('/home');
 
-    // TEMP DIAGNOSTIC: dump the rendered HTML so CI shows what Inertia resolved,
-    // which props are present, and whether Vue mounted anything into #app.
-    dump($page->content());
-
     $page->assertNoSmoke();
-    // "Characters" is the visible <h3> on the dashboard (Dashboard/Characters.vue);
-    // "Home" is only the document <title>, so assert on real page content.
     $page->assertSee('Characters');
     $page->screenshot(true, 'dashboard');
 
