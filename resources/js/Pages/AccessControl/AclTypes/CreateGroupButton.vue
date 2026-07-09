@@ -30,12 +30,12 @@
             for="role"
             class="block text-sm font-medium leading-5 text-gray-700"
           >Control Group</label>
-          <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="mt-1 relative rounded-md shadow-xs">
             <input
               id="role"
               v-model="name"
               type="text"
-              class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              class="shadow-xs focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
               placeholder="Some name"
             >
           </div>
@@ -45,14 +45,14 @@
         </div>
       </template>
       <template #buttons>
-        <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+        <span class="flex w-full rounded-md shadow-xs sm:ml-3 sm:w-auto">
           <Link
             method="post"
             as="button"
             :href="route('acl.create')"
             :data="{name: name}"
             type="button"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-emerald-500 focus:outline-hidden focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             Create
           </Link>

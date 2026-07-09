@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white overflow-hidden shadow rounded-lg divide-y divide-gray-200">
+  <div class="bg-white overflow-hidden shadow-sm rounded-lg divide-y divide-gray-200">
     <div class="px-4 py-5 sm:px-6">
       <!---->
       <!-- Content goes here -->

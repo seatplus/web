@@ -29,7 +29,7 @@
     </div>
     <div class="hidden sm:block">
       <nav
-        class="relative z-0 rounded-lg shadow flex divide-x divide-gray-200"
+        class="relative z-0 rounded-lg shadow-sm flex divide-x divide-gray-200"
         aria-label="Tabs"
       >
         <div

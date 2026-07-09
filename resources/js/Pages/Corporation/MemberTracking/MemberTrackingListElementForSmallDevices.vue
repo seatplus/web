@@ -1,6 +1,6 @@
 <template>
   <li class="sm:hidden ">
-    <div class="hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+    <div class="hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out">
       <div class="px-4 py-4 sm:px-6">
         <div class="flex items-center justify-between ">
           <div class="text-sm leading-5 font-medium text-indigo-600 truncate inline-flex items-center space-x-2">

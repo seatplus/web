@@ -6,17 +6,17 @@
         class="block text-sm font-medium text-gray-700"
       >{{ label }}</label>
     </slot>
-    <div class="relative mt-1 rounded-md shadow-sm">
+    <div class="relative mt-1 rounded-md shadow-xs">
       <input
         :id="label"
         :type="type"
         :name="label"
         :value="modelValue"
         :class="[
-          'block w-full rounded-md pr-10 focus:outline-none sm:text-sm',
+          'block w-full rounded-md pr-10 focus:outline-hidden sm:text-sm',
           {'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : error},
           {'border-yellow-300 text-yellow-900 placeholder-yellow-300 focus:border-yellow-500 focus:ring-yellow-500' : warning},
-          {'border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500' : isNormal},
+          {'border-gray-300 shadow-xs focus:border-indigo-500 focus:ring-indigo-500' : isNormal},
         ]"
         :placeholder="placeholder"
         @input="emit('update:modelValue', $event.target.value)"

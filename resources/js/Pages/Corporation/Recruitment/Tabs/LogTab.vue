@@ -121,7 +121,7 @@
                       v-model="form.comment"
                       name="comment"
                       rows="3"
-                      class="shadow-sm block w-full focus:ring-gray-900 focus:border-gray-900 sm:text-sm border border-gray-300 rounded-md"
+                      class="shadow-xs block w-full focus:ring-gray-900 focus:border-gray-900 sm:text-sm border border-gray-300 rounded-md"
                       placeholder="Leave a comment"
                     />
                     <div v-if="form.errors.comment">
@@ -132,7 +132,7 @@
                     <button
                       type="submit"
                       :disabled="form.processing"
-                      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+                      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-xs text-white bg-gray-900 hover:bg-black focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
                     >
                       Comment
                     </button>

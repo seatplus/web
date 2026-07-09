@@ -4,7 +4,7 @@
     <h3 class="mt-6 text-gray-900 text-sm leading-5 font-medium">
       {{ role.name }}
     </h3>
-    <dl class="mt-1 flex-grow flex flex-col justify-between">
+    <dl class="mt-1 grow flex flex-col justify-between">
       <dd class="text-gray-500 text-sm leading-5">
         {{ role.members }} {{ role.members > 1 ? 'Members' : 'Member' }}
       </dd>

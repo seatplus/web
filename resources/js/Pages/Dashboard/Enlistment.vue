@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 cursor-pointer  hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+    class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-xs flex items-center space-x-3 cursor-pointer  hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
     @click="openModal = true"
   >
     <div class="relative -mr-px w-0 flex-1 inline-flex items-center justify-between py-4 text-sm leading-5 text-gray-700 font-medium transition ease-in-out duration-150">
@@ -41,7 +41,7 @@
         <div v-if="enlistment.type === 'character'" />
         <span
           v-else
-          class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto"
+          class="flex w-full rounded-md shadow-xs sm:ml-3 sm:w-auto"
         >
           <Link
             v-if="hasApplications"
@@ -49,7 +49,7 @@
             method="delete"
             :preserve-state="false"
             as="button"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:ring-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-red-500 focus:outline-hidden focus:border-red-700 focus:ring-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             <UserMinusIcon
               class="-ml-1 mr-2 h-5 w-5"
@@ -64,7 +64,7 @@
             :preserve-state="false"
             as="button"
             :data="{corporation_id: enlistment.corporation_id}"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-emerald-500 focus:outline-hidden focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             <UserPlusIcon
               class="-ml-1 mr-2 h-5 w-5"

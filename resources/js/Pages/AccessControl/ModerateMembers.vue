@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-4">
     <PageHeader :page-title="pageTitle" :breadcrumbs="breadcrumbs" />
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg">
       <!--Header-->
       <div class="border-b border-gray-200 px-4 py-5 sm:px-6">
         <!-- Content goes here -->
@@ -16,7 +16,7 @@
       </div>
 
       <!--Content below-->
-      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <div class="bg-white shadow-sm overflow-hidden sm:rounded-md">
         <ul class="divide-y divide-gray-200">
           <InfiniteLoadingHelper
             v-slot="{results}"
@@ -27,7 +27,7 @@
               v-for="member in sortMembers(results)"
               :key="member.id"
             >
-              <div class="block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out">
+              <div class="block hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out">
                 <div class="px-4 py-4 sm:px-6">
                   <div class="flex items-center justify-between">
                     <div>
@@ -58,11 +58,11 @@
                     <div class="ml-2 shrink-0 flex">
                       <span
                         v-if="member.status === 'waitlist'"
-                        class="relative z-0 inline-flex shadow-sm rounded-md"
+                        class="relative z-0 inline-flex shadow-xs rounded-md"
                       >
                         <button
                           type="button"
-                          class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                          class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                           @click="approve(member)"
                         >
                           <svg
@@ -80,7 +80,7 @@
                         </button>
                         <button
                           type="button"
-                          class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+                          class="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
                           @click="removeMember(member)"
                         >
                           <svg
@@ -99,11 +99,11 @@
                       </span>
                       <span
                         v-if="member.status === 'member'"
-                        class="inline-flex rounded-md shadow-sm"
+                        class="inline-flex rounded-md shadow-xs"
                       >
                         <button
                           type="button"
-                          class="inline-flex items-center px-3 py-2 border border-gray-300t text-sm leading-4 font-medium rounded-md bg-white hover:text-gray-500 focus:outline-none focus:border-blue-700 focus:ring-blue active:text-gray-700 active:bg-gray-100 transition ease-in-out duration-150"
+                          class="inline-flex items-center px-3 py-2 border border-gray-300t text-sm leading-4 font-medium rounded-md bg-white hover:text-gray-500 focus:outline-hidden focus:border-blue-700 focus:ring-blue active:text-gray-700 active:bg-gray-100 transition ease-in-out duration-150"
                           @click="removeMember(member)"
                         >
                           <svg

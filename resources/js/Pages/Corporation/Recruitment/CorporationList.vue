@@ -3,7 +3,7 @@
     <li
       v-for="corporation in result"
       :key="corporation.corporation_id"
-      class="col-span-1 bg-white rounded-lg shadow"
+      class="col-span-1 bg-white rounded-lg shadow-sm"
     >
       <div class="w-full flex items-center justify-between p-6 space-x-6">
         <div class="flex-1 truncate">
@@ -30,7 +30,7 @@
         <div class="-mt-px flex">
           <div class="w-0 flex-1 flex border-r border-gray-200">
             <button
-              class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
+              class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
               @click="create(corporation, 'character')"
             >
               <svg
@@ -49,7 +49,7 @@
           </div>
           <div class="-ml-px w-0 flex-1 flex">
             <button
-              class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
+              class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
               @click="create(corporation, 'user')"
             >
               <svg

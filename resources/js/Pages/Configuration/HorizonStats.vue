@@ -4,7 +4,7 @@
       Horizon worker stats
     </h3>
     <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
             <div class="shrink-0 bg-indigo-500 rounded-md p-3">
@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-      <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
             <div class="shrink-0 bg-indigo-500 rounded-md p-3">
@@ -93,7 +93,7 @@
           </div>
         </div>
       </div>
-      <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg">
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
             <div class="shrink-0 bg-indigo-500 rounded-md p-3">

@@ -15,7 +15,7 @@
       </template>
     </PageHeader>
 
-    <div class="bg-white overflow-hidden shadow rounded-lg mb-3">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-3">
       <div class="px-4 py-5 sm:p-6">
         <div>
           <div>
@@ -41,7 +41,7 @@
                     v-model="form.roleName"
                     :placeholder="form.roleName"
                     type="text"
-                    class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
+                    class="max-w-lg block w-full shadow-xs focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md"
                   >
                 </div>
               </div>

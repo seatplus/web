@@ -134,7 +134,7 @@
               <a
                 type="button"
                 :href="route('auth.eve')"
-                class="flex p-2 lg:col-span-2 border-2 border-dashed border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg"
+                class="flex p-2 lg:col-span-2 border-2 border-dashed border-gray-300 hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg"
               >
                 <div class="mb-4 shrink-0 sm:mb-0 mr-4 self-center">
                   <div>

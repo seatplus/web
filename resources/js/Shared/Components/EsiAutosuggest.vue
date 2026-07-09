@@ -35,7 +35,7 @@
                 class="border-l-4 border-yellow-400 bg-yellow-50 p-4"
               >
                 <div class="flex">
-                  <div class="flex-shrink-0">
+                  <div class="shrink-0">
                     <ExclamationTriangleIcon
                       class="h-5 w-5 text-yellow-400"
                       aria-hidden="true"
@@ -66,7 +66,7 @@
         />
         <ListboxOptions
           static
-          class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+          class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-hidden sm:text-sm"
         >
           <ListboxOption
             v-for="option in options"

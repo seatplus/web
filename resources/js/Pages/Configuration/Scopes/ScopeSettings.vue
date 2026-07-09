@@ -7,7 +7,7 @@
           method="post"
           as="button"
           :data="{selectedScopes: selected_scopes, selectedEntities: selectedEntities, type: type}"
-          class="inline-flex justify-center rounded-md shadow-sm py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
+          class="inline-flex justify-center rounded-md shadow-xs py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           Save
         </Link>
@@ -16,12 +16,12 @@
         v-if="!creationMode"
         #secondary
       >
-        <span class="shadow-sm rounded-md">
+        <span class="shadow-xs rounded-md">
           <Link
             :href="route('delete.scopes', object.id)"
             method="delete"
             as="button"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out"
           >
             Deletes
           </Link>
@@ -31,7 +31,7 @@
 
 
     <div class="grid gap-6 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="bg-white overflow-hidden shadow rounded-lg col-span-2">
+      <div class="bg-white overflow-hidden shadow-sm rounded-lg col-span-2">
         <div class="px-4 py-5 sm:p-6">
           <!-- Content goes here -->
           <EsiMultiselect
@@ -113,7 +113,7 @@
           v-model="selectedModula"
           :options="options"
           :title="'Scope'"
-          class="overflow-hidden shadow rounded-lg"
+          class="overflow-hidden shadow-sm rounded-lg"
         />
       </div>
     </div>

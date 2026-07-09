@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-md rounded-md relative shadow-sm w-full">
+  <div class="max-w-md rounded-md relative shadow-xs w-full">
     <!--<input id="price" class="form-input block w-full pl-7 pr-12 sm:text-sm sm:leading-5" placeholder="0.00" />-->
     <SeatPlusSelect v-model="selected">
       <option
@@ -43,10 +43,10 @@
       </select>
     </div>
     <div class="flex items-center">
-      <span class="inline-flex rounded-md shadow-sm">
+      <span class="inline-flex rounded-md shadow-xs">
         <button
           type="button"
-          class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition ease-in-out duration-150"
+          class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded-sm text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition ease-in-out duration-150"
         >
           Button text
         </button>

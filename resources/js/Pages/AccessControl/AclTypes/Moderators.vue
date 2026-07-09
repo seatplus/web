@@ -7,7 +7,7 @@
       <li
         v-for="moderator in moderators"
         :key="moderator.id"
-        class="col-span-1 bg-white rounded-lg shadow"
+        class="col-span-1 bg-white rounded-lg shadow-sm"
       >
         <div class="w-full flex items-center justify-between p-6 space-x-6">
           <EntityBlock
@@ -20,7 +20,7 @@
           <div class="-mt-px flex">
             <div class="w-0 flex-1 flex border-r border-gray-200">
               <button
-                class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-red-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-red-700 focus:outline-none focus:ring-blue focus:border-red-300 focus:z-10 transition ease-in-out duration-150"
+                class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 hover:bg-red-100 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-red-700 focus:outline-hidden focus:ring-blue focus:border-red-300 focus:z-10 transition ease-in-out duration-150"
                 @click="removeMember(moderator)"
               >
                 <svg

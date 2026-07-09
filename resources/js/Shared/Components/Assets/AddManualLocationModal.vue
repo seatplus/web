@@ -34,13 +34,13 @@
             for="location_name"
             class="block text-sm font-medium text-gray-700"
           >Structure name</label>
-          <div class="mt-1 relative shadow-sm rounded-md">
+          <div class="mt-1 relative shadow-xs rounded-md">
             <input
               id="location_name"
               v-model="form.name"
               type="text"
               name="location_name"
-              :class="[form.errors.name ? ' focus:ring-red-500 border-red-300 text-red-900 focus:outline-none placeholder-red-300 focus:border-red-500' : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300' ,'block w-full pr-10  sm:text-sm rounded-md']"
+              :class="[form.errors.name ? ' focus:ring-red-500 border-red-300 text-red-900 focus:outline-hidden placeholder-red-300 focus:border-red-500' : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300' ,'block w-full pr-10  sm:text-sm rounded-md']"
               placeholder="Structure name"
             >
             <div
@@ -90,11 +90,11 @@
       </div>
     </template>
     <template #buttons>
-      <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+      <span class="flex w-full rounded-md shadow-xs sm:ml-3 sm:w-auto">
         <button
           :disabled="form.processing"
           type="submit"
-          class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+          class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-emerald-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-emerald-500 focus:outline-hidden focus:border-emerald-700 focus:ring-emerald transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           @click="submit()"
         >
           Submit

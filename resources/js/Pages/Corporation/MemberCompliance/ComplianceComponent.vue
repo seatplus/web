@@ -6,7 +6,7 @@
       <div class="flex justify-between">
         <EntityBlock :entity="corporation" />
         <div>
-          <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="mt-1 relative rounded-md shadow-xs">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <MagnifyingGlassIcon
                 class="h-5 w-5 text-gray-400"

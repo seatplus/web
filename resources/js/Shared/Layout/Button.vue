@@ -5,7 +5,7 @@
     :href="href"
     :method="method"
     :data="data"
-    class="inline-flex items-center border border-gray-300 shadow-sm rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    class="inline-flex items-center border border-gray-300 shadow-xs rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
     :class="{'px-2.5 py-1.5 text-xs font-medium' : buttonSize === 'xs', 'px-3 py-2 text-sm leading-4 font-medium' : buttonSize === 'small', 'px-4 py-2 text-sm font-medium' : buttonSize === 'medium', 'cursor-pointer' : !isInertiaButton}"
     @click="$emit('click')"
   >

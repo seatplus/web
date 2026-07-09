@@ -4,14 +4,14 @@
     <div class="flex-1 flex justify-between sm:hidden">
       <Link
         :href="buildHref(collection.meta.current_page - 1)"
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-none focus:ring-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-hidden focus:ring-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
         :class="{'text-gray-700 hover:text-gray-500' : !prevDisabled, 'text-gray-400 pointer-events-none' : prevDisabled}"
       >
         Previous
       </Link>
       <Link
         :href="buildHref(collection.meta.current_page + 1)"
-        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-none focus:ring-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md bg-white focus:outline-hidden focus:ring-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150"
         :class="{'text-gray-700 hover:text-gray-500' : !nextDisabled, 'text-gray-400 pointer-events-none' : nextDisabled}"
       >
         Next
@@ -30,10 +30,10 @@
         </p>
       </div>
       <div>
-        <span class="relative z-0 inline-flex shadow-sm">
+        <span class="relative z-0 inline-flex shadow-xs">
           <Link
             :href="buildHref(1)"
-            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
             :class="{ 'text-gray-500 hover:text-gray-400': !prevDisabled, 'text-gray-400 pointer-events-none': prevDisabled }"
           >
             <svg
@@ -56,7 +56,7 @@
 
           <Link
             :href="buildHref(collection.meta.current_page - 1)"
-            class="-ml-px relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+            class="-ml-px relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
             :class="{ 'text-gray-500 hover:text-gray-400': !prevDisabled, 'text-gray-400 pointer-events-none': prevDisabled }"
           >
             <svg
@@ -75,7 +75,7 @@
           <span v-for="page in pages">
             <Link
               :href="buildHref(page)"
-              class="hidden md:inline-flex -ml-px relative items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-indigo-300 focus:ring-indigo active:bg-indigo-200 active:text-gray-700 transition ease-in-out duration-150 hover:bg-indigo-50"
+              class="hidden md:inline-flex -ml-px relative items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-indigo-300 focus:ring-indigo active:bg-indigo-200 active:text-gray-700 transition ease-in-out duration-150 hover:bg-indigo-50"
               :class="{ 'bg-indigo-100 text-indigo-700': tinted && page === currentPage, 'bg-white text-gray-700': page !== currentPage }"
             >
               {{ page }}
@@ -84,7 +84,7 @@
 
           <Link
             :href="buildHref(collection.meta.current_page + 1)"
-            class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md sm:rounded-none border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+            class="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md sm:rounded-none border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
             :class="{ 'text-gray-500 hover:text-gray-400': !nextDisabled, 'text-gray-400 pointer-events-none': nextDisabled}"
           >
             <svg
@@ -102,7 +102,7 @@
 
           <Link
             :href="buildHref(collection.meta.last_page)"
-            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-none focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
             :class="{ 'text-gray-500 hover:text-gray-400': !nextDisabled, 'text-gray-400 pointer-events-none': nextDisabled }"
           >
             <svg

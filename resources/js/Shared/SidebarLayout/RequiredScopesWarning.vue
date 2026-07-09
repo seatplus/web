@@ -3,7 +3,7 @@
     <Disclosure
       v-slot="{ open }"
       :default-open="state"
-      class="bg-amber-100 shadow sm:rounded-lg"
+      class="bg-amber-100 shadow-sm sm:rounded-lg"
     >
       <div class="px-4 py-5 sm:p-6">
         <DisclosureButton
@@ -25,7 +25,7 @@
           />
         </DisclosureButton>
 
-        <DisclosurePanel class="mt-8 bg-white shadow overflow-hidden rounded-md">
+        <DisclosurePanel class="mt-8 bg-white shadow-sm overflow-hidden rounded-md">
           <ul class="divide-y divide-amber-400">
             <li
               v-for="character in missing_characters_scopes"
@@ -47,10 +47,10 @@
                 </div>
               </div>
               <div class="mt-4 sm:mt-0 sm:ml-6 sm:shrink-0">
-                <span class="inline-flex rounded-md shadow-sm">
+                <span class="inline-flex rounded-md shadow-xs">
                   <a
                     :href="route('auth.eve.step_up', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})"
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:ring-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
                   >
                     Fix
                   </a>

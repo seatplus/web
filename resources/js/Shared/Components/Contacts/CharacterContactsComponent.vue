@@ -5,7 +5,7 @@
     <template #header>
       <div class="flex">
         <EntityBlock
-          class="flex-grow"
+          class="grow"
           :entity="character"
         />
         <div>

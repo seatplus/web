@@ -12,7 +12,7 @@
           <li
             v-for="character of [...ownedCharacters, ...affiliatedCharacters]"
             :key="character.character_id"
-            class="col-span-1 bg-white rounded-lg shadow"
+            class="col-span-1 bg-white rounded-lg shadow-sm"
             @click="flipSelect(character)"
           >
             <div class="w-full flex items-center justify-between p-3 space-x-3">
@@ -40,10 +40,10 @@
         </ul>
       </div>
       <div class="mt-5 sm:mt-6">
-        <span class="flex w-full rounded-md shadow-sm">
+        <span class="flex w-full rounded-md shadow-xs">
           <button
             type="button"
-            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5"
           >
             Go back to last view
           </button>
