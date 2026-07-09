@@ -7,16 +7,17 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/index';
 import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout.vue";
 import I18n from '@/vendor/I18n';
-import { I18nKey } from '@/composables/useTranslations';
-
-const i18n = new I18n();
 
 const I18nPlugin = {
     install(app) {
-        // Options-API global for un-migrated pages (`this.$I18n`)…
-        app.config.globalProperties.$I18n = i18n;
-        // …and provide the same instance for the `useTranslations()` composable (`<script setup>`).
-        app.provide(I18nKey, i18n);
+        // Options-API global: translate against the current page's reactive `translations`
+        // prop. (`<script setup>` pages use the useTranslations() composable instead.)
+        app.config.globalProperties.$t = function (key, replace = {}) {
+            return I18n.trans(this.$page?.props?.translations || {}, key, replace);
+        };
+        app.config.globalProperties.$tc = function (key, count = 1, replace = {}) {
+            return I18n.trans_choice(this.$page?.props?.translations || {}, key, count, replace);
+        };
     }
 }
 

@@ -201,12 +201,11 @@
                 locale: _.get(page.props, 'locale'),
             })
 
-            // A full reload re-runs the @translations blade directive so
-            // window.translations reflects the newly persisted locale.
+            // `translations` is a reactive Inertia prop now — the redirect back re-renders
+            // in the newly-selected language without a full page reload.
             const updateLocale = () => {
                 localeForm.post(route('locale.update'), {
                     preserveScroll: true,
-                    onSuccess: () => window.location.reload(),
                 })
             }
 

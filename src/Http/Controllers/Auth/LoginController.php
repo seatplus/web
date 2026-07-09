@@ -6,9 +6,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
+use Seatplus\Web\Concerns\SharesTranslations;
 
 class LoginController
 {
+    use SharesTranslations;
+
     public function __invoke(): Response|RedirectResponse
     {
         // redirect to /home when authenticated
@@ -21,6 +24,8 @@ class LoginController
         if (strlen(config('web.config.EVE_CLIENT_ID')) < 5 || strlen(config('web.config.EVE_CLIENT_SECRET')) < 5) {
             session()->flash('warning', trans('web::auth.sso_config_warning'));
         }
+
+        $this->shareTranslations(['web::auth']);
 
         return Inertia::render('Auth/Login', [
             'evesso_img_src' => asset('img/evesso.png'),

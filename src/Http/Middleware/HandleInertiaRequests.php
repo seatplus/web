@@ -27,12 +27,12 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Seatplus\Web\Support\Translations;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -59,11 +59,12 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            // Resolved first (and lazily, when auth/session are safely available) so the
-            // app locale is set before the trans() closures below and the @translations
-            // blade directive in the Inertia root view render.
-            'locale' => fn () => $this->resolveLocale($request),
+            // Locale is resolved + set by the SetLocale middleware before controllers/props run.
+            'locale' => fn () => app()->getLocale(),
             'locales' => fn () => config('web.locales', []),
+            // Current-locale translations for the SPA: shared chrome baseline + whatever
+            // groups the page's controller declared via SharesTranslations.
+            'translations' => fn () => Translations::gather($this->translationGroups()),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
@@ -102,60 +103,18 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Resolve the request locale, set it on the application, and return it for the prop.
+     * Baseline chrome groups (config) + any groups controllers/middleware declared for
+     * this request.
      *
-     * Resolution order (first hit wins): authenticated user preference → session pick
-     * (guests) → browser Accept-Language → global setting → app default. Only a locale in
-     * the supported registry is honoured; anything else falls back to the app default.
+     * @return list<string>
      */
-    private function resolveLocale(Request $request): string
+    private function translationGroups(): array
     {
-        $supported = array_keys(config('web.locales', []));
-        $fallback = (string) config('app.locale');
+        $shared = config('web.translations.shared', []);
 
-        $candidate = $this->userLocale()
-            ?? session('locale')
-            ?? $this->browserLocale($request, $supported)
-            ?? setting('language')
-            ?? $fallback;
-
-        $locale = in_array($candidate, $supported, true) ? (string) $candidate : $fallback;
-
-        App::setLocale($locale);
-
-        return $locale;
-    }
-
-    /**
-     * The authenticated user's stored locale, or null. Read only when the column is loaded,
-     * to stay compatible with Model::shouldBeStrict() before the auth package ships it.
-     */
-    private function userLocale(): ?string
-    {
-        if (! auth()->check() || ! array_key_exists('locale', auth()->user()->getAttributes())) {
-            return null;
-        }
-
-        $locale = auth()->user()->getAttribute('locale');
-
-        return is_string($locale) ? $locale : null;
-    }
-
-    /**
-     * The first browser-preferred (Accept-Language) locale that we support, or null.
-     *
-     * @param  list<string>  $supported
-     */
-    private function browserLocale(Request $request, array $supported): ?string
-    {
-        foreach ($request->getLanguages() as $language) {
-            $code = strtolower(substr((string) $language, 0, 2));
-
-            if (in_array($code, $supported, true)) {
-                return $code;
-            }
-        }
-
-        return null;
+        return array_values(array_unique([
+            ...(is_array($shared) ? $shared : []),
+            ...Translations::needed(),
+        ]));
     }
 }

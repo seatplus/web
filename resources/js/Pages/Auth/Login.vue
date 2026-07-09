@@ -12,7 +12,7 @@
           SeAT plus
         </h2>
         <p class="mt-2 text-center text-sm leading-5 text-gray-600 max-w">
-          {{ $I18n.trans('web::auth.login_welcome') }}
+          {{ $t('web::auth.login_welcome') }}
         </p>
       </div>
 
@@ -78,11 +78,11 @@ export default {
         }
     },
     methods: {
-        // A full reload re-runs the @translations blade directive for the chosen locale.
+        // `translations` is a reactive Inertia prop now — the redirect back re-renders
+        // in the newly-selected language without a full page reload.
         switchLocale() {
             router.post(route('locale.update'), { locale: this.selectedLocale }, {
                 preserveScroll: true,
-                onSuccess: () => window.location.reload(),
             })
         }
     }
