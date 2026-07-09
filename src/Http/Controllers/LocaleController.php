@@ -5,13 +5,14 @@ namespace Seatplus\Web\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Seatplus\Web\Support\Locales;
 
 class LocaleController
 {
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'locale' => ['required', 'string', Rule::in(array_keys(config('web.locales', [])))],
+            'locale' => ['required', 'string', Rule::in(Locales::available())],
         ]);
 
         // Remember the choice for this session — covers guests and applies immediately.

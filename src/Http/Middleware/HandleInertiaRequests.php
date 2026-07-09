@@ -32,6 +32,7 @@ use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Seatplus\Web\Support\Locales;
 use Seatplus\Web\Support\Translations;
 
 class HandleInertiaRequests extends Middleware
@@ -61,7 +62,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             // Locale is resolved + set by the SetLocale middleware before controllers/props run.
             'locale' => fn () => app()->getLocale(),
-            'locales' => fn () => config('web.locales', []),
+            'locales' => fn () => Locales::available(),
             // Shared chrome translations (baseline) — the notification labels the persistent
             // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
             // `pageTranslations` prop and are merged client-side.

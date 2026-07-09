@@ -7,6 +7,7 @@ namespace Seatplus\Web\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Seatplus\Web\Support\Locales;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
@@ -28,7 +29,7 @@ class SetLocale
      */
     private function resolve(Request $request): string
     {
-        $supported = array_keys(config('web.locales', []));
+        $supported = Locales::available();
         $fallback = (string) config('app.locale');
 
         $candidate = $this->userLocale()

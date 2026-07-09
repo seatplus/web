@@ -52,11 +52,11 @@
                 @change="updateLocale"
               >
                 <option
-                  v-for="(label, code) in locales"
+                  v-for="code in locales"
                   :key="code"
                   :value="code"
                 >
-                  {{ label }}
+                  {{ localeName(code) }}
                 </option>
               </select>
             </dd>
@@ -155,6 +155,7 @@
     import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
     import {computed, ref, watch} from "vue";
     import { useForm, usePage, Link } from "@inertiajs/vue3";
+    import { localeName } from "@/i18n/localeName";
     
     export default {
         name: "UserSettings",
@@ -216,7 +217,8 @@
                 options,
                 locales,
                 localeForm,
-                updateLocale
+                updateLocale,
+                localeName
             }
         }
     }

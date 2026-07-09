@@ -45,11 +45,11 @@
           @change="switchLocale"
         >
           <option
-            v-for="(label, code) in locales"
+            v-for="code in locales"
             :key="code"
             :value="code"
           >
-            {{ label }}
+            {{ localeName(code) }}
           </option>
         </select>
       </div>
@@ -62,6 +62,7 @@
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
 import { router } from "@inertiajs/vue3";
+import { localeName } from "@/i18n/localeName";
 
 export default {
     name: "Login",
@@ -74,10 +75,11 @@ export default {
     },
     computed: {
         locales() {
-            return this.$page.props.locales || {}
+            return this.$page.props.locales || []
         }
     },
     methods: {
+        localeName,
         // `translations` is a reactive Inertia prop now — the redirect back re-renders
         // in the newly-selected language without a full page reload.
         switchLocale() {

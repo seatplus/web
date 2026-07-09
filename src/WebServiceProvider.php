@@ -187,11 +187,6 @@ class WebServiceProvider extends ServiceProvider
             __DIR__.'/../config/web.images.php',
             'web.images'
         );
-
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/web.locales.php',
-            'web.locales'
-        );
     }
 
     private function addCommands(): void

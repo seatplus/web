@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Web\Http\Middleware\SetLocale;
+use Seatplus\Web\Support\Locales;
 use Seatplus\Web\Support\Translations;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,6 +42,10 @@ test('ignores an unsupported browser locale and uses the app default', function 
 
 test('defaults to the app locale with no signal', function () {
     expect(localeFor())->toBe('en');
+});
+
+test('available locales are derived from the lang directories', function () {
+    expect(Locales::available())->toContain('en')->toContain('de');
 });
 
 test('the session pick beats the browser language', function () {

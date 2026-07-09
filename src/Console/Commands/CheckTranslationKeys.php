@@ -6,6 +6,7 @@ namespace Seatplus\Web\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Seatplus\Web\Support\Locales;
 
 class CheckTranslationKeys extends Command
 {
@@ -38,7 +39,7 @@ class CheckTranslationKeys extends Command
         $fallbackKeys = $this->keysFor("{$langPath}/{$fallback}");
         $hasGaps = false;
 
-        foreach (array_keys(config('web.locales', [])) as $locale) {
+        foreach (Locales::available() as $locale) {
             if ($locale === $fallback) {
                 continue;
             }
