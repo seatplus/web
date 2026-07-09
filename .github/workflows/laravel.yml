@@ -133,15 +133,121 @@ jobs:
       - name: Lint
         run: npm run lint
 
+  browser:
+    name: Browser (vs core)
+    runs-on: ubuntu-latest
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: laravel
+      DB_USERNAME: seatplus
+      DB_PASSWORD: secret
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: laravel
+          POSTGRES_USER: seatplus
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U seatplus -d laravel"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Check this PR out into ./web, then assemble a real core app around it.
+      - uses: actions/checkout@v4
+        with:
+          path: web
+
+      - name: Clone core
+        run: git clone --depth 1 -b 5.x https://github.com/seatplus/core.git core
+
+      - name: Overlay this PR into core/packages/web
+        run: |
+          rm -rf core/packages/web
+          cp -R web core/packages/web
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis, sockets
+          coverage: none
+
+      # Point core at the overlaid web via a path repo and alias the PR branch to a
+      # 5.x dev version so it satisfies core's `seatplus/web: ^5.0` constraint.
+      - name: Resolve core against the PR's web
+        working-directory: core
+        run: |
+          composer config repositories.web '{"type":"path","url":"packages/web"}'
+          composer require "seatplus/web:dev-${{ github.head_ref }} as 5.99.99" -W --no-interaction --no-scripts
+
+      - name: Prepare app env + publish assets
+        working-directory: core
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan vendor:publish --tag=web-static --force
+          php artisan vendor:publish --tag=web --force
+
+      - name: Copy this PR's browser tests into core
+        working-directory: core
+        run: |
+          mkdir -p tests/Browser/web
+          cp -R packages/web/tests/Browser/. tests/Browser/web/
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build assets + Playwright
+        working-directory: core
+        run: |
+          npm install
+          npm install --save-dev playwright
+          npm run build
+          npx playwright install --with-deps chromium
+
+      - name: Run browser tests
+        working-directory: core
+        run: vendor/bin/pest tests/Browser --no-coverage
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-browser-screenshots
+          path: core/tests/Browser/Screenshots/
+          if-no-files-found: warn
+
   laravel:
     name: Laravel
     runs-on: ubuntu-latest
-    needs: [lint, test, frontend]
+    needs: [lint, test, frontend, browser]
     if: always()
     steps:
       - name: Check all jobs passed
         run: |
-          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.test.result }}" != "success" || "${{ needs.frontend.result }}" != "success" ]]; then
+          if [[ "${{ needs.lint.result }}" != "success" || "${{ needs.test.result }}" != "success" || "${{ needs.frontend.result }}" != "success" || "${{ needs.browser.result }}" != "success" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi
