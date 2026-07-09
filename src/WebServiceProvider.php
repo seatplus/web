@@ -192,11 +192,6 @@ class WebServiceProvider extends ServiceProvider
             __DIR__.'/../config/web.locales.php',
             'web.locales'
         );
-
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/web.translations.php',
-            'web.translations'
-        );
     }
 
     private function addCommands(): void

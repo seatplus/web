@@ -62,9 +62,10 @@ class HandleInertiaRequests extends Middleware
             // Locale is resolved + set by the SetLocale middleware before controllers/props run.
             'locale' => fn () => app()->getLocale(),
             'locales' => fn () => config('web.locales', []),
-            // Shared chrome translations (baseline) for the current locale. Page-specific
-            // groups are added by controllers as a `pageTranslations` prop, merged client-side.
-            'translations' => fn () => Translations::gather($this->sharedTranslationGroups()),
+            // Shared chrome translations (baseline) — the notification labels the persistent
+            // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
+            // `pageTranslations` prop and are merged client-side.
+            'translations' => fn () => Translations::gather(['web::notifications']),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
@@ -86,12 +87,6 @@ class HandleInertiaRequests extends Middleware
                     ->where('id', auth()->user()->getAuthIdentifier())
                     ->first()
             ),
-            'translation' => fn () => [
-                'success' => trans('web::notifications.success'),
-                'info' => trans('web::notifications.info'),
-                'warning' => trans('web::notifications.warning'),
-                'error' => trans('web::notifications.error'),
-            ],
             'errors' => fn () => Session::get('errors')
                 ? Session::get('errors')->getBag('default')->getMessages()
                 : (object) [],
@@ -100,17 +95,5 @@ class HandleInertiaRequests extends Middleware
                 'icon' => asset(config('web.images.icon')),
             ],
         ]);
-    }
-
-    /**
-     * The shared chrome translation groups (config) always shipped to the SPA.
-     *
-     * @return list<string>
-     */
-    private function sharedTranslationGroups(): array
-    {
-        $shared = config('web.translations.shared', []);
-
-        return is_array($shared) ? array_values($shared) : [];
     }
 }
