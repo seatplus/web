@@ -35,6 +35,9 @@ it('renders the dashboard for an authenticated user', function () {
 
     $page = visit('/home');
 
+    // TEMP DIAGNOSTIC: raw page HTML to CI log (untruncated) to see what #app contains.
+    fwrite(STDERR, "\n<<<PAGEHTML>>>\n".$page->content()."\n<<<ENDHTML>>>\n");
+
     $page->assertNoSmoke();
     $page->assertSee('Characters');
     $page->screenshot(true, 'dashboard');
