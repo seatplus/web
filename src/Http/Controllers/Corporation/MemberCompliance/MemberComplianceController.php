@@ -36,6 +36,7 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
 use Seatplus\Web\Services\GetAffiliatedIds;
+use Seatplus\Web\Support\Translations;
 
 class MemberComplianceController
 {
@@ -109,6 +110,7 @@ class MemberComplianceController
             'member' => $member,
             'targetCorporation' => CorporationInfo::find($corporation_id),
             'watchlist' => $action->execute($corporation_id),
+            'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ]);
     }
 }

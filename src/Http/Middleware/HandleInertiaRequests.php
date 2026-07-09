@@ -62,9 +62,9 @@ class HandleInertiaRequests extends Middleware
             // Locale is resolved + set by the SetLocale middleware before controllers/props run.
             'locale' => fn () => app()->getLocale(),
             'locales' => fn () => config('web.locales', []),
-            // Current-locale translations for the SPA: shared chrome baseline + whatever
-            // groups the page's controller declared via SharesTranslations.
-            'translations' => fn () => Translations::gather($this->translationGroups()),
+            // Shared chrome translations (baseline) for the current locale. Page-specific
+            // groups are added by controllers as a `pageTranslations` prop, merged client-side.
+            'translations' => fn () => Translations::gather($this->sharedTranslationGroups()),
             'activeSidebarElement' => $request->route()?->getName(),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
@@ -103,18 +103,14 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
-     * Baseline chrome groups (config) + any groups controllers/middleware declared for
-     * this request.
+     * The shared chrome translation groups (config) always shipped to the SPA.
      *
      * @return list<string>
      */
-    private function translationGroups(): array
+    private function sharedTranslationGroups(): array
     {
         $shared = config('web.translations.shared', []);
 
-        return array_values(array_unique([
-            ...(is_array($shared) ? $shared : []),
-            ...Translations::needed(),
-        ]));
+        return is_array($shared) ? array_values($shared) : [];
     }
 }

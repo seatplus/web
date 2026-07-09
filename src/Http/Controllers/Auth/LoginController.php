@@ -6,12 +6,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Web\Concerns\SharesTranslations;
+use Seatplus\Web\Support\Translations;
 
 class LoginController
 {
-    use SharesTranslations;
-
     public function __invoke(): Response|RedirectResponse
     {
         // redirect to /home when authenticated
@@ -25,10 +23,9 @@ class LoginController
             session()->flash('warning', trans('web::auth.sso_config_warning'));
         }
 
-        $this->shareTranslations(['web::auth']);
-
         return Inertia::render('Auth/Login', [
             'evesso_img_src' => asset('img/evesso.png'),
+            'pageTranslations' => Translations::gather(['web::auth']),
         ]);
     }
 }

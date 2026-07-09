@@ -4,13 +4,12 @@ import I18n from '@/i18n/I18n';
 /**
  * Translation helper for `<script setup>` / Composition-API components.
  *
- * Reads the current page's `translations` Inertia prop (shared chrome baseline + the
- * groups the page's controller declared via SharesTranslations), so lookups are reactive
- * to locale and page changes.
+ * Merges the shared `translations` baseline with the page's own `pageTranslations`
+ * (declared by its controller), so lookups are reactive to locale and page changes.
  */
 export function useTranslations() {
     const page = usePage();
-    const bag = () => page.props.translations || {};
+    const bag = () => I18n.merge(page.props.translations, page.props.pageTranslations);
 
     return {
         trans: (key, replace = {}) => I18n.trans(bag(), key, replace),

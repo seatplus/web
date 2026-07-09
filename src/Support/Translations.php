@@ -9,35 +9,6 @@ use Illuminate\Support\Facades\Lang;
 class Translations
 {
     /**
-     * Register translation groups the current request's page needs; merged into the
-     * shared `translations` Inertia prop for the current locale.
-     *
-     * @param  list<string>  $groups  e.g. ['web::wallet_journal']
-     */
-    public static function need(array $groups): void
-    {
-        $request = request();
-        $existing = $request->attributes->get('translation_groups', []);
-
-        $request->attributes->set(
-            'translation_groups',
-            array_values(array_unique([...(is_array($existing) ? $existing : []), ...$groups])),
-        );
-    }
-
-    /**
-     * The groups registered by controllers/middleware for this request.
-     *
-     * @return list<string>
-     */
-    public static function needed(): array
-    {
-        $groups = request()->attributes->get('translation_groups', []);
-
-        return is_array($groups) ? array_values($groups) : [];
-    }
-
-    /**
      * Build the `window.translations`-shaped structure for the given group keys in the
      * current (or given) locale, with fallback-locale values merged underneath per key.
      *

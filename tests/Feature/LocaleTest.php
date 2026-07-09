@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Web\Http\Middleware\SetLocale;
 use Seatplus\Web\Support\Translations;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,10 +67,9 @@ test('gather falls back to the fallback locale for untranslated groups', functio
         ->and($bag['web::']['wallet_journal']['bounty_prize'] ?? null)->not->toBeNull();
 });
 
-test('needed() reflects groups registered via need()', function () {
-    Translations::need(['web::wallet_journal']);
-
-    expect(Translations::needed())->toContain('web::wallet_journal');
+test('a page declares its own translation groups as a pageTranslations prop', function () {
+    test()->get(route('login'))
+        ->assertInertia(fn (Assert $page) => $page->has('pageTranslations.web::.auth.login_welcome'));
 });
 
 /*

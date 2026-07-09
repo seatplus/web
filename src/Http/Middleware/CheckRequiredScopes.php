@@ -61,10 +61,9 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
             ];
         });
 
-        Translations::need(['web::missing_required_scopes']);
-
         return Inertia::render('Auth/MissingRequiredScopes', [
             'characters' => $missing_character,
+            'pageTranslations' => Translations::gather(['web::missing_required_scopes']),
         ])->toResponse(request());
     }
 }

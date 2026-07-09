@@ -44,6 +44,26 @@ export default class I18n
     }
 
     /**
+     * Merge translation bags (e.g. the shared baseline + a page's own groups) at the
+     * namespace level, combining their group sub-objects.
+     *
+     * @param  {...object}  bags
+     * @return {object}
+     */
+    static merge(...bags)
+    {
+        let merged = {};
+
+        for (let bag of bags) {
+            for (let namespace in (bag || {})) {
+                merged[namespace] = { ...(merged[namespace] || {}), ...bag[namespace] };
+            }
+        }
+
+        return merged;
+    }
+
+    /**
      * Match the translation limit with the count.
      *
      * @param  {string}  translation
