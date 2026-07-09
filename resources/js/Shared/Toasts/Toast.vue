@@ -10,7 +10,7 @@ const props = defineProps({
         required: true,
         validator(value) {
             // check if the object has the required properties: appearance, message
-            return value.hasOwnProperty('appearance') && value.hasOwnProperty('message')
+            return Object.prototype.hasOwnProperty.call(value, 'appearance') && Object.prototype.hasOwnProperty.call(value, 'message')
 
         }
     },

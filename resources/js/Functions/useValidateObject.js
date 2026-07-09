@@ -15,7 +15,7 @@ export function useValidateObject(object, schema) {
             !validate.required || (key in object),
             validate(object[key])
         ])
-        .filter(([_, ...tests]) => !tests.every(Boolean))
+        .filter(([, ...tests]) => !tests.every(Boolean))
         .map(([key, invalid]) => new Error(`${key} is ${invalid ? 'invalid' : 'required'}.`));
 
     const errors = validate(object, schema);

@@ -1,5 +1,5 @@
 <script setup>
-import { Link, Head, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import { defineProps, computed } from 'vue';
 import { last } from "lodash";
 import AppHead from "@/Shared/AppHead.vue";
@@ -46,7 +46,7 @@ const getBack = computed(() => {
         </Link>
       </nav>
       <nav class="hidden sm:flex items-center text-sm leading-5 font-medium">
-        <template v-for="breadcrumb of breadcrumbs">
+        <template v-for="breadcrumb of breadcrumbs" :key="breadcrumb.route">
           <Link
             :href="breadcrumb.route"
             class="text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out"

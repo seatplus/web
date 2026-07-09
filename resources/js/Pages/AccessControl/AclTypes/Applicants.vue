@@ -85,7 +85,7 @@
       },
       computed: {
           filteredMembers() {
-              return _.filter(this.members, (member) => member.hasOwnProperty('status') ? member.status === 'waitlist' : true)
+              return _.filter(this.members, (member) => Object.prototype.hasOwnProperty.call(member, 'status') ? member.status === 'waitlist' : true)
           }
       },
       watch: {

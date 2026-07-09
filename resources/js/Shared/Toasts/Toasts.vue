@@ -8,9 +8,6 @@ const toasts = useToasts()
 
 const visible = toasts.visibleToasts
 
-const addToast = (text) => {
-    toasts.addToast(text)
-}
 
 // get flash messages from the server
 const flashMessages = computed(() => {

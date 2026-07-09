@@ -76,7 +76,6 @@
 
 <script>
 import { Link } from '@inertiajs/vue3';
-import {router} from "@inertiajs/vue3";
 export default {
     name: "WideListElement",
     components: {Link},

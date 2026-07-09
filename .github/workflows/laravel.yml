@@ -130,9 +130,8 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Lint (advisory)
+      - name: Lint
         run: npm run lint
-        continue-on-error: true
 
   laravel:
     name: Laravel

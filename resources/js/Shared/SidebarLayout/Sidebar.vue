@@ -1,6 +1,6 @@
 <template>
   <nav class="md:flex-1 px-2 py-4 md:bg-gray-800">
-    <div v-for="(category, name, index) in sidebarEntries">
+    <div v-for="(category, name, index) in sidebarEntries" :key="name">
       <h3 :class="['text-xs leading-4 font-semibold text-white uppercase tracking-wider',{'mt-3' : index > 0}]">
         {{ category.name }}
       </h3>

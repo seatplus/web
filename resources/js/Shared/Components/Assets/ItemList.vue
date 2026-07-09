@@ -16,7 +16,7 @@
   import CompactAssetListComponent from "./CompactAssetListComponent.vue";
   import WideAssetListComponent from "./WideAssetListComponent.vue";
 
-  const props = defineProps({
+  defineProps({
     items: {
       required: true,
       type: Array
