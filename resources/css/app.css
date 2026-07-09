@@ -4,6 +4,13 @@
 /*Tailwind CSS*/
 @import 'tailwindcss';
 
+/* Explicitly scan the Vue/JS sources for class names. Tailwind v4's automatic
+   content detection skips gitignored paths, and in the consuming app (core)
+   resources/js is a gitignored published artifact — without this, no utility
+   classes are generated and the app renders unstyled. @source overrides the
+   gitignore exclusion. Path is relative to this file (resources/css). */
+@source "../js/**/*.{vue,js}";
+
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
