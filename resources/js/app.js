@@ -12,10 +12,10 @@ const I18nPlugin = {
     install(app) {
         // Options-API global: translate against the current page's reactive `translations`
         // prop. (`<script setup>` pages use the useTranslations() composable instead.)
-        app.config.globalProperties.$t = function (key, replace = {}) {
+        app.config.globalProperties.$trans = function (key, replace = {}) {
             return I18n.trans(this.$page?.props?.translations || {}, key, replace);
         };
-        app.config.globalProperties.$tc = function (key, count = 1, replace = {}) {
+        app.config.globalProperties.$trans_choice = function (key, count = 1, replace = {}) {
             return I18n.trans_choice(this.$page?.props?.translations || {}, key, count, replace);
         };
     }
