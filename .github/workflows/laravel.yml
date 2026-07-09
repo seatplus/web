@@ -241,6 +241,7 @@ jobs:
           name: web-browser-screenshots
           path: core/tests/Browser/Screenshots/
           if-no-files-found: warn
+          retention-days: 7
 
   laravel:
     name: Laravel
