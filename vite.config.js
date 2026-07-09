@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import run from 'vite-plugin-run';
 
@@ -24,6 +25,7 @@ export default defineConfig(({mode}) => {
                     'vendor/seatplus/**/resources/js/**',
                 ],
             }),
+            tailwindcss(),
             vue({
                 template: {
                     transformAssetUrls: {

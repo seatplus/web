@@ -109,11 +109,11 @@ class WebServiceProvider extends ServiceProvider
 
     private function addPublications(): void
     {
-        // Note: no tailwind.config.js — Tailwind v4 is CSS-first; the theme/config
-        // lives in the `@theme` block of resources/css/app.css.
+        // Note: no tailwind.config.js / postcss.config.js — Tailwind v4 is CSS-first
+        // (theme lives in the `@theme` block of resources/css/app.css) and runs through
+        // the @tailwindcss/vite plugin, so no PostCSS config is needed.
         $this->publishes([
             $this->getBaseFilePath().'package.json' => base_path('package.json'),
-            $this->getBaseFilePath().'postcss.config.js' => base_path('postcss.config.js'),
             $this->getBaseFilePath().'vite.config.js' => base_path('vite.config.js'),
         ], 'web-static');
 
