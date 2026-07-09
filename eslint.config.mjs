@@ -8,6 +8,7 @@ export default [
         languageOptions: {
             globals: {
                 ...globals.browser,
+                _: "readonly",
                 route: "readonly",
                 axios: "readonly",
             },
