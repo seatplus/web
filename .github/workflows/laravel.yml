@@ -182,7 +182,7 @@ jobs:
 
       - name: Overlay this PR into core/packages/web
         run: |
-          rm -rf core/packages/web
+          mkdir -p core/packages
           cp -R web core/packages/web
 
       - name: Setup PHP
