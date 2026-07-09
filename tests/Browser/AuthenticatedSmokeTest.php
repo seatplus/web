@@ -28,6 +28,10 @@ it('renders the dashboard for an authenticated user', function () {
 
     $page = visit('/home');
 
+    // TEMP DIAGNOSTIC: dump the rendered HTML so CI shows what Inertia resolved,
+    // which props are present, and whether Vue mounted anything into #app.
+    dump($page->content());
+
     $page->assertNoSmoke();
     // "Characters" is the visible <h3> on the dashboard (Dashboard/Characters.vue);
     // "Home" is only the document <title>, so assert on real page content.
