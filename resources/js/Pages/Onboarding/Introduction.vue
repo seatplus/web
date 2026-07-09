@@ -8,9 +8,9 @@
             aria-hidden="true"
           />
           <div class="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:max-w-none lg:p-0">
-            <div class="aspect-w-10 aspect-h-6 sm:aspect-w-2 sm:aspect-h-1 lg:aspect-w-1">
+            <div class="aspect-[10/6] sm:aspect-[2/1] lg:aspect-square">
               <img
-                class="rounded-3xl object-cover object-center shadow-2xl"
+                class="h-full w-full rounded-3xl object-cover object-center shadow-2xl"
                 :src="`https://images.evetech.net/characters/${mainCharacterId}/portrait?size=512`"
                 :alt="resolvedObject?.name"
               >
