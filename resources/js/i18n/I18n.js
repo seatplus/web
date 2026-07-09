@@ -72,7 +72,7 @@ export default class I18n
      */
     static _match(translation, count)
     {
-        let match = translation.match(/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/);
+        let match = translation.match(/^[{[]([^[\]{}]*)[}\]](.*)/);
 
         if (! match) return;
 

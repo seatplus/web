@@ -80,7 +80,7 @@ import { prefix } from 'metric-prefix'
 import {computed} from "vue";
 import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
 
-const props = defineProps({
+defineProps({
   items: {
     type: Array,
     required: true,

@@ -94,7 +94,7 @@ export default {
             preserveState: true
         })
 
-        const remove = (character_id) => Inertia.delete(route('delete.character.application', character_id), {
+        const remove = (character_id) => router.delete(route('delete.character.application', character_id), {
             preserveState: true,
             onSuccess: () => _.remove(applications.value, function (application) {
                 return _.isEqual(application.applicationable.character_id, character_id)

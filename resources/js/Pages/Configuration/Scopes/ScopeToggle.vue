@@ -50,7 +50,7 @@ export default {
 
         const intersection = _.intersection(props.selected, props.scope.value)
 
-        const enabled = ref(_.isEqual(props.scope.value.sort(), intersection.sort()))
+        const enabled = ref(_.isEqual([...props.scope.value].sort(), intersection.sort()))
         const selected = ref(props.selected)
 
         watch(enabled,() => {

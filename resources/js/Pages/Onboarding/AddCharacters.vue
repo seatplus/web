@@ -173,7 +173,7 @@
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import { UserPlusIcon } from "@heroicons/vue/24/outline";
 
-const props = defineProps({
+defineProps({
   characters: {
     type: Array,
     required: true,

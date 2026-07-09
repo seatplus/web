@@ -126,6 +126,8 @@ const nextUrl = computed(() => {
     if(props.step > 1) {
         return route(route_name, {step: props.step + 1})
     }
+
+    return null
 })
 
 </script>

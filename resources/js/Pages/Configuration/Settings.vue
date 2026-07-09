@@ -17,6 +17,7 @@
             >
               <option
                 v-for="navTab in navTabs"
+                :key="navTab.route"
                 :value="navTab.route"
               >
                 {{ navTab.name }}

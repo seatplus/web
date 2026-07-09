@@ -8,7 +8,7 @@
     <wide-lists>
       <template #elements>
         <wide-list-element
-          v-for="(asset, index) in filtered_items"
+          v-for="asset in filtered_items"
           :key="asset.item_id"
           :url="url(asset)"
         >
