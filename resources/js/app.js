@@ -6,7 +6,7 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/index';
 import SingleColumnLayout from "@/Shared/SidebarLayout/SingleColumnLayout.vue";
-import I18n from '@/vendor/I18n';
+import I18n from '@/i18n/I18n';
 
 const I18nPlugin = {
     install(app) {

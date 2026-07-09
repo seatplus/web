@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/vue3';
-import I18n from '@/vendor/I18n';
+import I18n from '@/i18n/I18n';
 
 /**
  * Translation helper for `<script setup>` / Composition-API components.
