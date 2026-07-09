@@ -48,6 +48,20 @@ test('available locales are derived from the lang directories', function () {
     expect(Locales::available())->toContain('en')->toContain('de');
 });
 
+test('available locales include locales from other package namespaces', function () {
+    // A plugin (e.g. notifications) shipping only French under its own namespace.
+    $dir = sys_get_temp_dir().'/i18n-'.uniqid();
+    mkdir($dir.'/fr', 0777, true);
+    app('translator')->addNamespace('discord', $dir);
+
+    $available = Locales::available();
+
+    rmdir($dir.'/fr');
+    rmdir($dir);
+
+    expect($available)->toContain('fr');
+});
+
 test('the session pick beats the browser language', function () {
     expect(localeFor(['HTTP_ACCEPT_LANGUAGE' => 'de'], sessionLocale: 'en'))->toBe('en');
 });
