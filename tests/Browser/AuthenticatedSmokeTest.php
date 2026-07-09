@@ -29,7 +29,9 @@ it('renders the dashboard for an authenticated user', function () {
     $page = visit('/home');
 
     $page->assertNoSmoke();
-    $page->assertSee('Home');
+    // "Characters" is the visible <h3> on the dashboard (Dashboard/Characters.vue);
+    // "Home" is only the document <title>, so assert on real page content.
+    $page->assertSee('Characters');
     $page->screenshot(true, 'dashboard');
 
     $this->assertAuthenticated();
