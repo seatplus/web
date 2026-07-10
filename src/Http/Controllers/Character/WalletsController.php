@@ -31,6 +31,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
@@ -49,23 +50,40 @@ class WalletsController extends Controller
 
         $ids = $this->getCharacterIds($dispatchTransferObject, 'walletJournals');
 
+        // One infinite-scroll prop per character — the page renders a wallet card
+        // per id. Each paginator uses its own pageName so their scroll state never
+        // collides; the <InfiniteScroll> component reads it via the matching key.
+        $journals = $ids->mapWithKeys(fn (int $character_id) => [
+            "journal_{$character_id}" => Inertia::scroll(
+                fn () => $this->journalQuery($character_id)->paginate(pageName: "journal_{$character_id}"),
+            ),
+        ])->all();
+
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'character_ids' => $ids,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            ...$journals,
         ]);
     }
 
     public function journal(int $character_id): LengthAwarePaginator
+    {
+        return $this->journalQuery($character_id)->paginate();
+    }
+
+    private function journalQuery(int $character_id): Builder
     {
         $query = WalletJournal::query()
             ->where('wallet_journable_id', $character_id)
             ->with('walletJournable')
             ->orderByDesc('date');
 
-        request()->whenHas('ref_type', fn (array $types) => $query->whereIn('ref_type', $types));
+        // whenFilled (not whenHas): an empty ref_type filter means "no filter",
+        // not whereIn([]) which would return nothing.
+        request()->whenFilled('ref_type', fn (array $types) => $query->whereIn('ref_type', $types));
 
-        return $query->paginate();
+        return $query;
     }
 
     public function journalTypes(GetRefTypesAction $action): \Illuminate\Http\Response|Collection

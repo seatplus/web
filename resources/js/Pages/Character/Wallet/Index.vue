@@ -31,6 +31,7 @@ import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelection
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import WalletFilter from "@/Shared/Components/Wallet/WalletFilter.vue";
+import { router } from "@inertiajs/vue3";
 
 export default {
     name: "Index",
@@ -63,6 +64,22 @@ export default {
     computed: {
         ref_types() {
             return _.map(this.filter, (ref_type) => ref_type.name)
+        },
+        // Scroll-prop keys for every character card (WalletsController::index).
+        journalKeys() {
+            return this.character_ids.map((id) => `journal_${id}`)
+        }
+    },
+    watch: {
+        // The ref_type filter is a page-level query param: reload only the journal
+        // scroll props so <InfiniteScroll> resets to the filtered first page.
+        ref_types(newValue) {
+            router.reload({
+                only: this.journalKeys,
+                data: { ref_type: newValue },
+                preserveState: true,
+                preserveScroll: true,
+            })
         }
     }
 }

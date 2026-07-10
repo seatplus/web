@@ -30,7 +30,30 @@
         </div>
       </div>
 
-      <ul class="relative z-0 divide-y divide-gray-200">
+      <!-- Character wallets: native Inertia infinite scroll over a page scroll prop -->
+      <InfiniteScroll
+        v-if="!division"
+        :data="scrollKey"
+        :items-element="`#${scrollBodyId}`"
+      >
+        <ul
+          :id="scrollBodyId"
+          class="relative z-0 divide-y divide-gray-200"
+        >
+          <WalletJournalRowComponent
+            v-for="(entry, index) in journalEntries"
+            :key="entry.id"
+            :entry="entry"
+            :even="index%2"
+          />
+        </ul>
+      </InfiniteScroll>
+
+      <!-- Corporation wallets: legacy axios loader (not yet migrated to InfiniteScroll) -->
+      <ul
+        v-else
+        class="relative z-0 divide-y divide-gray-200"
+      >
         <InfiniteLoadingHelper
           v-slot="{results}"
           :route-name="routeName"
@@ -53,10 +76,12 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
 
 export default {
     name: "WalletJournalComponent",
     components: {
+        InfiniteScroll,
         InfiniteLoadingHelper,
         EntityByIdBlock,
         WalletJournalRowComponent,
@@ -84,6 +109,17 @@ export default {
         }
     },
     computed: {
+        // Character journal is delivered as a page scroll prop keyed by character id
+        // (WalletsController::index), consumed by <InfiniteScroll :data="scrollKey">.
+        scrollKey() {
+            return `journal_${this.id}`
+        },
+        scrollBodyId() {
+            return `journal-body-${this.id}`
+        },
+        journalEntries() {
+            return this.$page.props[this.scrollKey]?.data ?? []
+        },
         routeName() {
             return this.division? 'corporation.wallet_journal.detail' : 'character.wallet_journal.detail'
         },
