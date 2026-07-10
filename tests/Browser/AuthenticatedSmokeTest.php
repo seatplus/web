@@ -67,14 +67,10 @@ it('wires the character portrait to the EVE image server', function () {
 
     $page = visit('/home');
 
-    // EveImage lazy-loads the portrait via an IntersectionObserver with
-    // threshold [1] — the <img> only mounts once the element is 100% within the
-    // viewport. Use a tall viewport so the dashboard character card is fully
-    // visible and the observer fires deterministically; otherwise the portrait may
-    // never mount in a short window and the assertion times out.
-    $page->resize(1280, 2400);
+    // EveImage lazy-loads the portrait via an IntersectionObserver, mounting the
+    // <img> a beat after the page settles — wait for it before asserting.
     $page->waitForText('Characters');
-    $page->wait(1); // give the observer + <img> mount a beat to settle
+    $page->wait(1);
 
     // Scope to the dashboard character-card portrait (h-12 w-12) so the locator
     // resolves to exactly one element — the character also appears as the sidebar
