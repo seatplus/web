@@ -61,19 +61,26 @@ it('renders the dashboard for an authenticated user', function () {
 it('wires the character portrait to the EVE image server', function () {
     $character = provisionAuthenticatedUser();
 
-    // EveImage lazy-loads the portrait via an IntersectionObserver, so wait for the
-    // dashboard to render before inspecting the <img>. We assert the *URL wiring*
-    // (correct CCP images.evetech.net portrait endpoint), not that the bytes load —
-    // the factory character id has no real portrait on Tranquility, so
-    // assertNoBrokenImages would be a false negative here.
+    // EveImage lazy-loads the portrait via an IntersectionObserver, so we need an
+    // assertion that waits for the <img> to mount — assertAttributeContains does
+    // (getAttribute retries until the element is attached); a plain snapshot count
+    // races the observer and finds nothing.
     //
-    // The selector encodes the assertion (host + character + portrait variant) and
-    // assertPresent counts matches, so it tolerates the character appearing more
-    // than once (e.g. the sidebar avatar at size=64 and the dashboard card at 512).
-    $selector = "img[src*='images.evetech.net/characters/{$character->character_id}/portrait']";
+    // Scope to the dashboard character-card portrait (h-12 w-12) so the locator
+    // resolves to exactly one element — the character also appears as the sidebar
+    // avatar (h-9 w-9), and a multi-match locator trips Playwright's strict mode.
+    //
+    // We assert the *URL wiring* (correct CCP images.evetech.net portrait endpoint),
+    // not that the bytes load — the factory character id has no real portrait on
+    // Tranquility, so assertNoBrokenImages would be a false negative here.
+    $selector = "img.h-12.w-12[src*='characters/{$character->character_id}/portrait']";
 
     $page = visit('/home');
     $page->waitForText('Characters');
 
-    $page->assertPresent($selector);
+    $page->assertAttributeContains(
+        $selector,
+        'src',
+        "images.evetech.net/characters/{$character->character_id}/portrait",
+    );
 });
