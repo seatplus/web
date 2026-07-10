@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -83,22 +82,12 @@ class CorporationWalletController extends Controller
         ]);
     }
 
-    public function journal(int $corporation_id, int $division_id): LengthAwarePaginator
-    {
-        return $this->journalQuery($corporation_id, $division_id)->paginate();
-    }
-
     private function journalQuery(int $corporation_id, int $division_id): Builder
     {
         return WalletJournal::where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
             ->with('walletJournable')
             ->orderByDesc('date');
-    }
-
-    public function balance(int $corporation_id, int $division_id): LengthAwarePaginator
-    {
-        return new LengthAwarePaginator($this->balanceData($corporation_id, $division_id), 30, 30);
     }
 
     private function balanceData(int $corporation_id, int $division_id): Collection
@@ -119,11 +108,6 @@ class CorporationWalletController extends Controller
             ->where('division', $division_id)
             ->with('type', 'location')
             ->orderByDesc('date');
-    }
-
-    public function transaction(int $corporation_id, int $division_id): LengthAwarePaginator
-    {
-        return $this->transactionQuery($corporation_id, $division_id)->paginate();
     }
 
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject): Collection
