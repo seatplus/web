@@ -29,7 +29,7 @@ it('renders the dashboard for an authenticated user', function () {
 
     $character = CharacterInfo::factory()->create();
 
-    $user = new User();
+    $user = new User;
     $user->main_character_id = $character->character_id;
     $user->save();
 
