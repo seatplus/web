@@ -26,15 +26,21 @@
 
 namespace Seatplus\Web;
 
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
+use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Console\Commands\CheckTranslationKeys;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\SetLocale;
+use Seatplus\Web\Http\Resources\UserRessource;
+use Seatplus\Web\Services\Sidebar\SidebarEntries;
+use Seatplus\Web\Support\Locales;
+use Seatplus\Web\Support\Translations;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
@@ -58,6 +64,50 @@ class WebServiceProvider extends ServiceProvider
         // even when the per-request middleware isn't run — e.g. Pest browser's
         // in-process server, which doesn't apply provider-pushed group middleware.
         Inertia::setRootView('web::app');
+
+        // Shared Inertia props, registered at provider level for the same reason
+        // as the root view: they must be present even when the pushed group
+        // middleware (HandleInertiaRequests) isn't applied (e.g. the Pest browser
+        // in-process server) — otherwise pages that read shared props (the sidebar
+        // reads `images`/`user`/`sidebar`) crash on mount. Closures are evaluated
+        // per response, so request()/auth()/session() resolve per request.
+        Inertia::share([
+            // Locale is resolved + set by the SetLocale middleware before controllers/props run.
+            'locale' => fn () => app()->getLocale(),
+            'locales' => fn () => Locales::available(),
+            // Shared chrome translations (baseline) — the notification labels the persistent
+            // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
+            // `pageTranslations` prop and are merged client-side.
+            'translations' => fn () => Translations::gather(['web::notifications']),
+            'activeSidebarElement' => fn () => request()->route()?->getName(),
+            'flash' => fn () => [
+                'success' => session()->pull('success'),
+                'info' => session()->pull('info'),
+                'warning' => session()->pull('warning'),
+                'error' => session()->pull('error'),
+            ],
+            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->getFilteredEntries(),
+            'user' => fn () => auth()->guest() ? '' : UserRessource::make(
+                User::with([
+                    'mainCharacter',
+                    'characters' => [
+                        'corporation',
+                        'refreshToken',
+                        'alliance',
+                        'characterAffiliation',
+                    ],
+                ])
+                    ->where('id', auth()->user()->getAuthIdentifier())
+                    ->first()
+            ),
+            'errors' => fn () => Session::get('errors')
+                ? Session::get('errors')->getBag('default')->getMessages()
+                : (object) [],
+            'images' => fn () => [
+                'logo' => asset(config('web.images.logo')),
+                'icon' => asset(config('web.images.icon')),
+            ],
+        ]);
 
         // Add Migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations/');

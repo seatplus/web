@@ -27,13 +27,7 @@
 namespace Seatplus\Web\Http\Middleware;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
-use Seatplus\Auth\Models\User;
-use Seatplus\Web\Http\Resources\UserRessource;
-use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Seatplus\Web\Support\Locales;
-use Seatplus\Web\Support\Translations;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -52,49 +46,8 @@ class HandleInertiaRequests extends Middleware
         return parent::version($request);
     }
 
-    /**
-     * Defines the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
-     */
-    public function share(Request $request): array
-    {
-        return array_merge(parent::share($request), [
-            // Locale is resolved + set by the SetLocale middleware before controllers/props run.
-            'locale' => fn () => app()->getLocale(),
-            'locales' => fn () => Locales::available(),
-            // Shared chrome translations (baseline) — the notification labels the persistent
-            // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
-            // `pageTranslations` prop and are merged client-side.
-            'translations' => fn () => Translations::gather(['web::notifications']),
-            'activeSidebarElement' => $request->route()?->getName(),
-            'flash' => fn () => [
-                'success' => session()->pull('success'),
-                'info' => session()->pull('info'),
-                'warning' => session()->pull('warning'),
-                'error' => session()->pull('error'),
-            ],
-            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->getFilteredEntries(),
-            'user' => fn () => auth()->guest() ? '' : UserRessource::make(
-                User::with([
-                    'mainCharacter',
-                    'characters' => [
-                        'corporation',
-                        'refreshToken',
-                        'alliance',
-                        'characterAffiliation',
-                    ],
-                ])
-                    ->where('id', auth()->user()->getAuthIdentifier())
-                    ->first()
-            ),
-            'errors' => fn () => Session::get('errors')
-                ? Session::get('errors')->getBag('default')->getMessages()
-                : (object) [],
-            'images' => fn () => [
-                'logo' => asset(config('web.images.logo')),
-                'icon' => asset(config('web.images.icon')),
-            ],
-        ]);
-    }
+    // Shared Inertia props are registered at the provider level via Inertia::share()
+    // in WebServiceProvider::boot(), so they apply even when this pushed group
+    // middleware isn't run (e.g. the Pest browser in-process server). See the note
+    // there and seatplus/web#1530.
 }
