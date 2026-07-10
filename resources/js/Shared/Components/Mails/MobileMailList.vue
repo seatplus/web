@@ -1,12 +1,15 @@
 <template>
-  <InfiniteLoadingHelper
-    v-slot="{results}"
-    route-name="get.mail.headers"
-    :params="{character_ids: characterIds}"
+  <InfiniteScroll
+    data="mailHeaders"
+    items-element="#mobile-mail-list"
+    preserve-url
   >
-    <ul class="divide-y divide-gray-200">
+    <ul
+      id="mobile-mail-list"
+      class="divide-y divide-gray-200"
+    >
       <Disclosure
-        v-for="mail in results"
+        v-for="mail in mailHeaders"
         :key="mail.id"
         v-slot="{open}"
         as="li"
@@ -49,7 +52,7 @@
         </DisclosurePanel>
       </Disclosure>
     </ul>
-  </InfiniteLoadingHelper>
+  </InfiniteScroll>
 </template>
 
 <script>
@@ -57,7 +60,8 @@ import MailRepresentation from "./MailRepresentation.vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 
@@ -65,17 +69,13 @@ export default {
     name: "MobileMailList",
     components: {
         MailRepresentation,
-        EveImage, Time, ResolveIdToName, InfiniteLoadingHelper,
+        EveImage, Time, ResolveIdToName, InfiniteScroll,
         ChevronUpIcon,
         Disclosure,
         DisclosureButton,
         DisclosurePanel,
     },
     props: {
-        characterIds: {
-            type: Array,
-            required: true
-        },
         selectedId: {
             type: Number,
             required: false
@@ -84,11 +84,15 @@ export default {
     emits: ['update:selectedId'],
     setup(props, {emit}) {
 
+        const page = usePage()
+
+        const mailHeaders = computed(() => page.props.mailHeaders?.data ?? [])
 
         const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
         const isSelected = (mail) => mail.id === props.selectedId
 
         return {
+            mailHeaders,
             emitSelection,
             isSelected
         }
