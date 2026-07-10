@@ -59,11 +59,26 @@ class WalletsController extends Controller
             ),
         ])->all();
 
+        // Transactions scroll the same way as journals (one prop + pageName per character).
+        $transactions = $ids->mapWithKeys(fn (int $character_id) => [
+            "transaction_{$character_id}" => Inertia::scroll(
+                fn () => $this->transactionQuery($character_id)->paginate(pageName: "transaction_{$character_id}"),
+            ),
+        ])->all();
+
+        // Balance chart data — deferred (loads after the initial render) so it never
+        // blocks the page, replacing the old client-side axios fetch.
+        $balances = $ids->mapWithKeys(fn (int $character_id) => [
+            "balance_{$character_id}" => Inertia::defer(fn () => $this->balanceData($character_id)),
+        ])->all();
+
         return inertia('Character/Wallet/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'character_ids' => $ids,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
             ...$journals,
+            ...$transactions,
+            ...$balances,
         ]);
     }
 
@@ -99,6 +114,11 @@ class WalletsController extends Controller
 
     public function balance(int $character_id): LengthAwarePaginator
     {
+        return new LengthAwarePaginator($this->balanceData($character_id), 30, 30);
+    }
+
+    private function balanceData(int $character_id): Collection
+    {
         $balance_part = Balance::query()
             ->whereHasMorph(
                 'balanceable',
@@ -115,14 +135,18 @@ class WalletsController extends Controller
             ->groupBy('x')
             ->limit(30);
 
-        return new LengthAwarePaginator($balance_part->union($journal_entries)->limit(30)->get(), 30, 30);
+        return $balance_part->union($journal_entries)->limit(30)->get();
+    }
+
+    private function transactionQuery(int $character_id): Builder
+    {
+        return WalletTransaction::where('wallet_transactionable_id', $character_id)
+            ->with('type', 'location')
+            ->orderByDesc('date');
     }
 
     public function transaction(int $character_id): LengthAwarePaginator
     {
-        return WalletTransaction::where('wallet_transactionable_id', $character_id)
-            ->with('type', 'location')
-            ->orderByDesc('date')
-            ->paginate();
+        return $this->transactionQuery($character_id)->paginate();
     }
 }

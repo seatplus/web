@@ -12,7 +12,12 @@
       </div>
     </template>
 
-    <div class="relative max-h-96 overflow-y-auto">
+    <!-- scroll-region: lets Inertia track/restore this custom scroll container so
+         <InfiniteScroll> merges the next page without jumping to top. -->
+    <div
+      class="relative max-h-96 overflow-y-auto"
+      scroll-region=""
+    >
       <div class="hidden sm:grid sm:grid-cols-12 sm:gap-x-0 sm:gap-y-0.5 grid-flow-row z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-500">
         <div class="px-6 sm:px-3 py-1">
           Date
@@ -31,20 +36,23 @@
         </div>
       </div>
 
-      <ul class="relative z-0 divide-y divide-gray-200">
-        <InfiniteLoadingHelper
-          v-slot="{results}"
-          :route-name="routeName"
-          :params="routeParameters"
+      <InfiniteScroll
+        :data="scrollKey"
+        :items-element="`#${scrollBodyId}`"
+        preserve-url
+      >
+        <ul
+          :id="scrollBodyId"
+          class="relative z-0 divide-y divide-gray-200"
         >
           <WalletTransactionRowComponent
-            v-for="(entry, index) in results"
+            v-for="(entry, index) in transactionEntries"
             :key="entry.transaction_id"
             :entry="entry"
             :even="index%2"
           />
-        </InfiniteLoadingHelper>
-      </ul>
+        </ul>
+      </InfiniteScroll>
     </div>
   </CardWithHeader>
 </template>
@@ -53,14 +61,14 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import WalletTransactionRowComponent from "./WalletTransactionRowComponent.vue";
-import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
 
 export default {
     name: "WalletTransactionComponent",
     components: {
-        InfiniteLoadingHelper,
+        InfiniteScroll,
         WalletTransactionRowComponent,
-         EntityByIdBlock, CardWithHeader
+        EntityByIdBlock, CardWithHeader
     },
     props: {
         id: {
@@ -73,27 +81,23 @@ export default {
             default: () => {}
         }
     },
-    data() {
-        return {
-            infiniteId: +new Date(),
-        }
-    },
     computed: {
-        routeName() {
-            return this.division? 'corporation.wallet_transaction.detail' : 'character.wallet_transaction.detail'
+        // Delivered as a page scroll prop (WalletsController / CorporationWalletController):
+        // keyed per character, or per corporation+division for corporate wallets.
+        scrollKey() {
+            return this.division
+                ? `transaction_${this.id}_${this.division.division_id}`
+                : `transaction_${this.id}`
         },
-        routeParameters() {
-            return this.division ? {
-                corporation_id: this.id,
-                division_id: this.division.division_id
-            } : {
-                character_id: this.id
-            }
+        scrollBodyId() {
+            return this.division
+                ? `transaction-body-${this.id}-${this.division.division_id}`
+                : `transaction-body-${this.id}`
+        },
+        transactionEntries() {
+            return this.$page.props[this.scrollKey]?.data ?? []
         }
-    },
-    created() {
-        this.infiniteId += 1;
-    },
+    }
 }
 </script>
 
