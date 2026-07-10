@@ -27,8 +27,6 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -55,11 +53,6 @@ class MailsController extends Controller
             // characters (both the desktop and mobile lists consume it via <InfiniteScroll>).
             'mailHeaders' => Inertia::scroll(fn () => $this->mailHeadersQuery($ids->all())->paginate()),
         ]);
-    }
-
-    public function mailHeaders(Request $request): LengthAwarePaginator
-    {
-        return $this->mailHeadersQuery($request->get('character_ids'))->paginate();
     }
 
     private function mailHeadersQuery(array $character_ids): Builder

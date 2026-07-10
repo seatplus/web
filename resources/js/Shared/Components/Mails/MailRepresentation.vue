@@ -80,11 +80,17 @@ export default {
 
         const fetchMails = async () => {
 
-            await axios.get(route('get.mail', props.mailId))
-                .then(response => {
-                    messages.value.push(...response.data);
-                })
-                .catch(error => console.log(error))
+            // Plain same-origin fetch — no axios, no Ziggy route(). (Wayfinder would be
+            // the typed alternative, but its generated routes aren't built in CI yet — B3.)
+            const response = await fetch(`/character/mails/content/${props.mailId}`, {
+                headers: { Accept: 'application/json' },
+            })
+
+            if (! response.ok) {
+                return
+            }
+
+            messages.value.push(...await response.json())
         }
 
         onBeforeMount(() => fetchMails())
