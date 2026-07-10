@@ -61,22 +61,25 @@ it('renders the dashboard for an authenticated user', function () {
 it('wires the character portrait to the EVE image server', function () {
     $character = provisionAuthenticatedUser();
 
-    // EveImage lazy-loads the portrait via an IntersectionObserver, so we need an
-    // assertion that waits for the <img> to mount — assertAttributeContains does
-    // (getAttribute retries until the element is attached); a plain snapshot count
-    // races the observer and finds nothing.
-    //
+    $page = visit('/home');
+
+    // EveImage lazy-loads the portrait via an IntersectionObserver with
+    // threshold [1] — the <img> only mounts once the element is 100% within the
+    // viewport. Use a tall viewport so the dashboard character card is fully
+    // visible and the observer fires deterministically; otherwise the portrait may
+    // never mount in a short window and the assertion times out.
+    $page->resize(1280, 2400);
+    $page->waitForText('Characters');
+
     // Scope to the dashboard character-card portrait (h-12 w-12) so the locator
     // resolves to exactly one element — the character also appears as the sidebar
     // avatar (h-9 w-9), and a multi-match locator trips Playwright's strict mode.
+    // assertAttributeContains waits for the (lazy) element to attach.
     //
     // We assert the *URL wiring* (correct CCP images.evetech.net portrait endpoint),
     // not that the bytes load — the factory character id has no real portrait on
     // Tranquility, so assertNoBrokenImages would be a false negative here.
     $selector = "img.h-12.w-12[src*='characters/{$character->character_id}/portrait']";
-
-    $page = visit('/home');
-    $page->waitForText('Characters');
 
     $page->assertAttributeContains(
         $selector,
