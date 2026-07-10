@@ -67,7 +67,7 @@ import { localeName } from "@/i18n/localeName";
 export default {
     name: "Login",
     components: {AppHead},
-    layout: (h, page) => h(EmptyLayout, [page]),
+    layout: (h, page) => h(EmptyLayout, () => page),
     data() {
         return {
             selectedLocale: this.$page.props.locale,
