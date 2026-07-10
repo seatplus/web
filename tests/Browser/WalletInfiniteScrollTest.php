@@ -66,12 +66,11 @@ it('merges the next journal and transaction pages in on scroll', function () {
         $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
         expect($before)->toBeGreaterThan(0);
 
+        // Scroll the list's own container to the bottom → InfiniteScroll's end trigger
+        // fires and merges the next page. assertScript auto-polls until the row count
+        // grows, so there's no fixed-wait timing assumption.
         $page->script("document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6)");
-        $page->wait(1);
-
-        // Scrolling merged at least one more page in.
-        $after = (int) $page->script("document.querySelectorAll('{$rows}').length");
-        expect($after)->toBeGreaterThan($before);
+        $page->assertScript("document.querySelectorAll('{$rows}').length > {$before}");
     };
 
     $page = visit('/character/wallets');
