@@ -76,6 +76,13 @@ class WalletsController extends Controller
             'dispatchTransferObject' => $dispatchTransferObject,
             'character_ids' => $ids,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            // ref_type filter options, resolved from the accessible journals so the
+            // filter is a plain prop-fed select (no autosuggest endpoint / Ziggy).
+            'ref_types' => WalletJournal::query()
+                ->whereIn('wallet_journable_id', $ids)
+                ->distinct()
+                ->orderBy('ref_type')
+                ->pluck('ref_type'),
             ...$journals,
             ...$transactions,
             ...$balances,

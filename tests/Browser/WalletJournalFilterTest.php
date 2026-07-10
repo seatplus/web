@@ -1,10 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -14,21 +12,18 @@ use Seatplus\Web\Models\Onboarding;
  * Wallet journal ref_type filter browser test.
  *
  * Seeds two distinct ref_types (30 player_donation + 3 bounty) and drives the real
- * WalletFilter UI: selecting "bounty" must reload the journal scroll prop with the
+ * WalletFilter: selecting "bounty" must reload the journal scroll prop with the
  * filter AND reset it, so the list shows only the 3 bounty rows — not the filtered
  * page merged onto the previously-loaded rows (the reset regression).
  *
- * Granted only the wallet_journals permission (not superuser) so the journalTypes
- * autosuggest endpoint (CheckAuthorizationWithExtendedScope) is reachable while the
- * sidebar/authorization stays realistic. Cache::flush() clears the cached ref_type
- * list + per-user permission cache.
+ * No permission needed: own-character wallet access, and the filter's options come
+ * from the ref_types page prop (no autosuggest endpoint — no axios/Ziggy).
  */
 
 uses(RefreshDatabase::class);
 
 it('filters the wallet journal by ref_type (and resets, not merges)', function () {
     Queue::fake();
-    Cache::flush();
 
     $character = CharacterInfo::factory()->create();
 
@@ -43,9 +38,6 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
     ]);
 
     Onboarding::create(['user_id' => $user->getKey()]);
-    // Minimal, realistic permission — just wallet journals (not superuser), so the
-    // ref_type autosuggest endpoint is authorized without unlocking the whole app.
-    $user->givePermissionTo(Permission::findOrCreate('wallet_journals'));
 
     // 30 player_donation (newest) + 3 bounty (oldest), 6h apart. So the unfiltered
     // first page is all player_donation; filtering to bounty must surface exactly 3.
@@ -76,8 +68,8 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
     $page->assertSee('Journal');
     $page->assertCount($rows, 15); // first page of 33, all player_donation
 
-    // Drive the real filter: type into the WalletFilter autosuggest and pick "bounty".
-    $page->type('Wallet Journal entries', 'bounty');
+    // Drive the real filter: type into the WalletFilter input and pick the "bounty" option.
+    $page->type('wallet-ref-type-filter', 'bounty');
     $page->waitForText('bounty');
     $page->click('bounty');
 
