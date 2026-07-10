@@ -536,14 +536,15 @@ test('recruiter can see corporation applications', function () {
         ->get(route('get.application', $application->id))
         ->assertOk();
 
-    // Get the test_users wallet journal as example that a recruiter does get permissions to any other recruit specific endpoint
+    // Hit a recruit-specific extended-scope endpoint (corporation.history) as an
+    // example that a recruiter gets permission to any recruit-specific endpoint.
     $response = test()->actingAs($recruiter)
-        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id))
+        ->get(route('corporation.history', test()->secondary_character->character_id))
         ->assertOk();
 
     // Any other character should be forbidden
     test()->actingAs($recruiter)
-        ->get(route('character.wallet_journal.detail', test()->secondary_character->character_id + 1))
+        ->get(route('corporation.history', test()->secondary_character->character_id + 1))
         ->assertForbidden();
 });
 

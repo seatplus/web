@@ -27,17 +27,14 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
-use Seatplus\Web\Http\Actions\Wallet\GetRefTypesAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Support\Translations;
@@ -89,11 +86,6 @@ class WalletsController extends Controller
         ]);
     }
 
-    public function journal(int $character_id): LengthAwarePaginator
-    {
-        return $this->journalQuery($character_id)->paginate();
-    }
-
     private function journalQuery(int $character_id): Builder
     {
         $query = WalletJournal::query()
@@ -106,22 +98,6 @@ class WalletsController extends Controller
         request()->whenFilled('ref_type', fn (array $types) => $query->whereIn('ref_type', $types));
 
         return $query;
-    }
-
-    public function journalTypes(GetRefTypesAction $action): \Illuminate\Http\Response|Collection
-    {
-        $term = request()->get('search');
-
-        if (Str::length($term) < 3) {
-            return response('the minimum length of 3 is not met', 403);
-        }
-
-        return $action->execute($term);
-    }
-
-    public function balance(int $character_id): LengthAwarePaginator
-    {
-        return new LengthAwarePaginator($this->balanceData($character_id), 30, 30);
     }
 
     private function balanceData(int $character_id): Collection
@@ -150,10 +126,5 @@ class WalletsController extends Controller
         return WalletTransaction::where('wallet_transactionable_id', $character_id)
             ->with('type', 'location')
             ->orderByDesc('date');
-    }
-
-    public function transaction(int $character_id): LengthAwarePaginator
-    {
-        return $this->transactionQuery($character_id)->paginate();
     }
 }
