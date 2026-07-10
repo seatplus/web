@@ -66,14 +66,14 @@ it('wires the character portrait to the EVE image server', function () {
     // (correct CCP images.evetech.net portrait endpoint), not that the bytes load —
     // the factory character id has no real portrait on Tranquility, so
     // assertNoBrokenImages would be a false negative here.
-    $selector = "img[src*='characters/{$character->character_id}/portrait']";
+    //
+    // The selector encodes the assertion (host + character + portrait variant) and
+    // assertPresent counts matches, so it tolerates the character appearing more
+    // than once (e.g. the sidebar avatar at size=64 and the dashboard card at 512).
+    $selector = "img[src*='images.evetech.net/characters/{$character->character_id}/portrait']";
 
     $page = visit('/home');
     $page->waitForText('Characters');
 
-    $page->assertAttributeContains(
-        $selector,
-        'src',
-        "images.evetech.net/characters/{$character->character_id}/portrait",
-    );
+    $page->assertPresent($selector);
 });
