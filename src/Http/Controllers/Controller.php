@@ -59,7 +59,13 @@ class Controller extends BaseController
     protected function fetchAffiliatedCharacterIdsWithRelation(
         array $characterIds,
         ?string $characterRelation = null
-    ): \Illuminate\Database\Eloquent\Collection {
+    ): Collection {
+        // The frontend iterates this as a list of scalar character_ids
+        // (`:id="character_id"`, typed Number). Returning full CharacterInfo models
+        // made each element an object, so pages built route('…', ['character_id' =>
+        // <object>]) and Ziggy threw "object passed as 'character_id' parameter …",
+        // crashing the setup() of components that resolve a route on mount (e.g.
+        // WalletJournalBalanceChart) and taking the page down. Pluck plain ids.
         return CharacterInfo::query()
             ->select('character_id')
             ->whereIn('character_id', $characterIds)
@@ -67,7 +73,7 @@ class Controller extends BaseController
                 $characterRelation,
                 fn (Builder $query) => $query->with($characterRelation),
             )
-            ->get();
+            ->pluck('character_id');
     }
 
     protected function getAffiliatedIds(DispatchTransferObject $dispatchTransferObject): array
