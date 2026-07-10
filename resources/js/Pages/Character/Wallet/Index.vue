@@ -76,6 +76,9 @@ export default {
         ref_types(newValue) {
             router.reload({
                 only: this.journalKeys,
+                // reset: without it InfiniteScroll *merges* the filtered page onto the
+                // existing rows instead of replacing them, so the filter looks ignored.
+                reset: this.journalKeys,
                 data: { ref_type: newValue },
                 preserveState: true,
                 preserveScroll: true,
