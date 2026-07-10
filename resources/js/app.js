@@ -22,17 +22,15 @@ const I18nPlugin = {
 }
 
 createInertiaApp({
-    resolve: (name) => {
-        const page = resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue'));
+    resolve: async (name) => {
+        const module = await resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue'));
 
-        page.then((module) => {
-            if (module.default.layout === undefined) {
-                module.default.layout = SingleColumnLayout;
-            }
-        });
+        // Default persistent layout for pages that don't set their own. Assign it
+        // before returning (not in a fire-and-forget .then) so it's applied on the
+        // initial mount.
+        module.default.layout ??= SingleColumnLayout;
 
-        return page;
-
+        return module;
     },
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
