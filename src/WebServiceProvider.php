@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web;
 
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
@@ -54,9 +55,7 @@ class WebServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'web');
 
         // Default the Inertia root view to this package's blade at the provider
-        // level (not only via HandleInertiaRequests::rootView()), so it applies
-        // even when the per-request middleware isn't run — e.g. Pest browser's
-        // in-process server, which doesn't apply provider-pushed group middleware.
+        // level (belt-and-suspenders alongside HandleInertiaRequests::rootView()).
         Inertia::setRootView('web::app');
 
         // Add Migrations
@@ -140,13 +139,22 @@ class WebServiceProvider extends ServiceProvider
         $router->aliasMiddleware('auth', Authenticate::class);
 
         /*
-         * Localization: resolve + set the request locale before controllers/props run.
+         * Append our web-group middleware through the HTTP kernel rather than the
+         * router. The kernel's constructor runs syncMiddlewareToRouter(), which
+         * *replaces* the router's group definitions with the kernel's own
+         * $middlewareGroups — so anything pushed straight onto the router
+         * ($router->pushMiddlewareToGroup) is lost whenever the kernel is resolved
+         * after this provider boots. Under normal FPM the kernel is built first
+         * (public/index.php) so a router push survives; but Pest's in-process
+         * browser server resolves the kernel lazily *after* boot, wiping it and
+         * leaving Inertia shared props unshared (renders a blank #app). Appending
+         * via the kernel mutates $middlewareGroups itself, so it persists across
+         * every re-sync. Order matters: SetLocale sets the locale that
+         * HandleInertiaRequests then shares.
          */
-        $router->pushMiddlewareToGroup('web', SetLocale::class);
-
-        // Inertia.JS adding
-        // $router->pushMiddlewareToGroup('web', Middleware::class);
-        $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
+        $kernel = $this->app->make(HttpKernel::class);
+        $kernel->appendMiddlewareToGroup('web', SetLocale::class);
+        $kernel->appendMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add acl-permission Middelware
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
