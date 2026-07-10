@@ -9,16 +9,17 @@ use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Models\Onboarding;
 
 /*
- * Corporation wallet journal infinite-scroll browser test.
+ * Corporation wallet infinite-scroll browser test.
  *
- * The corporation wallet is division-scoped: WalletJournalComponent renders a
- * `journal_<corporation>_<division>` scroll prop. Access is granted by the in-game
- * Director corp role (CharacterRole roles => ['Director']) — not superuser — which
- * CanUserService::validateSimplePermissions accepts, so this mirrors a real director
- * viewing their corp wallet.
+ * The corporation wallet is division-scoped: both lists render
+ * journal_<corporation>_<division> / transaction_<corporation>_<division> scroll
+ * props. Access is granted by the in-game Director corp role (CharacterRole
+ * roles => ['Director']) — not superuser — which CanUserService accepts, so this
+ * mirrors a real director viewing their corp wallet.
  *
  * CorporationDivision is created directly (its factory has a `division_typ` typo vs.
  * the real `division_type` column). Factory-name guessing is set in core's TestCase.
@@ -26,7 +27,7 @@ use Seatplus\Web\Models\Onboarding;
 
 uses(RefreshDatabase::class);
 
-it('merges the next corporation wallet journal page in on scroll', function () {
+it('merges the next corporation journal and transaction pages in on scroll', function () {
     Queue::fake();
 
     $character = CharacterInfo::factory()->create();
@@ -58,8 +59,6 @@ it('merges the next corporation wallet journal page in on scroll', function () {
         'division_id' => 1,
     ]);
 
-    // 40 journal rows for that corporation+division, 6h apart (adjacent entries never
-    // more than a day apart), spanning several paginator pages.
     WalletJournal::factory()
         ->count(40)
         ->sequence(fn ($sequence) => ['date' => now()->subHours($sequence->index * 6)])
@@ -69,23 +68,37 @@ it('merges the next corporation wallet journal page in on scroll', function () {
             'division' => 1,
         ]);
 
+    WalletTransaction::factory()
+        ->count(40)
+        ->sequence(fn ($sequence) => ['date' => now()->subHours($sequence->index * 6)])
+        ->create([
+            'wallet_transactionable_id' => $corporationId,
+            'wallet_transactionable_type' => CorporationInfo::class,
+            'division' => 1,
+        ]);
+
     $this->actingAs($user);
 
-    $rows = "#journal-body-{$corporationId}-1 > li";
+    $assertScrollMerges = function ($page, string $bodyId) {
+        $rows = "#{$bodyId} > li";
+        $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
+        expect($before)->toBeGreaterThan(0)->toBeLessThan(40);
+
+        $page->script("document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6)");
+        $page->wait(1);
+
+        $after = (int) $page->script("document.querySelectorAll('{$rows}').length");
+        expect($after)->toBeGreaterThan($before)->toBeLessThanOrEqual(40);
+    };
 
     $page = visit('/corporation/wallet');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
+    $page->assertSee('Transaction');
     $page->waitForText('Journal');
 
-    $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
-    expect($before)->toBeGreaterThan(0)->toBeLessThan(40);
+    $assertScrollMerges($page, "journal-body-{$corporationId}-1");
+    $assertScrollMerges($page, "transaction-body-{$corporationId}-1");
 
-    $page->script("document.getElementById('journal-body-{$corporationId}-1').closest('.overflow-y-auto').scrollTo(0, 1e6)");
-    $page->wait(1);
-
-    $after = (int) $page->script("document.querySelectorAll('{$rows}').length");
-    expect($after)->toBeGreaterThan($before)->toBeLessThanOrEqual(40);
-
-    $page->screenshot(true, 'corporation-wallet-journal-infinite-scroll');
+    $page->screenshot(true, 'corporation-wallet-infinite-scroll');
 });
