@@ -88,7 +88,7 @@
     export default {
         name: "MissingRequiredScopes",
         components: {AppHead, ImpersonatingBanner, EveImage},
-        layout: (h, page) => h(EmptyLayout, [page]),
+        layout: (h, page) => h(EmptyLayout, () => page),
         props: {
             characters: {
                 required: true
