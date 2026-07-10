@@ -8,11 +8,10 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Models\Onboarding;
 
 /*
- * Authenticated dashboard smoke test — runs against the real assembled core app.
+ * Authenticated dashboard smoke tests — run against the real assembled core app.
  *
- * Provisions a user with a single controlled character and loads /home, asserting
- * the Dashboard actually renders (visible "Characters" heading) with no JS/console
- * errors — mirroring a real logged-in user.
+ * Provisions a user with a single controlled character and loads /home, mirroring
+ * a real logged-in user.
  *
  * We create ONE CharacterInfo (its factory builds the affiliation/refresh-token/
  * role) and link it as the main character, rather than User::factory() — that
@@ -24,7 +23,8 @@ use Seatplus\Web\Models\Onboarding;
 
 uses(RefreshDatabase::class);
 
-it('renders the dashboard for an authenticated user', function () {
+function provisionAuthenticatedUser(): CharacterInfo
+{
     Queue::fake();
 
     $character = CharacterInfo::factory()->create();
@@ -41,7 +41,13 @@ it('renders the dashboard for an authenticated user', function () {
 
     Onboarding::create(['user_id' => $user->getKey()]);
 
-    $this->actingAs($user);
+    test()->actingAs($user);
+
+    return $character;
+}
+
+it('renders the dashboard for an authenticated user', function () {
+    provisionAuthenticatedUser();
 
     $page = visit('/home');
 
@@ -49,5 +55,25 @@ it('renders the dashboard for an authenticated user', function () {
     $page->assertSee('Characters');
     $page->screenshot(true, 'dashboard');
 
-    $this->assertAuthenticated();
+    test()->assertAuthenticated();
+});
+
+it('wires the character portrait to the EVE image server', function () {
+    $character = provisionAuthenticatedUser();
+
+    // EveImage lazy-loads the portrait via an IntersectionObserver, so wait for the
+    // dashboard to render before inspecting the <img>. We assert the *URL wiring*
+    // (correct CCP images.evetech.net portrait endpoint), not that the bytes load —
+    // the factory character id has no real portrait on Tranquility, so
+    // assertNoBrokenImages would be a false negative here.
+    $selector = "img[src*='characters/{$character->character_id}/portrait']";
+
+    $page = visit('/home');
+    $page->waitForText('Characters');
+
+    $page->assertAttributeContains(
+        $selector,
+        'src',
+        "images.evetech.net/characters/{$character->character_id}/portrait",
+    );
 });
