@@ -8,20 +8,32 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Models\Onboarding;
 
 /*
- * Authenticated dashboard smoke tests — run against the real assembled core app.
+ * Authentication browser tests — run against the real assembled core app (never under
+ * web's Testbench harness; web's phpunit.xml excludes tests/Browser). They execute
+ * both in core's browser CI (against the released web package) and in a web PR's
+ * browser job (which clones core and overlays the branch). visit()/assertNoSmoke()/
+ * screenshot() come from pest-plugin-browser, provided by the core app.
  *
- * Provisions a user with a single controlled character and loads /home, mirroring
- * a real logged-in user.
- *
- * We create ONE CharacterInfo (its factory builds the affiliation/refresh-token/
- * role) and link it as the main character, rather than User::factory() — that
- * builds a two-character graph whose CharacterAffiliation ids intermittently
- * collide, and a characterless user renders the dashboard blank. Queue is faked so
- * character-creation model events don't dispatch real ESI jobs. Factory-name
- * guessing for the seatplus packages is set in core's tests/TestCase::setUp.
+ * Ordered unauthenticated first, then authenticated. Provisioning uses ONE
+ * CharacterInfo linked as the main character rather than User::factory(), whose
+ * two-character graph has intermittently-colliding CharacterAffiliation ids and
+ * renders the dashboard blank. Queue is faked so character-creation events don't
+ * dispatch real ESI jobs. Factory-name guessing is set in core's tests/TestCase.
  */
 
 uses(RefreshDatabase::class);
+
+/* ------------------------------------------------------------- unauthenticated */
+
+it('renders the login page', function () {
+    $page = visit('/login');
+
+    $page->assertNoSmoke();
+    $page->assertSee('Sign in');
+    $page->screenshot(true, 'login');
+});
+
+/* --------------------------------------------------------------- authenticated */
 
 function provisionAuthenticatedUser(): CharacterInfo
 {
