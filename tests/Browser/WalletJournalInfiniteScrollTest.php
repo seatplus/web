@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -41,8 +40,8 @@ it('merges the next wallet journal page in on scroll', function () {
 
     Onboarding::create(['user_id' => $user->getKey()]);
 
-    // Superuser so getCharacterIds() returns this character irrespective of affiliations.
-    $user->givePermissionTo(Permission::findOrCreate('superuser'));
+    // No permission granted on purpose: a user can always see their OWN character's
+    // wallet (own-character access), which is the realistic case here.
 
     // 40 entries, one every 6 hours descending → adjacent entries are never more
     // than a day apart, and the list spans several paginator pages (default 15/page).

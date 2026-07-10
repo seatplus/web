@@ -18,8 +18,10 @@ use Seatplus\Web\Models\Onboarding;
  * filter AND reset it, so the list shows only the 3 bounty rows — not the filtered
  * page merged onto the previously-loaded rows (the reset regression).
  *
- * Superuser so the journalTypes autosuggest endpoint (CheckAuthorizationWithExtendedScope)
- * is reachable. Cache::flush() clears the cached ref_type list + per-user permission cache.
+ * Granted only the wallet_journals permission (not superuser) so the journalTypes
+ * autosuggest endpoint (CheckAuthorizationWithExtendedScope) is reachable while the
+ * sidebar/authorization stays realistic. Cache::flush() clears the cached ref_type
+ * list + per-user permission cache.
  */
 
 uses(RefreshDatabase::class);
@@ -41,7 +43,9 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
     ]);
 
     Onboarding::create(['user_id' => $user->getKey()]);
-    $user->givePermissionTo(Permission::findOrCreate('superuser'));
+    // Minimal, realistic permission — just wallet journals (not superuser), so the
+    // ref_type autosuggest endpoint is authorized without unlocking the whole app.
+    $user->givePermissionTo(Permission::findOrCreate('wallet_journals'));
 
     // 30 player_donation (newest) + 3 bounty (oldest), 6h apart. So the unfiltered
     // first page is all player_donation; filtering to bounty must surface exactly 3.
