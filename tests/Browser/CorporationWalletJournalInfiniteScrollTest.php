@@ -45,10 +45,11 @@ it('merges the next corporation wallet journal page in on scroll', function () {
     Onboarding::create(['user_id' => $user->getKey()]);
 
     // Director corp role → grants corp wallet access (no superuser / Spatie permission).
-    CharacterRole::factory()->create([
-        'character_id' => $character->character_id,
-        'roles' => ['Director'],
-    ]);
+    // CharacterInfo::factory() already creates an (empty) CharacterRole, so update it.
+    CharacterRole::updateOrCreate(
+        ['character_id' => $character->character_id],
+        ['roles' => ['Director']],
+    );
 
     // The wallet division the page renders a card for.
     CorporationDivision::create([
