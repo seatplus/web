@@ -53,6 +53,10 @@ it('renders the dashboard for an authenticated user', function () {
 
     $page->assertNoSmoke();
     $page->assertSee('Characters');
+
+    // Let the lazy-loaded portraits (EveImage IntersectionObserver) settle so the
+    // screenshot captures them rather than the placeholder SVGs.
+    $page->wait(1);
     $page->screenshot(true, 'dashboard');
 
     test()->assertAuthenticated();
@@ -70,6 +74,7 @@ it('wires the character portrait to the EVE image server', function () {
     // never mount in a short window and the assertion times out.
     $page->resize(1280, 2400);
     $page->waitForText('Characters');
+    $page->wait(1); // give the observer + <img> mount a beat to settle
 
     // Scope to the dashboard character-card portrait (h-12 w-12) so the locator
     // resolves to exactly one element — the character also appears as the sidebar
