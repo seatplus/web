@@ -57,6 +57,7 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
         'corporation_id' => $corporationId,
         'division_type' => 'wallet',
         'division_id' => 1,
+        'name' => 'Master Wallet',
     ]);
 
     WalletJournal::factory()
