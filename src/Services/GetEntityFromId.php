@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Support\Collection;
 use Seatplus\EsiClient\EsiClient;
+use Seatplus\EsiClient\Exceptions\RequestFailedException;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -69,11 +70,31 @@ class GetEntityFromId
             $this->determineTyp($character_affiliation);
         }
 
-        if (! $character_affiliation) {
-            $character_affiliation = $this->makeCharacterAffiliation($esi);
-        }
+        try {
+            if (! $character_affiliation) {
+                $character_affiliation = $this->makeCharacterAffiliation($esi);
+            }
 
-        return $this->buildResponse($esi, $character_affiliation);
+            return $this->buildResponse($esi, $character_affiliation);
+        } catch (RequestFailedException $exception) {
+            // ESI can't resolve this id (404 — e.g. a biomassed character referenced by
+            // an old mail). Degrade to an "Unknown" name instead of 500-ing every caller,
+            // and cache it so we don't hammer ESI on each render.
+            if ($exception->getCode() !== 404) {
+                throw $exception;
+            }
+
+            return $this->buildUnknownFallback();
+        }
+    }
+
+    private function buildUnknownFallback(): array
+    {
+        $fallback = ['id' => $this->id, 'name' => 'Unknown'];
+
+        cache([$this->cache_key => $fallback], now()->addDay());
+
+        return $fallback;
     }
 
     private function makeCharacterAffiliation(EsiClient $esi): ?CharacterAffiliation
