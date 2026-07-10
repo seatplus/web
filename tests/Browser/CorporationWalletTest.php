@@ -60,8 +60,10 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
         $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
         expect($before)->toBeGreaterThan(0);
 
-        $page->script("document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6)");
-        $page->assertScript("document.querySelectorAll('{$rows}').length > {$before}");
+        // Re-scroll to the bottom on every poll (comma expression) so the observer
+        // reliably fires even if layout hadn't settled on the first attempt; passes
+        // once the next page has merged in.
+        $page->assertScript("(document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
     };
 
     $page = visit('/corporation/wallet');
