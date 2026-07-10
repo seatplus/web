@@ -1,33 +1,43 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Queue;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Models\Onboarding;
 
 /*
  * Authenticated dashboard smoke test — runs against the real assembled core app.
  *
- * Logs in a user and loads /home, asserting the Dashboard actually renders
- * (the visible "Characters" heading) with no JS/console errors — not just that
- * some page came back.
+ * Provisions a user with a single controlled character and loads /home, asserting
+ * the Dashboard actually renders (visible "Characters" heading) with no JS/console
+ * errors — mirroring a real logged-in user.
  *
- * The user is created minimally (no characters) on purpose: User::factory()
- * builds a multi-character graph whose CharacterInfo affiliations occasionally
- * collide on character_affiliations (random ids), which is flaky here. A
- * characterless user is deterministic and still reaches Dashboard/Index (an
- * empty character list). In testing CheckRequiredScopes is skipped
- * (non-production) and ONBOARDING defaults off; the Onboarding record keeps it
- * passing even if onboarding is enabled.
+ * We create ONE CharacterInfo (its factory builds the affiliation/refresh-token/
+ * role) and link it as the main character, rather than User::factory() — that
+ * builds a two-character graph whose CharacterAffiliation ids intermittently
+ * collide, and a characterless user renders the dashboard blank. Queue is faked so
+ * character-creation model events don't dispatch real ESI jobs. Factory-name
+ * guessing for the seatplus packages is set in core's tests/TestCase::setUp.
  */
 
 uses(RefreshDatabase::class);
 
 it('renders the dashboard for an authenticated user', function () {
+    Queue::fake();
+
+    $character = CharacterInfo::factory()->create();
+
     $user = new User();
-    $user->active = true;
-    $user->remember_token = Str::random(10);
+    $user->main_character_id = $character->character_id;
     $user->save();
+
+    CharacterUser::create([
+        'user_id' => $user->getKey(),
+        'character_id' => $character->character_id,
+        'character_owner_hash' => sha1((string) $character->character_id),
+    ]);
 
     Onboarding::create(['user_id' => $user->getKey()]);
 
