@@ -26,21 +26,16 @@
 
 namespace Seatplus\Web;
 
-use Illuminate\Support\Facades\Session;
+use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
-use Seatplus\Auth\Models\User;
 use Seatplus\Web\Console\Commands\AssignSuperuser;
 use Seatplus\Web\Console\Commands\CheckTranslationKeys;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Http\Middleware\Authenticate;
 use Seatplus\Web\Http\Middleware\HandleInertiaRequests;
 use Seatplus\Web\Http\Middleware\SetLocale;
-use Seatplus\Web\Http\Resources\UserRessource;
-use Seatplus\Web\Services\Sidebar\SidebarEntries;
-use Seatplus\Web\Support\Locales;
-use Seatplus\Web\Support\Translations;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class WebServiceProvider extends ServiceProvider
@@ -60,54 +55,8 @@ class WebServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'web');
 
         // Default the Inertia root view to this package's blade at the provider
-        // level (not only via HandleInertiaRequests::rootView()), so it applies
-        // even when the per-request middleware isn't run — e.g. Pest browser's
-        // in-process server, which doesn't apply provider-pushed group middleware.
+        // level (belt-and-suspenders alongside HandleInertiaRequests::rootView()).
         Inertia::setRootView('web::app');
-
-        // Shared Inertia props, registered at provider level for the same reason
-        // as the root view: they must be present even when the pushed group
-        // middleware (HandleInertiaRequests) isn't applied (e.g. the Pest browser
-        // in-process server) — otherwise pages that read shared props (the sidebar
-        // reads `images`/`user`/`sidebar`) crash on mount. Closures are evaluated
-        // per response, so request()/auth()/session() resolve per request.
-        Inertia::share([
-            // Locale is resolved + set by the SetLocale middleware before controllers/props run.
-            'locale' => fn () => app()->getLocale(),
-            'locales' => fn () => Locales::available(),
-            // Shared chrome translations (baseline) — the notification labels the persistent
-            // layout (Toast.vue) needs on every page. Page-specific groups arrive as a
-            // `pageTranslations` prop and are merged client-side.
-            'translations' => fn () => Translations::gather(['web::notifications']),
-            'activeSidebarElement' => fn () => request()->route()?->getName(),
-            'flash' => fn () => [
-                'success' => session()->pull('success'),
-                'info' => session()->pull('info'),
-                'warning' => session()->pull('warning'),
-                'error' => session()->pull('error'),
-            ],
-            'sidebar' => fn () => auth()->guest() ? [] : (new SidebarEntries)->getFilteredEntries(),
-            'user' => fn () => auth()->guest() ? '' : UserRessource::make(
-                User::with([
-                    'mainCharacter',
-                    'characters' => [
-                        'corporation',
-                        'refreshToken',
-                        'alliance',
-                        'characterAffiliation',
-                    ],
-                ])
-                    ->where('id', auth()->user()->getAuthIdentifier())
-                    ->first()
-            ),
-            'errors' => fn () => Session::get('errors')
-                ? Session::get('errors')->getBag('default')->getMessages()
-                : (object) [],
-            'images' => fn () => [
-                'logo' => asset(config('web.images.logo')),
-                'icon' => asset(config('web.images.icon')),
-            ],
-        ]);
 
         // Add Migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations/');
@@ -190,13 +139,22 @@ class WebServiceProvider extends ServiceProvider
         $router->aliasMiddleware('auth', Authenticate::class);
 
         /*
-         * Localization: resolve + set the request locale before controllers/props run.
+         * Append our web-group middleware through the HTTP kernel rather than the
+         * router. The kernel's constructor runs syncMiddlewareToRouter(), which
+         * *replaces* the router's group definitions with the kernel's own
+         * $middlewareGroups — so anything pushed straight onto the router
+         * ($router->pushMiddlewareToGroup) is lost whenever the kernel is resolved
+         * after this provider boots. Under normal FPM the kernel is built first
+         * (public/index.php) so a router push survives; but Pest's in-process
+         * browser server resolves the kernel lazily *after* boot, wiping it and
+         * leaving Inertia shared props unshared (renders a blank #app). Appending
+         * via the kernel mutates $middlewareGroups itself, so it persists across
+         * every re-sync. Order matters: SetLocale sets the locale that
+         * HandleInertiaRequests then shares.
          */
-        $router->pushMiddlewareToGroup('web', SetLocale::class);
-
-        // Inertia.JS adding
-        // $router->pushMiddlewareToGroup('web', Middleware::class);
-        $router->pushMiddlewareToGroup('web', HandleInertiaRequests::class);
+        $kernel = $this->app->make(HttpKernel::class);
+        $kernel->appendMiddlewareToGroup('web', SetLocale::class);
+        $kernel->appendMiddlewareToGroup('web', HandleInertiaRequests::class);
 
         // Add acl-permission Middelware
         $router->aliasMiddleware('permission', PermissionMiddleware::class);
