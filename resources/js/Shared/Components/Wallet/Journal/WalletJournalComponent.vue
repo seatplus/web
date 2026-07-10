@@ -35,11 +35,12 @@
         </div>
       </div>
 
-      <!-- Character wallets: native Inertia infinite scroll over a page scroll prop -->
+      <!-- Character + corporation wallets both use native Inertia infinite scroll
+           over a page scroll prop (keyed per character, or per corporation+division). -->
       <InfiniteScroll
-        v-if="!division"
         :data="scrollKey"
         :items-element="`#${scrollBodyId}`"
+        preserve-url
       >
         <ul
           :id="scrollBodyId"
@@ -53,25 +54,6 @@
           />
         </ul>
       </InfiniteScroll>
-
-      <!-- Corporation wallets: legacy axios loader (not yet migrated to InfiniteScroll) -->
-      <ul
-        v-else
-        class="relative z-0 divide-y divide-gray-200"
-      >
-        <InfiniteLoadingHelper
-          v-slot="{results}"
-          :route-name="routeName"
-          :params="routeParameters"
-        >
-          <WalletJournalRowComponent
-            v-for="(entry, index) in results"
-            :key="entry.id"
-            :entry="entry"
-            :even="index%2"
-          />
-        </InfiniteLoadingHelper>
-      </ul>
     </div>
   </CardWithHeader>
 </template>
@@ -80,14 +62,12 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
 import { InfiniteScroll } from "@inertiajs/vue3";
 
 export default {
     name: "WalletJournalComponent",
     components: {
         InfiniteScroll,
-        InfiniteLoadingHelper,
         EntityByIdBlock,
         WalletJournalRowComponent,
         CardWithHeader
@@ -108,41 +88,24 @@ export default {
             default: () => new Object()
         }
     },
-    data() {
-        return {
-            infiniteId: +new Date(),
-        }
-    },
     computed: {
-        // Character journal is delivered as a page scroll prop keyed by character id
-        // (WalletsController::index), consumed by <InfiniteScroll :data="scrollKey">.
+        // The journal is delivered as a page scroll prop (WalletsController /
+        // CorporationWalletController::index): keyed per character, or per
+        // corporation+division for corporate wallets, and consumed by
+        // <InfiniteScroll :data="scrollKey">.
         scrollKey() {
-            return `journal_${this.id}`
+            return this.division
+                ? `journal_${this.id}_${this.division.division_id}`
+                : `journal_${this.id}`
         },
         scrollBodyId() {
-            return `journal-body-${this.id}`
+            return this.division
+                ? `journal-body-${this.id}-${this.division.division_id}`
+                : `journal-body-${this.id}`
         },
         journalEntries() {
             return this.$page.props[this.scrollKey]?.data ?? []
-        },
-        routeName() {
-            return this.division? 'corporation.wallet_journal.detail' : 'character.wallet_journal.detail'
-        },
-        routeParameters() {
-
-            let parameters = _.merge({ character_id: this.id }, this.filters)
-
-            if(this.division)
-                parameters = _.merge(parameters, {
-                    division_id: this.division.division_id,
-                    corporation_id: this.division.corporation_id
-                })
-
-            return parameters
         }
-    },
-    created() {
-        this.infiniteId += 1;
     }
 }
 </script>

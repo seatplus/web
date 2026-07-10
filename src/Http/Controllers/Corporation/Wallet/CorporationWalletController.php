@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -46,20 +47,37 @@ class CorporationWalletController extends Controller
             ->setIsCharacter(false)
             ->create(WalletJournal::class);
 
+        $divisions = $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject);
+
+        // One infinite-scroll prop per corporation+division wallet (the page renders
+        // a card per division), each with its own pageName so scroll state is
+        // independent; <InfiniteScroll> reads it via the matching key.
+        $journals = $divisions->mapWithKeys(fn ($division) => [
+            "journal_{$division->corporation_id}_{$division->division_id}" => Inertia::scroll(
+                fn () => $this->journalQuery($division->corporation_id, $division->division_id)
+                    ->paginate(pageName: "journal_{$division->corporation_id}_{$division->division_id}"),
+            ),
+        ])->all();
+
         return inertia('Corporation/Wallets/Wallet', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
+            'corporationDivisions' => $divisions,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            ...$journals,
         ]);
     }
 
     public function journal(int $corporation_id, int $division_id): LengthAwarePaginator
     {
+        return $this->journalQuery($corporation_id, $division_id)->paginate();
+    }
+
+    private function journalQuery(int $corporation_id, int $division_id): Builder
+    {
         return WalletJournal::where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
             ->with('walletJournable')
-            ->orderByDesc('date')
-            ->paginate();
+            ->orderByDesc('date');
     }
 
     public function balance(int $corporation_id, int $division_id): LengthAwarePaginator
