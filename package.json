@@ -36,7 +36,7 @@
         "@seregpie/vue-storage": "^1.1.1",
         "@vueuse/core": "^14.0.0",
         "chart.js": "^4.0.0",
-        "dayjs": "^1.10.4",
+        "dayjs": "^1.11.21",
         "lodash": "^4.17.20",
         "metric-prefix": "^0.9.0",
         "uuid": "^14.0.0",
