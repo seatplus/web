@@ -122,7 +122,7 @@ export default {
         },
         sub_text_class() {
 
-            let size = ''
+            let size
             switch (this.nameFontSize) {
                 case 'xs':
                 case 'sm':
