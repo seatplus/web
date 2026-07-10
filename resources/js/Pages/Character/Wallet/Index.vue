@@ -13,12 +13,15 @@
 
 
     <div class="space-y-4">
-      <WalletFilter v-model="filter" />
+      <WalletFilter
+        v-model="filter"
+        :ref-types="ref_types"
+      />
       <WalletComponent
         v-for="character_id of character_ids"
         :id="character_id"
         :key="character_id"
-        :filters="{ref_type: ref_types}"
+        :filters="{ref_type: filter}"
       />
     </div>
   </div>
@@ -31,6 +34,7 @@ import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelection
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import WalletFilter from "@/Shared/Components/Wallet/WalletFilter.vue";
+import { router } from "@inertiajs/vue3";
 
 export default {
     name: "Index",
@@ -50,19 +54,40 @@ export default {
         character_ids: {
             required: true,
             type: Array
+        },
+        // Available ref_type options for the filter (WalletsController::index) —
+        // passed as a prop so the filter needs no autosuggest endpoint (no axios/Ziggy).
+        ref_types: {
+            required: false,
+            type: Array,
+            default: () => []
         }
     },
     data() {
         return {
-          pageTitle: 'Character Wallets',
-            entities: [],
-            ready: false,
-            filter: []
+            pageTitle: 'Character Wallets',
+            filter: [] // selected ref_type strings
         }
     },
     computed: {
-        ref_types() {
-            return _.map(this.filter, (ref_type) => ref_type.name)
+        // Scroll-prop keys for every character card (WalletsController::index).
+        journalKeys() {
+            return this.character_ids.map((id) => `journal_${id}`)
+        }
+    },
+    watch: {
+        // The ref_type filter is a page-level query param: reload only the journal
+        // scroll props so <InfiniteScroll> resets to the filtered first page.
+        filter(newValue) {
+            router.reload({
+                only: this.journalKeys,
+                // reset: without it InfiniteScroll *merges* the filtered page onto the
+                // existing rows instead of replacing them, so the filter looks ignored.
+                reset: this.journalKeys,
+                data: { ref_type: newValue },
+                preserveState: true,
+                preserveScroll: true,
+            })
         }
     }
 }

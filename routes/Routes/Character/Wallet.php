@@ -25,26 +25,12 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Http\Controllers\Character\WalletsController;
-use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('wallets')
     ->controller(WalletsController::class)
     ->group(function () {
+        // The wallet page delivers journal/transaction (InfiniteScroll) and balance
+        // (deferred) as Inertia props; there are no separate JSON endpoints anymore.
         Route::get('', [WalletsController::class, 'index'])->name('character.wallets');
-
-        $walletJournalPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.WalletJournal::class);
-
-        Route::middleware($walletJournalPermission)
-            ->group(function () {
-
-                Route::get('/{character_id}/journal', [WalletsController::class, 'journal'])->name('character.wallet_journal.detail');
-                Route::get('/{character_id}/balance', [WalletsController::class, 'balance'])->name('character.balance');
-                Route::get('/{character_id}/transaction', [WalletsController::class, 'transaction'])->name('character.wallet_transaction.detail');
-            });
-
-        Route::middleware(CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.WalletJournal::class))
-            ->get('/ref_type', 'journalTypes')->name('wallet.journalTypes');
-
     });

@@ -11,7 +11,12 @@
         </div>
       </div>
     </template>
-    <div class="relative max-h-96 overflow-y-auto">
+    <!-- scroll-region: lets Inertia track/restore this custom scroll container's
+         position, so <InfiniteScroll> merges the next page without jumping to top. -->
+    <div
+      class="relative max-h-96 overflow-y-auto"
+      scroll-region=""
+    >
       <div class="hidden sm:grid sm:grid-cols-12 sm:gap-x-0 sm:gap-y-0.5 grid-flow-row z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-500">
         <div class="px-6 sm:px-3 py-1 col-span-2">
           Date
@@ -30,20 +35,25 @@
         </div>
       </div>
 
-      <ul class="relative z-0 divide-y divide-gray-200">
-        <InfiniteLoadingHelper
-          v-slot="{results}"
-          :route-name="routeName"
-          :params="routeParameters"
+      <!-- Character + corporation wallets both use native Inertia infinite scroll
+           over a page scroll prop (keyed per character, or per corporation+division). -->
+      <InfiniteScroll
+        :data="scrollKey"
+        :items-element="`#${scrollBodyId}`"
+        preserve-url
+      >
+        <ul
+          :id="scrollBodyId"
+          class="relative z-0 divide-y divide-gray-200"
         >
           <WalletJournalRowComponent
-            v-for="(entry, index) in results"
+            v-for="(entry, index) in journalEntries"
             :key="entry.id"
             :entry="entry"
             :even="index%2"
           />
-        </InfiniteLoadingHelper>
-      </ul>
+        </ul>
+      </InfiniteScroll>
     </div>
   </CardWithHeader>
 </template>
@@ -52,12 +62,12 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-import InfiniteLoadingHelper from "../../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
 
 export default {
     name: "WalletJournalComponent",
     components: {
-        InfiniteLoadingHelper,
+        InfiniteScroll,
         EntityByIdBlock,
         WalletJournalRowComponent,
         CardWithHeader
@@ -78,30 +88,24 @@ export default {
             default: () => new Object()
         }
     },
-    data() {
-        return {
-            infiniteId: +new Date(),
-        }
-    },
     computed: {
-        routeName() {
-            return this.division? 'corporation.wallet_journal.detail' : 'character.wallet_journal.detail'
+        // The journal is delivered as a page scroll prop (WalletsController /
+        // CorporationWalletController::index): keyed per character, or per
+        // corporation+division for corporate wallets, and consumed by
+        // <InfiniteScroll :data="scrollKey">.
+        scrollKey() {
+            return this.division
+                ? `journal_${this.id}_${this.division.division_id}`
+                : `journal_${this.id}`
         },
-        routeParameters() {
-
-            let parameters = _.merge({ character_id: this.id }, this.filters)
-
-            if(this.division)
-                parameters = _.merge(parameters, {
-                    division_id: this.division.division_id,
-                    corporation_id: this.division.corporation_id
-                })
-
-            return parameters
+        scrollBodyId() {
+            return this.division
+                ? `journal-body-${this.id}-${this.division.division_id}`
+                : `journal-body-${this.id}`
+        },
+        journalEntries() {
+            return this.$page.props[this.scrollKey]?.data ?? []
         }
-    },
-    created() {
-        this.infiniteId += 1;
     }
 }
 </script>

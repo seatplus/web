@@ -28,8 +28,8 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Wallet;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
@@ -46,25 +46,53 @@ class CorporationWalletController extends Controller
             ->setIsCharacter(false)
             ->create(WalletJournal::class);
 
+        $divisions = $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject);
+
+        // One infinite-scroll prop per corporation+division wallet (the page renders
+        // a card per division), each with its own pageName so scroll state is
+        // independent; <InfiniteScroll> reads it via the matching key.
+        $journals = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
+            "journal_{$division->corporation_id}_{$division->division_id}" => Inertia::scroll(
+                fn () => $this->journalQuery($division->corporation_id, $division->division_id)
+                    ->paginate(pageName: "journal_{$division->corporation_id}_{$division->division_id}"),
+            ),
+        ])->all();
+
+        $transactions = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
+            "transaction_{$division->corporation_id}_{$division->division_id}" => Inertia::scroll(
+                fn () => $this->transactionQuery($division->corporation_id, $division->division_id)
+                    ->paginate(pageName: "transaction_{$division->corporation_id}_{$division->division_id}"),
+            ),
+        ])->all();
+
+        // Balance chart data — deferred, replacing the old client-side axios fetch.
+        $balances = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
+            "balance_{$division->corporation_id}_{$division->division_id}" => Inertia::defer(
+                fn () => $this->balanceData($division->corporation_id, $division->division_id),
+            ),
+        ])->all();
+
         return inertia('Corporation/Wallets/Wallet', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporationDivisions' => $this->getAffiliatedCorporateWalletDivisions($dispatchTransferObject),
+            'corporationDivisions' => $divisions,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            ...$journals,
+            ...$transactions,
+            ...$balances,
         ]);
     }
 
-    public function journal(int $corporation_id, int $division_id): LengthAwarePaginator
+    private function journalQuery(int $corporation_id, int $division_id): Builder
     {
         return WalletJournal::where('wallet_journable_id', $corporation_id)
             ->where('division', $division_id)
             ->with('walletJournable')
-            ->orderByDesc('date')
-            ->paginate();
+            ->orderByDesc('date');
     }
 
-    public function balance(int $corporation_id, int $division_id): LengthAwarePaginator
+    private function balanceData(int $corporation_id, int $division_id): Collection
     {
-        $entries = WalletJournal::query()
+        return WalletJournal::query()
             ->select(DB::raw('DATE(date) as x'), DB::raw('AVG(balance) as y'))
             ->orderByDesc('x')
             ->where('wallet_journable_id', $corporation_id)
@@ -72,17 +100,14 @@ class CorporationWalletController extends Controller
             ->groupBy('x')
             ->limit(30)
             ->get();
-
-        return new LengthAwarePaginator($entries, 30, 30);
     }
 
-    public function transaction(int $corporation_id, int $division_id): LengthAwarePaginator
+    private function transactionQuery(int $corporation_id, int $division_id): Builder
     {
         return WalletTransaction::where('wallet_transactionable_id', $corporation_id)
             ->where('division', $division_id)
             ->with('type', 'location')
-            ->orderByDesc('date')
-            ->paginate();
+            ->orderByDesc('date');
     }
 
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject): Collection
