@@ -52,14 +52,14 @@ class CorporationWalletController extends Controller
         // One infinite-scroll prop per corporation+division wallet (the page renders
         // a card per division), each with its own pageName so scroll state is
         // independent; <InfiniteScroll> reads it via the matching key.
-        $journals = $divisions->mapWithKeys(fn ($division) => [
+        $journals = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
             "journal_{$division->corporation_id}_{$division->division_id}" => Inertia::scroll(
                 fn () => $this->journalQuery($division->corporation_id, $division->division_id)
                     ->paginate(pageName: "journal_{$division->corporation_id}_{$division->division_id}"),
             ),
         ])->all();
 
-        $transactions = $divisions->mapWithKeys(fn ($division) => [
+        $transactions = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
             "transaction_{$division->corporation_id}_{$division->division_id}" => Inertia::scroll(
                 fn () => $this->transactionQuery($division->corporation_id, $division->division_id)
                     ->paginate(pageName: "transaction_{$division->corporation_id}_{$division->division_id}"),
@@ -67,7 +67,7 @@ class CorporationWalletController extends Controller
         ])->all();
 
         // Balance chart data — deferred, replacing the old client-side axios fetch.
-        $balances = $divisions->mapWithKeys(fn ($division) => [
+        $balances = $divisions->mapWithKeys(fn (CorporationDivision $division) => [
             "balance_{$division->corporation_id}_{$division->division_id}" => Inertia::defer(
                 fn () => $this->balanceData($division->corporation_id, $division->division_id),
             ),
