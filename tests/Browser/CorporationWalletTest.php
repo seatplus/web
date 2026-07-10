@@ -1,56 +1,31 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationDivision;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
-use Seatplus\Web\Models\Onboarding;
 
 /*
- * Corporation wallet infinite-scroll browser test.
+ * Corporation wallet browser test.
  *
  * The corporation wallet is division-scoped: both lists render
- * journal_<corporation>_<division> / transaction_<corporation>_<division> scroll
- * props. Access is granted by the in-game Director corp role (CharacterRole
- * roles => ['Director']) — not superuser — which CanUserService accepts, so this
- * mirrors a real director viewing their corp wallet.
- *
- * CorporationDivision is created directly (its factory has a `division_typ` typo vs.
- * the real `division_type` column). Factory-name guessing is set in core's TestCase.
+ * journal_<corporation>_<division> / transaction_<corporation>_<division> scroll props.
+ * Access is granted by the in-game Director corp role (giveCorporationRole) — not
+ * superuser — which CanUserService accepts, mirroring a real director viewing their
+ * corp wallet. CorporationDivision is created directly (its factory has a `division_typ`
+ * typo vs. the real `division_type` column). Provisioning helpers live in
+ * tests/Browser/Pest.php.
  */
 
 uses(RefreshDatabase::class);
 
 it('merges the next corporation journal and transaction pages in on scroll', function () {
-    Queue::fake();
-
-    $character = CharacterInfo::factory()->create();
+    $character = actingAsCharacter();
     $corporationId = $character->corporation->corporation_id;
 
-    $user = new User;
-    $user->main_character_id = $character->character_id;
-    $user->save();
-
-    CharacterUser::create([
-        'user_id' => $user->getKey(),
-        'character_id' => $character->character_id,
-        'character_owner_hash' => sha1((string) $character->character_id),
-    ]);
-
-    Onboarding::create(['user_id' => $user->getKey()]);
-
     // Director corp role → grants corp wallet access (no superuser / Spatie permission).
-    // CharacterInfo::factory() already creates an (empty) CharacterRole, so update it.
-    CharacterRole::updateOrCreate(
-        ['character_id' => $character->character_id],
-        ['roles' => ['Director']],
-    );
+    giveCorporationRole($character);
 
     // The wallet division the page renders a card for.
     CorporationDivision::create([
@@ -78,17 +53,13 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
             'division' => 1,
         ]);
 
-    $this->actingAs($user);
-
+    // Scroll a list's own container to the bottom → InfiniteScroll's end trigger fires
+    // and merges the next page. assertScript auto-polls until the row count grows.
     $assertScrollMerges = function ($page, string $bodyId) {
         $rows = "#{$bodyId} > li";
-        // First page only (seeded 40 > the 15/page default, so not everything loads).
         $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
         expect($before)->toBeGreaterThan(0);
 
-        // Scroll the list's own container to the bottom → InfiniteScroll's end trigger
-        // fires and merges the next page. assertScript auto-polls until the row count
-        // grows, so there's no fixed-wait timing assumption.
         $page->script("document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6)");
         $page->assertScript("document.querySelectorAll('{$rows}').length > {$before}");
     };

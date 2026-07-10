@@ -1,24 +1,16 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Models\Onboarding;
 
 /*
  * Authentication browser tests — run against the real assembled core app (never under
  * web's Testbench harness; web's phpunit.xml excludes tests/Browser). They execute
  * both in core's browser CI (against the released web package) and in a web PR's
  * browser job (which clones core and overlays the branch). visit()/assertNoSmoke()/
- * screenshot() come from pest-plugin-browser, provided by the core app.
+ * screenshot() come from pest-plugin-browser, provided by the core app; user
+ * provisioning comes from the suite helpers in tests/Browser/Pest.php.
  *
- * Ordered unauthenticated first, then authenticated. Provisioning uses ONE
- * CharacterInfo linked as the main character rather than User::factory(), whose
- * two-character graph has intermittently-colliding CharacterAffiliation ids and
- * renders the dashboard blank. Queue is faked so character-creation events don't
- * dispatch real ESI jobs. Factory-name guessing is set in core's tests/TestCase.
+ * Ordered unauthenticated first, then authenticated.
  */
 
 uses(RefreshDatabase::class);
@@ -35,31 +27,8 @@ it('renders the login page', function () {
 
 /* --------------------------------------------------------------- authenticated */
 
-function provisionAuthenticatedUser(): CharacterInfo
-{
-    Queue::fake();
-
-    $character = CharacterInfo::factory()->create();
-
-    $user = new User;
-    $user->main_character_id = $character->character_id;
-    $user->save();
-
-    CharacterUser::create([
-        'user_id' => $user->getKey(),
-        'character_id' => $character->character_id,
-        'character_owner_hash' => sha1((string) $character->character_id),
-    ]);
-
-    Onboarding::create(['user_id' => $user->getKey()]);
-
-    test()->actingAs($user);
-
-    return $character;
-}
-
 it('renders the dashboard for an authenticated user', function () {
-    provisionAuthenticatedUser();
+    actingAsCharacter();
 
     $page = visit('/home');
 
@@ -75,7 +44,7 @@ it('renders the dashboard for an authenticated user', function () {
 });
 
 it('wires the character portrait to the EVE image server', function () {
-    $character = provisionAuthenticatedUser();
+    $character = actingAsCharacter();
 
     $page = visit('/home');
 

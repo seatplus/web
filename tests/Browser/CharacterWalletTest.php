@@ -1,50 +1,23 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
-use Seatplus\Web\Models\Onboarding;
 
 /*
  * Character wallet browser tests — run against the real assembled core app.
  *
  * Covers the modernized wallet view: journal + transaction infinite scroll (Inertia
  * <InfiniteScroll> over scroll props) and the prop-fed ref_type filter. No permission
- * is granted — a user always sees their OWN character's wallet. Factory-name guessing
- * for the seatplus packages is set in core's tests/TestCase::setUp.
+ * is granted — a user always sees their OWN character's wallet. Provisioning comes from
+ * the suite helper actingAsCharacter() (tests/Browser/Pest.php).
  */
 
 uses(RefreshDatabase::class);
 
-function authenticateWalletCharacter(): CharacterInfo
-{
-    Queue::fake();
-
-    $character = CharacterInfo::factory()->create();
-
-    $user = new User;
-    $user->main_character_id = $character->character_id;
-    $user->save();
-
-    CharacterUser::create([
-        'user_id' => $user->getKey(),
-        'character_id' => $character->character_id,
-        'character_owner_hash' => sha1((string) $character->character_id),
-    ]);
-
-    Onboarding::create(['user_id' => $user->getKey()]);
-
-    test()->actingAs($user);
-
-    return $character;
-}
-
 it('merges the next journal and transaction pages in on scroll', function () {
-    $character = authenticateWalletCharacter();
+    $character = actingAsCharacter();
 
     // 40 journal + 40 transaction rows, 6h apart (adjacent entries never more than a
     // day apart), spanning several paginator pages (default 15/page).
@@ -89,7 +62,7 @@ it('merges the next journal and transaction pages in on scroll', function () {
 });
 
 it('filters the wallet journal by ref_type (and resets, not merges)', function () {
-    $character = authenticateWalletCharacter();
+    $character = actingAsCharacter();
 
     // 30 player_donation (newest) + 3 bounty (oldest), 6h apart. So the unfiltered
     // first page is all player_donation; filtering to bounty must surface exactly 3.
