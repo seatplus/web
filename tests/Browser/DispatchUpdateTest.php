@@ -8,6 +8,7 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
+use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
 /*
@@ -23,6 +24,23 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
  */
 
 uses(RefreshDatabase::class);
+
+// updateRefreshTokenWithScopes lives in the web package's tests/Pest.php, which is NOT
+// loaded in the core browser context (only actingAsCharacter/giveCorporationRole are).
+// Define it here, guarded, so the synced browser test has it.
+if (! function_exists('updateRefreshTokenWithScopes')) {
+    function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes): RefreshToken
+    {
+        $helper_token = RefreshToken::factory()->scopes($scopes)->make([
+            'character_id' => $refreshToken->character_id,
+        ]);
+
+        $refreshToken->token = $helper_token->token;
+        $refreshToken->save();
+
+        return $refreshToken;
+    }
+}
 
 it('lists the user\'s own character in the update sidebar', function () {
     $character = actingAsCharacter();
