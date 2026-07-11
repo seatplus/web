@@ -34,9 +34,9 @@
           v-if="status === 'ready'"
           class="h-8 w-8 text-gray-400"
         />
-        <PlayIcon
+        <ArrowPathIcon
           v-if="status === 'pending'"
-          class="h-8 w-8 text-amber-400"
+          class="h-8 w-8 text-amber-400 animate-spin"
         />
         <CheckCircleIcon
           v-if="status === 'finished'"
@@ -54,14 +54,14 @@
 <script>
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
-import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
+import { PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import axios from "axios";
 import { usePage } from "@inertiajs/vue3";
 
 export default {
     name: "DispatchableEntry",
-    components: {Time, EveImage, PlayIcon, CheckCircleIcon, XCircleIcon},
+    components: {Time, EveImage, PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon},
     props: {
         entry: {
             type: Object,
