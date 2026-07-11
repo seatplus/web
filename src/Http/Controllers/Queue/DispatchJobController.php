@@ -87,17 +87,18 @@ class DispatchJobController extends Controller
             'manual_job' => ['required', fn (string $attribute, mixed $value, \Closure $fail) => in_array($value, $this->web_jobs->getJobKeys()) ?: $fail($attribute.' is invalid.')],
             'permission' => ['required'],
             'required_scopes' => ['required', 'array'],
-            'required_corporation_role' => ['nullable', 'string'],
+            'required_corporation_role' => ['present', 'array'],
+            'required_corporation_role.*' => ['string'],
         ]);
 
         $permission = data_get($validated_data, 'permission');
-        $corporation_role = data_get($validated_data, 'required_corporation_role');
+        $corporation_roles = data_get($validated_data, 'required_corporation_role', []);
 
-        $isCorporationScope = (bool) $corporation_role;
+        $isCorporationScope = filled($corporation_roles);
 
         $affiliated_ids = $this->getAffiliatedIds->get(
             permissions: [$permission],
-            corporationRoles: $isCorporationScope ? [$corporation_role] : [],
+            corporationRoles: $corporation_roles,
         );
 
         $tokens = RefreshToken::query()
@@ -108,13 +109,13 @@ class DispatchJobController extends Controller
             ->when(
                 $isCorporationScope,
                 fn (LazyCollection $tokens) => $tokens
-                    ->filter(function (RefreshToken $token) use ($request): bool {
+                    ->filter(function (RefreshToken $token) use ($corporation_roles): bool {
                         /** @var CharacterInfo $character */
                         $character = $token->character;
                         /** @var CharacterRole $roles */
                         $roles = $character->roles;
 
-                        return $roles->hasRole('roles', $request->get('required_corporation_role'));
+                        return collect($corporation_roles)->contains(fn (string $role) => $roles->hasRole('roles', $role));
                     })
                     ->unique(fn (RefreshToken $token) => $token->corporation_id)
             )

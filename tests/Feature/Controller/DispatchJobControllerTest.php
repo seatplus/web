@@ -6,13 +6,17 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
+use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
 beforeEach(function () {
+    // The real DispatchTransferObject always emits required_corporation_role as an
+    // array (empty for character scopes), so the tests must post it that way — an
+    // earlier string payload masked the entities endpoint rejecting the array.
     test()->dispatch_transfer_object = [
         'manual_job' => 'contacts',
         'permission' => config('eveapi.permissions.'.Contact::class),
         'required_scopes' => config('eveapi.scopes.character.contacts'),
-        'required_corporation_role' => '',
+        'required_corporation_role' => [],
     ];
 
     Contact::factory()->create([
@@ -73,7 +77,7 @@ test('one get dispatchable corporation entities', function () {
 
     expect($dispatch_transfer_object)->toBeArray();
 
-    $dispatch_transfer_object = Arr::set($dispatch_transfer_object, 'required_corporation_role', 'Director');
+    $dispatch_transfer_object = Arr::set($dispatch_transfer_object, 'required_corporation_role', ['Director']);
 
     // make test character a director of the corporation
     Event::fakeFor(function () {
@@ -109,5 +113,29 @@ test('one get dispatchable corporation entities', function () {
                     ->etc()
             )
                 ->etc()
+        );
+});
+
+test('entities endpoint accepts the real DispatchTransferObject payload', function () {
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, config('eveapi.scopes.character.contacts'));
+
+    // Build the payload the frontend actually sends (serialized DispatchTransferObject)
+    // rather than a hand-crafted array, so a drift between the DTO shape and the
+    // endpoint's validation (e.g. array vs string role) fails here.
+    $dispatch_transfer_object = CreateDispatchTransferObject::new()->create(Contact::class);
+    $payload = json_decode(json_encode($dispatch_transfer_object), true);
+
+    expect($payload['required_corporation_role'])->toBeArray();
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('manual_job.entities'), $payload)
+        ->assertStatus(200)
+        ->assertJson(
+            fn (AssertableJson $json) => $json->has(
+                'data.0',
+                fn (AssertableJson $data) => $data->where('character_id', test()->test_character->character_id)
+                    ->where('batch.state', 'ready')
+                    ->etc()
+            )->etc()
         );
 });

@@ -85,9 +85,9 @@ export default {
                 .then(result => status.value = result.data.state)
         }
 
-        onBeforeMount(async () => {
+        onBeforeMount(() => {
             if(batch_id.value)
-                await getStatus
+                getStatus()
         })
 
         watch(status, (newValue, oldValue) => {
