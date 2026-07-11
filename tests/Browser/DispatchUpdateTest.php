@@ -42,6 +42,17 @@ if (! function_exists('updateRefreshTokenWithScopes')) {
     }
 }
 
+// The Update SlideOver teleports into <div id="destination"> (app.blade.php), which is
+// outside the page's own content. The wallet pages also render a card per character/
+// corporation with the same name, so page-wide assertSee/assertDontSee can't tell the
+// sidebar apart — scope assertions to #destination.
+if (! function_exists('dispatchSidebarSees')) {
+    function dispatchSidebarSees(string $text): string
+    {
+        return "(document.querySelector('#destination')?.innerText ?? '').includes(".json_encode($text).')';
+    }
+}
+
 it('lists the user\'s own character in the update sidebar', function () {
     $character = actingAsCharacter();
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.character.wallet'));
@@ -51,7 +62,7 @@ it('lists the user\'s own character in the update sidebar', function () {
 
     $page->click('Update');
     $page->waitForText('Your characters');
-    $page->assertSee($character->name);
+    $page->assertScript(dispatchSidebarSees($character->name));
 
     $page->screenshot(true, 'dispatch-owned-character');
 });
@@ -85,14 +96,14 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     $page->click('Update');
     $page->waitForText('Your characters');
 
-    // Owned section shows the user's own character; the affiliated one is not loaded yet.
-    $page->assertSee($character->name);
-    $page->assertDontSee($affiliated_character->name);
+    // Owned section shows the user's own character; the affiliated one isn't in the
+    // sidebar yet (it also renders as a page card, hence the #destination scope).
+    $page->assertScript(dispatchSidebarSees($character->name));
+    $page->assertScript('! '.dispatchSidebarSees($affiliated_character->name));
 
-    // Expanding the affiliated section lazily loads the non-owned character.
+    // Expanding the affiliated section lazily loads the non-owned character into the sidebar.
     $page->click('Affiliated characters');
-    $page->waitForText($affiliated_character->name);
-    $page->assertSee($affiliated_character->name);
+    $page->assertScript(dispatchSidebarSees($affiliated_character->name));
 
     $page->screenshot(true, 'dispatch-affiliated-character');
 });
@@ -108,12 +119,12 @@ it('lists the corporation in the update sidebar on a corporation-scoped page', f
     );
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.corporation.wallet'));
 
-    $page = visit('/corporation/wallets');
+    $page = visit('/corporation/wallet');
     $page->assertNoSmoke();
 
     $page->click('Update');
     $page->waitForText('Your corporations');
-    $page->assertSee($character->corporation->name);
+    $page->assertScript(dispatchSidebarSees($character->corporation->name));
 
     $page->screenshot(true, 'dispatch-owned-corporation');
 });
