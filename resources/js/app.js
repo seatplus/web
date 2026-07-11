@@ -25,10 +25,13 @@ createInertiaApp({
     resolve: async (name) => {
         const module = await resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue'));
 
-        // Default persistent layout for pages that don't set their own. Assign it
-        // before returning (not in a fire-and-forget .then) so it's applied on the
-        // initial mount.
-        module.default.layout ??= SingleColumnLayout;
+        // Default persistent layout only for pages that don't declare one at all. Use
+        // `=== undefined` (not ??=) so a page that opts out with an explicit `layout: null`
+        // — e.g. mails, which render their own MultiColumnLayout — isn't double-wrapped
+        // with SingleColumnLayout (which stacks a second sidebar).
+        if (module.default.layout === undefined) {
+            module.default.layout = SingleColumnLayout;
+        }
 
         return module;
     },
