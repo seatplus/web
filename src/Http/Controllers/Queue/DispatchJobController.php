@@ -99,13 +99,21 @@ class DispatchJobController extends Controller
 
         $isCorporationScope = filled($corporation_roles);
 
-        $affiliated_ids = $this->getAffiliatedIds->get(
-            permissions: [$permission],
-            corporationRoles: $corporation_roles,
-        );
+        // The user's own characters come from the cached permission object (no query). The
+        // owned section scopes straight to them; only the affiliated section pays for the
+        // broader affiliation resolve — and it drops owned characters so the two sections
+        // never overlap and the eager owned list stays O(own characters), not O(affiliated).
+        $owned_character_ids = $this->getAffiliatedIds->ownedCharacterIds();
 
-        $scoped_tokens = RefreshToken::query()
-            ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids))
+        $character_ids = $ownership === 'owned'
+            ? $owned_character_ids
+            : array_values(array_diff(
+                $this->getAffiliatedIds->get(permissions: [$permission], corporationRoles: $corporation_roles),
+                $owned_character_ids,
+            ));
+
+        $tokens = RefreshToken::query()
+            ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $character_ids))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn (RefreshToken $token) => collect($validated_data['required_scopes'])->intersect($token->scopes)->isNotEmpty())
@@ -122,9 +130,17 @@ class DispatchJobController extends Controller
             )
             ->collect();
 
-        $owned_ids = $this->getOwnedIds($scoped_tokens, $isCorporationScope);
+        // Corp scope, affiliated section: drop corporations the user already manages through
+        // one of their own characters, so a corporation never appears in both sections.
+        if ($isCorporationScope && $ownership === 'affiliated') {
+            $owned_corporation_ids = CharacterInfo::query()
+                ->whereIn('character_id', $owned_character_ids)
+                ->pluck('corporation_id');
 
-        $entities = $scoped_tokens
+            $tokens = $tokens->reject(fn (RefreshToken $token) => $owned_corporation_ids->contains($token->corporation_id));
+        }
+
+        $entities = $tokens
             ->when($isCorporationScope, fn (Collection $tokens) => $tokens->unique(fn (RefreshToken $token) => $token->corporation_id))
             ->map(function (RefreshToken $token) use ($isCorporationScope, $validated_data): array {
                 /** @var CharacterInfo $character */
@@ -139,45 +155,9 @@ class DispatchJobController extends Controller
                     'batch' => $this->getBatchStatus(cache($this->getCacheKey($validated_data['manual_job'], $isCorporationScope ? $token->corporation_id : $token->character_id))),
                 ])->filter()->toArray();
             })
-            ->filter(fn (array $entity) => $this->matchesOwnership($entity, $owned_ids, $isCorporationScope, $ownership))
             ->values();
 
         return $this->paginate($entities, $request);
-    }
-
-    /**
-     * Ids the user owns outright: their own characters, or — for corporation scoped
-     * jobs — the corporations any of their own (role-holding) characters sit in.
-     *
-     * @param  Collection<int, RefreshToken>  $scoped_tokens
-     * @return array<int, int>
-     */
-    private function getOwnedIds(Collection $scoped_tokens, bool $isCorporationScope): array
-    {
-        $owned_character_ids = $this->getOwnedCharacterIds();
-
-        if (! $isCorporationScope) {
-            return $owned_character_ids;
-        }
-
-        return $scoped_tokens
-            ->filter(fn (RefreshToken $token) => in_array($token->character_id, $owned_character_ids, true))
-            ->map(fn (RefreshToken $token) => $token->corporation_id)
-            ->unique()
-            ->values()
-            ->all();
-    }
-
-    /**
-     * @param  array<string, mixed>  $entity
-     * @param  array<int, int>  $owned_ids
-     */
-    private function matchesOwnership(array $entity, array $owned_ids, bool $isCorporationScope, string $ownership): bool
-    {
-        $id = $isCorporationScope ? $entity['corporation_id'] : $entity['character_id'];
-        $isOwned = in_array($id, $owned_ids, true);
-
-        return $ownership === 'owned' ? $isOwned : ! $isOwned;
     }
 
     /**

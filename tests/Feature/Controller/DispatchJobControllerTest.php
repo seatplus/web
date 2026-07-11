@@ -151,11 +151,15 @@ test('partitions entities into owned and affiliated by the ownership flag', func
     $affiliated_character = $affiliated_user->characters->first();
     updateRefreshTokenWithScopes($affiliated_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
 
-    // both characters are in the user's manageable scope
-    test()->mock(GetAffiliatedIds::class, fn ($mock) => $mock->shouldReceive('get')->andReturn([
-        test()->test_character->character_id,
-        $affiliated_character->character_id,
-    ]));
+    // owned resolves straight from the cached permission object; the affiliated set is
+    // the full manageable scope (owned is diffed out by the controller).
+    test()->mock(GetAffiliatedIds::class, function ($mock) use ($affiliated_character) {
+        $mock->shouldReceive('ownedCharacterIds')->andReturn([test()->test_character->character_id]);
+        $mock->shouldReceive('get')->andReturn([
+            test()->test_character->character_id,
+            $affiliated_character->character_id,
+        ]);
+    });
 
     test()->actingAs(test()->test_user)
         ->postJson(route('manual_job.entities'), [...test()->dispatch_transfer_object, 'ownership' => 'owned'])
