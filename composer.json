@@ -52,13 +52,6 @@
     },
     "scripts": {
         "lint": "vendor/bin/pint",
-        "wayfinder": "@php vendor/bin/testbench wayfinder:generate --path=resources/js",
-        "post-install-cmd": [
-            "@wayfinder"
-        ],
-        "post-update-cmd": [
-            "@wayfinder"
-        ],
         "test:lint": "vendor/bin/pint --test",
         "test:types": "vendor/bin/phpstan --ansi",
         "test:type-coverage": "__PEST_PLUGIN_ENV=1 vendor/bin/pest --type-coverage --min=100",

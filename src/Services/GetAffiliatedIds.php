@@ -69,7 +69,9 @@ class GetAffiliatedIds
      */
     public function ownedCharacterIds(?User $user = null): array
     {
-        $user = $user ?? $this->user;
+        // Re-resolve auth() at call time: a container-injected instance may have been
+        // built before the auth middleware ran, leaving $this->user null.
+        $user = $user ?? $this->user ?? auth()->user();
 
         return data_get($this->canUserService->getUserPermissionObject($user), 'owned_character_ids', []);
     }
