@@ -1,0 +1,7 @@
+providers:
+  - Seatplus\Auth\AuthenticationServiceProvider
+  - Seatplus\Eveapi\EveapiServiceProvider
+  - Laravel\Horizon\HorizonServiceProvider
+  - Inertia\ServiceProvider
+  - Spatie\Permission\PermissionServiceProvider
+  - Seatplus\Web\WebServiceProvider
