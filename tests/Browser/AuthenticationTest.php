@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 /*
  * Authentication browser tests — run against the real assembled core app (never under
@@ -14,6 +16,33 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('attachOwnedCharacter')) {
+    /**
+     * Attach an additional owned character to the same user that owns $existing, so a
+     * browser test can exercise the multi-character case — the dashboard renders a card
+     * per every character the logged-in user owns, not just the main. Returns the newly
+     * attached character. Guarded so each Browser test file can define it standalone
+     * without colliding when the suite loads several.
+     */
+    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
+    {
+        $user = CharacterUser::query()
+            ->where('character_id', $existing->character_id)
+            ->firstOrFail()
+            ->user;
+
+        $character = CharacterInfo::factory()->create();
+
+        CharacterUser::create([
+            'user_id' => $user->getKey(),
+            'character_id' => $character->character_id,
+            'character_owner_hash' => sha1((string) $character->character_id),
+        ]);
+
+        return $character;
+    }
+}
 
 /* ------------------------------------------------------------- unauthenticated */
 
@@ -41,6 +70,34 @@ it('renders the dashboard for an authenticated user', function () {
     $page->screenshot(true, 'dashboard');
 
     test()->assertAuthenticated();
+});
+
+it('renders a dashboard card for every character the user owns', function () {
+    $mainCharacter = actingAsCharacter();
+    $secondCharacter = attachOwnedCharacter($mainCharacter);
+
+    $page = visit('/home');
+
+    $page->assertNoSmoke();
+    $page->waitForText('Characters');
+
+    // Portraits lazy-load via EveImage's IntersectionObserver — let them attach.
+    $page->wait(1);
+
+    // The dashboard renders one card (h-12 w-12 portrait) per owned character, not just
+    // the main. Assert both specific portraits resolve, and that exactly two character
+    // portraits render — a main-only dashboard would show a single one.
+    foreach ([$mainCharacter, $secondCharacter] as $character) {
+        $page->assertAttributeContains(
+            "img.h-12.w-12[src*='characters/{$character->character_id}/portrait']",
+            'src',
+            "images.evetech.net/characters/{$character->character_id}/portrait",
+        );
+    }
+
+    $page->assertCount('img.h-12.w-12', 2);
+
+    $page->screenshot(true, 'dashboard-multiple-characters');
 });
 
 it('wires the character portrait to the EVE image server', function () {
