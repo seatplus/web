@@ -34,9 +34,9 @@
           v-if="status === 'ready'"
           class="h-8 w-8 text-gray-400"
         />
-        <PlayIcon
+        <ArrowPathIcon
           v-if="status === 'pending'"
-          class="h-8 w-8 text-amber-400"
+          class="h-8 w-8 text-amber-400 animate-spin"
         />
         <CheckCircleIcon
           v-if="status === 'finished'"
@@ -54,14 +54,15 @@
 <script>
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
-import { PlayIcon, 	CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
+import { PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
-import axios from "axios";
 import { usePage } from "@inertiajs/vue3";
+import { getJson, post } from "@/Functions/http";
+import { getBatchStatus, dispatch } from "@/actions/Seatplus/Web/Http/Controllers/Queue/DispatchJobController";
 
 export default {
     name: "DispatchableEntry",
-    components: {Time, EveImage, PlayIcon, CheckCircleIcon, XCircleIcon},
+    components: {Time, EveImage, PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon},
     props: {
         entry: {
             type: Object,
@@ -73,21 +74,16 @@ export default {
         const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
         const updateStatus = ref()
         const dispatch_transfer_object = computed(() => usePage().props.dispatchTransferObject)
-        const url = computed(() => route('dispatch.job', {
-            character_id: props.entry.character_id,
-            corporation_id: props.entry.corporation_id,
-        }))
         const time = computed(() => _.get(props.entry, 'batch.time'))
 
-        function getStatus() {
-            axios
-                .get(route('get.batch_status', batch_id.value))
-                .then(result => status.value = result.data.state)
+        async function getStatus() {
+            const result = await getJson(getBatchStatus.url(batch_id.value))
+            status.value = result.state
         }
 
-        onBeforeMount(async () => {
+        onBeforeMount(() => {
             if(batch_id.value)
-                await getStatus
+                getStatus()
         })
 
         watch(status, (newValue, oldValue) => {
@@ -102,20 +98,26 @@ export default {
                 clearInterval(updateStatus.value)
         })
 
-        const dispatchJob = async () => await axios.post(url.value, {dispatch_transfer_object: dispatch_transfer_object.value})
-            .then(response => {
-                status.value = 'pending'
-                batch_id.value = response.data
+        const dispatchJob = async () => {
+            try {
+                const response = await post(dispatch.url(), {
+                    character_id: props.entry.character_id,
+                    corporation_id: props.entry.corporation_id,
+                    dispatch_transfer_object: dispatch_transfer_object.value,
+                })
 
+                batch_id.value = (await response.text()).trim()
+                status.value = 'pending'
                 getStatus()
-            })
-            .catch(error => console.log(error))
+            } catch (error) {
+                console.error(error)
+            }
+        }
 
         return {
             status,
             batch_id,
             dispatch_transfer_object,
-            url,
             dispatchJob,
             time
         }

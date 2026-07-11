@@ -102,21 +102,11 @@ jobs:
         run: vendor/bin/pest --no-coverage --shard=${{ matrix.shard }}/4
 
   frontend:
-    name: Frontend Build & Lint
+    name: Frontend Lint
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v7
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
-          coverage: none
-
-      - name: Install Composer dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -127,9 +117,11 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Build assets
-        run: npm run build
-
+      # No `vite build` here on purpose: the frontend imports Wayfinder-generated
+      # @/actions, which only exist inside a real app (this is a package — no artisan).
+      # The full production build is validated by the "Browser (vs core)" job, which
+      # runs `php artisan wayfinder:generate` against core. eslint has no import
+      # resolver, so linting needs no generated files.
       - name: Lint
         run: npm run lint
 
@@ -210,6 +202,9 @@ jobs:
           php artisan key:generate
           php artisan vendor:publish --tag=web-static --force
           php artisan vendor:publish --tag=web --force
+          # Wayfinder actions/routes are gitignored; generate them in the real app so
+          # the build resolves the frontend's @/actions imports.
+          php artisan wayfinder:generate
 
       - name: Copy this PR's browser tests into core
         working-directory: core
