@@ -31,6 +31,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\LazyCollection;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -89,10 +90,12 @@ class DispatchJobController extends Controller
             'required_scopes' => ['required', 'array'],
             'required_corporation_role' => ['present', 'array'],
             'required_corporation_role.*' => ['string'],
+            'ownership' => ['sometimes', 'in:owned,affiliated'],
         ]);
 
         $permission = data_get($validated_data, 'permission');
         $corporation_roles = data_get($validated_data, 'required_corporation_role', []);
+        $ownership = data_get($validated_data, 'ownership', 'owned');
 
         $isCorporationScope = filled($corporation_roles);
 
@@ -101,25 +104,29 @@ class DispatchJobController extends Controller
             corporationRoles: $corporation_roles,
         );
 
-        $tokens = RefreshToken::query()
+        $scoped_tokens = RefreshToken::query()
             ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $affiliated_ids))
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
-            ->filter(fn (RefreshToken $token) => collect($request->get('required_scopes'))->intersect($token->scopes)->isNotEmpty())
+            ->filter(fn (RefreshToken $token) => collect($validated_data['required_scopes'])->intersect($token->scopes)->isNotEmpty())
             ->when(
                 $isCorporationScope,
-                fn (LazyCollection $tokens) => $tokens
-                    ->filter(function (RefreshToken $token) use ($corporation_roles): bool {
-                        /** @var CharacterInfo $character */
-                        $character = $token->character;
-                        /** @var CharacterRole $roles */
-                        $roles = $character->roles;
+                fn (LazyCollection $tokens) => $tokens->filter(function (RefreshToken $token) use ($corporation_roles): bool {
+                    /** @var CharacterInfo $character */
+                    $character = $token->character;
+                    /** @var CharacterRole $roles */
+                    $roles = $character->roles;
 
-                        return collect($corporation_roles)->contains(fn (string $role) => $roles->hasRole('roles', $role));
-                    })
-                    ->unique(fn (RefreshToken $token) => $token->corporation_id)
+                    return collect($corporation_roles)->contains(fn (string $role) => $roles->hasRole('roles', $role));
+                })
             )
-            ->map(function (RefreshToken $token) use ($isCorporationScope, $request): array {
+            ->collect();
+
+        $owned_ids = $this->getOwnedIds($scoped_tokens, $isCorporationScope);
+
+        $entities = $scoped_tokens
+            ->when($isCorporationScope, fn (Collection $tokens) => $tokens->unique(fn (RefreshToken $token) => $token->corporation_id))
+            ->map(function (RefreshToken $token) use ($isCorporationScope, $validated_data): array {
                 /** @var CharacterInfo $character */
                 $character = $token->character;
                 /** @var CorporationInfo $corporation */
@@ -129,12 +136,68 @@ class DispatchJobController extends Controller
                     'character_id' => $isCorporationScope ? null : $token->character_id,
                     'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
                     'name' => $isCorporationScope ? $corporation->name : $character->name,
-                    'batch' => $this->getBatchStatus(cache($this->getCacheKey($request->get('manual_job'), $isCorporationScope ? $token->corporation_id : $token->character_id))),
+                    'batch' => $this->getBatchStatus(cache($this->getCacheKey($validated_data['manual_job'], $isCorporationScope ? $token->corporation_id : $token->character_id))),
                 ])->filter()->toArray();
             })
+            ->filter(fn (array $entity) => $this->matchesOwnership($entity, $owned_ids, $isCorporationScope, $ownership))
             ->values();
 
-        return new LengthAwarePaginator($tokens, $tokens->count(), $request->get('per_page', 10));
+        return $this->paginate($entities, $request);
+    }
+
+    /**
+     * Ids the user owns outright: their own characters, or — for corporation scoped
+     * jobs — the corporations any of their own (role-holding) characters sit in.
+     *
+     * @param  Collection<int, RefreshToken>  $scoped_tokens
+     * @return array<int, int>
+     */
+    private function getOwnedIds(Collection $scoped_tokens, bool $isCorporationScope): array
+    {
+        $owned_character_ids = $this->getOwnedCharacterIds();
+
+        if (! $isCorporationScope) {
+            return $owned_character_ids;
+        }
+
+        return $scoped_tokens
+            ->filter(fn (RefreshToken $token) => in_array($token->character_id, $owned_character_ids, true))
+            ->map(fn (RefreshToken $token) => $token->corporation_id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $entity
+     * @param  array<int, int>  $owned_ids
+     */
+    private function matchesOwnership(array $entity, array $owned_ids, bool $isCorporationScope, string $ownership): bool
+    {
+        $id = $isCorporationScope ? $entity['corporation_id'] : $entity['character_id'];
+        $isOwned = in_array($id, $owned_ids, true);
+
+        return $ownership === 'owned' ? $isOwned : ! $isOwned;
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $items
+     */
+    private function paginate(Collection $items, Request $request): LengthAwarePaginator
+    {
+        $per_page = (int) $request->get('per_page', 10);
+        $page = (int) $request->get('page', 1);
+
+        return new LengthAwarePaginator(
+            $items->forPage($page, $per_page)->values(),
+            $items->count(),
+            $per_page,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
     }
 
     private function getRefreshToken(DispatchIndividualJob $job): ?RefreshToken

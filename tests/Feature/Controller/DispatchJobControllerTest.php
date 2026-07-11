@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Jobs\ManualDispatchedJob;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
+use Seatplus\Web\Services\GetAffiliatedIds;
 
 beforeEach(function () {
     // The real DispatchTransferObject always emits required_corporation_role as an
@@ -138,4 +140,32 @@ test('entities endpoint accepts the real DispatchTransferObject payload', functi
                     ->etc()
             )->etc()
         );
+});
+
+test('partitions entities into owned and affiliated by the ownership flag', function () {
+    // owned: the test user's own character
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
+
+    // affiliated: a character the user may manage but does not own
+    $affiliated_user = Event::fakeFor(fn () => User::factory()->create());
+    $affiliated_character = $affiliated_user->characters->first();
+    updateRefreshTokenWithScopes($affiliated_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
+
+    // both characters are in the user's manageable scope
+    test()->mock(GetAffiliatedIds::class, fn ($mock) => $mock->shouldReceive('get')->andReturn([
+        test()->test_character->character_id,
+        $affiliated_character->character_id,
+    ]));
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('manual_job.entities'), [...test()->dispatch_transfer_object, 'ownership' => 'owned'])
+        ->assertOk()
+        ->assertJsonFragment(['character_id' => test()->test_character->character_id])
+        ->assertJsonMissing(['character_id' => $affiliated_character->character_id]);
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('manual_job.entities'), [...test()->dispatch_transfer_object, 'ownership' => 'affiliated'])
+        ->assertOk()
+        ->assertJsonFragment(['character_id' => $affiliated_character->character_id])
+        ->assertJsonMissing(['character_id' => test()->test_character->character_id]);
 });
