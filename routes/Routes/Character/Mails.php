@@ -25,19 +25,12 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Web\Http\Controllers\Character\MailsController;
-use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('mails')
     ->group(callback: function () {
+        // Mail headers are delivered as the `mailHeaders` Inertia scroll prop by
+        // index(); there's no separate headers JSON endpoint anymore.
         Route::get('', [MailsController::class, 'index'])->name('character.mails');
         Route::get('/content/{mail_id}', [MailsController::class, 'getMail'])->name('get.mail');
-
-        $mailPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Mail::class);
-
-        Route::middleware($mailPermission)
-            ->group(function () {
-                Route::get('/headers/', [MailsController::class, 'mailHeaders'])->name('get.mail.headers');
-            });
     });

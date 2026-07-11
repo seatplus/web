@@ -27,9 +27,8 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -50,13 +49,14 @@ class MailsController extends Controller
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characterIds' => $ids,
+            // Mail headers as a single infinite-scroll prop, scoped to the authorized
+            // characters (both the desktop and mobile lists consume it via <InfiniteScroll>).
+            'mailHeaders' => Inertia::scroll(fn () => $this->mailHeadersQuery($ids->all())->paginate()),
         ]);
     }
 
-    public function mailHeaders(Request $request): LengthAwarePaginator
+    private function mailHeadersQuery(array $character_ids): Builder
     {
-        $character_ids = $request->get('character_ids');
-
         return Mail::query()
             ->select('id', 'from', 'subject', 'timestamp')
             ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
@@ -64,8 +64,7 @@ class MailsController extends Controller
                 CharacterInfo::class,
                 fn (Builder $query) => $query->whereIn('character_id', $character_ids)
             ))
-            ->orderByDesc('timestamp')
-            ->paginate();
+            ->orderByDesc('timestamp');
     }
 
     public function getMail(EsiClient $esi, int $mail_id): Collection

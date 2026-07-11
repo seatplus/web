@@ -1,14 +1,21 @@
 <template>
-  <!--  py-6 px-4 sm:px-6 lg:px-8-->
-  <div class="absolute inset-0 overflow-y-auto">
-    <InfiniteLoadingHelper
-      v-slot="{results}"
-      route-name="get.mail.headers"
-      :params="{character_ids: characterIds}"
+  <!-- scroll-region: lets Inertia preserve this container's scroll position so
+       <InfiniteScroll> merges the next page in place instead of jumping to top. -->
+  <div
+    class="absolute inset-0 overflow-y-auto"
+    scroll-region=""
+  >
+    <InfiniteScroll
+      data="mailHeaders"
+      items-element="#desktop-mail-list"
+      preserve-url
     >
-      <ul class="divide-y divide-gray-200">
+      <ul
+        id="desktop-mail-list"
+        class="divide-y divide-gray-200"
+      >
         <li
-          v-for="mail in mails(results)"
+          v-for="mail in mails"
           :key="mail.id"
           :class="[mail.current ? 'bg-gray-200 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900', 'flex space-x-3 cursor-pointer' ,'py-6 px-4 sm:px-6 lg:px-8 rounded-md ml-1 mr-1']"
           @click="emitSelection(mail.id)"
@@ -36,25 +43,21 @@
           </div>
         </li>
       </ul>
-    </InfiniteLoadingHelper>
-    <!--    <div class="h-full border-2 border-gray-200 border-dashed rounded-lg" />-->
+    </InfiniteScroll>
   </div>
 </template>
 
 <script>
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
 
 export default {
     name: "DesktopMailList",
-    components: {ResolveIdToName, Time, EveImage, InfiniteLoadingHelper},
+    components: {ResolveIdToName, Time, EveImage, InfiniteScroll},
     props: {
-        characterIds: {
-            type: Array,
-            required: true
-        },
         selectedId: {
             required: false
         },
@@ -62,16 +65,15 @@ export default {
     emits: ['update:selectedId'],
     setup(props, {emit}) {
 
+        const page = usePage()
+
         const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
 
-        const mails = (results) => {
-            return _.map(results, result => {
-                return {
-                    ...result,
-                    current: _.isEqual(props.selectedId, result.id)
-                }
-            })
-        }
+        // Mail headers arrive as the page scroll prop; flag the selected one.
+        const mails = computed(() => _.map(page.props.mailHeaders?.data ?? [], result => ({
+            ...result,
+            current: _.isEqual(props.selectedId, result.id),
+        })))
 
         return {
             mails,
