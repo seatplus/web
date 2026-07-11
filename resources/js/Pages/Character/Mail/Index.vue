@@ -5,7 +5,7 @@
         <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
 
-        <PageHeader :page-title="pageTitle" class="">
+        <PageHeader :page-title="pageTitle">
           <template #primary>
             <DispatchUpdateButton />
           </template>
