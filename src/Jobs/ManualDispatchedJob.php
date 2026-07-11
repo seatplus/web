@@ -49,6 +49,9 @@ class ManualDispatchedJob
             ->then(fn () => logger()->info($success_message))
             ->name($this->name)
             ->onQueue('high')
+            // One member failing (e.g. a genuine ESI error on a single character/scope)
+            // must not cancel the rest of the update — like CharacterBatchJob does.
+            ->allowFailures()
             ->dispatch();
 
         return $batch->id;
