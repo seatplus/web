@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
@@ -14,6 +15,33 @@ use Seatplus\Eveapi\Models\Mail\MailRecipients;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('attachOwnedCharacter')) {
+    /**
+     * Attach an additional owned character to the same user that owns $existing, so a
+     * browser test can exercise the multi-character case — character-scoped pages
+     * aggregate over / render per every character the logged-in user owns, not just
+     * the main. Returns the newly attached character. Guarded so each Browser test
+     * file can define it standalone without colliding when the suite loads several.
+     */
+    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
+    {
+        $user = CharacterUser::query()
+            ->where('character_id', $existing->character_id)
+            ->firstOrFail()
+            ->user;
+
+        $character = CharacterInfo::factory()->create();
+
+        CharacterUser::create([
+            'user_id' => $user->getKey(),
+            'character_id' => $character->character_id,
+            'character_owner_hash' => sha1((string) $character->character_id),
+        ]);
+
+        return $character;
+    }
+}
 
 it('merges the next page of mail headers on scroll', function () {
     $character = actingAsCharacter();
@@ -42,4 +70,34 @@ it('merges the next page of mail headers on scroll', function () {
     $page->assertScript("(document.getElementById('desktop-mail-list').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
     $page->screenshot(true, 'character-mails-infinite-scroll');
+});
+
+it('aggregates mail headers across all of the user\'s characters', function () {
+    $mainCharacter = actingAsCharacter();
+    $secondCharacter = attachOwnedCharacter($mainCharacter);
+
+    // 6 mails per character (12 total, under the 15/page default) so the entire set
+    // lands on the first page: a main-character-only list would render 6, the full
+    // owned set renders 12 — the count alone proves the aggregation.
+    collect([$mainCharacter, $secondCharacter])
+        ->each(fn (CharacterInfo $character, int $characterIndex) => Mail::factory()
+            ->count(6)
+            ->sequence(fn ($sequence) => ['timestamp' => now()->subHours(($characterIndex * 6 + $sequence->index) * 6)->format('Y-m-d H:i:s')])
+            ->create()
+            ->each(fn (Mail $mail) => MailRecipients::factory()->create([
+                'mail_id' => $mail->id,
+                'receivable_id' => $character->character_id,
+                'receivable_type' => CharacterInfo::class,
+            ])));
+
+    $rows = '#desktop-mail-list > li';
+
+    $page = visit('/character/mails');
+    $page->assertNoSmoke();
+    $page->waitForText('Character Mails');
+
+    // Both characters' mails on a single page (6 + 6 = 12 < 15/page).
+    $page->assertCount($rows, 12);
+
+    $page->screenshot(true, 'character-mails-multiple-characters');
 });

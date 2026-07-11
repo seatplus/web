@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
@@ -15,6 +16,33 @@ use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('attachOwnedCharacter')) {
+    /**
+     * Attach an additional owned character to the same user that owns $existing, so a
+     * browser test can exercise the multi-character case — character-scoped pages
+     * aggregate over / render per every character the logged-in user owns, not just
+     * the main. Returns the newly attached character. Guarded so each Browser test
+     * file can define it standalone without colliding when the suite loads several.
+     */
+    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
+    {
+        $user = CharacterUser::query()
+            ->where('character_id', $existing->character_id)
+            ->firstOrFail()
+            ->user;
+
+        $character = CharacterInfo::factory()->create();
+
+        CharacterUser::create([
+            'user_id' => $user->getKey(),
+            'character_id' => $character->character_id,
+            'character_owner_hash' => sha1((string) $character->character_id),
+        ]);
+
+        return $character;
+    }
+}
 
 it('merges the next journal and transaction pages in on scroll', function () {
     $character = actingAsCharacter();
@@ -102,4 +130,31 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
     // Filtered + reset: only the 3 bounty rows remain (not 15 + merged).
     $page->assertCount($rows, 3);
     $page->screenshot(true, 'character-wallet-filter');
+});
+
+it('renders a wallet card for every character the user owns', function () {
+    $mainCharacter = actingAsCharacter();
+    $secondCharacter = attachOwnedCharacter($mainCharacter);
+
+    // A handful of journal rows per character so each card's list renders. The page
+    // renders one wallet (its own journal_<id> scroll prop / list) per owned character,
+    // so both journal bodies must be present — a single-character render would only
+    // emit the main character's.
+    collect([$mainCharacter, $secondCharacter])
+        ->each(fn (CharacterInfo $character) => WalletJournal::factory()
+            ->count(5)
+            ->sequence(fn ($sequence) => ['date' => now()->subHours($sequence->index * 6)])
+            ->create([
+                'wallet_journable_id' => $character->character_id,
+                'wallet_journable_type' => CharacterInfo::class,
+            ]));
+
+    $page = visit('/character/wallets');
+    $page->assertNoSmoke();
+    $page->waitForText('Journal');
+
+    $page->assertPresent("#journal-body-{$mainCharacter->character_id}");
+    $page->assertPresent("#journal-body-{$secondCharacter->character_id}");
+
+    $page->screenshot(true, 'character-wallet-multiple-characters');
 });
