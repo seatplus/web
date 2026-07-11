@@ -1,49 +1,55 @@
 <template>
-  <ul class="divide-y divide-gray-200 overflow-y-auto">
-    <InfiniteLoadingHelper
-      v-slot="{results}"
-      route-name="manual_job.entities"
-      method="POST"
-      :params="dispatch_transfer_object"
-    >
-      <DispatchableEntry
-        v-for="(entity, index) of results"
-        :key="`dispatchable entry ${index}`"
-        :entry="entity"
+  <div class="divide-y divide-gray-200 overflow-y-auto">
+    <!-- Owned: the user's own characters/corps, loaded immediately -->
+    <section>
+      <h3 class="px-6 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {{ isCorporationScope ? 'Your corporations' : 'Your characters' }}
+      </h3>
+      <DispatchEntityList
+        :params="ownedParams"
+        label="owned"
+        :empty-text="isCorporationScope ? 'no corporations you own are eligible' : 'no characters you own are eligible'"
       />
-    </InfiniteLoadingHelper>
-  </ul>
+    </section>
+
+    <!-- Affiliated: everything else the user may manage, fetched only when expanded -->
+    <section>
+      <button
+        type="button"
+        class="flex w-full items-center justify-between px-6 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 hover:bg-gray-50"
+        @click="showAffiliated = !showAffiliated"
+      >
+        <span>{{ isCorporationScope ? 'Affiliated corporations' : 'Affiliated characters' }}</span>
+        <ChevronDownIcon
+          class="h-4 w-4 transition-transform"
+          :class="{'rotate-180': showAffiliated}"
+        />
+      </button>
+      <DispatchEntityList
+        v-if="showAffiliated"
+        :params="affiliatedParams"
+        label="affiliated"
+        empty-text="no affiliated entities"
+      />
+    </section>
+  </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
+import { ChevronDownIcon } from "@heroicons/vue/24/outline";
+import DispatchEntityList from "./DispatchEntityList.vue";
 
-import DispatchableEntry from "./DispatchableEntry.vue";
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+const page = usePage();
+const showAffiliated = ref(false);
 
-export default {
-    name: "DispatchUpdate",
-    components: {InfiniteLoadingHelper, DispatchableEntry},
-    computed: {
-        dispatch_transfer_object() {
-            return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
-        },
-        job_name() {
-            return _.get(this.dispatch_transfer_object, 'manual_job')
-        }
-    },
-    methods: {
-        dispatchJob(entity) {
-
-            if(entity.batch !== 'ready')
-                return
-
-            axios.post(route('dispatch.job', {
-                character_id: entity.character_id,
-                corporation_id: entity.corporation_id,
-            }), {
-                dispatch_transfer_object: this.dispatch_transfer_object
-            })
-        }
-    }
-}
+const dispatchTransferObject = computed(
+    () => page.props.dispatch_transfer_object ?? page.props.dispatchTransferObject
+);
+const isCorporationScope = computed(
+    () => (dispatchTransferObject.value?.required_corporation_role ?? []).length > 0
+);
+const ownedParams = computed(() => ({ ...dispatchTransferObject.value, ownership: 'owned' }));
+const affiliatedParams = computed(() => ({ ...dispatchTransferObject.value, ownership: 'affiliated' }));
 </script>

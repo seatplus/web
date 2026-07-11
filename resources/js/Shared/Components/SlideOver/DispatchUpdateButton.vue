@@ -23,11 +23,6 @@ export default {
     return {
       open: false
     }
-  },
-  computed: {
-    url() {
-      return route('manual_job.entities', this.dispatch_transfer_object)
-    }
   }
 }
 </script>

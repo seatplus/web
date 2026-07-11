@@ -61,6 +61,20 @@ class GetAffiliatedIds
     }
 
     /**
+     * The user's own character ids, taken straight from the cached permission object
+     * (user_permissions_{id}, 5-min TTL) rather than a fresh query — the same slice
+     * collectAffiliatedIds() merges in as `owned_character_ids`.
+     *
+     * @return array<int, int>
+     */
+    public function ownedCharacterIds(?User $user = null): array
+    {
+        $user = $user ?? $this->user;
+
+        return data_get($this->canUserService->getUserPermissionObject($user), 'owned_character_ids', []);
+    }
+
+    /**
      * @param  array<int,string>  $permissions
      * @param  array<int,string>  $corporationRole
      * @return array<int,int>
