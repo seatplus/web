@@ -51,11 +51,6 @@ export default {
       return {
         pageTitle: 'Character Contracts'
       }
-  },
-  methods: {
-    getUrl(character_id) {
-      return route('character.contracts.details', character_id)
-    }
   }
 }
 </script>

@@ -33,6 +33,8 @@ import {ref} from "vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
 import {DialogTitle} from "@headlessui/vue";
 import ContractDetailsComponent from "./ContractDetailsComponent.vue";
+import { getJson } from "@/Functions/http";
+import { getContractDetails } from "@/actions/Seatplus/Web/Http/Controllers/Character/ContractsController";
 
 export default {
     name: "ExpandContractComponent",
@@ -53,10 +55,11 @@ export default {
         const openModal = ref(false)
         const contractDetails = ref()
 
-        const url = route('contract.details', {character_id: props.characterId, contract_id: props.contract.contract_id})
+        const url = getContractDetails.url({character_id: props.characterId, contract_id: props.contract.contract_id})
 
         const fetchDetails = async () => {
-            await axios.get(url, {headers: {'X-Modal': true}}).then(response => contractDetails.value = response.data[0])
+            const details = await getJson(url, {'X-Modal': true})
+            contractDetails.value = details[0]
         }
 
         const open = () => {
