@@ -12,7 +12,10 @@
       <span :class="{'sr-only' : title.srOnly}">{{ title.label }}</span>
     </div>
   </div>
-  <ul class="divide-y divide-gray-200">
+  <ul
+    :id="bodyId"
+    class="divide-y divide-gray-200"
+  >
     <slot
       :columns="columns"
       :count-columns="countColumns"
@@ -45,6 +48,12 @@ export default {
                 .filter()
                 .value()
                 .length> 0
+        },
+        // Optional id for the row <ul> so an <InfiniteScroll items-element> can target it.
+        bodyId: {
+            required: false,
+            type: String,
+            default: null,
         }
     },
     setup(props) {

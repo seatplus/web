@@ -11,61 +11,54 @@
         </div>
       </div>
     </template>
-    <!-- This example requires Tailwind CSS v2.0+ -->
-    <div class="relative max-h-96 overflow-y-auto">
+
+    <!-- scroll-region lets Inertia track/restore this custom scroll container so
+         <InfiniteScroll> merges the next page without jumping to top. -->
+    <div
+      class="relative max-h-96 overflow-y-auto"
+      :scroll-region="scrollKey ? '' : null"
+    >
+      <!-- Character page: contracts delivered as a page scroll prop → Inertia InfiniteScroll. -->
+      <InfiniteScroll
+        v-if="scrollKey"
+        :data="scrollKey"
+        :items-element="`#${scrollBodyId}`"
+        preserve-url
+      >
+        <StickyHeaderTable
+          :header-titles="headerTitles"
+          :body-id="scrollBodyId"
+        >
+          <template #default="slotProps">
+            <ContractRowComponent
+              v-for="contract in scrollEntries"
+              :key="contract.contract_id"
+              :contract="contract"
+              :columns="slotProps.columns"
+              :count-columns="slotProps.countColumns"
+              :character-id="id"
+            />
+          </template>
+        </StickyHeaderTable>
+      </InfiniteScroll>
+
+      <!-- Recruitment (watchlist): still the axios helper against the details endpoint. -->
       <InfiniteLoadingHelper
+        v-else
         v-slot="{results}"
         route-name="character.contracts.details"
         :params="parameters"
       >
-        <StickyHeaderTable
-          :header-titles="[{title: 'Issuer', columnSpan: 2}, {title: 'Assignee', columnSpan: 2}, {title: 'Type', columnSpan: 2}, {title: 'Details', columnSpan: 4}, {title: 'Content', columnSpan: 1, srOnly: true}]"
-        >
+        <StickyHeaderTable :header-titles="headerTitles">
           <template #default="slotProps">
-            <StickyHeaderTableRow
+            <ContractRowComponent
               v-for="contract in results"
               :key="contract.contract_id"
-              :number-columns="slotProps.countColumns"
-            >
-              <!--  Issuer-->
-              <StickyHeaderCell
-                :cell="slotProps.columns[0]"
-                class="self-center truncate"
-              >
-                <IssuerComponent :contract="contract" />
-              </StickyHeaderCell>
-              <!--  Assignee-->
-              <StickyHeaderCell
-                :cell="slotProps.columns[1]"
-                class="self-center truncate"
-              >
-                <AssigneeComponent :contract="contract" />
-              </StickyHeaderCell>
-              <!-- Contract type-->
-              <StickyHeaderCell
-                :cell="slotProps.columns[2]"
-                class="flex flex-wrap text-sm font-medium text-gray-500 sm:self-center truncate"
-              >
-                <ContractTypeComponent :contract="contract" />
-              </StickyHeaderCell>
-              <StickyHeaderCell
-                :cell="slotProps.columns[3]"
-                class="flex flex-wrap gap-x-2 text-sm font-medium text-gray-500 sm:self-center"
-              >
-                <DetailsComponent :contract="contract" />
-              </StickyHeaderCell>
-              <StickyHeaderCell
-                :cell="slotProps.columns[4]"
-                class="sm:self-center sm:place-self-end"
-              >
-                <ExpandContractComponent
-                  v-if="contract.items > 0"
-                  :character-id="id"
-                  :contract="contract"
-                />
-              </StickyHeaderCell>
-            </StickyHeaderTableRow>
-            <div ref="scrollComponent" />
+              :contract="contract"
+              :columns="slotProps.columns"
+              :count-columns="slotProps.countColumns"
+              :character-id="id"
+            />
           </template>
         </StickyHeaderTable>
       </InfiniteLoadingHelper>
@@ -74,32 +67,22 @@
 </template>
 
 <script>
-
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-import StickyHeaderTable from "../../Layout/Table/StickyHeaderTable.vue";
-import StickyHeaderTableRow from "../../Layout/Table/StickyHeaderTableRow.vue";
-import StickyHeaderCell from "../../Layout/Table/StickyHeaderCell.vue";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
-import {ref} from "vue";
-import ExpandContractComponent from "./ExpandContractComponent.vue";
-import IssuerComponent from "./Cells/IssuerComponent.vue";
-import AssigneeComponent from "./Cells/AssigneeComponent.vue";
-import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
-import DetailsComponent from "./Cells/DetailsComponent.vue";
- 
+import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
+import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
+import ContractRowComponent from "./ContractRowComponent.vue";
+
 export default {
     name: "ContractComponent",
     components: {
-        DetailsComponent,
-        ContractTypeComponent,
-        AssigneeComponent,
-        IssuerComponent,
-        ExpandContractComponent,
+        InfiniteScroll,
+        ContractRowComponent,
         InfiniteLoadingHelper,
-        StickyHeaderCell,
-        StickyHeaderTableRow,
-        StickyHeaderTable, CardWithHeader, EntityByIdBlock,
+        StickyHeaderTable,
+        CardWithHeader,
+        EntityByIdBlock,
     },
     props: {
         id: {
@@ -115,29 +98,30 @@ export default {
             required: false,
             type: Object,
             default: () => new Object()
-        }
-    },
-    setup() {
-
-        const contracts = ref([])
-
-        const getStartLocation = (contract) => _.get(contract, 'start_location.name', _.get(contract, 'start_location.locatable.name', 'unknown'))
-        const getEndLocation = (contract) => _.get(contract, 'end_location.name', _.get(contract, 'end_location.locatable.name', 'unknown'))
-
-        return {
-            contracts,
-            getStartLocation,
-            getEndLocation
-        }
-
+        },
+        // When set (character page) contracts come from this page scroll prop via
+        // <InfiniteScroll>. When null (recruitment) the axios helper + watchlist is used.
+        scrollKey: {
+            required: false,
+            type: String,
+            default: null,
+        },
     },
     computed: {
-        entity() {
-            return {
-                type: this.type,
-                character_id: this.type === 'character' ? this.id : null,
-                corporation_id: this.type === 'corporation' ? this.id : null
-            }
+        headerTitles() {
+            return [
+                {title: 'Issuer', columnSpan: 2},
+                {title: 'Assignee', columnSpan: 2},
+                {title: 'Type', columnSpan: 2},
+                {title: 'Details', columnSpan: 4},
+                {title: 'Content', columnSpan: 1, srOnly: true},
+            ]
+        },
+        scrollBodyId() {
+            return `contracts-body-${this.id}`
+        },
+        scrollEntries() {
+            return this.$page.props[this.scrollKey]?.data ?? []
         },
         parameters() {
             return {...this.watchlist, character_id: this.id}

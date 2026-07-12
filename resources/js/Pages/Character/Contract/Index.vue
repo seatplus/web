@@ -16,6 +16,7 @@
         v-for="character in characters"
         :id="character.character_id"
         :key="character.character_id"
+        :scroll-key="`contracts_${character.character_id}`"
       />
     </div>
   </div>
