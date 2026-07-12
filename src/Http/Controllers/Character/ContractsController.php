@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -53,16 +54,39 @@ class ContractsController extends Controller
             ->with(['character.corporation', 'character.alliance'])
             ->get();
 
+        // One InfiniteScroll prop per character (mirrors the wallet migration). Each
+        // paginator carries the ContractRessource shape and its own pageName so the
+        // per-character scroll state never collides.
+        $contracts = $characters->mapWithKeys(fn (CharacterAffiliation $affiliation): array => [
+            "contracts_{$affiliation->character_id}" => Inertia::scroll(
+                fn () => $this->contractsQuery($affiliation->character_id)
+                    ->paginate(pageName: "contracts_{$affiliation->character_id}")
+                    ->through(fn (Contract $contract) => (new ContractRessource($contract))->resolve()),
+            ),
+        ])->all();
+
         return inertia('Character/Contract/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characters' => $characters,
+            ...$contracts,
         ]);
+    }
+
+    /**
+     * Base query for a character's contracts with everything the row cells render.
+     * The watchlist scopes are applied only on the recruitment endpoint below.
+     *
+     * @return Builder<Contract>
+     */
+    private function contractsQuery(int $character_id): Builder
+    {
+        return Contract::whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
+            ->with(['items', 'items.type', 'items.type.group', 'startLocation.locatable', 'endLocation.locatable', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation']);
     }
 
     public function getCharacterContractsDetails(int $character_id, Request $request): AnonymousResourceCollection
     {
-        $query = Contract::whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
-            ->with(['items', 'items.type', 'items.type.group', 'startLocation', 'endLocation', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation'])
+        $query = $this->contractsQuery($character_id)
             ->tap(new LocationWatchListScope($request->all()))
             ->tap(new TypeWatchListScope($request->all()));
 

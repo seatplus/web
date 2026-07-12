@@ -29,8 +29,9 @@
 
 <script>
 import EveImage from "@/Shared/EveImage.vue"
-import axios from "axios";
 import {onMounted, onUnmounted, ref} from "vue";
+import { getJson } from "@/Functions/http";
+import { getEntityFromId } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
 export default {
     name: "EntityByIdBlock",
@@ -62,14 +63,18 @@ export default {
         const entity = ref(null)
 
         const getEntity = async () => {
-            await axios.get(route('resolve.id', props.id))
-                .then((response) => {
+            try {
+                const data = await getJson(getEntityFromId.url(props.id))
 
-                    entity.value = response.data
-
-                   isReady.value = true
-                })
-                .catch(error => console.log(error))
+                // resolve.id returns an empty payload ("") for ids it cannot resolve;
+                // only render once we actually have an entity object.
+                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                    entity.value = data
+                    isReady.value = true
+                }
+            } catch (error) {
+                console.log(error)
+            }
         }
 
         const observer = new IntersectionObserver(function(entries) {

@@ -12,10 +12,11 @@ function xsrfToken() {
     return match ? decodeURIComponent(match[1]) : '';
 }
 
-async function request(url, { method = 'GET', body } = {}) {
+async function request(url, { method = 'GET', body, headers: extraHeaders } = {}) {
     const headers = {
         Accept: 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
+        ...extraHeaders,
     };
 
     if (body !== undefined) {
@@ -37,8 +38,8 @@ async function request(url, { method = 'GET', body } = {}) {
     return response;
 }
 
-export async function getJson(url) {
-    return (await request(url)).json();
+export async function getJson(url, headers) {
+    return (await request(url, { headers })).json();
 }
 
 export function post(url, body = {}) {

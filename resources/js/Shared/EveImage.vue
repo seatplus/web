@@ -25,6 +25,8 @@
 
 <script>
 import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import { getJson } from "@/Functions/http";
+import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
     export default {
         name: "EveImage",
@@ -58,26 +60,36 @@ import {computed, onMounted, onUnmounted, ref, watch} from "vue";
             const eveImageComponent = ref(null)
 
             const getImageVariant = async () => {
+                // Guard against a non-object (e.g. an unresolved "" entity) so the `in`
+                // checks below never throw.
+                if (!props.object || typeof props.object !== 'object')
+                    return;
+
                 if ('character_id' in props.object)
                     return resourceVariant.value = 'portrait';
 
                 if ('corporation_id' in props.object || 'alliance_id' in props.object)
                     return resourceVariant.value = 'logo';
 
-                await axios.get(route('get.resource.variants', {
+                // No recognizable EVE resource type (e.g. an unresolved/unknown entity, or a
+                // location/station) — bail before requesting variants, which would otherwise
+                // build a URL without a resource_type and throw.
+                if (!resourceType.value || !resourceId.value)
+                    return;
+
+                const variants = await getJson(getResourceVariants.url({
                     resource_type: resourceType.value,
-                    resource_id: resourceId.value
-                })).then(result => {
+                    resource_id: resourceId.value,
+                }))
 
-                    function getVariant() {
-                        if(props.bpo && _.has(_.invert(result.data), 'bp'))
-                            return 'bp'
+                function getVariant() {
+                    if (props.bpo && _.has(_.invert(variants), 'bp'))
+                        return 'bp'
 
-                        return result.data[0]
-                    }
+                    return variants[0]
+                }
 
-                    resourceVariant.value = getVariant()
-                })
+                resourceVariant.value = getVariant()
             }
 
             const resourceSize = computed(() => {

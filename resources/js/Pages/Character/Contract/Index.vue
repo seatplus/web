@@ -16,6 +16,7 @@
         v-for="character in characters"
         :id="character.character_id"
         :key="character.character_id"
+        :scroll-key="`contracts_${character.character_id}`"
       />
     </div>
   </div>
@@ -50,11 +51,6 @@ export default {
       return {
         pageTitle: 'Character Contracts'
       }
-  },
-  methods: {
-    getUrl(character_id) {
-      return route('character.contracts.details', character_id)
-    }
   }
 }
 </script>

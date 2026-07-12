@@ -57,6 +57,31 @@ Reuse the existing `AclTypes/` building blocks (Affiliations, Members, Moderator
 
 ---
 
+## Frontend modernization — Inertia v3 (in progress)
+
+Rolling the frontend onto native Inertia v3 primitives and off the legacy axios/Ziggy stack.
+Three parallel tracks:
+
+- **B1 — InfiniteScroll rollout.** Replace the custom axios-based `InfiniteLoadingHelper`
+  with page-level `Inertia::scroll()` props rendered by `<InfiniteScroll>`. Pattern: one
+  scroll prop per character/entity, each with a distinct `pageName`, streamed into an
+  `items-element` inside a `scroll-region` container.
+  - ✅ Character + corporation wallet journals ([#1536](https://github.com/seatplus/web/pull/1536), [#1537](https://github.com/seatplus/web/pull/1537))
+  - ✅ Mail ([#1541](https://github.com/seatplus/web/pull/1541))
+  - 🔷 Contracts ([#1547](https://github.com/seatplus/web/pull/1547)) — dual-mode `ContractComponent`:
+    `scroll-key` prop on the character page, `InfiniteLoadingHelper` fallback kept for the
+    recruitment/watchlist endpoint (which still needs the details route).
+  - ⏭️ Remaining axios-fed lists (assets, transactions, …) to migrate as the pattern proves out.
+- **B2 — Remove axios.** Native `fetch` wrapper at `resources/js/Functions/http.js`
+  (`getJson`/`post`, `X-XSRF-TOKEN` from the `XSRF-TOKEN` cookie). Done for the dispatch/update
+  sidebar; retire per surface alongside B1.
+- **B3 — Remove Ziggy** ([#1462](https://github.com/seatplus/web/issues/1462)). Replace
+  `route()` calls with Wayfinder imports from `@/actions/` (controllers) / `@/routes/` (named).
+  Wayfinder output is gitignored and generated in CI (`php artisan wayfinder:generate` in
+  core's browser job; package "Frontend Lint" is lint-only).
+
+---
+
 ## Older open issues (lower priority)
 
 | Issue | Title |
@@ -72,6 +97,12 @@ Reuse the existing `AclTypes/` building blocks (Affiliations, Members, Moderator
 
 | PR | Description |
 |----|-------------|
+| [#1546](https://github.com/seatplus/web/pull/1546) | `ManualDispatchedJob` `->allowFailures()` — one job's failure no longer cancels the Update batch |
+| [#1545](https://github.com/seatplus/web/pull/1545) | Dispatch/update sidebar — owned vs affiliated sections, axios→fetch + Wayfinder, cached `getEntities` |
+| [#1544](https://github.com/seatplus/web/pull/1544) | Dispatch sidebar fix (`required_corporation_role` array validation) + owned/affiliated partition + browser tests |
+| [#1542](https://github.com/seatplus/web/pull/1542), [#1543](https://github.com/seatplus/web/pull/1543) | `GetEntityFromId` — resolve-id 404 fallback + alliance `[object Object]` name fix |
+| [#1541](https://github.com/seatplus/web/pull/1541) | Mail → InfiniteScroll; axios/Ziggy→fetch; fix `app.js` `layout:null` double-sidebar |
+| [#1537](https://github.com/seatplus/web/pull/1537), [#1536](https://github.com/seatplus/web/pull/1536) | Wallet journals (char + corp) → Inertia InfiniteScroll |
 | [#1476](https://github.com/seatplus/web/pull/1476) | ACL typed controllers — SOLID single-action controllers, new routes, feature tests |
 | [#1473](https://github.com/seatplus/web/pull/1473) | Controllers, actions, services, resources refactor (1-C) |
 | [#1472](https://github.com/seatplus/web/pull/1472) | Middleware overhaul — remove dead pipeline middleware, fix auth routing (1-B) |
