@@ -35,10 +35,14 @@ class AssetSearchScope
                 ->each(function (string $term) use ($query) {
                     $term = $term.'%';
 
-                    $query->where('name_normalized', 'like', $term)
-                        ->orWhere('type_name_normalized', 'like', $term)
-                        ->orWhere('group_name_normalized', 'like', $term)
-                        ->orWhere('category_name_normalized', 'like', $term);
+                    // ilike: the *_normalized columns preserve the source casing (regexp_replace
+                    // strips only non-alphanumerics, e.g. "SodiaTradealinassIbis"), so a
+                    // case-sensitive `like` would never match a lower-cased search term. This
+                    // mirrors handleAsset(), which lower-cases both sides.
+                    $query->where('name_normalized', 'ilike', $term)
+                        ->orWhere('type_name_normalized', 'ilike', $term)
+                        ->orWhere('group_name_normalized', 'ilike', $term)
+                        ->orWhere('category_name_normalized', 'ilike', $term);
                 });
         });
 

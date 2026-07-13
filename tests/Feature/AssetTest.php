@@ -111,6 +111,24 @@ test('the action filters locations by a matching asset at any nesting depth', fu
     }
 });
 
+test('the action text search is case-insensitive', function () {
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+
+    // name_normalized is generated as PascalCase ("SodiaTradealinasIbis"); a lower-cased
+    // search term must still match it (regression: `like` was case-sensitive on Postgres).
+    Asset::factory()->create([
+        'assetable_id' => test()->test_character->character_id,
+        'location_id' => $location->location_id,
+        'root_location_id' => $location->location_id,
+        'location_flag' => 'Hangar',
+        'name' => 'Sodia Tradealinas Ibis',
+    ]);
+
+    expect(assetLocations(['search' => 'sodia']))->toHaveCount(1);
+    expect(assetLocations(['search' => 'SODIA']))->toHaveCount(1);
+    expect(assetLocations(['search' => 'nomatch']))->toHaveCount(0);
+});
+
 test('item() returns the item plus one level of contents as JSON for the modal', function () {
     $container = Asset::factory()->create([
         'assetable_id' => test()->test_character->character_id,
