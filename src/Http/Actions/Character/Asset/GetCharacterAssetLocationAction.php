@@ -85,15 +85,24 @@ class GetCharacterAssetLocationAction
      */
     private function nestDescendantAssets(Location $location): void
     {
+        // The asset-safety location is synthetic (its `assets` are set directly, no descendants).
+        if (! $location->relationLoaded('descendantAssets')) {
+            return;
+        }
+
         $byParent = $location->descendantAssets->groupBy('location_id');
 
-        $attachContent = function (Asset $asset) use (&$attachContent, $byParent): void {
-            $children = $byParent->get($asset->item_id, collect())->values();
+        // Relations must be Eloquent Collections (filterContent + the resource expect them), so
+        // wrap each parent's children explicitly rather than using the base collection groupBy yields.
+        $childrenOf = fn (int $parentId): Collection => new Collection($byParent->get($parentId)?->all() ?? []);
+
+        $attachContent = function (Asset $asset) use (&$attachContent, $childrenOf): void {
+            $children = $childrenOf($asset->item_id);
             $children->each($attachContent);
             $asset->setRelation('content', $children);
         };
 
-        $topLevel = $byParent->get($location->location_id, collect())->values();
+        $topLevel = $childrenOf($location->location_id);
         $topLevel->each($attachContent);
 
         $location->setRelation('assets', $topLevel);
