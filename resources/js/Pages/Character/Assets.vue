@@ -128,7 +128,8 @@ export default {
     },
     setup(props) {
         const switchValue = ref(ls.get(COMPACT_VIEW_KEY) ?? false)
-        const search = ref(null)
+        // Hydrate the search box from the URL so a shared/reloaded ?search=… link shows its term.
+        const search = ref(new URLSearchParams(window.location.search).get('search'))
         const regions = ref([])
         const systems = ref([])
 
