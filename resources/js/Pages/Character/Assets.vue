@@ -78,7 +78,10 @@
         </div>
       </div>
 
-      <AssetsComponent :compact="switchValue" />
+      <AssetsComponent
+        :compact="switchValue"
+        :loading="searching"
+      />
     </div>
   </div>
 </template>
@@ -130,6 +133,8 @@ export default {
         const switchValue = ref(ls.get(COMPACT_VIEW_KEY) ?? false)
         // Hydrate the search box from the URL so a shared/reloaded ?search=… link shows its term.
         const search = ref(new URLSearchParams(window.location.search).get('search'))
+        // True while a filter reload is in flight, so the list can show it's updating.
+        const searching = ref(false)
         const regions = ref([])
         const systems = ref([])
 
@@ -150,6 +155,8 @@ export default {
             data: cleanParams.value,
             preserveState: true,
             preserveScroll: true,
+            onStart: () => { searching.value = true },
+            onFinish: () => { searching.value = false },
         })
 
         const debouncedReload = _.debounce(reload, 500)
@@ -170,6 +177,7 @@ export default {
             regions,
             systems,
             switchValue,
+            searching,
             cleanParams,
             pageTitle: 'Character Assets',
         }
