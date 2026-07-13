@@ -28,7 +28,7 @@ const isError = ref(props.toast.appearance === 'error')
 </script>
 
 <template>
-  <div class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+  <div class="pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5">
     <div class="p-4">
       <div class="flex items-start">
         <div class="shrink-0">

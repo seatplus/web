@@ -23,7 +23,7 @@
       />
       <ListboxOptions
         static
-        class="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-hidden sm:text-sm"
+        class="max-h-60 rounded-md py-1 text-base ring-1 ring-black/5 overflow-auto focus:outline-hidden sm:text-sm"
       >
         <ListboxOption
           v-for="option in options"

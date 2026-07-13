@@ -32,7 +32,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <ListboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-hidden sm:text-sm">
+        <ListboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black/5 overflow-auto focus:outline-hidden sm:text-sm">
           <ListboxOption
             v-for="option in options"
             :key="option.id"
