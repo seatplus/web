@@ -18,11 +18,13 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import CompactAssetListTemplate from "./CompactAssetListTemplate.vue";
-import AssetContentsLink from "./AssetContentsLink.vue";
+
 export default {
     name: "CompactAssetListElement",
-    components: { CompactAssetListTemplate, AssetContentsLink },
+    // AssetContentsLink is async to break the ItemList ↔ AssetContentsLink import cycle.
+    components: { CompactAssetListTemplate, AssetContentsLink: defineAsyncComponent(() => import("./AssetContentsLink.vue")) },
     props: {
         entry: {
             required: true,

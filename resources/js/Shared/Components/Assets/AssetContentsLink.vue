@@ -36,16 +36,12 @@
 </template>
 
 <script>
-import { ref, defineAsyncComponent } from "vue";
+import { ref } from "vue";
 import { DialogTitle } from "@headlessui/vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
+import ItemList from "./ItemList.vue";
 import { getJson } from "@/Functions/http";
 import { item as itemAction } from "@/actions/Seatplus/Web/Http/Controllers/Character/AssetsController";
-
-// Lazily resolved to break the ItemList ↔ AssetContentsLink import cycle (a container's
-// contents render another ItemList, which can drill again). A static import deadlocks at
-// module init ("can't access 'ItemList' before initialization").
-const ItemList = defineAsyncComponent(() => import("./ItemList.vue"));
 
 export default {
     name: "AssetContentsLink",

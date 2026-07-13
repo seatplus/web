@@ -78,9 +78,13 @@
 import WideListElement from "@/Shared/WideListElement.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import { usePage } from '@inertiajs/vue3';
-import AssetContentsLink from "./AssetContentsLink.vue";
 import { prefix } from 'metric-prefix'
-import {computed} from "vue";
+import {computed, defineAsyncComponent} from "vue";
+
+// Lazily resolved to break the ItemList ↔ AssetContentsLink import cycle (drilling a container
+// renders another ItemList). Async on the list-side chevron — not on the modal's ItemList — so
+// modal content still renders instantly at full size.
+const AssetContentsLink = defineAsyncComponent(() => import("./AssetContentsLink.vue"));
 import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
 
 defineProps({
