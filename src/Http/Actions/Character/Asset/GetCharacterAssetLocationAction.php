@@ -51,6 +51,10 @@ class GetCharacterAssetLocationAction
         // Prune to matching branches only when an asset-level filter is active; unfiltered loads
         // top-level items only (no content relation) so there is nothing to prune.
         if ($this->isFiltered()) {
+            // The filtered path flat-loads every descendant in one indexed query (root_location_id)
+            // instead of a recursive content.content eager-load. Rebuild the nested tree in PHP
+            // (O(n)) so the existing prune + the frontend render still see `assets` → `content`.
+            $locationCollection->each(fn (Location $location) => $this->nestDescendantAssets($location));
             $locationCollection = $this->filterLocationAssets($locationCollection);
         }
 
@@ -72,6 +76,28 @@ class GetCharacterAssetLocationAction
             ->where('assetable_type', CharacterInfo::class)
             ->tap(new AssetSearchScope($this->validated))
             ->tap(new TypeWatchListScope($this->validated));
+    }
+
+    /**
+     * Rebuild the nested asset tree from the flat descendantAssets relation (keyed on
+     * root_location_id). A child's parent is the asset whose item_id equals the child's
+     * location_id; a top-level item's parent is the location itself. O(n), single pass.
+     */
+    private function nestDescendantAssets(Location $location): void
+    {
+        $byParent = $location->descendantAssets->groupBy('location_id');
+
+        $attachContent = function (Asset $asset) use (&$attachContent, $byParent): void {
+            $children = $byParent->get($asset->item_id, collect())->values();
+            $children->each($attachContent);
+            $asset->setRelation('content', $children);
+        };
+
+        $topLevel = $byParent->get($location->location_id, collect())->values();
+        $topLevel->each($attachContent);
+
+        $location->setRelation('assets', $topLevel);
+        $location->unsetRelation('descendantAssets');
     }
 
     private function filterAsset(Collection|Asset|null $asset): bool
@@ -164,10 +190,11 @@ class GetCharacterAssetLocationAction
             ->with(['locatable' => ['system']])
             ->when(
                 $this->isFiltered(),
-                // Filtered: load the nested tree so a matched location can be pruned to only the
-                // top-level items that are, or contain, a match (filterLocationAssets in execute()).
+                // Filtered: flat-load every descendant in one indexed query on root_location_id
+                // (no recursive content.content eager-load, no depth limit). execute() rebuilds the
+                // tree in PHP and prunes it to matching branches.
                 fn (Builder $query) => $query->with([
-                    'assets' => fn (Relation $q) => $assetScope($q)->with(self::ASSETRELATIONS),
+                    'descendantAssets' => fn (Relation $q) => $assetScope($q)->with('type.group'),
                 ]),
                 // Unfiltered (the common case): only top-level items + a contents count for the
                 // chevron. No content.content eager-load, no PHP tree recursion.
