@@ -27,7 +27,9 @@ class LocationRessource extends JsonResource
             'is_manual_location' => $this->whenLoaded('locatable', function () {
                 return ! ($this->locatable instanceof Station || $this->locatable instanceof Structure);
             }, ! ($this->location_id === 2004)),
-            'assets' => AssetResource::collection($this->whenLoaded('assets')),
+            // Resolve to a plain array (not a resource object): Inertia re-wraps nested JsonResources
+            // in a `data` key, but the Vue side expects `assets` to be a plain array.
+            'assets' => $this->whenLoaded('assets', fn (): array => AssetResource::collection($this->assets)->resolve()),
             'volume' => $this->whenLoaded('assets', fn () => $this->calculateVolume($this->assets)),
         ];
     }
