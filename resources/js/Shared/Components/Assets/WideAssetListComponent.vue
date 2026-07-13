@@ -58,16 +58,17 @@
     </template>
 
     <template #navigation>
+      <!-- Chevron is purely a visual affordance; the whole row is the click target via the
+           stretched-link overlay below (kept transparent when the row has no contents so the
+           layout stays aligned). -->
+      <ChevronRightIcon
+        class="h-5 w-5"
+        :class="hasContent(asset) ? 'text-gray-400' : 'text-transparent'"
+      />
       <AssetContentsLink
         v-if="hasContent(asset)"
         :character-id="asset.owner_id"
         :item-id="asset.item_id"
-      >
-        <ChevronRightIcon class="h-5 w-5 text-gray-400" />
-      </AssetContentsLink>
-      <ChevronRightIcon
-        v-else
-        class="h-5 w-5 text-transparent"
       />
     </template>
   </WideListElement>

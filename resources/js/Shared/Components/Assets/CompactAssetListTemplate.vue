@@ -1,7 +1,7 @@
 <template>
   <li
     :class="[even ? 'bg-gray-50' : 'bg-white', {'cursor-pointer': hasContent}]"
-    class="grid grid-cols-2 sm:grid-cols-8 sm:gap-x-0 sm:gap-y-1 grid-flow-row justify-items-auto text-sm text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500"
+    class="list-none grid grid-cols-2 sm:grid-cols-8 sm:gap-x-0 sm:gap-y-1 grid-flow-row justify-items-auto text-sm text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500"
   >
     <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal sm:col-span-1">
       <label class="block text-sm font-medium text-gray-700 sm:hidden">

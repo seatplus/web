@@ -1,11 +1,17 @@
 <template>
   <!-- "Both": clicking opens the contents in a modal (fetched on demand); the href is the
-       shareable character.item deep link that renders the full ItemDetails page on direct visit. -->
+       shareable character.item deep link that renders the full ItemDetails page on direct visit.
+       With a slot it wraps that content (e.g. the compact row); without one it renders a
+       stretched-link overlay that fills the nearest positioned ancestor, so the whole row is
+       clickable without nesting a block element inside the anchor. -->
   <a
     :href="itemUrl"
+    :class="$slots.default ? undefined : 'absolute inset-0 z-10 focus:outline-hidden'"
     @click.stop.prevent="open"
   >
-    <slot />
+    <slot>
+      <span class="sr-only">Open contents</span>
+    </slot>
   </a>
   <teleport to="#destination">
     <WithDismissButtonModal
