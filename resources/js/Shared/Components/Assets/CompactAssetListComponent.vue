@@ -41,13 +41,8 @@ export default {
             return _.uniqBy(this.items, 'item_id')
         },
         hasOwnerPicture() {
-
-            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
-
-            if (_.size(selectedCharacterIds) > 1)
-                return true
-
-            return !selectedCharacterIds && this.$page.props.user.data.characters.length > 1;
+            // Show the owner avatar when the user has more than one character.
+            return this.$page.props.user.data.characters.length > 1
         }
     }
 }

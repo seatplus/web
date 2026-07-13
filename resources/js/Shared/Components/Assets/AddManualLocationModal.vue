@@ -108,6 +108,7 @@
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
 import {useForm} from "@inertiajs/vue3";
+import { create as createManualLocation } from "@/actions/Seatplus/Web/Http/Controllers/Shared/ManualLocationController";
 
 export default {
     name: "AddManualLocationModal",
@@ -150,7 +151,7 @@ emits: ['update:modelValue'],
             this.form.transform((data) => ({
                 ...data,
                 location_id: this.location_id
-            })).post(route('post.manual_location'), {
+            })).post(createManualLocation.url(), {
                 onSuccess: () => {
                     self.form.reset()
                     self.suggestions = []

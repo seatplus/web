@@ -28,6 +28,7 @@ import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ItemLayout from "@/Shared/Components/ItemLayout.vue";
 import { prefix } from "metric-prefix";
 import AppHead from "@/Shared/AppHead.vue";
+import { index as assetsRoute, item as itemRoute } from "@/actions/Seatplus/Web/Http/Controllers/Character/AssetsController";
 
 export default {
     name: "ItemDetails",
@@ -44,7 +45,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Character Assets',
-                    route: route('character.assets')
+                    route: assetsRoute.url()
                 }
             ]
         }
@@ -53,7 +54,7 @@ export default {
         if(this.object.container)
             this.breadcrumbs.push({
                 name: this.object.container.name,
-                route: route('character.item', this.object.container.item_id)
+                route: itemRoute.url({character_id: this.object.owner_id, item_id: this.object.container.item_id})
             })
     },
     methods: {
@@ -63,7 +64,7 @@ export default {
         },
         url(asset) {
 
-            return _.isEmpty(asset.content) ? '' : route('character.item', {'item_id': asset.item_id, 'character_id': asset.owner.character_id})
+            return _.isEmpty(asset.content) ? '' : itemRoute.url({character_id: asset.owner_id, item_id: asset.item_id})
         },
         hasContent(content) {
             return !_.isEmpty(content)

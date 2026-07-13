@@ -78,10 +78,7 @@
         </div>
       </div>
 
-      <AssetsComponent
-        :parameters="cleanParams"
-        :compact="switchValue"
-      />
+      <AssetsComponent :compact="switchValue" />
     </div>
   </div>
 </template>
@@ -93,6 +90,7 @@ import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import {computed, ref, watch} from 'vue'
+import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
@@ -125,7 +123,6 @@ export default {
     },
     setup(props) {
         const switchValue = ref(false)
-        const infiniteId = ref(+new Date())
         const search = ref(null)
         const regions = ref([])
         const systems = ref([])
@@ -139,18 +136,28 @@ export default {
             }
         })
 
-        const debounceInfiniteId = _.debounce(() => infiniteId.value++, 250)
+        // Reload only the `assets` scroll prop with the current filters; reset so
+        // <InfiniteScroll> replaces the list with the filtered first page instead of merging.
+        const reload = () => router.reload({
+            only: ['assets'],
+            reset: ['assets'],
+            data: cleanParams.value,
+            preserveState: true,
+            preserveScroll: true,
+        })
 
-        watch(() => search.value, (newValue) => {
-            if(_.size(newValue)>=3) {
-                debounceInfiniteId()
+        const debouncedReload = _.debounce(reload, 350)
+
+        // Search reloads on 3+ chars or when cleared; region/system selections reload immediately.
+        watch(search, (newValue) => {
+            if (! newValue || _.size(newValue) >= 3) {
+                debouncedReload()
             }
         })
 
-        watch([regions.value, systems.value], () => infiniteId.value++)
+        watch([regions, systems], () => reload(), { deep: true })
 
         return {
-            infiniteId,
             search,
             regions,
             systems,

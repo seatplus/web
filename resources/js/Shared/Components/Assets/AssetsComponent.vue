@@ -1,38 +1,40 @@
 <template>
   <div>
-    <InfiniteLoadingHelper
-      :key="loadingHelperKey"
-      v-slot="{results}"
-      :params="parameters"
-      route-name="get.character.assets.locations"
+    <!-- Native Inertia v3 infinite scroll over the page-level `assets` scroll prop
+         (locations paginated with pageName 'assets'). Replaces the axios/Ziggy
+         InfiniteLoadingHelper + useInfinityScrolling loader. -->
+    <InfiniteScroll
+      data="assets"
+      items-element="#assets-body"
+      preserve-url
     >
-      <div class="space-y-2 sm:space-y-6">
+      <div
+        id="assets-body"
+        class="space-y-2 sm:space-y-6"
+      >
         <LocationComponent
-          v-for="location in results"
+          v-for="location in locations"
           :key="location.location_id"
           :location="location"
           :context="context"
           :compact="compact"
         />
       </div>
-    </InfiniteLoadingHelper>
+    </InfiniteScroll>
   </div>
 </template>
 
 <script>
 import LocationComponent from "./LocationComponent.vue";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
-import { ref, watch } from "vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
+
 export default {
     name: "AssetsComponent",
     components: {
-        InfiniteLoadingHelper, LocationComponent,
+        InfiniteScroll,
+        LocationComponent,
     },
     props: {
-        parameters: {
-            type: Object,
-            required: true
-        },
         context: {
             required: false,
             type: String,
@@ -44,25 +46,10 @@ export default {
             type: Boolean
         }
     },
-    setup(props) {
-
-        const locations = ref([])
-        const loadingHelperKey = ref(+new Date() )
-
-        const debounce = _.debounce(() => loadingHelperKey.value++ , 350)
-
-        watch(() => props.parameters, () => debounce())
-
-        return {
-            locations,
-            loadingHelperKey
+    computed: {
+        locations() {
+            return this.$page.props.assets?.data ?? []
         }
-    },
-    data() {
-        return {
-            openModal: false,
-            modal_location_id: 0
-        }
-    },
+    }
 }
 </script>

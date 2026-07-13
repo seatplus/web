@@ -2,7 +2,7 @@
   <WideListElement
     v-for="asset in items"
     :key="asset.item_id"
-    :url="url(asset)"
+    :url="''"
   >
     <template #avatar>
       <span class="inline-block relative">
@@ -12,9 +12,12 @@
           :object="asset.type"
           :size="128"
         />
-          <span v-else class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500">
-              <span class="text-xl font-medium leading-none text-white">N/A</span>
-          </span>
+        <span
+          v-else
+          class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500"
+        >
+          <span class="text-xl font-medium leading-none text-white">N/A</span>
+        </span>
 
         <span
           v-if="asset.quantity > 1"
@@ -55,18 +58,17 @@
     </template>
 
     <template #navigation>
-      <Link
-        v-if="asset.content[0]"
-        :href="asset.url"
-        preserve-state
-        preserve-scroll
+      <AssetContentsLink
+        v-if="hasContent(asset)"
+        :character-id="asset.owner_id"
+        :item-id="asset.item_id"
       >
-          <ChevronRightIcon class="h-5 w-5 text-gray-400" />
-      </Link>
-        <ChevronRightIcon
-          v-else
-          class="h-5 w-5 text-transparent"
-        />
+        <ChevronRightIcon class="h-5 w-5 text-gray-400" />
+      </AssetContentsLink>
+      <ChevronRightIcon
+        v-else
+        class="h-5 w-5 text-transparent"
+      />
     </template>
   </WideListElement>
 </template>
@@ -75,7 +77,8 @@
 
 import WideListElement from "@/Shared/WideListElement.vue";
 import EveImage from "@/Shared/EveImage.vue";
-import {Link, usePage} from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
+import AssetContentsLink from "./AssetContentsLink.vue";
 import { prefix } from 'metric-prefix'
 import {computed} from "vue";
 import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
@@ -87,29 +90,23 @@ defineProps({
   },
 });
 
-const hasOwnerPicture = computed(() => {
-
-  let selectedCharacterIds = _.get(route().params, 'character_ids', null)
-
-  if (_.size(selectedCharacterIds) > 1)
-    return true
-
-  return !selectedCharacterIds && usePage().props.user.data.characters.length > 1;
-})
+// Show the owner avatar when the user has more than one character (helps attribute assets).
+const hasOwnerPicture = computed(() => usePage().props.user.data.characters.length > 1)
 
 const getMetricPrefix = function (numeric_value) {
     return prefix(numeric_value, {precision: 3, unit: 'm³'})
 }
 
-const url = function (asset) {
-    return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner_id}) : ''
+// content_count on the (unfiltered) list path; the loaded content array on the filtered path.
+const hasContent = function (asset) {
+    return (asset.content_count ?? _.size(asset.content)) > 0
 }
 
 const getType = function (asset) {
 
   let type = asset.type
 
-  // if type is not set we createa a dummy type
+  // if type is not set we create a dummy type
   if (!type) {
     type = {
       name: 'Unknown',

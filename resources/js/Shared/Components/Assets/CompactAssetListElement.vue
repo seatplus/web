@@ -1,16 +1,15 @@
 <template>
-  <Link
+  <AssetContentsLink
     v-if="hasContent"
     class="justify-self-end"
-    :href="route('character.item', {item_id: entry.item_id, character_id: entry.owner_id})"
-    preserve-state
-    preserve-scroll
+    :character-id="entry.owner_id"
+    :item-id="entry.item_id"
   >
     <CompactAssetListTemplate
       :entry="entry"
       :even="even"
     />
-  </Link>
+  </AssetContentsLink>
   <CompactAssetListTemplate
     v-else
     :entry="entry"
@@ -20,10 +19,10 @@
 
 <script>
 import CompactAssetListTemplate from "./CompactAssetListTemplate.vue";
-import { Link } from '@inertiajs/vue3';
+import AssetContentsLink from "./AssetContentsLink.vue";
 export default {
     name: "CompactAssetListElement",
-    components: {CompactAssetListTemplate, Link},
+    components: { CompactAssetListTemplate, AssetContentsLink },
     props: {
         entry: {
             required: true,
@@ -36,7 +35,7 @@ export default {
     },
     computed: {
         hasContent() {
-            return _.size(this.entry.content) > 0
+            return (this.entry.content_count ?? _.size(this.entry.content)) > 0
         },
     }
 }

@@ -64,7 +64,6 @@
 import {prefix} from "metric-prefix";
 import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import EveImage from "@/Shared/EveImage.vue"
-import {get} from "lodash";
 import {computed} from "vue";
 import {usePage} from "@inertiajs/vue3";
 
@@ -79,7 +78,7 @@ const props = defineProps({
     }
 })
 
-const type_name = get(props.entry, 'type.name', 'missing type information')
+const type_name = _.get(props.entry, 'type.name', 'missing type information')
 const name = props.entry.name ? `${props.entry.name} (${type_name})` : type_name
 const type = {
     ...props.entry.type,
@@ -88,7 +87,7 @@ const type = {
 
 
 const group = computed(() => {
-    let group_name =  get(props.entry, 'type.group.name', 'missing group information')
+    let group_name =  _.get(props.entry, 'type.group.name', 'missing group information')
 
     return props.entry.is_singleton ? group_name : `${group_name} (packaged)`
 })
@@ -97,15 +96,8 @@ const hasContent = computed(() => {
     return _.size(props.entry.content) > 0
 })
 
-const hasOwnerPicture = computed(() => {
-
-    let selectedCharacterIds = get(route().params, 'character_ids', null)
-
-    if (_.size(selectedCharacterIds) > 1)
-        return true
-
-    return !selectedCharacterIds && usePage().props.user.data.characters.length > 1;
-})
+// Show the owner avatar when the user has more than one character.
+const hasOwnerPicture = computed(() => usePage().props.user.data.characters.length > 1)
 
 // Methods
 const getMetricPrefix = function (numeric_value) {

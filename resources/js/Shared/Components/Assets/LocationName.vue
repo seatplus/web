@@ -5,6 +5,9 @@
 </template>
 
 <script>
+import { getJson } from "@/Functions/http";
+import { getLocation } from "@/actions/Seatplus/Web/Http/Controllers/Shared/ManualLocationController";
+
 export default {
     name: "LocationName",
     props: {
@@ -27,11 +30,12 @@ export default {
         }
     },
     created() {
-        if(_.isNull(this.location.location))
-            axios.get(route('get.manual_location', this.location.location_id))
-                .then((result) => {
-                        this.result = result.data
+        if (_.isNull(this.location.location)) {
+            getJson(getLocation.url(this.location.location_id))
+                .then((data) => {
+                    this.result = data
                 })
+        }
     }
 }
 </script>
