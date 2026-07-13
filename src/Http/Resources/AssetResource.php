@@ -56,10 +56,7 @@ class AssetResource extends JsonResource
             'location_flag' => $this->location_flag,
             'is_singleton' => $this->is_singleton,
             'is_blueprint_copy' => $this->is_blueprint_copy,
-            // Resolve nested content to a plain array (not a resource object): Inertia walks the
-            // prop tree and re-wraps any JsonResource it finds in a `data` key, which would break
-            // the array-typed `items`/`content` props the Vue side expects.
-            'content' => $this->whenLoaded('content', fn (): array => AssetResource::collection($this->content)->resolve()),
+            'content' => $this::collection($this->whenLoaded('content')),
             // has-contents signal for the chevron: a count on the unfiltered/list path, the loaded
             // (pruned) tree on the filtered/drill path. The client builds the item URL via Wayfinder.
             'content_count' => $this->whenCounted('content'),

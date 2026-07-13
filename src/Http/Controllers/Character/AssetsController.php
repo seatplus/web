@@ -58,8 +58,15 @@ class AssetsController extends Controller
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characterIds' => $characterIds,
+            // Fully flatten each location (assets → type → group, etc.) to primitive arrays.
+            // A bare ->resolve() only resolves the top level, leaving nested JsonResources as
+            // objects that Inertia then re-wraps/serializes inconsistently; encoding the whole
+            // tree once yields the plain arrays the Vue side expects.
             'assets' => Inertia::scroll(fn () => $action->execute($validated)
-                ->through(fn (Location $location): array => (new LocationRessource($location))->resolve())),
+                ->through(fn (Location $location): array => json_decode(
+                    (string) json_encode((new LocationRessource($location))->resolve()),
+                    true,
+                ))),
         ]);
     }
 
