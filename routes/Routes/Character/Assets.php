@@ -32,14 +32,15 @@ use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 Route::prefix('assets')
     ->controller(AssetsController::class)
     ->group(function () {
+        // index stays ungated (no character_id in the initial request for the permission
+        // middleware to authorise); the scroll-prop data is instead scoped to the authorised
+        // set via getCharacterIds()/the character_ids intersection in the controller.
         Route::get('', 'index')->name('character.assets');
 
         $assetPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Asset::class);
 
         Route::middleware($assetPermission)
             ->group(function () {
-                Route::get('locations', 'getLocations')->name('get.character.assets.locations');
                 Route::get('/{character_id}/item/{item_id}', 'item')->name('character.item');
             });
-
     });

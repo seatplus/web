@@ -26,14 +26,15 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\GetAssetLocationsRequest;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Http\Resources\LocationRessource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
@@ -41,38 +42,52 @@ use Seatplus\Web\Services\Controller\DispatchTransferObject;
 
 class AssetsController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request, GetCharacterAssetLocationAction $action): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
+        $characterIds = $this->getCharacterIds($dispatchTransferObject, 'assets');
+
+        // Filters + (a subset of) character scope come from the page query. Constrain requested
+        // character_ids to the authorised set; default to all of it.
+        $validated = $request->only(['search', 'systems', 'regions', 'types', 'groups', 'categories', 'only_unknown_locations']);
+        $requested = collect($request->input('character_ids'))->map(fn ($id): int => (int) $id)->filter();
+        $validated['character_ids'] = $requested->isEmpty()
+            ? $characterIds->values()->all()
+            : $characterIds->intersect($requested)->values()->all();
 
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'characterIds' => $this->getCharacterIds($dispatchTransferObject, 'assets'),
+            'characterIds' => $characterIds,
+            'assets' => Inertia::scroll(fn () => $action->execute($validated)
+                ->through(fn (Location $location): array => (new LocationRessource($location))->resolve())),
         ]);
     }
 
-    public function getLocations(GetAssetLocationsRequest $request, GetCharacterAssetLocationAction $action): AnonymousResourceCollection
+    public function item(int $character_id, int $item_id, Request $request): Response|JsonResponse
     {
-        $validated = $request->all();
-
-        $lengthAwarePaginator = $action->execute($validated);
-
-        return LocationRessource::collection(
-            $lengthAwarePaginator
-        );
-    }
-
-    public function item(int $character_id, int $item_id): Response
-    {
-        $query = EveApiAsset::with([
-            'location', 'type', 'type.group', 'container',
-            'content' => ['content', 'type', 'type.group', 'assetable'],
-        ])
+        $query = EveApiAsset::query()
             ->where('assetable_id', $character_id)
             ->where('assetable_type', CharacterInfo::class)
             ->where('item_id', $item_id);
 
-        $item = AssetResource::collection($query->get());
+        // Modal drill: the item + ONE level of contents (+ a count for deeper chevrons), as JSON.
+        if ($request->header('X-Modal')) {
+            return response()->json(
+                AssetResource::collection(
+                    (clone $query)
+                        ->with(['type.group', 'content' => fn ($contentQuery) => $contentQuery->with('type.group')->withCount('content')])
+                        ->get()
+                )->resolve()
+            );
+        }
+
+        // Shareable deep link: full ItemDetails page.
+        $item = AssetResource::collection(
+            $query->with([
+                'location', 'type', 'type.group', 'container',
+                'content' => ['content', 'type', 'type.group', 'assetable'],
+            ])->get()
+        );
 
         return Inertia::render('Character/ItemDetails', [
             'item' => $item,

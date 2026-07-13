@@ -57,10 +57,9 @@ class AssetResource extends JsonResource
             'is_singleton' => $this->is_singleton,
             'is_blueprint_copy' => $this->is_blueprint_copy,
             'content' => $this::collection($this->whenLoaded('content')),
-            'url' => route('character.item', [
-                'character_id' => $this->assetable_id,
-                'item_id' => $this->item_id,
-            ]),
+            // has-contents signal for the chevron: a count on the unfiltered/list path, the loaded
+            // (pruned) tree on the filtered/drill path. The client builds the item URL via Wayfinder.
+            'content_count' => $this->whenCounted('content'),
         ];
     }
 }
