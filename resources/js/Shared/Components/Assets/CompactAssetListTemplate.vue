@@ -35,10 +35,10 @@
           />
         </div>
         <div class="ml-4">
-          <!-- Purple name signals the row is expandable (has contents). -->
+          <!-- Indigo name signals the row is expandable (has contents). -->
           <h3
             class="text-sm leading-6 font-medium"
-            :class="hasContent ? 'text-purple-600' : 'text-gray-900'"
+            :class="hasContent ? 'text-indigo-600' : 'text-gray-900'"
           >
             {{ type.name }}
           </h3>
@@ -64,7 +64,7 @@
       <span class="sr-only">Expand</span>
       <ChevronRightIcon
         v-if="hasContent"
-        class="text-purple-500 h-5 w-5 justify-self-end"
+        class="text-indigo-500 h-5 w-5 justify-self-end"
       />
     </div>
   </li>

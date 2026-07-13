@@ -39,9 +39,16 @@
     </template>
 
     <template #lower_left>
-      <TagIcon class="shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+      <TagIcon
+        class="shrink-0 mr-1.5 h-5 w-5"
+        :class="hasContent(asset) ? 'text-indigo-400' : 'text-gray-400'"
+      />
 
-      <span class="truncate">{{ getType(asset).name }}</span>
+      <!-- Indigo type name signals the row is expandable (has contents). -->
+      <span
+        class="truncate"
+        :class="{ 'text-indigo-600': hasContent(asset) }"
+      >{{ getType(asset).name }}</span>
     </template>
 
     <template #upper_right>
@@ -63,7 +70,7 @@
            layout stays aligned). -->
       <ChevronRightIcon
         class="h-5 w-5"
-        :class="hasContent(asset) ? 'text-gray-400' : 'text-transparent'"
+        :class="hasContent(asset) ? 'text-indigo-500' : 'text-transparent'"
       />
       <AssetContentsLink
         v-if="hasContent(asset)"
