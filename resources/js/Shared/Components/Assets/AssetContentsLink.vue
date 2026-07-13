@@ -52,6 +52,8 @@ import { item as itemAction } from "@/actions/Seatplus/Web/Http/Controllers/Char
 export default {
     name: "AssetContentsLink",
     components: { WithDismissButtonModal, DialogTitle, ItemList },
+    // Renders <a> + <teleport> (two roots), so it can't auto-inherit fallthrough attrs.
+    inheritAttrs: false,
     props: {
         characterId: {
             type: Number,
