@@ -155,6 +155,8 @@ export default {
             data: cleanParams.value,
             preserveState: true,
             preserveScroll: true,
+            // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
+            preserveUrl: true,
             onStart: () => { searching.value = true },
             onFinish: () => { searching.value = false },
         })
