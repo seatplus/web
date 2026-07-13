@@ -94,6 +94,11 @@ import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import { ls } from "@/Functions/useLocalStorage";
+
+// Remember the compact/wide choice across visits (persisted for a year, refreshed on each toggle).
+const COMPACT_VIEW_KEY = 'assets.compactView'
+const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 
 export default {
     name: "Assets",
@@ -122,7 +127,7 @@ export default {
         },
     },
     setup(props) {
-        const switchValue = ref(false)
+        const switchValue = ref(ls.get(COMPACT_VIEW_KEY) ?? false)
         const search = ref(null)
         const regions = ref([])
         const systems = ref([])
@@ -156,6 +161,8 @@ export default {
         })
 
         watch([regions, systems], () => reload(), { deep: true })
+
+        watch(switchValue, (value) => ls.set(COMPACT_VIEW_KEY, value, COMPACT_VIEW_TTL))
 
         return {
             search,
