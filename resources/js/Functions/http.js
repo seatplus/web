@@ -39,7 +39,12 @@ async function request(url, { method = 'GET', body, headers: extraHeaders } = {}
 }
 
 export async function getJson(url, headers) {
-    return (await request(url, { headers })).json();
+    const response = await request(url, { headers });
+    const text = await response.text();
+
+    // An empty body (e.g. a controller returning null) is valid "no content" — return null
+    // instead of letting JSON.parse('') throw "unexpected end of data".
+    return text.length ? JSON.parse(text) : null;
 }
 
 export function post(url, body = {}) {
