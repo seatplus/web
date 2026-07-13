@@ -12,3 +12,9 @@ test('correct data is returned in response', function () {
     expect($resource instanceof GroupResource)->toBeTrue();
     expect($resource->name)->toEqual($group->name);
 });
+
+test('exposes the category_id', function () {
+    $group = Event::fakeFor(fn () => Group::factory()->create(['category_id' => 6]));
+
+    expect((new GroupResource($group))->resolve()['category_id'])->toBe(6);
+});

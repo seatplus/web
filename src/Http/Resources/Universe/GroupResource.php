@@ -39,6 +39,7 @@ class GroupResource extends JsonResource
     {
         return [
             'name' => $this->name,
+            'category_id' => $this->category_id,
         ];
     }
 }
