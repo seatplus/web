@@ -49,7 +49,7 @@
               <div class="mt-4 sm:mt-0 sm:ml-6 sm:shrink-0">
                 <span class="inline-flex rounded-md shadow-xs">
                   <a
-                    :href="route('auth.eve.step_up', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes)})"
+                    :href="route('auth.eve.step_up', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes), redirect: currentUrl })"
                     class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
                   >
                     Fix
@@ -90,6 +90,9 @@ const props = defineProps({
 
 const requiredScopes = _.get(props.dispatchTransferObject, 'required_scopes', [])
 const characters = usePage().props.user.data.characters
+
+// Explicit origin for the step-up return url (the callback stores this, validated, as `rurl`).
+const currentUrl = computed(() => usePage().url)
 
 const globalState = useGlobalState()
 const state = globalState.openScopeWarning
