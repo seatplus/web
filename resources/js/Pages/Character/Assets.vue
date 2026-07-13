@@ -151,7 +151,7 @@ export default {
             preserveScroll: true,
         })
 
-        const debouncedReload = _.debounce(reload, 350)
+        const debouncedReload = _.debounce(reload, 500)
 
         // Search reloads on 3+ chars or when cleared; region/system selections reload immediately.
         watch(search, (newValue) => {

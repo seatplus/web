@@ -107,7 +107,20 @@ class GetCharacterAssetLocationAction
 
     private function filterAssetsLogic(Asset $asset): bool
     {
-        return $this->filterAsset($asset) || $this->filterAsset(data_get($asset, 'content')) || $this->filterAsset(data_get($asset, 'content.content'));
+        if ($this->filterAsset($asset)) {
+            return true;
+        }
+
+        // Recurse only into eager-loaded content — strict mode (preventLazyLoading) forbids
+        // touching an unloaded relation, and the previous data_get('content.content') reached
+        // a nesting level deeper than what was eager-loaded, 500ing on a lazy-load violation.
+        // The location itself is already matched via the flat descendantAssets query; this only
+        // prunes the loaded tree to branches that contain a match.
+        if (! $asset->relationLoaded('content')) {
+            return false;
+        }
+
+        return $asset->content->contains(fn (Asset $child): bool => $this->filterAssetsLogic($child));
     }
 
     private function filterContent(Collection $content): Collection
