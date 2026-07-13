@@ -208,6 +208,16 @@ class DispatchJobController extends Controller
 
         $batch = Bus::findBatch($batch_id);
 
+        // Laravel prunes finished batches, so a completed (or unknown) batch is no longer found.
+        // Report it terminal instead of dereferencing null — otherwise every poll 500s on
+        // "read property failedJobs on null" and the client keeps polling, flooding the logs.
+        if (is_null($batch)) {
+            return [
+                'state' => 'finished',
+                'batch_id' => $batch_id,
+            ];
+        }
+
         if ($batch->failedJobs > 0 && $batch->progress() < 100) {
             return [
                 'state' => 'failures',
