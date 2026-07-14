@@ -81,6 +81,7 @@
       <AssetsComponent
         :compact="switchValue"
         :loading="searching"
+        :filter="appliedFilter"
       />
     </div>
   </div>
@@ -147,19 +148,28 @@ export default {
             }
         })
 
+        // The filter actually applied to the list (updated when a reload fires). Per-location lazy
+        // loads bind to this — not the live search input — so they refetch in sync with the shell
+        // list rather than on every keystroke.
+        const appliedFilter = ref(cleanParams.value)
+
         // Reload only the `assets` scroll prop with the current filters; reset so
         // <InfiniteScroll> replaces the list with the filtered first page instead of merging.
-        const reload = () => router.reload({
-            only: ['assets'],
-            reset: ['assets'],
-            data: cleanParams.value,
-            preserveState: true,
-            preserveScroll: true,
-            // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
-            preserveUrl: true,
-            onStart: () => { searching.value = true },
-            onFinish: () => { searching.value = false },
-        })
+        const reload = () => {
+            appliedFilter.value = cleanParams.value
+
+            router.reload({
+                only: ['assets'],
+                reset: ['assets'],
+                data: cleanParams.value,
+                preserveState: true,
+                preserveScroll: true,
+                // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
+                preserveUrl: true,
+                onStart: () => { searching.value = true },
+                onFinish: () => { searching.value = false },
+            })
+        }
 
         const debouncedReload = _.debounce(reload, 500)
 
@@ -181,6 +191,7 @@ export default {
             switchValue,
             searching,
             cleanParams,
+            appliedFilter,
             pageTitle: 'Character Assets',
         }
     }

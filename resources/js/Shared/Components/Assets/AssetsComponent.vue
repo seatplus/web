@@ -20,6 +20,7 @@
           :location="location"
           :context="context"
           :compact="compact"
+          :filter="filter"
         />
       </div>
 
@@ -110,6 +111,12 @@ export default {
             required: false,
             default: false,
             type: Boolean
+        },
+        // The applied asset filter, forwarded to each location's lazy per-location fetch.
+        filter: {
+            required: false,
+            type: Object,
+            default: () => ({})
         }
     },
     computed: {
