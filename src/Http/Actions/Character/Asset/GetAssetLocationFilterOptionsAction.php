@@ -30,7 +30,7 @@ class GetAssetLocationFilterOptionsAction
             ->map(fn (Location $location) => data_get($location, 'locatable.system'))
             ->filter()
             ->unique('system_id')
-            ->map(fn ($system): array => ['id' => (int) $system->system_id, 'name' => $system->name])
+            ->map(fn (mixed $system): array => ['id' => (int) $system->system_id, 'name' => $system->name])
             ->sortBy('name')
             ->values()
             ->all();
@@ -39,7 +39,7 @@ class GetAssetLocationFilterOptionsAction
             ->map(fn (Location $location) => data_get($location, 'locatable.system.region'))
             ->filter()
             ->unique('region_id')
-            ->map(fn ($region): array => ['id' => (int) $region->region_id, 'name' => $region->name])
+            ->map(fn (mixed $region): array => ['id' => (int) $region->region_id, 'name' => $region->name])
             ->sortBy('name')
             ->values()
             ->all();

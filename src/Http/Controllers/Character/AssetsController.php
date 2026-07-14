@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -52,7 +53,7 @@ class AssetsController extends Controller
         // Filters + (a subset of) character scope come from the page query. Constrain requested
         // character_ids to the authorised set; default to all of it.
         $validated = $request->only(['search', 'systems', 'regions', 'types', 'groups', 'categories', 'only_unknown_locations']);
-        $requested = collect($request->input('character_ids'))->map(fn ($id): int => (int) $id)->filter();
+        $requested = collect($request->input('character_ids'))->map(fn (mixed $id): int => (int) $id)->filter();
         $validated['character_ids'] = $requested->isEmpty()
             ? $characterIds->values()->all()
             : $characterIds->intersect($requested)->values()->all();
@@ -87,7 +88,7 @@ class AssetsController extends Controller
     {
         $authorized = $this->getCharacterIds($this->getDispatchTransferObject(), 'assets');
 
-        $requested = collect($request->input('character_ids'))->map(fn ($id): int => (int) $id)->filter();
+        $requested = collect($request->input('character_ids'))->map(fn (mixed $id): int => (int) $id)->filter();
 
         $validated = $request->only(['search', 'systems', 'regions', 'types', 'groups', 'categories']);
         $validated['character_ids'] = $requested->isEmpty()
@@ -109,7 +110,7 @@ class AssetsController extends Controller
             return response()->json(
                 AssetResource::collection(
                     (clone $query)
-                        ->with(['type.group', 'content' => fn ($contentQuery) => $contentQuery->with('type.group')->withCount('content')])
+                        ->with(['type.group', 'content' => fn (Relation $contentQuery) => $contentQuery->with('type.group')->withCount('content')])
                         ->get()
                 )->resolve()
             );
