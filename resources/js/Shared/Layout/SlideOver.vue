@@ -17,7 +17,7 @@
         >
           <div
             v-if="open"
-            class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+            class="absolute inset-0 bg-gray-500/75 transition-opacity"
             @click="flipStatus()"
           />
         </transition>
