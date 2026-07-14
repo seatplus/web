@@ -9,7 +9,7 @@
       <ComboboxLabel class="block text-sm font-medium leading-5 text-gray-700">
         {{ label }}
       </ComboboxLabel>
-      <div class="mt-1 relative">
+      <div class="mt-1 relative z-20">
         <ComboboxInput
           class="w-full bg-white border border-gray-300 rounded-md shadow-xs pl-3 pr-10 py-2 text-left focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           :placeholder="placeholder"
@@ -27,7 +27,7 @@
           leave-to-class="opacity-0"
           @after-leave="query = ''"
         >
-          <ComboboxOptions class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black/5 overflow-auto focus:outline-hidden sm:text-sm">
+          <ComboboxOptions class="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black/5 overflow-auto focus:outline-hidden sm:text-sm">
             <div
               v-if="! filteredOptions.length"
               class="px-3 py-2 text-sm text-gray-500 select-none"
