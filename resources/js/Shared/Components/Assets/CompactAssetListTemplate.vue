@@ -50,7 +50,7 @@
       <label class="block text-sm font-medium text-gray-700 sm:hidden">
         Volume
       </label>
-      {{ getMetricPrefix(entry.volume) }}
+      <span v-if="entry.volume">{{ getMetricPrefix(entry.volume) }}</span>
     </div>
 
     <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal sm:col-span-2">
@@ -115,6 +115,12 @@ const hasOwnerPicture = computed(() => usePage().props.user.data.characters.leng
 
 // Methods
 const getMetricPrefix = function (numeric_value) {
+    // An asset whose type is unresolved has no volume; metric-prefix/big.js throws
+    // "Invalid number" on null/NaN, which would crash the whole render. Guard defensively
+    // (the template also v-if's on volume).
+    if (numeric_value === null || numeric_value === undefined || isNaN(numeric_value)) {
+        return ''
+    }
 
     return prefix(numeric_value, {precision: 3, unit: 'm³'})
 }
