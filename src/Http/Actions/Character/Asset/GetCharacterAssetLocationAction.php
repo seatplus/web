@@ -3,8 +3,6 @@
 namespace Seatplus\Web\Http\Actions\Character\Asset;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -15,17 +13,14 @@ use Seatplus\Web\Services\Query\AssetSearchScope;
 use Seatplus\Web\Services\Query\LocationWatchListScope;
 use Seatplus\Web\Services\Query\TypeWatchListScope;
 
+/**
+ * Paginates the LOCATION SHELLS a character's (filtered) assets live in — no asset trees. Which
+ * locations appear is a flat, indexed `whereHas('descendantAssets', …)` (matches at any nesting
+ * depth). Each location's items are loaded lazily, per-location, by AssetsController::location()
+ * when the location scrolls into view.
+ */
 class GetCharacterAssetLocationAction
 {
-    const array ASSETRELATIONS = [
-        'type' => [
-            'group',
-        ],
-        'content' => [
-            'content',
-        ],
-    ];
-
     private array $validated = [];
 
     public function execute(array $validated): LengthAwarePaginator
@@ -33,25 +28,17 @@ class GetCharacterAssetLocationAction
         $this->validated = $validated;
 
         $results = $this->getPaginatedLocations();
-
         $locationCollection = $results->getCollection();
-
         $total = $results->total();
 
-        // if currentPage is 1 add asset safety location at beginning
-        if ($results->currentPage() === 1) {
-            $this->addAssetSafety($locationCollection);
+        // Asset safety is a virtual location (no universe_locations row) so the Location query never
+        // selects it — prepend it as a shell on page 1 when a matching asset is rooted there.
+        if ($results->currentPage() === 1 && $this->hasMatchingAssetSafety()) {
+            $locationCollection->prepend(new Location(['location_id' => Asset::ASSET_SAFETY]));
 
-            // if $locationCollection is larger than the total, we need to adjust the total
             if ($locationCollection->count() > $total) {
                 $total = $locationCollection->count();
             }
-        }
-
-        // Prune to matching branches only when an asset-level filter is active; unfiltered loads
-        // top-level items only (no content relation) so there is nothing to prune.
-        if ($this->isFiltered()) {
-            $locationCollection = $this->filterLocationAssets($locationCollection);
         }
 
         return new LengthAwarePaginator(
@@ -61,6 +48,24 @@ class GetCharacterAssetLocationAction
             $results->currentPage(),
             ['path' => request()->url(), 'query' => request()->query(), 'pageName' => 'assets']
         );
+    }
+
+    public function getPaginatedLocations(): LengthAwarePaginator
+    {
+        return Location::query()
+            ->with(['locatable' => ['system']])
+            // Flat, indexed selection via root_location_id — a location appears if it holds a
+            // matching asset at any depth. No asset tree is loaded here.
+            ->whereHas('descendantAssets', $this->getAssetQuery())
+            ->when(
+                data_get($this->validated, 'only_unknown_locations'),
+                fn (Builder $query) => $query
+                    ->doesntHaveMorph('locatable', [Station::class, Structure::class])
+                    ->orWhereNull('locatable_type')
+            )
+            ->tap(new LocationWatchListScope($this->validated))
+            ->orderBy('location_id')
+            ->paginate(pageName: 'assets');
     }
 
     private function getAssetQuery(): \Closure
@@ -74,140 +79,11 @@ class GetCharacterAssetLocationAction
             ->tap(new TypeWatchListScope($this->validated));
     }
 
-    private function filterAsset(Collection|Asset|null $asset): bool
+    private function hasMatchingAssetSafety(): bool
     {
-        if (! $asset) {
-            return false;
-        }
-
-        // if $query is an Asset, wrap it in a collection
-        if ($asset instanceof Asset) {
-            $asset = collect([$asset]);
-        }
-
-        return $asset
-            ->filter(new AssetSearchScope($this->validated))
-            ->filter(new TypeWatchListScope($this->validated))
-            ->isNotEmpty();
-    }
-
-    public function filterAssets(Collection $assets): Collection
-    {
-        return $assets->filter(fn (Asset $asset) => $this->filterAssetsLogic($asset))
-            ->map(function (Asset $asset) {
-                if ($asset->relationLoaded('content') && $asset->content->isNotEmpty()) {
-                    $filtered_content = $this->filterContent($asset->content);
-                    $asset->setRelation('content', $filtered_content);
-                }
-
-                return $asset;
-            })
-            ->values();
-    }
-
-    private function filterAssetsLogic(Asset $asset): bool
-    {
-        if ($this->filterAsset($asset)) {
-            return true;
-        }
-
-        // Recurse only into eager-loaded content — strict mode (preventLazyLoading) forbids
-        // touching an unloaded relation, and the previous data_get('content.content') reached
-        // a nesting level deeper than what was eager-loaded, 500ing on a lazy-load violation.
-        // The location itself is already matched via the flat descendantAssets query; this only
-        // prunes the loaded tree to branches that contain a match.
-        if (! $asset->relationLoaded('content')) {
-            return false;
-        }
-
-        return $asset->content->contains(fn (Asset $child): bool => $this->filterAssetsLogic($child));
-    }
-
-    private function filterContent(Collection $content): Collection
-    {
-        return $content->filter(fn (Asset $asset) => $this->filterAssetsLogic($asset))
-            ->map(function (Asset $asset) {
-                if ($asset->relationLoaded('content')) {
-                    $filtered_content = $this->filterContent($asset->content);
-                    $asset->setRelation('content', $filtered_content);
-                }
-
-                return $asset;
-            });
-    }
-
-    public function addAssetSafety(Collection $locationCollection): void
-    {
-        $asset_safety = Asset::where('location_id', Asset::ASSET_SAFETY)
-            ->with(self::ASSETRELATIONS)
-            ->get();
-
-        if ($asset_safety->isNotEmpty()) {
-            $asset_safety_location = new Location([
-                'location_id' => Asset::ASSET_SAFETY,
-            ]);
-
-            $asset_safety_location->setRelation('assets', $asset_safety);
-            $locationCollection->prepend($asset_safety_location);
-        }
-    }
-
-    public function getPaginatedLocations(): LengthAwarePaginator
-    {
-        $character_ids = $this->validated['character_ids'];
-
-        $assetScope = fn (Relation $query) => $query
-            ->whereIn('assetable_id', $character_ids)
-            ->where('assetable_type', CharacterInfo::class);
-
-        return Location::query()
-            ->with(['locatable' => ['system']])
-            ->when(
-                $this->isFiltered(),
-                // Filtered: load the nested tree so a matched location can be pruned to only the
-                // top-level items that are, or contain, a match (filterLocationAssets in execute()).
-                fn (Builder $query) => $query->with([
-                    'assets' => fn (Relation $q) => $assetScope($q)->with(self::ASSETRELATIONS),
-                ]),
-                // Unfiltered (the common case): only top-level items + a contents count for the
-                // chevron. No content.content eager-load, no PHP tree recursion.
-                fn (Builder $query) => $query->with([
-                    'assets' => fn (Relation $q) => $assetScope($q)->with('type.group')->withCount('content'),
-                ]),
-            )
-            // Location selection is always flat via root_location_id (matches at any nesting depth).
-            ->whereHas('descendantAssets', $this->getAssetQuery())
-            ->when(
-                data_get($this->validated, 'only_unknown_locations'),
-                fn (Builder $query) => $query
-                    ->doesntHaveMorph('locatable', [Station::class, Structure::class])
-                    ->orWhereNull('locatable_type')
-            )
-            ->tap(new LocationWatchListScope($this->validated))
-            ->orderBy('location_id')
-            ->paginate(pageName: 'assets');
-    }
-
-    /**
-     * Whether an asset-level filter (search / type / group / category) is active. Region/system are
-     * location-level (LocationWatchListScope) and don't require loading/pruning the asset tree.
-     */
-    private function isFiltered(): bool
-    {
-        return filled(data_get($this->validated, 'search'))
-            || filled(data_get($this->validated, 'types'))
-            || filled(data_get($this->validated, 'groups'))
-            || filled(data_get($this->validated, 'categories'));
-    }
-
-    public function filterLocationAssets(Collection $locationCollection): Collection
-    {
-        return $locationCollection
-            ->map(function (Location $location) {
-                $filtered_assets = $this->filterAssets($location->assets);
-                $location->setRelation('assets', $filtered_assets);
-
-                return $location;
-            });
+        return Asset::query()
+            ->where('root_location_id', Asset::ASSET_SAFETY)
+            ->tap($this->getAssetQuery())
+            ->exists();
     }
 }

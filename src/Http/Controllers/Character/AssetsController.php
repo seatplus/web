@@ -34,6 +34,7 @@ use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
+use Seatplus\Web\Http\Actions\Character\Asset\GetLocationTopLevelAssetsAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Http\Resources\LocationRessource;
@@ -68,6 +69,28 @@ class AssetsController extends Controller
                     true,
                 ))),
         ]);
+    }
+
+    /**
+     * A single location's top-level items (filtered-top-level via root_item_id), paginated and
+     * lazy-loaded when the location scrolls into view. Authorised identically to index(): the
+     * requested character_ids are intersected with getCharacterIds('assets') — own + assets-
+     * permission-affiliated (corp/alliance member management) + Director + superuser (+ recruits
+     * once impersonated) — and the query is hard-scoped to that set, so an arbitrary location_id
+     * or character_id can only ever return authorised assets.
+     */
+    public function location(int $location_id, Request $request, GetLocationTopLevelAssetsAction $action): JsonResponse
+    {
+        $authorized = $this->getCharacterIds($this->getDispatchTransferObject(), 'assets');
+
+        $requested = collect($request->input('character_ids'))->map(fn ($id): int => (int) $id)->filter();
+
+        $validated = $request->only(['search', 'systems', 'regions', 'types', 'groups', 'categories']);
+        $validated['character_ids'] = $requested->isEmpty()
+            ? $authorized->values()->all()
+            : $authorized->intersect($requested)->values()->all();
+
+        return AssetResource::collection($action->execute($location_id, $validated))->response();
     }
 
     public function item(int $character_id, int $item_id, Request $request): Response|JsonResponse

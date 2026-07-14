@@ -37,6 +37,11 @@ Route::prefix('assets')
         // set via getCharacterIds()/the character_ids intersection in the controller.
         Route::get('', 'index')->name('character.assets');
 
+        // Per-location lazy load of a location's top-level items. Ungated like index for the same
+        // reason: it spans the authorised character set (not a single character_id), so it is
+        // scoped in-controller via getCharacterIds()/the character_ids intersection.
+        Route::get('/location/{location_id}', 'location')->name('character.location');
+
         $assetPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Asset::class);
 
         Route::middleware($assetPermission)
