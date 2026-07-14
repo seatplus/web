@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Resources\Universe;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Eveapi\Models\Universe\Type;
+use Seatplus\Web\Services\EveImage\ImageVariant;
 
 /**
  * @mixin Type
@@ -42,6 +43,9 @@ class TypeResource extends JsonResource
             'volume' => $this->volume,
             'name' => $this->name,
             'group' => GroupResource::make($this->whenLoaded('group')),
+            // Image-server variation, derived from the type's inventory category so the client
+            // can build the images.evetech.net URL directly (no per-image variant roundtrip).
+            'image_variant' => ImageVariant::forCategory($this->group?->category_id),
         ];
     }
 }

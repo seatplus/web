@@ -1,10 +1,11 @@
 <template>
-  <div ref="eveImageComponent">
+  <div>
     <img
       v-if="isReady"
       :class="tailwind_class"
       :src="imageUrl"
       :alt="object.name"
+      loading="lazy"
     >
     <svg
       v-else
@@ -24,9 +25,7 @@
 </template>
 
 <script>
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
-import { getJson } from "@/Functions/http";
-import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
+import { computed } from "vue";
 
     export default {
         name: "EveImage",
@@ -55,58 +54,6 @@ import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Sha
             }
         },
         setup(props) {
-            const isReady = ref(false)
-            const resourceVariant = ref(null)
-            const eveImageComponent = ref(null)
-
-            const getImageVariant = async () => {
-                // Guard against a non-object (e.g. an unresolved "" entity) so the `in`
-                // checks below never throw.
-                if (!props.object || typeof props.object !== 'object')
-                    return;
-
-                if ('character_id' in props.object)
-                    return resourceVariant.value = 'portrait';
-
-                if ('corporation_id' in props.object || 'alliance_id' in props.object)
-                    return resourceVariant.value = 'logo';
-
-                // No recognizable EVE resource type (e.g. an unresolved/unknown entity, or a
-                // location/station) — bail before requesting variants, which would otherwise
-                // build a URL without a resource_type and throw.
-                if (!resourceType.value || !resourceId.value)
-                    return;
-
-                const variants = await getJson(getResourceVariants.url({
-                    resource_type: resourceType.value,
-                    resource_id: resourceId.value,
-                }))
-
-                // No variants for this resource (endpoint returned null/empty) — keep the default.
-                if (! variants) {
-                    return
-                }
-
-                function getVariant() {
-                    if (props.bpo && _.has(_.invert(variants), 'bp'))
-                        return 'bp'
-
-                    return variants[0]
-                }
-
-                resourceVariant.value = getVariant()
-            }
-
-            const resourceSize = computed(() => {
-
-                function isRetina() {
-                    return (window.devicePixelRatio > 1 ||	(window.matchMedia && window.matchMedia("(-webkit-min-device-pixel-ratio: 1.5),(-moz-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)").matches));
-                }
-
-                let size = props.size < 32 ? 32 : props.size
-
-                return isRetina() ? size*2 : size;
-            })
             const resourceId = computed(() => {
                 return _.chain(['type_id', 'character_id', 'corporation_id', 'alliance_id'])
                     .map(resource => _.get(props.object, resource))
@@ -114,6 +61,7 @@ import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Sha
                     .head()
                     .value()
             })
+
             const resourceType = computed(() => {
                 let array = {
                     'character_id': 'characters',
@@ -128,36 +76,46 @@ import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Sha
                     .head()
                     .value();
             })
+
+            // Resolved synchronously — no per-image HTTP roundtrip. characters/corps/alliances are
+            // deterministic; types carry their variation (render/bp/icon) from the backend
+            // (TypeResource.image_variant, derived from the inventory category), defaulting to icon.
+            const resourceVariant = computed(() => {
+                if (!props.object || typeof props.object !== 'object')
+                    return null
+
+                if ('character_id' in props.object)
+                    return 'portrait'
+
+                if ('corporation_id' in props.object || 'alliance_id' in props.object)
+                    return 'logo'
+
+                if (resourceType.value !== 'types')
+                    return null
+
+                return props.bpo ? 'bp' : (props.object.image_variant ?? 'icon')
+            })
+
+            const resourceSize = computed(() => {
+
+                function isRetina() {
+                    return (window.devicePixelRatio > 1 ||	(window.matchMedia && window.matchMedia("(-webkit-min-device-pixel-ratio: 1.5),(-moz-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)").matches));
+                }
+
+                let size = props.size < 32 ? 32 : props.size
+
+                return isRetina() ? size*2 : size;
+            })
+
             const imageUrl = computed(() => {
                 return `https://images.evetech.net/${resourceType.value}/${resourceId.value}/${resourceVariant.value}?size=${resourceSize.value}&tenant=tranquility`
             })
 
-            watch(resourceVariant, () => {
-                if(resourceVariant.value)
-                    isReady.value = true
-            })
-
-            const observer = new IntersectionObserver(function(entries) {
-                if(entries[0].isIntersecting === true) {
-                    if(isReady.value || resourceVariant.value)
-                        return
-
-                    getImageVariant()
-                }
-            }, { threshold: [1] });
-
-            onMounted(() => {
-                observer.observe(eveImageComponent.value);
-            })
-
-            onUnmounted(() => {
-                observer.disconnect()
-            })
+            const isReady = computed(() => Boolean(resourceType.value && resourceId.value && resourceVariant.value))
 
             return {
                 imageUrl,
                 isReady,
-                eveImageComponent
             }
 
         },

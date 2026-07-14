@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Http;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Type;
@@ -31,30 +30,6 @@ test('esi search validates the search term length', function () {
 
     get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
         ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
-});
-
-test('one can get resource variants via http and cache', function () {
-    Http::fake();
-
-    $resource_type = 'types';
-    $resource_id = 587;
-    $url = "https://images.evetech.net/{$resource_type}/{$resource_id}";
-    $expected_response = ['render', 'icon'];
-
-    Http::shouldReceive('get->json')->once()->andReturn(json_encode($expected_response));
-
-    expect(cache($url))->toBeNull();
-
-    // first time miss cache
-    $result = test()->actingAs(test()->test_user)
-        ->get(route('get.resource.variants', [
-            'resource_type' => $resource_type,
-            'resource_id' => $resource_id,
-        ]))
-        ->assertOk()
-        ->assertJson($expected_response);
-
-    expect(cache($url))->not()->toBeNull();
 });
 
 test('one can get cached market prices without hitting esi', function () {

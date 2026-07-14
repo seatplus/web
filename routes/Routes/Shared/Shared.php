@@ -55,5 +55,4 @@ Route::prefix('esi-search')
         Route::get('token', [HelperController::class, 'token'])->name('autosuggestion.token');
     });
 
-Route::get('/image/variants/{resource_type}/{resource_id}', [HelperController::class, 'getResourceVariants'])->name('get.resource.variants');
 Route::get('/markets/prices', [HelperController::class, 'getMarketsPrices'])->name('get.markets.prices');
