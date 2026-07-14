@@ -111,6 +111,33 @@ test('the action filters locations by a matching asset at any nesting depth', fu
     }
 });
 
+test('the action filters locations by region and system (excludes the others)', function () {
+    // Two locations in distinct systems/regions, one top-level asset each.
+    $locationA = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $locationB = Location::factory()->for(Station::factory(), 'locatable')->create();
+
+    foreach ([$locationA, $locationB] as $location) {
+        Asset::factory()->create([
+            'assetable_id' => test()->test_character->character_id,
+            'location_id' => $location->location_id,
+            'root_location_id' => $location->location_id,
+            'location_flag' => 'Hangar',
+        ]);
+    }
+
+    // Both show unfiltered; each single filter keeps only its own location (proving the other
+    // is excluded — a single-location fixture can't tell "filtered" from "ignored").
+    expect(assetLocations())->toHaveCount(2);
+
+    $byRegion = assetLocations(['regions' => [$locationA->locatable->system->region->region_id]]);
+    expect($byRegion)->toHaveCount(1)
+        ->and($byRegion->first()->location_id)->toBe($locationA->location_id);
+
+    $bySystem = assetLocations(['systems' => [$locationB->locatable->system->system_id]]);
+    expect($bySystem)->toHaveCount(1)
+        ->and($bySystem->first()->location_id)->toBe($locationB->location_id);
+});
+
 test('the action text search is case-insensitive', function () {
     $location = Location::factory()->for(Station::factory(), 'locatable')->create();
 

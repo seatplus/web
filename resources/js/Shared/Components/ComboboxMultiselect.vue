@@ -11,6 +11,7 @@
       </ComboboxLabel>
       <div class="mt-1 relative z-20">
         <ComboboxInput
+          :id="inputId"
           class="w-full bg-white border border-gray-300 rounded-md shadow-xs pl-3 pr-10 py-2 text-left focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           :placeholder="placeholder"
           :display-value="() => ''"
@@ -93,6 +94,11 @@ const props = defineProps({
     label: {
         type: String,
         required: true,
+    },
+    // Optional id on the text input — a stable hook for the region/system filter in browser tests.
+    inputId: {
+        type: String,
+        default: undefined,
     },
     placeholder: {
         type: String,

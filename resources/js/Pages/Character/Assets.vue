@@ -35,6 +35,7 @@
                 :options="filterOptions.regions"
                 label="Region"
                 placeholder="All regions"
+                input-id="region-filter"
               />
             </div>
 
@@ -44,6 +45,7 @@
                 :options="filterOptions.systems"
                 label="Solar System"
                 placeholder="All systems"
+                input-id="system-filter"
               />
             </div>
 
