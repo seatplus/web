@@ -50,3 +50,10 @@ export async function getJson(url, headers) {
 export function post(url, body = {}) {
     return request(url, { method: 'POST', body });
 }
+
+export async function postJson(url, body = {}, headers) {
+    const response = await request(url, { method: 'POST', body, headers });
+    const text = await response.text();
+
+    return text.length ? JSON.parse(text) : null;
+}

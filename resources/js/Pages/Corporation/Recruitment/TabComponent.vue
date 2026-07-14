@@ -73,7 +73,6 @@
         :key="'character.contact:' + character.character_id"
         :character="character"
         :corporation_id="targetCorporation.corporation_id"
-        :alliance_id="targetCorporation.alliance_id"
       />
     </div>
     <div

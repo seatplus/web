@@ -82,8 +82,10 @@ class ContactsController extends Controller
         $query = Contact::with(['labels', 'characterAffiliation', 'corporationAffiliation', 'allianceAffiliation', 'factionAffiliation'])
             ->where('contactable_id', $character_id);
 
+        // Contacts are fetched in full client-side (http.js), so return them all rather than
+        // paginating — the standings context above is computed once per request either way.
         return ContactResource::collection(
-            $query->paginate(),
+            $query->get(),
         );
     }
 }
