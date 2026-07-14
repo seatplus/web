@@ -12,7 +12,7 @@
     </PageHeader>
 
     <div>
-      <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
+      <div class="bg-white shadow-lg rounded-lg mb-6">
         <div class="px-4 py-5 sm:p-6">
           <div class="grid grid-cols-6 gap-5">
             <div class="col-span-6 lg:col-span-2">
@@ -30,7 +30,7 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <OptionsMultiselect
+              <ComboboxMultiselect
                 v-model="regions"
                 :options="filterOptions.regions"
                 label="Region"
@@ -39,7 +39,7 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <OptionsMultiselect
+              <ComboboxMultiselect
                 v-model="systems"
                 :options="filterOptions.systems"
                 label="Solar System"
@@ -97,7 +97,7 @@ import {computed, ref, watch} from 'vue'
 import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
-import OptionsMultiselect from "@/Shared/Components/OptionsMultiselect.vue";
+import ComboboxMultiselect from "@/Shared/Components/ComboboxMultiselect.vue";
 import { ls } from "@/Functions/useLocalStorage";
 
 // Remember the compact/wide choice across visits (persisted for a year, refreshed on each toggle).
@@ -107,7 +107,7 @@ const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 export default {
     name: "Assets",
     components: {
-        OptionsMultiselect,
+        ComboboxMultiselect,
         SelectedEntity,
         RequiredScopesWarning,
         DispatchUpdateButton,
