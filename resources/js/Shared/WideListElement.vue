@@ -1,5 +1,5 @@
 <template>
-  <li>
+  <li class="list-none">
     <Link
       v-if="url"
       :href="url"
@@ -38,7 +38,7 @@
     </Link>
     <div
       v-else
-      class="block hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out"
+      class="relative block hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out"
     >
       <div class="flex items-center px-4 py-4 sm:px-6">
         <div class="min-w-0 flex-1 flex items-center">

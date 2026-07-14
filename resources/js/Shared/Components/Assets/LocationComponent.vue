@@ -1,13 +1,22 @@
 <template>
   <WideLists>
     <template #header>
-      <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+      <div
+        class="bg-white px-4 border-b border-gray-200 sm:px-6"
+        :class="compact ? 'py-2' : 'py-5'"
+      >
         <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
           <div class="ml-4 mt-4">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <h3
+              class="leading-6 font-medium text-gray-900"
+              :class="compact ? 'text-sm' : 'text-lg'"
+            >
               {{ location.name ?? 'Unknown Location' }}
             </h3>
-            <p class="mt-1 text-sm text-gray-500">
+            <p
+              class="text-sm text-gray-500"
+              :class="compact ? 'mt-0' : 'mt-1'"
+            >
               {{ `${volume} volume and ${numberOfItems} items` }}
             </p>
           </div>
@@ -29,11 +38,11 @@
       </div>
     </template>
     <template #elements>
-        <ItemList
-            :key="location.assets.length"
-            :items="location.assets"
-            :compact="compact"
-        />
+      <ItemList
+        :key="location.assets.length"
+        :items="location.assets"
+        :compact="compact"
+      />
     </template>
   </WideLists>
   <teleport to="#destination">

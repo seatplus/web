@@ -79,8 +79,8 @@
       </div>
 
       <AssetsComponent
-        :parameters="cleanParams"
         :compact="switchValue"
+        :loading="searching"
       />
     </div>
   </div>
@@ -93,9 +93,15 @@ import AssetsComponent from "@/Shared/Components/Assets/AssetsComponent.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import {computed, ref, watch} from 'vue'
+import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import { ls } from "@/Functions/useLocalStorage";
+
+// Remember the compact/wide choice across visits (persisted for a year, refreshed on each toggle).
+const COMPACT_VIEW_KEY = 'assets.compactView'
+const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 
 export default {
     name: "Assets",
@@ -124,9 +130,11 @@ export default {
         },
     },
     setup(props) {
-        const switchValue = ref(false)
-        const infiniteId = ref(+new Date())
-        const search = ref(null)
+        const switchValue = ref(ls.get(COMPACT_VIEW_KEY) ?? false)
+        // Hydrate the search box from the URL so a shared/reloaded ?search=… link shows its term.
+        const search = ref(new URLSearchParams(window.location.search).get('search'))
+        // True while a filter reload is in flight, so the list can show it's updating.
+        const searching = ref(false)
         const regions = ref([])
         const systems = ref([])
 
@@ -139,22 +147,39 @@ export default {
             }
         })
 
-        const debounceInfiniteId = _.debounce(() => infiniteId.value++, 250)
+        // Reload only the `assets` scroll prop with the current filters; reset so
+        // <InfiniteScroll> replaces the list with the filtered first page instead of merging.
+        const reload = () => router.reload({
+            only: ['assets'],
+            reset: ['assets'],
+            data: cleanParams.value,
+            preserveState: true,
+            preserveScroll: true,
+            // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
+            preserveUrl: true,
+            onStart: () => { searching.value = true },
+            onFinish: () => { searching.value = false },
+        })
 
-        watch(() => search.value, (newValue) => {
-            if(_.size(newValue)>=3) {
-                debounceInfiniteId()
+        const debouncedReload = _.debounce(reload, 500)
+
+        // Search reloads on 3+ chars or when cleared; region/system selections reload immediately.
+        watch(search, (newValue) => {
+            if (! newValue || _.size(newValue) >= 3) {
+                debouncedReload()
             }
         })
 
-        watch([regions.value, systems.value], () => infiniteId.value++)
+        watch([regions, systems], () => reload(), { deep: true })
+
+        watch(switchValue, (value) => ls.set(COMPACT_VIEW_KEY, value, COMPACT_VIEW_TTL))
 
         return {
-            infiniteId,
             search,
             regions,
             systems,
             switchValue,
+            searching,
             cleanParams,
             pageTitle: 'Character Assets',
         }

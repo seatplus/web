@@ -19,7 +19,7 @@
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <DialogOverlay class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+          <DialogOverlay class="fixed inset-0 bg-gray-500/75 transition-opacity" />
         </TransitionChild>
 
         <!-- This element is to trick the browser into centering the modal contents. -->
@@ -38,7 +38,7 @@
         >
           <div
             :class="{'sm:max-w-lg': width === 'lg', 'sm:max-w-xl': width === 'xl', 'sm:max-w-2xl': width === '2xl', 'sm:max-w-3xl': width === '3xl', 'sm:max-w-4xl': width === '4xl', 'sm:max-w-5xl': width === '5xl' }"
-            class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:p-6"
+            class="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full sm:p-6"
           >
             <div class="hidden sm:block absolute top-0 right-0 pt-4 pr-4">
               <button

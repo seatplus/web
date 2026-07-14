@@ -2,7 +2,7 @@
   <WideListElement
     v-for="asset in items"
     :key="asset.item_id"
-    :url="url(asset)"
+    :url="''"
   >
     <template #avatar>
       <span class="inline-block relative">
@@ -12,9 +12,12 @@
           :object="asset.type"
           :size="128"
         />
-          <span v-else class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500">
-              <span class="text-xl font-medium leading-none text-white">N/A</span>
-          </span>
+        <span
+          v-else
+          class="inline-flex items-center justify-center h-12 w-12 shrink-0 mx-auto rounded-full bg-gray-500"
+        >
+          <span class="text-xl font-medium leading-none text-white">N/A</span>
+        </span>
 
         <span
           v-if="asset.quantity > 1"
@@ -36,9 +39,16 @@
     </template>
 
     <template #lower_left>
-      <TagIcon class="shrink-0 mr-1.5 h-5 w-5 text-gray-400" />
+      <TagIcon
+        class="shrink-0 mr-1.5 h-5 w-5"
+        :class="hasContent(asset) ? 'text-indigo-400' : 'text-gray-400'"
+      />
 
-      <span class="truncate">{{ getType(asset).name }}</span>
+      <!-- Indigo type name signals the row is expandable (has contents). -->
+      <span
+        class="truncate"
+        :class="{ 'text-indigo-600': hasContent(asset) }"
+      >{{ getType(asset).name }}</span>
     </template>
 
     <template #upper_right>
@@ -55,18 +65,18 @@
     </template>
 
     <template #navigation>
-      <Link
-        v-if="asset.content[0]"
-        :href="asset.url"
-        preserve-state
-        preserve-scroll
-      >
-          <ChevronRightIcon class="h-5 w-5 text-gray-400" />
-      </Link>
-        <ChevronRightIcon
-          v-else
-          class="h-5 w-5 text-transparent"
-        />
+      <!-- Chevron is purely a visual affordance; the whole row is the click target via the
+           stretched-link overlay below (kept transparent when the row has no contents so the
+           layout stays aligned). -->
+      <ChevronRightIcon
+        class="h-5 w-5"
+        :class="hasContent(asset) ? 'text-indigo-500' : 'text-transparent'"
+      />
+      <AssetContentsLink
+        v-if="hasContent(asset)"
+        :character-id="asset.owner_id"
+        :item-id="asset.item_id"
+      />
     </template>
   </WideListElement>
 </template>
@@ -75,9 +85,14 @@
 
 import WideListElement from "@/Shared/WideListElement.vue";
 import EveImage from "@/Shared/EveImage.vue";
-import {Link, usePage} from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 import { prefix } from 'metric-prefix'
-import {computed} from "vue";
+import {computed, defineAsyncComponent} from "vue";
+
+// Lazily resolved to break the ItemList ↔ AssetContentsLink import cycle (drilling a container
+// renders another ItemList). Async on the list-side chevron — not on the modal's ItemList — so
+// modal content still renders instantly at full size.
+const AssetContentsLink = defineAsyncComponent(() => import("./AssetContentsLink.vue"));
 import {TagIcon, ScaleIcon, ChevronRightIcon} from "@heroicons/vue/20/solid";
 
 defineProps({
@@ -87,29 +102,23 @@ defineProps({
   },
 });
 
-const hasOwnerPicture = computed(() => {
-
-  let selectedCharacterIds = _.get(route().params, 'character_ids', null)
-
-  if (_.size(selectedCharacterIds) > 1)
-    return true
-
-  return !selectedCharacterIds && usePage().props.user.data.characters.length > 1;
-})
+// Show the owner avatar when the user has more than one character (helps attribute assets).
+const hasOwnerPicture = computed(() => usePage().props.user.data.characters.length > 1)
 
 const getMetricPrefix = function (numeric_value) {
     return prefix(numeric_value, {precision: 3, unit: 'm³'})
 }
 
-const url = function (asset) {
-    return asset.content[0] ? route('character.item', {item_id: asset.item_id, character_id: asset.owner_id}) : ''
+// content_count on the (unfiltered) list path; the loaded content array on the filtered path.
+const hasContent = function (asset) {
+    return (asset.content_count ?? _.size(asset.content)) > 0
 }
 
 const getType = function (asset) {
 
   let type = asset.type
 
-  // if type is not set we createa a dummy type
+  // if type is not set we create a dummy type
   if (!type) {
     type = {
       name: 'Unknown',

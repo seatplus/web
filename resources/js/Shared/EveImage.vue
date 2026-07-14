@@ -82,6 +82,11 @@ import { getResourceVariants } from "@/actions/Seatplus/Web/Http/Controllers/Sha
                     resource_id: resourceId.value,
                 }))
 
+                // No variants for this resource (endpoint returned null/empty) — keep the default.
+                if (! variants) {
+                    return
+                }
+
                 function getVariant() {
                     if (props.bpo && _.has(_.invert(variants), 'bp'))
                         return 'bp'

@@ -5,7 +5,7 @@
       :label="label"
       :placeholder="placeholder"
       :categories="categories"
-      @selected-object="(obj) => selections.push(obj)"
+      @selected-object="(obj) => { if (obj) { selections.push(obj) } }"
     />
     <DismissibleButton
       v-for="selection in selections"
