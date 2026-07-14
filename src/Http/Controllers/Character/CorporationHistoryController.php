@@ -26,16 +26,20 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Web\Http\Controllers\Controller;
 
 class CorporationHistoryController extends Controller
 {
-    public function index(int $character_id): LengthAwarePaginator
+    /**
+     * A character's corporation history is a small, bounded list, so return it all in one
+     * response (fetched client-side via http.js getJson) instead of paginating.
+     */
+    public function index(int $character_id): Collection
     {
         return CorporationHistory::where('character_id', $character_id)
             ->orderByDesc('record_id')
-            ->paginate();
+            ->get();
     }
 }
