@@ -163,3 +163,96 @@ test('item() renders the ItemDetails page on a direct (shareable) visit', functi
         ]))
         ->assertInertia(fn (Assert $page) => $page->component('Character/ItemDetails')->has('item'));
 });
+
+// A location + a top-level container (100) holding a depth-2 matching asset (200), plus a
+// separate non-matching top-level item (300). Returns the character id and the location.
+function seedLocationWithNestedMatch(): array
+{
+    $characterId = test()->test_character->character_id;
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+
+    Asset::factory()->create([
+        'item_id' => 100, 'assetable_id' => $characterId, 'assetable_type' => CharacterInfo::class,
+        'location_id' => $location->location_id, 'root_location_id' => $location->location_id,
+        'root_item_id' => 100, 'location_flag' => 'Hangar', 'name' => 'Container',
+    ]);
+    Asset::factory()->create([ // nested match — rolls up to top-level 100 via root_item_id
+        'item_id' => 200, 'assetable_id' => $characterId, 'assetable_type' => CharacterInfo::class,
+        'location_id' => 100, 'root_location_id' => $location->location_id,
+        'root_item_id' => 100, 'name' => 'Sodia Ibis',
+    ]);
+    Asset::factory()->create([ // separate top-level item, no match
+        'item_id' => 300, 'assetable_id' => $characterId, 'assetable_type' => CharacterInfo::class,
+        'location_id' => $location->location_id, 'root_location_id' => $location->location_id,
+        'root_item_id' => 300, 'location_flag' => 'Hangar', 'name' => 'Other',
+    ]);
+
+    return [$characterId, $location];
+}
+
+test('location() returns only the top-level items that match at any depth (filtered)', function () {
+    [$characterId, $location] = seedLocationWithNestedMatch();
+
+    test()->actingAs(test()->test_user)
+        ->getJson(route('character.location', [
+            'location_id' => $location->location_id,
+            'character_ids' => [$characterId],
+            'search' => 'sodia',
+        ]))
+        ->assertOk()
+        ->assertJsonFragment(['item_id' => 100])   // top-level container that holds the match
+        ->assertJsonMissing(['item_id' => 300])    // non-matching top-level excluded
+        ->assertJsonPath('meta.total', 1);
+});
+
+test('location() returns the location direct children unfiltered', function () {
+    [$characterId, $location] = seedLocationWithNestedMatch();
+
+    test()->actingAs(test()->test_user)
+        ->getJson(route('character.location', [
+            'location_id' => $location->location_id,
+            'character_ids' => [$characterId],
+        ]))
+        ->assertOk()
+        // the two top-level items (100, 300) — not the nested 200
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonFragment(['item_id' => 100])
+        ->assertJsonFragment(['item_id' => 300])
+        ->assertJsonMissing(['item_id' => 200]);
+});
+
+test('location() returns nothing for a character the user is not authorised for', function () {
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $other = CharacterInfo::factory()->create(); // not owned/affiliated by the test user
+
+    Asset::factory()->create([
+        'item_id' => 999, 'assetable_id' => $other->character_id, 'assetable_type' => CharacterInfo::class,
+        'location_id' => $location->location_id, 'root_location_id' => $location->location_id,
+        'root_item_id' => 999, 'location_flag' => 'Hangar',
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->getJson(route('character.location', [
+            'location_id' => $location->location_id,
+            'character_ids' => [$other->character_id],
+        ]))
+        ->assertOk()
+        ->assertJsonPath('meta.total', 0); // requested id intersected out of the authorised set
+});
+
+test('index provides region/system filter options from the character locations', function () {
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+    Asset::factory()->create([
+        'assetable_id' => test()->test_character->character_id,
+        'assetable_type' => CharacterInfo::class,
+        'location_id' => $location->location_id,
+        'root_location_id' => $location->location_id,
+        'location_flag' => 'Hangar',
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('character.assets'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('filterOptions.regions', 1)
+            ->has('filterOptions.systems', 1));
+});
