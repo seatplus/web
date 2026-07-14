@@ -1,6 +1,6 @@
 <template>
   <div
-    v-for="(skills, group) in skills"
+    v-for="(groupSkills, group) in skills"
     :key="group"
   >
     <LeftAligned>
@@ -9,7 +9,7 @@
       </template>
       <template #description>
         <div class="flex justify-between">
-          <span>{{ sumSkillpoints(skills) }} total skillpoints</span>
+          <span>{{ sumSkillpoints(groupSkills) }} total skillpoints</span>
           <div class="flex space-x-1.5">
             <div class="flex">
               <div class="shrink-0 self-center">
@@ -31,7 +31,7 @@
         </div>
       </template>
       <LeftAlignedData
-        v-for="skill in skills"
+        v-for="skill in groupSkills"
         :key="skill.skill_id"
       >
         <template #title>
@@ -60,8 +60,9 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {computed} from "vue";
+import {computed, onMounted, ref} from "vue";
+import { getJson } from "@/Functions/http";
+import { skills as skillsAction } from "@/actions/Seatplus/Web/Http/Controllers/Character/SkillsController";
 import LeftAligned from "../../Layout/DataDisplay/LeftAligned.vue";
 import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData.vue";
 import {StarIcon} from "@heroicons/vue/20/solid";
@@ -78,9 +79,13 @@ export default {
     },
     setup(props) {
 
-        const results = useLoadCompleteResource('get.character.skills', {character_id: props.characterId});
+        // A character's skills are bounded — fetch them all in one request (axios/Ziggy-free).
+        const rawSkills = ref([])
+        onMounted(async () => {
+            rawSkills.value = await getJson(skillsAction.url(props.characterId)) ?? []
+        })
 
-        const skills = computed(() => _.chain(results.results.value)
+        const skills = computed(() => _.chain(rawSkills.value)
             .map((skill) => {
                 return {
                     ...skill,

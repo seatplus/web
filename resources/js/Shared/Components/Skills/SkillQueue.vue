@@ -53,8 +53,9 @@
 </template>
 
 <script>
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {computed} from "vue";
+import {computed, onMounted, ref} from "vue";
+import { getJson } from "@/Functions/http";
+import { skillQueue as skillQueueAction } from "@/actions/Seatplus/Web/Http/Controllers/Character/SkillsController";
 import { BookOpenIcon } from '@heroicons/vue/20/solid'
 import Time from "@/Shared/Time.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
@@ -69,9 +70,13 @@ export default {
         }
     },
     setup(props) {
-        const results = useLoadCompleteResource('get.character.skill.queue', { character_id: props.characterId })
+        // The skill queue is a small bounded list — fetch it in one request (axios/Ziggy-free).
+        const rawQueue = ref([])
+        onMounted(async () => {
+            rawQueue.value = await getJson(skillQueueAction.url(props.characterId)) ?? []
+        })
 
-        const queue = computed(() => _.chain(results.results.value)
+        const queue = computed(() => _.chain(rawQueue.value)
             .map((item) => {
                 return {
                     ...item,
@@ -83,7 +88,6 @@ export default {
         )
 
         return {
-            results,
             queue
         }
     }
