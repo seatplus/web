@@ -12,7 +12,7 @@
     </PageHeader>
 
     <div>
-      <div class="bg-white overflow-hidden shadow-lg rounded-lg mb-6">
+      <div class="bg-white shadow-lg rounded-lg mb-6">
         <div class="px-4 py-5 sm:p-6">
           <div class="grid grid-cols-6 gap-5">
             <div class="col-span-6 lg:col-span-2">
@@ -30,20 +30,22 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <EsiMultiselect
+              <ComboboxMultiselect
                 v-model="regions"
-                :categories="['region']"
+                :options="filterOptions.regions"
                 label="Region"
-                placeholder="search for region"
+                placeholder="All regions"
+                input-id="region-filter"
               />
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <EsiMultiselect
+              <ComboboxMultiselect
                 v-model="systems"
-                :categories="['solar_system']"
+                :options="filterOptions.systems"
                 label="Solar System"
-                placeholder="search for solar system"
+                placeholder="All systems"
+                input-id="system-filter"
               />
             </div>
 
@@ -81,6 +83,7 @@
       <AssetsComponent
         :compact="switchValue"
         :loading="searching"
+        :filter="appliedFilter"
       />
     </div>
   </div>
@@ -96,7 +99,7 @@ import {computed, ref, watch} from 'vue'
 import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
-import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import ComboboxMultiselect from "@/Shared/Components/ComboboxMultiselect.vue";
 import { ls } from "@/Functions/useLocalStorage";
 
 // Remember the compact/wide choice across visits (persisted for a year, refreshed on each toggle).
@@ -106,7 +109,7 @@ const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 export default {
     name: "Assets",
     components: {
-        EsiMultiselect,
+        ComboboxMultiselect,
         SelectedEntity,
         RequiredScopesWarning,
         DispatchUpdateButton,
@@ -128,6 +131,12 @@ export default {
             type: Array,
             default: () => []
         },
+        // Regions/systems present in the characters' locations — options for the filters.
+        filterOptions: {
+            required: false,
+            type: Object,
+            default: () => ({ regions: [], systems: [] })
+        },
     },
     setup(props) {
         const switchValue = ref(ls.get(COMPACT_VIEW_KEY) ?? false)
@@ -147,19 +156,28 @@ export default {
             }
         })
 
+        // The filter actually applied to the list (updated when a reload fires). Per-location lazy
+        // loads bind to this — not the live search input — so they refetch in sync with the shell
+        // list rather than on every keystroke.
+        const appliedFilter = ref(cleanParams.value)
+
         // Reload only the `assets` scroll prop with the current filters; reset so
         // <InfiniteScroll> replaces the list with the filtered first page instead of merging.
-        const reload = () => router.reload({
-            only: ['assets'],
-            reset: ['assets'],
-            data: cleanParams.value,
-            preserveState: true,
-            preserveScroll: true,
-            // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
-            preserveUrl: true,
-            onStart: () => { searching.value = true },
-            onFinish: () => { searching.value = false },
-        })
+        const reload = () => {
+            appliedFilter.value = cleanParams.value
+
+            router.reload({
+                only: ['assets'],
+                reset: ['assets'],
+                data: cleanParams.value,
+                preserveState: true,
+                preserveScroll: true,
+                // Filters are sent to the server but kept out of the browser URL (stays /character/assets).
+                preserveUrl: true,
+                onStart: () => { searching.value = true },
+                onFinish: () => { searching.value = false },
+            })
+        }
 
         const debouncedReload = _.debounce(reload, 500)
 
@@ -181,6 +199,7 @@ export default {
             switchValue,
             searching,
             cleanParams,
+            appliedFilter,
             pageTitle: 'Character Assets',
         }
     }

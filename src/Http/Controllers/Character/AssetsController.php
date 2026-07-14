@@ -34,7 +34,9 @@ use Inertia\Response;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
+use Seatplus\Web\Http\Actions\Character\Asset\GetAssetLocationFilterOptionsAction;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
+use Seatplus\Web\Http\Actions\Character\Asset\GetLocationTopLevelAssetsAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\AssetResource;
 use Seatplus\Web\Http\Resources\LocationRessource;
@@ -43,7 +45,7 @@ use Seatplus\Web\Services\Controller\DispatchTransferObject;
 
 class AssetsController extends Controller
 {
-    public function index(Request $request, GetCharacterAssetLocationAction $action): Response
+    public function index(Request $request, GetCharacterAssetLocationAction $action, GetAssetLocationFilterOptionsAction $filterOptionsAction): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
         $characterIds = $this->getCharacterIds($dispatchTransferObject, 'assets');
@@ -59,6 +61,9 @@ class AssetsController extends Controller
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characterIds' => $characterIds,
+            // The regions/systems actually present in these characters' locations — populates the
+            // region/system filters as a multiselect of relevant options (not a free-text search).
+            'filterOptions' => fn (): array => $filterOptionsAction->execute($validated['character_ids']),
             // Fully flatten each location (assets → type → group, etc.) to primitive arrays.
             // A bare ->resolve() only resolves the top level, leaving nested JsonResources as
             // objects that Inertia then re-wraps/serializes inconsistently; encoding the whole
@@ -69,6 +74,28 @@ class AssetsController extends Controller
                     true,
                 ))),
         ]);
+    }
+
+    /**
+     * A single location's top-level items (filtered-top-level via root_item_id), paginated and
+     * lazy-loaded when the location scrolls into view. Authorised identically to index(): the
+     * requested character_ids are intersected with getCharacterIds('assets') — own + assets-
+     * permission-affiliated (corp/alliance member management) + Director + superuser (+ recruits
+     * once impersonated) — and the query is hard-scoped to that set, so an arbitrary location_id
+     * or character_id can only ever return authorised assets.
+     */
+    public function location(int $location_id, Request $request, GetLocationTopLevelAssetsAction $action): JsonResponse
+    {
+        $authorized = $this->getCharacterIds($this->getDispatchTransferObject(), 'assets');
+
+        $requested = collect($request->input('character_ids'))->map(fn (mixed $id): int => (int) $id)->filter();
+
+        $validated = $request->only(['search', 'systems', 'regions', 'types', 'groups', 'categories']);
+        $validated['character_ids'] = $requested->isEmpty()
+            ? $authorized->values()->all()
+            : $authorized->intersect($requested)->values()->all();
+
+        return AssetResource::collection($action->execute($location_id, $validated))->response();
     }
 
     public function item(int $character_id, int $item_id, Request $request): Response|JsonResponse

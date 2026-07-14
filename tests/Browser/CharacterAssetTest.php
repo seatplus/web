@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -158,4 +159,123 @@ it('surfaces asset safety as its own location', function () {
     $page->waitForText($safety->name);
 
     $page->screenshot(true, 'character-assets-asset-safety');
+});
+
+if (! function_exists('attachOwnedCharacter')) {
+    /**
+     * Attach an additional owned character to the same user that owns $existing, so a browser test
+     * can exercise the multi-character case — the assets view aggregates over every character the
+     * logged-in user owns, not just the main. Returns the new character. Guarded so each Browser
+     * file can define it standalone without colliding when the suite loads several.
+     */
+    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
+    {
+        $user = CharacterUser::query()
+            ->where('character_id', $existing->character_id)
+            ->firstOrFail()
+            ->user;
+
+        $character = CharacterInfo::factory()->create();
+
+        CharacterUser::create([
+            'user_id' => $user->getKey(),
+            'character_id' => $character->character_id,
+            'character_owner_hash' => sha1((string) $character->character_id),
+        ]);
+
+        return $character;
+    }
+}
+
+it('narrows a location to only the top-level items that match the search at any depth', function () {
+    $character = actingAsCharacter();
+
+    $location = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $root = $location->location_id;
+
+    // A top-level container ("Praetor Bay") that HOLDS a nested asset named to match the search…
+    $container = makeCharacterAsset($character, $root, $root, ['name' => 'Praetor Bay']);
+    $container->update(['root_item_id' => $container->item_id]);
+    $nested = makeCharacterAsset($character, $container->item_id, $root, ['name' => 'Sodia Ibis', 'location_flag' => 'Cargo']);
+    $nested->update(['root_item_id' => $container->item_id]);
+
+    // …and a separate top-level item that does NOT match.
+    $other = makeCharacterAsset($character, $root, $root, ['name' => 'Quafe Crate']);
+    $other->update(['root_item_id' => $other->item_id]);
+
+    $page = visit('/character/assets');
+    $page->assertNoSmoke();
+    $page->waitForText('Character Assets');
+
+    // Unfiltered, the location lazy-loads both of its top-level items.
+    $page->waitForText('Praetor Bay');
+    $page->waitForText('Quafe Crate');
+
+    // Searching "sodia" matches the nested asset and rolls it up to its top-level container via
+    // root_item_id: only "Praetor Bay" survives, the unrelated top-level item drops out. Drives the
+    // shell re-query AND the per-location filtered-top-level refetch end-to-end.
+    $page->type('search', 'sodia');
+    $page->assertScript("(document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate'))");
+    $page->assertNoSmoke();
+
+    $page->screenshot(true, 'character-assets-search');
+});
+
+it('renders a location for every character the user owns', function () {
+    $mainCharacter = actingAsCharacter();
+    $secondCharacter = attachOwnedCharacter($mainCharacter);
+
+    // Each owned character holds assets in its own station. The view aggregates over every
+    // character the user owns (getCharacterIds), so BOTH locations must render — a single-character
+    // scope would show only the main's.
+    $locationA = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $locationB = Location::factory()->for(Station::factory(), 'locatable')->create();
+    makeCharacterAsset($mainCharacter, $locationA->location_id, $locationA->location_id);
+    makeCharacterAsset($secondCharacter, $locationB->location_id, $locationB->location_id);
+
+    $page = visit('/character/assets');
+    $page->assertNoSmoke();
+    $page->waitForText('Character Assets');
+
+    // Location cards are shells from the scroll prop, so their "system - station" header renders
+    // immediately (before the per-location lazy load). Assert both stations are present.
+    $page->waitForText($locationA->locatable->name);
+    $page->waitForText($locationB->locatable->name);
+
+    $page->screenshot(true, 'character-assets-multiple-characters');
+});
+
+it('filters the location list by region', function () {
+    $character = actingAsCharacter();
+
+    $locationA = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $locationB = Location::factory()->for(Station::factory(), 'locatable')->create();
+    makeCharacterAsset($character, $locationA->location_id, $locationA->location_id);
+    makeCharacterAsset($character, $locationB->location_id, $locationB->location_id);
+
+    $regionA = $locationA->locatable->system->region->name;
+    $stationA = $locationA->locatable->name;
+    $stationB = $locationB->locatable->name;
+
+    $page = visit('/character/assets');
+    $page->assertNoSmoke();
+    $page->waitForText('Character Assets');
+    $page->waitForText($stationA);
+    $page->waitForText($stationB);
+
+    // Pick location A's region in the combobox (mirrors the wallet-filter pattern: type to filter
+    // the options, then click the match). The region name only appears as a combobox option, never
+    // in a card header, so it is an unambiguous click target. The shell list re-queries and drops B.
+    $page->type('region-filter', $regionA);
+    $page->waitForText($regionA);
+    $page->click($regionA);
+
+    $page->assertScript(sprintf(
+        '(document.body.innerText.includes(%s) && !document.body.innerText.includes(%s))',
+        json_encode($stationA),
+        json_encode($stationB),
+    ));
+    $page->assertNoSmoke();
+
+    $page->screenshot(true, 'character-assets-region-filter');
 });
