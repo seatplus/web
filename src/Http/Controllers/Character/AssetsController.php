@@ -33,6 +33,7 @@ use Inertia\Response;
 use Seatplus\Eveapi\Models\Assets\Asset as EveApiAsset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
+use Seatplus\Web\Http\Actions\Character\Asset\GetAssetLocationFilterOptionsAction;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
 use Seatplus\Web\Http\Actions\Character\Asset\GetLocationTopLevelAssetsAction;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -43,7 +44,7 @@ use Seatplus\Web\Services\Controller\DispatchTransferObject;
 
 class AssetsController extends Controller
 {
-    public function index(Request $request, GetCharacterAssetLocationAction $action): Response
+    public function index(Request $request, GetCharacterAssetLocationAction $action, GetAssetLocationFilterOptionsAction $filterOptionsAction): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
         $characterIds = $this->getCharacterIds($dispatchTransferObject, 'assets');
@@ -59,6 +60,9 @@ class AssetsController extends Controller
         return Inertia::render('Character/Assets', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characterIds' => $characterIds,
+            // The regions/systems actually present in these characters' locations — populates the
+            // region/system filters as a multiselect of relevant options (not a free-text search).
+            'filterOptions' => fn (): array => $filterOptionsAction->execute($validated['character_ids']),
             // Fully flatten each location (assets → type → group, etc.) to primitive arrays.
             // A bare ->resolve() only resolves the top level, leaving nested JsonResources as
             // objects that Inertia then re-wraps/serializes inconsistently; encoding the whole

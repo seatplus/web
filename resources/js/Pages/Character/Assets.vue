@@ -30,20 +30,20 @@
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <EsiMultiselect
+              <OptionsMultiselect
                 v-model="regions"
-                :categories="['region']"
+                :options="filterOptions.regions"
                 label="Region"
-                placeholder="search for region"
+                placeholder="All regions"
               />
             </div>
 
             <div class="col-span-6 md:col-span-3 lg:col-span-2">
-              <EsiMultiselect
+              <OptionsMultiselect
                 v-model="systems"
-                :categories="['solar_system']"
+                :options="filterOptions.systems"
                 label="Solar System"
-                placeholder="search for solar system"
+                placeholder="All systems"
               />
             </div>
 
@@ -97,7 +97,7 @@ import {computed, ref, watch} from 'vue'
 import { router } from "@inertiajs/vue3";
 import { SwitchGroup, Switch, SwitchLabel } from '@headlessui/vue'
 import SelectedEntity from "@/Shared/Components/SelectedEntity.vue";
-import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import OptionsMultiselect from "@/Shared/Components/OptionsMultiselect.vue";
 import { ls } from "@/Functions/useLocalStorage";
 
 // Remember the compact/wide choice across visits (persisted for a year, refreshed on each toggle).
@@ -107,7 +107,7 @@ const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 export default {
     name: "Assets",
     components: {
-        EsiMultiselect,
+        OptionsMultiselect,
         SelectedEntity,
         RequiredScopesWarning,
         DispatchUpdateButton,
@@ -128,6 +128,12 @@ export default {
             required: true,
             type: Array,
             default: () => []
+        },
+        // Regions/systems present in the characters' locations — options for the filters.
+        filterOptions: {
+            required: false,
+            type: Object,
+            default: () => ({ regions: [], systems: [] })
         },
     },
     setup(props) {
