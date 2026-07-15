@@ -32,6 +32,7 @@ use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
+use Seatplus\Web\Support\AccessControl\RoleTypeMetadata;
 
 /**
  * @mixin Role
@@ -43,30 +44,46 @@ class RoleRessource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = auth()->user();
+        $service = (new BaseRoleService)->for($this->resource);
+        $meta = RoleTypeMetadata::for($this->type);
+
+        $isSuperuser = $user->can('superuser');
+        // Match the route middleware ('administrate access control groups'), not the old
+        // mismatched 'create,update and delete access control group' permission string.
+        $canEdit = $isSuperuser || $user->can('administrate access control groups');
+
+        $myStatus = $this->myStatus($user);          // 'active' | 'pending' | false
+        // canJoin() == meetsCriteria() for on-request/opt-in (eligible to apply/join).
+        $isEligible = $service->canJoin($user);
+
         return [
-            'name' => $this->name,
             'id' => $this->id,
+            'name' => $this->name,
+            'type' => $this->type->value,
+            'type_label' => $meta['label'],
+            'type_description' => $meta['description'],
             'members' => $this->users->count(),
-            'type' => $this->type,
-            'can_edit' => $this->when(auth()->user()->can('create,update and delete access control group'), true),
-            'can_moderate' => $this->when($this->canModerate(), true),
-            'status' => $this->roleMemberships()
-                ->where('entity_type', User::class)
-                ->where('entity_id', auth()->user()->getAuthIdentifier())
-                ->value('status') ?? false,
+            'my_status' => $myStatus,
+            'can_edit' => $canEdit,
+            // Fixed: delegate to the service for ALL moderated types (manual/on-request/opt-in),
+            // not the old hardcoded ON_REQUEST-only check. Automatic roles can't be moderated.
+            'can_moderate' => $isSuperuser || $service->canModerate($user),
+            // Per-user, per-type action affordances (apply = on-request, join = opt-in).
+            'can_apply' => $this->type === RoleType::ON_REQUEST && $myStatus === false && $isEligible,
+            'can_join' => $this->type === RoleType::OPT_IN && $myStatus === false && $isEligible,
+            'can_leave' => $myStatus !== false && $this->type !== RoleType::AUTOMATIC,
         ];
     }
 
-    private function canModerate(): bool
+    /**
+     * The authenticated user's membership status for this role, or false if not a member.
+     */
+    private function myStatus(User $user): string|false
     {
-        if ($this->type !== RoleType::ON_REQUEST) {
-            return false;
-        }
-
-        if (auth()->user()->can('superuser')) {
-            return true;
-        }
-
-        return (new BaseRoleService)->for($this->resource)->canModerate(auth()->user());
+        return $this->roleMemberships()
+            ->where('entity_type', User::class)
+            ->where('entity_id', $user->getAuthIdentifier())
+            ->value('status') ?? false;
     }
 }
