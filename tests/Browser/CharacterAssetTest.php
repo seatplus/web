@@ -97,6 +97,27 @@ if (! function_exists('makeNestedAssetChain')) {
     }
 }
 
+if (! function_exists('assertAssetsScript')) {
+    /**
+     * Assert a JS condition on the assets page, re-scrolling the list to the bottom on each poll so
+     * per-location items — which lazy-load when their location scrolls into view — are present.
+     * On mobile the stacked filter block pushes the first location below the fold, so a plain
+     * waitForText never triggers the load; scrolling the list container does.
+     */
+    function assertAssetsScript($page, string $condition): void
+    {
+        $page->assertScript("(document.getElementById('assets-body')?.closest('.overflow-y-auto')?.scrollTo(0, 1e6), {$condition})");
+    }
+}
+
+if (! function_exists('assetTextVisible')) {
+    /** Wait (with scroll) for a single asset/item name to appear on the assets list. */
+    function assetTextVisible($page, string $text): void
+    {
+        assertAssetsScript($page, "document.body.innerText.includes('".addslashes($text)."')");
+    }
+}
+
 it('merges the next locations page in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
@@ -135,7 +156,7 @@ it('drills three levels deep via the shareable item deep link', function (string
 
     // The top-level capital ship renders in its location list with a contents affordance:
     // the chevron links to the shareable character.item URL.
-    $page->waitForText($capital->name);
+    assetTextVisible($page, $capital->name);
     $page->assertPresent("a[href*='/item/{$capital->item_id}']");
 
     // Follow that shareable link down each containment level. The item() page renders one
@@ -154,8 +175,7 @@ it('drills three levels deep via the shareable item deep link', function (string
     $level4->waitForText($cargo->name);
 
     $level4->screenshot(true, "character-assets-deeplink-depth-three-{$device}");
-    // Desktop-only until the assets list renders per-location items on mobile (Assets mobile PR).
-})->with(['desktop']);
+})->with(['desktop', 'iphone']);
 
 it('opens a container’s contents in a modal on click', function (string $device) {
     $character = actingAsCharacter();
@@ -164,7 +184,7 @@ it('opens a container’s contents in a modal on click', function (string $devic
     $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
-    $page->waitForText($capital->name);
+    assetTextVisible($page, $capital->name);
 
     // Clicking the capital's contents affordance opens the modal and fetches its one level of
     // contents on demand (X-Modal) — the freighter appears without a full page navigation.
@@ -172,8 +192,7 @@ it('opens a container’s contents in a modal on click', function (string $devic
     $page->waitForText($freighter->name);
 
     $page->screenshot(true, "character-assets-contents-modal-{$device}");
-    // Desktop-only until the assets list renders per-location items on mobile (Assets mobile PR).
-})->with(['desktop']);
+})->with(['desktop', 'iphone']);
 
 it('surfaces asset safety as its own location', function (string $device) {
     $character = actingAsCharacter();
@@ -185,11 +204,10 @@ it('surfaces asset safety as its own location', function (string $device) {
     $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
-    $page->waitForText($safety->name);
+    assetTextVisible($page, $safety->name);
 
     $page->screenshot(true, "character-assets-asset-safety-{$device}");
-    // Desktop-only until the assets list renders per-location items on mobile (Assets mobile PR).
-})->with(['desktop']);
+})->with(['desktop', 'iphone']);
 
 if (! function_exists('attachOwnedCharacter')) {
     /**
@@ -237,20 +255,20 @@ it('narrows a location to only the top-level items that match the search at any 
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
-    // Unfiltered, the location lazy-loads both of its top-level items.
-    $page->waitForText('Praetor Bay');
-    $page->waitForText('Quafe Crate');
+    // Unfiltered, the location lazy-loads both of its top-level items (scroll to trigger).
+    assetTextVisible($page, 'Praetor Bay');
+    assetTextVisible($page, 'Quafe Crate');
 
     // Searching "herp" matches the nested asset ("Herpaderp Ibis") and rolls it up to its top-level
     // container via root_item_id: only "Praetor Bay" survives, the unrelated top-level item drops out.
     // Drives the shell re-query AND the per-location filtered-top-level refetch end-to-end.
     $page->type('search', 'herp');
-    $page->assertScript("(document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate'))");
+    // The filtered re-query rebuilds the location list, which lazy-loads on scroll again.
+    assertAssetsScript($page, "document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate')");
     $page->assertNoSmoke();
 
     $page->screenshot(true, "character-assets-search-{$device}");
-    // Desktop-only until the assets list renders per-location items on mobile (Assets mobile PR).
-})->with(['desktop']);
+})->with(['desktop', 'iphone']);
 
 it('renders a location for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
