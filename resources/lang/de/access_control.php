@@ -105,7 +105,7 @@ return [
     ],
 
     'wizard' => [
-        'title' => 'Gruppe erstellen',
+        'title' => 'Neue Gruppe',
         'back' => 'Zurück',
         'next' => 'Weiter',
         'review' => 'Überprüfe die Gruppe, bevor du sie erstellst.',

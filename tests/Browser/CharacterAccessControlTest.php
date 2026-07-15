@@ -116,7 +116,7 @@ it('configures a group: switch join method and save (admin)', function () {
     grantAclAdmin($character->character_id);
     $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
 
-    $page = visit('/manage_control_group/'.$role->id);
+    $page = visit('/acl/manage_control_group/'.$role->id);
     $page->assertNoSmoke();
 
     // The two clearly-separated sections + the join-method picker render.
@@ -138,7 +138,7 @@ it('creates a group through the guided wizard (admin)', function () {
 
     $page = visit('/acl/create');
     $page->assertNoSmoke();
-    $page->waitForText('Create group');
+    $page->waitForText('New group');
 
     // Step 1 — Name.
     $page->type('role-name', 'Logistics');
@@ -171,7 +171,7 @@ it('creates an open-to-all group through the wizard (admin)', function () {
 
     $page = visit('/acl/create');
     $page->assertNoSmoke();
-    $page->waitForText('Create group');
+    $page->waitForText('New group');
 
     // Step 1 — Name.
     $page->type('role-name', 'Everyone');

@@ -115,7 +115,7 @@ return [
 
     // Create wizard
     'wizard' => [
-        'title' => 'Create group',
+        'title' => 'New group',
         'back' => 'Back',
         'next' => 'Next',
         'review' => 'Review the group before creating it.',
