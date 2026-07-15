@@ -2,6 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contracts\Contract;
@@ -14,15 +17,21 @@ if (! function_exists('deviceVisit')) {
      * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
      * suite's other function_exists helpers rather than in tests/Pest.php.
      */
-    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    function deviceVisit(string $device, string $url, array $options = []): mixed
     {
-        $page = visit($url, $options);
-
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
         if ($device === 'iphone') {
-            $page->resize(390, 844);
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
         }
 
-        return $page;
+        return visit($url, $options);
     }
 }
 
