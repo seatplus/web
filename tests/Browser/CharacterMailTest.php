@@ -88,7 +88,9 @@ it('merges the next page of mail headers on scroll', function (string $device) {
     $page->assertScript("(document.getElementById('desktop-mail-list').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
     $page->screenshot(true, "character-mails-infinite-scroll-{$device}");
-})->with(['desktop', 'iphone']);
+    // Desktop-only: mobile renders MobileMailList (a different component), not #desktop-mail-list.
+    // Mobile mail infinite-scroll is addressed in its own PR.
+})->with(['desktop']);
 
 it('aggregates mail headers across all of the user\'s characters', function (string $device) {
     $mainCharacter = actingAsCharacter();
