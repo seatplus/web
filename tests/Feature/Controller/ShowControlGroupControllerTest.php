@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 
@@ -36,7 +37,26 @@ it('shows role detail page to admin with administrate permission', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/RoleDetail')
             ->where('can_edit', true)
-            ->has('role.affiliations')
+            ->has('role.applies_to')
+            ->has('role.eligibility')
+        );
+});
+
+it('shows role detail to a plain member (discover flow, not just admins/moderators)', function () {
+    RoleMembership::create([
+        'role_id' => test()->role->id,
+        'entity_type' => User::class,
+        'entity_id' => test()->test_user->getKey(),
+        'status' => 'active',
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.detail', test()->role->id))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('AccessControl/RoleDetail')
+            ->where('can_edit', false)
+            ->where('role.my_status', 'active')
         );
 });
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     'group' => 'Gruppe',
     'groups' => 'Gruppen',
+    'members_count' => '{0} Keine Mitglieder|{1} :count Mitglied|[2,*] :count Mitglieder',
 
     'join_method' => [
         'label' => 'Beitrittsart',
