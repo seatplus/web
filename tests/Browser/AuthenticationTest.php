@@ -14,7 +14,11 @@ if (! function_exists('deviceVisit')) {
     {
         $page = visit($url, $options);
 
-        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+        if ($device === 'iphone') {
+            $page->resize(390, 844);
+        }
+
+        return $page;
     }
 }
 
