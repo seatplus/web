@@ -1,6 +1,18 @@
 <template>
   <div class="space-y-8">
-    <PageHeader :page-title="trans('web::access_control.groups')" />
+    <PageHeader :page-title="trans('web::access_control.groups')">
+      <template
+        v-if="canCreate"
+        #primary
+      >
+        <Link
+          :href="createUrl"
+          class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+        >
+          {{ trans('web::access_control.actions.create') }}
+        </Link>
+      </template>
+    </PageHeader>
 
     <!-- My groups -->
     <section class="space-y-3">
@@ -26,6 +38,24 @@
       </p>
     </section>
 
+    <!-- All groups (managers only) -->
+    <section
+      v-if="allGroups.length"
+      class="space-y-3"
+    >
+      <h2 class="text-sm font-semibold text-gray-900">
+        {{ trans('web::access_control.discover.all_groups') }}
+      </h2>
+      <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <li
+          v-for="role in allGroups"
+          :key="role.id"
+        >
+          <RoleCard :role="role" />
+        </li>
+      </ul>
+    </section>
+
     <!-- Available to join -->
     <section
       v-if="availableGroups.length"
@@ -47,9 +77,12 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { Link } from "@inertiajs/vue3";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import RoleCard from "@/Shared/Components/AccessControl/RoleCard.vue";
 import { useTranslations } from "@/composables/useTranslations";
+import { create as createGroupRoute } from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/CreateControlGroupController";
 
 defineProps({
     myGroups: {
@@ -60,11 +93,21 @@ defineProps({
         type: Array,
         default: () => [],
     },
+    allGroups: {
+        type: Array,
+        default: () => [],
+    },
     canCreate: {
+        type: Boolean,
+        default: false,
+    },
+    canManage: {
         type: Boolean,
         default: false,
     },
 });
 
 const { trans } = useTranslations();
+
+const createUrl = computed(() => createGroupRoute.url());
 </script>

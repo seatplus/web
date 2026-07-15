@@ -6,6 +6,7 @@ return [
     'group' => 'Gruppe',
     'groups' => 'Gruppen',
     'members_count' => '{0} Keine Mitglieder|{1} :count Mitglied|[2,*] :count Mitglieder',
+    'delete_confirm' => 'Gruppe ":name" endgültig löschen? Dies kann nicht rückgängig gemacht werden.',
 
     'join_method' => [
         'label' => 'Beitrittsart',
@@ -31,6 +32,8 @@ return [
         'label' => 'Berechtigung',
         'help' => 'Mitglieder welcher Corporations oder Allianzen dieser Gruppe beitreten können.',
         'everyone' => 'Jeder kann beitreten',
+        'everyone_help' => 'Jeder Nutzer ist berechtigt, unabhängig von Corporation oder Allianz.',
+        'none' => 'Noch niemand',
     ],
 
     'applies_to' => [
@@ -43,6 +46,8 @@ return [
         'exclude' => 'Nie (ausschließen)',
         'exclude_help' => 'Immer ausgeschlossen, auch wenn oben zutreffend.',
         'everything' => 'Alles',
+        'everything_help' => 'Die Berechtigungen der Gruppe gelten für jeden Charakter, jede Corporation und Allianz.',
+        'none' => 'Nichts',
     ],
 
     'status' => [
@@ -65,6 +70,13 @@ return [
         'delete' => 'Gruppe löschen',
         'configure' => 'Konfigurieren',
         'manage_members' => 'Mitglieder verwalten',
+        'save' => 'Speichern',
+        'cancel' => 'Abbrechen',
+        'add' => 'Hinzufügen',
+    ],
+
+    'fields' => [
+        'name' => 'Name',
     ],
 
     'sections' => [
@@ -78,8 +90,32 @@ return [
 
     'discover' => [
         'my_groups' => 'Meine Gruppen',
+        'all_groups' => 'Alle Gruppen',
         'available' => 'Verfügbar zum Beitritt',
         'none_available' => 'Keine Gruppen zum Beitritt verfügbar.',
         'no_groups' => 'Du bist noch in keiner Gruppe.',
+    ],
+
+    'permissions' => [
+        'help' => 'Welche Berechtigungen diese Gruppe ihren Mitgliedern gewährt.',
+        'search' => 'Berechtigungen filtern…',
+        'none' => 'Keine passenden Berechtigungen.',
+        'none_selected' => 'Keine',
+        'selected' => ':count ausgewählt',
+    ],
+
+    'wizard' => [
+        'title' => 'Neue Gruppe',
+        'back' => 'Zurück',
+        'next' => 'Weiter',
+        'review' => 'Überprüfe die Gruppe, bevor du sie erstellst.',
+        'steps' => [
+            'name' => 'Name',
+            'join_method' => 'Beitrittsart',
+            'eligibility' => 'Berechtigung',
+            'applies_to' => 'Gilt für',
+            'permissions' => 'Berechtigungen',
+            'review' => 'Überprüfen',
+        ],
     ],
 ];

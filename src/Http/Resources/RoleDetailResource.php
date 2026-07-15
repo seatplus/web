@@ -10,6 +10,7 @@ use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Services\Roles\AbstractRoleService;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -40,17 +41,40 @@ class RoleDetailResource extends JsonResource
             [
                 'capabilities' => RoleTypeMetadata::for($this->type),
                 'permissions' => $this->permissions->pluck('name'),
-                // Authorization scope — what the permissions apply to.
+                // Authorization scope — what the permissions apply to. The three affiliation types are
+                // independent. "Everything" = the Doomheim sentinel affiliated as INVERSE.
                 'applies_to' => [
-                    'mode' => $this->affiliations->contains('type', AffiliationType::INVERSE->value)
-                        ? 'everyone_except'
-                        : 'only_these',
-                    'included' => $this->mapAffiliations([AffiliationType::ALLOWED->value, AffiliationType::INVERSE->value]),
+                    'everything' => $this->hasEverythingAffiliation(),
+                    'allowed' => $this->mapAffiliations([AffiliationType::ALLOWED->value]),
+                    'inverse' => $this->mapAffiliations([AffiliationType::INVERSE->value]),
                     'excluded' => $this->mapAffiliations([AffiliationType::FORBIDDEN->value]),
                 ],
-                // Membership eligibility — the corp/alliance criteria rows.
-                'eligibility' => $this->mapCriteria(),
+                // Membership eligibility — the corp/alliance criteria rows. "Anyone" = the Doomheim
+                // sentinel criterion (open to all).
+                'eligibility' => [
+                    'anyone' => $this->isOpenToAll(),
+                    'entities' => $this->mapCriteria(),
+                ],
             ]
+        );
+    }
+
+    /** Whether the group's permissions apply to everyone (Doomheim affiliated as INVERSE). */
+    private function hasEverythingAffiliation(): bool
+    {
+        return $this->affiliations->contains(
+            fn (Affiliation $affiliation) => (int) $affiliation->affiliatable_id === AbstractRoleService::EVERYONE_CORPORATION_ID
+                && $affiliation->affiliatable_type === CorporationInfo::class
+                && $affiliation->type === AffiliationType::INVERSE->value
+        );
+    }
+
+    /** Whether the group is open to all (Doomheim present as a criterion). */
+    private function isOpenToAll(): bool
+    {
+        return $this->roleMemberships->contains(
+            fn (RoleMembership $membership) => (int) $membership->entity_id === AbstractRoleService::EVERYONE_CORPORATION_ID
+                && $membership->entity_type === CorporationInfo::class
         );
     }
 
@@ -62,6 +86,8 @@ class RoleDetailResource extends JsonResource
     {
         return $this->affiliations
             ->whereIn('type', $types)
+            ->reject(fn (Affiliation $affiliation) => (int) $affiliation->affiliatable_id === AbstractRoleService::EVERYONE_CORPORATION_ID
+                && $affiliation->affiliatable_type === CorporationInfo::class)
             ->map(function (Affiliation $affiliation): array {
                 $name = data_get($affiliation->affiliatable, 'name');
 
@@ -84,6 +110,8 @@ class RoleDetailResource extends JsonResource
     {
         return $this->roleMemberships
             ->whereIn('entity_type', [CorporationInfo::class, AllianceInfo::class])
+            ->reject(fn (RoleMembership $membership) => (int) $membership->entity_id === AbstractRoleService::EVERYONE_CORPORATION_ID
+                && $membership->entity_type === CorporationInfo::class)
             ->map(function (RoleMembership $membership): array {
                 $name = data_get($membership->entity, 'name');
 

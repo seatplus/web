@@ -59,7 +59,8 @@ Route::delete('/acl/{role_id}/deny/{user_id}', DenyApplicationController::class)
 Route::delete('/acl/{role_id}/user/{user_id}', LeaveControlGroupController::class)->name('acl.leave');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
-    Route::post('/create', CreateControlGroupController::class)->name('acl.create');
+    Route::get('/create', [CreateControlGroupController::class, 'create'])->name('acl.create');
+    Route::post('/create', [CreateControlGroupController::class, 'store'])->name('acl.store');
 
     Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
 

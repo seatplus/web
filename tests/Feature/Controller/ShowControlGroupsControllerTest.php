@@ -34,6 +34,34 @@ it('shows ControlGroupsIndex to user with view access control permission', funct
         ->assertInertia(fn (Assert $page) => $page->component('AccessControl/ControlGroupsIndex'));
 });
 
+it('shows every group to a manager, including a manual group they do not belong to', function () {
+    // superuser passes the view gate (Gate::before) and gets canManage = true
+    assignPermissionToTestUser(['superuser']);
+
+    // a manual group the manager is neither a member of nor able to join
+    $managed = Role::findById(Role::create(['name' => 'managed'])->id);
+    $managed->update(['type' => RoleType::MANUAL]);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('canManage', true)
+            ->has('allGroups', 1)
+            ->where('allGroups.0.name', 'managed')
+            ->has('myGroups', 0));
+});
+
+it('does not expose all groups to a non-manager', function () {
+    assignPermissionToTestUser(['view access control']);
+    Role::create(['name' => 'somebody elses group']);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.groups'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('canManage', false)
+            ->has('allGroups', 0));
+});
+
 it('segments roles into my groups and available-to-join', function () {
     assignPermissionToTestUser(['view access control']);
     $corporationId = test()->test_character->corporation->corporation_id;
