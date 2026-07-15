@@ -6,6 +6,20 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Corporation wallet browser test.
  *
@@ -20,7 +34,7 @@ use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 
 uses(RefreshDatabase::class);
 
-it('merges the next corporation journal and transaction pages in on scroll', function () {
+it('merges the next corporation journal and transaction pages in on scroll', function (string $device) {
     $character = actingAsCharacter();
     $corporationId = $character->corporation->corporation_id;
 
@@ -66,7 +80,7 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
         $page->assertScript("(document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
     };
 
-    $page = visit('/corporation/wallet');
+    $page = deviceVisit($device, '/corporation/wallet');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
     $page->assertSee('Transaction');
@@ -75,5 +89,5 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
     $assertScrollMerges($page, "journal-body-{$corporationId}-1");
     $assertScrollMerges($page, "transaction-body-{$corporationId}-1");
 
-    $page->screenshot(true, 'corporation-wallet-infinite-scroll');
-});
+    $page->screenshot(true, "corporation-wallet-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);

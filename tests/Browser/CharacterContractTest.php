@@ -8,6 +8,20 @@ use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Character contracts browser tests — run against the real assembled core app.
  *
@@ -81,7 +95,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next contracts page in on scroll', function () {
+it('merges the next contracts page in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // 40 contracts → several paginator pages (default 15/page) for the contracts_<id> prop.
@@ -89,7 +103,7 @@ it('merges the next contracts page in on scroll', function () {
 
     $rows = "#contracts-body-{$character->character_id} > *";
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
@@ -102,10 +116,10 @@ it('merges the next contracts page in on scroll', function () {
     // so InfiniteScroll's end trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('contracts-body-{$character->character_id}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-contracts-infinite-scroll');
-});
+    $page->screenshot(true, "character-contracts-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders both the assignee and the acceptor for an accepted contract', function () {
+it('renders both the assignee and the acceptor for an accepted contract', function (string $device) {
     $character = actingAsCharacter();
 
     // A second, distinct character to act as the acceptor. A factory character carries its
@@ -119,7 +133,7 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
         'status' => 'in_progress',
     ]);
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
@@ -130,10 +144,10 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
     $page->waitForText($character->name);
     $page->waitForText($acceptor->name);
 
-    $page->screenshot(true, 'character-contracts-assignee-acceptor');
-});
+    $page->screenshot(true, "character-contracts-assignee-acceptor-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a contracts list for every character the user owns', function () {
+it('renders a contracts list for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -143,12 +157,12 @@ it('renders a contracts list for every character the user owns', function () {
     collect([$mainCharacter, $secondCharacter])
         ->each(fn (CharacterInfo $character) => makeCharacterContracts($character, 5));
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
     $page->assertPresent("#contracts-body-{$mainCharacter->character_id}");
     $page->assertPresent("#contracts-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, 'character-contracts-multiple-characters');
-});
+    $page->screenshot(true, "character-contracts-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);

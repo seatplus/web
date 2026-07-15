@@ -4,6 +4,20 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Authentication browser tests — run against the real assembled core app (never under
  * web's Testbench harness; web's phpunit.xml excludes tests/Browser). They execute
@@ -46,20 +60,20 @@ if (! function_exists('attachOwnedCharacter')) {
 
 /* ------------------------------------------------------------- unauthenticated */
 
-it('renders the login page', function () {
-    $page = visit('/login');
+it('renders the login page', function (string $device) {
+    $page = deviceVisit($device, '/login');
 
     $page->assertNoSmoke();
     $page->assertSee('Sign in');
-    $page->screenshot(true, 'login');
-});
+    $page->screenshot(true, "login-{$device}");
+})->with(['desktop', 'iphone']);
 
 /* --------------------------------------------------------------- authenticated */
 
-it('renders the dashboard for an authenticated user', function () {
+it('renders the dashboard for an authenticated user', function (string $device) {
     actingAsCharacter();
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     $page->assertNoSmoke();
     $page->assertSee('Characters');
@@ -67,16 +81,16 @@ it('renders the dashboard for an authenticated user', function () {
     // Let the lazy-loaded portraits (EveImage IntersectionObserver) settle so the
     // screenshot captures them rather than the placeholder SVGs.
     $page->wait(1);
-    $page->screenshot(true, 'dashboard');
+    $page->screenshot(true, "dashboard-{$device}");
 
     test()->assertAuthenticated();
-});
+})->with(['desktop', 'iphone']);
 
-it('renders a dashboard card for every character the user owns', function () {
+it('renders a dashboard card for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     $page->assertNoSmoke();
     $page->waitForText('Characters');
@@ -97,13 +111,13 @@ it('renders a dashboard card for every character the user owns', function () {
 
     $page->assertCount('img.h-12.w-12', 2);
 
-    $page->screenshot(true, 'dashboard-multiple-characters');
-});
+    $page->screenshot(true, "dashboard-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('wires the character portrait to the EVE image server', function () {
+it('wires the character portrait to the EVE image server', function (string $device) {
     $character = actingAsCharacter();
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     // EveImage lazy-loads the portrait via an IntersectionObserver, mounting the
     // <img> a beat after the page settles — wait for it before asserting.
@@ -125,4 +139,4 @@ it('wires the character portrait to the EVE image server', function () {
         'src',
         "images.evetech.net/characters/{$character->character_id}/portrait",
     );
-});
+})->with(['desktop', 'iphone']);

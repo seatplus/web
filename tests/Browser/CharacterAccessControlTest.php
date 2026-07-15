@@ -9,6 +9,20 @@ use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Access-control discover flow browser tests, run against the assembled core app.
  * Covers the redesigned /acl index: "My groups" vs "Available to join" segmentation and the
@@ -57,12 +71,12 @@ if (! function_exists('makeOptInRoleForCorporation')) {
     }
 }
 
-it('lists a group the eligible user can join under "Available to join"', function () {
+it('lists a group the eligible user can join under "Available to join"', function (string $device) {
     $character = actingAsCharacter();
     grantAclView($character->character_id);
     makeOptInRoleForCorporation('Fleet Operations', $character->corporation_id);
 
-    $page = visit('/acl');
+    $page = deviceVisit($device, '/acl');
     $page->assertNoSmoke();
 
     $page->waitForText('Available to join');
@@ -70,15 +84,15 @@ it('lists a group the eligible user can join under "Available to join"', functio
     // Self-service group → a Join affordance is present.
     $page->assertSee('Join');
 
-    $page->screenshot(true, 'acl-discover-available');
-});
+    $page->screenshot(true, "acl-discover-available-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('joins a self-service group and moves it into "My groups"', function () {
+it('joins a self-service group and moves it into "My groups"', function (string $device) {
     $character = actingAsCharacter();
     grantAclView($character->character_id);
     makeOptInRoleForCorporation('Fleet Operations', $character->corporation_id);
 
-    $page = visit('/acl');
+    $page = deviceVisit($device, '/acl');
     $page->assertNoSmoke();
     $page->waitForText('Fleet Operations');
 
@@ -87,10 +101,10 @@ it('joins a self-service group and moves it into "My groups"', function () {
     $page->assertScript("(document.body.innerText.includes('Fleet Operations') && document.body.innerText.includes('Member'))");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'acl-discover-joined');
-});
+    $page->screenshot(true, "acl-discover-joined-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a group the user already belongs to under "My groups"', function () {
+it('renders a group the user already belongs to under "My groups"', function (string $device) {
     $character = actingAsCharacter();
     $user = grantAclView($character->character_id);
 
@@ -103,20 +117,20 @@ it('renders a group the user already belongs to under "My groups"', function () 
         'status' => 'active',
     ]);
 
-    $page = visit('/acl');
+    $page = deviceVisit($device, '/acl');
     $page->assertNoSmoke();
     $page->waitForText('My groups');
     $page->waitForText('Directors');
 
-    $page->screenshot(true, 'acl-discover-my-groups');
-});
+    $page->screenshot(true, "acl-discover-my-groups-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('configures a group: switch join method and save (admin)', function () {
+it('configures a group: switch join method and save (admin)', function (string $device) {
     $character = actingAsCharacter();
     grantAclAdmin($character->character_id);
     $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
 
-    $page = visit('/acl/manage_control_group/'.$role->id);
+    $page = deviceVisit($device, '/acl/manage_control_group/'.$role->id);
     $page->assertNoSmoke();
 
     // The two clearly-separated sections + the join-method picker render.
@@ -129,14 +143,14 @@ it('configures a group: switch join method and save (admin)', function () {
     $page->click('Save');
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'acl-configure');
-});
+    $page->screenshot(true, "acl-configure-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('creates a group through the guided wizard (admin)', function () {
+it('creates a group through the guided wizard (admin)', function (string $device) {
     $character = actingAsCharacter();
     grantAclAdmin($character->character_id);
 
-    $page = visit('/acl/create');
+    $page = deviceVisit($device, '/acl/create');
     $page->assertNoSmoke();
     $page->waitForText('New group');
 
@@ -162,14 +176,14 @@ it('creates a group through the guided wizard (admin)', function () {
     $page->assertScript("document.body.innerText.includes('Logistics')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'acl-create-wizard');
-});
+    $page->screenshot(true, "acl-create-wizard-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('creates an open-to-all group through the wizard (admin)', function () {
+it('creates an open-to-all group through the wizard (admin)', function (string $device) {
     $character = actingAsCharacter();
     grantAclAdmin($character->character_id);
 
-    $page = visit('/acl/create');
+    $page = deviceVisit($device, '/acl/create');
     $page->assertNoSmoke();
     $page->waitForText('New group');
 
@@ -201,5 +215,5 @@ it('creates an open-to-all group through the wizard (admin)', function () {
     $page->assertScript("document.body.innerText.includes('Everyone')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'acl-create-wizard-everyone');
-});
+    $page->screenshot(true, "acl-create-wizard-everyone-{$device}");
+})->with(['desktop', 'iphone']);

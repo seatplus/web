@@ -6,6 +6,20 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Character wallet browser tests — run against the real assembled core app.
  *
@@ -44,7 +58,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next journal and transaction pages in on scroll', function () {
+it('merges the next journal and transaction pages in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // 40 journal + 40 transaction rows, 6h apart (adjacent entries never more than a
@@ -79,7 +93,7 @@ it('merges the next journal and transaction pages in on scroll', function () {
         $page->assertScript("(document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
     };
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
     $page->assertSee('Transaction');
@@ -88,10 +102,10 @@ it('merges the next journal and transaction pages in on scroll', function () {
     $assertScrollMerges($page, "journal-body-{$character->character_id}");
     $assertScrollMerges($page, "transaction-body-{$character->character_id}");
 
-    $page->screenshot(true, 'character-wallet-infinite-scroll');
-});
+    $page->screenshot(true, "character-wallet-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('filters the wallet journal by ref_type (and resets, not merges)', function () {
+it('filters the wallet journal by ref_type (and resets, not merges)', function (string $device) {
     $character = actingAsCharacter();
 
     // 30 player_donation (newest) + 3 bounty (oldest), 6h apart. So the unfiltered
@@ -116,7 +130,7 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
 
     $rows = "#journal-body-{$character->character_id} > li";
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
     $page->assertCount($rows, 15); // first page of 33, all player_donation
@@ -129,10 +143,10 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
 
     // Filtered + reset: only the 3 bounty rows remain (not 15 + merged).
     $page->assertCount($rows, 3);
-    $page->screenshot(true, 'character-wallet-filter');
-});
+    $page->screenshot(true, "character-wallet-filter-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a wallet card for every character the user owns', function () {
+it('renders a wallet card for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -149,12 +163,12 @@ it('renders a wallet card for every character the user owns', function () {
                 'wallet_journable_type' => CharacterInfo::class,
             ]));
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->waitForText('Journal');
 
     $page->assertPresent("#journal-body-{$mainCharacter->character_id}");
     $page->assertPresent("#journal-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, 'character-wallet-multiple-characters');
-});
+    $page->screenshot(true, "character-wallet-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);

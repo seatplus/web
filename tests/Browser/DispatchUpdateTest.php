@@ -11,6 +11,20 @@ use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * "Update" (dispatch) sidebar browser tests — run against the real assembled core app.
  *
@@ -53,21 +67,21 @@ if (! function_exists('dispatchSidebarSees')) {
     }
 }
 
-it('lists the user\'s own character in the update sidebar', function () {
+it('lists the user\'s own character in the update sidebar', function (string $device) {
     $character = actingAsCharacter();
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.character.wallet'));
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
 
     $page->click('Update');
     $page->waitForText('Your characters');
     $page->assertScript(dispatchSidebarSees($character->name));
 
-    $page->screenshot(true, 'dispatch-owned-character');
-});
+    $page->screenshot(true, "dispatch-owned-character-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('reveals an affiliated (non-owned) character only when the affiliated section is expanded', function () {
+it('reveals an affiliated (non-owned) character only when the affiliated section is expanded', function (string $device) {
     $character = actingAsCharacter();
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.character.wallet'));
     $user = User::whereMainCharacterId($character->character_id)->sole();
@@ -90,7 +104,7 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     ]);
     $user->assignRole($role);
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
 
     $page->click('Update');
@@ -105,10 +119,10 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     $page->click('Affiliated characters');
     $page->assertScript(dispatchSidebarSees($affiliated_character->name));
 
-    $page->screenshot(true, 'dispatch-affiliated-character');
-});
+    $page->screenshot(true, "dispatch-affiliated-character-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('lists the corporation in the update sidebar on a corporation-scoped page', function () {
+it('lists the corporation in the update sidebar on a corporation-scoped page', function (string $device) {
     $character = actingAsCharacter();
 
     // Director grants access to the corporation wallet page; Accountant satisfies the
@@ -119,12 +133,12 @@ it('lists the corporation in the update sidebar on a corporation-scoped page', f
     );
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.corporation.wallet'));
 
-    $page = visit('/corporation/wallet');
+    $page = deviceVisit($device, '/corporation/wallet');
     $page->assertNoSmoke();
 
     $page->click('Update');
     $page->waitForText('Your corporations');
     $page->assertScript(dispatchSidebarSees($character->corporation->name));
 
-    $page->screenshot(true, 'dispatch-owned-corporation');
-});
+    $page->screenshot(true, "dispatch-owned-corporation-{$device}");
+})->with(['desktop', 'iphone']);

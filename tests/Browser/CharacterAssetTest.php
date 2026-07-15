@@ -9,6 +9,20 @@ use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Eveapi\Models\Universe\Type;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Character assets browser tests — run against the real assembled core app.
  *
@@ -70,7 +84,7 @@ if (! function_exists('makeNestedAssetChain')) {
     }
 }
 
-it('merges the next locations page in on scroll', function () {
+it('merges the next locations page in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // >1 paginator page of locations (15/page) so the `assets` scroll prop has a next page.
@@ -81,7 +95,7 @@ it('merges the next locations page in on scroll', function () {
 
     $rows = '#assets-body > *';
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -95,14 +109,14 @@ it('merges the next locations page in on scroll', function () {
     // trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('assets-body').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-assets-infinite-scroll');
-});
+    $page->screenshot(true, "character-assets-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('drills three levels deep via the shareable item deep link', function () {
+it('drills three levels deep via the shareable item deep link', function (string $device) {
     $character = actingAsCharacter();
     ['capital' => $capital, 'freighter' => $freighter, 'container' => $container, 'cargo' => $cargo] = makeNestedAssetChain($character);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -113,27 +127,27 @@ it('drills three levels deep via the shareable item deep link', function () {
 
     // Follow that shareable link down each containment level. The item() page renders one
     // level of contents, so each parent's ItemDetails shows the next-deeper asset.
-    $level2 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $capital->item_id], false));
+    $level2 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $capital->item_id], false));
     $level2->assertNoSmoke();
     $level2->waitForText($freighter->name);
 
-    $level3 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $freighter->item_id], false));
+    $level3 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $freighter->item_id], false));
     $level3->assertNoSmoke();
     $level3->waitForText($container->name);
 
     // Three layers of nesting: the container's page shows the cargo inside it.
-    $level4 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $container->item_id], false));
+    $level4 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $container->item_id], false));
     $level4->assertNoSmoke();
     $level4->waitForText($cargo->name);
 
-    $level4->screenshot(true, 'character-assets-deeplink-depth-three');
-});
+    $level4->screenshot(true, "character-assets-deeplink-depth-three-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('opens a container’s contents in a modal on click', function () {
+it('opens a container’s contents in a modal on click', function (string $device) {
     $character = actingAsCharacter();
     ['capital' => $capital, 'freighter' => $freighter] = makeNestedAssetChain($character);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
     $page->waitForText($capital->name);
@@ -143,23 +157,23 @@ it('opens a container’s contents in a modal on click', function () {
     $page->click("a[href*='/item/{$capital->item_id}']");
     $page->waitForText($freighter->name);
 
-    $page->screenshot(true, 'character-assets-contents-modal');
-});
+    $page->screenshot(true, "character-assets-contents-modal-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('surfaces asset safety as its own location', function () {
+it('surfaces asset safety as its own location', function (string $device) {
     $character = actingAsCharacter();
 
     // Asset-safety items carry the sentinel location id; the action prepends a synthetic
     // location for them on page 1 (uncommon in practice, hence a dedicated edge-case check).
     $safety = makeCharacterAsset($character, Asset::ASSET_SAFETY, Asset::ASSET_SAFETY, ['location_flag' => 'AssetSafety']);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
     $page->waitForText($safety->name);
 
-    $page->screenshot(true, 'character-assets-asset-safety');
-});
+    $page->screenshot(true, "character-assets-asset-safety-{$device}");
+})->with(['desktop', 'iphone']);
 
 if (! function_exists('attachOwnedCharacter')) {
     /**
@@ -187,7 +201,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('narrows a location to only the top-level items that match the search at any depth', function () {
+it('narrows a location to only the top-level items that match the search at any depth', function (string $device) {
     $character = actingAsCharacter();
 
     $location = Location::factory()->for(Station::factory(), 'locatable')->create();
@@ -203,7 +217,7 @@ it('narrows a location to only the top-level items that match the search at any 
     $other = makeCharacterAsset($character, $root, $root, ['name' => 'Quafe Crate']);
     $other->update(['root_item_id' => $other->item_id]);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -218,10 +232,10 @@ it('narrows a location to only the top-level items that match the search at any 
     $page->assertScript("(document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate'))");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'character-assets-search');
-});
+    $page->screenshot(true, "character-assets-search-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a location for every character the user owns', function () {
+it('renders a location for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -233,7 +247,7 @@ it('renders a location for every character the user owns', function () {
     makeCharacterAsset($mainCharacter, $locationA->location_id, $locationA->location_id);
     makeCharacterAsset($secondCharacter, $locationB->location_id, $locationB->location_id);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -242,10 +256,10 @@ it('renders a location for every character the user owns', function () {
     $page->waitForText($locationA->locatable->name);
     $page->waitForText($locationB->locatable->name);
 
-    $page->screenshot(true, 'character-assets-multiple-characters');
-});
+    $page->screenshot(true, "character-assets-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('filters the location list by region', function () {
+it('filters the location list by region', function (string $device) {
     $character = actingAsCharacter();
 
     $locationA = Location::factory()->for(Station::factory(), 'locatable')->create();
@@ -257,7 +271,7 @@ it('filters the location list by region', function () {
     $stationA = $locationA->locatable->name;
     $stationB = $locationB->locatable->name;
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
     $page->waitForText($stationA);
@@ -277,5 +291,5 @@ it('filters the location list by region', function () {
     ));
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'character-assets-region-filter');
-});
+    $page->screenshot(true, "character-assets-region-filter-{$device}");
+})->with(['desktop', 'iphone']);

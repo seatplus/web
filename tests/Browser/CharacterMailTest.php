@@ -6,6 +6,20 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
 
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, array|string $url, array $options = []): mixed
+    {
+        $page = visit($url, $options);
+
+        return $device === 'iphone' ? $page->on()->iPhone15() : $page;
+    }
+}
+
 /*
  * Character mail browser test — the mail header list (desktop aside + mobile) is now
  * an Inertia <InfiniteScroll> over the `mailHeaders` scroll prop instead of the axios
@@ -43,7 +57,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next page of mail headers on scroll', function () {
+it('merges the next page of mail headers on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     Mail::factory()
@@ -58,7 +72,7 @@ it('merges the next page of mail headers on scroll', function () {
 
     $rows = '#desktop-mail-list > li';
 
-    $page = visit('/character/mails');
+    $page = deviceVisit($device, '/character/mails');
     $page->assertNoSmoke();
     $page->waitForText('Character Mails');
 
@@ -69,10 +83,10 @@ it('merges the next page of mail headers on scroll', function () {
     // Re-scroll the list's container on each poll until the next page merges in.
     $page->assertScript("(document.getElementById('desktop-mail-list').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-mails-infinite-scroll');
-});
+    $page->screenshot(true, "character-mails-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('aggregates mail headers across all of the user\'s characters', function () {
+it('aggregates mail headers across all of the user\'s characters', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -92,12 +106,12 @@ it('aggregates mail headers across all of the user\'s characters', function () {
 
     $rows = '#desktop-mail-list > li';
 
-    $page = visit('/character/mails');
+    $page = deviceVisit($device, '/character/mails');
     $page->assertNoSmoke();
     $page->waitForText('Character Mails');
 
     // Both characters' mails on a single page (6 + 6 = 12 < 15/page).
     $page->assertCount($rows, 12);
 
-    $page->screenshot(true, 'character-mails-multiple-characters');
-});
+    $page->screenshot(true, "character-mails-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);
