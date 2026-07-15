@@ -174,7 +174,7 @@ function createRoleViaHttp(
 
     test()->actingAs($actor)
         ->followingRedirects()
-        ->postJson(route('acl.create'), ['name' => $roleName]);
+        ->postJson(route('acl.store'), ['name' => $roleName, 'type' => $roleType]);
 
     $role = Role::findByName($roleName);
 
