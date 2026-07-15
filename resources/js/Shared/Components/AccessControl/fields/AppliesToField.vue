@@ -4,44 +4,76 @@
       {{ trans('web::access_control.applies_to.help') }}
     </p>
 
-    <!-- Mode: Only these / Everyone except -->
-    <div class="mt-3 flex flex-wrap gap-2">
-      <button
-        v-for="m in ['only_these', 'everyone_except']"
-        :key="m"
-        type="button"
-        class="rounded-md px-3 py-1.5 text-sm font-medium"
-        :class="mode === m ? 'bg-indigo-600 text-white' : 'text-gray-700 ring-1 ring-gray-300 hover:bg-gray-50'"
-        @click="mode = m"
+    <!-- Everything toggle: permissions apply to all entities (Doomheim inverse). -->
+    <div class="mt-3 flex items-center gap-3">
+      <SimpleToggle v-model="everything" />
+      <div
+        class="cursor-pointer"
+        @click="everything = ! everything"
       >
-        {{ trans(`web::access_control.applies_to.mode.${m}`) }}
-      </button>
+        <span class="text-sm font-medium text-gray-700">
+          {{ trans('web::access_control.applies_to.everything') }}
+        </span>
+        <p class="text-sm text-gray-500">
+          {{ trans('web::access_control.applies_to.everything_help') }}
+        </p>
+      </div>
     </div>
 
-    <div class="mt-4">
-      <EsiMultiselect
-        v-model="included"
-        :categories="['character', 'corporation', 'alliance']"
-        :label="trans('web::access_control.applies_to.label')"
-        :placeholder="trans('web::access_control.applies_to.label')"
-      />
-    </div>
+    <!-- The three affiliation types are independent and may be combined. -->
+    <div
+      v-show="! everything"
+      class="mt-4 space-y-6"
+    >
+      <!-- Only these (allowed) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">
+          {{ trans('web::access_control.applies_to.mode.only_these') }}
+        </label>
+        <div class="mt-2">
+          <EsiMultiselect
+            v-model="allowed"
+            :categories="['character', 'corporation', 'alliance']"
+            :label="trans('web::access_control.applies_to.mode.only_these')"
+            :show-label="false"
+            :placeholder="trans('web::access_control.applies_to.mode.only_these')"
+          />
+        </div>
+      </div>
 
-    <!-- Never (forbidden) carve-outs -->
-    <div class="mt-6 border-t border-gray-100 pt-6">
-      <label class="block text-sm font-medium text-gray-700">
-        {{ trans('web::access_control.applies_to.exclude') }}
-      </label>
-      <p class="text-sm text-gray-500">
-        {{ trans('web::access_control.applies_to.exclude_help') }}
-      </p>
-      <div class="mt-2">
-        <EsiMultiselect
-          v-model="excluded"
-          :categories="['character', 'corporation', 'alliance']"
-          :label="trans('web::access_control.applies_to.exclude')"
-          :placeholder="trans('web::access_control.applies_to.exclude')"
-        />
+      <!-- Everyone except (inverse) -->
+      <div class="border-t border-gray-100 pt-6">
+        <label class="block text-sm font-medium text-gray-700">
+          {{ trans('web::access_control.applies_to.mode.everyone_except') }}
+        </label>
+        <div class="mt-2">
+          <EsiMultiselect
+            v-model="inverse"
+            :categories="['character', 'corporation', 'alliance']"
+            :label="trans('web::access_control.applies_to.mode.everyone_except')"
+            :show-label="false"
+            :placeholder="trans('web::access_control.applies_to.mode.everyone_except')"
+          />
+        </div>
+      </div>
+
+      <!-- Never (forbidden) carve-outs -->
+      <div class="border-t border-gray-100 pt-6">
+        <label class="block text-sm font-medium text-gray-700">
+          {{ trans('web::access_control.applies_to.exclude') }}
+        </label>
+        <p class="text-sm text-gray-500">
+          {{ trans('web::access_control.applies_to.exclude_help') }}
+        </p>
+        <div class="mt-2">
+          <EsiMultiselect
+            v-model="excluded"
+            :categories="['character', 'corporation', 'alliance']"
+            :label="trans('web::access_control.applies_to.exclude')"
+            :show-label="false"
+            :placeholder="trans('web::access_control.applies_to.exclude')"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -49,12 +81,16 @@
 
 <script setup>
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
+import SimpleToggle from "@/Shared/SimpleToggle.vue";
 import { useTranslations } from "@/composables/useTranslations";
 
-// only_these → ALLOWED, everyone_except → INVERSE (the parent maps to affiliation_type on submit).
-const mode = defineModel("mode", { type: String, default: "only_these" });
-const included = defineModel("included", { type: Array, default: () => [] });
+// The three affiliation types map straight to the backend `affiliation_type` on submit and are
+// independent — a group can grant "only these" AND "everyone except" AND "never" at once.
+const allowed = defineModel("allowed", { type: Array, default: () => [] });
+const inverse = defineModel("inverse", { type: Array, default: () => [] });
 const excluded = defineModel("excluded", { type: Array, default: () => [] });
+// everything → a single INVERSE Doomheim affiliation (applies to everyone).
+const everything = defineModel("everything", { type: Boolean, default: false });
 
 const { trans } = useTranslations();
 </script>

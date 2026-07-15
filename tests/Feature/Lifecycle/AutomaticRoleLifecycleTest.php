@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Queue;
 use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 
 beforeEach(function () {
     Queue::fake();
@@ -53,6 +54,23 @@ it('sets assigned criteria for automatic role via HTTP', function () {
             ->where('entity_id', test()->test_character->corporation->corporation_id)
             ->exists()
     )->toBeTrue();
+});
+
+it('open-to-all automatic role assigns every user, including unaffiliated ones', function () {
+    // a second user in an unrelated corporation — would not match any normal criterion
+    $other_user = User::factory()->create();
+
+    // Doomheim (1000001) as the criterion = open to all
+    test()->actingAs(test()->test_user)
+        ->postJson(route('acl.update.automatic', test()->role->id), [
+            'assigned' => [
+                ['entity_id' => 1000001, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect(route('acl.detail', test()->role->id));
+
+    expect(test()->test_user->fresh()->hasRole(test()->role->name))->toBeTrue()
+        ->and($other_user->fresh()->hasRole(test()->role->name))->toBeTrue();
 });
 
 it('automatic role rejects moderator assignment', function () {

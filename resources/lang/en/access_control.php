@@ -35,6 +35,8 @@ return [
         'label' => 'Eligibility',
         'help' => 'Which corporations or alliances\' members can join this group.',
         'everyone' => 'Anyone can join',
+        'everyone_help' => 'Every user is eligible, regardless of their corporation or alliance.',
+        'none' => 'No one yet',
     ],
 
     // Applies to (affiliations) — the entities this group\'s PERMISSIONS operate on. NOT membership.
@@ -48,6 +50,8 @@ return [
         'exclude' => 'Never (exclude)',
         'exclude_help' => 'Always excluded, even if matched above.',
         'everything' => 'Everything',
+        'everything_help' => 'The group\'s permissions apply to every character, corporation and alliance.',
+        'none' => 'Nothing',
     ],
 
     // Membership status
@@ -94,6 +98,7 @@ return [
     // Discover
     'discover' => [
         'my_groups' => 'My groups',
+        'all_groups' => 'All groups',
         'available' => 'Available to join',
         'none_available' => 'No groups available to join.',
         'no_groups' => 'You are not in any groups yet.',
@@ -104,6 +109,7 @@ return [
         'help' => 'Which permissions this group grants its members.',
         'search' => 'Filter permissions…',
         'none' => 'No matching permissions.',
+        'none_selected' => 'None',
         'selected' => ':count selected',
     ],
 

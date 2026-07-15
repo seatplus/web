@@ -35,6 +35,15 @@ class ShowControlGroupsController extends Controller
                 ->where('entity_id', $userId))
             ->get();
 
+        // Managers (superuser / global ACL admin) get the full list to configure — including groups
+        // they neither belong to nor can join (e.g. a manual group they just created). Excludes the
+        // ones already surfaced under "My groups" to avoid duplication.
+        $canManage = $user->can('superuser') || $user->can('administrate access control groups');
+
+        $allGroups = $canManage
+            ? Role::query()->whereNotIn('id', $myGroups->modelKeys())->get()
+            : collect();
+
         // Available: self-service / request groups the user is eligible for (a criteria corp/alliance
         // matches one of their characters — mirrors meetsCriteria()) and is not already in.
         $availableGroups = Role::query()
@@ -54,7 +63,9 @@ class ShowControlGroupsController extends Controller
         return Inertia::render('AccessControl/ControlGroupsIndex', [
             'myGroups' => RoleRessource::collection($myGroups)->resolve(),
             'availableGroups' => RoleRessource::collection($availableGroups)->resolve(),
-            'canCreate' => $user->can('superuser') || $user->can('administrate access control groups'),
+            'allGroups' => RoleRessource::collection($allGroups)->resolve(),
+            'canCreate' => $canManage,
+            'canManage' => $canManage,
             'activeSidebarElement' => 'acl.groups',
             'pageTranslations' => Translations::gather(['web::access_control']),
         ]);

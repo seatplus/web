@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 beforeEach(function () {
     Queue::fake();
@@ -39,6 +41,34 @@ it('shows role detail page to admin with administrate permission', function () {
             ->where('can_edit', true)
             ->has('role.applies_to')
             ->has('role.eligibility')
+        );
+});
+
+it('round-trips the everything / anyone Doomheim sentinels in the detail resource', function () {
+    assignPermissionToTestUser('administrate access control groups');
+
+    // Doomheim (1000001): inverse affiliation = applies to everything; as a criterion = open to all.
+    Affiliation::create([
+        'role_id' => test()->role->id,
+        'affiliatable_id' => 1000001,
+        'affiliatable_type' => CorporationInfo::class,
+        'type' => 'inverse',
+    ]);
+    RoleMembership::create([
+        'role_id' => test()->role->id,
+        'entity_id' => 1000001,
+        'entity_type' => CorporationInfo::class,
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('acl.detail', test()->role->id))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('role.applies_to.everything', true)
+            ->where('role.applies_to.allowed', [])
+            ->where('role.applies_to.inverse', [])
+            ->where('role.eligibility.anyone', true)
+            ->where('role.eligibility.entities', [])
         );
 });
 

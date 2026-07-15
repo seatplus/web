@@ -9,6 +9,7 @@ use Seatplus\Auth\Http\Actions\Roles\ManageAutomaticRoleAction;
 use Seatplus\Auth\Http\Actions\Roles\Manual\ManageManualRoleAction;
 use Seatplus\Auth\Http\Actions\Roles\OnRequest\ManageOnRequestRoleAction;
 use Seatplus\Auth\Http\Actions\Roles\OptIn\ManageOptInRoleAction;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ManageRoleRequest;
@@ -33,7 +34,12 @@ class ManageRoleController extends Controller
         // Sync the permissions the group grants (only when the form submitted them, so a
         // configure save that omits the field doesn't silently revoke everything).
         if ($request->has('permissions')) {
-            Role::findById($role_id)->syncPermissions($request->input('permissions', []));
+            // findOrCreate so config-declared permissions that were never persisted still resolve.
+            $permissions = collect($request->input('permissions', []))
+                ->map(fn (string $name) => Permission::findOrCreate($name))
+                ->all();
+
+            Role::findById($role_id)->syncPermissions($permissions);
         }
 
         return redirect()->route('acl.detail', $role_id)->with('success', 'updated');

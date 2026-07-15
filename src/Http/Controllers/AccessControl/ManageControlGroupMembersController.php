@@ -6,10 +6,10 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\RoleDetailResource;
+use Seatplus\Web\Support\AccessControl\AssignablePermissions;
 use Seatplus\Web\Support\AccessControl\RoleTypeMetadata;
 use Seatplus\Web\Support\Translations;
 
@@ -25,7 +25,7 @@ class ManageControlGroupMembersController extends Controller
             // Every join method + its capability rules, so the picker can explain each option
             // and the form knows whether to show the eligibility section / which endpoint to POST.
             'joinMethods' => RoleTypeMetadata::all(),
-            'availablePermissions' => Permission::query()->orderBy('name')->pluck('name'),
+            'availablePermissions' => AssignablePermissions::all(),
             'activeSidebarElement' => 'acl.groups',
             'pageTranslations' => Translations::gather(['web::access_control']),
         ]);

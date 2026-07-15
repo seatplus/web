@@ -164,3 +164,42 @@ it('creates a group through the guided wizard (admin)', function () {
 
     $page->screenshot(true, 'acl-create-wizard');
 });
+
+it('creates an open-to-all group through the wizard (admin)', function () {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+
+    $page = visit('/acl/create');
+    $page->assertNoSmoke();
+    $page->waitForText('Create group');
+
+    // Step 1 — Name.
+    $page->type('role-name', 'Everyone');
+    $page->click('Next');
+
+    // Step 2 — Join method: "Self-service" (opt-in → the eligibility step appears).
+    $page->waitForText('Self-service');
+    $page->click('Self-service');
+    $page->click('Next');
+
+    // Step — Eligibility: toggle "Anyone can join" (Doomheim sentinel).
+    $page->waitForText('Anyone can join');
+    $page->click('Anyone can join');
+    $page->click('Next');
+
+    // Step — Applies to: toggle "Everything".
+    $page->waitForText('Everything');
+    $page->click('Everything');
+    $page->click('Next');
+
+    // Step — Permissions (leave empty) → Review.
+    $page->click('Next');
+    $page->waitForText('Everyone'); // review summary shows the name
+
+    // Create → lands on the new group's detail.
+    $page->click('Create group');
+    $page->assertScript("document.body.innerText.includes('Everyone')");
+    $page->assertNoSmoke();
+
+    $page->screenshot(true, 'acl-create-wizard-everyone');
+});

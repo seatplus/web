@@ -54,18 +54,51 @@
       v-if="role.capabilities?.uses_eligibility"
       :title="trans('web::access_control.eligibility.label')"
       :help="trans('web::access_control.eligibility.help')"
-      :entities="role.eligibility"
-      :empty="trans('web::access_control.eligibility.everyone')"
+      :entities="role.eligibility?.anyone ? [] : (role.eligibility?.entities ?? [])"
+      :empty="role.eligibility?.anyone
+        ? trans('web::access_control.eligibility.everyone')
+        : trans('web::access_control.eligibility.none')"
     />
 
-    <!-- Applies to (permission scope) -->
-    <EntitySummary
-      :title="trans('web::access_control.applies_to.label')"
-      :help="trans('web::access_control.applies_to.help')"
-      :entities="role.applies_to?.included ?? []"
-      :excluded="role.applies_to?.excluded ?? []"
-      :empty="trans('web::access_control.applies_to.everything')"
-    />
+    <!-- Applies to (permission scope) — three independent affiliation types -->
+    <div class="rounded-lg bg-white p-6 shadow-sm ring-1 ring-black/5">
+      <h3 class="text-sm font-semibold text-gray-900">
+        {{ trans('web::access_control.applies_to.label') }}
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        {{ trans('web::access_control.applies_to.help') }}
+      </p>
+
+      <p
+        v-if="role.applies_to?.everything"
+        class="mt-3 text-sm font-medium text-indigo-700"
+      >
+        {{ trans('web::access_control.applies_to.everything') }}
+      </p>
+      <template v-else>
+        <AppliesToGroup
+          :label="trans('web::access_control.applies_to.mode.only_these')"
+          :entities="role.applies_to?.allowed ?? []"
+          chip-class="bg-indigo-50 text-indigo-700"
+        />
+        <AppliesToGroup
+          :label="trans('web::access_control.applies_to.mode.everyone_except')"
+          :entities="role.applies_to?.inverse ?? []"
+          chip-class="bg-amber-50 text-amber-700"
+        />
+        <AppliesToGroup
+          :label="trans('web::access_control.applies_to.exclude')"
+          :entities="role.applies_to?.excluded ?? []"
+          chip-class="bg-rose-50 text-rose-700"
+        />
+        <p
+          v-if="! hasAnyAppliesTo"
+          class="mt-3 text-sm text-gray-400"
+        >
+          {{ trans('web::access_control.applies_to.none') }}
+        </p>
+      </template>
+    </div>
 
     <!-- Permissions granted -->
     <div
@@ -92,6 +125,7 @@
 import { computed } from "vue";
 import RoleTypeBadge from "./RoleTypeBadge.vue";
 import EntitySummary from "./EntitySummary.vue";
+import AppliesToGroup from "./AppliesToGroup.vue";
 import { useRoleActions } from "@/composables/useRoleActions";
 import { useTranslations } from "@/composables/useTranslations";
 
@@ -104,6 +138,12 @@ const props = defineProps({
 
 const actions = useRoleActions();
 const { trans } = useTranslations();
+
+const hasAnyAppliesTo = computed(() => Boolean(
+    props.role.applies_to?.allowed?.length
+    || props.role.applies_to?.inverse?.length
+    || props.role.applies_to?.excluded?.length,
+));
 
 const statusLabel = computed(() => {
     if (props.role.my_status === "active") {

@@ -4,6 +4,13 @@
  * and the sectioned edit page so they never diverge.
  */
 
+/**
+ * Doomheim — EVE's graveyard corporation that no live character belongs to. Used as a sentinel:
+ * affiliated as INVERSE it means "applies to everyone"; as a membership criterion it means
+ * "anyone is eligible" (open to all). Mirrors `AbstractRoleService::EVERYONE_CORPORATION_ID`.
+ */
+export const EVERYONE_CORPORATION_ID = 1000001;
+
 /** Resource entities `{id, entity_type, name}` → EsiMultiselect selections `{id, name, category}`. */
 export function entitiesToSelections(entities) {
     return (entities ?? []).map((entity) => ({
@@ -15,8 +22,8 @@ export function entitiesToSelections(entities) {
 
 /**
  * Build the common role payload from form data + the selected join-method metadata.
- * `mode === 'everyone_except'` → INVERSE affiliations; the excluded list → FORBIDDEN.
- * Eligibility (criteria) is only sent for join methods that use it.
+ * The three applies-to lists are independent: `allowed` → ALLOWED, `inverse` → INVERSE,
+ * `excluded` → FORBIDDEN. Eligibility (criteria) is only sent for join methods that use it.
  * Note: `type` is NOT included here — the edit endpoints carry it in the route; the create
  * wizard adds `type: form.method` on top of this.
  */
@@ -27,13 +34,27 @@ export function buildRolePayload(data, selectedMethod) {
         ...(affiliationType ? { affiliation_type: affiliationType } : {}),
     }));
 
+    // "Applies to everything" → a single INVERSE Doomheim affiliation (everyone except a corp nobody is in).
+    const affiliated = data.everything
+        ? [{ entity_id: EVERYONE_CORPORATION_ID, entity_type: "corporation", affiliation_type: "inverse" }]
+        : [
+            ...toEntities(data.allowed, "allowed"),
+            ...toEntities(data.inverse, "inverse"),
+            ...toEntities(data.excluded, "forbidden"),
+        ];
+
+    // Eligibility only applies to join methods that use it. "Anyone" → the Doomheim sentinel criterion.
+    let assigned = [];
+    if (selectedMethod?.uses_eligibility) {
+        assigned = data.anyone
+            ? [{ entity_id: EVERYONE_CORPORATION_ID, entity_type: "corporation" }]
+            : toEntities(data.eligibility);
+    }
+
     return {
         name: data.name,
-        affiliated: [
-            ...toEntities(data.included, data.mode === "everyone_except" ? "inverse" : "allowed"),
-            ...toEntities(data.excluded, "forbidden"),
-        ],
-        assigned: selectedMethod?.uses_eligibility ? toEntities(data.eligibility) : [],
+        affiliated,
+        assigned,
         permissions: data.permissions ?? [],
     };
 }

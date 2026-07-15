@@ -38,6 +38,24 @@
       </p>
     </section>
 
+    <!-- All groups (managers only) -->
+    <section
+      v-if="allGroups.length"
+      class="space-y-3"
+    >
+      <h2 class="text-sm font-semibold text-gray-900">
+        {{ trans('web::access_control.discover.all_groups') }}
+      </h2>
+      <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <li
+          v-for="role in allGroups"
+          :key="role.id"
+        >
+          <RoleCard :role="role" />
+        </li>
+      </ul>
+    </section>
+
     <!-- Available to join -->
     <section
       v-if="availableGroups.length"
@@ -75,7 +93,15 @@ defineProps({
         type: Array,
         default: () => [],
     },
+    allGroups: {
+        type: Array,
+        default: () => [],
+    },
     canCreate: {
+        type: Boolean,
+        default: false,
+    },
+    canManage: {
         type: Boolean,
         default: false,
     },

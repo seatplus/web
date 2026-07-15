@@ -40,6 +40,18 @@ it('can navigate to the enabling ESI Search page', function () {
         ->assertRedirect('/');
 });
 
+// the step-up upgrade link must carry the origin page so the user returns there, not the dashboard
+it('passes the origin page as the step-up redirect target', function () {
+    test()->actingAs($this->test_user)
+        ->from('/acl/create')
+        ->get(route('enable_esi_search'))
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('EnableEsiSearch')
+                ->where('characters.0.upgrade_url', fn ($url) => str_contains(urldecode($url), '/acl/create'))
+        );
+});
+
 // try get the token and succeed to do so
 it('returns truthy if the user has the necessary scope', function () {
     updateRefreshTokenWithScopes($this->test_character->refreshToken, ['esi-search.search_structures.v1']);

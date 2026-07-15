@@ -17,6 +17,7 @@ use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\StoreRoleRequest;
+use Seatplus\Web\Support\AccessControl\AssignablePermissions;
 use Seatplus\Web\Support\AccessControl\RoleTypeMetadata;
 use Seatplus\Web\Support\Translations;
 
@@ -34,7 +35,7 @@ class CreateControlGroupController extends Controller
     {
         return Inertia::render('AccessControl/CreateRole', [
             'joinMethods' => RoleTypeMetadata::all(),
-            'availablePermissions' => Permission::query()->orderBy('name')->pluck('name'),
+            'availablePermissions' => AssignablePermissions::all(),
             'activeSidebarElement' => 'acl.groups',
             'pageTranslations' => Translations::gather(['web::access_control']),
         ]);
@@ -57,7 +58,10 @@ class CreateControlGroupController extends Controller
 
             app(self::TYPE_ACTION_MAP[$validated['type']])->execute($roleRequest);
 
-            $role->syncPermissions($validated['permissions'] ?? []);
+            // findOrCreate so config-declared permissions that were never persisted still resolve.
+            $role->syncPermissions(
+                collect($validated['permissions'] ?? [])->map(fn (string $name) => Permission::findOrCreate($name))->all()
+            );
 
             return $role;
         });

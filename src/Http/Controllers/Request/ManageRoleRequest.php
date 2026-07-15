@@ -6,7 +6,7 @@ namespace Seatplus\Web\Http\Controllers\Request;
 
 use Illuminate\Validation\Rule;
 use Seatplus\Auth\Http\Requests\RoleRequest;
-use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Web\Support\AccessControl\AssignablePermissions;
 
 class ManageRoleRequest extends RoleRequest
 {
@@ -22,7 +22,7 @@ class ManageRoleRequest extends RoleRequest
     {
         return array_merge(parent::rules(), [
             'permissions' => 'nullable|array',
-            'permissions.*' => ['string', Rule::exists((new Permission)->getTable(), 'name')],
+            'permissions.*' => ['string', Rule::in(AssignablePermissions::all()->all())],
         ]);
     }
 }

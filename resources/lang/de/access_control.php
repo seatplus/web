@@ -32,6 +32,8 @@ return [
         'label' => 'Berechtigung',
         'help' => 'Mitglieder welcher Corporations oder Allianzen dieser Gruppe beitreten können.',
         'everyone' => 'Jeder kann beitreten',
+        'everyone_help' => 'Jeder Nutzer ist berechtigt, unabhängig von Corporation oder Allianz.',
+        'none' => 'Noch niemand',
     ],
 
     'applies_to' => [
@@ -44,6 +46,8 @@ return [
         'exclude' => 'Nie (ausschließen)',
         'exclude_help' => 'Immer ausgeschlossen, auch wenn oben zutreffend.',
         'everything' => 'Alles',
+        'everything_help' => 'Die Berechtigungen der Gruppe gelten für jeden Charakter, jede Corporation und Allianz.',
+        'none' => 'Nichts',
     ],
 
     'status' => [
@@ -86,6 +90,7 @@ return [
 
     'discover' => [
         'my_groups' => 'Meine Gruppen',
+        'all_groups' => 'Alle Gruppen',
         'available' => 'Verfügbar zum Beitritt',
         'none_available' => 'Keine Gruppen zum Beitritt verfügbar.',
         'no_groups' => 'Du bist noch in keiner Gruppe.',
@@ -95,6 +100,7 @@ return [
         'help' => 'Welche Berechtigungen diese Gruppe ihren Mitgliedern gewährt.',
         'search' => 'Berechtigungen filtern…',
         'none' => 'Keine passenden Berechtigungen.',
+        'none_selected' => 'Keine',
         'selected' => ':count ausgewählt',
     ],
 

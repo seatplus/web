@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
-use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Web\Support\AccessControl\AssignablePermissions;
 
 /**
  * The create-group wizard's single submit: name + join method (type) + the "Applies to"
@@ -33,7 +33,7 @@ class StoreRoleRequest extends FormRequest
             'assigned.*.entity_id' => 'required|integer',
             'assigned.*.entity_type' => ['required', 'string', Rule::in(['character', 'corporation', 'alliance'])],
             'permissions' => 'nullable|array',
-            'permissions.*' => ['string', Rule::exists((new Permission)->getTable(), 'name')],
+            'permissions.*' => ['string', Rule::in(AssignablePermissions::all()->all())],
         ];
     }
 }

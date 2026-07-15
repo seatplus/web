@@ -23,7 +23,10 @@
         v-if="selectedMethod?.uses_eligibility"
         class="mt-6 border-t border-gray-100 pt-6"
       >
-        <EligibilityField v-model="form.eligibility" />
+        <EligibilityField
+          v-model="form.eligibility"
+          v-model:anyone="form.anyone"
+        />
       </div>
     </div>
 
@@ -34,9 +37,10 @@
       </h3>
       <div class="mt-4">
         <AppliesToField
-          v-model:mode="form.mode"
-          v-model:included="form.included"
+          v-model:allowed="form.allowed"
+          v-model:inverse="form.inverse"
           v-model:excluded="form.excluded"
+          v-model:everything="form.everything"
         />
       </div>
     </div>
@@ -90,10 +94,12 @@ const { trans } = useTranslations();
 const form = useForm({
     name: props.role.name,
     method: props.role.type,
-    mode: props.role.applies_to?.mode ?? "only_these",
-    included: entitiesToSelections(props.role.applies_to?.included),
+    allowed: entitiesToSelections(props.role.applies_to?.allowed),
+    inverse: entitiesToSelections(props.role.applies_to?.inverse),
     excluded: entitiesToSelections(props.role.applies_to?.excluded),
-    eligibility: entitiesToSelections(props.role.eligibility),
+    everything: props.role.applies_to?.everything ?? false,
+    eligibility: entitiesToSelections(props.role.eligibility?.entities),
+    anyone: props.role.eligibility?.anyone ?? false,
     permissions: [...(props.role.permissions ?? [])],
 });
 

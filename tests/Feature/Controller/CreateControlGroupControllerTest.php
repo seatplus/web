@@ -33,7 +33,8 @@ it('renders the create wizard with join methods and available permissions', func
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/CreateRole')
             ->has('joinMethods', 4)
-            ->has('availablePermissions')
+            // sourced from config('web.permissions'), not the (possibly empty) DB
+            ->where('availablePermissions', fn ($permissions) => $permissions->contains('view access control'))
         );
 });
 
@@ -70,6 +71,29 @@ it('creates a fully configured group in one request via acl.store', function () 
         ->and($role->affiliations()->where('type', 'allowed')->exists())->toBeTrue()
         ->and($role->roleMemberships()->where('entity_type', CorporationInfo::class)->exists())->toBeTrue()
         ->and($role->hasPermissionTo('view access control'))->toBeTrue();
+});
+
+it('creates an open-to-all, applies-to-everything group via acl.store', function () {
+    assignPermissionToTestUser('administrate access control groups');
+
+    // Doomheim (1000001): inverse affiliation = applies to everything; as a criterion = open to all.
+    test()->actingAs(test()->test_user)
+        ->post(route('acl.store'), [
+            'name' => 'Everyone',
+            'type' => 'opt-in',
+            'affiliated' => [
+                ['entity_id' => 1000001, 'entity_type' => 'corporation', 'affiliation_type' => 'inverse'],
+            ],
+            'assigned' => [
+                ['entity_id' => 1000001, 'entity_type' => 'corporation'],
+            ],
+        ])
+        ->assertRedirect();
+
+    $role = Role::findByName('Everyone');
+
+    expect($role->affiliations()->where('type', 'inverse')->where('affiliatable_id', 1000001)->exists())->toBeTrue()
+        ->and($role->roleMemberships()->where('entity_type', CorporationInfo::class)->where('entity_id', 1000001)->exists())->toBeTrue();
 });
 
 it('rejects an invalid join method', function () {

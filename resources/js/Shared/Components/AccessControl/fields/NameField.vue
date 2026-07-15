@@ -9,6 +9,7 @@
       v-model="model"
       type="text"
       class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
+      @keyup.enter="emit('enter')"
     >
     <p
       v-if="error"
@@ -28,6 +29,8 @@ defineProps({
     error: { type: String, default: null },
     id: { type: String, default: "role-name" },
 });
+
+const emit = defineEmits(["enter"]);
 
 const { trans } = useTranslations();
 </script>

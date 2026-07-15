@@ -1,27 +1,32 @@
 <template>
   <div>
     <EsiAutosuggest
-      :key="uniqueID"
       :label="label"
       :placeholder="placeholder"
       :categories="categories"
+      :show-label="showLabel"
+      reset-after-select
       @selected-object="(obj) => { if (obj) { selections.push(obj) } }"
     />
-    <DismissibleButton
-      v-for="selection in selections"
-      :id="selection.id"
-      :key="selection.id"
-      :name="selection.name"
-      @remove="(id) => selections = selections.filter((obj) => obj.id !== id)"
-    />
+    <div
+      v-if="selections.length"
+      class="mt-2 flex flex-wrap gap-2"
+    >
+      <DismissibleEntityButton
+        v-for="selection in selections"
+        :key="selection.id"
+        :entity="selection"
+        @remove="(id) => selections = selections.filter((obj) => obj.id !== id)"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
 
-import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
+import DismissibleEntityButton from "@/Shared/Layout/Buttons/DismissibleEntityButton.vue";
 import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
-import {ref, watchEffect} from "vue";
+import {ref, watch} from "vue";
 
 
 const props = defineProps({
@@ -41,17 +46,18 @@ const props = defineProps({
     placeholder: {
         required: true,
         type: String
+    },
+    showLabel: {
+        required: false,
+        type: Boolean,
+        default: true
     }
 });
 
 const selections = ref(props.modelValue);
-const uniqueID = ref(+new Date());
 
 const emits = defineEmits(['update:modelValue']);
 
-watchEffect(() => {
-    emits('update:modelValue', selections.value);
-    uniqueID.value++
-});
+watch(selections, (value) => emits('update:modelValue', value), {deep: true});
 
 </script>

@@ -1,40 +1,101 @@
 <template>
-  <nav class="flex flex-wrap items-center gap-x-2 gap-y-3">
-    <template
-      v-for="(step, index) in steps"
-      :key="step.key"
+  <nav aria-label="Progress">
+    <ol
+      role="list"
+      class="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0"
     >
-      <div class="flex items-center gap-2">
+      <li
+        v-for="(step, stepIdx) in steps"
+        :key="step.key"
+        class="relative md:flex md:flex-1"
+      >
+        <!-- Complete -->
         <span
-          class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-          :class="index < current
-            ? 'bg-indigo-600 text-white'
-            : index === current
-              ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-600'
-              : 'bg-gray-100 text-gray-400'"
+          v-if="statusOf(stepIdx) === 'complete'"
+          class="flex w-full items-center"
         >
-          {{ index + 1 }}
+          <span class="flex items-center px-6 py-4 text-sm font-medium">
+            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-600">
+              <CheckIcon
+                class="size-6 text-white"
+                aria-hidden="true"
+              />
+            </span>
+            <span class="ml-4 text-sm font-medium text-gray-900">{{ step.label }}</span>
+          </span>
         </span>
+
+        <!-- Current -->
         <span
-          class="text-sm"
-          :class="index === current ? 'font-medium text-gray-900' : 'text-gray-500'"
+          v-else-if="statusOf(stepIdx) === 'current'"
+          class="flex items-center px-6 py-4 text-sm font-medium"
+          aria-current="step"
         >
-          {{ step.label }}
+          <span class="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-indigo-600">
+            <span class="text-indigo-600">{{ stepNumber(stepIdx) }}</span>
+          </span>
+          <span class="ml-4 text-sm font-medium text-indigo-600">{{ step.label }}</span>
         </span>
-      </div>
-      <span
-        v-if="index < steps.length - 1"
-        class="h-px w-6 bg-gray-200"
-        aria-hidden="true"
-      />
-    </template>
+
+        <!-- Upcoming -->
+        <span
+          v-else
+          class="flex items-center"
+        >
+          <span class="flex items-center px-6 py-4 text-sm font-medium">
+            <span class="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-gray-300">
+              <span class="text-gray-500">{{ stepNumber(stepIdx) }}</span>
+            </span>
+            <span class="ml-4 text-sm font-medium text-gray-500">{{ step.label }}</span>
+          </span>
+        </span>
+
+        <!-- Arrow separator for md screens and up -->
+        <template v-if="stepIdx !== steps.length - 1">
+          <div
+            class="absolute top-0 right-0 hidden h-full w-5 md:block"
+            aria-hidden="true"
+          >
+            <svg
+              class="size-full text-gray-300"
+              viewBox="0 0 22 80"
+              fill="none"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M0 -2L20 40L0 82"
+                vector-effect="non-scaling-stroke"
+                stroke="currentcolor"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+        </template>
+      </li>
+    </ol>
   </nav>
 </template>
 
 <script setup>
-defineProps({
+import { CheckIcon } from "@heroicons/vue/24/solid";
+
+const props = defineProps({
     // [{ key, label }]
     steps: { type: Array, required: true },
     current: { type: Number, default: 0 },
 });
+
+const statusOf = (index) => {
+    if (index < props.current) {
+        return "complete";
+    }
+
+    if (index === props.current) {
+        return "current";
+    }
+
+    return "upcoming";
+};
+
+const stepNumber = (index) => String(index + 1).padStart(2, "0");
 </script>
