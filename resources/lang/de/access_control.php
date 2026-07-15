@@ -6,6 +6,7 @@ return [
     'group' => 'Gruppe',
     'groups' => 'Gruppen',
     'members_count' => '{0} Keine Mitglieder|{1} :count Mitglied|[2,*] :count Mitglieder',
+    'delete_confirm' => 'Gruppe ":name" endgültig löschen? Dies kann nicht rückgängig gemacht werden.',
 
     'join_method' => [
         'label' => 'Beitrittsart',
@@ -88,5 +89,27 @@ return [
         'available' => 'Verfügbar zum Beitritt',
         'none_available' => 'Keine Gruppen zum Beitritt verfügbar.',
         'no_groups' => 'Du bist noch in keiner Gruppe.',
+    ],
+
+    'permissions' => [
+        'help' => 'Welche Berechtigungen diese Gruppe ihren Mitgliedern gewährt.',
+        'search' => 'Berechtigungen filtern…',
+        'none' => 'Keine passenden Berechtigungen.',
+        'selected' => ':count ausgewählt',
+    ],
+
+    'wizard' => [
+        'title' => 'Gruppe erstellen',
+        'back' => 'Zurück',
+        'next' => 'Weiter',
+        'review' => 'Überprüfe die Gruppe, bevor du sie erstellst.',
+        'steps' => [
+            'name' => 'Name',
+            'join_method' => 'Beitrittsart',
+            'eligibility' => 'Berechtigung',
+            'applies_to' => 'Gilt für',
+            'permissions' => 'Berechtigungen',
+            'review' => 'Überprüfen',
+        ],
     ],
 ];

@@ -131,3 +131,36 @@ it('configures a group: switch join method and save (admin)', function () {
 
     $page->screenshot(true, 'acl-configure');
 });
+
+it('creates a group through the guided wizard (admin)', function () {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+
+    $page = visit('/acl/create');
+    $page->assertNoSmoke();
+    $page->waitForText('Create group');
+
+    // Step 1 — Name.
+    $page->type('role-name', 'Logistics');
+    $page->click('Next');
+
+    // Step 2 — Join method: pick "Managed" (no eligibility step for manual).
+    $page->waitForText('Managed');
+    $page->click('Managed');
+    $page->click('Next');
+
+    // Step — Applies to (leave scope empty).
+    $page->waitForText('Only these');
+    $page->click('Next');
+
+    // Step — Permissions (leave empty) → Review.
+    $page->click('Next');
+    $page->waitForText('Logistics'); // review summary shows the name
+
+    // Create → lands on the new group's detail.
+    $page->click('Create group');
+    $page->assertScript("document.body.innerText.includes('Logistics')");
+    $page->assertNoSmoke();
+
+    $page->screenshot(true, 'acl-create-wizard');
+});

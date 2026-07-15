@@ -7,6 +7,7 @@ return [
     'group' => 'Group',
     'groups' => 'Groups',
     'members_count' => '{0} No members|{1} :count member|[2,*] :count members',
+    'delete_confirm' => 'Permanently delete ":name"? This cannot be undone.',
 
     // Join method (role type) — WHO can be a member and how they get in.
     'join_method' => [
@@ -96,5 +97,29 @@ return [
         'available' => 'Available to join',
         'none_available' => 'No groups available to join.',
         'no_groups' => 'You are not in any groups yet.',
+    ],
+
+    // Permissions the group grants
+    'permissions' => [
+        'help' => 'Which permissions this group grants its members.',
+        'search' => 'Filter permissions…',
+        'none' => 'No matching permissions.',
+        'selected' => ':count selected',
+    ],
+
+    // Create wizard
+    'wizard' => [
+        'title' => 'Create group',
+        'back' => 'Back',
+        'next' => 'Next',
+        'review' => 'Review the group before creating it.',
+        'steps' => [
+            'name' => 'Name',
+            'join_method' => 'Join method',
+            'eligibility' => 'Eligibility',
+            'applies_to' => 'Applies to',
+            'permissions' => 'Permissions',
+            'review' => 'Review',
+        ],
     ],
 ];
