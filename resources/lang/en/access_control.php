@@ -71,6 +71,13 @@ return [
         'delete' => 'Delete group',
         'configure' => 'Configure',
         'manage_members' => 'Manage members',
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'add' => 'Add',
+    ],
+
+    'fields' => [
+        'name' => 'Name',
     ],
 
     // Page sections

@@ -65,6 +65,13 @@ return [
         'delete' => 'Gruppe löschen',
         'configure' => 'Konfigurieren',
         'manage_members' => 'Mitglieder verwalten',
+        'save' => 'Speichern',
+        'cancel' => 'Abbrechen',
+        'add' => 'Hinzufügen',
+    ],
+
+    'fields' => [
+        'name' => 'Name',
     ],
 
     'sections' => [

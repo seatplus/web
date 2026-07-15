@@ -29,6 +29,17 @@ if (! function_exists('grantAclView')) {
     }
 }
 
+if (! function_exists('grantAclAdmin')) {
+    /** Give the user owning $characterId the 'administrate access control groups' permission. */
+    function grantAclAdmin(int $characterId): User
+    {
+        $user = CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
+        $user->givePermissionTo(Permission::findOrCreate('administrate access control groups'));
+
+        return $user;
+    }
+}
+
 if (! function_exists('makeOptInRoleForCorporation')) {
     /** A self-service (opt-in) group whose eligibility criterion is $corporationId. */
     function makeOptInRoleForCorporation(string $name, int $corporationId): Role
@@ -98,4 +109,25 @@ it('renders a group the user already belongs to under "My groups"', function () 
     $page->waitForText('Directors');
 
     $page->screenshot(true, 'acl-discover-my-groups');
+});
+
+it('configures a group: switch join method and save (admin)', function () {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+    $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
+
+    $page = visit('/manage_control_group/'.$role->id);
+    $page->assertNoSmoke();
+
+    // The two clearly-separated sections + the join-method picker render.
+    $page->waitForText('Membership');
+    $page->waitForText('Authorization');
+    $page->waitForText('Self-service');
+
+    // Switch join method and save (no entities needed — posts to acl.update.{type}).
+    $page->click('Self-service');
+    $page->click('Save');
+    $page->assertNoSmoke();
+
+    $page->screenshot(true, 'acl-configure');
 });
