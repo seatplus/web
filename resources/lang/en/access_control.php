@@ -6,6 +6,7 @@ return [
     // The group itself
     'group' => 'Group',
     'groups' => 'Groups',
+    'members_count' => '{0} No members|{1} :count member|[2,*] :count members',
 
     // Join method (role type) — WHO can be a member and how they get in.
     'join_method' => [

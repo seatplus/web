@@ -7,22 +7,15 @@ namespace Seatplus\Web\Http\Controllers\AccessControl;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
-use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\RoleDetailResource;
+use Seatplus\Web\Support\Translations;
 
 class ShowControlGroupController extends Controller
 {
-    private const array ENTITY_TYPE_MAP = [
-        CorporationInfo::class => 'corporation',
-        AllianceInfo::class => 'alliance',
-        CharacterInfo::class => 'character',
-    ];
-
     public function __construct(
         private readonly BaseRoleService $baseRoleService,
     ) {}
@@ -33,26 +26,25 @@ class ShowControlGroupController extends Controller
             ->findOrFail($role_id);
 
         $user = auth()->user();
+        $service = $this->baseRoleService->for($role);
 
         $canEdit = $user->can('superuser') || $user->can('administrate access control groups');
-        $canView = $canEdit || $this->baseRoleService->for($role)->canModerate($user);
+        $isMember = $role->roleMemberships()
+            ->where('entity_type', User::class)
+            ->where('entity_id', $user->getAuthIdentifier())
+            ->exists();
+
+        // The read-only detail backs the discover flow, so members and eligible users may view it
+        // too — not only admins/moderators. (canJoin() == meetsCriteria() for on-request/opt-in.)
+        $canView = $canEdit || $service->canModerate($user) || $isMember || $service->canJoin($user);
 
         abort_unless($canView, 403);
 
         return Inertia::render('AccessControl/RoleDetail', [
-            'role' => [
-                'id' => $role->id,
-                'name' => $role->name,
-                'type' => $role->type->value,
-                'affiliations' => $role->affiliations->map(fn (Affiliation $affiliation) => [
-                    'id' => $affiliation->affiliatable_id,
-                    'entity_type' => self::ENTITY_TYPE_MAP[$affiliation->affiliatable_type] ?? 'character',
-                    'affiliation_type' => $affiliation->type,
-                ]),
-                'permissions' => $role->permissions->pluck('name'),
-            ],
+            'role' => (new RoleDetailResource($role))->resolve(),
             'can_edit' => $canEdit,
             'activeSidebarElement' => 'acl.groups',
+            'pageTranslations' => Translations::gather(['web::access_control']),
         ]);
     }
 }
