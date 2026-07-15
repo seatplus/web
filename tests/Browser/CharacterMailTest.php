@@ -83,7 +83,9 @@ it('merges the next page of mail headers on scroll', function (string $device) {
             'receivable_type' => CharacterInfo::class,
         ]));
 
-    $rows = '#desktop-mail-list > li';
+    // The visible list differs by viewport: aside #desktop-mail-list on md+, #mobile-mail-list below.
+    $listId = $device === 'iphone' ? 'mobile-mail-list' : 'desktop-mail-list';
+    $rows = "#{$listId} > li";
 
     $page = deviceVisit($device, '/character/mails');
     $page->assertNoSmoke();
@@ -94,12 +96,10 @@ it('merges the next page of mail headers on scroll', function (string $device) {
     expect($before)->toBeGreaterThan(0);
 
     // Re-scroll the list's container on each poll until the next page merges in.
-    $page->assertScript("(document.getElementById('desktop-mail-list').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
+    $page->assertScript("(document.getElementById('{$listId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
     $page->screenshot(true, "character-mails-infinite-scroll-{$device}");
-    // Desktop-only: mobile renders MobileMailList (a different component), not #desktop-mail-list.
-    // Mobile mail infinite-scroll is addressed in its own PR.
-})->with(['desktop']);
+})->with(['desktop', 'iphone']);
 
 it('aggregates mail headers across all of the user\'s characters', function (string $device) {
     $mainCharacter = actingAsCharacter();
