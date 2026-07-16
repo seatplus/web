@@ -58,6 +58,22 @@
       >
         {{ trans('web::access_control.actions.leave') }}
       </button>
+
+      <!-- Moderator / admin entry points -->
+      <Link
+        v-if="canManageMembers"
+        :href="manageUrl"
+        class="flex-1 py-3 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+      >
+        {{ trans('web::access_control.actions.manage_members') }}
+      </Link>
+      <Link
+        v-if="role.can_edit"
+        :href="configureUrl"
+        class="flex-1 py-3 text-center text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+      >
+        {{ trans('web::access_control.actions.configure') }}
+      </Link>
     </div>
   </div>
 </template>
@@ -69,6 +85,8 @@ import RoleTypeBadge from "./RoleTypeBadge.vue";
 import { useRoleActions } from "@/composables/useRoleActions";
 import { useTranslations } from "@/composables/useTranslations";
 import ShowControlGroupController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ShowControlGroupController";
+import ManageMembersController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageMembersController";
+import { index as configureController } from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageControlGroupMembersController";
 
 const props = defineProps({
     role: {
@@ -81,7 +99,19 @@ const actions = useRoleActions();
 const { trans, trans_choice } = useTranslations();
 
 const detailUrl = computed(() => ShowControlGroupController.url({ role_id: props.role.id }));
-const hasActions = computed(() => props.role.can_join || props.role.can_apply || props.role.can_leave);
+const manageUrl = computed(() => ManageMembersController.url({ role_id: props.role.id }));
+const configureUrl = computed(() => configureController.url({ role_id: props.role.id }));
+
+// Manage-members is reachable by moderators and admins (matches the controller gate).
+const canManageMembers = computed(() => props.role.can_moderate || props.role.can_edit);
+
+const hasActions = computed(() =>
+    props.role.can_join
+    || props.role.can_apply
+    || props.role.can_leave
+    || props.role.can_edit
+    || canManageMembers.value);
+
 const statusLabel = computed(() => {
     if (props.role.my_status === "active") {
         return trans("web::access_control.status.active");

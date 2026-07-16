@@ -5,10 +5,18 @@
       :breadcrumbs="breadcrumbs"
     >
       <template
-        v-if="can_edit"
+        v-if="can_edit || role.can_moderate"
         #primary
       >
         <Link
+          v-if="role.can_moderate || can_edit"
+          :href="manageUrl"
+          class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 ring-1 ring-gray-300 hover:bg-gray-50"
+        >
+          {{ trans('web::access_control.actions.manage_members') }}
+        </Link>
+        <Link
+          v-if="can_edit"
           :href="configureUrl"
           class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
         >
@@ -27,6 +35,7 @@ import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import RoleOverviewSection from "@/Shared/Components/AccessControl/RoleOverviewSection.vue";
 import { useTranslations } from "@/composables/useTranslations";
 import ShowControlGroupsController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ShowControlGroupsController";
+import ManageMembersController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageMembersController";
 import { index as configureRoute } from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageControlGroupMembersController";
 
 const props = defineProps({
@@ -49,4 +58,5 @@ const breadcrumbs = computed(() => [
 ]);
 
 const configureUrl = computed(() => configureRoute.url({ role_id: props.role.id }));
+const manageUrl = computed(() => ManageMembersController.url({ role_id: props.role.id }));
 </script>

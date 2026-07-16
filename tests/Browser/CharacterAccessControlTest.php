@@ -347,3 +347,21 @@ it('shows members and moderators sections on the manage page (admin)', function 
 
     snap($page, "acl-moderate-sections-{$device}");
 })->with(['desktop', 'iphone']);
+
+it('surfaces configure and manage-members entry points to an admin on the index', function (string $device) {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+
+    $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
+    $role->update(['type' => RoleType::MANUAL]);
+
+    $page = deviceVisit($device, '/acl');
+    $page->assertNoSmoke();
+
+    // The admin's "All groups" section lists it with the privileged actions on the card.
+    $page->waitForText('Ops Team');
+    $page->assertSee('Configure');
+    $page->assertSee('Manage members');
+
+    snap($page, "acl-admin-entrypoints-{$device}");
+})->with(['desktop', 'iphone']);
