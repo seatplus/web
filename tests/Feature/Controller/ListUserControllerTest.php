@@ -58,6 +58,8 @@ it('finds a user by any of their characters (an alt), returning the main for dis
         ->assertOk()
         // matched via the alt, but the user is returned…
         ->assertJsonFragment(['id' => test()->test_user->id])
-        // …with the user's MAIN character for the pill/row (snake_case main_character key).
-        ->assertJsonPath('data.0.main_character.character_id', test()->test_user->main_character_id);
+        // …with the user's MAIN character for the pill/row (camelCase mainCharacter)…
+        ->assertJsonPath('data.0.mainCharacter.character_id', test()->test_user->main_character_id)
+        // …and the alt's name available for the picker subtext.
+        ->assertJsonFragment(['name' => 'Alt Toon']);
 });

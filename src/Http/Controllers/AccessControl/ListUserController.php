@@ -27,25 +27,31 @@
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\UserSearchResource;
 
 class ListUserController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): AnonymousResourceCollection
     {
         $name_lookup = request()->get('name');
 
-        return User::with('mainCharacter', 'characters')
-            ->when(
-                request()->has('name'),
-                fn (Builder $query) => $query
-                    ->whereHas(
-                        'characters',
-                        fn (Builder $query) => $query
-                            ->where('name', 'like', "%${name_lookup}%")
-                    )
-            )
-            ->paginate();
+        // Wrap in a light camelCase resource (mainCharacter + characters) so the picker gets a
+        // stable shape instead of a raw model dump — without over-fetching or lazy loading.
+        return UserSearchResource::collection(
+            User::with('mainCharacter', 'characters')
+                ->when(
+                    request()->has('name'),
+                    fn (Builder $query) => $query
+                        ->whereHas(
+                            'characters',
+                            fn (Builder $query) => $query
+                                ->where('name', 'like', "%{$name_lookup}%")
+                        )
+                )
+                ->paginate()
+        );
     }
 }

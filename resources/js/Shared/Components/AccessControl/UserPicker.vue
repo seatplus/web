@@ -19,16 +19,26 @@
         @click="pick(user)"
       >
         <EveImage
-          v-if="user.main_character"
-          :object="user.main_character"
+          v-if="user.mainCharacter"
+          :object="user.mainCharacter"
           :size="64"
-          tailwind_class="h-6 w-6 rounded-full"
+          tailwind_class="h-6 w-6 shrink-0 rounded-full"
         />
         <span
           v-else
           class="h-6 w-6 shrink-0 rounded-full bg-gray-200"
         />
-        <span class="truncate">{{ user.main_character?.name ?? `#${user.id}` }}</span>
+        <div class="min-w-0">
+          <div class="truncate text-gray-900">
+            {{ user.mainCharacter?.name ?? `#${user.id}` }}
+          </div>
+          <div
+            v-if="altNames(user)"
+            class="truncate text-xs text-gray-400"
+          >
+            {{ altNames(user) }}
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -47,6 +57,14 @@ const { trans } = useTranslations();
 const query = ref("");
 const results = ref([]);
 let timer = null;
+
+// The user's other characters (everything except the main), so you can tell who you're picking
+// even when you searched by an alt.
+const altNames = (user) => (user.characters ?? [])
+    .filter((character) => character.character_id !== user.mainCharacter?.character_id)
+    .map((character) => character.name)
+    .filter(Boolean)
+    .join(", ");
 
 const search = () => {
     clearTimeout(timer);
