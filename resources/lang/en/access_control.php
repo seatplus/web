@@ -7,6 +7,12 @@ return [
     'group' => 'Group',
     'groups' => 'Groups',
     'members_count' => '{0} No members|{1} :count member|[2,*] :count members',
+    'moderate' => [
+        'no_applications' => 'No pending applications.',
+        'no_members' => 'No members yet.',
+        'no_moderators' => 'No moderators yet.',
+        'search_users' => 'Search by character name…',
+    ],
     'delete_confirm' => 'Permanently delete ":name"? This cannot be undone.',
 
     // Join method (role type) — WHO can be a member and how they get in.

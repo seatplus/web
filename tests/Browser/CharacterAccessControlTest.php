@@ -12,6 +12,7 @@ use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 if (! function_exists('deviceVisit')) {
@@ -272,4 +273,77 @@ it('creates an open-to-all group through the wizard (admin)', function (string $
     $page->assertNoSmoke();
 
     snap($page, "acl-create-wizard-everyone-{$device}");
+})->with(['desktop', 'iphone']);
+
+if (! function_exists('makeOnRequestRole')) {
+    /** A request-to-join (on-request) group. */
+    function makeOnRequestRole(string $name): Role
+    {
+        $role = Role::findById(Role::create(['name' => $name])->id);
+        $role->update(['type' => RoleType::ON_REQUEST]);
+
+        return $role;
+    }
+}
+
+if (! function_exists('makeApplicant')) {
+    /** Seed a distinct user (named character) with a pending application to $role. */
+    function makeApplicant(Role $role, string $name): CharacterInfo
+    {
+        $character = CharacterInfo::factory()->create(['name' => $name]);
+
+        $user = new User;
+        $user->main_character_id = $character->character_id;
+        $user->save();
+
+        CharacterUser::create([
+            'user_id' => $user->getKey(),
+            'character_id' => $character->character_id,
+            'character_owner_hash' => sha1((string) $character->character_id),
+        ]);
+
+        RoleMembership::create([
+            'role_id' => $role->id,
+            'entity_type' => User::class,
+            'entity_id' => $user->getKey(),
+            'status' => 'pending',
+        ]);
+
+        return $character;
+    }
+}
+
+it('lets a moderator approve a pending application', function (string $device) {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+    $role = makeOnRequestRole('Recruiters');
+    makeApplicant($role, 'Hopeful Pilot');
+
+    $page = deviceVisit($device, '/acl/'.$role->id.'/manage_members');
+    $page->assertNoSmoke();
+
+    // The pending applicant shows under Applications.
+    $page->waitForText('Pending applications');
+    $page->waitForText('Hopeful Pilot');
+
+    // Approving moves them into Members.
+    $page->click('Approve');
+    $page->assertScript("(document.body.innerText.includes('Members') && document.body.innerText.includes('Hopeful Pilot'))");
+    $page->assertNoSmoke();
+
+    snap($page, "acl-moderate-approve-{$device}");
+})->with(['desktop', 'iphone']);
+
+it('shows members and moderators sections on the manage page (admin)', function (string $device) {
+    $character = actingAsCharacter();
+    grantAclAdmin($character->character_id);
+    $role = makeOnRequestRole('Logistics');
+
+    $page = deviceVisit($device, '/acl/'.$role->id.'/manage_members');
+    $page->assertNoSmoke();
+
+    $page->waitForText('Members');
+    $page->waitForText('Moderators');
+
+    snap($page, "acl-moderate-sections-{$device}");
 })->with(['desktop', 'iphone']);
