@@ -7,6 +7,7 @@ use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
@@ -76,7 +77,26 @@ if (! function_exists('makeCharacterAsset')) {
      */
     function makeCharacterAsset(CharacterInfo $character, int $locationId, int $rootLocationId, array $overrides = []): Asset
     {
-        $type = Type::factory()->create(['group_id' => Group::factory()->create()->group_id]);
+        // Real EVE type/group/category so images.evetech.net serves a real item image (ships →
+        // 'render', minerals → 'icon') instead of the generic default it returns for fabricated ids.
+        // Shared via firstOrCreate so many assets can reuse a type (as real inventories do).
+        $realType = fake()->randomElement([
+            ['type' => 587, 'type_name' => 'Rifter', 'group' => 25, 'group_name' => 'Frigate', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 24698, 'type_name' => 'Drake', 'group' => 419, 'group_name' => 'Combat Battlecruiser', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 638, 'type_name' => 'Raven', 'group' => 27, 'group_name' => 'Battleship', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 34, 'type_name' => 'Tritanium', 'group' => 18, 'group_name' => 'Mineral', 'category' => 4, 'category_name' => 'Material'],
+        ]);
+
+        // Use the factories (they bypass mass-assignment guarding) + existence checks so a real
+        // type/group/category is created once and shared across assets.
+        if (! Category::query()->whereKey($realType['category'])->exists()) {
+            Category::factory()->create(['category_id' => $realType['category'], 'name' => $realType['category_name'], 'published' => true]);
+        }
+        if (! Group::query()->whereKey($realType['group'])->exists()) {
+            Group::factory()->create(['group_id' => $realType['group'], 'category_id' => $realType['category'], 'name' => $realType['group_name'], 'published' => true]);
+        }
+        $type = Type::query()->whereKey($realType['type'])->first()
+            ?? Type::factory()->create(['type_id' => $realType['type'], 'group_id' => $realType['group'], 'name' => $realType['type_name'], 'published' => true]);
 
         return Asset::factory()->withName()->create(array_merge([
             'assetable_id' => $character->character_id,

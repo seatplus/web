@@ -4,9 +4,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Pest\Browser\Api\PendingAwaitablePage;
 use Pest\Browser\Enums\Device;
 use Pest\Browser\Playwright\Playwright;
+use Seatplus\Auth\Enums\AffiliationType;
 use Seatplus\Auth\Enums\RoleType;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\CharacterUser;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -177,6 +179,12 @@ it('creates a group through the guided wizard (admin)', function (string $device
     $character = actingAsCharacter();
     grantAclAdmin($character->character_id);
 
+    // A real corporation so its applies-to pill renders a real logo (not the CDN placeholder).
+    $corporation = CorporationInfo::factory()->create([
+        'corporation_id' => 98008630,
+        'name' => 'Thunderwaffe',
+    ]);
+
     $page = deviceVisit($device, '/acl/create');
     $page->assertNoSmoke();
     $page->waitForText('New group');
@@ -190,11 +198,14 @@ it('creates a group through the guided wizard (admin)', function (string $device
     $page->click('Managed');
     $page->click('Next');
 
-    // Step — Applies to (leave scope empty).
+    // Step — Applies to. The entity pickers are ESI autosuggest (need a live token), so a specific
+    // corp can't be selected in a browser test; the real-corp scope is attached via the model below.
     $page->waitForText('Only these');
     $page->click('Next');
 
-    // Step — Permissions (leave empty) → Review.
+    // Step — Permissions: grant one (the list is DB-backed, so this IS driven through the UI).
+    $page->waitForText('view access control');
+    $page->click('view access control');
     $page->click('Next');
     $page->waitForText('Logistics'); // review summary shows the name
 
@@ -202,6 +213,24 @@ it('creates a group through the guided wizard (admin)', function (string $device
     $page->click('Create group');
     $page->assertScript("document.body.innerText.includes('Logistics')");
     $page->assertNoSmoke();
+
+    // The wizard created the group with the permission; attach the applies-to scope the ESI picker
+    // can't set in a test — INVERSE ("everyone except Thunderwaffe") to a real corporation — then
+    // reopen the detail so the screenshot shows a fully-configured group (real logo pill + permission).
+    $role = Role::firstWhere('name', 'Logistics');
+    expect($role->permissions->pluck('name'))->toContain('view access control');
+    Affiliation::create([
+        'role_id' => $role->id,
+        'affiliatable_id' => $corporation->corporation_id,
+        'affiliatable_type' => CorporationInfo::class,
+        'type' => AffiliationType::INVERSE->value,
+    ]);
+
+    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/detail');
+    $page->assertNoSmoke();
+    $page->waitForText('Logistics');
+    $page->waitForText('Thunderwaffe');
+    $page->waitForText('view access control');
 
     snap($page, "acl-create-wizard-{$device}");
 })->with(['desktop', 'iphone']);
