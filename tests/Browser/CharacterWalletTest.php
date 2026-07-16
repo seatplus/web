@@ -1,10 +1,51 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * Character wallet browser tests — run against the real assembled core app.
@@ -16,6 +57,21 @@ use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
 
 if (! function_exists('attachOwnedCharacter')) {
     /**
@@ -32,7 +88,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),
@@ -44,7 +100,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next journal and transaction pages in on scroll', function () {
+it('merges the next journal and transaction pages in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // 40 journal + 40 transaction rows, 6h apart (adjacent entries never more than a
@@ -79,7 +135,7 @@ it('merges the next journal and transaction pages in on scroll', function () {
         $page->assertScript("(document.getElementById('{$bodyId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
     };
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
     $page->assertSee('Transaction');
@@ -88,10 +144,10 @@ it('merges the next journal and transaction pages in on scroll', function () {
     $assertScrollMerges($page, "journal-body-{$character->character_id}");
     $assertScrollMerges($page, "transaction-body-{$character->character_id}");
 
-    $page->screenshot(true, 'character-wallet-infinite-scroll');
-});
+    snap($page, "character-wallet-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('filters the wallet journal by ref_type (and resets, not merges)', function () {
+it('filters the wallet journal by ref_type (and resets, not merges)', function (string $device) {
     $character = actingAsCharacter();
 
     // 30 player_donation (newest) + 3 bounty (oldest), 6h apart. So the unfiltered
@@ -116,7 +172,7 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
 
     $rows = "#journal-body-{$character->character_id} > li";
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->assertSee('Journal');
     $page->assertCount($rows, 15); // first page of 33, all player_donation
@@ -129,10 +185,10 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
 
     // Filtered + reset: only the 3 bounty rows remain (not 15 + merged).
     $page->assertCount($rows, 3);
-    $page->screenshot(true, 'character-wallet-filter');
-});
+    snap($page, "character-wallet-filter-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a wallet card for every character the user owns', function () {
+it('renders a wallet card for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -149,12 +205,12 @@ it('renders a wallet card for every character the user owns', function () {
                 'wallet_journable_type' => CharacterInfo::class,
             ]));
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
     $page->waitForText('Journal');
 
     $page->assertPresent("#journal-body-{$mainCharacter->character_id}");
     $page->assertPresent("#journal-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, 'character-wallet-multiple-characters');
-});
+    snap($page, "character-wallet-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);

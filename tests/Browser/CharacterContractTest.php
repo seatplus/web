@@ -2,11 +2,52 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Universe\Location;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * Character contracts browser tests — run against the real assembled core app.
@@ -54,6 +95,21 @@ if (! function_exists('makeCharacterContracts')) {
     }
 }
 
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
+
 if (! function_exists('attachOwnedCharacter')) {
     /**
      * Attach an additional owned character to the same user that owns $existing, so a
@@ -69,7 +125,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),
@@ -81,7 +137,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next contracts page in on scroll', function () {
+it('merges the next contracts page in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // 40 contracts → several paginator pages (default 15/page) for the contracts_<id> prop.
@@ -89,7 +145,7 @@ it('merges the next contracts page in on scroll', function () {
 
     $rows = "#contracts-body-{$character->character_id} > *";
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
@@ -102,15 +158,15 @@ it('merges the next contracts page in on scroll', function () {
     // so InfiniteScroll's end trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('contracts-body-{$character->character_id}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-contracts-infinite-scroll');
-});
+    snap($page, "character-contracts-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders both the assignee and the acceptor for an accepted contract', function () {
+it('renders both the assignee and the acceptor for an accepted contract', function (string $device) {
     $character = actingAsCharacter();
 
     // A second, distinct character to act as the acceptor. A factory character carries its
     // own CharacterAffiliation, so resolve.id returns it offline (no ESI in the browser).
-    $acceptor = CharacterInfo::factory()->create();
+    $acceptor = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
     // Accepted contracts assigned to the main character but accepted by someone else — the
     // AssigneeComponent then renders a second entity block (acceptor_id !== 0 and != assignee).
@@ -119,7 +175,7 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
         'status' => 'in_progress',
     ]);
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
@@ -130,10 +186,10 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
     $page->waitForText($character->name);
     $page->waitForText($acceptor->name);
 
-    $page->screenshot(true, 'character-contracts-assignee-acceptor');
-});
+    snap($page, "character-contracts-assignee-acceptor-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a contracts list for every character the user owns', function () {
+it('renders a contracts list for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -143,12 +199,12 @@ it('renders a contracts list for every character the user owns', function () {
     collect([$mainCharacter, $secondCharacter])
         ->each(fn (CharacterInfo $character) => makeCharacterContracts($character, 5));
 
-    $page = visit('/character/contracts');
+    $page = deviceVisit($device, '/character/contracts');
     $page->assertNoSmoke();
     $page->waitForText('Character Contracts');
 
     $page->assertPresent("#contracts-body-{$mainCharacter->character_id}");
     $page->assertPresent("#contracts-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, 'character-contracts-multiple-characters');
-});
+    snap($page, "character-contracts-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);

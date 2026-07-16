@@ -1,13 +1,55 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Eveapi\Models\Universe\Type;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * Character assets browser tests — run against the real assembled core app.
@@ -35,7 +77,26 @@ if (! function_exists('makeCharacterAsset')) {
      */
     function makeCharacterAsset(CharacterInfo $character, int $locationId, int $rootLocationId, array $overrides = []): Asset
     {
-        $type = Type::factory()->create(['group_id' => Group::factory()->create()->group_id]);
+        // Real EVE type/group/category so images.evetech.net serves a real item image (ships →
+        // 'render', minerals → 'icon') instead of the generic default it returns for fabricated ids.
+        // Shared via firstOrCreate so many assets can reuse a type (as real inventories do).
+        $realType = fake()->randomElement([
+            ['type' => 587, 'type_name' => 'Rifter', 'group' => 25, 'group_name' => 'Frigate', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 24698, 'type_name' => 'Drake', 'group' => 419, 'group_name' => 'Combat Battlecruiser', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 638, 'type_name' => 'Raven', 'group' => 27, 'group_name' => 'Battleship', 'category' => 6, 'category_name' => 'Ship'],
+            ['type' => 34, 'type_name' => 'Tritanium', 'group' => 18, 'group_name' => 'Mineral', 'category' => 4, 'category_name' => 'Material'],
+        ]);
+
+        // Use the factories (they bypass mass-assignment guarding) + existence checks so a real
+        // type/group/category is created once and shared across assets.
+        if (! Category::query()->whereKey($realType['category'])->exists()) {
+            Category::factory()->create(['category_id' => $realType['category'], 'name' => $realType['category_name'], 'published' => true]);
+        }
+        if (! Group::query()->whereKey($realType['group'])->exists()) {
+            Group::factory()->create(['group_id' => $realType['group'], 'category_id' => $realType['category'], 'name' => $realType['group_name'], 'published' => true]);
+        }
+        $type = Type::query()->whereKey($realType['type'])->first()
+            ?? Type::factory()->create(['type_id' => $realType['type'], 'group_id' => $realType['group'], 'name' => $realType['type_name'], 'published' => true]);
 
         return Asset::factory()->withName()->create(array_merge([
             'assetable_id' => $character->character_id,
@@ -70,7 +131,28 @@ if (! function_exists('makeNestedAssetChain')) {
     }
 }
 
-it('merges the next locations page in on scroll', function () {
+if (! function_exists('assertAssetsScript')) {
+    /**
+     * Assert a JS condition on the assets page, re-scrolling the list to the bottom on each poll so
+     * per-location items — which lazy-load when their location scrolls into view — are present.
+     * On mobile the stacked filter block pushes the first location below the fold, so a plain
+     * waitForText never triggers the load; scrolling the list container does.
+     */
+    function assertAssetsScript($page, string $condition): void
+    {
+        $page->assertScript("(document.getElementById('assets-body')?.closest('.overflow-y-auto')?.scrollTo(0, 1e6), {$condition})");
+    }
+}
+
+if (! function_exists('assetTextVisible')) {
+    /** Wait (with scroll) for a single asset/item name to appear on the assets list. */
+    function assetTextVisible($page, string $text): void
+    {
+        assertAssetsScript($page, "document.body.innerText.includes('".addslashes($text)."')");
+    }
+}
+
+it('merges the next locations page in on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     // >1 paginator page of locations (15/page) so the `assets` scroll prop has a next page.
@@ -81,7 +163,7 @@ it('merges the next locations page in on scroll', function () {
 
     $rows = '#assets-body > *';
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -95,71 +177,86 @@ it('merges the next locations page in on scroll', function () {
     // trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('assets-body').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-assets-infinite-scroll');
-});
+    snap($page, "character-assets-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('drills three levels deep via the shareable item deep link', function () {
+it('drills three levels deep via the shareable item deep link', function (string $device) {
     $character = actingAsCharacter();
     ['capital' => $capital, 'freighter' => $freighter, 'container' => $container, 'cargo' => $cargo] = makeNestedAssetChain($character);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
     // The top-level capital ship renders in its location list with a contents affordance:
     // the chevron links to the shareable character.item URL.
-    $page->waitForText($capital->name);
+    assetTextVisible($page, $capital->name);
     $page->assertPresent("a[href*='/item/{$capital->item_id}']");
 
     // Follow that shareable link down each containment level. The item() page renders one
     // level of contents, so each parent's ItemDetails shows the next-deeper asset.
-    $level2 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $capital->item_id], false));
+    $level2 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $capital->item_id], false));
     $level2->assertNoSmoke();
     $level2->waitForText($freighter->name);
 
-    $level3 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $freighter->item_id], false));
+    $level3 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $freighter->item_id], false));
     $level3->assertNoSmoke();
     $level3->waitForText($container->name);
 
     // Three layers of nesting: the container's page shows the cargo inside it.
-    $level4 = visit(route('character.item', ['character_id' => $character->character_id, 'item_id' => $container->item_id], false));
+    $level4 = deviceVisit($device, route('character.item', ['character_id' => $character->character_id, 'item_id' => $container->item_id], false));
     $level4->assertNoSmoke();
     $level4->waitForText($cargo->name);
 
-    $level4->screenshot(true, 'character-assets-deeplink-depth-three');
-});
+    snap($level4, "character-assets-deeplink-depth-three-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('opens a container’s contents in a modal on click', function () {
+it('opens a container’s contents in a modal on click', function (string $device) {
     $character = actingAsCharacter();
     ['capital' => $capital, 'freighter' => $freighter] = makeNestedAssetChain($character);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
-    $page->waitForText($capital->name);
+    assetTextVisible($page, $capital->name);
 
     // Clicking the capital's contents affordance opens the modal and fetches its one level of
     // contents on demand (X-Modal) — the freighter appears without a full page navigation.
     $page->click("a[href*='/item/{$capital->item_id}']");
     $page->waitForText($freighter->name);
 
-    $page->screenshot(true, 'character-assets-contents-modal');
-});
+    snap($page, "character-assets-contents-modal-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('surfaces asset safety as its own location', function () {
+it('surfaces asset safety as its own location', function (string $device) {
     $character = actingAsCharacter();
 
     // Asset-safety items carry the sentinel location id; the action prepends a synthetic
     // location for them on page 1 (uncommon in practice, hence a dedicated edge-case check).
     $safety = makeCharacterAsset($character, Asset::ASSET_SAFETY, Asset::ASSET_SAFETY, ['location_flag' => 'AssetSafety']);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
-    $page->waitForText($safety->name);
+    assetTextVisible($page, $safety->name);
 
-    $page->screenshot(true, 'character-assets-asset-safety');
-});
+    snap($page, "character-assets-asset-safety-{$device}");
+})->with(['desktop', 'iphone']);
+
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
 
 if (! function_exists('attachOwnedCharacter')) {
     /**
@@ -175,7 +272,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),
@@ -187,7 +284,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('narrows a location to only the top-level items that match the search at any depth', function () {
+it('narrows a location to only the top-level items that match the search at any depth', function (string $device) {
     $character = actingAsCharacter();
 
     $location = Location::factory()->for(Station::factory(), 'locatable')->create();
@@ -196,32 +293,33 @@ it('narrows a location to only the top-level items that match the search at any 
     // A top-level container ("Praetor Bay") that HOLDS a nested asset named to match the search…
     $container = makeCharacterAsset($character, $root, $root, ['name' => 'Praetor Bay']);
     $container->update(['root_item_id' => $container->item_id]);
-    $nested = makeCharacterAsset($character, $container->item_id, $root, ['name' => 'Sodia Ibis', 'location_flag' => 'Cargo']);
+    $nested = makeCharacterAsset($character, $container->item_id, $root, ['name' => 'Herpaderp Ibis', 'location_flag' => 'Cargo']);
     $nested->update(['root_item_id' => $container->item_id]);
 
     // …and a separate top-level item that does NOT match.
     $other = makeCharacterAsset($character, $root, $root, ['name' => 'Quafe Crate']);
     $other->update(['root_item_id' => $other->item_id]);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
-    // Unfiltered, the location lazy-loads both of its top-level items.
-    $page->waitForText('Praetor Bay');
-    $page->waitForText('Quafe Crate');
+    // Unfiltered, the location lazy-loads both of its top-level items (scroll to trigger).
+    assetTextVisible($page, 'Praetor Bay');
+    assetTextVisible($page, 'Quafe Crate');
 
-    // Searching "sodia" matches the nested asset and rolls it up to its top-level container via
-    // root_item_id: only "Praetor Bay" survives, the unrelated top-level item drops out. Drives the
-    // shell re-query AND the per-location filtered-top-level refetch end-to-end.
-    $page->type('search', 'sodia');
-    $page->assertScript("(document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate'))");
+    // Searching "herp" matches the nested asset ("Herpaderp Ibis") and rolls it up to its top-level
+    // container via root_item_id: only "Praetor Bay" survives, the unrelated top-level item drops out.
+    // Drives the shell re-query AND the per-location filtered-top-level refetch end-to-end.
+    $page->type('search', 'herp');
+    // The filtered re-query rebuilds the location list, which lazy-loads on scroll again.
+    assertAssetsScript($page, "document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'character-assets-search');
-});
+    snap($page, "character-assets-search-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('renders a location for every character the user owns', function () {
+it('renders a location for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -233,7 +331,7 @@ it('renders a location for every character the user owns', function () {
     makeCharacterAsset($mainCharacter, $locationA->location_id, $locationA->location_id);
     makeCharacterAsset($secondCharacter, $locationB->location_id, $locationB->location_id);
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
 
@@ -242,10 +340,10 @@ it('renders a location for every character the user owns', function () {
     $page->waitForText($locationA->locatable->name);
     $page->waitForText($locationB->locatable->name);
 
-    $page->screenshot(true, 'character-assets-multiple-characters');
-});
+    snap($page, "character-assets-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('filters the location list by region', function () {
+it('filters the location list by region', function (string $device) {
     $character = actingAsCharacter();
 
     $locationA = Location::factory()->for(Station::factory(), 'locatable')->create();
@@ -257,7 +355,7 @@ it('filters the location list by region', function () {
     $stationA = $locationA->locatable->name;
     $stationB = $locationB->locatable->name;
 
-    $page = visit('/character/assets');
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
     $page->waitForText($stationA);
@@ -277,5 +375,5 @@ it('filters the location list by region', function () {
     ));
     $page->assertNoSmoke();
 
-    $page->screenshot(true, 'character-assets-region-filter');
-});
+    snap($page, "character-assets-region-filter-{$device}");
+})->with(['desktop', 'iphone']);

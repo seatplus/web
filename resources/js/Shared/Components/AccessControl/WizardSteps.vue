@@ -1,9 +1,32 @@
 <template>
-  <nav aria-label="Progress">
-    <ol
-      role="list"
-      class="divide-y divide-gray-300 rounded-md border border-gray-300 md:flex md:divide-y-0"
+  <div>
+    <!-- Mobile: compact indicator (the full stepper is too tall on small screens). -->
+    <div class="md:hidden">
+      <div class="flex items-baseline justify-between">
+        <p class="text-sm font-medium text-indigo-600">
+          {{ steps[current]?.label }}
+        </p>
+        <p class="text-xs text-gray-500">
+          {{ current + 1 }} / {{ steps.length }}
+        </p>
+      </div>
+      <div class="mt-2 overflow-hidden rounded-full bg-gray-200">
+        <div
+          class="h-1.5 rounded-full bg-indigo-600 transition-all duration-300 ease-out"
+          :style="{ width: `${pct}%` }"
+        />
+      </div>
+    </div>
+
+    <!-- md+ : full bordered stepper -->
+    <nav
+      aria-label="Progress"
+      class="hidden md:block"
     >
+      <ol
+        role="list"
+        class="rounded-md border border-gray-300 md:flex md:divide-y-0"
+      >
       <li
         v-for="(step, stepIdx) in steps"
         :key="step.key"
@@ -71,12 +94,14 @@
             </svg>
           </div>
         </template>
-      </li>
-    </ol>
-  </nav>
+        </li>
+      </ol>
+    </nav>
+  </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { CheckIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
@@ -84,6 +109,8 @@ const props = defineProps({
     steps: { type: Array, required: true },
     current: { type: Number, default: 0 },
 });
+
+const pct = computed(() => (props.steps.length ? ((props.current + 1) / props.steps.length) * 100 : 0));
 
 const statusOf = (index) => {
     if (index < props.current) {

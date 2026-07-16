@@ -1,8 +1,49 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * Authentication browser tests — run against the real assembled core app (never under
@@ -46,20 +87,20 @@ if (! function_exists('attachOwnedCharacter')) {
 
 /* ------------------------------------------------------------- unauthenticated */
 
-it('renders the login page', function () {
-    $page = visit('/login');
+it('renders the login page', function (string $device) {
+    $page = deviceVisit($device, '/login');
 
     $page->assertNoSmoke();
     $page->assertSee('Sign in');
-    $page->screenshot(true, 'login');
-});
+    snap($page, "login-{$device}");
+})->with(['desktop', 'iphone']);
 
 /* --------------------------------------------------------------- authenticated */
 
-it('renders the dashboard for an authenticated user', function () {
+it('renders the dashboard for an authenticated user', function (string $device) {
     actingAsCharacter();
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     $page->assertNoSmoke();
     $page->assertSee('Characters');
@@ -67,16 +108,16 @@ it('renders the dashboard for an authenticated user', function () {
     // Let the lazy-loaded portraits (EveImage IntersectionObserver) settle so the
     // screenshot captures them rather than the placeholder SVGs.
     $page->wait(1);
-    $page->screenshot(true, 'dashboard');
+    snap($page, "dashboard-{$device}");
 
     test()->assertAuthenticated();
-});
+})->with(['desktop', 'iphone']);
 
-it('renders a dashboard card for every character the user owns', function () {
+it('renders a dashboard card for every character the user owns', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     $page->assertNoSmoke();
     $page->waitForText('Characters');
@@ -97,13 +138,13 @@ it('renders a dashboard card for every character the user owns', function () {
 
     $page->assertCount('img.h-12.w-12', 2);
 
-    $page->screenshot(true, 'dashboard-multiple-characters');
-});
+    snap($page, "dashboard-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('wires the character portrait to the EVE image server', function () {
+it('wires the character portrait to the EVE image server', function (string $device) {
     $character = actingAsCharacter();
 
-    $page = visit('/home');
+    $page = deviceVisit($device, '/home');
 
     // EveImage lazy-loads the portrait via an IntersectionObserver, mounting the
     // <img> a beat after the page settles — wait for it before asserting.
@@ -125,4 +166,4 @@ it('wires the character portrait to the EVE image server', function () {
         'src',
         "images.evetech.net/characters/{$character->character_id}/portrait",
     );
-});
+})->with(['desktop', 'iphone']);

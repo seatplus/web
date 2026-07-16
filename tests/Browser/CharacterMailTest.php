@@ -1,10 +1,51 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Mail\MailRecipients;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * Character mail browser test — the mail header list (desktop aside + mobile) is now
@@ -15,6 +56,21 @@ use Seatplus\Eveapi\Models\Mail\MailRecipients;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
 
 if (! function_exists('attachOwnedCharacter')) {
     /**
@@ -31,7 +87,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),
@@ -43,7 +99,7 @@ if (! function_exists('attachOwnedCharacter')) {
     }
 }
 
-it('merges the next page of mail headers on scroll', function () {
+it('merges the next page of mail headers on scroll', function (string $device) {
     $character = actingAsCharacter();
 
     Mail::factory()
@@ -56,9 +112,11 @@ it('merges the next page of mail headers on scroll', function () {
             'receivable_type' => CharacterInfo::class,
         ]));
 
-    $rows = '#desktop-mail-list > li';
+    // The visible list differs by viewport: aside #desktop-mail-list on md+, #mobile-mail-list below.
+    $listId = $device === 'iphone' ? 'mobile-mail-list' : 'desktop-mail-list';
+    $rows = "#{$listId} > li";
 
-    $page = visit('/character/mails');
+    $page = deviceVisit($device, '/character/mails');
     $page->assertNoSmoke();
     $page->waitForText('Character Mails');
 
@@ -67,12 +125,12 @@ it('merges the next page of mail headers on scroll', function () {
     expect($before)->toBeGreaterThan(0);
 
     // Re-scroll the list's container on each poll until the next page merges in.
-    $page->assertScript("(document.getElementById('desktop-mail-list').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
+    $page->assertScript("(document.getElementById('{$listId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, 'character-mails-infinite-scroll');
-});
+    snap($page, "character-mails-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('aggregates mail headers across all of the user\'s characters', function () {
+it('aggregates mail headers across all of the user\'s characters', function (string $device) {
     $mainCharacter = actingAsCharacter();
     $secondCharacter = attachOwnedCharacter($mainCharacter);
 
@@ -92,12 +150,12 @@ it('aggregates mail headers across all of the user\'s characters', function () {
 
     $rows = '#desktop-mail-list > li';
 
-    $page = visit('/character/mails');
+    $page = deviceVisit($device, '/character/mails');
     $page->assertNoSmoke();
     $page->waitForText('Character Mails');
 
     // Both characters' mails on a single page (6 + 6 = 12 < 15/page).
     $page->assertCount($rows, 12);
 
-    $page->screenshot(true, 'character-mails-multiple-characters');
-});
+    snap($page, "character-mails-multiple-characters-{$device}");
+})->with(['desktop', 'iphone']);

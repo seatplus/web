@@ -2,6 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -10,6 +13,44 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
+
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
 
 /*
  * "Update" (dispatch) sidebar browser tests — run against the real assembled core app.
@@ -53,21 +94,21 @@ if (! function_exists('dispatchSidebarSees')) {
     }
 }
 
-it('lists the user\'s own character in the update sidebar', function () {
+it('lists the user\'s own character in the update sidebar', function (string $device) {
     $character = actingAsCharacter();
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.character.wallet'));
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
 
     $page->click('Update');
     $page->waitForText('Your characters');
     $page->assertScript(dispatchSidebarSees($character->name));
 
-    $page->screenshot(true, 'dispatch-owned-character');
-});
+    snap($page, "dispatch-owned-character-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('reveals an affiliated (non-owned) character only when the affiliated section is expanded', function () {
+it('reveals an affiliated (non-owned) character only when the affiliated section is expanded', function (string $device) {
     $character = actingAsCharacter();
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.character.wallet'));
     $user = User::whereMainCharacterId($character->character_id)->sole();
@@ -90,7 +131,7 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     ]);
     $user->assignRole($role);
 
-    $page = visit('/character/wallets');
+    $page = deviceVisit($device, '/character/wallets');
     $page->assertNoSmoke();
 
     $page->click('Update');
@@ -105,10 +146,10 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     $page->click('Affiliated characters');
     $page->assertScript(dispatchSidebarSees($affiliated_character->name));
 
-    $page->screenshot(true, 'dispatch-affiliated-character');
-});
+    snap($page, "dispatch-affiliated-character-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('lists the corporation in the update sidebar on a corporation-scoped page', function () {
+it('lists the corporation in the update sidebar on a corporation-scoped page', function (string $device) {
     $character = actingAsCharacter();
 
     // Director grants access to the corporation wallet page; Accountant satisfies the
@@ -119,12 +160,12 @@ it('lists the corporation in the update sidebar on a corporation-scoped page', f
     );
     updateRefreshTokenWithScopes($character->refreshToken, config('eveapi.scopes.corporation.wallet'));
 
-    $page = visit('/corporation/wallet');
+    $page = deviceVisit($device, '/corporation/wallet');
     $page->assertNoSmoke();
 
     $page->click('Update');
     $page->waitForText('Your corporations');
     $page->assertScript(dispatchSidebarSees($character->corporation->name));
 
-    $page->screenshot(true, 'dispatch-owned-corporation');
-});
+    snap($page, "dispatch-owned-corporation-{$device}");
+})->with(['desktop', 'iphone']);
