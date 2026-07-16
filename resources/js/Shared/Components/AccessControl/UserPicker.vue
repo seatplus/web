@@ -19,8 +19,8 @@
         @click="pick(user)"
       >
         <EveImage
-          v-if="user.mainCharacter"
-          :object="user.mainCharacter"
+          v-if="user.main_character"
+          :object="user.main_character"
           :size="64"
           tailwind_class="h-6 w-6 rounded-full"
         />
@@ -28,7 +28,7 @@
           v-else
           class="h-6 w-6 shrink-0 rounded-full bg-gray-200"
         />
-        <span class="truncate">{{ user.mainCharacter?.name ?? `#${user.id}` }}</span>
+        <span class="truncate">{{ user.main_character?.name ?? `#${user.id}` }}</span>
       </li>
     </ul>
   </div>
