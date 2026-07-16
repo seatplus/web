@@ -43,12 +43,12 @@ class HomeController extends Controller
             'characters' => CharacterInfo::with('corporation', 'alliance', 'application', 'balance', 'batchUpdate')
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
+            // Open job postings are a small, bounded list — deferred so the dashboard renders
+            // immediately and the list arrives in a follow-up request (no client fetch/axios).
+            'openEnlistments' => Inertia::defer(
+                fn () => Enlistment::with('corporation', 'corporation.alliance')->get()
+            ),
         ]);
-    }
-
-    public function getEnlistments(): LengthAwarePaginator
-    {
-        return Enlistment::with('corporation', 'corporation.alliance')->paginate();
     }
 
     public function getOwnApplications(int $corporation_id): LengthAwarePaginator

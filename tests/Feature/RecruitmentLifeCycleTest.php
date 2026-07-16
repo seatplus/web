@@ -76,17 +76,18 @@ test('user with permission and affiliations can delete enlistment', function () 
 test('secondary user can see enlistment', function () {
     createEnlistment();
 
-    $response = test()->actingAs(test()->secondary_user)
-        ->get(route('list.open.enlistments'))
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has(
-                    'data.0',
-                    fn ($json) => $json
-                        ->where('corporation_id', test()->test_character->corporation->corporation_id)
-                        ->etc()
-                )
+    // openEnlistments is a deferred prop on the dashboard — resolve it via an Inertia partial reload.
+    test()->actingAs(test()->secondary_user)
+        ->get(route('home'), [
+            'X-Inertia' => 'true',
+            'X-Inertia-Partial-Component' => 'Dashboard/Index',
+            'X-Inertia-Partial-Data' => 'openEnlistments',
+        ])
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Dashboard/Index')
+                ->has('openEnlistments', 1)
+                ->where('openEnlistments.0.corporation_id', test()->test_character->corporation->corporation_id)
                 ->etc()
         );
 });
