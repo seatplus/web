@@ -24,7 +24,9 @@ class ShowControlGroupsController extends Controller
         $userId = $user->getAuthIdentifier();
 
         // The corps/alliances the user belongs to — used to find groups they're eligible to join.
-        $characters = $user->characters;
+        // Eager-load characterAffiliation: the corporation_id/alliance_id accessors read it, and
+        // lazy loading is disabled (strict mode).
+        $characters = $user->characters()->with('characterAffiliation')->get();
         $corporationIds = $characters->pluck('corporation_id')->filter()->unique()->values()->all();
         $allianceIds = $characters->pluck('alliance_id')->filter()->unique()->values()->all();
 
