@@ -2,9 +2,14 @@
   <li class="flex items-center justify-between gap-3 py-3">
     <div class="flex min-w-0 items-center gap-3">
       <EveImage
+        v-if="member.character.character_id"
         :object="member.character"
         :size="64"
         tailwind_class="h-8 w-8 rounded-full"
+      />
+      <span
+        v-else
+        class="h-8 w-8 shrink-0 rounded-full bg-gray-200"
       />
       <span class="truncate text-sm font-medium text-gray-900">
         {{ member.character.name ?? '—' }}
