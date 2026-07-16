@@ -35,6 +35,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Character contracts browser tests — run against the real assembled core app.
  *
@@ -129,7 +143,7 @@ it('merges the next contracts page in on scroll', function (string $device) {
     // so InfiniteScroll's end trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('contracts-body-{$character->character_id}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, "character-contracts-infinite-scroll-{$device}");
+    snap($page, "character-contracts-infinite-scroll-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders both the assignee and the acceptor for an accepted contract', function (string $device) {
@@ -157,7 +171,7 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
     $page->waitForText($character->name);
     $page->waitForText($acceptor->name);
 
-    $page->screenshot(true, "character-contracts-assignee-acceptor-{$device}");
+    snap($page, "character-contracts-assignee-acceptor-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders a contracts list for every character the user owns', function (string $device) {
@@ -177,5 +191,5 @@ it('renders a contracts list for every character the user owns', function (strin
     $page->assertPresent("#contracts-body-{$mainCharacter->character_id}");
     $page->assertPresent("#contracts-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, "character-contracts-multiple-characters-{$device}");
+    snap($page, "character-contracts-multiple-characters-{$device}");
 })->with(['desktop', 'iphone']);

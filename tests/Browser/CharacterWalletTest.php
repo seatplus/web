@@ -33,6 +33,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Character wallet browser tests — run against the real assembled core app.
  *
@@ -115,7 +129,7 @@ it('merges the next journal and transaction pages in on scroll', function (strin
     $assertScrollMerges($page, "journal-body-{$character->character_id}");
     $assertScrollMerges($page, "transaction-body-{$character->character_id}");
 
-    $page->screenshot(true, "character-wallet-infinite-scroll-{$device}");
+    snap($page, "character-wallet-infinite-scroll-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('filters the wallet journal by ref_type (and resets, not merges)', function (string $device) {
@@ -156,7 +170,7 @@ it('filters the wallet journal by ref_type (and resets, not merges)', function (
 
     // Filtered + reset: only the 3 bounty rows remain (not 15 + merged).
     $page->assertCount($rows, 3);
-    $page->screenshot(true, "character-wallet-filter-{$device}");
+    snap($page, "character-wallet-filter-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders a wallet card for every character the user owns', function (string $device) {
@@ -183,5 +197,5 @@ it('renders a wallet card for every character the user owns', function (string $
     $page->assertPresent("#journal-body-{$mainCharacter->character_id}");
     $page->assertPresent("#journal-body-{$secondCharacter->character_id}");
 
-    $page->screenshot(true, "character-wallet-multiple-characters-{$device}");
+    snap($page, "character-wallet-multiple-characters-{$device}");
 })->with(['desktop', 'iphone']);

@@ -36,6 +36,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Character assets browser tests — run against the real assembled core app.
  *
@@ -143,7 +157,7 @@ it('merges the next locations page in on scroll', function (string $device) {
     // trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('assets-body').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, "character-assets-infinite-scroll-{$device}");
+    snap($page, "character-assets-infinite-scroll-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('drills three levels deep via the shareable item deep link', function (string $device) {
@@ -174,7 +188,7 @@ it('drills three levels deep via the shareable item deep link', function (string
     $level4->assertNoSmoke();
     $level4->waitForText($cargo->name);
 
-    $level4->screenshot(true, "character-assets-deeplink-depth-three-{$device}");
+    snap($level4, "character-assets-deeplink-depth-three-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('opens a container’s contents in a modal on click', function (string $device) {
@@ -191,7 +205,7 @@ it('opens a container’s contents in a modal on click', function (string $devic
     $page->click("a[href*='/item/{$capital->item_id}']");
     $page->waitForText($freighter->name);
 
-    $page->screenshot(true, "character-assets-contents-modal-{$device}");
+    snap($page, "character-assets-contents-modal-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('surfaces asset safety as its own location', function (string $device) {
@@ -206,7 +220,7 @@ it('surfaces asset safety as its own location', function (string $device) {
     $page->waitForText('Character Assets');
     assetTextVisible($page, $safety->name);
 
-    $page->screenshot(true, "character-assets-asset-safety-{$device}");
+    snap($page, "character-assets-asset-safety-{$device}");
 })->with(['desktop', 'iphone']);
 
 if (! function_exists('attachOwnedCharacter')) {
@@ -267,7 +281,7 @@ it('narrows a location to only the top-level items that match the search at any 
     assertAssetsScript($page, "document.body.innerText.includes('Praetor Bay') && !document.body.innerText.includes('Quafe Crate')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "character-assets-search-{$device}");
+    snap($page, "character-assets-search-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders a location for every character the user owns', function (string $device) {
@@ -291,7 +305,7 @@ it('renders a location for every character the user owns', function (string $dev
     $page->waitForText($locationA->locatable->name);
     $page->waitForText($locationB->locatable->name);
 
-    $page->screenshot(true, "character-assets-multiple-characters-{$device}");
+    snap($page, "character-assets-multiple-characters-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('filters the location list by region', function (string $device) {
@@ -326,5 +340,5 @@ it('filters the location list by region', function (string $device) {
     ));
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "character-assets-region-filter-{$device}");
+    snap($page, "character-assets-region-filter-{$device}");
 })->with(['desktop', 'iphone']);

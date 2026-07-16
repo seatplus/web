@@ -33,6 +33,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Character mail browser test — the mail header list (desktop aside + mobile) is now
  * an Inertia <InfiniteScroll> over the `mailHeaders` scroll prop instead of the axios
@@ -98,7 +112,7 @@ it('merges the next page of mail headers on scroll', function (string $device) {
     // Re-scroll the list's container on each poll until the next page merges in.
     $page->assertScript("(document.getElementById('{$listId}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    $page->screenshot(true, "character-mails-infinite-scroll-{$device}");
+    snap($page, "character-mails-infinite-scroll-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('aggregates mail headers across all of the user\'s characters', function (string $device) {
@@ -128,5 +142,5 @@ it('aggregates mail headers across all of the user\'s characters', function (str
     // Both characters' mails on a single page (6 + 6 = 12 < 15/page).
     $page->assertCount($rows, 12);
 
-    $page->screenshot(true, "character-mails-multiple-characters-{$device}");
+    snap($page, "character-mails-multiple-characters-{$device}");
 })->with(['desktop', 'iphone']);

@@ -31,6 +31,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Authentication browser tests — run against the real assembled core app (never under
  * web's Testbench harness; web's phpunit.xml excludes tests/Browser). They execute
@@ -78,7 +92,7 @@ it('renders the login page', function (string $device) {
 
     $page->assertNoSmoke();
     $page->assertSee('Sign in');
-    $page->screenshot(true, "login-{$device}");
+    snap($page, "login-{$device}");
 })->with(['desktop', 'iphone']);
 
 /* --------------------------------------------------------------- authenticated */
@@ -94,7 +108,7 @@ it('renders the dashboard for an authenticated user', function (string $device) 
     // Let the lazy-loaded portraits (EveImage IntersectionObserver) settle so the
     // screenshot captures them rather than the placeholder SVGs.
     $page->wait(1);
-    $page->screenshot(true, "dashboard-{$device}");
+    snap($page, "dashboard-{$device}");
 
     test()->assertAuthenticated();
 })->with(['desktop', 'iphone']);
@@ -124,7 +138,7 @@ it('renders a dashboard card for every character the user owns', function (strin
 
     $page->assertCount('img.h-12.w-12', 2);
 
-    $page->screenshot(true, "dashboard-multiple-characters-{$device}");
+    snap($page, "dashboard-multiple-characters-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('wires the character portrait to the EVE image server', function (string $device) {

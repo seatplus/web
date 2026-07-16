@@ -36,6 +36,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Access-control discover flow browser tests, run against the assembled core app.
  * Covers the redesigned /acl index: "My groups" vs "Available to join" segmentation and the
@@ -97,7 +111,7 @@ it('lists a group the eligible user can join under "Available to join"', functio
     // Self-service group → a Join affordance is present.
     $page->assertSee('Join');
 
-    $page->screenshot(true, "acl-discover-available-{$device}");
+    snap($page, "acl-discover-available-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('joins a self-service group and moves it into "My groups"', function (string $device) {
@@ -114,7 +128,7 @@ it('joins a self-service group and moves it into "My groups"', function (string 
     $page->assertScript("(document.body.innerText.includes('Fleet Operations') && document.body.innerText.includes('Member'))");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "acl-discover-joined-{$device}");
+    snap($page, "acl-discover-joined-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders a group the user already belongs to under "My groups"', function (string $device) {
@@ -135,7 +149,7 @@ it('renders a group the user already belongs to under "My groups"', function (st
     $page->waitForText('My groups');
     $page->waitForText('Directors');
 
-    $page->screenshot(true, "acl-discover-my-groups-{$device}");
+    snap($page, "acl-discover-my-groups-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('configures a group: switch join method and save (admin)', function (string $device) {
@@ -156,7 +170,7 @@ it('configures a group: switch join method and save (admin)', function (string $
     $page->click('Save');
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "acl-configure-{$device}");
+    snap($page, "acl-configure-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('creates a group through the guided wizard (admin)', function (string $device) {
@@ -189,7 +203,7 @@ it('creates a group through the guided wizard (admin)', function (string $device
     $page->assertScript("document.body.innerText.includes('Logistics')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "acl-create-wizard-{$device}");
+    snap($page, "acl-create-wizard-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('creates an open-to-all group through the wizard (admin)', function (string $device) {
@@ -228,5 +242,5 @@ it('creates an open-to-all group through the wizard (admin)', function (string $
     $page->assertScript("document.body.innerText.includes('Everyone')");
     $page->assertNoSmoke();
 
-    $page->screenshot(true, "acl-create-wizard-everyone-{$device}");
+    snap($page, "acl-create-wizard-everyone-{$device}");
 })->with(['desktop', 'iphone']);

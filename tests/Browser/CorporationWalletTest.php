@@ -33,6 +33,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * Corporation wallet browser test.
  *
@@ -102,5 +116,5 @@ it('merges the next corporation journal and transaction pages in on scroll', fun
     $assertScrollMerges($page, "journal-body-{$corporationId}-1");
     $assertScrollMerges($page, "transaction-body-{$corporationId}-1");
 
-    $page->screenshot(true, "corporation-wallet-infinite-scroll-{$device}");
+    snap($page, "corporation-wallet-infinite-scroll-{$device}");
 })->with(['desktop', 'iphone']);

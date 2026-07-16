@@ -38,6 +38,20 @@ if (! function_exists('deviceVisit')) {
     }
 }
 
+if (! function_exists('snap')) {
+    /**
+     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
+     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
+     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
+     */
+    function snap($page, string $name): void
+    {
+        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
+        $page->waitForEvent('networkidle');
+        $page->screenshot(true, $name);
+    }
+}
+
 /*
  * "Update" (dispatch) sidebar browser tests — run against the real assembled core app.
  *
@@ -91,7 +105,7 @@ it('lists the user\'s own character in the update sidebar', function (string $de
     $page->waitForText('Your characters');
     $page->assertScript(dispatchSidebarSees($character->name));
 
-    $page->screenshot(true, "dispatch-owned-character-{$device}");
+    snap($page, "dispatch-owned-character-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('reveals an affiliated (non-owned) character only when the affiliated section is expanded', function (string $device) {
@@ -132,7 +146,7 @@ it('reveals an affiliated (non-owned) character only when the affiliated section
     $page->click('Affiliated characters');
     $page->assertScript(dispatchSidebarSees($affiliated_character->name));
 
-    $page->screenshot(true, "dispatch-affiliated-character-{$device}");
+    snap($page, "dispatch-affiliated-character-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('lists the corporation in the update sidebar on a corporation-scoped page', function (string $device) {
@@ -153,5 +167,5 @@ it('lists the corporation in the update sidebar on a corporation-scoped page', f
     $page->waitForText('Your corporations');
     $page->assertScript(dispatchSidebarSees($character->corporation->name));
 
-    $page->screenshot(true, "dispatch-owned-corporation-{$device}");
+    snap($page, "dispatch-owned-corporation-{$device}");
 })->with(['desktop', 'iphone']);
