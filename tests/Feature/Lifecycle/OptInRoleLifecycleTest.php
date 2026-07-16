@@ -72,12 +72,14 @@ it('eligible user can join opt-in role and then leave via HTTP', function () {
     expect(test()->test_user->fresh()->hasRole(test()->role))->toBeFalse();
 });
 
-it('opt-in role rejects moderator assignment', function () {
+it('opt-in role accepts moderator assignment', function () {
     test()->actingAs(test()->admin)
         ->postJson(route('acl.update.opt-in', test()->role->id), [])
         ->assertRedirect();
 
     test()->actingAs(test()->admin)
         ->post(route('acl.moderator.add', [test()->role->id, test()->admin->id]))
-        ->assertForbidden();
+        ->assertRedirect();
+
+    expect(test()->role->refresh()->roleMemberships()->where('can_moderate', true)->exists())->toBeTrue();
 });
