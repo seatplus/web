@@ -43,12 +43,21 @@ use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveModeratorController;
+use Seatplus\Web\Http\Controllers\AccessControl\RoleHubController;
+use Seatplus\Web\Http\Controllers\AccessControl\RoleHubIndexController;
 use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupsController;
 
 Route::get('/', ShowControlGroupsController::class)->name('acl.groups')
     ->middleware([CheckAuthorization::class.':view access control']);
+
+// Unified role hub — a parallel surface to the separate discover/configure/moderate pages.
+// The index mirrors the groups list (needs the view permission); the per-role hub gates at the
+// controller (canView), like acl.detail, so members/moderators/eligible users can open it too.
+Route::get('/hub', RoleHubIndexController::class)->name('acl.hub')
+    ->middleware([CheckAuthorization::class.':view access control']);
+Route::get('/hub/{role_id}', RoleHubController::class)->name('acl.hub.show');
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
 Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
 Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');

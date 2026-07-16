@@ -8,10 +8,24 @@
         >
           {{ role.name }}
         </Link>
-        <RoleTypeBadge
-          :type="role.type"
-          :label="role.type_label"
-        />
+        <div class="flex shrink-0 items-center gap-2">
+          <RoleTypeBadge
+            :type="role.type"
+            :label="role.type_label"
+          />
+          <!-- Hub mode: a direct jump into the group's management view for moderators/admins,
+               so they don't have to open the group first. Sits at the far right of the card. -->
+          <Link
+            v-if="hub && canManageMembers"
+            :href="gearUrl"
+            class="text-gray-400 hover:text-gray-600"
+            :title="role.can_edit
+              ? trans('web::access_control.actions.configure')
+              : trans('web::access_control.actions.manage_members')"
+          >
+            <Cog6ToothIcon class="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       <p class="mt-2 text-sm text-gray-500">
@@ -59,16 +73,17 @@
         {{ trans('web::access_control.actions.leave') }}
       </button>
 
-      <!-- Moderator / admin entry points -->
+      <!-- Moderator / admin entry points — separate-page mode only. In hub mode these all lead to
+           the same page, so the card title alone opens the hub (tabs handle manage/configure). -->
       <Link
-        v-if="canManageMembers"
+        v-if="canManageMembers && ! hub"
         :href="manageUrl"
         class="flex-1 py-3 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
       >
         {{ trans('web::access_control.actions.manage_members') }}
       </Link>
       <Link
-        v-if="role.can_edit"
+        v-if="role.can_edit && ! hub"
         :href="configureUrl"
         class="flex-1 py-3 text-center text-sm font-medium text-indigo-600 hover:bg-indigo-50"
       >
@@ -81,11 +96,13 @@
 <script setup>
 import { computed } from "vue";
 import { Link } from "@inertiajs/vue3";
+import { Cog6ToothIcon } from "@heroicons/vue/24/outline";
 import RoleTypeBadge from "./RoleTypeBadge.vue";
 import { useRoleActions } from "@/composables/useRoleActions";
 import { useTranslations } from "@/composables/useTranslations";
 import ShowControlGroupController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ShowControlGroupController";
 import ManageMembersController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageMembersController";
+import RoleHubController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/RoleHubController";
 import { index as configureController } from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ManageControlGroupMembersController";
 
 const props = defineProps({
@@ -93,14 +110,31 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    // Route the card into the unified hub (single page with tabs) instead of the separate pages.
+    hub: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const actions = useRoleActions();
 const { trans, trans_choice } = useTranslations();
 
-const detailUrl = computed(() => ShowControlGroupController.url({ role_id: props.role.id }));
+// Hub mode: the title opens the single hub page (its tabs cover manage/configure). Separate mode:
+// the title opens the read-only detail, with per-action links in the footer.
+const detailUrl = computed(() => (props.hub
+    ? RoleHubController.url({ role_id: props.role.id })
+    : ShowControlGroupController.url({ role_id: props.role.id })));
+// Footer "manage members" link (separate-page mode only).
 const manageUrl = computed(() => ManageMembersController.url({ role_id: props.role.id }));
 const configureUrl = computed(() => configureController.url({ role_id: props.role.id }));
+
+// Hub mode: the gear jumps straight into the group's management view — Configure for admins who can
+// edit the group, otherwise the Members (moderation) tab. Shown to anyone who can manage or configure.
+const gearUrl = computed(() => RoleHubController.url(
+    { role_id: props.role.id },
+    { query: { tab: props.role.can_edit ? "configure" : "members" } },
+));
 
 // Manage-members is reachable by moderators and admins (matches the controller gate).
 const canManageMembers = computed(() => props.role.can_moderate || props.role.can_edit);
@@ -109,8 +143,8 @@ const hasActions = computed(() =>
     props.role.can_join
     || props.role.can_apply
     || props.role.can_leave
-    || props.role.can_edit
-    || canManageMembers.value);
+    // The management nav links only exist in separate-page mode.
+    || (! props.hub && (props.role.can_edit || canManageMembers.value)));
 
 const statusLabel = computed(() => {
     if (props.role.my_status === "active") {

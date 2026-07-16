@@ -101,6 +101,12 @@ return [
             'route' => 'acl.groups',
             'icon' => 'UserGroupIcon',
         ],
+        [
+            'name' => 'Group Hub',
+            'permission' => 'view access control',
+            'route' => 'acl.hub',
+            'icon' => 'Squares2X2Icon',
+        ],
     ],
     'settings' => [
         [
