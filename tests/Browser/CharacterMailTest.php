@@ -57,6 +57,21 @@ if (! function_exists('snap')) {
 
 uses(RefreshDatabase::class);
 
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
+
 if (! function_exists('attachOwnedCharacter')) {
     /**
      * Attach an additional owned character to the same user that owns $existing, so a
@@ -72,7 +87,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),

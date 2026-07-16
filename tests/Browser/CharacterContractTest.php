@@ -95,6 +95,21 @@ if (! function_exists('makeCharacterContracts')) {
     }
 }
 
+if (! function_exists('realCharacterId')) {
+    /**
+     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
+     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
+     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
+     */
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
+
 if (! function_exists('attachOwnedCharacter')) {
     /**
      * Attach an additional owned character to the same user that owns $existing, so a
@@ -110,7 +125,7 @@ if (! function_exists('attachOwnedCharacter')) {
             ->firstOrFail()
             ->user;
 
-        $character = CharacterInfo::factory()->create();
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
         CharacterUser::create([
             'user_id' => $user->getKey(),
@@ -151,7 +166,7 @@ it('renders both the assignee and the acceptor for an accepted contract', functi
 
     // A second, distinct character to act as the acceptor. A factory character carries its
     // own CharacterAffiliation, so resolve.id returns it offline (no ESI in the browser).
-    $acceptor = CharacterInfo::factory()->create();
+    $acceptor = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
 
     // Accepted contracts assigned to the main character but accepted by someone else — the
     // AssigneeComponent then renders a second entity block (acceptor_id !== 0 and != assignee).
