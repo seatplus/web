@@ -7,6 +7,7 @@ namespace Seatplus\Web\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 /**
  * One User membership row of a role — a member, applicant, or moderator — reduced to what the
@@ -32,6 +33,13 @@ class RoleMemberResource extends JsonResource
                 'character_id' => is_int($mainCharacterId) ? $mainCharacterId : (int) $mainCharacterId,
                 'name' => is_string($mainCharacterName) ? $mainCharacterName : null,
             ],
+            // Every character on the user, so the row can show the alts as subtext (like the picker).
+            'characters' => collect(data_get($this->entity, 'characters', []))
+                ->map(fn (CharacterInfo $character): array => [
+                    'character_id' => $character->character_id,
+                    'name' => $character->name,
+                ])
+                ->values(),
         ];
     }
 }

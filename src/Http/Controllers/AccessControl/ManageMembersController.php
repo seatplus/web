@@ -33,7 +33,7 @@ class ManageMembersController extends Controller
 
         $memberships = $role->roleMemberships()
             ->where('entity_type', User::class)
-            ->with(['entity' => fn (MorphTo $morph) => $morph->morphWith([User::class => ['mainCharacter']])])
+            ->with(['entity' => fn (MorphTo $morph) => $morph->morphWith([User::class => ['mainCharacter', 'characters']])])
             ->get();
 
         return Inertia::render('AccessControl/ModerateMembers', [
