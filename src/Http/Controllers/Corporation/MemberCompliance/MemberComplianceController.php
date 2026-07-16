@@ -91,7 +91,9 @@ class MemberComplianceController
                 'application.corporation.alliance.ssoScopes',
             ]);
 
-        return CorporationComplianceResource::collection($users->paginate());
+        // Fetched in full client-side (http.js getJson) with client-side renegade/loyalist
+        // filtering, so return the whole list rather than paginating.
+        return CorporationComplianceResource::collection($users->get());
     }
 
     public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action): Response

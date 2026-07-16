@@ -46,12 +46,38 @@
       </div>
 
       <ul class="relative z-0">
-        <CompleteLoadingHelper
-          :key="Object.values(urlParams).join(',')"
-          route-name="corporation.compliance"
-          :params="urlParams"
-          @results="(results) => rawUsers = results"
+        <li
+          v-if="loading"
+          class="flex justify-center py-6"
         >
+          <svg
+            class="animate-spin h-6 w-6 text-gray-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+        </li>
+        <li
+          v-else-if="!users.length"
+          class="text-center text-sm text-gray-500 py-6"
+        >
+          no entries
+        </li>
+        <template v-else>
           <MemberComplianceListElement
             v-for="(user, index) in users"
             :key="user.id"
@@ -60,7 +86,7 @@
             :corporation-id="corporation.corporation_id"
             :even="index%2 === 0"
           />
-        </CompleteLoadingHelper>
+        </template>
       </ul>
     </div>
   </CardWithHeader>
@@ -71,12 +97,12 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement.vue";
-import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";
+import {computed, onMounted, ref, watch} from "vue";
+import { getJson } from "@/Functions/http";
+import { getCorporationCompliance } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/MemberCompliance/MemberComplianceController";
 export default {
     name: "ComplianceComponent",
     components: {
-        CompleteLoadingHelper,
         MemberComplianceListElement,
         EntityBlock, CardWithHeader, MagnifyingGlassIcon},
     props: {
@@ -96,11 +122,38 @@ export default {
     },
     setup(props) {
         const rawUsers = ref([])
+        const loading = ref(true)
         const search = ref('')
-        const urlParams = ref({
-            corporation_id: props.corporation.corporation_id,
-            type: props.corporation.type
-        })
+
+        // Full (unpaginated) compliance list for this corporation, fetched axios/Ziggy-free.
+        // `search` (>=3 chars) is applied server-side; queryParam filtering is client-side below.
+        const fetchUsers = async () => {
+            loading.value = true
+            try {
+                const query = search.value.length >= 3 ? { search: search.value } : {}
+                const response = await getJson(getCorporationCompliance.url(
+                    { corporation_id: props.corporation.corporation_id, type: props.corporation.type },
+                    { query },
+                ))
+                rawUsers.value = response?.data ?? []
+            } finally {
+                loading.value = false
+            }
+        }
+
+        onMounted(fetchUsers)
+
+        // Refetch (debounced) only when the effective search term changes (>=3 chars, or cleared).
+        let lastQuery = ''
+        const maybeRefetch = _.debounce(() => {
+            const query = search.value.length >= 3 ? search.value : ''
+            if (query === lastQuery) {
+                return
+            }
+            lastQuery = query
+            fetchUsers()
+        }, 300)
+        watch(search, maybeRefetch)
 
         const users = computed(() => {
 
@@ -115,15 +168,11 @@ export default {
             return rawUsers.value
         })
 
-        watch(search,(newValue) => {
-            newValue.length >= 3 ? urlParams.value.search = newValue : delete urlParams.value.search
-        })
-
         return {
             rawUsers,
             users,
             search,
-            urlParams
+            loading,
         }
     }
 }
