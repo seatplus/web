@@ -36,6 +36,20 @@ export default defineConfig(({mode}) => {
             }),
             run([
                 {
+                    // Keep the Wayfinder output (@/actions, @/routes) generated and in sync.
+                    // Runs on dev/build startup so a fresh checkout always has it, and re-runs
+                    // when backend routes/controllers change. Avoids the drift where @/actions
+                    // goes missing while components still import from it.
+                    startup: true,
+                    name: 'wayfinder generate',
+                    run: ['php', 'artisan', 'wayfinder:generate'],
+                    pattern: [
+                        'routes/**',
+                        'vendor/seatplus/**/routes/**',
+                        'vendor/seatplus/**/src/Http/Controllers/**',
+                    ],
+                },
+                {
                     startup: false,
                     name: 'copy vendor',
                     run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
