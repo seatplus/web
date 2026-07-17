@@ -157,18 +157,17 @@ it('renders a recruit corporation history through the recruitment review page', 
     // CorporationHistoryComponent and triggers its fetch-swap load.
     switchRecruitmentTab($page, $device, 'Corporation History');
 
-    // Let the component's getJson history load settle so the timeline rows exist in the DOM before
-    // we scroll them (the ordered <li>s only render once `results` is populated).
-    $page->waitForEvent('networkidle');
-
-    // Corp names resolve lazily: each row's ResolveIdToName only fetches once its element is *fully*
-    // visible (IntersectionObserver threshold 1), so a below-the-fold row never resolves on its own —
-    // and the asserted name (`first()`, record_id 1000) is the *last*, bottom-most timeline row. Scroll
-    // every history row fully into view, settling between, so each passes through full visibility; once
-    // resolved the name stays in the DOM regardless of the final scroll position. (Same technique as
-    // CharacterContactTest.)
-    foreach (range(0, $historyCorporations->count() - 1) as $rowIndex) {
-        $page->script("(document.querySelectorAll('.max-h-96.overflow-auto li')[{$rowIndex}] ?? document.body).scrollIntoView({ block: 'center' })");
+    // Corp names resolve lazily: each timeline row's ResolveIdToName only fetches once its element is
+    // *fully* visible (IntersectionObserver threshold 1), so on the short iPhone viewport the history
+    // card — which renders below the fold — never resolves on its own. Scroll the card's own scroll
+    // container to the viewport centre, settling between, so that once the getJson load populates the
+    // (short, bounded) timeline every row sits fully in view and resolves. The container renders with
+    // the component, before the fetch resolves, so this targets a real element regardless of load
+    // timing (the rows themselves don't exist until `results` is populated); repeating a few times
+    // covers the tick where the tab has switched but the component has not yet mounted. Once resolved a
+    // name stays in the DOM regardless of the final scroll position. (Same technique as CharacterContactTest.)
+    foreach (range(1, 3) as $attempt) {
+        $page->script("(document.querySelector('.max-h-96.overflow-auto') ?? document.body).scrollIntoView({ block: 'center' })");
         $page->waitForEvent('networkidle');
     }
 
