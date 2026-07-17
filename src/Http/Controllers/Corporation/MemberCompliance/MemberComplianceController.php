@@ -91,7 +91,7 @@ class MemberComplianceController
                 'application.corporation.alliance.ssoScopes',
             ]);
 
-        return CorporationComplianceResource::collection($users->paginate());
+        return CorporationComplianceResource::collection($users->get());
     }
 
     public function reviewUser(int $corporation_id, User $user, WatchlistArrayAction $action): Response

@@ -5,7 +5,7 @@
         <EveImage
           :object="character"
           :size="256"
-          tailwind_class="`h-8 w-8 rounded-full"
+          tailwind_class="h-8 w-8 rounded-full"
         />
         <!--        <span class="absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-400" />-->
         <div

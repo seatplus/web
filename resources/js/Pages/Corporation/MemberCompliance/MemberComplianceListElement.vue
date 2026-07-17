@@ -37,7 +37,7 @@
       <div class="flex gap-x-2 flex-wrap">
         <Button
           button-size="xs"
-          :href="route('corporation.review.user', {'corporation_id': corporationId, 'user': user.id})"
+          :href="reviewUrl"
         >
           Review
         </Button>
@@ -51,6 +51,7 @@ import {computed} from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import CharacterComplianceElement from "./CharacterComplianceElement.vue";
 import Button from "@/Shared/Layout/Button.vue";
+import { reviewUser } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/MemberCompliance/MemberComplianceController";
 
 export default {
     name: "MemberComplianceListElement",
@@ -85,10 +86,16 @@ export default {
 
         const compliantCharacters = computed(() => _.filter(characters.value, (character) => character.missing_scopes.length === 0))
 
+        const reviewUrl = computed(() => reviewUser.url({
+            corporation_id: props.corporationId,
+            user: props.user.id,
+        }))
+
         return {
             characters,
             nonCompliantCharacters,
-            compliantCharacters
+            compliantCharacters,
+            reviewUrl
         }
     }
 }

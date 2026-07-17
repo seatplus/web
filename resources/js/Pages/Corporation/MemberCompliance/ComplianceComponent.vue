@@ -46,21 +46,26 @@
       </div>
 
       <ul class="relative z-0">
-        <CompleteLoadingHelper
-          :key="Object.values(urlParams).join(',')"
-          route-name="corporation.compliance"
-          :params="urlParams"
-          @results="(results) => rawUsers = results"
+        <MemberComplianceListElement
+          v-for="(user, index) in users"
+          :key="user.id"
+          :user="user"
+          :can-review="canReview"
+          :corporation-id="corporation.corporation_id"
+          :even="index%2 === 0"
+        />
+        <li
+          v-if="loading"
+          class="flex justify-center py-4 text-sm text-gray-500"
         >
-          <MemberComplianceListElement
-            v-for="(user, index) in users"
-            :key="user.id"
-            :user="user"
-            :can-review="canReview"
-            :corporation-id="corporation.corporation_id"
-            :even="index%2 === 0"
-          />
-        </CompleteLoadingHelper>
+          loading resource
+        </li>
+        <li
+          v-else-if="users.length === 0"
+          class="flex justify-center py-4 text-sm text-gray-500"
+        >
+          no entries
+        </li>
       </ul>
     </div>
   </CardWithHeader>
@@ -71,12 +76,12 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import MemberComplianceListElement from "./MemberComplianceListElement.vue";
-import {computed, ref, watch} from "vue";
-import CompleteLoadingHelper from "@/Shared/Layout/CompleteLoadingHelper.vue";
+import {computed, onMounted, ref, watch} from "vue";
+import { getJson } from "@/Functions/http";
+import { getCorporationCompliance } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/MemberCompliance/MemberComplianceController";
 export default {
     name: "ComplianceComponent",
     components: {
-        CompleteLoadingHelper,
         MemberComplianceListElement,
         EntityBlock, CardWithHeader, MagnifyingGlassIcon},
     props: {
@@ -90,17 +95,13 @@ export default {
         },
         canReview: {
             type: Boolean,
-            required: true,
-            default: false
+            required: true
         }
     },
     setup(props) {
         const rawUsers = ref([])
         const search = ref('')
-        const urlParams = ref({
-            corporation_id: props.corporation.corporation_id,
-            type: props.corporation.type
-        })
+        const loading = ref(true)
 
         const users = computed(() => {
 
@@ -115,15 +116,38 @@ export default {
             return rawUsers.value
         })
 
-        watch(search,(newValue) => {
-            newValue.length >= 3 ? urlParams.value.search = newValue : delete urlParams.value.search
-        })
+        const load = async () => {
+            loading.value = true
+
+            // Only forward the search term once it is specific enough to matter; an empty query
+            // fetches the full corporation membership again (mirrors the previous urlParams idiom).
+            const query = search.value.length >= 3 ? { search: search.value } : {}
+
+            const url = getCorporationCompliance.url(
+                {
+                    corporation_id: props.corporation.corporation_id,
+                    type: props.corporation.type,
+                },
+                { query },
+            )
+
+            const response = await getJson(url)
+
+            rawUsers.value = response.data
+            loading.value = false
+        }
+
+        const debouncedLoad = _.debounce(load, 300)
+
+        watch(search, debouncedLoad)
+
+        onMounted(load)
 
         return {
             rawUsers,
             users,
             search,
-            urlParams
+            loading,
         }
     }
 }
