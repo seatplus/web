@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Pest\Browser\Api\PendingAwaitablePage;
 use Pest\Browser\Enums\Device;
 use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
@@ -112,8 +114,15 @@ it('renders a recruit corporation history through the recruitment review page', 
     $reviewer->givePermissionTo(Permission::findOrCreate('superuser'));
 
     // The recruit whose (character-type) application is being reviewed. A real EVE id renders a
-    // real portrait for the corporation-history card's EntityBlock header.
+    // real portrait for the corporation-history card's EntityBlock header. The applicant owns the
+    // character, so link it to a user — the review page resolves the applicant's account via
+    // CharacterUser (Event::fakeFor avoids the factory auto-attaching an unrelated character).
     $recruit = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
+    $recruitOwner = Event::fakeFor(fn () => User::factory()->create());
+    CharacterUser::create([
+        'user_id' => $recruitOwner->id,
+        'character_id' => $recruit->character_id,
+    ]);
     $corporation = CorporationInfo::factory()->create();
 
     // A short, ordered corporation history. Each row's corporation_id resolves to a name offline
