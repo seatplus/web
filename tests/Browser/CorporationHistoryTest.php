@@ -151,7 +151,7 @@ it('renders a recruit corporation history through the recruitment review page', 
         'status' => 'open',
     ]);
 
-    $page = deviceVisit($device, "/recruitment/application/{$application->id}");
+    $page = deviceVisit($device, "/corporation/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->assertSee('User Application');
 
