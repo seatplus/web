@@ -1,5 +1,24 @@
 <template>
   <div>
+    <!-- Debounced server-side corp-name search. Reloads only the `corporations` scroll prop with a
+         namespaced `corp_search` param (never `search`, so it can't collide with a page's own search),
+         resetting the prop so <InfiniteScroll> replaces the list with the filtered first page. -->
+    <div class="mb-4">
+      <label
+        for="corp_search"
+        class="sr-only"
+      >
+        Search corporations
+      </label>
+      <input
+        id="corp_search"
+        v-model="corpSearch"
+        type="text"
+        placeholder="Search for a corporation…"
+        class="block w-full py-2 px-3 border border-gray-300 rounded-md shadow-xs focus:outline-hidden focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+      >
+    </div>
+
     <!-- Native Inertia v3 infinite scroll over the page-level `corporations` scroll prop
          (affiliated, not-yet-enlisted corporations paginated with pageName 'corporations').
          Replaces the axios/Ziggy useInfinityScrolling loader. -->
@@ -91,7 +110,7 @@
 </template>
 
 <script>
-import { InfiniteScroll } from "@inertiajs/vue3";
+import { InfiniteScroll, router } from "@inertiajs/vue3";
 import { UserIcon, UsersIcon } from "@heroicons/vue/24/outline";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
@@ -111,9 +130,36 @@ export default {
     setup() {
         return { openRecruitment };
     },
+    data() {
+        return {
+            corpSearch: '',
+        };
+    },
     computed: {
         corporations() {
             return this.$page.props.corporations?.data ?? [];
+        },
+    },
+    watch: {
+        corpSearch() {
+            this.debouncedReload();
+        },
+    },
+    created() {
+        // Debounce so the server only reloads once the manager pauses typing.
+        this.debouncedReload = _.debounce(this.reload, 300);
+    },
+    methods: {
+        // Reload only the `corporations` scroll prop with the namespaced search term; reset it so
+        // <InfiniteScroll> replaces the list with the filtered first page instead of merging.
+        reload() {
+            router.reload({
+                only: ['corporations'],
+                reset: ['corporations'],
+                data: { corp_search: this.corpSearch === '' ? null : this.corpSearch },
+                preserveScroll: true,
+                preserveUrl: true,
+            });
         },
     },
 }

@@ -101,17 +101,25 @@ it('renders the affiliated corporation list to create a job posting', function (
     $page = deviceVisit($device, '/corporation/recruitment');
     $page->assertNoSmoke();
 
-    // Page shell + the "Job Posting" copy the redesigned picker section lives under.
+    // Page shell + the intro copy the inline picker (now the sole create surface, no modal) lives under.
     $page->waitForText('Corporation Recruitment');
-    $page->waitForText('Create a job posting');
+    $page->waitForText('Open a corporation for recruitment');
 
-    // A corporation card with its two footer actions (Button + heroicons).
+    // A corporation card is the create surface itself: it carries the two "Job Posting" footer actions
+    // (Button + heroicons) that POST create.corporation.recruitment inline — no popup involved.
     $page->waitForText($corporation->name);
     $page->assertSee('Recruits only');
     $page->assertSee('All characters');
 
-    // The infinite-scroll row list is present with at least the seeded corporations.
+    // The infinite-scroll row list is present with at least the two seeded corporations.
     $page->assertScript("document.querySelectorAll('#recruitment-corporation-list > li').length >= 2");
+
+    // The debounced corp search (namespaced corp_search) reloads only the `corporations` scroll prop
+    // and filters server-side: typing "Science" keeps that corp and drops the unrelated "Caldari" one.
+    $page->assertScript("!!document.querySelector('#corp_search')");
+    $page->type('corp_search', 'Science');
+    $page->assertScript("document.body.innerText.includes('Science and Trade Institute') && !document.body.innerText.includes('Caldari Provisions')");
+    $page->assertNoSmoke();
 
     snap($page, "job-posting-corporation-list-{$device}");
 })->with(['desktop', 'iphone']);

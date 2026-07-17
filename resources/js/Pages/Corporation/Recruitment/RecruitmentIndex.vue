@@ -1,15 +1,6 @@
 <template>
   <div class="space-y-3">
-    <PageHeader :page-title="pageTitle">
-      <template
-        v-if="canManageRecruitment"
-        #primary
-      >
-        <HeaderButton @click="create_enlistment = true">
-          New job posting
-        </HeaderButton>
-      </template>
-    </PageHeader>
+    <PageHeader :page-title="pageTitle" />
 
     <CorporationRecruitment
       v-for="enlistment in enlistments"
@@ -21,28 +12,30 @@
       v-if="canManageRecruitment"
       class="space-y-3"
     >
-      <h2 class="px-4 text-sm font-medium text-gray-500 sm:px-0">
-        Create a job posting
-      </h2>
+      <div class="px-4 sm:px-0">
+        <h2 class="text-sm font-medium text-gray-500">
+          Open a corporation for recruitment — pick who can apply
+        </h2>
+        <p class="mt-1 text-sm text-gray-400">
+          Search for a corporation below, then create its Job Posting straight from
+          the card: <span class="font-medium">Recruits only</span> lets single
+          characters apply, <span class="font-medium">All characters</span> opens it
+          to whole accounts.
+        </p>
+      </div>
       <CorporationList />
     </section>
-
-    <teleport to="#destination">
-      <CreateEnlistmentModal v-model="create_enlistment" />
-    </teleport>
   </div>
 </template>
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
-import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
-import CreateEnlistmentModal from "./CreateEnlistmentModal.vue";
 import CorporationRecruitment from "@/Pages/Corporation/Recruitment/CorporationRecruitment.vue";
 import CorporationList from "@/Pages/Corporation/Recruitment/CorporationList.vue";
 
 export default {
     name: "RecruitmentIndex",
-    components: {CorporationList, CorporationRecruitment, CreateEnlistmentModal, HeaderButton, PageHeader},
+    components: {CorporationList, CorporationRecruitment, PageHeader},
     props: {
         canManageRecruitment: {
             required: true,
@@ -56,7 +49,6 @@ export default {
     data() {
         return {
           pageTitle: 'Corporation Recruitment',
-          create_enlistment: false
         }
     }
 }

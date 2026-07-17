@@ -98,10 +98,15 @@ class GetRecruitmentIndexController extends Controller
 
     private function getEnlistableCorporations(bool $isSuperuser, array $manageableIds): LengthAwarePaginator
     {
+        // Namespaced `corp_search` (not `search`) so the CorporationList filter can never collide
+        // with another page's own search param; reuses the same affiliated-corporation data.
+        $search = request('corp_search');
+
         return CorporationInfo::query()
             ->select('corporation_infos.*')
             ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
             ->whereNotIn('corporation_id', Enlistments::query()->select('corporation_id'))
+            ->when($search, fn (Builder $query) => $query->where('name', 'like', "%{$search}%"))
             ->with('alliance')
             ->orderBy('name')
             ->paginate(pageName: 'corporations')

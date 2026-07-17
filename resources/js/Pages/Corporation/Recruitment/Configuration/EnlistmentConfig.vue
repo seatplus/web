@@ -1,10 +1,10 @@
 <template>
   <TwoColumnCardWithSubmitAction :with-bottom-border="withBottomBorder">
     <template #title>
-      <span v-if="!enlistment">Create</span> Job Posting
+      Job Posting
     </template>
     <template #description>
-      Select <span v-if="!enlistment">corporation and</span> type of job posting. Additionally you can opt to support multiple review process steps.
+      Select type of job posting. Additionally you can opt to support multiple review process steps.
     </template>
     <div class="space-y-6 sm:space-y-5">
       <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start">
@@ -14,15 +14,7 @@
           Corporation
         </label>
         <div class="mt-1 sm:mt-0 sm:col-span-2">
-          <Autosuggest
-            v-if="!enlistment"
-            route-name="get.affiliated.corporations"
-            :route-parameters="{ permission: 'can open or close corporations for recruitment' }"
-            placeholder="Search for corporation"
-            @selectedObject="selection => form.corporation = selection"
-          />
           <EntityByIdBlock
-            v-else
             :id="enlistment.corporation_id"
             :image-size="8"
             name-font-size="md"
@@ -90,7 +82,6 @@
 import { useForm } from "@inertiajs/vue3";
 import {computed} from "vue";
 import SimpleToggle from "@/Shared/SimpleToggle.vue";
-import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Button from "@/Shared/Layout/Button.vue";
@@ -98,7 +89,7 @@ import { create as createEnlistment } from "@/actions/Seatplus/Web/Http/Controll
 
 export default {
     name: "EnlistmentConfig",
-    components: {Button, EntityByIdBlock, TwoColumnCardWithSubmitAction, Autosuggest, SimpleToggle},
+    components: {Button, EntityByIdBlock, TwoColumnCardWithSubmitAction, SimpleToggle},
     props: {
         enlistment: {
             required: false,
