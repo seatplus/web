@@ -26,27 +26,18 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Http\Actions\Shared\GetAffiliatedEntitiesAction;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Resources\CorporationInfoRessource;
 
 class GetAffiliatedCorporationsController extends Controller
 {
-    public function __invoke(string $permission, string $corporationRoles = ''): AnonymousResourceCollection
+    public function __invoke(GetAffiliatedEntitiesAction $action, string $permission, string $corporationRoles = ''): AnonymousResourceCollection
     {
-        $searchParam = $this->request->get('search');
-        $affiliatedIds = $this->getAffiliatedIds->get($permission, explode(',', $corporationRoles));
-
-        $query = CorporationInfo::query()
-            ->whereIn('corporation_id', $affiliatedIds)
-            ->select('corporation_infos.*')
-            ->when($searchParam, fn (Builder $query) => $query->where('name', 'like', "%{$searchParam}%"))
-            ->with('alliance');
-
-        return CorporationInfoRessource::collection(
-            $query->paginate()
+        return $action->corporations(
+            $permission,
+            explode(',', $corporationRoles),
+            $this->request->get('search'),
         );
     }
 }

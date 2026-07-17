@@ -1,121 +1,118 @@
 <template>
+  <!-- Empty: the character has no trained skills yet. -->
   <div
-    v-for="(skills, group) in skills"
-    :key="group"
+    v-if="isEmpty"
+    class="text-center py-12"
   >
-    <LeftAligned>
-      <template #title>
-        {{ group }}
-      </template>
-      <template #description>
-        <div class="flex justify-between">
-          <span>{{ sumSkillpoints(skills) }} total skillpoints</span>
-          <div class="flex space-x-1.5">
-            <div class="flex">
-              <div class="shrink-0 self-center">
-                <StarIcon class="h-4 w-4" />
+    <AcademicCapIcon class="mx-auto h-12 w-12 text-gray-400" />
+    <h3 class="mt-2 text-sm font-semibold text-gray-900">
+      No skills found.
+    </h3>
+    <p class="mt-1 text-sm text-gray-500">
+      This character has no trained skills yet, or the data has not been fetched.
+    </p>
+  </div>
+
+  <!-- One card per skill group, matching the modern SkillQueue card. -->
+  <template v-else>
+    <CardWithHeader
+      v-for="(groupSkills, group) in groupedSkills"
+      :key="group"
+    >
+      <template #header>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">
+            {{ group }}
+          </h3>
+          <div class="flex items-center space-x-3 text-sm text-gray-500">
+            <span>{{ sumSkillpoints(groupSkills) }} total skillpoints</span>
+            <div class="flex space-x-1.5">
+              <div class="flex">
+                <div class="shrink-0 self-center">
+                  <StarIcon class="h-4 w-4" />
+                </div>
+                <span>active</span>
               </div>
-              <span>
-                active
-              </span>
-            </div>
-            <div class="flex">
-              <div class="shrink-0 self-center">
-                <StarIconOutline class="h-4 w-4" />
+              <div class="flex">
+                <div class="shrink-0 self-center">
+                  <StarIconOutline class="h-4 w-4" />
+                </div>
+                <span>trained</span>
               </div>
-              <span>
-                trained
-              </span>
             </div>
           </div>
         </div>
       </template>
-      <LeftAlignedData
-        v-for="skill in skills"
-        :key="skill.skill_id"
-      >
-        <template #title>
-          {{ skill.name }}
-        </template>
-        <template #description>
-          <div class="flex justify-end">
-            <div
-              v-for="level in levels(skill)"
-              :key="level.key"
-            >
-              <StarIcon
-                v-if="level.active"
-                class="h-4 w-4"
-              />
-              <StarIconOutline
-                v-else
-                class="h-4 w-4"
-              />
+      <dl class="divide-y divide-gray-200 px-4 sm:px-6">
+        <LeftAlignedData
+          v-for="skill in groupSkills"
+          :key="skill.skill_id"
+        >
+          <template #title>
+            {{ skill.name }}
+          </template>
+          <template #description>
+            <div class="flex justify-end">
+              <div
+                v-for="level in levels(skill)"
+                :key="level.key"
+              >
+                <StarIcon
+                  v-if="level.active"
+                  class="h-4 w-4"
+                />
+                <StarIconOutline
+                  v-else
+                  class="h-4 w-4"
+                />
+              </div>
             </div>
-          </div>
-        </template>
-      </LeftAlignedData>
-    </LeftAligned>
-  </div>
+          </template>
+        </LeftAlignedData>
+      </dl>
+    </CardWithHeader>
+  </template>
 </template>
 
-<script>
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {computed} from "vue";
-import LeftAligned from "../../Layout/DataDisplay/LeftAligned.vue";
+<script setup>
+import { computed } from "vue";
 import LeftAlignedData from "../../Layout/DataDisplay/LeftAlignedData.vue";
-import {StarIcon} from "@heroicons/vue/20/solid";
-import {StarIcon as StarIconOutline} from "@heroicons/vue/24/outline";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import { StarIcon } from "@heroicons/vue/20/solid";
+import { StarIcon as StarIconOutline, AcademicCapIcon } from "@heroicons/vue/24/outline";
 
-export default {
-    name: "Skills",
-    components: {LeftAlignedData, LeftAligned, StarIcon, StarIconOutline},
-    props: {
-        characterId: {
-            type: Number,
-            required: true
-        }
+const props = defineProps({
+    skills: {
+        type: Array,
+        default: () => [],
     },
-    setup(props) {
+});
 
-        const results = useLoadCompleteResource('get.character.skills', {character_id: props.characterId});
+const groupedSkills = computed(() => _.chain(props.skills)
+    .map((skill) => ({
+        ...skill,
+        name: _.get(skill, "type.name"),
+        group: _.get(skill, "type.group.name"),
+    }))
+    .groupBy("group")
+    .value());
 
-        const skills = computed(() => _.chain(results.results.value)
-            .map((skill) => {
-                return {
-                    ...skill,
-                    name: _.get(skill, 'type.name'),
-                    group: _.get(skill, 'type.group.name')
-                }
-            })
-            .groupBy('group')
-            .value()
-        )
+const isEmpty = computed(() => props.skills.length === 0);
 
-        const sumSkillpoints = (skillgroup) => _.sumBy(skillgroup, 'skillpoints_in_skill').toLocaleString()
+const sumSkillpoints = (skillGroup) => _.sumBy(skillGroup, "skillpoints_in_skill").toLocaleString();
 
-        const levels = (skill) => {
+const levels = (skill) => {
+    const trainedLevels = [];
 
-            let levels = []
-
-            for (let i = 0; i < skill.trained_skill_level; i++) {
-                levels.push({
-                    key: `${skill.skill_id}:${skill.trained_skill_level}`,
-                    active: i <= skill.active_skill_level
-                })
-            }
-
-            return levels
-
-        }
-
-        return {
-            skills,
-            sumSkillpoints,
-            levels
-        }
+    for (let i = 0; i < skill.trained_skill_level; i++) {
+        trainedLevels.push({
+            key: `${skill.skill_id}:${i}`,
+            active: i <= skill.active_skill_level,
+        });
     }
-}
+
+    return trainedLevels;
+};
 </script>
 
 <style scoped>

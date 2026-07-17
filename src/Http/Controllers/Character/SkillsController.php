@@ -27,7 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
@@ -40,33 +40,29 @@ class SkillsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'skills');
+        $characterIds = $this->getCharacterIds($dispatchTransferObject, 'skills');
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'character_ids' => $ids,
+            'character_ids' => $characterIds,
+            'skills' => Inertia::defer(fn () => $characterIds->mapWithKeys(fn (int $characterId) => [
+                $characterId => Skill::query()
+                    ->with('type.group')
+                    ->where('character_id', $characterId)
+                    ->get(),
+            ])),
+            'skillQueue' => Inertia::defer(fn () => $characterIds->mapWithKeys(fn (int $characterId) => [
+                $characterId => SkillQueue::query()
+                    ->with('type.group')
+                    ->where('character_id', $characterId)
+                    ->where(
+                        fn (Builder $query) => $query
+                            ->where('finish_date', '>=', now())
+                            ->orWhereNull('finish_date')
+                    )
+                    ->orderBy('queue_position', 'asc')
+                    ->get(),
+            ])),
         ]);
-    }
-
-    public function skills(int $character_id): LengthAwarePaginator
-    {
-        return Skill::query()
-            ->with('type.group')
-            ->where('character_id', $character_id)
-            ->paginate();
-    }
-
-    public function skillQueue(int $character_id): LengthAwarePaginator
-    {
-        return SkillQueue::query()
-            ->with('type.group')
-            ->where('character_id', $character_id)
-            ->where(
-                fn (Builder $query) => $query
-                    ->where('finish_date', '>=', now())
-                    ->orWhereNull('finish_date')
-            )
-            ->orderBy('queue_position', 'asc')
-            ->paginate();
     }
 }

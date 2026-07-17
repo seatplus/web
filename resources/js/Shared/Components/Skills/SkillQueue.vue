@@ -1,11 +1,29 @@
 <template>
-  <CardWithHeader v-if="queue.length > 0">
+  <!-- The queue, or an empty state when nothing is training. -->
+  <CardWithHeader>
     <template #header>
       <h3 class="text-lg leading-6 font-medium text-gray-900">
         Skill Queue
       </h3>
     </template>
-    <div class="flow-root px-4 py-5 sm:px-6">
+
+    <div
+      v-if="isEmpty"
+      class="text-center px-4 py-12 sm:px-6"
+    >
+      <BookOpenIcon class="mx-auto h-12 w-12 text-gray-400" />
+      <h3 class="mt-2 text-sm font-semibold text-gray-900">
+        No skills in training.
+      </h3>
+      <p class="mt-1 text-sm text-gray-500">
+        This character's skill queue is empty.
+      </p>
+    </div>
+
+    <div
+      v-else
+      class="flow-root px-4 py-5 sm:px-6"
+    >
       <ul class="-mb-8">
         <li
           v-for="(item, itemIdx) in queue"
@@ -46,48 +64,30 @@
       </ul>
     </div>
   </CardWithHeader>
-
-<!--  <div class=" bg-white shadow-sm overflow-hidden sm:rounded-lg">
-
-  </div>-->
 </template>
 
-<script>
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
-import {computed} from "vue";
-import { BookOpenIcon } from '@heroicons/vue/20/solid'
+<script setup>
+import { computed } from "vue";
+import { BookOpenIcon } from "@heroicons/vue/20/solid";
 import Time from "@/Shared/Time.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 
-export default {
-    name: "SkillQueue",
-    components: {CardWithHeader, Time, BookOpenIcon},
-    props: {
-        characterId: {
-            type: Number,
-            required: true
-        }
+const props = defineProps({
+    skillQueue: {
+        type: Array,
+        default: () => [],
     },
-    setup(props) {
-        const results = useLoadCompleteResource('get.character.skill.queue', { character_id: props.characterId })
+});
 
-        const queue = computed(() => _.chain(results.results.value)
-            .map((item) => {
-                return {
-                    ...item,
-                    name: _.get(item, 'type.name')
-                }
-            })
-            .sortBy(['queue_position'])
-            .value()
-        )
+const queue = computed(() => _.chain(props.skillQueue)
+    .map((item) => ({
+        ...item,
+        name: _.get(item, "type.name"),
+    }))
+    .sortBy(["queue_position"])
+    .value());
 
-        return {
-            results,
-            queue
-        }
-    }
-}
+const isEmpty = computed(() => queue.value.length === 0);
 </script>
 
 <style scoped>

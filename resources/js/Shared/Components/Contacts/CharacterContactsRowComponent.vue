@@ -1,23 +1,20 @@
 <template>
-  <li
-    :class="even ? (has_standing_offset ? 'bg-amber-100' :'bg-gray-50') : (has_standing_offset ? 'bg-amber-50' :'bg-white')"
-    class="grid grid-cols-2 sm:grid-cols-6 sm:gap-x-0 sm:gap-y-1 grid-flow-row text-sm text-gray-500 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500"
-  >
-    <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal sm:col-span-2">
-      <label class="block text-sm font-medium text-gray-700 sm:hidden">
-        Contact
-      </label>
+  <StickyHeaderTableRow :number-columns="numberColumns">
+    <StickyHeaderCell
+      :cell="columns[0]"
+      class="self-center whitespace-normal"
+    >
       <EntityByIdBlock
         :id="entry.contact_id"
         :image-size="10"
         name-font-size="text-base"
       />
-    </div>
-    <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal">
-      <label class="block text-sm font-medium text-gray-700 sm:hidden">
-        Labels
-      </label>
-      <div class="ml-2 flex space-x-1 space-y-1 flex-wrap flex-row-reverse">
+    </StickyHeaderCell>
+    <StickyHeaderCell
+      :cell="columns[1]"
+      class="self-center whitespace-normal"
+    >
+      <div class="flex space-x-1 space-y-1 flex-wrap flex-row-reverse">
         <span
           v-for="label in entry.labels"
           :key="label.id"
@@ -26,67 +23,50 @@
           {{ label.label_name }}
         </span>
       </div>
-    </div>
-    <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal">
-      <label class="block text-sm font-medium text-gray-700 sm:hidden">
-        Standing
-      </label>
+    </StickyHeaderCell>
+    <StickyHeaderCell
+      :cell="columns[2]"
+      class="self-center whitespace-normal"
+    >
       {{ entry.standing }}
-    </div>
-    <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal">
-      <label class="block text-sm font-medium text-gray-700 sm:hidden">
-        Corporation standing
-      </label>
+    </StickyHeaderCell>
+    <StickyHeaderCell
+      :cell="columns[3]"
+      class="self-center whitespace-normal"
+    >
       {{ entry.corporation_standing != null ? entry.corporation_standing : 'N.A.' }}
-    </div>
-    <div class="px-6 sm:px-3 py-4 sm:py-1 self-center whitespace-normal">
-      <label class="block text-sm font-medium text-gray-700 sm:hidden">
-        Alliance standing
-      </label>
+    </StickyHeaderCell>
+    <StickyHeaderCell
+      :cell="columns[4]"
+      class="self-center whitespace-normal"
+    >
       {{ entry.alliance_standing != null ? entry.alliance_standing : 'N.A.' }}
-    </div>
-  </li>
+    </StickyHeaderCell>
+  </StickyHeaderTableRow>
 </template>
 
 <script>
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow.vue";
+import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
+
 export default {
     name: "CharacterContactsRowComponent",
-    components: {EntityByIdBlock},
+    components: { EntityByIdBlock, StickyHeaderTableRow, StickyHeaderCell },
     props: {
         entry: {
             required: true,
             type: Object,
         },
-        even: {
+        columns: {
             required: true,
-            type: Number
-        }
+            type: Array,
+        },
+        numberColumns: {
+            required: true,
+            type: Number,
+        },
     },
-    computed: {
-        has_standing_offset() {
-            if(_.isNil(this.entry.corporation_standing) && _.isNil(this.entry.alliance_standing)) {
-                return false
-            }
-
-            let standing = this.entry.standing
-
-            if(standing === 0) {
-                return false
-            }
-
-            let corp_standing = this.entry.corporation_standing != null ? this.entry.corporation_standing : 0
-            let alliance_standing = this.entry.alliance_standing != null ? this.entry.alliance_standing : 0
-
-            return !((this.diff(corp_standing,standing) === 0) || (this.diff(alliance_standing,standing) === 0));
-
-        }
-    },
-    methods: {
-        diff(a,b) {
-            return a > b ? a - b : b - a
-        }
-    }
 }
 </script>
 

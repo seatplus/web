@@ -26,14 +26,11 @@
 
 namespace Seatplus\Web\Http\Controllers\Shared;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Http\Actions\Shared\GetAffiliatedEntitiesAction;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Resources\CharacterInfoRessource;
 use Seatplus\Web\Services\GetAffiliatedIds;
-use Seatplus\Web\Services\GetRecruitIdsService;
 
 class GetAffiliatedCharactersController extends Controller
 {
@@ -44,34 +41,8 @@ class GetAffiliatedCharactersController extends Controller
         parent::__construct($request, $getAffiliatedIds);
     }
 
-    public function __invoke(string $permission): AnonymousResourceCollection
+    public function __invoke(string $permission, GetAffiliatedEntitiesAction $action): AnonymousResourceCollection
     {
-        $search_param = request()->get('search');
-
-        $affiliatedIds = $this->getAffiliatedIds->get($permission);
-        $user_character_ids = auth()->user()->characters->pluck('character_id')->toArray();
-        $recruit_ids = GetRecruitIdsService::get();
-
-        $owned_characters = $this->getCharacterInfoQuery($affiliatedIds, $search_param);
-        $recruits = $this->getCharacterInfoQuery($recruit_ids, $search_param);
-        $affiliatables = $this->getCharacterInfoQuery($user_character_ids, $search_param);
-
-        $query = $owned_characters
-            ->union($recruits)
-            ->union($affiliatables)
-            ->distinct()
-            ->with(['corporation', 'alliance'])
-            ->has($permission)
-            ->paginate();
-
-        return CharacterInfoRessource::collection($query);
-    }
-
-    private function getCharacterInfoQuery(array $ids, ?string $search_param = null): Builder
-    {
-        return CharacterInfo::query()
-            ->whereIn('character_id', $ids)
-            ->when($search_param, fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search_param}%"))
-            ->orderBy('character_infos.name');
+        return $action->characters($permission, $this->request->get('search'));
     }
 }
