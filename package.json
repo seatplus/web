@@ -16,7 +16,7 @@
         "@vitejs/plugin-vue": "^6.0",
         "@vue/compiler-sfc": "^3.0.7",
         "acorn": "^8.17",
-        "eslint": "^10.6.0",
+        "eslint": "^10.7.0",
         "eslint-plugin-vue": "^10.9.2",
         "vue-eslint-parser": "^10.4.1",
         "globals": "^17.7.0",
