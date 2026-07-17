@@ -9,6 +9,7 @@ use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -18,11 +19,12 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
  * Corporation-history browser test — runs against the real assembled core app.
  *
  * Exercises the axios/Ziggy-free CorporationHistoryComponent, which now loads the (bounded)
- * history in one shot via the native-fetch helper (Functions/http.js) + a Wayfinder URL
- * instead of the legacy InfiniteLoadingHelper. The component only renders inside the
- * recruitment review page (Pages/Corporation/Recruitment/Application.vue → TabComponent),
- * so the test provisions a single character application and opens it as a superuser — which
- * bypasses CheckAffiliationForApplication, keeping the setup to models + factories.
+ * history via Inertia's <WhenVisible> — a partial reload of the page-level `corporationHistory`
+ * optional prop, fired when the card scrolls into view — instead of an on-mount getJson fetch or
+ * the legacy InfiniteLoadingHelper. The component only renders inside the recruitment review page
+ * (Pages/Corporation/Recruitment/Application.vue → TabComponent), so the test provisions a single
+ * character application and opens it as a superuser — which bypasses CheckAffiliationForApplication,
+ * keeping the setup to models + factories.
  */
 
 uses(RefreshDatabase::class);
@@ -123,9 +125,22 @@ it('renders a recruit corporation history through the recruitment review page', 
     ]);
     $corporation = CorporationInfo::factory()->create();
 
-    // A short, ordered corporation history. Each row's corporation_id resolves to a name offline
-    // (resolve.id → CorporationInfo) so the timeline renders real corp names, not placeholders.
-    $historyCorporations = CorporationInfo::factory()->count(3)->create();
+    // A short, ordered corporation history. Each row's corporation_id must resolve to a name *offline*
+    // (resolve.id → GetEntityFromId → a local CharacterAffiliation), otherwise the resolver falls back
+    // to an ESI lookup that returns "Unknown". A bare CorporationInfo has no affiliation, so anchor each
+    // history corp with a factory CharacterInfo — whose afterCreating carries its own CharacterAffiliation
+    // (character + corporation + alliance all local) — and use that character's corporation. This is the
+    // same self-anchoring the contact test relies on, and it keeps resolution deterministic regardless of
+    // when <WhenVisible> fires the load.
+    $historyCorporations = collect(range(0, 2))->map(function (): CorporationInfo {
+        $anchorCharacter = CharacterInfo::factory()->create();
+
+        $corporationId = CharacterAffiliation::query()
+            ->where('character_id', $anchorCharacter->character_id)
+            ->value('corporation_id');
+
+        return CorporationInfo::query()->findOrFail($corporationId);
+    });
 
     $historyCorporations->each(function (CorporationInfo $historyCorporation, int $index) use ($recruit) {
         CorporationHistory::factory()->create([
@@ -154,25 +169,28 @@ it('renders a recruit corporation history through the recruitment review page', 
     $page->assertSee('User Application');
 
     // The review page opens on the "Log" tab; switch to the corporation-history tab, which mounts
-    // CorporationHistoryComponent and triggers its fetch-swap load.
+    // CorporationHistoryComponent (rendering its <WhenVisible> fallback). Scrolling that card into
+    // view — below — is what now fires the partial reload that populates the timeline.
     switchRecruitmentTab($page, $device, 'Corporation History');
 
     // Corp names resolve lazily: each timeline row's ResolveIdToName only fetches once its element is
     // *fully* visible (IntersectionObserver threshold 1), so on the short iPhone viewport the history
     // card — which renders below the fold — never resolves on its own. Scroll the card's own scroll
-    // container to the viewport centre, settling between, so that once the getJson load populates the
-    // (short, bounded) timeline every row sits fully in view and resolves. The container renders with
-    // the component, before the fetch resolves, so this targets a real element regardless of load
-    // timing (the rows themselves don't exist until `results` is populated); repeating a few times
-    // covers the tick where the tab has switched but the component has not yet mounted. Once resolved a
-    // name stays in the DOM regardless of the final scroll position. (Same technique as CharacterContactTest.)
+    // container to the viewport centre, settling between: this both fires <WhenVisible> (its wrapper
+    // becomes visible) and, once the partial reload populates the (short, bounded) timeline, puts every
+    // row fully in view so it resolves. The container renders with the component — the <WhenVisible>
+    // fallback carries the same `.max-h-96.overflow-auto` wrapper — so this targets a real element
+    // regardless of load timing (the rows themselves don't exist until `corporationHistory` is
+    // populated); repeating a few times covers the tick where the tab has switched but the component has
+    // not yet mounted. Once resolved a name stays in the DOM regardless of the final scroll position.
+    // (Same technique as CharacterContactTest.)
     foreach (range(1, 3) as $attempt) {
         $page->script("(document.querySelector('.max-h-96.overflow-auto') ?? document.body).scrollIntoView({ block: 'center' })");
         $page->waitForEvent('networkidle');
     }
 
-    // The first history corporation's name appearing is proof the axios/Ziggy-free load path populated
-    // the timeline and its ResolveIdToName resolved.
+    // The first history corporation's name appearing is proof the <WhenVisible> partial-reload load
+    // path populated the timeline and its ResolveIdToName resolved.
     $page->waitForText($historyCorporations->first()->name);
 
     snap($page, "recruitment-corporation-history-{$device}");

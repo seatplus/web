@@ -27,23 +27,27 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
 use Seatplus\Web\Http\Actions\Recruitment\DeleteCharacterApplicationAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
+use Seatplus\Web\Http\Controllers\Character\CorporationHistoryController;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
@@ -122,13 +126,47 @@ class ApplicationsController extends Controller
             default => collect([]),
         };
 
+        // The recruit's character ids drive the (lazy) corporation-history prop below. `$recruit` is
+        // either a User model (with its `characters` relation) or a Collection wrapping a single
+        // CharacterInfo — both expose a `characters` list, so one traversal covers account- and
+        // character-type applications alike.
+        $recruitCharacterIds = collect(data_get($recruit, 'characters', []))
+            ->map(fn (mixed $character): int => (int) data_get($character, 'character_id'))
+            ->all();
+
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            // The recruit's per-character corporation history, keyed by character_id. Declared
+            // `optional` so it is NOT resolved on the initial page render (the history tab is not
+            // the default tab and sits below the fold) — it is only computed when the tab's
+            // CorporationHistoryComponent scrolls into view and its <WhenVisible data="corporationHistory">
+            // issues a partial reload for exactly this prop. Delegates to the same
+            // CorporationHistoryController@index the standalone corporation.history endpoint uses, so
+            // the (bounded, un-paginated) query lives in one place.
+            'corporationHistory' => Inertia::optional(fn (): array => $this->corporationHistoriesForCharacters($recruitCharacterIds)),
         ]);
+    }
+
+    /**
+     * Resolve each character's corporation history keyed by character_id, reusing the same
+     * CorporationHistoryController@index query the standalone endpoint serves so it lives in one place.
+     *
+     * @param  array<int, int>  $characterIds
+     * @return array<int, Collection<int, CorporationHistory>>
+     */
+    private function corporationHistoriesForCharacters(array $characterIds): array
+    {
+        $historyController = app(CorporationHistoryController::class);
+
+        return collect($characterIds)
+            ->mapWithKeys(fn (int $characterId): array => [
+                $characterId => $historyController->index($characterId),
+            ])
+            ->all();
     }
 
     public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action): RedirectResponse
