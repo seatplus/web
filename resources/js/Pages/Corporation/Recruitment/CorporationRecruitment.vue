@@ -1,31 +1,19 @@
 <template>
-  <!-- Be sure to use this with a layout container that is full-width on mobile -->
-  <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg my-5">
-    <div class="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
-      <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
-        <div class="ml-4 mt-4">
-          <EntityBlock :entity="enlistment.corporation" />
-        </div>
+  <CardWithHeader class="my-5">
+    <template #header>
+      <div class="flex flex-wrap items-center justify-between gap-4 sm:flex-nowrap">
+        <EntityBlock :entity="enlistment.corporation" />
 
-        <div
+        <Button
           v-if="enlistment.can_manage"
-          class="ml-4 mt-4 shrink-0 flex space-x-3"
+          :href="editEnlistment.url({ corporation_id: enlistment.corporation_id })"
+          method="get"
+          class="shrink-0"
         >
-          <span class="inline-flex rounded-md shadow-xs">
-
-            <Link
-              :href="route('edit.enlistment', enlistment.corporation_id)"
-              method="get"
-              as="button"
-              type="button"
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-50 focus:outline-hidden focus:ring-2 focus:border-indigo-300 focus:ring-offset-2 focus:ring-indigo active:bg-indigo-200"
-            >
-              Edit Enlistment
-            </Link>
-          </span>
-        </div>
+          Edit Enlistment
+        </Button>
       </div>
-    </div>
+    </template>
 
     <div class="px-4 py-5 sm:p-6 space-y-4 sm:space-y-6">
       <!--TODO: add finished applications-->
@@ -35,7 +23,7 @@
         @select="changeActiveTab"
       />
 
-      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg relative max-h-96 overflow-y-auto">
+      <div class="relative max-h-96 overflow-y-auto rounded-lg">
         <PendingTable
           v-if="isPending"
           :step-count="stepIndex"
@@ -47,28 +35,35 @@
         />
       </div>
     </div>
-  </div>
+  </CardWithHeader>
 </template>
 
 <script>
 
-import { Link } from "@inertiajs/vue3";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import Button from "@/Shared/Layout/Button.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import PendingTable from "./ApplicationsTable/PendingTable.vue";
 import ClosedTable from "./ApplicationsTable/ClosedTable.vue";
+import { edit as editEnlistment } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/EnlistmentsController";
 
 export default {
     name: "CorporationRecruitment",
     components: {
+        CardWithHeader,
+        Button,
         ClosedTable,
         PendingTable,
-        BarWithUnderline, EntityBlock, Link },
+        BarWithUnderline, EntityBlock },
     props: {
         enlistment: {
             required: true,
             type: Object
         },
+    },
+    setup() {
+        return { editEnlistment };
     },
     data() {
         return {

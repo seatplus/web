@@ -1,104 +1,120 @@
 <template>
-  <ul class="grid grid-cols-1 gap-6 px-4 sm:px-6">
-    <li
-      v-for="corporation in result"
-      :key="corporation.corporation_id"
-      class="col-span-1 bg-white rounded-lg shadow-sm"
+  <div>
+    <!-- Native Inertia v3 infinite scroll over the page-level `corporations` scroll prop
+         (affiliated, not-yet-enlisted corporations paginated with pageName 'corporations').
+         Replaces the axios/Ziggy useInfinityScrolling loader. -->
+    <InfiniteScroll
+      data="corporations"
+      items-element="#recruitment-corporation-list"
+      :buffer="500"
+      preserve-url
     >
-      <div class="w-full flex items-center justify-between p-6 space-x-6">
-        <div class="flex-1 truncate">
-          <div class="flex items-center space-x-3">
-            <h3 class="text-gray-900 text-sm leading-5 font-medium truncate">
-              {{ corporation.name }}
-            </h3>
-            <span
-              v-if="corporation.alliance"
-              class="shrink-0 inline-block px-2 py-0.5 text-teal-800 text-xs leading-4 font-medium bg-teal-100 rounded-full"
-            >{{ corporation.alliance }}</span>
-          </div>
-          <p class="mt-1 text-gray-500 text-sm leading-5 truncate">
-            How should scopes be applied?
-          </p>
-        </div>
-        <EveImage
-          :object="corporation"
-          :size="256"
-          tailwind_class="w-10 h-10 bg-gray-300 rounded-full shrink-0"
-        />
-      </div>
-      <div class="border-t border-gray-200">
-        <div class="-mt-px flex">
-          <div class="w-0 flex-1 flex border-r border-gray-200">
-            <button
-              class="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
-              @click="create(corporation, 'character')"
-            >
-              <svg
-                class="w-5 h-5 text-gray-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+      <ul
+        id="recruitment-corporation-list"
+        class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+      >
+        <li
+          v-for="corporation in corporations"
+          :key="corporation.corporation_id"
+        >
+          <CardWithHeader>
+            <template #header>
+              <EntityBlock :entity="corporation" />
+            </template>
+
+            <div class="grid grid-cols-2 divide-x divide-gray-200">
+              <Button
+                :href="openRecruitment.url()"
+                method="post"
+                :data="{ corporation_id: corporation.corporation_id, type: 'character' }"
+                class="w-full justify-center gap-x-2 rounded-none border-0 py-4 shadow-none"
               >
-                <path
-                  fill-rule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clip-rule="evenodd"
+                <UserIcon
+                  class="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
                 />
-              </svg>
-              <span class="ml-3">Recruits only</span>
-            </button>
-          </div>
-          <div class="-ml-px w-0 flex-1 flex">
-            <button
-              class="relative w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-br-lg hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150"
-              @click="create(corporation, 'user')"
-            >
-              <svg
-                class="w-5 h-5 text-gray-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+                Recruits only
+              </Button>
+              <Button
+                :href="openRecruitment.url()"
+                method="post"
+                :data="{ corporation_id: corporation.corporation_id, type: 'user' }"
+                class="w-full justify-center gap-x-2 rounded-none border-0 py-4 shadow-none"
               >
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-              </svg>
-              <span class="ml-3">All Characters</span>
-            </button>
-          </div>
+                <UsersIcon
+                  class="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+                All characters
+              </Button>
+            </div>
+          </CardWithHeader>
+        </li>
+      </ul>
+
+      <template #loading>
+        <div class="relative block w-full py-6 text-center">
+          <svg
+            class="animate-spin mx-auto h-8 w-8 text-gray-400"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span class="mt-2 block text-sm font-medium text-gray-500">
+            loading more corporations…
+          </span>
         </div>
-      </div>
-    </li>
-    <div ref="scrollComponent" />
-  </ul>
+      </template>
+    </InfiniteScroll>
+
+    <p
+      v-if="corporations.length === 0"
+      class="px-4 py-8 text-center text-sm text-gray-500"
+    >
+      No corporations available to open for recruitment.
+    </p>
+  </div>
 </template>
 
 <script>
+import { InfiniteScroll } from "@inertiajs/vue3";
+import { UserIcon, UsersIcon } from "@heroicons/vue/24/outline";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import Button from "@/Shared/Layout/Button.vue";
+import { create as openRecruitment } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/EnlistmentsController";
 
-import EveImage from "@/Shared/EveImage.vue"
-import {useInfinityScrolling} from "@/Functions/useInfinityScrolling";
-import {router} from "@inertiajs/vue3";
 export default {
-  name: "CorporationList",
-  components: {EveImage,
-    //InfiniteLoading
-  },
-  props: {
-    parameters: {
-      required: true,
-      type: Object
-    }
-  },
-  setup(props) {
-
-    return useInfinityScrolling('get.affiliated.corporations', props.parameters)
-
-  },
-  methods: {
-    create(corporation, type) {
-
-      router.post(route('create.corporation.recruitment'), {corporation_id: corporation.corporation_id, type: type})
-    }
-  }
+    name: "CorporationList",
+    components: {
+        InfiniteScroll,
+        CardWithHeader,
+        EntityBlock,
+        Button,
+        UserIcon,
+        UsersIcon,
+    },
+    setup() {
+        return { openRecruitment };
+    },
+    computed: {
+        corporations() {
+            return this.$page.props.corporations?.data ?? [];
+        },
+    },
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -167,7 +167,14 @@ test('senior hr sees recruitment component', function () {
     test()->actingAs(test()->test_user->refresh())
         ->get(route('corporation.recruitment'))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Corporation/Recruitment/RecruitmentIndex')
+                ->where('canManageRecruitment', true)
+                // Corporations a manager may open for recruitment are served as a native
+                // Inertia infinite-scroll prop (replacing the old axios/Ziggy loader).
+                ->has('corporations')
+        );
 });
 
 test('junior hr sees recruitment component', function () {
