@@ -319,7 +319,7 @@ it('lets a moderator approve a pending application', function (string $device) {
     $role = makeOnRequestRole('Recruiters');
     makeApplicant($role, 'Hopeful Pilot');
 
-    $page = deviceVisit($device, '/acl/'.$role->id.'/manage_members');
+    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/manage_members');
     $page->assertNoSmoke();
 
     // The pending applicant shows under Applications.
@@ -339,7 +339,7 @@ it('shows members and moderators sections on the manage page (admin)', function 
     grantAclAdmin($character->character_id);
     $role = makeOnRequestRole('Logistics');
 
-    $page = deviceVisit($device, '/acl/'.$role->id.'/manage_members');
+    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/manage_members');
     $page->assertNoSmoke();
 
     $page->waitForText('Members');
@@ -351,6 +351,8 @@ it('shows members and moderators sections on the manage page (admin)', function 
 it('surfaces configure and manage-members entry points to an admin on the index', function (string $device) {
     $character = actingAsCharacter();
     grantAclAdmin($character->character_id);
+    // The /acl index is gated by 'view access control'; a global ACL admin also needs it to load.
+    grantAclView($character->character_id);
 
     $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
     $role->update(['type' => RoleType::MANUAL]);
