@@ -276,21 +276,6 @@ jobs:
           git -C "$work" push -q --force \
             "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "shots:${branch}"
 
-          # Pair screenshots by view name: files are named "<view>-desktop.png" / "<view>-iphone.png"
-          # (see snap() in the browser tests), so group them into one row per view with a Desktop and
-          # an iPhone column. Anything without a device suffix is listed underneath.
-          declare -A desktop_url iphone_url other_url
-          for f in "${shots[@]}"; do
-            base="$(basename "$f")"
-            name="$(basename "$f" .png)"
-            url="https://raw.githubusercontent.com/${REPO}/${branch}/${base}"
-            case "$name" in
-              *-desktop) desktop_url["${name%-desktop}"]="$url" ;;
-              *-iphone)  iphone_url["${name%-iphone}"]="$url" ;;
-              *)         other_url["$name"]="$url" ;;
-            esac
-          done
-
           comment="$RUNNER_TEMP/screenshots-comment.md"
           {
             echo "<!-- browser-screenshots -->"
@@ -300,27 +285,19 @@ jobs:
             echo
             echo "| View | Desktop | iPhone |"
             echo "| --- | --- | --- |"
-            while IFS= read -r key; do
-              [ -z "$key" ] && continue
-              d="${desktop_url[$key]:-}"
-              i="${iphone_url[$key]:-}"
-              dcell="—"; icell="—"
-              [ -n "$d" ] && dcell="<img src=\"$d\" width=\"420\">"
-              [ -n "$i" ] && icell="<img src=\"$i\" width=\"220\">"
-              echo "| \`${key}\` | ${dcell} | ${icell} |"
-            done < <(printf '%s\n' "${!desktop_url[@]}" "${!iphone_url[@]}" | sort -u)
-
-            if [ ${#other_url[@]} -gt 0 ]; then
-              echo
-              echo "<details><summary>Other screenshots</summary>"
-              echo
-              while IFS= read -r name; do
-                [ -z "$name" ] && continue
-                echo "<img src=\"${other_url[$name]}\" width=\"420\"> "
-              done < <(printf '%s\n' "${!other_url[@]}" | sort)
-              echo
-              echo "</details>"
-            fi
+            # One row per view. Screenshots are named "<view>-desktop.png" / "<view>-iphone.png"
+            # (see snap()); derive the unique view names and look each device file up by name in
+            # $work. Plain string iteration — no associative arrays — so an all-suffixed set (the
+            # normal case) can't trip "unbound variable" under `set -u`.
+            base_url="https://raw.githubusercontent.com/${REPO}/${branch}"
+            printf '%s\n' "${shots[@]}" | sed -E 's|.*/||; s|\.png$||; s/-(desktop|iphone)$//' | sort -u \
+              | while IFS= read -r view; do
+                  [ -z "$view" ] && continue
+                  dcell="—"; icell="—"
+                  [ -f "$work/${view}-desktop.png" ] && dcell="<img src=\"${base_url}/${view}-desktop.png\" width=\"420\">"
+                  [ -f "$work/${view}-iphone.png" ]  && icell="<img src=\"${base_url}/${view}-iphone.png\" width=\"220\">"
+                  echo "| \`${view}\` | ${dcell} | ${icell} |"
+                done
           } > "$comment"
 
           echo "has_screenshots=true" >> "$GITHUB_OUTPUT"
