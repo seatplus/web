@@ -1,34 +1,26 @@
 <template>
   <ul
-    ref="scrollComponent"
     class="relative z-0 divide-y divide-gray-200 overflow-y-auto border-t"
   >
-    <InfiniteLoadingHelper
-      :key="Object.values(params).join(',')"
-      v-slot="{results}"
-      :route-name="routeName"
-      :params="params"
-    >
-      <SelectionEntity
-        v-for="character in results"
-        :key="character.character_id"
-        v-model="selected_ids"
-        :entity="character"
-      />
-    </InfiniteLoadingHelper>
+    <SelectionEntity
+      v-for="entity in results"
+      :key="entity.id"
+      v-model="selected_ids"
+      :entity="entity"
+    />
   </ul>
-  <div ref="scrollComponent" />
 </template>
 
 <script>
 import SelectionEntity from "./SelectionEntity.vue";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
-import {computed, ref, watch} from "vue";
-import {router} from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
+import { getJson } from "@/Functions/http";
+import GetAffiliatedCharactersController from "@/actions/Seatplus/Web/Http/Controllers/Shared/GetAffiliatedCharactersController";
+import GetAffiliatedCorporationsController from "@/actions/Seatplus/Web/Http/Controllers/Shared/GetAffiliatedCorporationsController";
 
 export default {
     name: "EntitySelection",
-    components: {InfiniteLoadingHelper, SelectionEntity},
+    components: {SelectionEntity},
     props: {
         dispatchTransferObject: {
             required: true,
@@ -43,60 +35,80 @@ export default {
             default: ''
         }
     },
-    setup(props) {
-
-        const params = ref(props.type === 'character'
-            ? { permission: props.dispatchTransferObject.permission }
-            : { permission: props.dispatchTransferObject.permission, corporation_role: props.dispatchTransferObject.required_corporation_role}
-        )
-
-        const search = computed(() => props.search)
-        const routeName = computed( () => props.type === 'character' ? 'get.affiliated.characters' : 'get.affiliated.corporations')
-
-        watch(search,(newValue) => {
-            newValue.length >= 3 ? params.value.search = newValue : delete params.value.search
-        })
-
-        return {
-            routeName,
-            params
-        }
-    },
     data() {
         return {
+            results: [],
             initial_ids: [],
-            selected_ids: []
+            selected_ids: [],
+            searchTimer: null,
         }
     },
     computed: {
         changed() {
-            return !_.isEqual(this.initial_ids, this.selected_character_ids)
+            return JSON.stringify(this.initial_ids) !== JSON.stringify(this.selected_ids)
+        }
+    },
+    watch: {
+        search() {
+            clearTimeout(this.searchTimer)
+            this.searchTimer = setTimeout(() => this.fetchEntities(), 300)
         }
     },
     beforeMount() {
+        // The current selection is carried in the page URL. Ziggy used to serialise it as
+        // `character_ids[0]=…`; Inertia serialises `character_ids[]=…` — both share the
+        // `${type}_ids` key prefix, so collect every matching entry.
+        const params = new URLSearchParams(window.location.search)
+        const ids = []
 
-        let ids = _.get(route().params, `${this.type}_ids`)
+        for (const [key, value] of params.entries()) {
+            if (key.startsWith(`${this.type}_ids`)) {
+                ids.push(parseInt(value))
+            }
+        }
 
-        if(!ids)
-            return
-
-        this.selected_ids = _.map(ids, (id) => parseInt(id))
-        this.initial_ids = _.map(ids, (id) => parseInt(id))
-
+        this.selected_ids = ids
+        this.initial_ids = [...ids]
+    },
+    mounted() {
+        this.fetchEntities()
     },
     beforeUnmount() {
+        clearTimeout(this.searchTimer)
 
-        if(!this.changed)
+        if (!this.changed) {
             return
+        }
 
-        let routeName = route().current()
+        if (this.selected_ids.length === 0) {
+            router.get(window.location.pathname)
+            return
+        }
 
-        if(_.isEmpty(this.selected_ids))
-            return router.get(route(routeName))
+        router.get(window.location.pathname, { [`${this.type}_ids`]: this.selected_ids })
+    },
+    methods: {
+        async fetchEntities() {
+            const query = this.search.length >= 3 ? { search: this.search } : {}
+            const permission = this.dispatchTransferObject.permission
 
-        let queryParameter = this.type === 'character' ? { character_ids: this.selected_ids } : {corporation_ids: this.selected_ids}
+            let url
 
-        router.get(route(routeName, {_query: queryParameter}))
+            if (this.type === 'character') {
+                url = GetAffiliatedCharactersController.url({ permission }, { query })
+            } else {
+                const roles = (this.dispatchTransferObject.required_corporation_role ?? []).join(',')
+
+                url = GetAffiliatedCorporationsController.url(
+                    roles ? { permission, corporation_role: roles } : { permission },
+                    { query },
+                )
+            }
+
+            const response = await getJson(url)
+
+            this.results = response?.data ?? []
+        }
     },
 }
 </script>

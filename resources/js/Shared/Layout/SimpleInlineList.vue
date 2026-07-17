@@ -10,15 +10,15 @@
         class="flex items-center"
       >
         <input
-          :id="option.id"
+          :id="`${uid}-${option.id}`"
           v-model="picked"
-          :name="key +option.id"
+          :name="uid + option.id"
           :value="option.id"
           type="radio"
           class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
         >
         <label
-          :for="option.id"
+          :for="`${uid}-${option.id}`"
           class="ml-3 block text-sm font-medium text-gray-700"
         >
           {{ option.title }}
@@ -60,8 +60,11 @@ export default {
         }
     },
     computed: {
-        key() {
-            return getCurrentInstance().vnode.key
+        // Per-instance id so the radios' id/for/name are unique across multiple SimpleInlineList
+        // instances on the same page (e.g. one contacts card per character). Without this the
+        // duplicated `for`/`id` made clicking a later card's label toggle the first card's radio.
+        uid() {
+            return getCurrentInstance().uid
         }
     },
     watch: {

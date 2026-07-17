@@ -294,9 +294,10 @@ it('allows user with review permission to review corporation member', function (
         ->and($affiliated_character_ids)->toContain($first_character->character_id)
         ->and($affiliated_character_ids)->toContain($second_character->character_id);
 
-    $response = test()->actingAs(test()->test_user)->get(route('get.character.skills', [
-        'character_id' => $second_character->character_id,
-    ]));
+    // The reviewer can reach the character skills page. Per-character skills now load as
+    // affiliation-scoped Inertia deferred props on the index route rather than a dedicated
+    // JSON endpoint, so we assert the page renders rather than hitting a removed route.
+    $response = test()->actingAs(test()->test_user)->get(route('character.skills'));
 
     $response->assertOk();
 });
