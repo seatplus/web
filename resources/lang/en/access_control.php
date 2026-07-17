@@ -110,6 +110,16 @@ return [
         'no_groups' => 'You are not in any groups yet.',
     ],
 
+    // Unified hub — everything for one group on a single tabbed page.
+    'hub' => [
+        'title' => 'Group hub',
+        'tabs' => [
+            'overview' => 'Overview',
+            'members' => 'Members',
+            'configure' => 'Configure',
+        ],
+    ],
+
     // Permissions the group grants
     'permissions' => [
         'help' => 'Which permissions this group grants its members.',

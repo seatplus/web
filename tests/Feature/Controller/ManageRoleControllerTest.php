@@ -33,7 +33,7 @@ it('updates an automatic role', function () {
 
     test()->actingAs(test()->test_user)
         ->postJson(route('acl.update.automatic', test()->role->id), ['name' => 'renamed automatic'])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->refresh()->type)->toBe(RoleType::AUTOMATIC);
     \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'renamed automatic']);
@@ -44,7 +44,7 @@ it('updates a manual role', function () {
 
     test()->actingAs(test()->test_user)
         ->postJson(route('acl.update.manual', test()->role->id), ['name' => 'renamed manual'])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->refresh()->type)->toBe(RoleType::MANUAL);
     \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'renamed manual']);
@@ -55,7 +55,7 @@ it('updates an on-request role', function () {
 
     test()->actingAs(test()->test_user)
         ->postJson(route('acl.update.on-request', test()->role->id), [])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->refresh()->type)->toBe(RoleType::ON_REQUEST);
 });
@@ -65,7 +65,7 @@ it('updates an opt-in role', function () {
 
     test()->actingAs(test()->test_user)
         ->postJson(route('acl.update.opt-in', test()->role->id), [])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->refresh()->type)->toBe(RoleType::OPT_IN);
 });

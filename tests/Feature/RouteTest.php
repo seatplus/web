@@ -8,6 +8,6 @@ it('protects configurations routes', function () {
 
 it('access control routes require view access control permission', function () {
     test()->actingAs(test()->test_user)
-        ->get(route('acl.groups'))
+        ->get(route('acl.hub'))
         ->assertForbidden();
 });

@@ -30,7 +30,7 @@ it('sets automatic type and affiliations via HTTP', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->fresh()->type)->toBe(RoleType::AUTOMATIC)
         ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
@@ -46,7 +46,7 @@ it('sets assigned criteria for automatic role via HTTP', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     // Verify a role_membership criterion was created for the corporation
     expect(
@@ -67,7 +67,7 @@ it('open-to-all automatic role assigns every user, including unaffiliated ones',
                 ['entity_id' => 1000001, 'entity_type' => 'corporation'],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->test_user->fresh()->hasRole(test()->role->name))->toBeTrue()
         ->and($other_user->fresh()->hasRole(test()->role->name))->toBeTrue();

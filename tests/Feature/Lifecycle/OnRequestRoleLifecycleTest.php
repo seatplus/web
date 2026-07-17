@@ -41,7 +41,7 @@ it('full lifecycle: configure apply set moderator approve leave', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->fresh()->type)->toBe(RoleType::ON_REQUEST)
         ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
@@ -105,7 +105,7 @@ it('deny flow: configure apply set moderator deny', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     assignPermissionToTestUser(['view access control']);
     test()->actingAs(test()->test_user)

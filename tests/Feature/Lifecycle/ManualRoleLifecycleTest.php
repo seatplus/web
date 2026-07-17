@@ -31,7 +31,7 @@ it('full lifecycle: create affiliations add member kick member', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 

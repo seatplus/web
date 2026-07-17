@@ -102,6 +102,16 @@ return [
         'no_groups' => 'Du bist noch in keiner Gruppe.',
     ],
 
+    // Vereinheitlichter Hub — alles zu einer Gruppe auf einer Seite mit Tabs.
+    'hub' => [
+        'title' => 'Gruppen-Hub',
+        'tabs' => [
+            'overview' => 'Übersicht',
+            'members' => 'Mitglieder',
+            'configure' => 'Konfigurieren',
+        ],
+    ],
+
     'permissions' => [
         'help' => 'Welche Berechtigungen diese Gruppe ihren Mitgliedern gewährt.',
         'search' => 'Berechtigungen filtern…',

@@ -96,9 +96,11 @@ return [
     ],
     'Access Control' => [
         [
-            'name' => 'Control Group',
-            'permission' => 'view access control',
-            'route' => 'acl.groups',
+            'name' => 'Control Groups',
+            // Admins manage groups without necessarily holding the view permission; moderators are
+            // additionally surfaced by the Access Control category's role-moderator special case.
+            'permission' => 'view access control|administrate access control groups',
+            'route' => 'acl.hub',
             'icon' => 'UserGroupIcon',
         ],
     ],

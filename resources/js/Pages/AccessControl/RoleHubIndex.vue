@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-8">
-    <PageHeader :page-title="trans('web::access_control.groups')">
+    <PageHeader :page-title="trans('web::access_control.hub.title')">
       <template
         v-if="canCreate"
         #primary

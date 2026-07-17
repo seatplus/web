@@ -218,7 +218,7 @@ import AppliesToField from "@/Shared/Components/AccessControl/fields/AppliesToFi
 import PermissionsField from "@/Shared/Components/AccessControl/fields/PermissionsField.vue";
 import { useTranslations } from "@/composables/useTranslations";
 import { buildRolePayload } from "@/composables/useRolePayload";
-import ShowControlGroupsController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/ShowControlGroupsController";
+import RoleHubIndexController from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/RoleHubIndexController";
 import { store as storeGroup } from "@/actions/Seatplus/Web/Http/Controllers/AccessControl/CreateControlGroupController";
 
 const props = defineProps({
@@ -305,7 +305,7 @@ const submit = () => {
 };
 
 const breadcrumbs = computed(() => [
-    { name: trans("web::access_control.groups"), route: ShowControlGroupsController.url() },
+    { name: trans("web::access_control.groups"), route: RoleHubIndexController.url() },
     { name: trans("web::access_control.wizard.title"), route: "" },
 ]);
 </script>

@@ -38,19 +38,23 @@ use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
-use Seatplus\Web\Http\Controllers\AccessControl\ManageControlGroupMembersController;
-use Seatplus\Web\Http\Controllers\AccessControl\ManageMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveModeratorController;
+use Seatplus\Web\Http\Controllers\AccessControl\RoleHubController;
+use Seatplus\Web\Http\Controllers\AccessControl\RoleHubIndexController;
 use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
-use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\ShowControlGroupsController;
 
-Route::get('/', ShowControlGroupsController::class)->name('acl.groups')
-    ->middleware([CheckAuthorization::class.':view access control']);
+// The unified role hub is the single ACL surface. `acl.groups` is kept as a redirect so the many
+// existing route('acl.groups') references (breadcrumbs, post-delete redirects, sidebar history)
+// still resolve to the hub index.
+Route::redirect('/', '/acl/hub')->name('acl.groups');
+
+// Hub index + per-role hub. Both gate inside their controllers (superuser / view access control /
+// administrate / role moderator) so admins and moderators reach them without the view permission.
+Route::get('/hub', RoleHubIndexController::class)->name('acl.hub');
+Route::get('/hub/{role_id}', RoleHubController::class)->name('acl.hub.show');
 Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
-Route::get('/acl/{role_id}/manage_members', ManageMembersController::class)->name('manage.acl.members');
 Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');
 Route::post('/acl/{role_id}/apply', ApplyToRoleController::class)->name('acl.apply');
 Route::post('/acl/{role_id}/join', JoinOptInRoleController::class)->name('acl.join');
@@ -68,13 +72,8 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
 });
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
-    Route::get('/manage_control_group/{role_id}', [ManageControlGroupMembersController::class, 'index'])->name('acl.manage');
-
     Route::get('/user', ListUserController::class)->name('list.users');
 });
-
-Route::get('/acl/{role_id}/detail', ShowControlGroupController::class)
-    ->name('acl.detail');
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {
     Route::post('/acl/{role_id}/automatic', ManageRoleController::class)->name('acl.update.automatic')->defaults('type', 'automatic');

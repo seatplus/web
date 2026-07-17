@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Enums\RoleType;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -16,38 +17,52 @@ use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\RoleRessource;
 use Seatplus\Web\Support\Translations;
 
-class ShowControlGroupsController extends Controller
+/**
+ * Index for the unified role hub — the same segmented discover list as {@see ShowControlGroupsController},
+ * but its cards route into the single-page {@see RoleHubController} instead of the separate per-action
+ * pages. Kept as a parallel surface so the two designs can be compared side by side.
+ */
+class RoleHubIndexController extends Controller
 {
     public function __invoke(): Response
     {
         $user = auth()->user();
         $userId = $user->getAuthIdentifier();
 
-        // The corps/alliances the user belongs to — used to find groups they're eligible to join.
+        // The hub index is reachable by anyone who has a reason to see groups: superusers and global
+        // ACL admins, users who may view access control, and per-role moderators (who manage a group
+        // without necessarily holding the view permission). superuser bypasses the can() checks.
+        $isModerator = RoleMembership::query()
+            ->where('entity_type', User::class)
+            ->where('entity_id', $userId)
+            ->where('can_moderate', true)
+            ->exists();
+
+        abort_unless(
+            $user->can('view access control')
+            || $user->can('administrate access control groups')
+            || $isModerator,
+            403
+        );
+
         // Eager-load characterAffiliation: the corporation_id/alliance_id accessors read it, and
         // lazy loading is disabled (strict mode).
         $characters = $user->characters()->with('characterAffiliation')->get();
         $corporationIds = $characters->pluck('corporation_id')->filter()->unique()->values()->all();
         $allianceIds = $characters->pluck('alliance_id')->filter()->unique()->values()->all();
 
-        // My groups: any role where the user has a membership row (member, applicant, or moderator).
         $myGroups = Role::query()
             ->whereHas('roleMemberships', fn (Builder $query) => $query
                 ->where('entity_type', User::class)
                 ->where('entity_id', $userId))
             ->get();
 
-        // Managers (superuser / global ACL admin) get the full list to configure — including groups
-        // they neither belong to nor can join (e.g. a manual group they just created). Excludes the
-        // ones already surfaced under "My groups" to avoid duplication.
         $canManage = $user->can('superuser') || $user->can('administrate access control groups');
 
         $allGroups = $canManage
             ? Role::query()->whereNotIn('id', $myGroups->modelKeys())->get()
             : collect();
 
-        // Available: self-service / request groups the user is eligible for (a criteria corp/alliance
-        // matches one of their characters — mirrors meetsCriteria()) and is not already in.
         $availableGroups = Role::query()
             ->whereIn('type', [RoleType::OPT_IN->value, RoleType::ON_REQUEST->value])
             ->where(fn (Builder $query) => $query
@@ -62,13 +77,13 @@ class ShowControlGroupsController extends Controller
                 ->where('entity_id', $userId))
             ->get();
 
-        return Inertia::render('AccessControl/ControlGroupsIndex', [
+        return Inertia::render('AccessControl/RoleHubIndex', [
             'myGroups' => RoleRessource::collection($myGroups)->resolve(),
             'availableGroups' => RoleRessource::collection($availableGroups)->resolve(),
             'allGroups' => RoleRessource::collection($allGroups)->resolve(),
             'canCreate' => $canManage,
             'canManage' => $canManage,
-            'activeSidebarElement' => 'acl.groups',
+            'activeSidebarElement' => 'acl.hub',
             'pageTranslations' => Translations::gather(['web::access_control']),
         ]);
     }
