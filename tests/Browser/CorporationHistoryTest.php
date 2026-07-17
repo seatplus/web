@@ -159,8 +159,23 @@ it('renders a recruit corporation history through the recruitment review page', 
     // CorporationHistoryComponent and triggers its fetch-swap load.
     switchRecruitmentTab($page, $device, 'Corporation History');
 
-    // The first history corporation's name only appears once the fetch has resolved and the row's
-    // ResolveIdToName has run — proof the axios/Ziggy-free load path populated the timeline.
+    // Let the component's getJson history load settle so the timeline rows exist in the DOM before
+    // we scroll them (the ordered <li>s only render once `results` is populated).
+    $page->waitForEvent('networkidle');
+
+    // Corp names resolve lazily: each row's ResolveIdToName only fetches once its element is *fully*
+    // visible (IntersectionObserver threshold 1), so a below-the-fold row never resolves on its own —
+    // and the asserted name (`first()`, record_id 1000) is the *last*, bottom-most timeline row. Scroll
+    // every history row fully into view, settling between, so each passes through full visibility; once
+    // resolved the name stays in the DOM regardless of the final scroll position. (Same technique as
+    // CharacterContactTest.)
+    foreach (range(0, $historyCorporations->count() - 1) as $rowIndex) {
+        $page->script("(document.querySelectorAll('.max-h-96.overflow-auto li')[{$rowIndex}] ?? document.body).scrollIntoView({ block: 'center' })");
+        $page->waitForEvent('networkidle');
+    }
+
+    // The first history corporation's name appearing is proof the axios/Ziggy-free load path populated
+    // the timeline and its ResolveIdToName resolved.
     $page->waitForText($historyCorporations->first()->name);
 
     snap($page, "recruitment-corporation-history-{$device}");
