@@ -33,6 +33,7 @@ use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\SsoScopes;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\RecruitContractScrollPropsAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Resources\CorporationComplianceResource;
 use Seatplus\Web\Services\GetAffiliatedIds;
@@ -106,11 +107,18 @@ class MemberComplianceController
                 'mainCharacter',
             ]);
 
+        $watchlist = $action->execute($corporation_id);
+
+        $characterIds = $member->characters->pluck('character_id')->all();
+
         return inertia('Corporation/MemberCompliance/ReviewUser', [
             'member' => $member,
             'targetCorporation' => CorporationInfo::find($corporation_id),
-            'watchlist' => $action->execute($corporation_id),
+            'watchlist' => $watchlist,
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            // Per-character contract scroll props so the review contract tab renders native
+            // <InfiniteScroll> instead of the legacy axios details endpoint.
+            ...(new RecruitContractScrollPropsAction)->execute($characterIds, $watchlist),
         ]);
     }
 }

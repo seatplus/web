@@ -40,6 +40,7 @@ use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\RefreshToken;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\RecruitContractScrollPropsAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
 use Seatplus\Web\Http\Actions\Recruitment\DeleteCharacterApplicationAction;
@@ -122,12 +123,23 @@ class ApplicationsController extends Controller
             default => collect([]),
         };
 
+        $watchlist = $action->execute($application->corporation_id);
+
+        $characterIds = collect(data_get($recruit, 'characters', []))
+            ->map(fn ($character): mixed => data_get($character, 'character_id'))
+            ->filter()
+            ->values()
+            ->all();
+
         return inertia('Corporation/Recruitment/Application', [
             'recruit' => $recruit->toArray(),
             'application' => $application,
-            'watchlist' => $action->execute($application->corporation_id),
+            'watchlist' => $watchlist,
             'activeSidebarElement' => 'corporation.recruitment',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
+            // Per-character contract scroll props so the recruitment contract tab renders
+            // native <InfiniteScroll> instead of the legacy axios details endpoint.
+            ...(new RecruitContractScrollPropsAction)->execute($characterIds, $watchlist),
         ]);
     }
 

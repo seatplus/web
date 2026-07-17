@@ -8,7 +8,7 @@
     v-for="character_id in characterIds"
     :id="character_id"
     :key="`${character_id}:${activeTabId}`"
-    :watchlist="activeTabId === 1 ? watchlist : {}"
+    :scroll-key="scrollKey(character_id)"
   />
 </template>
 
@@ -43,11 +43,18 @@ export default {
 
         const activeTabId = ref(hasWatchlist.value ? 1 : 2)
 
+        // Tab 1 (Watchlisted) reads the watchlist-filtered scroll prop; tab 2 (All) the full one.
+        // Both are emitted per character by the recruitment/review controllers.
+        const scrollKey = (characterId) => activeTabId.value === 1
+            ? `watchlisted_contracts_${characterId}`
+            : `contracts_${characterId}`
+
         return {
             tabs: raw_tabs,
             changeActiveTab,
             hasWatchlist,
-            activeTabId
+            activeTabId,
+            scrollKey
         }
     }
 }
