@@ -34,7 +34,7 @@ it('sets opt-in type and affiliations via HTTP', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN)
         ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
@@ -51,7 +51,7 @@ it('eligible user can join opt-in role and then leave via HTTP', function () {
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.detail', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', test()->role->id));
 
     expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN);
 

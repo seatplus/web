@@ -27,10 +27,7 @@
           v-for="role in myGroups"
           :key="role.id"
         >
-          <RoleCard
-            :role="role"
-            hub
-          />
+          <RoleCard :role="role" />
         </li>
       </ul>
       <p
@@ -54,10 +51,7 @@
           v-for="role in allGroups"
           :key="role.id"
         >
-          <RoleCard
-            :role="role"
-            hub
-          />
+          <RoleCard :role="role" />
         </li>
       </ul>
     </section>
@@ -75,10 +69,7 @@
           v-for="role in availableGroups"
           :key="role.id"
         >
-          <RoleCard
-            :role="role"
-            hub
-          />
+          <RoleCard :role="role" />
         </li>
       </ul>
     </section>

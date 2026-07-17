@@ -42,6 +42,6 @@ class ManageRoleController extends Controller
             Role::findById($role_id)->syncPermissions($permissions);
         }
 
-        return redirect()->route('acl.detail', $role_id)->with('success', 'updated');
+        return redirect()->route('acl.hub.show', $role_id)->with('success', 'updated');
     }
 }

@@ -36,7 +36,7 @@ class CreateControlGroupController extends Controller
         return Inertia::render('AccessControl/CreateRole', [
             'joinMethods' => RoleTypeMetadata::all(),
             'availablePermissions' => AssignablePermissions::all(),
-            'activeSidebarElement' => 'acl.groups',
+            'activeSidebarElement' => 'acl.hub',
             'pageTranslations' => Translations::gather(['web::access_control']),
         ]);
     }
@@ -66,6 +66,6 @@ class CreateControlGroupController extends Controller
             return $role;
         });
 
-        return redirect()->route('acl.detail', $role->id)->with('success', 'Group created');
+        return redirect()->route('acl.hub.show', $role->id)->with('success', 'Group created');
     }
 }

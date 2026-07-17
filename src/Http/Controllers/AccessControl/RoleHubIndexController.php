@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Enums\RoleType;
+use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -27,6 +28,22 @@ class RoleHubIndexController extends Controller
     {
         $user = auth()->user();
         $userId = $user->getAuthIdentifier();
+
+        // The hub index is reachable by anyone who has a reason to see groups: superusers and global
+        // ACL admins, users who may view access control, and per-role moderators (who manage a group
+        // without necessarily holding the view permission). superuser bypasses the can() checks.
+        $isModerator = RoleMembership::query()
+            ->where('entity_type', User::class)
+            ->where('entity_id', $userId)
+            ->where('can_moderate', true)
+            ->exists();
+
+        abort_unless(
+            $user->can('view access control')
+            || $user->can('administrate access control groups')
+            || $isModerator,
+            403
+        );
 
         // Eager-load characterAffiliation: the corporation_id/alliance_id accessors read it, and
         // lazy loading is disabled (strict mode).

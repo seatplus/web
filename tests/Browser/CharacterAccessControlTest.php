@@ -5,27 +5,24 @@ use Pest\Browser\Api\PendingAwaitablePage;
 use Pest\Browser\Enums\Device;
 use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Enums\AffiliationType;
-use Seatplus\Auth\Enums\RoleType;
-use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
+/*
+ * Create-group wizard browser tests, run against the assembled core app. The discover / configure /
+ * moderate flows now live on the unified hub (see RoleHubTest); this file covers the one surface the
+ * hub doesn't — the guided creation wizard (/acl/create), which lands on the new group's hub.
+ */
+
+uses(RefreshDatabase::class);
+
 if (! function_exists('deviceVisit')) {
-    /**
-     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
-     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
-     * suite's other function_exists helpers rather than in tests/Pest.php.
-     */
     function deviceVisit(string $device, string $url, array $options = []): mixed
     {
-        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
-        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
-        // no per-call re-navigation like ->on()->iPhone15()).
         if ($device === 'iphone') {
             return new PendingAwaitablePage(
                 Playwright::defaultBrowserType(),
@@ -40,11 +37,6 @@ if (! function_exists('deviceVisit')) {
 }
 
 if (! function_exists('snap')) {
-    /**
-     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
-     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
-     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
-     */
     function snap($page, string $name): void
     {
         $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
@@ -53,128 +45,22 @@ if (! function_exists('snap')) {
     }
 }
 
-/*
- * Access-control discover flow browser tests, run against the assembled core app.
- * Covers the redesigned /acl index: "My groups" vs "Available to join" segmentation and the
- * self-service Join action for an eligible user. Provisioning via actingAsCharacter()
- * (core tests/Pest.php); the acting character's corporation is used as the join criterion.
- */
-
-uses(RefreshDatabase::class);
-
-if (! function_exists('grantAclView')) {
-    /** Give the user owning $characterId the 'view access control' permission and return them. */
-    function grantAclView(int $characterId): User
+if (! function_exists('userOfCharacter')) {
+    function userOfCharacter(int $characterId): User
     {
-        $user = CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
-        $user->givePermissionTo(Permission::findOrCreate('view access control'));
-
-        return $user;
+        return CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
     }
 }
 
 if (! function_exists('grantAclAdmin')) {
-    /** Give the user owning $characterId the 'administrate access control groups' permission. */
     function grantAclAdmin(int $characterId): User
     {
-        $user = CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
+        $user = userOfCharacter($characterId);
         $user->givePermissionTo(Permission::findOrCreate('administrate access control groups'));
 
         return $user;
     }
 }
-
-if (! function_exists('makeOptInRoleForCorporation')) {
-    /** A self-service (opt-in) group whose eligibility criterion is $corporationId. */
-    function makeOptInRoleForCorporation(string $name, int $corporationId): Role
-    {
-        $role = Role::findById(Role::create(['name' => $name])->id);
-        $role->update(['type' => RoleType::OPT_IN]);
-
-        RoleMembership::create([
-            'role_id' => $role->id,
-            'entity_type' => CorporationInfo::class,
-            'entity_id' => $corporationId,
-        ]);
-
-        return $role;
-    }
-}
-
-it('lists a group the eligible user can join under "Available to join"', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclView($character->character_id);
-    makeOptInRoleForCorporation('Fleet Operations', $character->corporation_id);
-
-    $page = deviceVisit($device, '/acl');
-    $page->assertNoSmoke();
-
-    $page->waitForText('Available to join');
-    $page->waitForText('Fleet Operations');
-    // Self-service group → a Join affordance is present.
-    $page->assertSee('Join');
-
-    snap($page, "acl-discover-available-{$device}");
-})->with(['desktop', 'iphone']);
-
-it('joins a self-service group and moves it into "My groups"', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclView($character->character_id);
-    makeOptInRoleForCorporation('Fleet Operations', $character->corporation_id);
-
-    $page = deviceVisit($device, '/acl');
-    $page->assertNoSmoke();
-    $page->waitForText('Fleet Operations');
-
-    // Join instantly (opt-in); the card re-renders as a member under My groups.
-    $page->click('Join');
-    $page->assertScript("(document.body.innerText.includes('Fleet Operations') && document.body.innerText.includes('Member'))");
-    $page->assertNoSmoke();
-
-    snap($page, "acl-discover-joined-{$device}");
-})->with(['desktop', 'iphone']);
-
-it('renders a group the user already belongs to under "My groups"', function (string $device) {
-    $character = actingAsCharacter();
-    $user = grantAclView($character->character_id);
-
-    $role = Role::findById(Role::create(['name' => 'Directors'])->id);
-    $role->update(['type' => RoleType::MANUAL]);
-    RoleMembership::create([
-        'role_id' => $role->id,
-        'entity_type' => User::class,
-        'entity_id' => $user->getKey(),
-        'status' => 'active',
-    ]);
-
-    $page = deviceVisit($device, '/acl');
-    $page->assertNoSmoke();
-    $page->waitForText('My groups');
-    $page->waitForText('Directors');
-
-    snap($page, "acl-discover-my-groups-{$device}");
-})->with(['desktop', 'iphone']);
-
-it('configures a group: switch join method and save (admin)', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclAdmin($character->character_id);
-    $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
-
-    $page = deviceVisit($device, '/acl/manage_control_group/'.$role->id);
-    $page->assertNoSmoke();
-
-    // The two clearly-separated sections + the join-method picker render.
-    $page->waitForText('Membership');
-    $page->waitForText('Authorization');
-    $page->waitForText('Self-service');
-
-    // Switch join method and save (no entities needed — posts to acl.update.{type}).
-    $page->click('Self-service');
-    $page->click('Save');
-    $page->assertNoSmoke();
-
-    snap($page, "acl-configure-{$device}");
-})->with(['desktop', 'iphone']);
 
 it('creates a group through the guided wizard (admin)', function (string $device) {
     $character = actingAsCharacter();
@@ -210,14 +96,14 @@ it('creates a group through the guided wizard (admin)', function (string $device
     $page->click('Next');
     $page->waitForText('Logistics'); // review summary shows the name
 
-    // Create → lands on the new group's detail.
+    // Create → lands on the new group's hub.
     $page->click('Create group');
     $page->assertScript("document.body.innerText.includes('Logistics')");
     $page->assertNoSmoke();
 
     // The wizard created the group with the permission; attach the applies-to scope the ESI picker
     // can't set in a test — INVERSE ("everyone except Thunderwaffe") to a real corporation — then
-    // reopen the detail so the screenshot shows a fully-configured group (real logo pill + permission).
+    // reopen the hub so the screenshot shows a fully-configured group (real logo pill + permission).
     $role = Role::firstWhere('name', 'Logistics');
     expect($role->permissions->pluck('name'))->toContain('view access control');
     Affiliation::create([
@@ -227,7 +113,7 @@ it('creates a group through the guided wizard (admin)', function (string $device
         'type' => AffiliationType::INVERSE->value,
     ]);
 
-    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/detail');
+    $page = deviceVisit($device, '/acl/hub/'.$role->id);
     $page->assertNoSmoke();
     $page->waitForText('Logistics');
     $page->waitForText('Thunderwaffe');
@@ -267,103 +153,10 @@ it('creates an open-to-all group through the wizard (admin)', function (string $
     $page->click('Next');
     $page->waitForText('Everyone'); // review summary shows the name
 
-    // Create → lands on the new group's detail.
+    // Create → lands on the new group's hub.
     $page->click('Create group');
     $page->assertScript("document.body.innerText.includes('Everyone')");
     $page->assertNoSmoke();
 
     snap($page, "acl-create-wizard-everyone-{$device}");
-})->with(['desktop', 'iphone']);
-
-if (! function_exists('makeOnRequestRole')) {
-    /** A request-to-join (on-request) group. */
-    function makeOnRequestRole(string $name): Role
-    {
-        $role = Role::findById(Role::create(['name' => $name])->id);
-        $role->update(['type' => RoleType::ON_REQUEST]);
-
-        return $role;
-    }
-}
-
-if (! function_exists('makeApplicant')) {
-    /** Seed a distinct user (named character) with a pending application to $role. */
-    function makeApplicant(Role $role, string $name): CharacterInfo
-    {
-        $character = CharacterInfo::factory()->create(['name' => $name]);
-
-        $user = new User;
-        $user->main_character_id = $character->character_id;
-        $user->save();
-
-        CharacterUser::create([
-            'user_id' => $user->getKey(),
-            'character_id' => $character->character_id,
-            'character_owner_hash' => sha1((string) $character->character_id),
-        ]);
-
-        RoleMembership::create([
-            'role_id' => $role->id,
-            'entity_type' => User::class,
-            'entity_id' => $user->getKey(),
-            'status' => 'pending',
-        ]);
-
-        return $character;
-    }
-}
-
-it('lets a moderator approve a pending application', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclAdmin($character->character_id);
-    $role = makeOnRequestRole('Recruiters');
-    makeApplicant($role, 'Hopeful Pilot');
-
-    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/manage_members');
-    $page->assertNoSmoke();
-
-    // The pending applicant shows under Applications.
-    $page->waitForText('Pending applications');
-    $page->waitForText('Hopeful Pilot');
-
-    // Approving moves them into Members.
-    $page->click('Approve');
-    $page->assertScript("(document.body.innerText.includes('Members') && document.body.innerText.includes('Hopeful Pilot'))");
-    $page->assertNoSmoke();
-
-    snap($page, "acl-moderate-approve-{$device}");
-})->with(['desktop', 'iphone']);
-
-it('shows members and moderators sections on the manage page (admin)', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclAdmin($character->character_id);
-    $role = makeOnRequestRole('Logistics');
-
-    $page = deviceVisit($device, '/acl/acl/'.$role->id.'/manage_members');
-    $page->assertNoSmoke();
-
-    $page->waitForText('Members');
-    $page->waitForText('Moderators');
-
-    snap($page, "acl-moderate-sections-{$device}");
-})->with(['desktop', 'iphone']);
-
-it('surfaces configure and manage-members entry points to an admin on the index', function (string $device) {
-    $character = actingAsCharacter();
-    grantAclAdmin($character->character_id);
-    // The /acl index is gated by 'view access control'; a global ACL admin also needs it to load.
-    grantAclView($character->character_id);
-
-    $role = Role::findById(Role::create(['name' => 'Ops Team'])->id);
-    $role->update(['type' => RoleType::MANUAL]);
-
-    $page = deviceVisit($device, '/acl');
-    $page->assertNoSmoke();
-
-    // The admin's "All groups" section lists it with the privileged actions on the card.
-    $page->waitForText('Ops Team');
-    $page->assertSee('Configure');
-    $page->assertSee('Manage members');
-
-    snap($page, "acl-admin-entrypoints-{$device}");
 })->with(['desktop', 'iphone']);
