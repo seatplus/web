@@ -185,7 +185,7 @@ it('lists the corporation in the update sidebar on a corporation-scoped page', f
  * relation the controller filters on with `->has($permission)`, so a character with an asset is
  * listed. Both characters get an asset for that reason.
  */
-it('picks a character in the entity slide-over and filters the page by the selection', function () {
+it('picks a character in the entity slide-over and filters the page by the selection', function (string $device) {
     $owned = actingAsCharacter();
     Asset::factory()->create([
         'assetable_id' => $owned->character_id,
@@ -214,7 +214,7 @@ it('picks a character in the entity slide-over and filters the page by the selec
     ]);
     $user->assignRole($role);
 
-    $page = visit(route('character.assets'));
+    $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
 
     // Open the picker: the SlideOver teleports into #destination and getJson-loads both characters.
@@ -223,7 +223,7 @@ it('picks a character in the entity slide-over and filters the page by the selec
     $page->assertScript(dispatchSidebarSees($owned->name));
     $page->assertScript(dispatchSidebarSees($affiliated->name));
 
-    snap($page, 'entity-picker-open');
+    snap($page, "entity-picker-open-{$device}");
 
     // Tick the owned character, then close the panel — closing unmounts EntitySelection, whose
     // beforeUnmount navigates with the selection. Both actions scoped to #destination so the
@@ -238,5 +238,5 @@ it('picks a character in the entity slide-over and filters the page by the selec
     $page->assertScript('! window.location.search.includes('.json_encode((string) $affiliated->character_id).')');
     $page->assertScript('!! document.querySelector(".bg-amber-400")');
 
-    snap($page, 'entity-picker-selection-applied');
-});
+    snap($page, "entity-picker-selection-applied-{$device}");
+})->with(['desktop', 'iphone']);
