@@ -99,7 +99,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
             'target_corporation_id' => test()->test_character->corporation->corporation_id,
         ])
         ->assertJson(
-            fn (AssertableJson $json) => $json->has(3)
+            fn (AssertableJson $json) => $json->has(1)
                 ->has('data', 1)
                 ->has(
                     'data.0',

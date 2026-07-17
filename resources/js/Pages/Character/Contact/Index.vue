@@ -17,7 +17,6 @@
         :key="character.character_id"
         :character="character"
         :corporation_id="character.corporation_id"
-        :alliance_id="character.alliance_id"
       />
     </div>
   </div>

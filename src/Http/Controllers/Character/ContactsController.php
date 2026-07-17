@@ -50,7 +50,9 @@ class ContactsController extends Controller
         $characters = CharacterInfo::query()
             ->has('contacts')
             ->whereIn('character_id', $ids)
-            ->get();
+            ->with('characterAffiliation')
+            ->get()
+            ->each->append('corporation_id');
 
         return inertia('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -83,7 +85,7 @@ class ContactsController extends Controller
             ->where('contactable_id', $character_id);
 
         return ContactResource::collection(
-            $query->paginate(),
+            $query->get(),
         );
     }
 }
