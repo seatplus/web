@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Pest\Browser\Api\PendingAwaitablePage;
+use Pest\Browser\Enums\Device;
+use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Eveapi\Models\Application;
@@ -21,6 +24,30 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
  */
 
 uses(RefreshDatabase::class);
+
+if (! function_exists('deviceVisit')) {
+    /**
+     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
+     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
+     * suite's other function_exists helpers rather than in tests/Pest.php.
+     */
+    function deviceVisit(string $device, string $url, array $options = []): mixed
+    {
+        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
+        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
+        // no per-call re-navigation like ->on()->iPhone15()).
+        if ($device === 'iphone') {
+            return new PendingAwaitablePage(
+                Playwright::defaultBrowserType(),
+                Device::IPHONE_15,
+                $url,
+                $options,
+            );
+        }
+
+        return visit($url, $options);
+    }
+}
 
 if (! function_exists('snap')) {
     /**
@@ -51,7 +78,28 @@ if (! function_exists('realCharacterId')) {
     }
 }
 
-it('renders a recruit corporation history through the recruitment review page', function () {
+if (! function_exists('switchRecruitmentTab')) {
+    /**
+     * Activate a TabComponent tab on either viewport. The desktop layout (.hidden sm:block) is a row
+     * of clickable <div>s; the mobile layout (.sm:hidden) is a <select id="tabs"> bound to
+     * `active_element` via v-model. The mobile options carry no explicit :value, so each option's
+     * value is its label text — set it and dispatch a bubbling change event so Vue's v-model updates.
+     */
+    function switchRecruitmentTab($page, string $device, string $label): void
+    {
+        if ($device === 'iphone') {
+            $value = json_encode($label);
+
+            $page->script("const select = document.querySelector('#tabs'); select.value = {$value}; select.dispatchEvent(new Event('change', { bubbles: true }));");
+
+            return;
+        }
+
+        $page->click($label);
+    }
+}
+
+it('renders a recruit corporation history through the recruitment review page', function (string $device) {
     // The logged-in reviewer. Superuser bypasses CheckAffiliationForApplication, so no role /
     // affiliation plumbing is needed to open someone else's application.
     $reviewerCharacter = actingAsCharacter();
@@ -94,17 +142,17 @@ it('renders a recruit corporation history through the recruitment review page', 
         'status' => 'open',
     ]);
 
-    $page = visit("/recruitment/application/{$application->id}");
+    $page = deviceVisit($device, "/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->assertSee('User Application');
 
     // The review page opens on the "Log" tab; switch to the corporation-history tab, which mounts
     // CorporationHistoryComponent and triggers its fetch-swap load.
-    $page->click('Corporation History');
+    switchRecruitmentTab($page, $device, 'Corporation History');
 
     // The first history corporation's name only appears once the fetch has resolved and the row's
     // ResolveIdToName has run — proof the axios/Ziggy-free load path populated the timeline.
     $page->waitForText($historyCorporations->first()->name);
 
-    snap($page, 'recruitment-corporation-history');
-});
+    snap($page, "recruitment-corporation-history-{$device}");
+})->with(['desktop', 'iphone']);
