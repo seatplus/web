@@ -62,7 +62,7 @@ class GetAffiliatedCharactersController extends Controller
             ->distinct()
             ->with(['corporation', 'alliance'])
             ->has($permission)
-            ->paginate();
+            ->get();
 
         return CharacterInfoRessource::collection($query);
     }

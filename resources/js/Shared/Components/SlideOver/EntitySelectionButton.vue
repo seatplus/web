@@ -68,9 +68,16 @@ export default {
     },
     computed: {
         has_selected() {
-            let ids = _.get(route().params, `${this.type}_ids`)
+            // The picker writes the current selection into the page URL as `${type}_ids[…]`.
+            const params = new URLSearchParams(window.location.search)
 
-            return !!ids
+            for (const key of params.keys()) {
+                if (key.startsWith(`${this.type}_ids`)) {
+                    return true
+                }
+            }
+
+            return false
         },
         dispatchTransferObject() {
             return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
