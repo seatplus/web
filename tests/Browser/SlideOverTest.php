@@ -22,8 +22,10 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
  *  1. The "Update" (dispatch) sidebar — lists the entities whose ESI data the user can refresh,
  *     split into owned ("Your characters"/"Your corporations", eager) and "Affiliated …" (lazy).
  *  2. The "Select character/corporation" entity picker — the axios/Ziggy-free rewrite that lists
- *     the entities the user may view (getJson + Wayfinder), lets you tick a subset, and on close
- *     navigates the page with `character_ids[]`/`corporation_ids[]` so the list filters.
+ *     the entities the user may view. The affiliated list is NOT fetched up front: it rides on the
+ *     lazily-resolved `affiliatedEntities` Inertia shared prop and is pulled in via <WhenVisible>
+ *     only once the slide-over opens and the list scrolls into view. You tick a subset, and on close
+ *     the picker navigates the page with `character_ids[]`/`corporation_ids[]` so the list filters.
  *
  * Both teleport their panel into <div id="destination"> (app.blade.php), outside the page's own
  * content, so #destination-scoped assertions (slideOverSees) tell the panel apart from the page's
@@ -218,9 +220,19 @@ it('picks a character in the entity slide-over and filters the page by the selec
     $page = deviceVisit($device, '/character/assets');
     $page->assertNoSmoke();
 
-    // Open the picker: the SlideOver teleports into #destination and getJson-loads both characters.
+    // The affiliated list is lazy: before the picker opens, its slide-over (and the <WhenVisible>
+    // inside it) is not mounted, so the `affiliatedEntities` shared prop has never been requested
+    // and neither character is present in the teleported panel. #destination is empty here — the
+    // pages render their own character cards, hence the #destination scope.
+    $page->assertScript('! '.slideOverSees($owned->name));
+    $page->assertScript('! '.slideOverSees($affiliated->name));
+
+    // Open the picker: the SlideOver teleports into #destination, and <WhenVisible> fires a partial
+    // reload for the `affiliatedEntities` prop once the list scrolls into view — loading both
+    // characters on demand (WhenVisible fired) rather than eagerly on page load.
     $page->click('Select Character');
     $page->waitForText('Select character');
+    $page->waitForText($owned->name);
     $page->assertScript(slideOverSees($owned->name));
     $page->assertScript(slideOverSees($affiliated->name));
 

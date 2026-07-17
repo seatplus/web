@@ -28,8 +28,10 @@ namespace Seatplus\Web\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
+use Seatplus\Web\Http\Actions\Shared\GetAffiliatedEntitiesAction;
 use Seatplus\Web\Http\Resources\UserRessource;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Support\Locales;
@@ -95,6 +97,48 @@ class HandleInertiaRequests extends Middleware
                 'logo' => asset(config('web.images.logo')),
                 'icon' => asset(config('web.images.icon')),
             ],
+            // The entity-picker slide-over's affiliated character/corporation list. Declared
+            // `optional` so it is NOT resolved on ordinary page loads (no DB query, no cost) —
+            // only when the picker's <WhenVisible data="affiliatedEntities"> scrolls into view and
+            // issues a partial reload for exactly this prop. The picker context (`type`,
+            // `permission`, `corporationRoles`, `search`) rides along as request data on that reload
+            // so the same shared prop can serve every character/corporation page without any
+            // per-controller wiring. Delegates to the same action the standalone
+            // GetAffiliated{Characters,Corporations} endpoints use, so the query lives in one place.
+            'affiliatedEntities' => Inertia::optional(fn () => $this->resolveAffiliatedEntities($request)),
         ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function resolveAffiliatedEntities(Request $request): array
+    {
+        if (auth()->guest()) {
+            return [];
+        }
+
+        $permission = $request->input('permission');
+
+        if (blank($permission)) {
+            return [];
+        }
+
+        // `search_aff` (not `search`) so the picker's query never collides with a page's own
+        // `search` filter (e.g. the assets page) when this prop reloads via <WhenVisible>.
+        $search = $request->input('search_aff') ?: null;
+        $action = app(GetAffiliatedEntitiesAction::class);
+
+        if ($request->input('type') === 'corporation') {
+            $corporationRoles = collect(explode(',', (string) $request->input('corporationRoles', '')))
+                ->map(fn (string $role): string => trim($role))
+                ->filter()
+                ->values()
+                ->all();
+
+            return $action->corporations($permission, $corporationRoles, $search)->resolve();
+        }
+
+        return $action->characters($permission, $search)->resolve();
     }
 }
