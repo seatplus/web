@@ -6,7 +6,7 @@
         #primary
       >
         <HeaderButton @click="create_enlistment = true">
-          Open new enlistment
+          New job posting
         </HeaderButton>
       </template>
     </PageHeader>
@@ -16,6 +16,16 @@
       :key="enlistment"
       :enlistment="enlistment"
     />
+
+    <section
+      v-if="canManageRecruitment"
+      class="space-y-3"
+    >
+      <h2 class="px-4 text-sm font-medium text-gray-500 sm:px-0">
+        Create a job posting
+      </h2>
+      <CorporationList />
+    </section>
 
     <teleport to="#destination">
       <CreateEnlistmentModal v-model="create_enlistment" />
@@ -28,10 +38,11 @@ import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue"
 import CreateEnlistmentModal from "./CreateEnlistmentModal.vue";
 import CorporationRecruitment from "@/Pages/Corporation/Recruitment/CorporationRecruitment.vue";
+import CorporationList from "@/Pages/Corporation/Recruitment/CorporationList.vue";
 
 export default {
     name: "RecruitmentIndex",
-    components: {CorporationRecruitment, CreateEnlistmentModal, HeaderButton, PageHeader},
+    components: {CorporationList, CorporationRecruitment, CreateEnlistmentModal, HeaderButton, PageHeader},
     props: {
         canManageRecruitment: {
             required: true,

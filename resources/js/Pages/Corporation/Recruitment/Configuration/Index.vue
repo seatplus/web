@@ -1,12 +1,12 @@
 <template>
   <div>
     <PageHeader :breadcrumbs="breadcrumbs">
-      Corporation Enlistment
+      Job Posting Settings
       <template #primary>
         <!--TODO: Create Delete Button with confirmation dialog-->
         <span class="shadow-xs rounded-md">
           <Button
-            :href="route('delete.enlistment', enlistment.corporation_id)"
+            :href="deleteUrl"
             method="delete"
           >
             Delete
@@ -52,14 +52,12 @@
 
 
       <template #button>
-        <button
-          :disabled="form.processing"
-          type="submit"
-          class="bg-indigo-600 border border-transparent rounded-md shadow-xs py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        <Button
+          :is-inertia-button="false"
           @click="submit"
         >
           Save
-        </button>
+        </Button>
       </template>
     </TwoColumnCardWithSubmitAction>
     <ItemsWatchlist
@@ -76,7 +74,9 @@ import EnlistmentConfig from "./EnlistmentConfig.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import ItemsWatchlist from "./ItemsWatchlist.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
-import {router, useForm} from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
+import { deleteMethod as deleteEnlistment, updateWatchlist } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/EnlistmentsController";
+import GetRecruitmentIndexController from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/GetRecruitmentIndexController";
 
 export default {
     name: "Index",
@@ -96,7 +96,7 @@ export default {
             breadcrumbs: [
                 {
                     name: 'Corporation Recruitment',
-                    route: route('corporation.recruitment')
+                    route: GetRecruitmentIndexController.url()
                 }
             ],
             form: useForm({
@@ -105,9 +105,14 @@ export default {
             }),
         }
     },
+    computed: {
+        deleteUrl() {
+            return deleteEnlistment.url(this.enlistment.corporation_id)
+        }
+    },
     methods: {
         submit() {
-          router.post(route('update.watchlist', this.corporationId), this.form)
+            this.form.post(updateWatchlist.url(this.enlistment.corporation_id))
         }
     }
 }

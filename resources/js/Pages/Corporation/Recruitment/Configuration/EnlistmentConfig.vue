@@ -1,10 +1,10 @@
 <template>
   <TwoColumnCardWithSubmitAction :with-bottom-border="withBottomBorder">
     <template #title>
-      <span v-if="!enlistment">Create</span> Enlistment
+      <span v-if="!enlistment">Create</span> Job Posting
     </template>
     <template #description>
-      Select <span v-if="!enlistment">corporation and</span> type of enlistment. Additionally you can opt to support multiple review process steps.
+      Select <span v-if="!enlistment">corporation and</span> type of job posting. Additionally you can opt to support multiple review process steps.
     </template>
     <div class="space-y-6 sm:space-y-5">
       <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start">
@@ -76,14 +76,12 @@
       </div>
     </div>
     <template #button>
-      <button
-        :disabled="form.processing"
-        type="submit"
-        class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-xs text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      <Button
+        :is-inertia-button="false"
         @click="submit()"
       >
         Save
-      </button>
+      </Button>
     </template>
   </TwoColumnCardWithSubmitAction>
 </template>
@@ -95,10 +93,12 @@ import SimpleToggle from "@/Shared/SimpleToggle.vue";
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWithSubmitAction.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
+import Button from "@/Shared/Layout/Button.vue";
+import { create as createEnlistment } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/EnlistmentsController";
 
 export default {
     name: "EnlistmentConfig",
-    components: {EntityByIdBlock, TwoColumnCardWithSubmitAction, Autosuggest, SimpleToggle},
+    components: {Button, EntityByIdBlock, TwoColumnCardWithSubmitAction, Autosuggest, SimpleToggle},
     props: {
         enlistment: {
             required: false,
@@ -122,7 +122,7 @@ export default {
         const submit = () => {
             form
                 .transform((data) => ({ ...data, corporation_id: data.corporation.corporation_id}))
-                .post(route('create.corporation.recruitment'), {
+                .post(createEnlistment.url(), {
                 onSuccess: () => {
                     emit('onSuccess')
                 }
