@@ -5,10 +5,10 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div>
-        <SkillQueue :character-id="characterId" />
+        <SkillQueue :skill-queue="skillQueue" />
       </div>
       <div class="col-span-2 space-y-4">
-        <Skills :character-id="characterId" />
+        <Skills :skills="skills" />
       </div>
     </div>
   </div>
@@ -25,6 +25,14 @@ export default {
         characterId: {
             type: Number,
             required: true
+        },
+        skills: {
+            type: Array,
+            default: () => []
+        },
+        skillQueue: {
+            type: Array,
+            default: () => []
         }
     }
 }

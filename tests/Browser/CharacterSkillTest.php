@@ -139,7 +139,7 @@ if (! function_exists('seedCharacterSkills')) {
             ]);
         }
 
-        // One skill actively training — future finish_date so the skillQueue endpoint returns it.
+        // One skill actively training — future finish_date so the skillQueue deferred prop returns it.
         $queued = makeSkillType(['type' => 3302, 'type_name' => 'Small Projectile Turret', 'group' => 255, 'group_name' => 'Gunnery']);
         SkillQueue::factory()->create([
             'character_id' => $character->character_id,
@@ -157,12 +157,13 @@ if (! function_exists('seedCharacterSkills')) {
 /*
  * Character skills browser tests — run against the real assembled core app.
  *
- * Covers the axios/Ziggy-free Skills view: the page renders one SkillsComponent per owned
- * character (getCharacterIds), and each SkillQueue/Skills child fetches its rows on mount via
- * getJson() + Wayfinder actions (get.character.skills / get.character.skill.queue → ->get()).
- * Skills group by type.group.name into CardWithHeader cards; the queue lists items with a future
- * finish_date. A user always sees their OWN characters' skills, so no permission is granted.
- * Provisioning comes from the suite helper actingAsCharacter() (core tests/Pest.php).
+ * Covers the deferred-props Skills view: the page renders one SkillsComponent per owned
+ * character (getCharacterIds), and the skills/skillQueue data arrives as Inertia deferred props
+ * keyed by character_id (resolved on a follow-up partial reload after the initial render, with a
+ * pulsing skeleton fallback in the meantime). Skills group by type.group.name into CardWithHeader
+ * cards; the queue lists items with a future finish_date. A user always sees their OWN characters'
+ * skills, so no permission is granted. Provisioning comes from the suite helper actingAsCharacter()
+ * (core tests/Pest.php).
  */
 
 uses(RefreshDatabase::class);
