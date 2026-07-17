@@ -22,14 +22,24 @@ test('has dispatchable job', function () {
     );
 });
 
-test('one get skills per character', function () {
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.skills', test()->test_character->character_id))
-        ->assertOk();
-});
+test('skills and skill queue are deferred and keyed by character id', function () {
+    $characterId = test()->test_character->character_id;
 
-test('one get skill queue per character', function () {
     $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.skill.queue', test()->test_character->character_id))
-        ->assertOk();
+        ->get(route('character.skills'));
+
+    // Deferred props are absent from the initial render, then resolved on the partial reload.
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('Character/Skill/Index')
+            ->has('character_ids')
+            ->missing('skills')
+            ->missing('skillQueue')
+            ->loadDeferredProps(fn (Assert $reload) => $reload
+                ->has('skills')
+                ->has('skills.'.$characterId)
+                ->has('skillQueue')
+                ->has('skillQueue.'.$characterId)
+            )
+    );
 });
