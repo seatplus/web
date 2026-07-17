@@ -27,7 +27,7 @@
 namespace Seatplus\Web\Http\Controllers\Character;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
@@ -48,15 +48,15 @@ class SkillsController extends Controller
         ]);
     }
 
-    public function skills(int $character_id): LengthAwarePaginator
+    public function skills(int $character_id): Collection
     {
         return Skill::query()
             ->with('type.group')
             ->where('character_id', $character_id)
-            ->paginate();
+            ->get();
     }
 
-    public function skillQueue(int $character_id): LengthAwarePaginator
+    public function skillQueue(int $character_id): Collection
     {
         return SkillQueue::query()
             ->with('type.group')
@@ -67,6 +67,6 @@ class SkillsController extends Controller
                     ->orWhereNull('finish_date')
             )
             ->orderBy('queue_position', 'asc')
-            ->paginate();
+            ->get();
     }
 }

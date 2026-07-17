@@ -23,13 +23,15 @@ test('has dispatchable job', function () {
 });
 
 test('one get skills per character', function () {
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.skills', test()->test_character->character_id))
-        ->assertOk();
+    test()->actingAs(test()->test_user)
+        ->getJson(route('get.character.skills', test()->test_character->character_id))
+        ->assertOk()
+        ->assertJson([]);
 });
 
 test('one get skill queue per character', function () {
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.character.skill.queue', test()->test_character->character_id))
-        ->assertOk();
+    test()->actingAs(test()->test_user)
+        ->getJson(route('get.character.skill.queue', test()->test_character->character_id))
+        ->assertOk()
+        ->assertJson([]);
 });
