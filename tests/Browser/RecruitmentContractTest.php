@@ -152,7 +152,7 @@ if (! function_exists('makeReviewableRecruit')) {
 
 uses(RefreshDatabase::class);
 
-it('merges the next recruit-contracts page in on scroll in the review contract tab', function () {
+it('merges the next recruit-contracts page in on scroll in the review contract tab', function (string $device) {
     // Reviewer: any logged-in user, elevated to superuser so the compliance gates pass.
     $reviewer = actingAsCharacter();
     userOfCharacter($reviewer->character_id)->givePermissionTo(Permission::findOrCreate('superuser'));
@@ -170,22 +170,28 @@ it('merges the next recruit-contracts page in on scroll in the review contract t
         'user' => $recruitUser->getKey(),
     ]);
 
-    // Desktop only: TabComponent renders the tab strip as clickable <div>s on sm+ and swaps it for
-    // a native <select> on mobile, so the click-to-activate path below is a desktop assertion.
-    $page = deviceVisit('desktop', $url);
+    $page = deviceVisit($device, $url);
     $page->assertNoSmoke();
 
     // The header renders the recruit's main-character name via Vue — waiting on it confirms the
     // page has hydrated before we drive the (reactive) tab switch.
     $page->waitForText($recruitCharacter->name);
 
-    // TabComponent opens on the "Log" tab; activate "Contracts". Click the visible leaf <div> whose
-    // text is exactly "Contracts" (the mobile <select>'s <option> is excluded — it is not a <div>).
-    $page->script("[...document.querySelectorAll('div')].find(el => el.children.length === 0 && el.textContent.trim() === 'Contracts' && el.offsetParent !== null)?.click()");
+    // TabComponent opens on the "Log" tab; activate "Contracts". The switcher differs per viewport:
+    // sm+ renders clickable <div>s; mobile (.sm:hidden) renders a native <select v-model>. The
+    // <option> has no :value binding, so its value is its text ("Contracts").
+    if ($device === 'iphone') {
+        // Drive the mobile <select>: set its value to the "Contracts" option and fire a bubbling
+        // change event so Vue's v-model updates active_element.
+        $page->script("(() => { const s = document.getElementById('tabs'); s.value = 'Contracts'; s.dispatchEvent(new Event('change', { bubbles: true })); })()");
+    } else {
+        $page->click('Contracts');
+    }
 
     $rows = "#contracts-body-{$recruitCharacter->character_id} > *";
 
     // assertScript auto-polls: waits for the tab to mount and the first scroll-prop page to render.
+    // Proves the native <InfiniteScroll> list rendered on this viewport (the point of the migration).
     $page->assertScript("document.querySelectorAll('{$rows}').length > 0");
 
     $before = (int) $page->script("document.querySelectorAll('{$rows}').length");
@@ -195,5 +201,5 @@ it('merges the next recruit-contracts page in on scroll in the review contract t
     // InfiniteScroll's end trigger fires; passes once the next page has merged in.
     $page->assertScript("(document.getElementById('contracts-body-{$recruitCharacter->character_id}').closest('.overflow-y-auto').scrollTo(0, 1e6), document.querySelectorAll('{$rows}').length > {$before})");
 
-    snap($page, 'recruitment-contracts-infinite-scroll-desktop');
-});
+    snap($page, "recruitment-contracts-infinite-scroll-{$device}");
+})->with(['desktop', 'iphone']);
