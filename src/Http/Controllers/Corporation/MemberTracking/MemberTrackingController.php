@@ -28,10 +28,8 @@ namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
 use Seatplus\Eveapi\Models\SsoScopes;
@@ -48,33 +46,32 @@ class MemberTrackingController extends Controller
             ->setIsCharacter(false)
             ->create(CorporationMemberTracking::class);
 
+        $corporations = $this->getAffiliatedCorporations($dispatchTransferObject);
+
+        // One native infinite-scroll prop per affiliated corporation (the page renders a
+        // card per corporation), each with its own pageName so scroll state never collides;
+        // <InfiniteScroll> reads it via the matching `members_<corporation>` key. Replaces
+        // the axios/Ziggy useInfinityScrolling loader against get.corporation.member_tracking.
+        $members = $corporations->mapWithKeys(fn (CorporationInfo $corporation) => [
+            "members_{$corporation->corporation_id}" => Inertia::scroll(
+                fn () => MemberTrackingResource::collection(
+                    $this->memberQuery($corporation->corporation_id)
+                        ->paginate(pageName: "members_{$corporation->corporation_id}")
+                ),
+            ),
+        ])->all();
+
         return Inertia::render('Corporation/MemberTracking/MemberTracking', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporations' => $this->getAffiliatedCorporations($dispatchTransferObject),
+            'corporations' => $corporations,
+            ...$members,
         ]);
     }
 
-    public function getMemberTracking(int $corporation_id): AnonymousResourceCollection
+    private function memberQuery(int $corporation_id): Builder
     {
-        /** @var CorporationInfo|null $corporation */
-        $corporation = CorporationInfo::find($corporation_id);
-
-        /** @var SsoScopes|null $corporation_sso_scopes */
-        $corporation_sso_scopes = $corporation?->ssoScopes;
-        /** @var AllianceInfo|null $alliance */
-        $alliance = $corporation?->alliance;
-        /** @var SsoScopes|null $alliance_sso_scopes */
-        $alliance_sso_scopes = $alliance?->ssoScopes;
-
-        $sso_scopes = collect([
-            'corporation_scopes' => $corporation_sso_scopes?->selected_scopes,
-            'alliance_scopes' => $alliance_sso_scopes?->selected_scopes,
-        ])->flatten(1)->filter();
-
-        $query = CorporationMemberTracking::where('corporation_id', $corporation_id)
+        return CorporationMemberTracking::where('corporation_id', $corporation_id)
             ->with('character.refreshToken', 'location.locatable', 'ship');
-
-        return MemberTrackingResource::collection($query->paginate())->additional(['required_scopes' => $sso_scopes]);
     }
 
     private function getAffiliatedCorporations(DispatchTransferObject $dispatchTransferObject): Collection
