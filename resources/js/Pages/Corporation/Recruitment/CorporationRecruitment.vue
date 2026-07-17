@@ -35,7 +35,9 @@
         @select="changeActiveTab"
       />
 
-      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg relative max-h-96 overflow-y-auto">
+      <!-- The table components own their own scroll-region container (needed by
+           <InfiniteScroll>), so this wrapper must not add a second scroll container. -->
+      <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg relative">
         <PendingTable
           v-if="isPending"
           :step-count="stepIndex"

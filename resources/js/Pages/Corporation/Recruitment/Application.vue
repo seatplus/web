@@ -13,7 +13,6 @@
       </template>
     </PageHeader>
 
-
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <li class="col-span-2">
         <TabComponent
@@ -25,204 +24,171 @@
       </li>
 
       <li class="col-span-1">
-        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-          <div>
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
-              <!-- Heroicon name: check -->
-              <IdentificationIcon class="h-6 w-6 text-indigo-600" />
+        <CardWithHeader>
+          <template #header>
+            <div class="flex items-center gap-4">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-100">
+                <IdentificationIcon class="h-6 w-6 text-indigo-600" />
+              </div>
+              <div>
+                <h3 class="text-lg font-medium leading-6 text-gray-900">
+                  Application of {{ recruit.main_character.name }}
+                </h3>
+                <p class="mt-1 text-sm leading-5 text-gray-500">
+                  This will decide if one or all of the following characters are allowed to join the corporation: {{ characters }}
+                </p>
+              </div>
             </div>
-            <div class="mt-3 sm:mt-5">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Application of {{ recruit.main_character.name }}
-              </h3>
-              <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-                This will decide if one or all of the following characters are allowed to join the corporation: {{ characters }}
-              </p>
-              <p class="mt-1 max-w-2xl text-sm leading-5 text-gray-500">
-                Remember to invite them in game as well.
-              </p>
+          </template>
+
+          <div class="space-y-6 px-4 py-5 sm:p-6">
+            <p class="text-sm leading-5 text-gray-500">
+              Remember to invite them in game as well.
+            </p>
+
+            <div class="space-y-3">
               <UpdateCharacterComponent
                 v-for="character in recruit.characters"
                 :key="character.character_id"
                 :character="character"
               />
-              <!--Decision-->
-              <div
-                v-show="application.status === 'open'"
-                class="mt-6 sm:mt-5 sm:border-t sm:border-gray-200 sm:pt-5"
-              >
-                <div
-                  role="group"
-                  aria-labelledby="label-notifications"
-                >
-                  <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
-                    <div>
-                      <div
-                        id="label-notifications"
-                        class="text-base leading-6 font-medium text-gray-900 sm:text-sm sm:leading-5 sm:text-gray-700"
-                      >
-                        Decision
-                      </div>
-                    </div>
-                    <div class="sm:col-span-2">
-                      <div class="max-w-lg">
-                        <p class="text-sm leading-5 text-gray-500">
-                          Decide if the recruit should be accepted to corporation or not.
-                        </p>
-                        <div class="mt-4">
-                          <div class="flex items-center">
-                            <input
-                              id="accept_application"
-                              v-model="form.decision"
-                              value="accepted"
-                              name="accept_application"
-                              type="radio"
-                              class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
-                            >
-                            <label
-                              for="accept_application"
-                              class="ml-3"
-                            >
-                              <span class="block text-sm leading-5 font-medium text-gray-700">Accept application</span>
-                            </label>
-                          </div>
-                          <div class="mt-4 flex items-center">
-                            <input
-                              id="reject_application"
-                              v-model="form.decision"
-                              value="rejected"
-                              name="reject_application"
-                              type="radio"
-                              class="form-radio h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
-                            >
-                            <label
-                              for="reject_application"
-                              class="ml-3"
-                            >
-                              <span class="block text-sm leading-5 font-medium text-gray-700">Reject application</span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!--Explanation-->
-              <div
-                v-if="form.decision === 'rejected' "
-                class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5"
-              >
-                <label
-                  for="explanation"
-                  class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2"
-                >
-                  Explanation
-                </label>
-                <div class="mt-1 sm:mt-0 sm:col-span-2">
-                  <div class="max-w-lg flex rounded-md shadow-xs">
-                    <textarea
-                      id="explanation"
-                      v-model="form.explanation"
-                      rows="3"
-                      class="form-textarea block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                      required
-                    />
-                  </div>
-                  <p
-                    v-if="$page.props.errors.explanation"
-                    class="mt-2 text-sm text-red-600"
-                  >
-                    {{ $page.errors.explanation[0] }}
-                  </p>
-                  <p class="mt-2 text-sm text-gray-500">
-                    Write a few sentences about the decision, in that recruiters in the future might learn from past decisions.
-                  </p>
-                </div>
-              </div>
             </div>
+
+            <!-- Decision -->
+            <form
+              v-if="isOpen"
+              class="space-y-6 border-t border-gray-200 pt-6"
+              @submit.prevent="submit"
+            >
+              <fieldset>
+                <legend class="text-sm font-medium text-gray-900">
+                  Decision
+                </legend>
+                <p class="mt-1 text-sm leading-5 text-gray-500">
+                  Decide if the recruit should be accepted to the corporation or not.
+                </p>
+                <div class="mt-4 space-y-4">
+                  <div class="flex items-center">
+                    <input
+                      id="accept_application"
+                      v-model="form.decision"
+                      value="accepted"
+                      name="decision"
+                      type="radio"
+                      class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    >
+                    <label
+                      for="accept_application"
+                      class="ml-3 block text-sm font-medium text-gray-700"
+                    >
+                      Accept application
+                    </label>
+                  </div>
+                  <div class="flex items-center">
+                    <input
+                      id="reject_application"
+                      v-model="form.decision"
+                      value="rejected"
+                      name="decision"
+                      type="radio"
+                      class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    >
+                    <label
+                      for="reject_application"
+                      class="ml-3 block text-sm font-medium text-gray-700"
+                    >
+                      Reject application
+                    </label>
+                  </div>
+                </div>
+                <p
+                  v-if="form.errors.decision"
+                  class="mt-2 text-sm text-red-600"
+                >
+                  {{ form.errors.decision }}
+                </p>
+              </fieldset>
+
+              <!-- Explanation (required when rejecting) -->
+              <div v-if="form.decision === 'rejected'">
+                <InputWithValidation
+                  v-model="form.explanation"
+                  label="Explanation"
+                  placeholder="Why is this application rejected?"
+                  :error="form.errors.explanation ?? ''"
+                />
+                <p
+                  v-if="!form.errors.explanation"
+                  class="mt-2 text-sm text-gray-500"
+                >
+                  Write a few sentences about the decision, so recruiters in the future might learn from past decisions.
+                </p>
+              </div>
+
+              <div class="flex justify-end">
+                <Button
+                  :is-inertia-button="false"
+                  button-size="medium"
+                  @click="submit"
+                >
+                  Submit review
+                </Button>
+              </div>
+            </form>
           </div>
-          <div
-            v-show="application.status === 'open'"
-            class="mt-5 sm:mt-6"
-          >
-            <span class="flex w-full rounded-md shadow-xs">
-              <button
-                type="button"
-                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-indigo-600 text-base leading-6 font-medium text-white shadow-xs hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                @click="submit"
-              >
-                Submit review
-              </button>
-            </span>
-          </div>
-        </div>
+        </CardWithHeader>
       </li>
     </ul>
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { router, useForm } from "@inertiajs/vue3";
+import { IdentificationIcon } from '@heroicons/vue/24/outline';
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import Button from "@/Shared/Layout/Button.vue";
+import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
 import TabComponent from "./TabComponent.vue";
-import {IdentificationIcon} from '@heroicons/vue/24/outline'
 import UpdateCharacterComponent from "./UpdateCharacterComponent.vue";
-import {router} from "@inertiajs/vue3";
+import { reviewApplication } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/ApplicationsController";
+import ImpersonateRecruit from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/ImpersonateRecruit";
 
-export default {
-    name: "Application",
-    components: {
-        UpdateCharacterComponent,
-        TabComponent,
-        HeaderButton,
-        PageHeader,
-        IdentificationIcon
+const props = defineProps({
+    recruit: {
+        required: true,
+        type: Object
     },
-    props: {
-        recruit: {
-            required: true,
-            type: Object
-        },
-        application: {
-            required: true,
-            type: Object
-        },
-        watchlist: {
-            required: true,
-            type: Object
-        },
-        activeSidebarElement: {
-            required: true,
-            type: String
-        }
+    application: {
+        required: true,
+        type: Object
     },
-    data() {
-        return {
-            pageTitle: 'Application',
-            form: {
-                decision: null,
-                explanation: null
-            }
-        }
+    watchlist: {
+        required: true,
+        type: Object
     },
-    computed: {
-        characters() {
-            return _.map(this.recruit.characters, (character) => character.name ).join(', ')
-        },
-        canImpersonate() {
-            return this.recruit.id && this.application.status === 'open'
-        }
-    },
-    methods: {
-        impersonate() {
-            return router.visit(route('impersonate.recruit', this.application.id))
-        },
-        submit() {
-            return router.post(route('review.application', this.application.id), this.form);
-        }
+    activeSidebarElement: {
+        required: true,
+        type: String
     }
-}
+});
+
+const form = useForm({
+    decision: null,
+    explanation: ''
+});
+
+const isOpen = computed(() => props.application.status === 'open');
+
+const canImpersonate = computed(() => props.recruit.id && isOpen.value);
+
+const characters = computed(() => _.map(props.recruit.characters, (character) => character.name).join(', '));
+
+const impersonate = () => router.visit(ImpersonateRecruit.url(props.application.id));
+
+const submit = () => form.post(reviewApplication.url(props.application.id));
 </script>
 
 <style scoped>

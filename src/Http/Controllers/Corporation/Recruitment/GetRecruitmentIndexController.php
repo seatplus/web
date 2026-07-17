@@ -31,8 +31,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
+use Inertia\ScrollProp;
+use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\ApplicationRessource;
 
 class GetRecruitmentIndexController extends Controller
 {
@@ -44,11 +47,74 @@ class GetRecruitmentIndexController extends Controller
     {
         $can_manage_recruitment = auth()->user()->can(self::MANAGEPERMISSION);
 
+        $enlistments = $this->getEnlistments();
+
         return Inertia::render('Corporation/Recruitment/RecruitmentIndex', [
             'canManageRecruitment' => $can_manage_recruitment,
-            'enlistments' => $this->getEnlistments(),
+            'enlistments' => $enlistments,
             'activeSidebarElement' => 'corporation.recruitment',
+            // One infinite-scroll prop per (corporation × review step) for open applications
+            // plus one per corporation for closed applications. Each paginator uses its own
+            // pageName so their scroll state never collides; the frontend <InfiniteScroll>
+            // reads it via the matching `open_{corporation}_{step}` / `closed_{corporation}`
+            // key. Scroll props are deferred, so only the table the recruiter is looking at
+            // actually resolves — replacing the per-list axios endpoints.
+            ...$this->applicationScrollProps($enlistments),
         ]);
+    }
+
+    /**
+     * Build the per-enlistment infinite-scroll props for open (per review step) and
+     * closed applications.
+     *
+     * @return array<string, ScrollProp>
+     */
+    private function applicationScrollProps(Collection $enlistments): array
+    {
+        $props = [];
+
+        foreach ($enlistments as $enlistment) {
+            $corporationId = $enlistment->corporation_id;
+
+            foreach (range(0, max($enlistment->steps_count - 1, 0)) as $decisionCount) {
+                $key = "open_{$corporationId}_{$decisionCount}";
+
+                $props[$key] = Inertia::scroll(
+                    fn () => ApplicationRessource::collection(
+                        $this->openApplicationsQuery($corporationId, $decisionCount)->paginate(pageName: $key)
+                    ),
+                );
+            }
+
+            $closedKey = "closed_{$corporationId}";
+
+            $props[$closedKey] = Inertia::scroll(
+                fn () => ApplicationRessource::collection(
+                    $this->closedApplicationsQuery($corporationId)->paginate(pageName: $closedKey)
+                ),
+            );
+        }
+
+        return $props;
+    }
+
+    private function openApplicationsQuery(int $corporationId, int $decisionCount): Builder
+    {
+        return Application::query()
+            ->with('logEntries')
+            ->whereHas('logEntries', function (Builder $query) {
+                $query->where('type', 'decision');
+            }, '=', $decisionCount)
+            ->ofCorporation($corporationId)
+            ->whereStatus('open');
+    }
+
+    private function closedApplicationsQuery(int $corporationId): Builder
+    {
+        return Application::query()
+            ->ofCorporation($corporationId)
+            ->latest('updated_at')
+            ->where('status', '<>', 'open');
     }
 
     private function getEnlistments(): Collection

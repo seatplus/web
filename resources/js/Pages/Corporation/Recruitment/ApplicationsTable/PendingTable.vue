@@ -1,23 +1,33 @@
 <template>
-  <InfiniteLoadingHelper
-    :key="routeParams"
-    v-slot="{results}"
-    route-name="open.corporation.applications"
-    :params="routeParams"
+  <!-- scroll-region: lets Inertia track/restore this custom scroll container's
+       position so <InfiniteScroll> merges the next page without jumping to top. -->
+  <div
+    class="relative max-h-96 overflow-y-auto"
+    scroll-region=""
   >
-    <ApplicationsTable :applications="filterPendings(results)" />
-  </InfiniteLoadingHelper>
+    <InfiniteScroll
+      :key="scrollKey"
+      :data="scrollKey"
+      :items-element="`#${bodyId}`"
+      preserve-url
+    >
+      <ApplicationsTable
+        :applications="applications"
+        :body-id="bodyId"
+      />
+    </InfiniteScroll>
+  </div>
 </template>
 
 <script>
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
 import ApplicationsTable from "@/Pages/Corporation/Recruitment/ApplicationsTable/ApplicationsTable.vue";
 
 export default {
     name: "PendingTable",
     components: {
         ApplicationsTable,
-         InfiniteLoadingHelper,
+        InfiniteScroll,
     },
     props: {
         stepCount: {
@@ -30,16 +40,16 @@ export default {
         }
     },
     computed: {
-        routeParams() {
-            return {
-                corporation_id: this.corporationId,
-                decision_count: this.stepCount
-            }
-        }
-    },
-    methods: {
-        filterPendings(pendings) {
-            return _.filter(pendings, {decision_count: this.stepCount})
+        // Open applications are delivered as a page scroll prop keyed per corporation +
+        // review step (GetRecruitmentIndexController), consumed via <InfiniteScroll :data>.
+        scrollKey() {
+            return `open_${this.corporationId}_${this.stepCount}`
+        },
+        bodyId() {
+            return `open-body-${this.corporationId}-${this.stepCount}`
+        },
+        applications() {
+            return this.$page.props[this.scrollKey]?.data ?? []
         }
     }
 }

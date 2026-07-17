@@ -1,9 +1,12 @@
 <template>
-  <StickyHeaderTable :header-titles="headerTitles">
+  <StickyHeaderTable
+    :header-titles="headerTitles"
+    :body-id="bodyId"
+  >
     <template #default="{ countColumns, columns }">
       <StickyHeaderTableRow
         v-for="applicant in applications"
-        :key="applicant"
+        :key="applicant.application_id"
         :number-columns="countColumns"
       >
         <StickyHeaderCell
@@ -26,7 +29,7 @@
           <div class="flex gap-x-2 flex-wrap">
             <CharacterComplianceElement
               v-for="character in applicant.characters"
-              :key="character"
+              :key="character.character_id"
               :character="character"
             />
           </div>
@@ -40,13 +43,13 @@
             <div class="flex justify-end">
               <Button
                 button-size="xs"
-                :href="route('get.application', applicant.application_id)"
+                :href="getApplication.url(applicant.application_id)"
               >
                 Review
               </Button>
             </div>
           </slot>
-        </stickyheadercell>
+        </StickyHeaderCell>
       </StickyHeaderTableRow>
     </template>
   </StickyHeaderTable>
@@ -59,6 +62,7 @@ import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import CharacterComplianceElement from "@/Pages/Corporation/MemberCompliance/CharacterComplianceElement.vue";
 import Button from "@/Shared/Layout/Button.vue";
+import { getApplication } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/ApplicationsController";
 
 let headerTitles = [
     {title: 'Main Character', columnSpan: 3},
@@ -75,11 +79,18 @@ export default {
         applications: {
             required: true,
             type: Array
+        },
+        // Optional id for the row <ul> so an ancestor <InfiniteScroll items-element> can target it.
+        bodyId: {
+            required: false,
+            type: String,
+            default: null
         }
     },
     setup() {
         return {
-            headerTitles
+            headerTitles,
+            getApplication
         }
     }
 }

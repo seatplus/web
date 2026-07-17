@@ -31,6 +31,8 @@ import {computed, ref, watchEffect} from "vue";
 import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import {DialogTitle} from "@headlessui/vue";
+import { getJson } from "@/Functions/http";
+import { getActivityLog } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/ApplicationsController";
 
 
 export default {
@@ -51,9 +53,10 @@ export default {
 
         watchEffect(() => {
             if(open.value && !isLoaded.value) {
-                axios.get(route('get.activity.log', props.applicationId))
-                    .then(result => application.value = result.data)
-                    .catch(error => console.log(error))
+                // Non-Inertia JSON endpoint: native fetch via http.js (drops axios) with a
+                // Wayfinder-built URL (drops Ziggy route()).
+                getJson(getActivityLog.url(props.applicationId))
+                    .then(result => application.value = result)
             }
         })
 
