@@ -12,13 +12,12 @@
 
     <div class="mt-3 flex flex-wrap gap-2">
       <template v-if="entities.length">
-        <span
+        <EntityChip
           v-for="entity in entities"
           :key="`${entity.entity_type}-${entity.id}`"
-          class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700"
-        >
-          {{ entity.name ?? entity.id }}
-        </span>
+          :entity="entity"
+          chip-class="bg-indigo-50 text-indigo-700"
+        />
       </template>
       <span
         v-else
@@ -34,18 +33,18 @@
       class="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3"
     >
       <span class="text-xs font-medium text-gray-500">{{ excludedLabel }}</span>
-      <span
+      <EntityChip
         v-for="entity in excluded"
         :key="`ex-${entity.entity_type}-${entity.id}`"
-        class="inline-flex items-center rounded-md bg-rose-50 px-2 py-1 text-xs font-medium text-rose-700"
-      >
-        {{ entity.name ?? entity.id }}
-      </span>
+        :entity="entity"
+        chip-class="bg-rose-50 text-rose-700"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
+import EntityChip from "./EntityChip.vue";
 import { useTranslations } from "@/composables/useTranslations";
 
 defineProps({

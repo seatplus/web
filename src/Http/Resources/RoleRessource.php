@@ -63,7 +63,7 @@ class RoleRessource extends JsonResource
             'type' => $this->type->value,
             'type_label' => $meta['label'],
             'type_description' => $meta['description'],
-            'members' => $this->users->count(),
+            'members' => $this->users()->count(),
             'my_status' => $myStatus,
             'can_edit' => $canEdit,
             // Fixed: delegate to the service for ALL moderated types (manual/on-request/opt-in),

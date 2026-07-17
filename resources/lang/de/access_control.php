@@ -6,6 +6,12 @@ return [
     'group' => 'Gruppe',
     'groups' => 'Gruppen',
     'members_count' => '{0} Keine Mitglieder|{1} :count Mitglied|[2,*] :count Mitglieder',
+    'moderate' => [
+        'no_applications' => 'Keine ausstehenden Anträge.',
+        'no_members' => 'Noch keine Mitglieder.',
+        'no_moderators' => 'Noch keine Moderatoren.',
+        'search_users' => 'Nach Charaktername suchen…',
+    ],
     'delete_confirm' => 'Gruppe ":name" endgültig löschen? Dies kann nicht rückgängig gemacht werden.',
 
     'join_method' => [

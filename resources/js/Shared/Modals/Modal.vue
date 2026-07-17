@@ -13,7 +13,15 @@
         v-if="open"
         class="fixed bottom-0 z-10 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center"
       >
-        <div class="fixed inset-0 transition-opacity">
+        <!--
+          -z-10 keeps the backdrop below the panel. The panel used to rely on the `transform`
+          utility for its stacking context, but Tailwind v4 dropped the standalone `transform`
+          class, so the panel became a non-positioned in-flow box and this fixed-position backdrop
+          painted on top of it. Pushing the backdrop to a negative z-index (within this modal's own
+          z-10 stacking context) restores backdrop-behind-panel without depending on the panel's
+          own classes.
+        -->
+        <div class="fixed inset-0 transition-opacity -z-10">
           <div
             class="absolute inset-0 bg-gray-500 opacity-75"
             @click="toggle"

@@ -1,46 +1,61 @@
 <?php
 
-/*
- * MIT License
- *
- * Copyright (c) 2019, 2020, 2021 Felix Huber
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+declare(strict_types=1);
 
 namespace Seatplus\Web\Http\Controllers\AccessControl;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Inertia\Inertia;
+use Inertia\Response;
+use Seatplus\Auth\Enums\RoleMembershipStatus;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Roles\BaseRoleService;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Http\Resources\RoleMemberResource;
+use Seatplus\Web\Support\AccessControl\RoleTypeMetadata;
+use Seatplus\Web\Support\Translations;
 
 class ManageMembersController extends Controller
 {
-    public function __invoke(int $role_id)
+    public function __invoke(int $role_id): Response
     {
-        $role = Role::find($role_id);
+        $role = Role::findOrFail($role_id);
 
-        abort_unless((new BaseRoleService)->for($role)->canModerate(auth()->user()), 403);
+        $user = auth()->user();
+
+        // Moderators are managed by admins only; a plain moderator manages members/applications.
+        $canManageModerators = $user->can('superuser') || $user->can('administrate access control groups');
+        $canModerate = (new BaseRoleService)->for($role)->canModerate($user);
+
+        // Admins (superuser / global ACL admin) and per-role moderators may open the manage page.
+        abort_unless($canManageModerators || $canModerate, 403);
+
+        $memberships = $role->roleMemberships()
+            ->where('entity_type', User::class)
+            ->with(['entity' => fn (MorphTo $morph) => $morph->morphWith([User::class => ['mainCharacter', 'characters']])])
+            ->get();
 
         return Inertia::render('AccessControl/ModerateMembers', [
-            'role' => $role,
+            'role' => [
+                'id' => $role->id,
+                'name' => $role->name,
+                'type' => $role->type->value,
+                'type_label' => RoleTypeMetadata::for($role->type)['label'],
+                'capabilities' => RoleTypeMetadata::for($role->type),
+            ],
+            'members' => RoleMemberResource::collection(
+                $memberships->where('status', RoleMembershipStatus::ACTIVE->value)
+            )->resolve(),
+            'applicants' => RoleMemberResource::collection(
+                $memberships->where('status', RoleMembershipStatus::PENDING->value)
+            )->resolve(),
+            'moderators' => RoleMemberResource::collection(
+                $memberships->where('can_moderate', true)
+            )->resolve(),
+            'canManageModerators' => $canManageModerators,
+            'activeSidebarElement' => 'acl.groups',
+            'pageTranslations' => Translations::gather(['web::access_control']),
         ]);
     }
 }

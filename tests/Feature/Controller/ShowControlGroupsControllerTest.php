@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Queue;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Enums\RoleType;
@@ -93,4 +94,29 @@ it('segments roles into my groups and available-to-join', function () {
             ->where('myGroups.0.name', 'mine')
             ->where('availableGroups.0.name', 'available')
             ->where('availableGroups.0.can_join', true));
+});
+
+it('renders the index under strict mode without lazy-loading violations', function () {
+    assignPermissionToTestUser(['view access control', 'administrate access control groups']);
+
+    // A real membership so RoleRessource runs against an actual row (users count, type meta, flags).
+    $role = Role::findById(Role::create(['name' => 'Ops'])->id);
+    $role->update(['type' => RoleType::MANUAL]);
+    RoleMembership::create([
+        'role_id' => $role->id,
+        'entity_type' => User::class,
+        'entity_id' => test()->test_user->getKey(),
+        'status' => 'active',
+    ]);
+
+    // The dev app disables lazy loading; enforce it here so the index's eager loading is verified.
+    Model::preventLazyLoading(true);
+
+    try {
+        test()->actingAs(test()->test_user)
+            ->get(route('acl.groups'))
+            ->assertOk();
+    } finally {
+        Model::preventLazyLoading(false);
+    }
 });

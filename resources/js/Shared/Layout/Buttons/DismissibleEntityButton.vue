@@ -6,7 +6,7 @@
       tailwind_class="h-5 w-5 rounded-full"
     />
     <span class="flex flex-col leading-tight">
-      <span class="max-w-[12rem] truncate">{{ entity.name ?? entity.id }}</span>
+      <span class="max-w-[12rem] truncate">{{ label }}</span>
       <span
         v-if="subText"
         class="max-w-[12rem] truncate text-[10px] text-indigo-400"
@@ -17,7 +17,7 @@
       class="ml-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:bg-indigo-500 focus:text-white focus:outline-hidden"
       @click="$emit('remove', entity.id)"
     >
-      <span class="sr-only">Remove {{ entity.name ?? entity.id }}</span>
+      <span class="sr-only">Remove {{ label }}</span>
       <svg
         class="h-2 w-2"
         stroke="currentColor"
@@ -36,7 +36,9 @@
 
 <script setup>
 import EveImage from "@/Shared/EveImage.vue";
-import { computed } from "vue";
+import { computed, ref, watchEffect } from "vue";
+import { getJson } from "@/Functions/http";
+import { getEntityFromId } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
 const props = defineProps({
     // { id, name, category, ... } — a search result or a loaded selection.
@@ -56,6 +58,22 @@ const imageObject = computed(() => {
 
     return { ...props.entity, [`${category}_id`]: props.entity.id };
 });
+
+// A loaded selection can reference an entity the app has never persisted (added by id via ESI
+// search), so it carries no name. Resolve it lazily by id through the cached resolve.id endpoint —
+// the portrait already renders from the id alone. Mirrors EntityChip.
+const resolvedName = ref(null);
+
+watchEffect(async () => {
+    if (props.entity?.name || ! props.entity?.id) {
+        return;
+    }
+
+    const data = await getJson(getEntityFromId.url(props.entity.id));
+    resolvedName.value = data?.name ?? null;
+});
+
+const label = computed(() => props.entity?.name ?? resolvedName.value ?? props.entity?.id);
 
 // Corp/alliance context, shown only when the entity carries it.
 const subText = computed(() => {
