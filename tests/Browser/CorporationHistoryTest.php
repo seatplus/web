@@ -82,22 +82,20 @@ if (! function_exists('realCharacterId')) {
 
 if (! function_exists('switchRecruitmentTab')) {
     /**
-     * Activate a TabComponent tab on either viewport. The desktop layout (.hidden sm:block) is a row
-     * of clickable <div>s; the mobile layout (.sm:hidden) is a <select id="tabs"> bound to
-     * `active_element` via v-model. The mobile options carry no explicit :value, so each option's
-     * value is its label text — set it and dispatch a bubbling change event so Vue's v-model updates.
+     * Activate a TabComponent tab on either viewport by driving the <select id="tabs"> that is bound
+     * to `active_element` via v-model. Both layouts share that state: the mobile layout (.sm:hidden)
+     * shows the select and the desktop layout (.hidden sm:block) shows a row of <div>s, but the
+     * select is always mounted (merely display:none on desktop), so setting its value + dispatching a
+     * bubbling change event updates active_element — and the visible desktop tab highlights — on
+     * either viewport. This is deterministic; a text-click on the desktop tab instead resolves to the
+     * (DOM-earlier) hidden <option> of the same label and never becomes actionable. The options carry
+     * no explicit :value, so each option's value is its label text.
      */
     function switchRecruitmentTab($page, string $device, string $label): void
     {
-        if ($device === 'iphone') {
-            $value = json_encode($label);
+        $value = json_encode($label);
 
-            $page->script("const select = document.querySelector('#tabs'); select.value = {$value}; select.dispatchEvent(new Event('change', { bubbles: true }));");
-
-            return;
-        }
-
-        $page->click($label);
+        $page->script("const select = document.querySelector('#tabs'); select.value = {$value}; select.dispatchEvent(new Event('change', { bubbles: true }));");
     }
 }
 
