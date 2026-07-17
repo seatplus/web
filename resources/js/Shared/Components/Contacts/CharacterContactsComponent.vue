@@ -1,6 +1,4 @@
 <template>
-  <!-- This example requires Tailwind CSS v2.0+ -->
-
   <CardWithHeader>
     <template #header>
       <div class="flex">
@@ -22,38 +20,27 @@
       </div>
     </template>
     <div class="relative max-h-96 overflow-y-auto">
-      <div class="hidden sm:grid sm:grid-cols-6 sm:gap-x-0 sm:gap-y-0.5 grid-flow-row z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-500">
-        <div class="px-6 sm:px-3 py-1 col-span-2">
-          Contact
-        </div>
-        <div class="px-6 sm:px-3 py-1">
-          Labels
-        </div>
-        <div class="px-6 sm:px-3 py-1">
-          Standing
-        </div>
-        <div class="px-6 sm:px-3 py-1">
-          Corporation standing
-        </div>
-        <div class="px-6 sm:px-3 py-1">
-          Alliance standing
-        </div>
-      </div>
-      <ul class="relative z-0 divide-y divide-gray-200">
-        <CompleteLoadingHelper
-          route-name="character.contacts.detail"
-          :params="{character_id: character.character_id}"
-          :form-data="{corporation_id: corporation_id, alliance_id: alliance_id}"
-          @results="(result) => contacts_raw = result"
-        >
+      <p
+        v-if="filteredContacts.length === 0"
+        class="py-12 text-center text-sm text-gray-500"
+      >
+        No contacts
+      </p>
+
+      <StickyHeaderTable
+        v-else
+        :header-titles="headerTitles"
+      >
+        <template #default="{ countColumns, columns }">
           <CharacterContactsRowComponent
-            v-for="(entry, index) in contacts"
+            v-for="entry in filteredContacts"
             :key="entry.contact_id"
-            :even="index%2"
             :entry="entry"
+            :columns="columns"
+            :number-columns="countColumns"
           />
-        </CompleteLoadingHelper>
-      </ul>
+        </template>
+      </StickyHeaderTable>
     </div>
   </CardWithHeader>
 </template>
@@ -62,54 +49,58 @@
 
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
-import CompleteLoadingHelper from "../../Layout/CompleteLoadingHelper.vue";
 import CharacterContactsRowComponent from "./CharacterContactsRowComponent.vue";
-import {computed, ref} from "vue";
+import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
 import SimpleInlineList from "../../Layout/SimpleInlineList.vue";
+import { computed, ref } from "vue";
 
 export default {
     name: "CharacterContactsComponent",
     components: {
         SimpleInlineList,
         CharacterContactsRowComponent,
-        CompleteLoadingHelper,
-        CardWithHeader, EntityBlock
+        StickyHeaderTable,
+        CardWithHeader,
+        EntityBlock,
     },
     props: {
         character: {
             required: true,
             type: Object
         },
-        corporation_id: {
-            required: true,
-            type: Number
-        },
-        alliance_id: {
-            required: false,
-            type: Number
+        contacts: {
+            type: Array,
+            default: () => []
         },
     },
-    setup() {
+    setup(props) {
 
-        const contacts_raw = ref([])
         const selected_filter = ref('')
         const options = [
             {id: 'all', title: 'All contacts'},
             {id: 'standing', title: 'Only With Standing Offset'},
         ]
 
+        const headerTitles = [
+            {title: 'Contact', columnSpan: 2},
+            {title: 'Labels', columnSpan: 1},
+            {title: 'Standing', columnSpan: 1},
+            {title: 'Corporation standing', columnSpan: 1},
+            {title: 'Alliance standing', columnSpan: 1},
+        ]
+
         const diff = (a,b) => a > b ? a - b : b - a
 
-        const contacts = computed(() => {
+        const filteredContacts = computed(() => {
 
-            let unsortedContacts = contacts_raw.value
+            let unsortedContacts = props.contacts
 
             if(selected_filter.value === 'wofaction') {
-                unsortedContacts = _.filter(contacts_raw.value, {contact_type: 'faction'})
+                unsortedContacts = _.filter(props.contacts, {contact_type: 'faction'})
             }
 
             if(selected_filter.value === 'standing') {
-                unsortedContacts =  _.filter(contacts_raw.value, (contact) => {
+                unsortedContacts =  _.filter(props.contacts, (contact) => {
                     if(_.isNil(contact.corporation_standing) && _.isNil(contact.alliance_standing)) {
                         return false
                     }
@@ -135,10 +126,10 @@ export default {
         })
 
         return {
-            contacts,
+            filteredContacts,
             options,
             selected_filter,
-            contacts_raw
+            headerTitles,
         }
     }
 }
