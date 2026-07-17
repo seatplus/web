@@ -169,10 +169,14 @@ it('renders a contacts card for every character the user owns', function (string
     $page->waitForText($secondCharacter->name);
 
     // …and each card's fetch-swap load resolves its own contact row. Contact names resolve lazily
-    // (EntityByIdBlock's IntersectionObserver, threshold 1 — only when the block is fully visible),
-    // so on the short iPhone viewport the below-the-fold card would never resolve. Nudge the page to
-    // the bottom to bring the lower card fully into view; once resolved the name stays in the DOM.
-    $page->script('window.scrollTo(0, document.body.scrollHeight)');
+    // (EntityByIdBlock's IntersectionObserver, threshold 1 — only fires when the block is *fully*
+    // visible), so on the short iPhone viewport a below-the-fold card never resolves. Scroll each
+    // card's own scroll container fully into view, settling between, so every block passes through
+    // full visibility; once resolved the name stays in the DOM regardless of the final scroll pos.
+    foreach (['0', '1'] as $cardIndex) {
+        $page->script("(document.querySelectorAll('.max-h-96.overflow-y-auto')[{$cardIndex}] ?? document.body).scrollIntoView({ block: 'center' })");
+        $page->waitForEvent('networkidle');
+    }
     $page->waitForText($mainContact->name);
     $page->waitForText($secondContact->name);
 
