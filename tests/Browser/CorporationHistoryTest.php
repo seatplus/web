@@ -119,7 +119,7 @@ it('renders a recruit corporation history through the recruitment review page', 
     // CharacterUser (Event::fakeFor avoids the factory auto-attaching an unrelated character).
     $recruit = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
     $recruitOwner = Event::fakeFor(fn () => User::factory()->create());
-    CharacterUser::create([
+    CharacterUser::factory()->create([
         'user_id' => $recruitOwner->id,
         'character_id' => $recruit->character_id,
     ]);
