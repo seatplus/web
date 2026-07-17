@@ -27,14 +27,12 @@
       </div>
     </div>
     <template #button>
-      <button
-        :disabled="form.processing"
-        type="submit"
-        class="bg-indigo-600 border border-transparent rounded-md shadow-xs py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      <Button
+        :is-inertia-button="false"
         @click="submit"
       >
         Save
-      </button>
+      </Button>
     </template>
   </TwoColumnCardWithSubmitAction>
 </template>
@@ -44,11 +42,13 @@ import TwoColumnCardWithSubmitAction from "@/Shared/Layout/Forms/TwoColumnCardWi
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import {ref, watch} from "vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
+import Button from "@/Shared/Layout/Button.vue";
 import { useForm } from "@inertiajs/vue3";
+import { updateWatchlist } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/EnlistmentsController";
 
 export default {
     name: "ItemsWatchlist",
-    components: {DismissibleButton, Autosuggest, TwoColumnCardWithSubmitAction},
+    components: {Button, DismissibleButton, Autosuggest, TwoColumnCardWithSubmitAction},
     props: {
         items: {
             required: true,
@@ -69,7 +69,7 @@ export default {
 
         const select = (selection) => form.items.push(selection)
         const unselect = (id) => form.items = _.filter(form.items, (item) => item.id !== id)
-        const submit = () => form.post(route('update.watchlist', props.corporationId))
+        const submit = () => form.post(updateWatchlist.url(props.corporationId))
 
         watch(form.items, () => uniqueId.value++, {deep: true})
 
