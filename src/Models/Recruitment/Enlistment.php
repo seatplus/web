@@ -26,7 +26,13 @@
 
 namespace Seatplus\Web\Models\Recruitment;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -36,6 +42,34 @@ use Seatplus\Eveapi\Models\Universe\Type;
 
 class Enlistment extends Enlistments
 {
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class, 'corporation_id', 'corporation_id');
+    }
+
+    /**
+     * Eager-load the given user's open applications onto each enlistment. Replaces the
+     * former `list.existing.applications` JSON endpoint the dashboard used to poll per card.
+     */
+    #[Scope]
+    protected function withOpenApplicationsOf(Builder $query, User $user): void
+    {
+        $query->with(['applications' => function (HasMany $query) use ($user) {
+            $query->where('status', 'open')
+                ->whereHasMorph(
+                    'applicationable',
+                    [User::class, CharacterInfo::class],
+                    function (Builder $query, string $type) use ($user) {
+                        match ($type) {
+                            User::class => $query->whereKey($user->getAuthIdentifier()),
+                            CharacterInfo::class => $query->whereIn('character_id', $user->characters()->pluck('character_infos.character_id')),
+                            default => null,
+                        };
+                    }
+                );
+        }]);
+    }
+
     public function systems(): MorphToMany
     {
         return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');

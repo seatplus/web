@@ -26,6 +26,7 @@ class OnboardingController extends Controller
             'mainCharacterId' => $user->main_character_id,
             'enlistments' => Enlistment::query()
                 ->with(['corporation' => ['alliance']])
+                ->withOpenApplicationsOf(auth()->user())
                 ->get(),
         ]);
     }

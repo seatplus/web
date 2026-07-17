@@ -31,7 +31,7 @@
         <CharacterApplication
           v-if="enlistment.type === 'character'"
           :enlistment="enlistment"
-          :application-results="applicationResults.results.value"
+          :application-results="applications"
         />
         <span v-else>
           This corporation accepts recruits on a user level. This means once you enlist, every character within your user account must comply with a possible set of scopes at all time.
@@ -84,7 +84,6 @@ import {computed, ref} from "vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
 
@@ -99,15 +98,15 @@ export default {
     },
     setup(props) {
 
-        const applicationResults = useLoadCompleteResource('list.existing.applications', { corporation_id: props.enlistment.corporation_id })
+        const applications = computed(() => props.enlistment.applications ?? [])
         const openModal = ref(false)
 
-        const hasApplications = computed(() => !_.isEmpty(applicationResults.results.value))
+        const hasApplications = computed(() => !_.isEmpty(applications.value))
 
         return {
             hasApplications,
             openModal,
-            applicationResults
+            applications
         }
     }
 }

@@ -22,7 +22,13 @@ test('redirects to home if authorized', function () {
     $response = test()->actingAs(test()->test_user)
         ->get('/home');
 
-    $response->assertInertia(fn (Assert $page) => $page->component('Dashboard/Index'));
+    // openEnlistments is deferred: absent from the initial render, resolved on partial reload.
+    $response->assertInertia(
+        fn (Assert $page) => $page
+            ->component('Dashboard/Index')
+            ->missing('openEnlistments')
+            ->loadDeferredProps(fn (Assert $reload) => $reload->has('openEnlistments'))
+    );
 
     test()->assertAuthenticatedAs(test()->test_user);
     expect(auth()->check())->toBeTrue();

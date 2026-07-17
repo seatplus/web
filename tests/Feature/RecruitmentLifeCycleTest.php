@@ -76,18 +76,19 @@ test('user with permission and affiliations can delete enlistment', function () 
 test('secondary user can see enlistment', function () {
     createEnlistment();
 
-    $response = test()->actingAs(test()->secondary_user)
-        ->get(route('list.open.enlistments'))
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has(
-                    'data.0',
-                    fn ($json) => $json
-                        ->where('corporation_id', test()->test_character->corporation->corporation_id)
-                        ->etc()
+    // The dashboard exposes open enlistments as a deferred prop (openEnlistments): it is
+    // absent from the initial render and resolved via a partial reload.
+    test()->actingAs(test()->secondary_user)
+        ->get(route('home'))
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Dashboard/Index')
+                ->missing('openEnlistments')
+                ->loadDeferredProps(
+                    fn (Assert $reload) => $reload
+                        ->has('openEnlistments', 1)
+                        ->where('openEnlistments.0.corporation_id', test()->test_character->corporation->corporation_id)
                 )
-                ->etc()
         );
 });
 
@@ -118,13 +119,18 @@ test('secondary user can apply as user', function () {
 
     expect(test()->secondary_user->refresh()->application)->toBeNull();
 
-    // first check that existing applications does not exist
+    // The user's own open applications ride along on each deferred openEnlistments entry;
+    // before applying, the enlistment carries no application.
     test()->actingAs(test()->secondary_user)
-        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) // 'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 0)
-                ->etc()
+        ->get(route('home'))
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Dashboard/Index')
+                ->loadDeferredProps(
+                    fn (Assert $reload) => $reload
+                        ->has('openEnlistments', 1)
+                        ->has('openEnlistments.0.applications', 0)
+                )
         );
 
     applySecondary();
@@ -132,20 +138,19 @@ test('secondary user can apply as user', function () {
     test()->assertNotNull(test()->secondary_user->refresh()->application);
     expect(test()->secondary_user->refresh()->application instanceof Application)->toBeTrue();
 
-    // then check that existing applications does exist
+    // after applying, the application is embedded on the enlistment
     test()->actingAs(test()->secondary_user)
-        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) // 'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has(
-                    'data.0',
-                    fn ($json) => $json
-                        ->where('applicationable_id', test()->secondary_user->id)
-                        ->where('corporation_id', test()->test_character->corporation->corporation_id)
-                        ->etc()
+        ->get(route('home'))
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Dashboard/Index')
+                ->loadDeferredProps(
+                    fn (Assert $reload) => $reload
+                        ->has('openEnlistments', 1)
+                        ->has('openEnlistments.0.applications', 1)
+                        ->where('openEnlistments.0.applications.0.applicationable_id', test()->secondary_user->id)
+                        ->where('openEnlistments.0.applications.0.corporation_id', test()->test_character->corporation->corporation_id)
                 )
-                ->etc()
         );
 
     // pull application
