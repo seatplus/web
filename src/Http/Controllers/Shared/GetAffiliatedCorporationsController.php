@@ -46,7 +46,7 @@ class GetAffiliatedCorporationsController extends Controller
             ->with('alliance');
 
         return CorporationInfoRessource::collection(
-            $query->paginate()
+            $query->get()
         );
     }
 }
