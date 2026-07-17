@@ -25,19 +25,9 @@
  */
 
 use Illuminate\Support\Facades\Route;
-use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Web\Http\Controllers\Character\SkillsController;
-use Seatplus\Web\Http\Middleware\CheckAuthorizationWithExtendedScope;
 
 Route::prefix('skills')
     ->group(function () {
         Route::get('', [SkillsController::class, 'index'])->name('character.skills');
-
-        $skillPermission = CheckAuthorizationWithExtendedScope::class.':'.config('eveapi.permissions.'.Skill::class);
-
-        Route::middleware($skillPermission)
-            ->group(function () {
-                Route::get('/{character_id}/skills', [SkillsController::class, 'skills'])->name('get.character.skills');
-                Route::get('/{character_id}/skillqueue', [SkillsController::class, 'skillQueue'])->name('get.character.skill.queue');
-            });
     });
