@@ -124,7 +124,9 @@ class HandleInertiaRequests extends Middleware
             return [];
         }
 
-        $search = $request->input('search') ?: null;
+        // `search_aff` (not `search`) so the picker's query never collides with a page's own
+        // `search` filter (e.g. the assets page) when this prop reloads via <WhenVisible>.
+        $search = $request->input('search_aff') ?: null;
         $action = app(GetAffiliatedEntitiesAction::class);
 
         if ($request->input('type') === 'corporation') {

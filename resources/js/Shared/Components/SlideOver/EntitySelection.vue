@@ -86,7 +86,9 @@ export default {
                     type: this.type,
                     permission: this.permission,
                     corporationRoles: this.corporationRoles,
-                    search: this.searchParam,
+                    // Namespaced so the picker's search never collides with a page's own `search`
+                    // query filter (e.g. the assets page) during the partial reload.
+                    search_aff: this.searchParam,
                 },
                 preserveUrl: true,
             }
