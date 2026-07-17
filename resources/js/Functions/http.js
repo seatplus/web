@@ -50,12 +50,3 @@ export async function getJson(url, headers) {
 export function post(url, body = {}) {
     return request(url, { method: 'POST', body });
 }
-
-export async function postJson(url, body = {}) {
-    const response = await request(url, { method: 'POST', body });
-    const text = await response.text();
-
-    // An empty body (e.g. a controller returning null) is valid "no content" — return null
-    // instead of letting JSON.parse('') throw "unexpected end of data".
-    return text.length ? JSON.parse(text) : null;
-}

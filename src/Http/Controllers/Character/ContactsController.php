@@ -26,7 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
@@ -34,7 +34,6 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Controllers\Request\ContactsRequest;
 use Seatplus\Web\Http\Resources\ContactResource;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 
@@ -54,38 +53,41 @@ class ContactsController extends Controller
             ->get()
             ->each->append('corporation_id');
 
-        return inertia('Character/Contact/Index', [
+        return Inertia::render('Character/Contact/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
             'characters' => $characters,
+            // Keyed by character_id → the character's own contacts, resolved eagerly per character.
+            // ContactResource reads the corp/alliance standings from the request session, so each
+            // character's collection must be resolved before the next iteration overwrites it.
+            'contacts' => Inertia::defer(fn () => $characters->mapWithKeys(fn (CharacterInfo $character) => [
+                $character->character_id => $this->resolveContacts($character),
+            ])),
         ]);
     }
 
-    public function getContacts(int $character_id, ContactsRequest $request): AnonymousResourceCollection
+    private function resolveContacts(CharacterInfo $character): array
     {
-        $validated = $request->validated();
-
         $affiliation = CharacterAffiliation::query()
-            ->firstWhere('corporation_id', $validated['target_corporation_id']);
+            ->firstWhere('corporation_id', $character->corporation_id);
 
         $contactable_ids = array_filter([
-            $affiliation->corporation_id,
-            $affiliation->alliance_id,
+            $affiliation?->corporation_id,
+            $affiliation?->alliance_id,
         ]);
 
         $corp_alliance_standing = Contact::query()
             ->whereIn('contactable_id', $contactable_ids)
             ->get();
 
-        $request->session()->now('contacts', [
+        request()->session()->now('contacts', [
             'corporation_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type === CorporationInfo::class),
             'alliance_contacts' => $corp_alliance_standing->filter(fn (Contact $contact) => $contact->contactable_type === AllianceInfo::class),
         ]);
 
-        $query = Contact::with(['labels', 'characterAffiliation', 'corporationAffiliation', 'allianceAffiliation', 'factionAffiliation'])
-            ->where('contactable_id', $character_id);
+        $contacts = Contact::with(['labels', 'characterAffiliation', 'corporationAffiliation', 'allianceAffiliation', 'factionAffiliation'])
+            ->where('contactable_id', $character->character_id)
+            ->get();
 
-        return ContactResource::collection(
-            $query->get(),
-        );
+        return ContactResource::collection($contacts)->resolve(request());
     }
 }

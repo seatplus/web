@@ -11,23 +11,28 @@ test('see component', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('character.contacts'));
 
-    $response->assertInertia(fn (Assert $page) => $page->component('Character/Contact/Index'));
+    // The per-character contacts arrive as a deferred prop (contacts): absent from the
+    // initial render, resolved via a follow-up partial reload.
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('Character/Contact/Index')
+        ->has('characters')
+        ->missing('contacts'));
 });
 
 it('has details', function () {
     test()->test_character->contacts()->create(Contact::factory()->make()->toArray());
 
     $contact = test()->test_character->contacts->first();
+    $character_id = test()->test_character->character_id;
 
-    $response = test()->actingAs(test()->test_user)
-        ->post(
-            uri: route('character.contacts.detail', test()->test_character->character_id),
-            data: [
-                'target_corporation_id' => test()->test_character->corporation->corporation_id,
-            ]
-        );
-
-    $response->assertOk();
+    test()->actingAs(test()->test_user)
+        ->get(route('character.contacts', ['character_ids' => [$character_id]]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Character/Contact/Index')
+            ->missing('contacts')
+            ->loadDeferredProps(fn (Assert $reload) => $reload
+                ->has("contacts.{$character_id}", 1)
+                ->where("contacts.{$character_id}.0.contact_id", $contact->contact_id)));
 });
 
 it('has corporation standing', function (string $contact_type, string $corp_contact_level) {
@@ -93,16 +98,17 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
     };
 
     $corp_standing = $getCorpStanding($affiliation);
+    $character_id = $this->test_character->character_id;
 
     test()->actingAs(test()->test_user)
-        ->post(route('character.contacts.detail', test()->test_character->character_id), [
-            'target_corporation_id' => test()->test_character->corporation->corporation_id,
-        ])
-        ->assertJson(
-            fn (AssertableJson $json) => $json->has(1)
-                ->has('data', 1)
+        ->get(route('character.contacts', ['character_ids' => [$character_id]]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Character/Contact/Index')
+            ->missing('contacts')
+            ->loadDeferredProps(fn (Assert $reload) => $reload
+                ->has("contacts.{$character_id}", 1)
                 ->has(
-                    'data.0',
+                    "contacts.{$character_id}.0",
                     fn (AssertableJson $json) =>
                     // Here we have a problem. The $corp_standing is a float, but in the json it is a string.
                     // the json_encode is storing decimal values as string.
@@ -111,8 +117,5 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
                     $json->where('corporation_standing', fn ($standing) => number_format($standing, 2) === number_format($corp_standing, 2))
                         ->where('standing', fn ($standing) => number_format($standing, 2) === number_format(10, 2))
                         ->etc()
-                        ->etc()
-                )
-                ->etc()
-        );
+                )));
 })->with(fn () => collect(['character', 'corporation', 'alliance', 'faction'])->crossJoin(['alliance', 'corporation', 'faction', 'character'])->toArray());
