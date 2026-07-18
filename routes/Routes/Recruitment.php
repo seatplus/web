@@ -29,6 +29,6 @@ Route::middleware(CheckAuthorization::class.':can open or close corporations for
         Route::controller(PostingController::class)->group(function () {
             Route::post('/posting', 'open')->name('recruitment.posting.open');
             Route::delete('/posting/{corporation_id}', 'close')->name('recruitment.posting.close');
-            Route::put('/posting/{corporation_id}/stages', 'updateStages')->name('recruitment.posting.stages');
+            Route::put('/posting/{corporation_id}', 'save')->name('recruitment.posting.save');
         });
     });

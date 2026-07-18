@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\UpdateWatchlistAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
@@ -62,7 +63,11 @@ class PostingController extends Controller
         return back()->with('success', 'Posting closed');
     }
 
-    public function updateStages(Request $request, int $corporation_id): RedirectResponse
+    /**
+     * Persist a posting's configuration in one request: its ordered review stages and its
+     * item/location watchlist.
+     */
+    public function save(Request $request, int $corporation_id, UpdateWatchlistAction $watchlist): RedirectResponse
     {
         $this->authorizeCorporation($corporation_id);
 
@@ -70,6 +75,11 @@ class PostingController extends Controller
             'stages' => ['required', 'array', 'min:1'],
             'stages.*.label' => ['required', 'string', 'max:255'],
             'stages.*.role_id' => ['nullable', 'integer', 'exists:roles,id'],
+            'systems' => ['array'],
+            'regions' => ['array'],
+            'items' => ['array'],
+            'items.*.watchable_id' => ['required'],
+            'items.*.watchable_type' => ['required'],
         ]);
 
         $enlistment = Enlistment::query()->findOrFail($corporation_id);
@@ -85,7 +95,9 @@ class PostingController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Review stages updated');
+        $watchlist->execute($corporation_id, $validated);
+
+        return back()->with('success', 'Posting saved');
     }
 
     private function authorizeCorporation(int $corporationId): void

@@ -14,7 +14,7 @@
     >
       <p class="text-xs text-gray-500">
         Items, assets and contracts matching this watchlist are highlighted while reviewing an
-        applicant (and, later, while observing an employee).
+        applicant (and, later, while observing an employee). Saved together with the review stages.
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -50,36 +50,22 @@
           />
         </div>
       </div>
-
-      <div class="flex justify-end">
-        <button
-          type="button"
-          :disabled="form.processing"
-          class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
-          @click="save"
-        >
-          Save watchlist
-        </button>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useForm } from "@inertiajs/vue3";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 
+// The parent posting card's Inertia form; the watchlist fields are part of it so everything saves
+// together with a single button.
 const props = defineProps({
-  watched: {
+  form: {
     required: true,
     type: Object,
-  },
-  watchlistUrl: {
-    required: true,
-    type: String,
   },
 });
 
@@ -87,25 +73,14 @@ const open = ref(false);
 // Re-key the items autosuggest after each selection so it clears its input.
 const itemsKey = ref(0);
 
-// A single form covers locations (regions/systems) and items; the backend applies them together.
-const form = useForm({
-  systems: props.watched.systems,
-  regions: props.watched.regions,
-  items: props.watched.items,
-});
-
 function addItem(selection) {
-  if (!form.items.some((item) => item.id === selection.id)) {
-    form.items.push(selection);
+  if (!props.form.items.some((item) => item.id === selection.id)) {
+    props.form.items.push(selection);
   }
   itemsKey.value++;
 }
 
 function removeItem(id) {
-  form.items = form.items.filter((item) => item.id !== id);
-}
-
-function save() {
-  form.post(props.watchlistUrl, { preserveScroll: true });
+  props.form.items = props.form.items.filter((item) => item.id !== id);
 }
 </script>

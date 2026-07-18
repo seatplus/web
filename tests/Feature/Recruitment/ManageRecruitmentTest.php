@@ -41,7 +41,7 @@ it('replaces the review stages of a posting', function () {
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
 
     test()->actingAs(test()->test_user)
-        ->put(route('recruitment.posting.stages', $corp->corporation_id), [
+        ->put(route('recruitment.posting.save', $corp->corporation_id), [
             'stages' => [
                 ['label' => 'Screen', 'role_id' => null],
                 ['label' => 'Final', 'role_id' => null],

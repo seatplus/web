@@ -38,7 +38,7 @@
       </p>
 
       <div
-        v-for="(stage, index) in stagesForm.stages"
+        v-for="(stage, index) in form.stages"
         :key="index"
         class="flex items-center gap-2"
       >
@@ -67,7 +67,7 @@
           </option>
         </select>
         <button
-          v-if="stagesForm.stages.length > 1"
+          v-if="form.stages.length > 1"
           type="button"
           class="text-gray-400 hover:text-red-600"
           title="Remove stage"
@@ -83,17 +83,17 @@
       </div>
 
       <p
-        v-if="stagesForm.stages.length === 1"
+        v-if="form.stages.length === 1"
         class="text-xs text-gray-400 pl-7"
       >
         A posting keeps at least one stage.
       </p>
 
       <div
-        v-if="stagesForm.errors.stages"
+        v-if="form.errors.stages"
         class="text-sm text-red-600"
       >
-        {{ stagesForm.errors.stages }}
+        {{ form.errors.stages }}
       </div>
 
       <button
@@ -105,10 +105,7 @@
       </button>
     </div>
 
-    <WatchlistSection
-      :watched="posting.watched"
-      :watchlist-url="posting.watchlist_url"
-    />
+    <WatchlistSection :form="form" />
 
     <div class="flex items-center justify-between pt-2 border-t border-gray-100">
       <button
@@ -121,11 +118,11 @@
       </button>
       <button
         type="button"
-        :disabled="stagesForm.processing"
+        :disabled="form.processing"
         class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
-        @click="saveStages"
+        @click="save"
       >
-        Save stages
+        Save posting
       </button>
     </div>
   </div>
@@ -148,25 +145,29 @@ const props = defineProps({
   },
 });
 
-const stagesForm = useForm({
+// One form covers the whole posting configuration: its review stages and its watchlist.
+const form = useForm({
   stages: props.posting.stages.map((stage) => ({
     label: stage.label,
     role_id: stage.role_id,
   })),
+  systems: props.posting.watched.systems,
+  regions: props.posting.watched.regions,
+  items: props.posting.watched.items,
 });
 
 const closeForm = useForm({});
 
 function addStage() {
-  stagesForm.stages.push({ label: "", role_id: null });
+  form.stages.push({ label: "", role_id: null });
 }
 
 function removeStage(index) {
-  stagesForm.stages.splice(index, 1);
+  form.stages.splice(index, 1);
 }
 
-function saveStages() {
-  stagesForm.put(props.posting.stages_url, {
+function save() {
+  form.put(props.posting.save_url, {
     preserveScroll: true,
   });
 }

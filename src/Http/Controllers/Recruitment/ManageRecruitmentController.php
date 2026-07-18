@@ -58,10 +58,9 @@ class ManageRecruitmentController extends Controller
                         ->values()
                         ->all(),
                     'close_url' => route('recruitment.posting.close', $posting->corporation_id),
-                    'stages_url' => route('recruitment.posting.stages', $posting->corporation_id),
+                    'save_url' => route('recruitment.posting.save', $posting->corporation_id),
                     // Item/location watchlist for observing applicant (and later employee) assets & contracts.
                     'watched' => (new WatchedArrayAction)->execute($posting->corporation_id),
-                    'watchlist_url' => route('update.watchlist', $posting->corporation_id),
                 ];
             })
             ->all();
