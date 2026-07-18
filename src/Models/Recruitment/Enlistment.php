@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Models\Recruitment;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\Universe\Category;
@@ -36,6 +37,14 @@ use Seatplus\Eveapi\Models\Universe\Type;
 
 class Enlistment extends Enlistments
 {
+    /**
+     * The structured review stages for this posting, replacing the legacy `; `-delimited steps string.
+     */
+    public function reviewRounds(): HasMany
+    {
+        return $this->hasMany(EnlistmentReviewRound::class, 'corporation_id', 'corporation_id');
+    }
+
     public function systems(): MorphToMany
     {
         return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');

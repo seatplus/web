@@ -94,6 +94,30 @@ return [
             'icon' => 'ClipboardDocumentCheckIcon',
         ],
     ],
+    'Recruitment' => [
+        [
+            // Applicant-facing central job portal — no permission, visible to every authenticated user.
+            'name' => 'Job Portal',
+            'route' => 'recruitment.portal',
+            'icon' => 'BriefcaseIcon',
+        ],
+        [
+            // Reviewer inbox — applications waiting at a stage this user's control group handles.
+            'name' => 'Reviews',
+            'permission' => 'can accept or deny applications',
+            'character_role' => 'director',
+            'route' => 'recruitment.reviews',
+            'icon' => 'InboxStackIcon',
+        ],
+        [
+            // HR/recruiter workspace — open/close postings and configure review stages.
+            'name' => 'Manage Recruitment',
+            'permission' => 'can open or close corporations for recruitment',
+            'character_role' => 'director',
+            'route' => 'recruitment.manage',
+            'icon' => 'ClipboardDocumentListIcon',
+        ],
+    ],
     'Access Control' => [
         [
             'name' => 'Control Groups',

@@ -38,12 +38,12 @@ use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Actions\Recruitment\CreateApplicationLogEntryAction;
 use Seatplus\Web\Http\Actions\Recruitment\DeleteCharacterApplicationAction;
 use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
+use Seatplus\Web\Http\Actions\Recruitment\ReviewApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
@@ -131,32 +131,18 @@ class ApplicationsController extends Controller
         ]);
     }
 
-    public function reviewApplication(Request $request, string $application_id, CreateApplicationLogEntryAction $action): RedirectResponse
+    public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action): RedirectResponse
     {
         $request->validate([
             'decision' => ['required', Rule::in(['rejected', 'accepted'])],
             'explanation' => 'required_if:decision,rejected',
         ]);
 
-        $action->setComment($request->get('explanation') ?? '')
-            ->setType('decision')
-            ->setApplicationId($application_id)
-            ->execute();
+        $application = Application::findOrFail($application_id);
 
-        $application = Application::find($application_id);
-
-        if ($request->get('decision') === 'rejected') {
-            $application->status = 'rejected';
-            $application->save();
-        }
-
-        /** @var Enlistments $enlistment */
-        $enlistment = $application->enlistment;
-
-        if ($request->get('decision') === 'accepted' && $enlistment->steps_count <= $application->decision_count) {
-            $application->status = 'accepted';
-            $application->save();
-        }
+        // Advances the application one review round: gates on the round's control group, records the
+        // decision, and hires (creates an Employment) when the final round is accepted.
+        $action->execute($application, $request->get('decision'), $request->get('explanation'));
 
         return redirect()->route('corporation.recruitment')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
