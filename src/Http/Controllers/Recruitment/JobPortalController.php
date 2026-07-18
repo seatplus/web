@@ -4,16 +4,19 @@ namespace Seatplus\Web\Http\Controllers\Recruitment;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\JobPostingResource;
 use Seatplus\Web\Models\Recruitment\ApplicationRoundReview;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
+use Seatplus\Web\Support\CorporationShape;
 
 /**
  * The central job portal: a cross-corporation view over every open posting (enlistment), decoupled
@@ -87,33 +90,41 @@ class JobPortalController extends Controller
             ->groupBy('application_id');
 
         return $applications->map(function (Application $application) use ($roundsByCorporation, $reviewsByApplication) {
+            /** @var Collection<int, EnlistmentReviewRound> $rounds */
             $rounds = $roundsByCorporation->get($application->corporation_id, collect());
             $position = $application->logEntries->where('type', 'decision')->count();
+            $currentRound = $rounds->firstWhere('position', $position);
+
+            /** @var CorporationInfo $corporation */
+            $corporation = $application->corporation;
 
             return [
                 'application_id' => $application->id,
-                'corporation' => [
-                    'corporation_id' => $application->corporation->corporation_id,
-                    'name' => $application->corporation->name,
-                    'ticker' => $application->corporation->ticker,
-                ],
+                'corporation' => CorporationShape::make($corporation),
                 'status' => $application->status,
                 'current_position' => $position,
                 'current_stage' => $application->status === 'open'
-                    ? ($rounds->firstWhere('position', $position)?->label ?? 'Open')
+                    ? ($currentRound instanceof EnlistmentReviewRound ? $currentRound->label : 'Open')
                     : null,
                 'total_stages' => $rounds->count(),
                 'timeline' => $reviewsByApplication->get($application->id, collect())
-                    ->map(fn (ApplicationRoundReview $review) => [
-                        'position' => $review->position,
-                        'stage_label' => $rounds->firstWhere('position', $review->position)?->label ?? 'Stage '.($review->position + 1),
-                        // Whose main character acted; comments are deliberately omitted from the applicant view.
-                        'reviewer' => $review->causer?->mainCharacter?->name ?? 'A recruiter',
-                        'decision' => $review->decision,
-                        'at' => $review->created_at?->toDateTimeString(),
-                    ])
-                    ->values(),
+                    ->map(function (ApplicationRoundReview $review) use ($rounds) {
+                        $round = $rounds->firstWhere('position', $review->position);
+                        $causer = $review->causer;
+                        $mainCharacter = $causer instanceof User ? $causer->mainCharacter : null;
+
+                        return [
+                            'position' => $review->position,
+                            'stage_label' => $round instanceof EnlistmentReviewRound ? $round->label : 'Stage '.($review->position + 1),
+                            // Whose main character acted; comments are deliberately omitted from the applicant view.
+                            'reviewer' => $mainCharacter instanceof CharacterInfo ? $mainCharacter->name : 'A recruiter',
+                            'decision' => $review->decision,
+                            'at' => $review->created_at?->toDateTimeString(),
+                        ];
+                    })
+                    ->values()
+                    ->all(),
             ];
-        })->values()->toArray();
+        })->values()->all();
     }
 }

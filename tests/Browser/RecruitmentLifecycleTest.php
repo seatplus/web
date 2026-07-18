@@ -163,8 +163,10 @@ it('manage — an HR manager sees their posting and its staged review process', 
     $page->assertNoSmoke();
 
     $page->waitForText('Manage Recruitment');
-    $page->assertSee('Screening');
-    $page->assertSee('Final');
+    // The stage labels live in editable inputs (values), not page text, so assert on their values.
+    $page->waitForText('Review stages');
+    $page->assertScript("Array.from(document.querySelectorAll('input')).some((i) => i.value === 'Screening')");
+    $page->assertScript("Array.from(document.querySelectorAll('input')).some((i) => i.value === 'Final')");
 
     snap($page, "recruitment-manage-{$device}");
 })->with(['desktop', 'iphone']);
@@ -214,7 +216,8 @@ it('portal — an applicant sees their progress and reviewer-action timeline', f
     $page = deviceVisit($device, '/recruitment');
     $page->assertNoSmoke();
 
-    $page->waitForText('Your applications');
+    // Progress is shown inline on the corporation's posting card (no separate panel).
+    $page->waitForText('Job Portal');
     $page->assertSee('Under review');
     $page->assertSee('Stage 2 of 2');
 

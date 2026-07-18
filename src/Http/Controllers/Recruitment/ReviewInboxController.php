@@ -10,9 +10,11 @@ use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 use Seatplus\Web\Services\Recruitment\StageGate;
+use Seatplus\Web\Support\CorporationShape;
 
 /**
  * The reviewer inbox: every open application currently sitting at a stage the signed-in user is
@@ -26,6 +28,7 @@ class ReviewInboxController extends Controller
 
     public function __invoke(StageGate $stageGate): Response
     {
+        /** @var User $user */
         $user = auth()->user();
         $isSuperuser = $user->can('superuser');
 
@@ -55,14 +58,10 @@ class ReviewInboxController extends Controller
             ->groupBy('corporation_id');
 
         $pending = $applications
+            ->filter(fn (Application $application) => $stageGate->allows($user, $this->currentRoleId($application, $roundsByCorporation)))
             ->map(fn (Application $application) => $this->present($application, $roundsByCorporation))
-            ->filter(fn (?array $row) => $stageGate->allows($user, $row['role_id']))
-            ->map(function (array $row) {
-                unset($row['role_id']);
-
-                return $row;
-            })
-            ->values();
+            ->values()
+            ->all();
 
         return Inertia::render('Recruitment/Reviews/Index', [
             'pending' => $pending,
@@ -70,34 +69,50 @@ class ReviewInboxController extends Controller
     }
 
     /**
-     * @param  Collection<int, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
-     * @return array{application_id: string, role_id: ?int, applicant: array, corporation: array, stage: array, total_stages: int, review_url: string}
+     * The control group gating the round this application currently sits at (null = flat permission).
+     *
+     * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
+     */
+    private function currentRoleId(Application $application, Collection $roundsByCorporation): ?int
+    {
+        /** @var Collection<int, EnlistmentReviewRound> $rounds */
+        $rounds = $roundsByCorporation->get($application->corporation_id, collect());
+        $position = $application->logEntries->where('type', 'decision')->count();
+        $round = $rounds->firstWhere('position', $position);
+
+        return $round instanceof EnlistmentReviewRound ? $round->role_id : null;
+    }
+
+    /**
+     * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
+     * @return array<string, mixed>
      */
     private function present(Application $application, Collection $roundsByCorporation): array
     {
+        /** @var Collection<int, EnlistmentReviewRound> $rounds */
         $rounds = $roundsByCorporation->get($application->corporation_id, collect());
         $position = $application->logEntries->where('type', 'decision')->count();
         $round = $rounds->firstWhere('position', $position);
 
         $applicationable = $application->applicationable;
-        $mainCharacter = $applicationable instanceof User ? $applicationable->mainCharacter : $applicationable;
+        $mainCharacter = $applicationable instanceof User
+            ? $applicationable->mainCharacter
+            : ($applicationable instanceof CharacterInfo ? $applicationable : null);
+
+        /** @var CorporationInfo $corporation */
+        $corporation = $application->corporation;
 
         return [
             'application_id' => $application->id,
-            'role_id' => $round?->role_id,
             'applicant' => [
-                'name' => $mainCharacter?->name,
-                'character_id' => $mainCharacter?->character_id,
+                'name' => $mainCharacter instanceof CharacterInfo ? $mainCharacter->name : null,
+                'character_id' => $mainCharacter instanceof CharacterInfo ? $mainCharacter->character_id : null,
                 'is_user' => $applicationable instanceof User,
             ],
-            'corporation' => [
-                'corporation_id' => $application->corporation->corporation_id,
-                'name' => $application->corporation->name,
-                'ticker' => $application->corporation->ticker,
-            ],
+            'corporation' => CorporationShape::make($corporation),
             'stage' => [
                 'position' => $position,
-                'label' => $round?->label ?? 'Open',
+                'label' => $round instanceof EnlistmentReviewRound ? $round->label : 'Open',
             ],
             'total_stages' => $rounds->count(),
             'review_url' => route('get.application', $application->id),

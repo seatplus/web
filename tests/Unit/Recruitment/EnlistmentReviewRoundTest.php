@@ -30,14 +30,14 @@ it('gate falls back to the recruiter permission when the round has no control-gr
 
     expect($gate->allows($user, null))->toBeFalse();
 
-    $user->givePermissionTo(StageGate::RECRUITER_PERMISSION);
+    assignPermission($user, StageGate::RECRUITER_PERMISSION);
 
     expect($gate->allows($user->fresh(), null))->toBeTrue();
 });
 
 it('gate lets a superuser through regardless of round configuration', function () {
     $user = User::factory()->create();
-    $user->givePermissionTo('superuser');
+    assignPermission($user, 'superuser');
 
     expect((new StageGate)->allows($user->fresh(), null))->toBeTrue();
 });

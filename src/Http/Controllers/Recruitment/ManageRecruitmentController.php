@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\Permissions\Role;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
+use Seatplus\Web\Support\CorporationShape;
 
 /**
  * The HR/recruiter workspace, decoupled from the applicant-facing portal. Here a manager opens or
@@ -38,31 +40,30 @@ class ManageRecruitmentController extends Controller
             ])
             ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
             ->get()
-            ->map(fn (Enlistment $posting) => [
-                'corporation_id' => $posting->corporation_id,
-                'type' => $posting->type,
-                'corporation' => [
-                    'corporation_id' => $posting->corporation->corporation_id,
-                    'name' => $posting->corporation->name,
-                    'ticker' => $posting->corporation->ticker,
-                    'alliance' => $posting->corporation->alliance ? [
-                        'alliance_id' => $posting->corporation->alliance->alliance_id,
-                        'name' => $posting->corporation->alliance->name,
-                    ] : null,
-                ],
-                'stages' => $posting->reviewRounds
-                    ->map(fn (EnlistmentReviewRound $round) => [
-                        'position' => $round->position,
-                        'label' => $round->label,
-                        'role_id' => $round->role_id,
-                    ])
-                    ->values(),
-                'close_url' => route('recruitment.posting.close', $posting->corporation_id),
-                'stages_url' => route('recruitment.posting.stages', $posting->corporation_id),
-                // Item/location watchlist for observing applicant (and later employee) assets & contracts.
-                'watched' => (new WatchedArrayAction)->execute($posting->corporation_id),
-                'watchlist_url' => route('update.watchlist', $posting->corporation_id),
-            ]);
+            ->map(function (Enlistment $posting) {
+                /** @var CorporationInfo $corporation */
+                $corporation = $posting->corporation;
+
+                return [
+                    'corporation_id' => $posting->corporation_id,
+                    'type' => $posting->type,
+                    'corporation' => CorporationShape::make($corporation),
+                    'stages' => $posting->reviewRounds
+                        ->map(fn (EnlistmentReviewRound $round) => [
+                            'position' => $round->position,
+                            'label' => $round->label,
+                            'role_id' => $round->role_id,
+                        ])
+                        ->values()
+                        ->all(),
+                    'close_url' => route('recruitment.posting.close', $posting->corporation_id),
+                    'stages_url' => route('recruitment.posting.stages', $posting->corporation_id),
+                    // Item/location watchlist for observing applicant (and later employee) assets & contracts.
+                    'watched' => (new WatchedArrayAction)->execute($posting->corporation_id),
+                    'watchlist_url' => route('update.watchlist', $posting->corporation_id),
+                ];
+            })
+            ->all();
 
         return Inertia::render('Recruitment/Manage/Index', [
             'postings' => $postings,
