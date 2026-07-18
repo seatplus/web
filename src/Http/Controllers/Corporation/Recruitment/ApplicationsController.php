@@ -47,6 +47,7 @@ use Seatplus\Web\Http\Actions\Recruitment\ReviewApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
+use Seatplus\Web\Services\CharacterInspectionScrollProps;
 use Seatplus\Web\Support\Translations;
 
 class ApplicationsController extends Controller
@@ -94,7 +95,7 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getApplication(string $application_id, WatchlistArrayAction $action): Response
+    public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps): Response
     {
         $application = Application::query()
             ->with([
@@ -109,26 +110,35 @@ class ApplicationsController extends Controller
                     ]);
                 },
             ])
-            ->find($application_id);
+            ->findOrFail($application_id);
+
+        $applicationable = $application->applicationable;
 
         $recruit = match ($application->applicationable_type) {
-            User::class => $application->applicationable,
+            User::class => $applicationable,
             CharacterInfo::class => collect([
                 // snake_case to match the raw User-model branch above (and the Vue read
                 // `recruit.main_character` in Pages/Corporation/Recruitment/Application.vue)
-                'main_character' => $application->applicationable,
-                'characters' => [$application->applicationable],
+                'main_character' => $applicationable,
+                'characters' => [$applicationable],
             ]),
             default => collect([]),
         };
 
-        return inertia('Corporation/Recruitment/Application', [
+        // The recruit's character ids feed the shared Asset/Wallet tab components' scroll props.
+        $characterIds = match (true) {
+            $applicationable instanceof User => $applicationable->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all(),
+            $applicationable instanceof CharacterInfo => [(int) $applicationable->character_id],
+            default => [],
+        };
+
+        return inertia('Corporation/Recruitment/Application', array_merge([
             'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
             'activeSidebarElement' => 'corporation.recruitment',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
-        ]);
+        ], $inspectionProps->build($characterIds, request())));
     }
 
     public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action): RedirectResponse
