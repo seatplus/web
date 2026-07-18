@@ -38,11 +38,19 @@ Route::prefix('recruitment')
         Route::delete('/application/character/{character_id}', [ApplicationsController::class, 'pullCharacterApplication'])->name('delete.character.application');
         Route::delete('/application/user/', [ApplicationsController::class, 'pullUserApplication'])->name('delete.user.application');
 
-        /* Senior HR */
+        /*
+         * Creating a Job Posting is gated on the plain permission only — intentionally NOT
+         * affiliation-scoped (no CheckAuthorization/CanUserService), so a permission-holder may open
+         * any corporation for recruitment. See EnlistmentsController@create for the rationale.
+         */
+        Route::middleware('permission:can open or close corporations for recruitment')
+            ->post('/', [EnlistmentsController::class, 'create'])
+            ->name('create.corporation.recruitment');
+
+        /* Senior HR — managing an existing posting stays scoped to affiliated/director corporations. */
         Route::middleware([CheckAuthorization::class.':can open or close corporations for recruitment,director'])
             ->controller(EnlistmentsController::class)
             ->group(function () {
-                Route::post('/', 'create')->name('create.corporation.recruitment');
                 Route::get('/{corporation_id}', 'edit')->name('edit.enlistment');
                 Route::delete('/{corporation_id}', 'delete')->name('delete.enlistment');
 

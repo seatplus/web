@@ -28,33 +28,55 @@ namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\UpdateWatchlistAction;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\CreateOpenRecruitmentRequest;
 use Seatplus\Web\Http\Controllers\Request\UpdateWatchlistRequest;
 use Seatplus\Web\Models\Recruitment\Enlistment;
+use Seatplus\Web\Services\DispatchCorporationOrAllianceInfoJob;
 
 class EnlistmentsController extends Controller
 {
-    public function create(CreateOpenRecruitmentRequest $request): RedirectResponse
+    /**
+     * Open (or update) a corporation's Job Posting.
+     *
+     * INTENTIONAL AUTHORIZATION RELAXATION: this action is gated on the plain
+     * `can open or close corporations for recruitment` permission only — it is NOT scoped to the
+     * user's affiliated corporations (the create route was deliberately removed from the
+     * CheckAuthorization/CanUserService affiliation gate). A permission-holder may therefore open
+     * ANY corporation for recruitment, including ones they are not affiliated with, so recruiters
+     * can post for a corp before its data has ever been pulled. Reviewers: this is by design.
+     *
+     * Because any corp_id is accepted, the corporation may not yet exist locally; ensure its
+     * CorporationInfo is (being) populated via the same public-ESI id-resolution path the SSO-scope
+     * "applies to" picker uses, so the freshly-created posting card can render its logo/name.
+     */
+    public function create(CreateOpenRecruitmentRequest $request, DispatchCorporationOrAllianceInfoJob $dispatchCorporationInfo): RedirectResponse
     {
+        $corporationId = (int) data_get($request->validated(), 'corporation_id');
+
+        if (! CorporationInfo::query()->where('corporation_id', $corporationId)->exists()) {
+            $dispatchCorporationInfo->handle(CorporationInfo::class, $corporationId);
+        }
+
         $enlistment = Enlistment::query()->updateOrCreate(
-            ['corporation_id' => data_get($request->validated(), 'corporation_id')],
+            ['corporation_id' => $corporationId],
             [
                 'type' => data_get($request->validated(), 'type'),
                 'steps' => data_get($request->validated(), 'steps') ?? '',
             ]
         );
 
-        return redirect()->back()->with('success', $enlistment->wasRecentlyCreated ? 'Enlistment Created' : 'Enlistment Updated');
+        return redirect()->back()->with('success', $enlistment->wasRecentlyCreated ? 'Job posting created' : 'Job posting updated');
     }
 
     public function delete(int $corporation_id): RedirectResponse
     {
         Enlistment::where('corporation_id', $corporation_id)->delete();
 
-        return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'corporation is closed for recruitment');
+        return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'Job posting closed');
     }
 
     public function edit(int $corporation_id, WatchedArrayAction $action): Response

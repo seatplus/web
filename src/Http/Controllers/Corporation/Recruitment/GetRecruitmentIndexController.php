@@ -27,15 +27,12 @@
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
 use DB;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\Enlistments;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Http\Resources\CorporationInfoRessource;
 
 class GetRecruitmentIndexController extends Controller
 {
@@ -58,12 +55,6 @@ class GetRecruitmentIndexController extends Controller
         return Inertia::render('Corporation/Recruitment/RecruitmentIndex', [
             'canManageRecruitment' => $canManageRecruitment,
             'enlistments' => $this->getEnlistments($isSuperuser, $manageableIds),
-            // Corporations the manager may open for recruitment (i.e. affiliated + not yet
-            // enlisted) as a native Inertia infinite-scroll prop, replacing the old
-            // axios/Ziggy useInfinityScrolling loader inside CorporationList.vue.
-            'corporations' => Inertia::scroll(
-                fn (): LengthAwarePaginator => $this->getEnlistableCorporations($isSuperuser, $manageableIds),
-            ),
             'activeSidebarElement' => 'corporation.recruitment',
         ]);
     }
@@ -94,22 +85,5 @@ class GetRecruitmentIndexController extends Controller
 
             return $manageable->concat($recruitable);
         });
-    }
-
-    private function getEnlistableCorporations(bool $isSuperuser, array $manageableIds): LengthAwarePaginator
-    {
-        // Namespaced `corp_search` (not `search`) so the CorporationList filter can never collide
-        // with another page's own search param; reuses the same affiliated-corporation data.
-        $search = request('corp_search');
-
-        return CorporationInfo::query()
-            ->select('corporation_infos.*')
-            ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
-            ->whereNotIn('corporation_id', Enlistments::query()->select('corporation_id'))
-            ->when($search, fn (Builder $query) => $query->where('name', 'like', "%{$search}%"))
-            ->with('alliance')
-            ->orderBy('name')
-            ->paginate(pageName: 'corporations')
-            ->through(fn (CorporationInfo $corporation): array => (new CorporationInfoRessource($corporation))->resolve());
     }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
@@ -10,10 +11,12 @@ use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Jobs\Corporation\CorporationInfoJob;
 use Seatplus\Eveapi\Jobs\Seatplus\UpdateCharacter;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
@@ -56,6 +59,52 @@ test('user with permission and affiliations succeeds to create enlistment', func
     createEnlistment();
 
     expect(Enlistment::all())->toHaveCount(1);
+});
+
+test('permission holder may open any corporation for recruitment (not affiliation scoped)', function () {
+    // A corporation the test user is NOT affiliated with. Under the old CheckAuthorization gate this
+    // would have been forbidden; creating a Job Posting is now permission-gated only.
+    $unaffiliated = CorporationInfo::factory()->create();
+
+    assignPermissionToTestUser(['can open or close corporations for recruitment']);
+
+    \Pest\Laravel\assertDatabaseMissing('enlistments', ['corporation_id' => $unaffiliated->corporation_id]);
+
+    test()->actingAs(test()->test_user->refresh())
+        ->post(route('create.corporation.recruitment'), [
+            'corporation_id' => $unaffiliated->corporation_id,
+            'type' => 'user',
+        ])
+        ->assertRedirect();
+
+    \Pest\Laravel\assertDatabaseHas('enlistments', [
+        'corporation_id' => $unaffiliated->corporation_id,
+        'type' => 'user',
+    ]);
+});
+
+test('opening recruitment for a brand new corporation dispatches its info job', function () {
+    // Any corp_id is accepted; if the corporation isn't known locally the controller ensures its
+    // CorporationInfo is populated via the public-ESI id-resolution path (dispatchSync).
+    assignPermissionToTestUser(['can open or close corporations for recruitment']);
+    test()->test_user = test()->test_user->refresh();
+
+    $unknownCorporationId = 98_000_001;
+
+    \Pest\Laravel\assertDatabaseMissing('corporation_infos', ['corporation_id' => $unknownCorporationId]);
+
+    Bus::fake();
+
+    test()->actingAs(test()->test_user)
+        ->post(route('create.corporation.recruitment'), [
+            'corporation_id' => $unknownCorporationId,
+            'type' => 'character',
+        ])
+        ->assertRedirect();
+
+    Bus::assertDispatched(CorporationInfoJob::class);
+
+    \Pest\Laravel\assertDatabaseHas('enlistments', ['corporation_id' => $unknownCorporationId]);
 });
 
 test('user with permission and affiliations can delete enlistment', function () {
@@ -171,9 +220,10 @@ test('senior hr sees recruitment component', function () {
             fn (Assert $page) => $page
                 ->component('Corporation/Recruitment/RecruitmentIndex')
                 ->where('canManageRecruitment', true)
-                // Corporations a manager may open for recruitment are served as a native
-                // Inertia infinite-scroll prop (replacing the old axios/Ziggy loader).
-                ->has('corporations')
+                // The index lists only posted corporations (enlistments); the always-visible
+                // openable-corporation list (and its scroll prop) is gone — creating a posting is
+                // now an inline panel driven by the ESI corporation search.
+                ->has('enlistments')
         );
 });
 

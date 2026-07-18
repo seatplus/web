@@ -33,6 +33,10 @@ class CreateOpenRecruitmentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * The `can open or close corporations for recruitment` permission is the sole gate. This is an
+     * intentional authorization relaxation: unlike the edit/delete/watchlist routes, creating a Job
+     * Posting is NOT scoped to affiliated corporations, so a permission-holder may open any corp.
      */
     public function authorize(): bool
     {
@@ -45,7 +49,10 @@ class CreateOpenRecruitmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'corporation_id' => ['required', 'exists:corporation_infos,corporation_id'],
+            // Any corporation id is accepted (permission-gated, not affiliation-scoped). No
+            // `exists:corporation_infos` — the corp may be brand new; the controller ensures its
+            // CorporationInfo gets populated via the public-ESI id-resolution path.
+            'corporation_id' => ['required', 'integer'],
             'type' => ['required', 'string', Rule::in(['character', 'user'])],
             'steps' => ['nullable', 'string'],
         ];

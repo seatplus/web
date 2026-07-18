@@ -11,18 +11,20 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 /*
- * Recruitment "Job Posting" management browser test — the HR flow where a manager browses
- * corporations, opens one for recruitment and configures it. Consolidates the former
- * RecruitmentListTest (#1588) + RecruitmentConfigTest (#1583) into one suite and asserts the
- * new user-facing "Job Posting" copy.
+ * Recruitment "Job Posting" management browser test — the HR flow where a manager posts a corp for
+ * recruitment and configures it. Consolidates the former RecruitmentListTest (#1588) +
+ * RecruitmentConfigTest (#1583) into one suite and asserts the new user-facing "Job Posting" copy.
  *
- * The two surfaces exercised here, both against the real assembled core app:
+ * The surfaces exercised here, all against the real assembled core app:
  *
- *  1. Recruitment index (/corporation/recruitment): the affiliated-corporation picker
- *     (CorporationList.vue) is now an Inertia <InfiniteScroll> over the `corporations` scroll
- *     prop (no more axios/Ziggy useInfinityScrolling), cards rebuilt on the shared
- *     CardWithHeader + Button. A superuser passes the recruitment gate and marks every
- *     not-yet-enlisted corporation enlistable, so the cards render without wiring affiliations.
+ *  1. Recruitment index (/corporation/recruitment): now lists ONLY corporations that already have a
+ *     Job Posting (one CorporationRecruitment card each) plus an empty state when there are none.
+ *     The always-visible openable-corporation list (CorporationList.vue) is gone. Creating a posting
+ *     is an inline panel revealed by a "Create job posting" button: a corporation search (the same
+ *     ESI "applies to" picker the ACL affiliations use — EsiAutosuggest, shows nothing until you
+ *     type) plus a labelled "who can apply" choice. The ESI search itself is token-gated and cannot
+ *     be driven offline (same constraint as the ACL browser tests), so the create POST path is
+ *     covered by the RecruitmentLifeCycleTest feature test; here we assert the panel + inputs render.
  *
  *  2. Configuration (/corporation/recruitment/{corporation_id}): corporation-scoped, rendered by
  *     EnlistmentsController@edit behind CheckAuthorization:'can open or close corporations for
@@ -79,49 +81,76 @@ if (! function_exists('userOfCharacter')) {
     }
 }
 
-it('renders the affiliated corporation list to create a job posting', function (string $device) {
+it('shows an empty state and reveals an inline create panel', function (string $device) {
     $character = actingAsCharacter();
 
-    // Superuser: passes the CheckAuthorization recruitment gate (CanUserService bypass) and
-    // makes every not-yet-enlisted corporation enlistable, so the picker cards render.
+    // Superuser passes the recruitment gate (CanUserService bypass) and may manage recruitment,
+    // so the "Create job posting" entry point renders.
     userOfCharacter($character->character_id)
         ->givePermissionTo(Permission::findOrCreate('superuser'));
 
-    // Real NPC corporation ids so images.evetech.net serves real logos in the screenshot.
+    $page = deviceVisit($device, '/corporation/recruitment');
+    $page->assertNoSmoke();
+
+    // Page shell.
+    $page->waitForText('Corporation Recruitment');
+
+    // No postings yet → the empty state and the create entry point are shown.
+    $page->waitForText('No job postings yet');
+    $page->assertSee('Create job posting');
+
+    // The old always-visible openable-corporation list is gone.
+    $page->assertScript("!document.querySelector('#recruitment-corporation-list')");
+
+    // Create is an inline panel (no modal, no navigation) revealed by the button.
+    $page->click('Create job posting');
+    $page->waitForText('Create a job posting');
+    $page->assertSee('Who can apply?');
+    $page->assertSee('Recruits only');
+    $page->assertSee('All characters');
+
+    // The corporation search is the ESI "applies to" picker: an input that shows nothing until you
+    // type. Its input carries id="Corporation" (from the field label); no option list before typing.
+    $page->assertScript("!!document.querySelector('#Corporation')");
+    $page->assertScript("document.querySelectorAll('[role=option]').length === 0");
+    $page->assertNoSmoke();
+
+    snap($page, "job-posting-empty-create-{$device}");
+})->with(['desktop', 'iphone']);
+
+it('lists only corporations that have a job posting', function (string $device) {
+    $character = actingAsCharacter();
+
+    userOfCharacter($character->character_id)
+        ->givePermissionTo(Permission::findOrCreate('superuser'));
+
+    // Real NPC corporation id so images.evetech.net serves a real logo in the screenshot.
     $corporation = CorporationInfo::factory()->create([
         'corporation_id' => 1000107,
         'name' => 'Science and Trade Institute',
     ]);
 
-    CorporationInfo::factory()->create([
-        'corporation_id' => 1000035,
-        'name' => 'Caldari Provisions',
+    // A posted corporation → exactly one card, no empty state.
+    Enlistment::create([
+        'corporation_id' => $corporation->corporation_id,
+        'type' => 'user',
+        'steps' => '',
     ]);
 
     $page = deviceVisit($device, '/corporation/recruitment');
     $page->assertNoSmoke();
 
-    // Page shell + the intro copy the inline picker (now the sole create surface, no modal) lives under.
     $page->waitForText('Corporation Recruitment');
-    $page->waitForText('Open a corporation for recruitment');
 
-    // A corporation card is the create surface itself: it carries the two "Job Posting" footer actions
-    // (Button + heroicons) that POST create.corporation.recruitment inline — no popup involved.
+    // The posted corporation renders as a card; the empty state is gone.
     $page->waitForText($corporation->name);
-    $page->assertSee('Recruits only');
-    $page->assertSee('All characters');
+    $page->assertDontSee('No job postings yet');
 
-    // The infinite-scroll row list is present with at least the two seeded corporations.
-    $page->assertScript("document.querySelectorAll('#recruitment-corporation-list > li').length >= 2");
-
-    // The debounced corp search (namespaced corp_search) reloads only the `corporations` scroll prop
-    // and filters server-side: typing "Science" keeps that corp and drops the unrelated "Caldari" one.
-    $page->assertScript("!!document.querySelector('#corp_search')");
-    $page->type('corp_search', 'Science');
-    $page->assertScript("document.body.innerText.includes('Science and Trade Institute') && !document.body.innerText.includes('Caldari Provisions')");
+    // Still no always-visible openable-corporation list — postings are the only cards.
+    $page->assertScript("!document.querySelector('#recruitment-corporation-list')");
     $page->assertNoSmoke();
 
-    snap($page, "job-posting-corporation-list-{$device}");
+    snap($page, "job-posting-list-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('a corp director configures a job posting', function (string $device) {
