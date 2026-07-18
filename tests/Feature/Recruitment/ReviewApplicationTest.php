@@ -25,7 +25,12 @@ beforeEach(function () {
     test()->junior = Event::fakeFor(fn () => tap(User::factory()->create(), fn (User $u) => $u->assignRole(test()->juniorRole)));
     test()->senior = Event::fakeFor(fn () => tap(User::factory()->create(), fn (User $u) => $u->assignRole(test()->seniorRole)));
 
-    test()->application = Event::fakeFor(fn () => Application::factory()->create(['corporation_id' => test()->corp->corporation_id]));
+    $applicant = Event::fakeFor(fn () => User::factory()->create());
+    test()->application = Application::factory()->create([
+        'corporation_id' => test()->corp->corporation_id,
+        'applicationable_type' => User::class,
+        'applicationable_id' => $applicant->getKey(),
+    ]);
 });
 
 function review(User $reviewer, string $decision): void

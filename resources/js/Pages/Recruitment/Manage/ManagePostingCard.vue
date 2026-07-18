@@ -106,7 +106,6 @@
     </div>
 
     <WatchlistSection
-      :corporation-id="posting.corporation_id"
       :watched="posting.watched"
       :watchlist-url="posting.watchlist_url"
     />

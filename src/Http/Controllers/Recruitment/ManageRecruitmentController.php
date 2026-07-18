@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Controllers\Recruitment;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -36,7 +37,7 @@ class ManageRecruitmentController extends Controller
         $postings = Enlistment::query()
             ->with([
                 'corporation.alliance',
-                'reviewRounds' => fn ($query) => $query->orderBy('position'),
+                'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
             ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
             ->get()

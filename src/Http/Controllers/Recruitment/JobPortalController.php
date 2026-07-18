@@ -3,6 +3,7 @@
 namespace Seatplus\Web\Http\Controllers\Recruitment;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
@@ -32,7 +33,7 @@ class JobPortalController extends Controller
         $postings = Enlistment::query()
             ->with([
                 'corporation.alliance',
-                'reviewRounds' => fn ($query) => $query->orderBy('position'),
+                'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
             ->get();
 
@@ -102,6 +103,7 @@ class JobPortalController extends Controller
                 'application_id' => $application->id,
                 'corporation' => CorporationShape::make($corporation),
                 'status' => $application->status,
+                'withdraw_url' => route('recruitment.withdraw', $application->id),
                 'current_position' => $position,
                 'current_stage' => $application->status === 'open'
                     ? ($currentRound instanceof EnlistmentReviewRound ? $currentRound->label : 'Open')

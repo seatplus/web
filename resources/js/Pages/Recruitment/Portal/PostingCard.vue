@@ -94,6 +94,16 @@
             <span class="ml-auto text-xs text-gray-400">{{ entry.at }}</span>
           </li>
         </ol>
+
+        <button
+          v-if="application.status === 'open'"
+          type="button"
+          :disabled="withdrawForm.processing"
+          class="mt-2 text-sm font-medium text-red-600 hover:text-red-500 disabled:opacity-50"
+          @click="withdraw"
+        >
+          Withdraw application
+        </button>
       </template>
 
       <!-- Not applied: apply form. -->
@@ -190,6 +200,14 @@ const form = useForm({
 
 function submit() {
   form.post(props.postApplicationUrl, {
+    preserveScroll: true,
+  });
+}
+
+const withdrawForm = useForm({});
+
+function withdraw() {
+  withdrawForm.delete(props.application.withdraw_url, {
     preserveScroll: true,
   });
 }

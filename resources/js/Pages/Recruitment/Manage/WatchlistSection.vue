@@ -19,33 +19,48 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <EsiMultiselect
-          v-model="geoForm.regions"
+          v-model="form.regions"
           :categories="['region']"
           label="Regions"
           placeholder="Search for a region"
         />
         <EsiMultiselect
-          v-model="geoForm.systems"
+          v-model="form.systems"
           :categories="['solar_system']"
           label="Solar systems"
           placeholder="Search for a solar system"
         />
       </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Item types, groups or categories</label>
+        <Autosuggest
+          :key="itemsKey"
+          route-name="autosuggestion.typesOrGroupOrCategories"
+          placeholder="Search for items"
+          @selectedObject="addItem"
+        />
+        <div class="mt-2 flex flex-wrap gap-2">
+          <DismissibleButton
+            v-for="item in form.items"
+            :id="item.id"
+            :key="item.id"
+            :name="item.name"
+            @remove="removeItem"
+          />
+        </div>
+      </div>
+
       <div class="flex justify-end">
         <button
           type="button"
-          :disabled="geoForm.processing"
+          :disabled="form.processing"
           class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
-          @click="saveLocations"
+          @click="save"
         >
-          Save locations
+          Save watchlist
         </button>
       </div>
-
-      <ItemsWatchlist
-        :items="watched.items"
-        :corporation-id="corporationId"
-      />
     </div>
   </div>
 </template>
@@ -54,13 +69,10 @@
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
-import ItemsWatchlist from "@/Pages/Corporation/Recruitment/Configuration/ItemsWatchlist.vue";
+import Autosuggest from "@/Shared/Components/Autosuggest.vue";
+import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 
 const props = defineProps({
-  corporationId: {
-    required: true,
-    type: Number,
-  },
   watched: {
     required: true,
     type: Object,
@@ -72,15 +84,28 @@ const props = defineProps({
 });
 
 const open = ref(false);
+// Re-key the items autosuggest after each selection so it clears its input.
+const itemsKey = ref(0);
 
-// Locations (regions/systems) save independently of the item watchlist; the backend action applies a
-// partial update, so posting only these keys leaves the item selection untouched.
-const geoForm = useForm({
+// A single form covers locations (regions/systems) and items; the backend applies them together.
+const form = useForm({
   systems: props.watched.systems,
   regions: props.watched.regions,
+  items: props.watched.items,
 });
 
-function saveLocations() {
-  geoForm.post(props.watchlistUrl, { preserveScroll: true });
+function addItem(selection) {
+  if (!form.items.some((item) => item.id === selection.id)) {
+    form.items.push(selection);
+  }
+  itemsKey.value++;
+}
+
+function removeItem(id) {
+  form.items = form.items.filter((item) => item.id !== id);
+}
+
+function save() {
+  form.post(props.watchlistUrl, { preserveScroll: true });
 }
 </script>

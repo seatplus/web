@@ -54,3 +54,15 @@ it('submits an account-wide application from the portal', function () {
 
     expect(Application::query()->where('corporation_id', $corp->corporation_id)->count())->toBe(1);
 });
+
+it('withdraws the user\'s own application', function () {
+    $corp = CorporationInfo::factory()->create();
+    Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
+    $application = test()->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
+
+    test()->actingAs(test()->test_user)
+        ->delete(route('recruitment.withdraw', $application->id))
+        ->assertRedirect();
+
+    expect(Application::query()->whereKey($application->id)->exists())->toBeFalse();
+});

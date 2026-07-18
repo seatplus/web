@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Event;
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Models\Recruitment\Enlistment;
@@ -18,7 +19,12 @@ it('lists open applications with their current stage', function () {
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Screen']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 1, 'label' => 'Final']);
 
-    Event::fakeFor(fn () => Application::factory()->create(['corporation_id' => $corp->corporation_id]));
+    $applicant = Event::fakeFor(fn () => User::factory()->create());
+    Application::factory()->create([
+        'corporation_id' => $corp->corporation_id,
+        'applicationable_type' => User::class,
+        'applicationable_id' => $applicant->getKey(),
+    ]);
 
     test()->actingAs(test()->test_user)
         ->get(route('recruitment.reviews'))
@@ -37,7 +43,13 @@ it('excludes applications that are no longer open', function () {
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
 
-    Event::fakeFor(fn () => Application::factory()->create(['corporation_id' => $corp->corporation_id, 'status' => 'accepted']));
+    $applicant = Event::fakeFor(fn () => User::factory()->create());
+    Application::factory()->create([
+        'corporation_id' => $corp->corporation_id,
+        'applicationable_type' => User::class,
+        'applicationable_id' => $applicant->getKey(),
+        'status' => 'accepted',
+    ]);
 
     test()->actingAs(test()->test_user)
         ->get(route('recruitment.reviews'))
