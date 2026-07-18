@@ -9,22 +9,6 @@
     </p>
 
     <div
-      v-if="myApplications.length > 0"
-      class="space-y-2"
-    >
-      <h3 class="text-lg font-medium text-gray-900">
-        Your applications
-      </h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <MyApplicationCard
-          v-for="application in myApplications"
-          :key="application.application_id"
-          :application="application"
-        />
-      </div>
-    </div>
-
-    <div
       v-if="postings.length === 0"
       class="text-center py-12"
     >
@@ -43,7 +27,7 @@
         :key="posting.corporation_id"
         :posting="posting"
         :characters="characters"
-        :applied="appliedCorporationIds.includes(posting.corporation_id)"
+        :application="applicationFor(posting.corporation_id)"
         :post-application-url="postApplicationUrl"
       />
     </div>
@@ -54,18 +38,13 @@
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import { BriefcaseIcon } from "@heroicons/vue/24/outline";
 import PostingCard from "./PostingCard.vue";
-import MyApplicationCard from "./MyApplicationCard.vue";
 
-defineProps({
+const props = defineProps({
   postings: {
     required: true,
     type: Array,
   },
   characters: {
-    required: true,
-    type: Array,
-  },
-  appliedCorporationIds: {
     required: true,
     type: Array,
   },
@@ -78,4 +57,8 @@ defineProps({
     type: String,
   },
 });
+
+function applicationFor(corporationId) {
+  return props.myApplications.find((application) => application.corporation.corporation_id === corporationId) ?? null;
+}
 </script>

@@ -41,7 +41,6 @@ class JobPortalController extends Controller
                     'name' => $character->name,
                 ])
                 ->values(),
-            'appliedCorporationIds' => $this->appliedCorporationIds($user),
             'myApplications' => $this->myApplications($user),
             // Server-provided endpoint so the page needs neither Ziggy nor a generated Wayfinder import.
             'postApplicationUrl' => route('recruitment.apply'),
@@ -116,34 +115,5 @@ class JobPortalController extends Controller
                     ->values(),
             ];
         })->values()->toArray();
-    }
-
-    /**
-     * The corporation ids this user already has an open application to, so the portal can show
-     * "Applied" instead of an apply button. Covers both account-wide and single-character applications.
-     *
-     * @return array<int>
-     */
-    private function appliedCorporationIds(User $user): array
-    {
-        $characterIds = $user->characters->pluck('character_id')->toArray();
-
-        return Application::query()
-            ->where('status', 'open')
-            ->whereHasMorph(
-                'applicationable',
-                [User::class, CharacterInfo::class],
-                function (Builder $query, string $type) use ($user, $characterIds) {
-                    match ($type) {
-                        User::class => $query->whereKey($user->getAuthIdentifier()),
-                        CharacterInfo::class => $query->whereIn('character_id', $characterIds),
-                        default => null,
-                    };
-                }
-            )
-            ->pluck('corporation_id')
-            ->unique()
-            ->values()
-            ->toArray();
     }
 }

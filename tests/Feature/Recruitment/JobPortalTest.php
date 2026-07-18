@@ -23,20 +23,24 @@ it('lists open postings across corporations with their stages', function () {
             ->component('Recruitment/Portal/Index')
             ->has('postings', 2)
             ->has('postings.0.corporation.name')
-            ->where('appliedCorporationIds', [])
+            ->has('myApplications', 0)
         );
 });
 
-it('marks postings the user has already applied to', function () {
+it('surfaces the user\'s own application with its progress', function () {
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
+    EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
 
     test()->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
 
     test()->actingAs(test()->test_user)
         ->get(route('recruitment.portal'))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('appliedCorporationIds', [$corp->corporation_id])
+            ->has('myApplications', 1)
+            ->where('myApplications.0.corporation.corporation_id', $corp->corporation_id)
+            ->where('myApplications.0.status', 'open')
+            ->where('myApplications.0.total_stages', 1)
         );
 });
 
