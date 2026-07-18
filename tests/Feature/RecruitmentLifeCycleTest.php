@@ -242,9 +242,30 @@ test('junior hr sees recruitment component', function () {
         ->get(route('corporation.recruitment'))
         ->assertForbidden();
 
-    assignPermissionToTestUser(['can accept or deny applications']);
+    // A junior HR holds the recruiter permission through a role that carries the corporation
+    // affiliation — permissions are affiliation-scoped, so a bare direct permission resolves to no
+    // affiliated corporations (and therefore no visible enlistments). Previously this test passed
+    // only incidentally: the create request warmed the cached permission object while the manager
+    // role was still attached. Creating a Job Posting is no longer affiliation-gated, so wire the
+    // recruiter up explicitly, the way a real junior HR is granted access.
+    createRoleViaHttp(
+        roleName: 'junior',
+        affiliations: [
+            [
+                'entity_id' => test()->test_character->corporation->corporation_id,
+                'entity_type' => 'corporation',
+                'affiliation_type' => 'allowed',
+            ],
+        ],
+        member: test()->test_user,
+        permissions: ['can accept or deny applications'],
+    );
 
-    expect(test()->test_user->characters)->toHaveCount(1)
+    // The earlier forbidden request cached an empty affiliated-id object (before the recruiter role
+    // existed); role changes don't bust that 5-minute cache, so drop it to resolve fresh.
+    cache()->forget('user_permissions_'.test()->test_user->id);
+
+    expect(test()->test_user->refresh()->characters)->toHaveCount(1)
         ->and(test()->test_user->characters->first()->character_id)->toBe(test()->test_character->character_id)
         ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
         ->and(test()->test_user->can('superuser'))->toBeFalse()
