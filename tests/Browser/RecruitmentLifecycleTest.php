@@ -309,3 +309,27 @@ it('reviews — a senior reviewer sees the application at the final stage', func
 
     snap($page, "recruitment-reviews-senior-{$device}");
 })->with(['desktop', 'iphone']);
+
+// ═══ Reviewer — application detail (the shared inspection tabs) ════════════════════════════════
+
+it('reviews — a reviewer opens an application and sees the shared inspection tabs', function (string $device) {
+    $character = actingAsCharacter();
+    makeRecruiterOfCorporation($character, 'can accept or deny applications');
+
+    openPostingWithStages($character->corporation_id, [['label' => 'Open', 'role' => null]]);
+    $application = seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 0);
+    cache()->flush();
+
+    $page = deviceVisit($device, "/corporation/recruitment/application/{$application->id}");
+    $page->assertNoSmoke();
+
+    // The detail names the applicant and offers the shared inspection tabs. Skills, Contacts and Mails
+    // render here — this branch wires their data into CharacterInspectionScrollProps (the Mails tab
+    // previously threw for lack of its scroll prop).
+    $page->waitForText('Jane Applicant');
+    $page->assertSee('Skills');
+    $page->assertSee('Contacts');
+    $page->assertSee('Mails');
+
+    snap($page, "recruitment-review-detail-{$device}");
+})->with(['desktop', 'iphone']);
