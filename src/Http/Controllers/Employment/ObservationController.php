@@ -32,9 +32,12 @@ class ObservationController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
-        // Observation is broader than compliance (it also covers activity + lifecycle status), so we
-        // list every corp the user is authorized to observe — not only those with SSO scopes configured.
+        // Only corporations that (or whose alliance) have SSO scopes configured are observable — with no
+        // scopes there is nothing to be compliant against, so an unconfigured corp (e.g. an old corp the
+        // user merely has a character in) would just be noise.
         $corporations = CorporationInfo::query()
+            ->has('ssoScopes')
+            ->orHas('alliance.ssoScopes')
             ->when(
                 ! $user->can('superuser'),
                 fn (Builder $query) => $query->whereIn(
