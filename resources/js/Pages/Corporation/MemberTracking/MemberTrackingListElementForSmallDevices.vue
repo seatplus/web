@@ -14,20 +14,6 @@
               :with-sub-text="false"
             />
           </div>
-          <div class="ml-2 shrink-0 flex">
-            <span
-              v-if="isOk"
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800"
-            >
-              compliant
-            </span>
-            <span
-              v-else
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800"
-            >
-              Not compliant
-            </span>
-          </div>
         </div>
         <div class="mt-2 sm:flex sm:justify-between">
           <div class="sm:flex">
@@ -114,23 +100,9 @@ export default {
         member: {
             required: true,
             type: Object
-        },
-        required_scopes: {
-            required: true,
-            type: Array
         }
     },
     computed: {
-        missing_scopes() {
-
-            return _.differenceWith(this.required_scopes, this.refresh_token_scopes, _.isEqual)
-        },
-        refresh_token_scopes() {
-            return _.get(this.member, 'character.refresh_token.scopes', [])
-        },
-        isOk() {
-            return _.isEmpty(this.missing_scopes) && !_.isEmpty(this.refresh_token_scopes)
-        },
         locationName() {
             return _.get(this.member, 'location.name', 'Unknown Location')
         }

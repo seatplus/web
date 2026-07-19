@@ -85,12 +85,16 @@ Route::middleware('web')
                         include __DIR__.'/Routes/Corporation/Wallet.php';
                         include __DIR__.'/Routes/Corporation/MemberTracking.php';
                         include __DIR__.'/Routes/Corporation/Recruitment.php';
-                        include __DIR__.'/Routes/Corporation/MemberCompliance.php';
                     });
 
                 Route::prefix('recruitment')
                     ->group(function () {
                         include __DIR__.'/Routes/Recruitment.php';
+                    });
+
+                Route::prefix('employment')
+                    ->group(function () {
+                        include __DIR__.'/Routes/Employment.php';
                     });
 
                 Route::prefix('onboarding')

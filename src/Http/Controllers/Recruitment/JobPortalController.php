@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -30,12 +31,29 @@ class JobPortalController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
+        $user->loadMissing('characters.characterAffiliation');
+
+        // The corporation(s) the applicant currently belongs to — read straight from the affiliation
+        // (present even before the CorporationInfo row is). You don't apply to your own corp, so their
+        // postings are pushed to the bottom of the portal rather than surfaced first.
+        $currentCorporationIds = $user->characters
+            ->map(function (CharacterInfo $character): ?int {
+                $affiliation = $character->characterAffiliation;
+
+                return $affiliation instanceof CharacterAffiliation ? (int) $affiliation->corporation_id : null;
+            })
+            ->filter()
+            ->unique()
+            ->values();
+
         $postings = Enlistment::query()
             ->with([
                 'corporation.alliance',
                 'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
-            ->get();
+            ->get()
+            ->sortBy(fn (Enlistment $posting) => $currentCorporationIds->contains((int) $posting->corporation_id) ? 1 : 0)
+            ->values();
 
         return Inertia::render('Recruitment/Portal/Index', [
             'postings' => JobPostingResource::collection($postings)->resolve(),

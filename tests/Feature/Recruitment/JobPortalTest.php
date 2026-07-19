@@ -27,6 +27,24 @@ it('lists open postings across corporations with their stages', function () {
         );
 });
 
+it('sorts the applicant\'s current corporation to the bottom of the portal', function () {
+    $ownCorp = test()->test_character->corporation;
+    $otherCorp = CorporationInfo::factory()->create();
+
+    // Own-corp posting is created first, so only the sort can push it below the other corp.
+    Enlistment::query()->create(['corporation_id' => $ownCorp->corporation_id, 'type' => 'user']);
+    Enlistment::query()->create(['corporation_id' => $otherCorp->corporation_id, 'type' => 'user']);
+
+    test()->actingAs(test()->test_user)
+        ->get(route('recruitment.portal'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('postings', 2)
+            ->where('postings.0.corporation_id', $otherCorp->corporation_id)
+            ->where('postings.1.corporation_id', $ownCorp->corporation_id)
+        );
+});
+
 it('surfaces the user\'s own application with its progress', function () {
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);

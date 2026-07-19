@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
@@ -50,26 +49,12 @@ class ApplicationRessource extends JsonResource
             'application_id' => $this->id,
             'is_user' => $is_user,
             $this->mergeWhen($is_user, ['user' => $this->applicationable]),
-            'mainCharacter' => $is_user ? data_get($this->applicationable, 'mainCharacter') : $this->getMainCharacterFromCharacterId(data_get($this->applicationable, 'character_id')),
+            // For a single-character application the applying character is the whole scope — show it,
+            // not the account's main character (which is a different alt and confuses recruiters).
+            'mainCharacter' => $is_user ? data_get($this->applicationable, 'mainCharacter') : $this->applicationable,
             'characters' => $this->getCharacters(),
             'decision_count' => $this->decision_count,
         ];
-    }
-
-    private function getMainCharacterFromCharacterId(mixed $character_id): ?CharacterInfo
-    {
-        /** @var CharacterUser|null $character_user */
-        $character_user = CharacterUser::query()
-            ->with('user.mainCharacter')
-            ->firstWhere('character_id', $character_id);
-
-        /** @var User|null $user */
-        $user = $character_user?->user;
-
-        /** @var CharacterInfo|null $mainCharacter */
-        $mainCharacter = $user?->mainCharacter;
-
-        return $mainCharacter;
     }
 
     private function buildCharacterArray(CharacterInfo $character): array
