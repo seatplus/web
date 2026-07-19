@@ -26,11 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
@@ -46,7 +44,6 @@ use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Actions\Recruitment\ReviewApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
-use Seatplus\Web\Http\Resources\ApplicationRessource;
 use Seatplus\Web\Services\CharacterInspectionScrollProps;
 use Seatplus\Web\Services\Recruitment\ApplicationGroupService;
 use Seatplus\Web\Support\Translations;
@@ -72,28 +69,6 @@ class ApplicationsController extends Controller
         auth()->user()->application()->delete();
 
         return back()->with('success', 'Application deleted');
-    }
-
-    public function getOpenCorporationApplications(int $corporation_id, int $decision_count): AnonymousResourceCollection
-    {
-        $query = Application::query()
-            ->with('logEntries')
-            ->whereHas('logEntries', function (Builder $query) {
-                $query->where('type', 'decision');
-            }, '=', $decision_count)
-            ->ofCorporation($corporation_id)
-            ->whereStatus('open');
-
-        return ApplicationRessource::collection($query->paginate());
-    }
-
-    public function getClosedCorporationApplications(int $corporation_id): AnonymousResourceCollection
-    {
-        $applications = Application::query()->ofCorporation($corporation_id)
-            ->latest('updated_at')
-            ->where('status', '<>', 'open');
-
-        return ApplicationRessource::collection($applications->paginate());
     }
 
     public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps, ApplicationGroupService $groupService): Response
