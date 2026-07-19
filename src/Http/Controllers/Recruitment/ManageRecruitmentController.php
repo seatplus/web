@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchedArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Models\Recruitment\Enlistment;
@@ -37,6 +38,7 @@ class ManageRecruitmentController extends Controller
         $postings = Enlistment::query()
             ->with([
                 'corporation.alliance',
+                'corporation.ssoScopes',
                 'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
             ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
@@ -44,6 +46,7 @@ class ManageRecruitmentController extends Controller
             ->map(function (Enlistment $posting) {
                 /** @var CorporationInfo $corporation */
                 $corporation = $posting->corporation;
+                $ssoScopes = $corporation->ssoScopes;
 
                 return [
                     'corporation_id' => $posting->corporation_id,
@@ -61,6 +64,8 @@ class ManageRecruitmentController extends Controller
                     'save_url' => route('recruitment.posting.save', $posting->corporation_id),
                     // Item/location watchlist for observing applicant (and later employee) assets & contracts.
                     'watched' => (new WatchedArrayAction)->execute($posting->corporation_id),
+                    // The corporation's currently required SSO scopes (compliance + application), edited here.
+                    'required_scopes' => $ssoScopes instanceof SsoScopes ? ($ssoScopes->selected_scopes ?? []) : [],
                 ];
             })
             ->all();
@@ -70,6 +75,8 @@ class ManageRecruitmentController extends Controller
             // Control groups available to gate a stage; a stage with no group falls back to the flat
             // recruiter permission.
             'controlGroups' => Role::query()->orderBy('name')->get(['id', 'name']),
+            // The full catalogue of ESI scopes a corporation can require, for the scope picker.
+            'availableScopes' => config('eveapi.scopes'),
             'openUrl' => route('recruitment.posting.open'),
         ]);
     }

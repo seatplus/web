@@ -93,6 +93,7 @@
       :key="posting.corporation_id"
       :posting="posting"
       :control-groups="controlGroups"
+      :available-scopes="availableScopes"
     />
   </div>
 </template>
@@ -118,6 +119,10 @@ const props = defineProps({
   openUrl: {
     required: true,
     type: String,
+  },
+  availableScopes: {
+    required: true,
+    type: Object,
   },
 });
 

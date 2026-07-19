@@ -166,6 +166,43 @@
       </div>
     </div>
 
+    <div class="border-t border-gray-100 pt-3 space-y-3">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        @click="scopesOpen = !scopesOpen"
+      >
+        {{ scopesOpen ? 'Hide' : 'Manage' }} required SSO scopes
+        <span
+          v-if="form.selected_scopes.length > 0"
+          class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
+          title="ESI scopes characters must grant for this corporation"
+        >
+          {{ form.selected_scopes.length }} required
+        </span>
+      </button>
+
+      <div
+        v-if="scopesOpen"
+        class="space-y-4"
+      >
+        <p class="text-xs text-gray-500">
+          Characters must have granted these ESI scopes to be compliant for this corporation — checked
+          both while reviewing an applicant and while observing an employee. Clearing every scope removes
+          the corporation from Observation.
+        </p>
+
+        <CharacterScopes
+          v-model:selected-scopes="form.selected_scopes"
+          :scopes="availableScopes.character"
+        />
+        <CorporationScopes
+          v-model:selected-scopes="form.selected_scopes"
+          :scopes="availableScopes.corporation"
+        />
+      </div>
+    </div>
+
     <div class="flex items-center justify-between pt-2 border-t border-gray-100">
       <button
         type="button"
@@ -195,6 +232,8 @@ import EveImage from "@/Shared/EveImage.vue";
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
+import CharacterScopes from "@/Pages/Configuration/Scopes/CharacterScopes.vue";
+import CorporationScopes from "@/Pages/Configuration/Scopes/CorporationScopes.vue";
 
 const props = defineProps({
   posting: {
@@ -205,9 +244,13 @@ const props = defineProps({
     required: true,
     type: Array,
   },
+  availableScopes: {
+    required: true,
+    type: Object,
+  },
 });
 
-// One form covers the whole posting configuration: its review stages and its watchlist.
+// One form covers the whole posting configuration: its review stages, watchlist and required scopes.
 const form = useForm({
   stages: props.posting.stages.map((stage) => ({
     label: stage.label,
@@ -216,11 +259,13 @@ const form = useForm({
   systems: props.posting.watched.systems,
   regions: props.posting.watched.regions,
   items: props.posting.watched.items,
+  selected_scopes: props.posting.required_scopes ?? [],
 });
 
 const closeForm = useForm({});
 
 const watchlistOpen = ref(false);
+const scopesOpen = ref(false);
 // Re-key the items autosuggest after each selection so it clears its input.
 const itemsKey = ref(0);
 
