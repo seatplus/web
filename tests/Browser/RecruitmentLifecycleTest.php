@@ -55,6 +55,18 @@ if (! function_exists('userOfCharacter')) {
     }
 }
 
+if (! function_exists('realCharacterId')) {
+    // images.evetech.net serves a generic default for fabricated ids, so seeded applicants must use a
+    // real EVE character id to render a real portrait in the screenshots. Shared pool across the suite.
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
+
 if (! function_exists('makeControlGroup')) {
     function makeControlGroup(string $name): Role
     {
@@ -112,7 +124,7 @@ if (! function_exists('seedApplicantAtStage')) {
     /** Create an applicant with an open application to $corporationId, already advanced to $stage. */
     function seedApplicantAtStage(int $corporationId, string $name, int $stage = 0): Application
     {
-        $character = CharacterInfo::factory()->create(['name' => $name]);
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId(), 'name' => $name]);
 
         $user = new User;
         $user->main_character_id = $character->character_id;
