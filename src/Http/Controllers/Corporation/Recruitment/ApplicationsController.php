@@ -52,9 +52,9 @@ use Seatplus\Web\Support\Translations;
 
 class ApplicationsController extends Controller
 {
-    public function apply(ApplicationRequest $application_request): RedirectResponse
+    public function apply(ApplicationRequest $application_request, HandleApplicationAction $action): RedirectResponse
     {
-        (new HandleApplicationAction)->execute($application_request->all());
+        $action->execute($application_request->all());
 
         return back()->with('success', 'Application submitted');
     }
