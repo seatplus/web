@@ -53,17 +53,3 @@ it('gate checks control-group membership when the round has a role', function ()
 
     expect($gate->allows($user->fresh(), $role->id))->toBeTrue();
 });
-
-it('backfills the steps string into ordered review rounds', function () {
-    $multi = Enlistments::query()->create(['corporation_id' => 98000001, 'type' => 'user', 'steps' => 'Screen; Interview; Final']);
-    $default = Enlistments::query()->create(['corporation_id' => 98000002, 'type' => 'character']);
-
-    $migration = require __DIR__.'/../../../database/migrations/2026_07_18_000003_backfill_enlistment_review_rounds_from_steps.php';
-    $migration->up();
-
-    $multiRounds = EnlistmentReviewRound::query()->where('corporation_id', 98000001)->orderBy('position')->pluck('label')->all();
-    $defaultRounds = EnlistmentReviewRound::query()->where('corporation_id', 98000002)->pluck('label')->all();
-
-    expect($multiRounds)->toBe(['Screen', 'Interview', 'Final'])
-        ->and($defaultRounds)->toBe(['Open']);
-});

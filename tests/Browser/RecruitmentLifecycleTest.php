@@ -55,6 +55,18 @@ if (! function_exists('userOfCharacter')) {
     }
 }
 
+if (! function_exists('realCharacterId')) {
+    // images.evetech.net serves a generic default for fabricated ids, so seeded applicants must use a
+    // real EVE character id to render a real portrait in the screenshots. Shared pool across the suite.
+    function realCharacterId(): int
+    {
+        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
+        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
+
+        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
+    }
+}
+
 if (! function_exists('makeControlGroup')) {
     function makeControlGroup(string $name): Role
     {
@@ -112,7 +124,7 @@ if (! function_exists('seedApplicantAtStage')) {
     /** Create an applicant with an open application to $corporationId, already advanced to $stage. */
     function seedApplicantAtStage(int $corporationId, string $name, int $stage = 0): Application
     {
-        $character = CharacterInfo::factory()->create(['name' => $name]);
+        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId(), 'name' => $name]);
 
         $user = new User;
         $user->main_character_id = $character->character_id;
@@ -250,7 +262,7 @@ it('reviews — a junior reviewer sees an application waiting at their stage', f
     snap($page, "recruitment-reviews-junior-{$device}");
 })->with(['desktop', 'iphone']);
 
-it('reviews — a junior reviewer does not see an application at a senior stage', function () {
+it('reviews — a junior reviewer does not see an application at a senior stage', function (string $device) {
     $character = actingAsCharacter();
     $reviewer = makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -265,16 +277,16 @@ it('reviews — a junior reviewer does not see an application at a senior stage'
     seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 1);
     cache()->flush();
 
-    $page = visit('/recruitment/reviews');
+    $page = deviceVisit($device, '/recruitment/reviews');
     $page->assertNoSmoke();
 
     $page->waitForText('Nothing to review');
     $page->assertDontSee('Jane Applicant');
 
-    snap($page, 'recruitment-reviews-junior-empty-desktop');
-});
+    snap($page, "recruitment-reviews-junior-empty-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('reviews — a senior reviewer sees the application at the final stage', function () {
+it('reviews — a senior reviewer sees the application at the final stage', function (string $device) {
     $character = actingAsCharacter();
     $reviewer = makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -288,12 +300,12 @@ it('reviews — a senior reviewer sees the application at the final stage', func
     seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 1);
     cache()->flush();
 
-    $page = visit('/recruitment/reviews');
+    $page = deviceVisit($device, '/recruitment/reviews');
     $page->assertNoSmoke();
 
     $page->waitForText('Reviews');
     $page->assertSee('Jane Applicant');
     $page->assertSee('Stage 2 of 2');
 
-    snap($page, 'recruitment-reviews-senior-desktop');
-});
+    snap($page, "recruitment-reviews-senior-{$device}");
+})->with(['desktop', 'iphone']);

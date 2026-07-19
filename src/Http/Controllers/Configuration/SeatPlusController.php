@@ -52,7 +52,9 @@ class SeatPlusController extends Controller
             'search_param' => 'string',
         ]);
 
-        $query = User::with('characters', 'characters.alliance', 'characters.corporation', 'mainCharacter.corporation');
+        // UserRessource reads each character's refreshToken (for its granted scopes), so eager-load it
+        // to avoid a lazy-loading violation under Model::preventLazyLoading().
+        $query = User::with('characters', 'characters.refreshToken', 'characters.alliance', 'characters.corporation', 'mainCharacter.corporation');
 
         if (request()->has('search_param')) {
             $query = $query->search($validatedData['search_param']);

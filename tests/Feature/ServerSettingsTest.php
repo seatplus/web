@@ -14,6 +14,11 @@ beforeEach(function () {
 });
 
 it('has users list', function () {
+    // A second user whose character/refreshToken is not pre-loaded — UserRessource reads each
+    // character's refreshToken for its scopes, so the list query must eager-load it (strict mode
+    // would otherwise raise a LazyLoadingViolationException, as it did on /configuration/settings).
+    Event::fakeFor(fn () => User::factory()->create());
+
     $response = test()->actingAs(test()->test_user)
         ->get(route('server.settings'));
 
