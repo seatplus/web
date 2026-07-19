@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\Route;
 use Seatplus\Auth\Http\Middleware\CheckAuthorization;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ApplicationsController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\EnlistmentsController;
-use Seatplus\Web\Http\Controllers\Corporation\Recruitment\GetRecruitmentIndexController;
 use Seatplus\Web\Http\Controllers\Corporation\Recruitment\ImpersonateRecruit;
 use Seatplus\Web\Http\Middleware\CheckAffiliationForApplication;
 
@@ -48,10 +47,6 @@ Route::prefix('recruitment')
 
                 Route::post('/watchlist/{corporation_id}', 'updateWatchlist')->name('update.watchlist');
             });
-
-        /* Junior HR */
-        Route::middleware(CheckAuthorization::class.':can open or close corporations for recruitment|can accept or deny applications,director')
-            ->get('', GetRecruitmentIndexController::class)->name('corporation.recruitment');
 
         Route::controller(ApplicationsController::class)
             ->group(function () {

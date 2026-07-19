@@ -136,7 +136,7 @@ class ApplicationsController extends Controller
             'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
-            'activeSidebarElement' => 'corporation.recruitment',
+            'activeSidebarElement' => 'recruitment.reviews',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ], $inspectionProps->build($characterIds, request())));
     }
@@ -154,7 +154,7 @@ class ApplicationsController extends Controller
         // decision, and hires (creates an Employment) when the final round is accepted.
         $action->execute($application, $request->get('decision'), $request->get('explanation'));
 
-        return redirect()->route('corporation.recruitment')
+        return redirect()->route('recruitment.reviews')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
                 User::class => 'User',
                 CharacterInfo::class => 'Character',
