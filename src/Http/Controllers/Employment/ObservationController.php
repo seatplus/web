@@ -4,7 +4,6 @@ namespace Seatplus\Web\Http\Controllers\Employment;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,28 +44,33 @@ class ObservationController extends Controller
                     (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director'),
                 ),
             )
-            ->get(['name', 'corporation_id', 'ticker'])
-            ->map(fn (CorporationInfo $corporation) => [
+            ->get(['name', 'corporation_id', 'ticker']);
+
+        $corporationIds = $corporations->pluck('corporation_id')->map(fn (mixed $id): int => (int) $id);
+
+        return Inertia::render('Employment/Index', [
+            'corporations' => $corporations->map(fn (CorporationInfo $corporation) => [
                 'corporation_id' => $corporation->corporation_id,
                 'name' => $corporation->name,
                 'ticker' => $corporation->ticker,
-                // Server-provided endpoint so the page fetches members via http.js without Ziggy.
-                'observe_url' => route('employment.observe.corporation', $corporation->corporation_id),
-            ]);
-
-        return Inertia::render('Employment/Index', [
-            'corporations' => $corporations,
+            ]),
+            // Members keyed by corporation_id, deferred so the corporation cards render first. The
+            // component filters them client-side — no per-corporation search endpoint needed.
+            'members' => Inertia::defer(fn () => $corporationIds->mapWithKeys(fn (int $corporationId) => [
+                $corporationId => $this->membersOf($corporationId),
+            ])),
         ]);
     }
 
-    public function corporation(int $corporation_id): AnonymousResourceCollection
+    /**
+     * The corporation's members (registered users with a character in it) shaped for observation. The
+     * index already restricts the corporation list to those the user may observe, so no re-check here.
+     *
+     * @return array<int, mixed>
+     */
+    private function membersOf(int $corporation_id): array
     {
-        $this->authorizeCorporation($corporation_id);
-
-        $search = request()->string('search')->toString();
-
         $users = User::query()
-            ->when($search !== '', fn (Builder $query) => $query->whereHas('characters', fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search}%")))
             ->whereHas('characters.corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id))
             ->with([
                 'mainCharacter',
@@ -75,11 +79,11 @@ class ObservationController extends Controller
                 'characters.alliance.ssoScopes',
                 'characters.refreshToken',
             ])
-            ->paginate();
+            ->get();
 
-        $this->attachObservationData($users->getCollection(), $corporation_id);
+        $this->attachObservationData($users, $corporation_id);
 
-        return EmploymentObservationResource::collection($users);
+        return EmploymentObservationResource::collection($users)->resolve();
     }
 
     /**
