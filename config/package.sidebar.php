@@ -79,13 +79,7 @@ return [
             'route' => 'corporation.member_tracking',
             'icon' => 'CheckBadgeIcon',
         ],
-        [
-            'name' => 'Member Compliance',
-            'permission' => 'view member compliance',
-            'character_role' => 'director',
-            'route' => 'corporation.member_compliance',
-            'icon' => 'ShieldCheckIcon',
-        ],
+        // Member Compliance moved to Personnel → Observation (which adds activity + lifecycle status).
         [
             'name' => 'Recruitment',
             'permission' => 'can open or close corporations for recruitment|can accept or deny applications',
@@ -94,13 +88,16 @@ return [
             'icon' => 'ClipboardDocumentCheckIcon',
         ],
     ],
-    'Recruitment' => [
+    // Applicant-facing front door — browsing/applying to open postings. Visible to every user.
+    'Careers' => [
         [
-            // Applicant-facing central job portal — no permission, visible to every authenticated user.
             'name' => 'Job Portal',
             'route' => 'recruitment.portal',
             'icon' => 'BriefcaseIcon',
         ],
+    ],
+    // The HR view of the whole employee lifecycle — recruit, review, observe. Director-gated.
+    'Personnel' => [
         [
             // Reviewer inbox — applications waiting at a stage this user's control group handles.
             'name' => 'Reviews',
@@ -117,8 +114,6 @@ return [
             'route' => 'recruitment.manage',
             'icon' => 'ClipboardDocumentListIcon',
         ],
-    ],
-    'Employment' => [
         [
             // Observation during employment — compliance + activity + lifecycle status of corp members.
             'name' => 'Observation',
