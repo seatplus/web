@@ -1,10 +1,9 @@
 <?php
 
+use Illuminate\Support\Collection;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
-use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Models\Employment\Employment;
 
 beforeEach(function () {
@@ -12,20 +11,15 @@ beforeEach(function () {
     cache()->flush();
 });
 
-it('lists corporations that can be observed', function () {
+it('lists every authorized corporation, even without SSO scopes configured', function () {
     $corp = test()->test_character->corporation;
-    SsoScopes::factory()->create([
-        'morphable_id' => $corp->corporation_id,
-        'morphable_type' => CorporationInfo::class,
-        'type' => 'default',
-    ]);
 
     test()->actingAs(test()->test_user)
         ->get(route('employment.observe'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Employment/Index')
-            ->has('corporations')
+            ->where('corporations', fn (Collection $corporations) => $corporations->pluck('corporation_id')->contains($corp->corporation_id))
         );
 });
 
