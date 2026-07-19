@@ -15,6 +15,7 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\JobPostingResource;
+use Seatplus\Web\Models\Recruitment\ApplicationGroupMember;
 use Seatplus\Web\Models\Recruitment\ApplicationRoundReview;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
@@ -91,7 +92,11 @@ class JobPortalController extends Controller
                     };
                 }
             )
-            ->with(['corporation', 'logEntries'])
+            ->with([
+                'corporation',
+                'logEntries',
+                'applicationable' => fn (MorphTo $morphTo) => $morphTo->morphWith([CharacterInfo::class => []]),
+            ])
             ->latest('updated_at')
             ->get();
 
@@ -108,7 +113,28 @@ class JobPortalController extends Controller
             ->get()
             ->groupBy('application_id');
 
-        return $applications->map(function (Application $application) use ($roundsByCorporation, $reviewsByApplication) {
+        // A multi-character application is one submission — collapse its members into a single entry
+        // that lists the covered characters. Ungrouped applications are a group of one.
+        $groupIdByApplication = ApplicationGroupMember::query()
+            ->whereIn('application_id', $applications->pluck('id'))
+            ->pluck('group_id', 'application_id');
+
+        $groupKey = fn (Application $application): string => (string) ($groupIdByApplication->get((string) $application->id) ?? $application->id);
+
+        $coveredCharactersByGroup = $applications
+            ->filter(fn (Application $application) => $application->applicationable instanceof CharacterInfo)
+            ->groupBy($groupKey)
+            ->map(fn (Collection $members) => $members
+                ->map(function (Application $application): string {
+                    /** @var CharacterInfo $character */
+                    $character = $application->applicationable;
+
+                    return (string) $character->name;
+                })
+                ->values()
+                ->all());
+
+        return $applications->unique($groupKey)->map(function (Application $application) use ($roundsByCorporation, $reviewsByApplication, $groupKey, $coveredCharactersByGroup) {
             /** @var Collection<int, EnlistmentReviewRound> $rounds */
             $rounds = $roundsByCorporation->get($application->corporation_id, collect());
             $position = $application->logEntries->where('type', 'decision')->count();
@@ -121,6 +147,8 @@ class JobPortalController extends Controller
                 'application_id' => $application->id,
                 'corporation' => CorporationShape::make($corporation),
                 'status' => $application->status,
+                // The character(s) this application covers (empty for a whole-account application).
+                'covered_characters' => $coveredCharactersByGroup->get($groupKey($application), []),
                 'withdraw_url' => route('recruitment.withdraw', $application->id),
                 'current_position' => $position,
                 'current_stage' => $application->status === 'open'

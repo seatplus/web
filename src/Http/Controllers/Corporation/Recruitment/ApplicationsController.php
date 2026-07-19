@@ -150,7 +150,7 @@ class ApplicationsController extends Controller
         ], $inspectionProps->build($characterIds, request())));
     }
 
-    public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action): RedirectResponse
+    public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action, ApplicationGroupService $groupService): RedirectResponse
     {
         $request->validate([
             'decision' => ['required', Rule::in(['rejected', 'accepted'])],
@@ -159,9 +159,12 @@ class ApplicationsController extends Controller
 
         $application = Application::findOrFail($application_id);
 
-        // Advances the application one review round: gates on the round's control group, records the
-        // decision, and hires (creates an Employment) when the final round is accepted.
-        $action->execute($application, $request->get('decision'), $request->get('explanation'));
+        // A multi-character application is decided as one: every covered character advances the same
+        // round and, on final acceptance, is hired as its own Employment. Ungrouped applications are a
+        // group of one. Each member gates on the round's control group and records its own decision log.
+        $groupService->groupFor($application)->each(
+            fn (Application $member) => $action->execute($member, $request->get('decision'), $request->get('explanation')),
+        );
 
         return redirect()->route('recruitment.reviews')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {

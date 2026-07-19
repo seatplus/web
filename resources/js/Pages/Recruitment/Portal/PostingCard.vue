@@ -60,6 +60,13 @@
           </span>
         </div>
 
+        <p
+          v-if="application.covered_characters && application.covered_characters.length"
+          class="mt-1 text-xs text-gray-500"
+        >
+          Applying with: {{ application.covered_characters.join(', ') }}
+        </p>
+
         <div
           v-if="application.status === 'open' && application.total_stages > 0"
           class="mt-1 h-1.5 w-full rounded-full bg-gray-100"
