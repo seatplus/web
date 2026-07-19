@@ -108,10 +108,17 @@
     <div class="border-t border-gray-100 pt-3 space-y-3">
       <button
         type="button"
-        class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-500"
         @click="watchlistOpen = !watchlistOpen"
       >
         {{ watchlistOpen ? 'Hide' : 'Manage' }} watchlist
+        <span
+          v-if="watchlistCount > 0"
+          class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
+          title="Items, regions and systems on this watchlist"
+        >
+          {{ watchlistCount }} set
+        </span>
       </button>
 
       <div
@@ -181,7 +188,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 import EveImage from "@/Shared/EveImage.vue";
@@ -216,6 +223,9 @@ const closeForm = useForm({});
 const watchlistOpen = ref(false);
 // Re-key the items autosuggest after each selection so it clears its input.
 const itemsKey = ref(0);
+
+// Surfaced on the (collapsed) toggle so a configured watchlist is visible at a glance.
+const watchlistCount = computed(() => form.systems.length + form.regions.length + form.items.length);
 
 function addStage() {
   form.stages.push({ label: "", role_id: null });
