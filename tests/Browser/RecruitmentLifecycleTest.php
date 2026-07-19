@@ -250,7 +250,7 @@ it('reviews — a junior reviewer sees an application waiting at their stage', f
     snap($page, "recruitment-reviews-junior-{$device}");
 })->with(['desktop', 'iphone']);
 
-it('reviews — a junior reviewer does not see an application at a senior stage', function () {
+it('reviews — a junior reviewer does not see an application at a senior stage', function (string $device) {
     $character = actingAsCharacter();
     $reviewer = makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -265,16 +265,16 @@ it('reviews — a junior reviewer does not see an application at a senior stage'
     seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 1);
     cache()->flush();
 
-    $page = visit('/recruitment/reviews');
+    $page = deviceVisit($device, '/recruitment/reviews');
     $page->assertNoSmoke();
 
     $page->waitForText('Nothing to review');
     $page->assertDontSee('Jane Applicant');
 
-    snap($page, 'recruitment-reviews-junior-empty-desktop');
-});
+    snap($page, "recruitment-reviews-junior-empty-{$device}");
+})->with(['desktop', 'iphone']);
 
-it('reviews — a senior reviewer sees the application at the final stage', function () {
+it('reviews — a senior reviewer sees the application at the final stage', function (string $device) {
     $character = actingAsCharacter();
     $reviewer = makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -288,12 +288,12 @@ it('reviews — a senior reviewer sees the application at the final stage', func
     seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 1);
     cache()->flush();
 
-    $page = visit('/recruitment/reviews');
+    $page = deviceVisit($device, '/recruitment/reviews');
     $page->assertNoSmoke();
 
     $page->waitForText('Reviews');
     $page->assertSee('Jane Applicant');
     $page->assertSee('Stage 2 of 2');
 
-    snap($page, 'recruitment-reviews-senior-desktop');
-});
+    snap($page, "recruitment-reviews-senior-{$device}");
+})->with(['desktop', 'iphone']);
