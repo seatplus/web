@@ -72,6 +72,7 @@
         v-for="character in recruit.characters"
         :key="'character.contact:' + character.character_id"
         :character="character"
+        :contacts="contactsFor(character.character_id)"
         :corporation_id="targetCorporation.corporation_id"
         :alliance_id="targetCorporation.alliance_id"
       />
@@ -94,6 +95,8 @@
         v-for="character in recruit.characters"
         :key="'character.skills:' + character.character_id"
         :character-id="character.character_id"
+        :skills="skillsFor(character.character_id)"
+        :skill-queue="skillQueueFor(character.character_id)"
       />
     </div>
     <div
@@ -181,6 +184,17 @@ export default {
         },
         select(entry) {
             this.active_element = entry
+        },
+        // Skills and contacts arrive as deferred page props keyed by character_id (built by
+        // CharacterInspectionScrollProps), so read them off the page rather than threading them through.
+        skillsFor(characterId) {
+            return _.get(this.$page.props, ['skills', characterId], [])
+        },
+        skillQueueFor(characterId) {
+            return _.get(this.$page.props, ['skillQueue', characterId], [])
+        },
+        contactsFor(characterId) {
+            return _.get(this.$page.props, ['contacts', characterId], [])
         }
     }
 }
