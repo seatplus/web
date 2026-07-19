@@ -93,6 +93,11 @@ Route::middleware('web')
                         include __DIR__.'/Routes/Recruitment.php';
                     });
 
+                Route::prefix('employment')
+                    ->group(function () {
+                        include __DIR__.'/Routes/Employment.php';
+                    });
+
                 Route::prefix('onboarding')
                     ->group(function () {
                         include __DIR__.'/Routes/Onboarding/Onboarding.php';

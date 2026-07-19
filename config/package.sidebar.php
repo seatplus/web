@@ -118,6 +118,16 @@ return [
             'icon' => 'ClipboardDocumentListIcon',
         ],
     ],
+    'Employment' => [
+        [
+            // Observation during employment — compliance + activity + lifecycle status of corp members.
+            'name' => 'Observation',
+            'permission' => 'view member compliance',
+            'character_role' => 'director',
+            'route' => 'employment.observe',
+            'icon' => 'EyeIcon',
+        ],
+    ],
     'Access Control' => [
         [
             'name' => 'Control Groups',
