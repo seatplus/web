@@ -11,10 +11,7 @@
 
     <div class="relative max-h-96 overflow-y-auto">
       <div class="hidden sm:grid grid-cols-12 gap-x-0 gap-y-1 grid-flow-row z-10 sticky top-0 border-t border-b border-gray-200 bg-gray-50 text-sm font-medium text-gray-500">
-        <div class="px-3 py-1">
-          Token
-        </div>
-        <div class="px-3 py-1 col-span-3">
+        <div class="px-3 py-1 col-span-4">
           Name
         </div>
         <div class="px-3 py-1 col-span-3">
@@ -36,13 +33,11 @@
           v-for="member in result"
           :key="member.character_id"
           :member="member"
-          :required_scopes="corporation.required_scopes"
         />
         <MemberTrackingListElement
           v-for="(member, index) in result"
           :key="member.character_id"
           :member="member"
-          :required_scopes="corporation.required_scopes"
           :even="index%2"
         />
         <div ref="scrollComponent" />
