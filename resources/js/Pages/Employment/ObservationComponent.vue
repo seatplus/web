@@ -77,6 +77,12 @@
         >
           {{ member.count_missing === 0 ? 'Compliant' : member.count_missing + ' missing scopes' }}
         </span>
+        <Link
+          :href="member.inspect_url"
+          class="text-sm font-medium text-indigo-600 hover:text-indigo-500 whitespace-nowrap"
+        >
+          Inspect
+        </Link>
       </li>
     </ul>
   </div>
@@ -84,6 +90,7 @@
 
 <script setup>
 import { onMounted, ref, watch } from "vue";
+import { Link } from "@inertiajs/vue3";
 import { getJson } from "@/Functions/http";
 import EveImage from "@/Shared/EveImage.vue";
 

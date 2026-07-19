@@ -29,6 +29,8 @@ class EmploymentObservationResource extends JsonResource
             'last_logon' => $lastLogonByCharacter->get($character->character_id),
         ]);
 
+        $corporationId = $this->getAttribute('observation_corporation_id');
+
         return [
             'id' => $this->id,
             'main_character' => $this->mainCharacter,
@@ -37,6 +39,7 @@ class EmploymentObservationResource extends JsonResource
             'count_complete' => $characters->reject(fn (array $character) => data_get($character, 'missing_scopes'))->count(),
             'count_total' => $characters->count(),
             'employment_status' => $status instanceof EmploymentStatus ? $status->value : null,
+            'inspect_url' => route('employment.observe.member', [$corporationId, $this->getKey()]),
         ];
     }
 

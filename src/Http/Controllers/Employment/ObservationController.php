@@ -11,9 +11,11 @@ use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationMemberTracking;
+use Seatplus\Web\Http\Actions\Corporation\Recruitment\WatchlistArrayAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\EmploymentObservationResource;
 use Seatplus\Web\Models\Employment\Employment;
+use Seatplus\Web\Services\CharacterInspectionScrollProps;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
 /**
@@ -56,6 +58,8 @@ class ObservationController extends Controller
 
     public function corporation(int $corporation_id): AnonymousResourceCollection
     {
+        $this->authorizeCorporation($corporation_id);
+
         $search = request()->string('search')->toString();
 
         $users = User::query()
@@ -73,6 +77,42 @@ class ObservationController extends Controller
         $this->attachObservationData($users->getCollection(), $corporation_id);
 
         return EmploymentObservationResource::collection($users);
+    }
+
+    /**
+     * Inspect a single member: their characters (in this corporation) with the shared Asset / Wallet /
+     * Contract tabs, fed the same scroll props as the character pages via CharacterInspectionScrollProps.
+     */
+    public function member(int $corporation_id, User $user, WatchlistArrayAction $watchlist, CharacterInspectionScrollProps $inspection): Response
+    {
+        $this->authorizeCorporation($corporation_id);
+
+        $user->loadMissing([
+            'mainCharacter',
+            'characters' => fn (Relation $query) => $query->whereHas('corporation', fn (Builder $query) => $query->where('corporation_infos.corporation_id', $corporation_id)),
+        ]);
+
+        $characterIds = $user->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
+
+        return Inertia::render('Employment/Inspect', array_merge([
+            'recruit' => $user,
+            'watchlist' => $watchlist->execute($corporation_id),
+            'targetCorporation' => CorporationInfo::find($corporation_id),
+        ], $inspection->build($characterIds, request())));
+    }
+
+    private function authorizeCorporation(int $corporation_id): void
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        if ($user->can('superuser')) {
+            return;
+        }
+
+        $observableIds = (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director');
+
+        abort_unless(in_array($corporation_id, $observableIds), 403, 'You may not observe this corporation.');
     }
 
     /**
@@ -96,9 +136,10 @@ class ObservationController extends Controller
             ->whereIn('subject_id', $users->pluck('id'))
             ->pluck('status', 'subject_id');
 
-        $users->each(function (User $user) use ($lastLogonByCharacter, $statusByUser) {
+        $users->each(function (User $user) use ($lastLogonByCharacter, $statusByUser, $corporation_id) {
             $user->setAttribute('observation_last_logon', $lastLogonByCharacter);
             $user->setAttribute('observation_status', $statusByUser->get($user->getKey()));
+            $user->setAttribute('observation_corporation_id', $corporation_id);
         });
     }
 }

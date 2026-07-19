@@ -10,5 +10,6 @@ Route::middleware(CheckAuthorization::class.':view member compliance,director')
     ->controller(ObservationController::class)
     ->group(function () {
         Route::get('', 'index')->name('employment.observe');
+        Route::get('/{corporation_id}/member/{user}', 'member')->name('employment.observe.member');
         Route::get('/{corporation_id}', 'corporation')->name('employment.observe.corporation');
     });

@@ -49,3 +49,17 @@ it('returns a corporation\'s members with compliance, activity and employment st
         ->assertJsonFragment(['id' => test()->test_user->getKey()])
         ->assertJsonFragment(['employment_status' => 'active']);
 });
+
+it('inspects a member with the shared review tabs', function () {
+    $corp = test()->test_character->corporation;
+
+    test()->actingAs(test()->test_user)
+        ->get(route('employment.observe.member', [$corp->corporation_id, test()->test_user->getKey()]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Employment/Inspect')
+            ->has('recruit')
+            ->has('watchlist')
+            ->has('targetCorporation')
+        );
+});
