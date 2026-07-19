@@ -38,7 +38,7 @@ it('lists open applications with their current stage', function () {
         );
 });
 
-it('excludes applications that are no longer open', function () {
+it('moves settled applications out of the queue and into the history list', function () {
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
@@ -53,5 +53,9 @@ it('excludes applications that are no longer open', function () {
 
     test()->actingAs(test()->test_user)
         ->get(route('recruitment.reviews'))
-        ->assertInertia(fn (Assert $page) => $page->has('pending', 0));
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('pending', 0)
+            ->has('history', 1)
+            ->where('history.0.status', 'accepted')
+        );
 });
