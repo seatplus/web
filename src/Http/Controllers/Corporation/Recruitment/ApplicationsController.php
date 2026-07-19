@@ -48,6 +48,7 @@ use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
 use Seatplus\Web\Http\Resources\ApplicationRessource;
 use Seatplus\Web\Services\CharacterInspectionScrollProps;
+use Seatplus\Web\Services\Recruitment\ApplicationGroupService;
 use Seatplus\Web\Support\Translations;
 
 class ApplicationsController extends Controller
@@ -95,7 +96,7 @@ class ApplicationsController extends Controller
         return ApplicationRessource::collection($applications->paginate());
     }
 
-    public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps): Response
+    public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps, ApplicationGroupService $groupService): Response
     {
         $application = Application::query()
             ->with([
@@ -114,23 +115,31 @@ class ApplicationsController extends Controller
 
         $applicationable = $application->applicationable;
 
-        $recruit = match ($application->applicationable_type) {
-            User::class => $applicationable,
-            CharacterInfo::class => collect([
-                // snake_case to match the raw User-model branch above (and the Vue read
-                // `recruit.main_character` in Pages/Corporation/Recruitment/Application.vue)
-                'main_character' => $applicationable,
-                'characters' => [$applicationable],
-            ]),
-            default => collect([]),
-        };
+        if ($applicationable instanceof User) {
+            $recruit = $applicationable;
+            $characterIds = $applicationable->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
+        } elseif ($applicationable instanceof CharacterInfo) {
+            // A single-character application may cover several characters as one group — review them all
+            // together: the recruit's characters are every covered character, not just the opened one.
+            $coveredCharacterIds = $groupService->groupFor($application)
+                ->pluck('applicationable_id')
+                ->map(fn (mixed $id): int => (int) $id);
 
-        // The recruit's character ids feed the shared Asset/Wallet tab components' scroll props.
-        $characterIds = match (true) {
-            $applicationable instanceof User => $applicationable->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all(),
-            $applicationable instanceof CharacterInfo => [(int) $applicationable->character_id],
-            default => [],
-        };
+            $characters = CharacterInfo::query()
+                ->whereIn('character_id', $coveredCharacterIds)
+                ->with('batchUpdate')
+                ->get();
+
+            // snake_case to match the User-model branch (and the Vue read `recruit.main_character`).
+            $recruit = collect([
+                'main_character' => $applicationable,
+                'characters' => $characters,
+            ]);
+            $characterIds = $characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
+        } else {
+            $recruit = collect([]);
+            $characterIds = [];
+        }
 
         return inertia('Corporation/Recruitment/Application', array_merge([
             'recruit' => $recruit->toArray(),

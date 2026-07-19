@@ -12,6 +12,7 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Models\Recruitment\ApplicationGroupMember;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 use Seatplus\Web\Services\Recruitment\StageGate;
 use Seatplus\Web\Support\CorporationShape;
@@ -56,11 +57,22 @@ class ReviewInboxController extends Controller
             ->get()
             ->groupBy('corporation_id');
 
+        // Multi-character applications are one review: collapse a group into a single row and expose how
+        // many characters it covers. Ungrouped (single-char / whole-account) applications are groups of one.
+        $groupIdByApplication = ApplicationGroupMember::query()
+            ->whereIn('application_id', $applications->pluck('id'))
+            ->pluck('group_id', 'application_id');
+        $groupSizes = $groupIdByApplication->countBy();
+
+        $groupKey = fn (Application $application): string => (string) $groupIdByApplication->get((string) $application->id, (string) $application->id);
+        $coveredCount = fn (Application $application): int => (int) $groupSizes->get($groupIdByApplication->get((string) $application->id), 1);
+
         // Open applications sitting at a stage this user's control group reviews.
         $pending = $applications
             ->where('status', 'open')
             ->filter(fn (Application $application) => $stageGate->allows($user, $this->currentRoleId($application, $roundsByCorporation)))
-            ->map(fn (Application $application) => $this->present($application, $roundsByCorporation))
+            ->unique($groupKey)
+            ->map(fn (Application $application) => $this->present($application, $roundsByCorporation, $coveredCount($application)))
             ->values()
             ->all();
 
@@ -68,7 +80,8 @@ class ReviewInboxController extends Controller
         $history = $applications
             ->whereIn('status', ['accepted', 'rejected'])
             ->sortByDesc('updated_at')
-            ->map(fn (Application $application) => $this->presentClosed($application, $roundsByCorporation))
+            ->unique($groupKey)
+            ->map(fn (Application $application) => $this->presentClosed($application, $roundsByCorporation, $coveredCount($application)))
             ->values()
             ->all();
 
@@ -97,7 +110,7 @@ class ReviewInboxController extends Controller
      * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
      * @return array<string, mixed>
      */
-    private function present(Application $application, Collection $roundsByCorporation): array
+    private function present(Application $application, Collection $roundsByCorporation, int $coveredCount = 1): array
     {
         /** @var Collection<int, EnlistmentReviewRound> $rounds */
         $rounds = $roundsByCorporation->get($application->corporation_id, collect());
@@ -107,6 +120,7 @@ class ReviewInboxController extends Controller
         return [
             'application_id' => $application->id,
             'applicant' => $this->applicant($application),
+            'covered_count' => $coveredCount,
             'corporation' => CorporationShape::make($this->corporationOf($application)),
             'stage' => [
                 'position' => $position,
@@ -123,7 +137,7 @@ class ReviewInboxController extends Controller
      * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
      * @return array<string, mixed>
      */
-    private function presentClosed(Application $application, Collection $roundsByCorporation): array
+    private function presentClosed(Application $application, Collection $roundsByCorporation, int $coveredCount = 1): array
     {
         /** @var Collection<int, EnlistmentReviewRound> $rounds */
         $rounds = $roundsByCorporation->get($application->corporation_id, collect());
@@ -131,6 +145,7 @@ class ReviewInboxController extends Controller
         return [
             'application_id' => $application->id,
             'applicant' => $this->applicant($application),
+            'covered_count' => $coveredCount,
             'corporation' => CorporationShape::make($this->corporationOf($application)),
             'status' => $application->status,
             'decided_at' => $application->updated_at?->toDateTimeString(),

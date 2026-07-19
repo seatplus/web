@@ -40,7 +40,7 @@
           <p class="text-sm font-semibold text-gray-900 truncate">
             {{ row.applicant.name ?? 'Unknown applicant' }}
             <span class="text-xs font-normal text-gray-400">
-              {{ row.applicant.is_user ? 'account-wide' : 'single character' }}
+              {{ row.applicant.is_user ? 'account-wide' : (row.covered_count > 1 ? `${row.covered_count} characters` : 'single character') }}
             </span>
           </p>
           <p class="text-sm text-gray-500 truncate">
@@ -88,7 +88,7 @@
             <p class="text-sm font-semibold text-gray-900 truncate">
               {{ row.applicant.name ?? 'Unknown applicant' }}
               <span class="text-xs font-normal text-gray-400">
-                {{ row.applicant.is_user ? 'account-wide' : 'single character' }}
+                {{ row.applicant.is_user ? 'account-wide' : (row.covered_count > 1 ? `${row.covered_count} characters` : 'single character') }}
               </span>
             </p>
             <p class="text-sm text-gray-500 truncate">
