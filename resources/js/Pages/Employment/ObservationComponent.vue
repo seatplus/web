@@ -89,9 +89,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
-import { Link } from "@inertiajs/vue3";
-import { getJson } from "@/Functions/http";
+import { computed, ref } from "vue";
+import { Link, usePage } from "@inertiajs/vue3";
 import EveImage from "@/Shared/EveImage.vue";
 
 const props = defineProps({
@@ -101,19 +100,27 @@ const props = defineProps({
   },
 });
 
-const members = ref([]);
-const loading = ref(true);
+const page = usePage();
 const search = ref("");
 
-async function fetchMembers() {
-  loading.value = true;
-  const url = search.value
-    ? `${props.corporation.observe_url}?search=${encodeURIComponent(search.value)}`
-    : props.corporation.observe_url;
-  const response = await getJson(url);
-  members.value = response?.data ?? [];
-  loading.value = false;
-}
+// Members arrive as a deferred page prop keyed by corporation_id — undefined until it loads.
+const corporationMembers = computed(() => page.props.members?.[props.corporation.corporation_id]);
+const loading = computed(() => corporationMembers.value === undefined);
+
+// Filter client-side — the member set per corporation is bounded, so no search round-trip is needed.
+const members = computed(() => {
+  const list = corporationMembers.value ?? [];
+  const term = search.value.trim().toLowerCase();
+
+  if (!term) {
+    return list;
+  }
+
+  return list.filter((member) =>
+    (member.main_character?.name ?? "").toLowerCase().includes(term)
+    || (member.characters ?? []).some((character) => (character.name ?? "").toLowerCase().includes(term)),
+  );
+});
 
 function lastSeen(lastLogon) {
   if (!lastLogon) {
@@ -131,12 +138,4 @@ function statusClass(status) {
     alumni: "bg-gray-100 text-gray-600",
   }[status] ?? "bg-gray-100 text-gray-600";
 }
-
-let debounce;
-watch(search, () => {
-  clearTimeout(debounce);
-  debounce = setTimeout(fetchMembers, 300);
-});
-
-onMounted(fetchMembers);
 </script>
