@@ -60,6 +60,13 @@
           </span>
         </div>
 
+        <p
+          v-if="application.covered_characters && application.covered_characters.length"
+          class="mt-1 text-xs text-gray-500"
+        >
+          Applying with: {{ application.covered_characters.join(', ') }}
+        </p>
+
         <div
           v-if="application.status === 'open' && application.total_stages > 0"
           class="mt-1 h-1.5 w-full rounded-full bg-gray-100"
@@ -112,30 +119,31 @@
         class="space-y-2"
         @submit.prevent="submit"
       >
-        <select
+        <fieldset
           v-if="!isUserType"
-          v-model="form.character_id"
-          required
-          class="block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          class="space-y-1"
         >
-          <option
-            :value="null"
-            disabled
-          >
-            Select a character&hellip;
-          </option>
-          <option
+          <legend class="text-xs font-medium text-gray-500">
+            Select the character(s) to apply with
+          </legend>
+          <label
             v-for="character in characters"
             :key="character.character_id"
-            :value="character.character_id"
+            class="flex items-center gap-2 text-sm text-gray-700"
           >
+            <input
+              v-model="form.character_ids"
+              type="checkbox"
+              :value="character.character_id"
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            >
             {{ character.name }}
-          </option>
-        </select>
+          </label>
+        </fieldset>
 
         <button
           type="submit"
-          :disabled="form.processing"
+          :disabled="form.processing || (!isUserType && form.character_ids.length === 0)"
           class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
         >
           {{ form.processing ? 'Applying&hellip;' : 'Apply' }}
@@ -195,7 +203,8 @@ const progressPercent = computed(() => {
 
 const form = useForm({
   corporation_id: props.posting.corporation_id,
-  character_id: null,
+  // Empty for whole-account postings; the selected subset for single-character postings.
+  character_ids: [],
 });
 
 function submit() {

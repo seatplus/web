@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
 use Seatplus\Auth\Models\User;
@@ -156,66 +155,12 @@ test('secondary user can apply as user', function () {
     expect(test()->secondary_user->refresh()->application)->toBeNull();
 });
 
-test('senior hr sees recruitment component', function () {
-    expect(test()->test_user->can('superuser'))->toBeFalse();
-
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('corporation.recruitment'))
-        ->assertForbidden();
-
-    assignPermissionToTestUser(['can open or close corporations for recruitment']);
-
-    test()->actingAs(test()->test_user->refresh())
-        ->get(route('corporation.recruitment'))
-        ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/RecruitmentIndex'));
-});
-
-test('junior hr sees recruitment component', function () {
-    createEnlistment();
-
-    // First remove all roles from the user
-    test()->test_user->syncRoles([]);
-    expect(test()->test_user->roles)->toBeEmpty();
-
-    // Remove all Permissions
-    test()->test_user->syncPermissions([]);
-    expect(test()->test_user->permissions)->toBeEmpty();
-
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('corporation.recruitment'))
-        ->assertForbidden();
-
-    assignPermissionToTestUser(['can accept or deny applications']);
-
-    expect(test()->test_user->characters)->toHaveCount(1)
-        ->and(test()->test_user->characters->first()->character_id)->toBe(test()->test_character->character_id)
-        ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
-        ->and(test()->test_user->can('superuser'))->toBeFalse()
-        ->and(test()->test_user->can('can open or close corporations for recruitment'))->toBeFalse()
-        ->and(test()->actingAs(test()->test_user->refresh())->get(route('corporation.recruitment')))
-        ->assertOk()
-        ->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/RecruitmentIndex')
-                ->has('enlistments', 1)
-        );
-});
-
 test('junior hr handles open user applications', function () {
     createEnlistment();
 
     test()->test_user = test()->test_user->refresh();
 
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(0, 'data');
-
     applySecondary();
-
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(1, 'data');
 
     // open application
 
@@ -260,7 +205,7 @@ test('junior hr handles open user applications', function () {
             'decision' => 'rejected',
             'explanation' => 'Some reason',
         ])
-        ->assertRedirect(route('corporation.recruitment'));
+        ->assertRedirect(route('recruitment.reviews'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_user->id,
@@ -276,15 +221,7 @@ test('junior hr handles open character applications', function () {
 
     test()->test_user = test()->test_user->refresh();
 
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(0, 'data');
-
     applySecondary(false);
-
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(1, 'data');
 
     // open application
     expect(Application::all())->toHaveCount(1)
@@ -310,7 +247,7 @@ test('junior hr handles open character applications', function () {
             'decision' => 'rejected',
             'explanation' => 'Some reason',
         ])
-        ->assertRedirect(route('corporation.recruitment'));
+        ->assertRedirect(route('recruitment.reviews'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
         'applicationable_id' => test()->secondary_character->character_id,
@@ -319,57 +256,6 @@ test('junior hr handles open character applications', function () {
     ]);
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
-});
-
-test('single-character application lists only the applying character, not the account main', function () {
-    createEnlistment();
-
-    test()->test_user = test()->test_user->refresh();
-
-    // Give the applicant a second character; the account main stays the original character.
-    $alt = CharacterUser::factory()->make();
-    test()->secondary_user->characterUsers()->save($alt);
-    $altCharacterId = $alt->character_id;
-
-    expect(test()->secondary_user->refresh()->main_character_id)
-        ->not->toEqual($altCharacterId);
-
-    // Apply as the alt only (single-character application).
-    test()->actingAs(test()->secondary_user)
-        ->post(route('post.application'), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
-            'character_id' => $altCharacterId,
-        ]);
-
-    // The recruiter's applications list must surface only the applying alt — not the account main.
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertOk()
-        ->assertJsonCount(1, 'data')
-        ->assertJsonCount(1, 'data.0.characters')
-        ->assertJsonPath('data.0.mainCharacter.character_id', $altCharacterId)
-        ->assertJsonPath('data.0.characters.0.character_id', $altCharacterId);
-});
-
-test('junior h r can see shitlist', function () {
-    createEnlistment();
-
-    test()->test_user = test()->test_user->refresh();
-
-    // Create SSO Setting
-
-    // Give Test User required scope
-
-    // Test that test user is not on shitlist
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(0, 'data');
-
-    applySecondary();
-
-    test()->actingAs(test()->test_user)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertJsonCount(1, 'data');
 });
 
 test('senior hr can setup watchlist', function () {
@@ -543,16 +429,6 @@ test('recruiter can see corporation applications', function () {
         ->assertRedirect();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
-
-    // get list with open appliactions
-    $response = test()->actingAs($recruiter)
-        ->get(route('open.corporation.applications', [test()->test_character->corporation->corporation_id, 0]))
-        ->assertOk();
-
-    // get list with closed applications
-    test()->actingAs($recruiter)
-        ->get(route('closed.corporation.applications', test()->test_character->corporation->corporation_id))
-        ->assertOk();
 
     // Apply with secondary user
     applySecondary(false);

@@ -26,11 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 use Inertia\Response;
 use Seatplus\Auth\Models\User;
@@ -46,15 +44,15 @@ use Seatplus\Web\Http\Actions\Recruitment\HandleApplicationAction;
 use Seatplus\Web\Http\Actions\Recruitment\ReviewApplicationAction;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Controllers\Request\ApplicationRequest;
-use Seatplus\Web\Http\Resources\ApplicationRessource;
 use Seatplus\Web\Services\CharacterInspectionScrollProps;
+use Seatplus\Web\Services\Recruitment\ApplicationGroupService;
 use Seatplus\Web\Support\Translations;
 
 class ApplicationsController extends Controller
 {
-    public function apply(ApplicationRequest $application_request): RedirectResponse
+    public function apply(ApplicationRequest $application_request, HandleApplicationAction $action): RedirectResponse
     {
-        (new HandleApplicationAction)->execute($application_request->all());
+        $action->execute($application_request->all());
 
         return back()->with('success', 'Application submitted');
     }
@@ -73,29 +71,7 @@ class ApplicationsController extends Controller
         return back()->with('success', 'Application deleted');
     }
 
-    public function getOpenCorporationApplications(int $corporation_id, int $decision_count): AnonymousResourceCollection
-    {
-        $query = Application::query()
-            ->with('logEntries')
-            ->whereHas('logEntries', function (Builder $query) {
-                $query->where('type', 'decision');
-            }, '=', $decision_count)
-            ->ofCorporation($corporation_id)
-            ->whereStatus('open');
-
-        return ApplicationRessource::collection($query->paginate());
-    }
-
-    public function getClosedCorporationApplications(int $corporation_id): AnonymousResourceCollection
-    {
-        $applications = Application::query()->ofCorporation($corporation_id)
-            ->latest('updated_at')
-            ->where('status', '<>', 'open');
-
-        return ApplicationRessource::collection($applications->paginate());
-    }
-
-    public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps): Response
+    public function getApplication(string $application_id, WatchlistArrayAction $action, CharacterInspectionScrollProps $inspectionProps, ApplicationGroupService $groupService): Response
     {
         $application = Application::query()
             ->with([
@@ -114,34 +90,42 @@ class ApplicationsController extends Controller
 
         $applicationable = $application->applicationable;
 
-        $recruit = match ($application->applicationable_type) {
-            User::class => $applicationable,
-            CharacterInfo::class => collect([
-                // snake_case to match the raw User-model branch above (and the Vue read
-                // `recruit.main_character` in Pages/Corporation/Recruitment/Application.vue)
-                'main_character' => $applicationable,
-                'characters' => [$applicationable],
-            ]),
-            default => collect([]),
-        };
+        if ($applicationable instanceof User) {
+            $recruit = $applicationable;
+            $characterIds = $applicationable->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
+        } elseif ($applicationable instanceof CharacterInfo) {
+            // A single-character application may cover several characters as one group — review them all
+            // together: the recruit's characters are every covered character, not just the opened one.
+            $coveredCharacterIds = $groupService->groupFor($application)
+                ->pluck('applicationable_id')
+                ->map(fn (mixed $id): int => (int) $id);
 
-        // The recruit's character ids feed the shared Asset/Wallet tab components' scroll props.
-        $characterIds = match (true) {
-            $applicationable instanceof User => $applicationable->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all(),
-            $applicationable instanceof CharacterInfo => [(int) $applicationable->character_id],
-            default => [],
-        };
+            $characters = CharacterInfo::query()
+                ->whereIn('character_id', $coveredCharacterIds)
+                ->with('batchUpdate')
+                ->get();
+
+            // snake_case to match the User-model branch (and the Vue read `recruit.main_character`).
+            $recruit = collect([
+                'main_character' => $applicationable,
+                'characters' => $characters,
+            ]);
+            $characterIds = $characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
+        } else {
+            $recruit = collect([]);
+            $characterIds = [];
+        }
 
         return inertia('Corporation/Recruitment/Application', array_merge([
             'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $action->execute($application->corporation_id),
-            'activeSidebarElement' => 'corporation.recruitment',
+            'activeSidebarElement' => 'recruitment.reviews',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
         ], $inspectionProps->build($characterIds, request())));
     }
 
-    public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action): RedirectResponse
+    public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action, ApplicationGroupService $groupService): RedirectResponse
     {
         $request->validate([
             'decision' => ['required', Rule::in(['rejected', 'accepted'])],
@@ -150,11 +134,14 @@ class ApplicationsController extends Controller
 
         $application = Application::findOrFail($application_id);
 
-        // Advances the application one review round: gates on the round's control group, records the
-        // decision, and hires (creates an Employment) when the final round is accepted.
-        $action->execute($application, $request->get('decision'), $request->get('explanation'));
+        // A multi-character application is decided as one: every covered character advances the same
+        // round and, on final acceptance, is hired as its own Employment. Ungrouped applications are a
+        // group of one. Each member gates on the round's control group and records its own decision log.
+        $groupService->groupFor($application)->each(
+            fn (Application $member) => $action->execute($member, $request->get('decision'), $request->get('explanation')),
+        );
 
-        return redirect()->route('corporation.recruitment')
+        return redirect()->route('recruitment.reviews')
             ->with('success', sprintf('%s %s', match ($application->applicationable_type) {
                 User::class => 'User',
                 CharacterInfo::class => 'Character',

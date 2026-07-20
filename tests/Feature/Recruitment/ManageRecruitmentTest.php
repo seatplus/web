@@ -2,6 +2,7 @@
 
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 
@@ -20,7 +21,9 @@ it('renders the manage workspace with the manageable postings', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Recruitment/Manage/Index')
             ->has('postings', 1)
+            ->has('postings.0.required_scopes')
             ->has('controlGroups')
+            ->has('availableScopes')
         );
 });
 
@@ -51,6 +54,45 @@ it('replaces the review stages of a posting', function () {
 
     expect(EnlistmentReviewRound::query()->where('corporation_id', $corp->corporation_id)->orderBy('position')->pluck('label')->all())
         ->toBe(['Screen', 'Final']);
+});
+
+it('saves the corporation required SSO scopes as the default type', function () {
+    $corp = CorporationInfo::factory()->create();
+    Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
+    EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
+
+    test()->actingAs(test()->test_user)
+        ->put(route('recruitment.posting.save', $corp->corporation_id), [
+            'stages' => [['label' => 'Open', 'role_id' => null]],
+            'selected_scopes' => ['esi-assets.read_assets.v1'],
+        ])
+        ->assertRedirect();
+
+    $scopes = SsoScopes::query()->where('morphable_id', $corp->corporation_id)->first();
+
+    expect($scopes)->not->toBeNull()
+        ->and($scopes->type)->toBe('default')
+        ->and($scopes->selected_scopes)->toContain('esi-assets.read_assets.v1');
+});
+
+it('removes the required SSO scopes when the selection is cleared', function () {
+    $corp = CorporationInfo::factory()->create();
+    Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
+    EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
+    SsoScopes::factory()->create([
+        'morphable_id' => $corp->corporation_id,
+        'morphable_type' => CorporationInfo::class,
+        'type' => 'default',
+    ]);
+
+    test()->actingAs(test()->test_user)
+        ->put(route('recruitment.posting.save', $corp->corporation_id), [
+            'stages' => [['label' => 'Open', 'role_id' => null]],
+            'selected_scopes' => [],
+        ])
+        ->assertRedirect();
+
+    expect(SsoScopes::query()->where('morphable_id', $corp->corporation_id)->exists())->toBeFalse();
 });
 
 it('closes a posting and cascades its stages', function () {

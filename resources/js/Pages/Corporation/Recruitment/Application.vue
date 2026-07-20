@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-3">
-    <PageHeader :breadcrumbs="[{name: 'Recruitment', route: 'corporation.recruitment'}]">
+    <PageHeader :breadcrumbs="[{name: 'Reviews', route: 'recruitment.reviews'}]">
       User Application
       <template #primary>
         <HeaderButton

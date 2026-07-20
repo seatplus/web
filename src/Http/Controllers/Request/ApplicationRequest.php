@@ -45,7 +45,11 @@ class ApplicationRequest extends FormRequest
     {
         return [
             'corporation_id' => ['required', 'exists:enlistments,corporation_id'],
+            // Legacy single-character apply (kept for the corp UI) …
             'character_id' => ['exists:character_infos,character_id'],
+            // … and multi-character apply from the portal (a subset of the account's characters).
+            'character_ids' => ['array'],
+            'character_ids.*' => ['exists:character_infos,character_id'],
         ];
     }
 }
