@@ -2,9 +2,6 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -12,8 +9,9 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Assets\Asset;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
-use Seatplus\Eveapi\Models\RefreshToken;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
+
+require_once __DIR__.'/helpers.php';
 
 /*
  * SlideOver browser tests — the two slide-over surfaces that sit on the character/corporation
@@ -34,71 +32,6 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('deviceVisit')) {
-    /**
-     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
-     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
-     * suite's other function_exists helpers rather than in tests/Pest.php.
-     */
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
-        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
-        // no per-call re-navigation like ->on()->iPhone15()).
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    /**
-     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
-     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
-     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
-     */
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
-
-// updateRefreshTokenWithScopes lives in the web package's tests/Pest.php, which is NOT
-// loaded in the core browser context (only actingAsCharacter/giveCorporationRole are).
-// Define it here, guarded, so the synced browser test has it.
-if (! function_exists('updateRefreshTokenWithScopes')) {
-    function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes): RefreshToken
-    {
-        $helper_token = RefreshToken::factory()->scopes($scopes)->make([
-            'character_id' => $refreshToken->character_id,
-        ]);
-
-        $refreshToken->token = $helper_token->token;
-        $refreshToken->save();
-
-        return $refreshToken;
-    }
-}
-
-// Both slide-overs teleport into <div id="destination">, outside the page's own content. The
-// pages also render a card per character/corporation with the same name, so page-wide assertSee
-// can't tell the panel apart — scope assertions to #destination.
-if (! function_exists('slideOverSees')) {
-    function slideOverSees(string $text): string
-    {
-        return "(document.querySelector('#destination')?.innerText ?? '').includes(".json_encode($text).')';
-    }
-}
 
 /*
  * --- "Update" (dispatch) sidebar -------------------------------------------------------------

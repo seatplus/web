@@ -1,17 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
-use Seatplus\Auth\Enums\RoleType;
-use Seatplus\Auth\Models\AccessControl\RoleMembership;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Auth\Models\Permissions\Permission;
-use Seatplus\Auth\Models\Permissions\Role;
-use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+
+require_once __DIR__.'/helpers.php';
 
 /*
  * Unified role hub browser tests, run against the assembled core app. Covers the 3 management
@@ -22,135 +13,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('deviceVisit')) {
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
-
-if (! function_exists('userOfCharacter')) {
-    function userOfCharacter(int $characterId): User
-    {
-        return CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
-    }
-}
-
-if (! function_exists('grantAclView')) {
-    function grantAclView(int $characterId): User
-    {
-        $user = userOfCharacter($characterId);
-        $user->givePermissionTo(Permission::findOrCreate('view access control'));
-
-        return $user;
-    }
-}
-
-if (! function_exists('grantAclAdmin')) {
-    function grantAclAdmin(int $characterId): User
-    {
-        $user = userOfCharacter($characterId);
-        $user->givePermissionTo(Permission::findOrCreate('administrate access control groups'));
-
-        return $user;
-    }
-}
-
-if (! function_exists('makeManualRole')) {
-    function makeManualRole(string $name): Role
-    {
-        $role = Role::findById(Role::create(['name' => $name])->id);
-        $role->update(['type' => RoleType::MANUAL]);
-
-        return $role;
-    }
-}
-
-if (! function_exists('makeOnRequestRole')) {
-    function makeOnRequestRole(string $name): Role
-    {
-        $role = Role::findById(Role::create(['name' => $name])->id);
-        $role->update(['type' => RoleType::ON_REQUEST]);
-
-        return $role;
-    }
-}
-
-if (! function_exists('makeOptInRoleForCorporation')) {
-    function makeOptInRoleForCorporation(string $name, int $corporationId): Role
-    {
-        $role = Role::findById(Role::create(['name' => $name])->id);
-        $role->update(['type' => RoleType::OPT_IN]);
-
-        RoleMembership::create([
-            'role_id' => $role->id,
-            'entity_type' => CorporationInfo::class,
-            'entity_id' => $corporationId,
-        ]);
-
-        return $role;
-    }
-}
-
-if (! function_exists('addRoleMember')) {
-    /** Give $user an active membership of $role (optionally as a moderator). */
-    function addRoleMember(Role $role, User $user, bool $moderator = false): void
-    {
-        RoleMembership::create([
-            'role_id' => $role->id,
-            'entity_type' => User::class,
-            'entity_id' => $user->getKey(),
-            'status' => 'active',
-            'can_moderate' => $moderator,
-        ]);
-    }
-}
-
-if (! function_exists('makeApplicant')) {
-    /** Seed a distinct user (named character) with a pending application to $role. */
-    function makeApplicant(Role $role, string $name): CharacterInfo
-    {
-        $character = CharacterInfo::factory()->create(['name' => $name]);
-
-        $user = new User;
-        $user->main_character_id = $character->character_id;
-        $user->save();
-
-        CharacterUser::create([
-            'user_id' => $user->getKey(),
-            'character_id' => $character->character_id,
-            'character_owner_hash' => sha1((string) $character->character_id),
-        ]);
-
-        RoleMembership::create([
-            'role_id' => $role->id,
-            'entity_type' => User::class,
-            'entity_id' => $user->getKey(),
-            'status' => 'pending',
-        ]);
-
-        return $character;
-    }
-}
 
 // ═══ Index (/acl/hub) ═════════════════════════════════════════════════════════════════════════
 

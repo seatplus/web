@@ -1,16 +1,12 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
 use Seatplus\Auth\Enums\AffiliationType;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Auth\Models\Permissions\Affiliation;
-use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
-use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+
+require_once __DIR__.'/helpers.php';
 
 /*
  * Create-group wizard browser tests, run against the assembled core app. The discover / configure /
@@ -19,48 +15,6 @@ use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('deviceVisit')) {
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
-
-if (! function_exists('userOfCharacter')) {
-    function userOfCharacter(int $characterId): User
-    {
-        return CharacterUser::query()->where('character_id', $characterId)->firstOrFail()->user;
-    }
-}
-
-if (! function_exists('grantAclAdmin')) {
-    function grantAclAdmin(int $characterId): User
-    {
-        $user = userOfCharacter($characterId);
-        $user->givePermissionTo(Permission::findOrCreate('administrate access control groups'));
-
-        return $user;
-    }
-}
 
 it('creates a group through the guided wizard (admin)', function (string $device) {
     $character = actingAsCharacter();

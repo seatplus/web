@@ -1,53 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Contracts\Contract;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Eveapi\Models\Universe\Location;
 
-if (! function_exists('deviceVisit')) {
-    /**
-     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
-     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
-     * suite's other function_exists helpers rather than in tests/Pest.php.
-     */
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
-        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
-        // no per-call re-navigation like ->on()->iPhone15()).
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    /**
-     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
-     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
-     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
-     */
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
+require_once __DIR__.'/helpers.php';
 
 /*
  * Character contracts browser tests — run against the real assembled core app.
@@ -60,82 +16,6 @@ if (! function_exists('snap')) {
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('makeCharacterContracts')) {
-    /**
-     * Create $count contracts owned by (attached to) $character and return them. Defaults
-     * model a personal, unaccepted (outstanding) contract issued to and assigned to the
-     * character itself, so every id the row renders (issuer/assignee) resolves offline
-     * from the DB. Override e.g. acceptor_id/status for the accepted case. Guarded so each
-     * Browser file can define it standalone without colliding when the suite loads several.
-     *
-     * @param  array<string, mixed>  $overrides
-     * @return Collection<int, Contract>
-     */
-    function makeCharacterContracts(CharacterInfo $character, int $count, array $overrides = []): Collection
-    {
-        // Share supporting records across the whole batch. Left to its defaults the Contract
-        // factory spins up a fresh Location→Station→System and a CorporationInfo per contract,
-        // and those random universe/corp ids collide (e.g. universe_systems_pkey) once enough
-        // rows are created. Create them once and reuse the ids.
-        $contracts = Contract::factory()->count($count)->create(array_merge([
-            'issuer_id' => $character->character_id,
-            'assignee_id' => $character->character_id,
-            'for_corporation' => false,
-            'acceptor_id' => 0,
-            'status' => 'outstanding',
-            'issuer_corporation_id' => CorporationInfo::factory()->create()->corporation_id,
-            'start_location_id' => Location::factory()->withStation()->create()->location_id,
-            'end_location_id' => Location::factory()->withStation()->create()->location_id,
-        ], $overrides));
-
-        $character->contracts()->syncWithoutDetaching($contracts->pluck('contract_id')->all());
-
-        return $contracts;
-    }
-}
-
-if (! function_exists('realCharacterId')) {
-    /**
-     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
-     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
-     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
-     */
-    function realCharacterId(): int
-    {
-        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
-        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
-
-        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
-    }
-}
-
-if (! function_exists('attachOwnedCharacter')) {
-    /**
-     * Attach an additional owned character to the same user that owns $existing, so a
-     * browser test can exercise the multi-character case — character-scoped pages render
-     * one list per every character the logged-in user owns, not just the main. Returns the
-     * newly attached character. Guarded so each Browser file can define it standalone
-     * without colliding when the suite loads several.
-     */
-    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
-    {
-        $user = CharacterUser::query()
-            ->where('character_id', $existing->character_id)
-            ->firstOrFail()
-            ->user;
-
-        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
-
-        CharacterUser::create([
-            'user_id' => $user->getKey(),
-            'character_id' => $character->character_id,
-            'character_owner_hash' => sha1((string) $character->character_id),
-        ]);
-
-        return $character;
-    }
-}
 
 it('merges the next contracts page in on scroll', function (string $device) {
     $character = actingAsCharacter();

@@ -1,49 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
-use Seatplus\Auth\Models\CharacterUser;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
-if (! function_exists('deviceVisit')) {
-    /**
-     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
-     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
-     * suite's other function_exists helpers rather than in tests/Pest.php.
-     */
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
-        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
-        // no per-call re-navigation like ->on()->iPhone15()).
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    /**
-     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
-     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
-     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
-     */
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
+require_once __DIR__.'/helpers.php';
 
 /*
  * Authentication browser tests — run against the real assembled core app (never under
@@ -57,33 +16,6 @@ if (! function_exists('snap')) {
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('attachOwnedCharacter')) {
-    /**
-     * Attach an additional owned character to the same user that owns $existing, so a
-     * browser test can exercise the multi-character case — the dashboard renders a card
-     * per every character the logged-in user owns, not just the main. Returns the newly
-     * attached character. Guarded so each Browser test file can define it standalone
-     * without colliding when the suite loads several.
-     */
-    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
-    {
-        $user = CharacterUser::query()
-            ->where('character_id', $existing->character_id)
-            ->firstOrFail()
-            ->user;
-
-        $character = CharacterInfo::factory()->create();
-
-        CharacterUser::create([
-            'user_id' => $user->getKey(),
-            'character_id' => $character->character_id,
-            'character_owner_hash' => sha1((string) $character->character_id),
-        ]);
-
-        return $character;
-    }
-}
 
 /* ------------------------------------------------------------- unauthenticated */
 
