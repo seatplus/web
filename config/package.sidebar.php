@@ -79,14 +79,7 @@ return [
             'route' => 'corporation.member_tracking',
             'icon' => 'CheckBadgeIcon',
         ],
-        // Member Compliance moved to Personnel → Observation (which adds activity + lifecycle status).
-        [
-            'name' => 'Recruitment',
-            'permission' => 'can open or close corporations for recruitment|can accept or deny applications',
-            'character_role' => 'director',
-            'route' => 'corporation.recruitment',
-            'icon' => 'ClipboardDocumentCheckIcon',
-        ],
+        // Member Compliance moved to Personnel → Observation; Recruitment moved to Personnel → Reviews.
     ],
     // Applicant-facing front door — browsing/applying to open postings. Visible to every user.
     'Careers' => [

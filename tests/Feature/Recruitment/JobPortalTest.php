@@ -1,8 +1,11 @@
 <?php
 
 use Inertia\Testing\AssertableInertia as Assert;
+use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Web\Models\Recruitment\ApplicationGroupMember;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 
@@ -71,6 +74,37 @@ it('submits an account-wide application from the portal', function () {
         ->assertRedirect();
 
     expect(Application::query()->where('corporation_id', $corp->corporation_id)->count())->toBe(1);
+});
+
+it('submits a multi-character application covering a subset of the account', function () {
+    $corp = CorporationInfo::factory()->create();
+    Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
+
+    // test_user starts with one character; give it two more so we can apply with a subset.
+    $alt1 = CharacterUser::factory()->make();
+    $alt2 = CharacterUser::factory()->make();
+    test()->test_user->characterUsers()->save($alt1);
+    test()->test_user->characterUsers()->save($alt2);
+    // The base TestCase already loaded ->characters (1 char) on this instance; a real request resolves
+    // the auth user fresh, so refresh the relation to reflect all three characters.
+    test()->test_user->load('characters');
+
+    $covered = [test()->test_character->character_id, $alt1->character_id];
+
+    test()->actingAs(test()->test_user)
+        ->post(route('recruitment.apply'), [
+            'corporation_id' => $corp->corporation_id,
+            'character_ids' => $covered,
+        ])
+        ->assertRedirect();
+
+    // One CharacterInfo application per covered character; the uncovered third stays untouched.
+    expect(Application::query()->where('applicationable_type', CharacterInfo::class)->whereIn('applicationable_id', $covered)->count())->toBe(2)
+        ->and(Application::query()->where('applicationable_id', $alt2->character_id)->exists())->toBeFalse();
+
+    // Both applications are tied under a single group.
+    expect(ApplicationGroupMember::query()->count())->toBe(2)
+        ->and(ApplicationGroupMember::query()->distinct()->count('group_id'))->toBe(1);
 });
 
 it('withdraws the user\'s own application', function () {

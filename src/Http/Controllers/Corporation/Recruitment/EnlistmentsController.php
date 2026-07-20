@@ -54,13 +54,13 @@ class EnlistmentsController extends Controller
     {
         Enlistment::where('corporation_id', $corporation_id)->delete();
 
-        return redirect()->action([GetRecruitmentIndexController::class])->with('success', 'corporation is closed for recruitment');
+        return redirect()->route('recruitment.manage')->with('success', 'corporation is closed for recruitment');
     }
 
     public function edit(int $corporation_id, WatchedArrayAction $action): Response
     {
         return inertia('Corporation/Recruitment/Configuration/Index', [
-            'activeSidebarElement' => 'corporation.recruitment',
+            'activeSidebarElement' => 'recruitment.manage',
             'corporationId' => $corporation_id,
             'enlistment' => Enlistment::find($corporation_id),
             'watched' => $action->execute($corporation_id),

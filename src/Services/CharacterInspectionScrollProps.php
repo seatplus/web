@@ -9,12 +9,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Contacts\Contact;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
+use Seatplus\Eveapi\Models\Mail\Mail;
+use Seatplus\Eveapi\Models\Skills\Skill;
+use Seatplus\Eveapi\Models\Skills\SkillQueue;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Wallet\Balance;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
+use Seatplus\Web\Http\Resources\ContactResource;
 use Seatplus\Web\Http\Resources\LocationRessource;
 
 /**
@@ -38,7 +46,109 @@ class CharacterInspectionScrollProps
         return array_merge(
             $this->assetProps($characterIds, $request),
             $this->walletProps($characterIds),
+            $this->skillProps($characterIds),
+            $this->contactProps($characterIds),
+            $this->mailProps($characterIds),
         );
+    }
+
+    /**
+     * Mail headers across the inspected characters as one infinite-scroll prop — mirrors
+     * Character\MailsController so the shared MobileMailList renders (it throws when the prop is absent).
+     *
+     * @param  array<int, int>  $characterIds
+     * @return array<string, mixed>
+     */
+    private function mailProps(array $characterIds): array
+    {
+        return [
+            'mailHeaders' => Inertia::scroll(fn () => Mail::query()
+                ->select('id', 'from', 'subject', 'timestamp')
+                ->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+                    'receivable',
+                    CharacterInfo::class,
+                    fn (Builder $query) => $query->whereIn('character_id', $characterIds),
+                ))
+                ->orderByDesc('timestamp')
+                ->paginate()),
+        ];
+    }
+
+    /**
+     * Skills keyed by character_id (deferred) — mirrors Character\SkillsController so the shared
+     * SkillsComponent renders the recruit's/employee's skills, not just the character pages'.
+     *
+     * @param  array<int, int>  $characterIds
+     * @return array<string, mixed>
+     */
+    private function skillProps(array $characterIds): array
+    {
+        return [
+            'skills' => Inertia::defer(fn () => collect($characterIds)->mapWithKeys(fn (int $characterId) => [
+                $characterId => Skill::query()
+                    ->with('type.group')
+                    ->where('character_id', $characterId)
+                    ->get(),
+            ])),
+            'skillQueue' => Inertia::defer(fn () => collect($characterIds)->mapWithKeys(fn (int $characterId) => [
+                $characterId => SkillQueue::query()
+                    ->with('type.group')
+                    ->where('character_id', $characterId)
+                    ->where(fn (Builder $query) => $query->where('finish_date', '>=', now())->orWhereNull('finish_date'))
+                    ->orderBy('queue_position')
+                    ->get(),
+            ])),
+        ];
+    }
+
+    /**
+     * Contacts keyed by character_id (deferred) — mirrors Character\ContactsController, including the
+     * per-character corp/alliance standings that ContactResource reads from the session.
+     *
+     * @param  array<int, int>  $characterIds
+     * @return array<string, mixed>
+     */
+    private function contactProps(array $characterIds): array
+    {
+        return [
+            'contacts' => Inertia::defer(fn () => CharacterInfo::query()
+                ->whereIn('character_id', $characterIds)
+                ->with('characterAffiliation')
+                ->get()
+                ->each->append('corporation_id')
+                ->mapWithKeys(fn (CharacterInfo $character) => [
+                    $character->character_id => $this->resolveContacts($character),
+                ])),
+        ];
+    }
+
+    /**
+     * @return array<int, mixed>
+     */
+    private function resolveContacts(CharacterInfo $character): array
+    {
+        $affiliation = CharacterAffiliation::query()
+            ->firstWhere('corporation_id', $character->corporation_id);
+
+        $contactableIds = array_filter([
+            $affiliation?->corporation_id,
+            $affiliation?->alliance_id,
+        ]);
+
+        $corpAllianceStanding = Contact::query()
+            ->whereIn('contactable_id', $contactableIds)
+            ->get();
+
+        request()->session()->now('contacts', [
+            'corporation_contacts' => $corpAllianceStanding->filter(fn (Contact $contact) => $contact->contactable_type === CorporationInfo::class),
+            'alliance_contacts' => $corpAllianceStanding->filter(fn (Contact $contact) => $contact->contactable_type === AllianceInfo::class),
+        ]);
+
+        $contacts = Contact::with(['labels', 'characterAffiliation', 'corporationAffiliation', 'allianceAffiliation', 'factionAffiliation'])
+            ->where('contactable_id', $character->character_id)
+            ->get();
+
+        return ContactResource::collection($contacts)->resolve(request());
     }
 
     /**

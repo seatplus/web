@@ -95,8 +95,8 @@ export default {
         return {
             breadcrumbs: [
                 {
-                    name: 'Corporation Recruitment',
-                    route: route('corporation.recruitment')
+                    name: 'Manage Recruitment',
+                    route: route('recruitment.manage')
                 }
             ],
             form: useForm({

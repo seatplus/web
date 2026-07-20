@@ -7,13 +7,15 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Web\Http\Controllers\Controller;
+use Seatplus\Web\Models\Recruitment\ApplicationGroupMember;
+use Seatplus\Web\Services\Recruitment\ApplicationGroupService;
 
 /**
  * Withdraw one of the signed-in user's own applications from the job portal.
  */
 class WithdrawController extends Controller
 {
-    public function __invoke(string $application_id): RedirectResponse
+    public function __invoke(string $application_id, ApplicationGroupService $groupService): RedirectResponse
     {
         /** @var User $user */
         $user = auth()->user();
@@ -22,7 +24,12 @@ class WithdrawController extends Controller
 
         abort_unless($this->belongsToUser($user, $application), 403, 'This is not your application.');
 
-        $application->delete();
+        // A multi-character application is one submission — withdraw the whole group (all members were
+        // the user's own characters, applied together). Ungrouped applications are a group of one.
+        $groupService->groupFor($application)->each(function (Application $member) {
+            ApplicationGroupMember::query()->where('application_id', (string) $member->id)->delete();
+            $member->delete();
+        });
 
         return back()->with('success', 'Application withdrawn');
     }
