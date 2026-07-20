@@ -25,6 +25,16 @@ it('has users list', function () {
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/UserList'));
 });
 
+it('shares the settings navigation as a prop', function () {
+    $response = test()->actingAs(test()->test_user)
+        ->get(route('server.settings'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->has('settingsNavigation', count(config('web.settings')))
+        ->where('settingsNavigation.0.route', 'server.settings')
+    );
+});
+
 it('has server scopes', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('settings.scopes'));

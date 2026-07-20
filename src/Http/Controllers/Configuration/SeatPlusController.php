@@ -37,15 +37,6 @@ use Seatplus\Web\Services\ImpersonateService;
 
 class SeatPlusController extends Controller
 {
-    public function navigation(): string
-    {
-        $navigation_tabs = config('web.settings');
-
-        return collect($navigation_tabs)
-            ->map(fn (array $tab) => array_merge($tab, ['uri' => route($tab['route'])]))
-            ->toJson();
-    }
-
     public function settings(): Response
     {
         $validatedData = request()->validate([

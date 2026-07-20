@@ -74,16 +74,16 @@ export default {
         return {
             pageTitle: 'Server Settings',
             currentRoute: '',
-            navTabs: []
+        }
+    },
+    computed: {
+        // Nav tabs are static config, shared eagerly by HandleInertiaRequests as page chrome —
+        // read them off the page props rather than fetching them after mount.
+        navTabs() {
+            return this.$page.props.settingsNavigation ?? []
         }
     },
     watch: {
-        navTabs(Tabs) {
-            _.each(Tabs, navTab => {
-                if(this.isActive(navTab.route))
-                    this.currentRoute = navTab.route
-            })
-        },
         currentRoute(currentRoute) {
             if(this.isActive(currentRoute))
                 return
@@ -92,11 +92,9 @@ export default {
         }
     },
     mounted() {
-        this.$nextTick(function () {
-            axios.get(route('settings.navigation')).then(result => {
-                this.navTabs = result.data
-            })
-        })
+        const active = this.navTabs.find(navTab => this.isActive(navTab.route))
+        if (active)
+            this.currentRoute = active.route
     },
     methods: {
         isActive(string) {

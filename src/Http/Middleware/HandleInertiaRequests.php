@@ -97,6 +97,10 @@ class HandleInertiaRequests extends Middleware
                 'logo' => asset(config('web.images.logo')),
                 'icon' => asset(config('web.images.icon')),
             ],
+            // Server-settings navigation tabs. Static config (name/logo/route per tab), so it is
+            // shared eagerly as page chrome rather than fetched post-mount by Settings.vue — which
+            // removes an axios + Ziggy round-trip and the flash of empty tabs.
+            'settingsNavigation' => fn () => config('web.settings'),
             // The entity-picker slide-over's affiliated character/corporation list. Declared
             // `optional` so it is NOT resolved on ordinary page loads (no DB query, no cost) —
             // only when the picker's <WhenVisible data="affiliatedEntities"> scrolls into view and
