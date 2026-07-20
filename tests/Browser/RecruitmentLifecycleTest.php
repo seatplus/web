@@ -13,6 +13,12 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
+use Seatplus\Eveapi\Models\Skills\Skill;
+use Seatplus\Eveapi\Models\Skills\SkillQueue;
+use Seatplus\Eveapi\Models\Universe\Category;
+use Seatplus\Eveapi\Models\Universe\Group;
+use Seatplus\Eveapi\Models\Universe\Type;
+use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 
@@ -154,6 +160,56 @@ if (! function_exists('seedApplicantAtStage')) {
         }
 
         return $application;
+    }
+}
+
+if (! function_exists('makeSkillType')) {
+    /**
+     * @param  array{type: int, type_name: string, group: int, group_name: string}  $skill
+     */
+    function makeSkillType(array $skill): Type
+    {
+        if (! Category::query()->whereKey(16)->exists()) {
+            Category::factory()->create(['category_id' => 16, 'name' => 'Skill', 'published' => true]);
+        }
+        if (! Group::query()->whereKey($skill['group'])->exists()) {
+            Group::factory()->create(['group_id' => $skill['group'], 'category_id' => 16, 'name' => $skill['group_name'], 'published' => true]);
+        }
+
+        return Type::query()->whereKey($skill['type'])->first()
+            ?? Type::factory()->create(['type_id' => $skill['type'], 'group_id' => $skill['group'], 'name' => $skill['type_name'], 'published' => true]);
+    }
+}
+
+if (! function_exists('seedCharacterSkills')) {
+    /** Seed a small deterministic skill sheet for $character; returns the queued skill's name. */
+    function seedCharacterSkills(CharacterInfo $character): string
+    {
+        $gunnery = makeSkillType(['type' => 3300, 'type_name' => 'Gunnery', 'group' => 255, 'group_name' => 'Gunnery']);
+        $smallHybrid = makeSkillType(['type' => 3301, 'type_name' => 'Small Hybrid Turret', 'group' => 255, 'group_name' => 'Gunnery']);
+        $spaceshipCommand = makeSkillType(['type' => 3327, 'type_name' => 'Spaceship Command', 'group' => 257, 'group_name' => 'Spaceship Command']);
+
+        foreach ([$gunnery, $smallHybrid, $spaceshipCommand] as $type) {
+            Skill::factory()->create([
+                'character_id' => $character->character_id,
+                'skill_id' => $type->type_id,
+                'active_skill_level' => 5,
+                'trained_skill_level' => 5,
+                'skillpoints_in_skill' => 256_000,
+            ]);
+        }
+
+        $queued = makeSkillType(['type' => 3302, 'type_name' => 'Small Projectile Turret', 'group' => 255, 'group_name' => 'Gunnery']);
+        SkillQueue::factory()->create([
+            'character_id' => $character->character_id,
+            'skill_id' => $queued->type_id,
+            'queue_position' => 0,
+            'finished_level' => 5,
+            'start_date' => now()->subDay()->format('Y-m-d H:i:s'),
+            'finish_date' => now()->addDays(3)->format('Y-m-d H:i:s'),
+        ]);
+
+        return $queued->name;
     }
 }
 
@@ -330,3 +386,44 @@ it('reviews — a reviewer opens an application and sees the shared inspection t
 
     snap($page, "recruitment-review-detail-{$device}");
 })->with(['desktop', 'iphone']);
+
+it('reviews — the inspection tabs render the applicant\'s data', function () {
+    $character = actingAsCharacter();
+    makeRecruiterOfCorporation($character, 'can accept or deny applications');
+
+    openPostingWithStages($character->corporation_id, [['label' => 'Open', 'role' => null]]);
+    $application = seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 0);
+
+    // Give the applicant's character skills and a wallet journal so the review tabs show real data.
+    $applicant = User::query()->findOrFail($application->applicationable_id);
+    $applicantCharacter = CharacterInfo::query()->findOrFail($applicant->main_character_id);
+    seedCharacterSkills($applicantCharacter);
+    WalletJournal::factory()
+        ->count(5)
+        ->sequence(fn ($sequence) => ['date' => now()->subHours($sequence->index * 6)])
+        ->create([
+            'wallet_journable_id' => $applicantCharacter->character_id,
+            'wallet_journable_type' => CharacterInfo::class,
+        ]);
+    cache()->flush();
+
+    // Desktop only: the tab switcher is clickable text here; on mobile it's a <select>.
+    $page = visit("/corporation/recruitment/application/{$application->id}");
+    $page->assertNoSmoke();
+    $page->waitForText('Jane Applicant');
+
+    // Skills tab — the applicant's trained skills.
+    $page->click('[data-tab="Skills"]');
+    $page->waitForText('Gunnery');
+    snap($page, 'recruitment-review-tab-skills');
+
+    // Wallets tab — the applicant's wallet journal.
+    $page->click('[data-tab="Wallets"]');
+    $page->assertNoSmoke();
+    snap($page, 'recruitment-review-tab-wallets');
+
+    // Assets tab — renders through the shared inspection scroll props.
+    $page->click('[data-tab="Assets"]');
+    $page->assertNoSmoke();
+    snap($page, 'recruitment-review-tab-assets');
+});
