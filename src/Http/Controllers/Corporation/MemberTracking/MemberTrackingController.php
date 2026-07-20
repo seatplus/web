@@ -26,8 +26,8 @@
 
 namespace Seatplus\Web\Http\Controllers\Corporation\MemberTracking;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -45,19 +45,37 @@ class MemberTrackingController extends Controller
             ->setIsCharacter(false)
             ->create(CorporationMemberTracking::class);
 
+        $corporations = $this->getAffiliatedCorporations($dispatchTransferObject);
+
+        // One InfiniteScroll prop per corporation (mirrors the wallet/contracts migration),
+        // replacing the axios/Ziggy useInfinityScrolling loader. Each paginator carries the
+        // MemberTrackingResource shape and its own pageName so the per-corporation scroll
+        // state never collides.
+        $members = $corporations->mapWithKeys(fn (CorporationInfo $corporation): array => [
+            "members_{$corporation->corporation_id}" => Inertia::scroll(
+                fn () => $this->memberQuery($corporation->corporation_id)
+                    ->paginate(pageName: "members_{$corporation->corporation_id}")
+                    ->through(fn (CorporationMemberTracking $member) => (new MemberTrackingResource($member))->resolve()),
+            ),
+        ])->all();
+
         return Inertia::render('Corporation/MemberTracking/MemberTracking', [
             'dispatchTransferObject' => $dispatchTransferObject,
-            'corporations' => $this->getAffiliatedCorporations($dispatchTransferObject),
+            'corporations' => $corporations,
+            ...$members,
         ]);
     }
 
-    public function getMemberTracking(int $corporation_id): AnonymousResourceCollection
+    /**
+     * Base query for a corporation's ESI member tracking with everything the row cells render.
+     * Pure ESI member tracking — SSO-scope compliance lives in Personnel → Observation.
+     *
+     * @return Builder<CorporationMemberTracking>
+     */
+    private function memberQuery(int $corporation_id): Builder
     {
-        // Pure ESI member tracking — SSO-scope compliance lives in Personnel → Observation.
-        $query = CorporationMemberTracking::where('corporation_id', $corporation_id)
+        return CorporationMemberTracking::where('corporation_id', $corporation_id)
             ->with('character', 'location.locatable', 'ship');
-
-        return MemberTrackingResource::collection($query->paginate());
     }
 
     private function getAffiliatedCorporations(DispatchTransferObject $dispatchTransferObject): Collection
