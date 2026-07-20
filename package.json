@@ -17,7 +17,7 @@
         "@vue/compiler-sfc": "^3.5.40",
         "acorn": "^8.17",
         "eslint": "^10.7.0",
-        "eslint-plugin-vue": "^10.9.2",
+        "eslint-plugin-vue": "^10.10.0",
         "vue-eslint-parser": "^10.4.1",
         "globals": "^17.7.0",
         "laravel-vite-plugin": "^3.1",
