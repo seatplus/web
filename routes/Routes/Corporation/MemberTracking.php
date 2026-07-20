@@ -34,8 +34,4 @@ Route::prefix('tracking')
         Route::middleware(CheckAuthorization::class.':view member tracking,director')
             ->get('', [MemberTrackingController::class, 'index'])
             ->name('corporation.member_tracking');
-
-        Route::middleware(CheckAuthorization::class.':view member tracking,director')
-            ->get('/members/{corporation_id}', [MemberTrackingController::class, 'getMemberTracking'])
-            ->name('get.corporation.member_tracking');
     });
