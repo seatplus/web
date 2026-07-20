@@ -1,55 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Pest\Browser\Api\PendingAwaitablePage;
-use Pest\Browser\Enums\Device;
-use Pest\Browser\Playwright\Playwright;
-use Seatplus\Auth\Models\CharacterUser;
 use Seatplus\Eveapi\Models\Assets\Asset;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Universe\Category;
-use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
-use Seatplus\Eveapi\Models\Universe\Type;
 
-if (! function_exists('deviceVisit')) {
-    /**
-     * Visit $url on the given viewport ("desktop" or "iphone"). Browser tests run in the core app,
-     * whose tests/Pest.php is not overlaid, so this helper is defined here (guarded) alongside the
-     * suite's other function_exists helpers rather than in tests/Pest.php.
-     */
-    function deviceVisit(string $device, string $url, array $options = []): mixed
-    {
-        // iPhone: build a persistent page at the mobile viewport the same way visit() builds the
-        // desktop one, so the page loads mobile from the start (no desktop-load-then-resize reflow,
-        // no per-call re-navigation like ->on()->iPhone15()).
-        if ($device === 'iphone') {
-            return new PendingAwaitablePage(
-                Playwright::defaultBrowserType(),
-                Device::IPHONE_15,
-                $url,
-                $options,
-            );
-        }
-
-        return visit($url, $options);
-    }
-}
-
-if (! function_exists('snap')) {
-    /**
-     * Settle before screenshotting: flip lazy EVE-image portraits/logos to eager so off-screen
-     * (full-page) images fetch, wait for the network to go idle, then capture — so screenshots show
-     * resolved images instead of loading placeholders. Best-effort: a slow/absent image won't fail.
-     */
-    function snap($page, string $name): void
-    {
-        $page->script("document.querySelectorAll('img').forEach((i) => { i.loading = 'eager'; });");
-        $page->waitForEvent('networkidle');
-        $page->screenshot(true, $name);
-    }
-}
+require_once __DIR__.'/helpers.php';
 
 /*
  * Character assets browser tests — run against the real assembled core app.
@@ -65,92 +21,6 @@ if (! function_exists('snap')) {
  */
 
 uses(RefreshDatabase::class);
-
-if (! function_exists('makeCharacterAsset')) {
-    /**
-     * Create one named asset owned by $character at $locationId (rooted at $rootLocationId).
-     * It gets a real published Type backed by a real Group so the ItemDetails page — whose
-     * LocationSlot dereferences asset.type.name / asset.type.group.name without a null-guard —
-     * renders cleanly. Guarded so each Browser file can define it standalone.
-     *
-     * @param  array<string, mixed>  $overrides
-     */
-    function makeCharacterAsset(CharacterInfo $character, int $locationId, int $rootLocationId, array $overrides = []): Asset
-    {
-        // Real EVE type/group/category so images.evetech.net serves a real item image (ships →
-        // 'render', minerals → 'icon') instead of the generic default it returns for fabricated ids.
-        // Shared via firstOrCreate so many assets can reuse a type (as real inventories do).
-        $realType = fake()->randomElement([
-            ['type' => 587, 'type_name' => 'Rifter', 'group' => 25, 'group_name' => 'Frigate', 'category' => 6, 'category_name' => 'Ship'],
-            ['type' => 24698, 'type_name' => 'Drake', 'group' => 419, 'group_name' => 'Combat Battlecruiser', 'category' => 6, 'category_name' => 'Ship'],
-            ['type' => 638, 'type_name' => 'Raven', 'group' => 27, 'group_name' => 'Battleship', 'category' => 6, 'category_name' => 'Ship'],
-            ['type' => 34, 'type_name' => 'Tritanium', 'group' => 18, 'group_name' => 'Mineral', 'category' => 4, 'category_name' => 'Material'],
-        ]);
-
-        // Use the factories (they bypass mass-assignment guarding) + existence checks so a real
-        // type/group/category is created once and shared across assets.
-        if (! Category::query()->whereKey($realType['category'])->exists()) {
-            Category::factory()->create(['category_id' => $realType['category'], 'name' => $realType['category_name'], 'published' => true]);
-        }
-        if (! Group::query()->whereKey($realType['group'])->exists()) {
-            Group::factory()->create(['group_id' => $realType['group'], 'category_id' => $realType['category'], 'name' => $realType['group_name'], 'published' => true]);
-        }
-        $type = Type::query()->whereKey($realType['type'])->first()
-            ?? Type::factory()->create(['type_id' => $realType['type'], 'group_id' => $realType['group'], 'name' => $realType['type_name'], 'published' => true]);
-
-        return Asset::factory()->withName()->create(array_merge([
-            'assetable_id' => $character->character_id,
-            'assetable_type' => CharacterInfo::class,
-            'location_id' => $locationId,
-            'root_location_id' => $rootLocationId,
-            'location_flag' => 'Hangar',
-            'type_id' => $type->type_id,
-        ], $overrides));
-    }
-}
-
-if (! function_exists('makeNestedAssetChain')) {
-    /**
-     * Seed a three-level nesting rooted in a station location:
-     * capital ship → freighter → container → cargo (each child.location_id = parent.item_id).
-     * Returns [location, capital, freighter, container, cargo].
-     *
-     * @return array<string, mixed>
-     */
-    function makeNestedAssetChain(CharacterInfo $character): array
-    {
-        $location = Location::factory()->for(Station::factory(), 'locatable')->create();
-        $root = $location->location_id;
-
-        $capital = makeCharacterAsset($character, $root, $root);
-        $freighter = makeCharacterAsset($character, $capital->item_id, $root, ['location_flag' => 'ShipHangar']);
-        $container = makeCharacterAsset($character, $freighter->item_id, $root, ['location_flag' => 'Cargo']);
-        $cargo = makeCharacterAsset($character, $container->item_id, $root, ['location_flag' => 'Cargo']);
-
-        return compact('location', 'capital', 'freighter', 'container', 'cargo');
-    }
-}
-
-if (! function_exists('assertAssetsScript')) {
-    /**
-     * Assert a JS condition on the assets page, re-scrolling the list to the bottom on each poll so
-     * per-location items — which lazy-load when their location scrolls into view — are present.
-     * On mobile the stacked filter block pushes the first location below the fold, so a plain
-     * waitForText never triggers the load; scrolling the list container does.
-     */
-    function assertAssetsScript($page, string $condition): void
-    {
-        $page->assertScript("(document.getElementById('assets-body')?.closest('.overflow-y-auto')?.scrollTo(0, 1e6), {$condition})");
-    }
-}
-
-if (! function_exists('assetTextVisible')) {
-    /** Wait (with scroll) for a single asset/item name to appear on the assets list. */
-    function assetTextVisible($page, string $text): void
-    {
-        assertAssetsScript($page, "document.body.innerText.includes('".addslashes($text)."')");
-    }
-}
 
 it('merges the next locations page in on scroll', function (string $device) {
     $character = actingAsCharacter();
@@ -242,47 +112,6 @@ it('surfaces asset safety as its own location', function (string $device) {
 
     snap($page, "character-assets-asset-safety-{$device}");
 })->with(['desktop', 'iphone']);
-
-if (! function_exists('realCharacterId')) {
-    /**
-     * A real EVE character id (verified CEO) so images.evetech.net serves a real portrait in
-     * screenshots instead of the generic default it returns for fabricated ids. Picks one not yet
-     * used in this (RefreshDatabase-isolated) test; falls back to a random id if the pool is spent.
-     */
-    function realCharacterId(): int
-    {
-        $pool = [197343093, 1319140135, 92081232, 1191750472, 94391213, 887625289, 1435633555, 1809892636];
-        $available = array_values(array_diff($pool, CharacterInfo::query()->pluck('character_id')->all()));
-
-        return $available[0] ?? fake()->unique()->numberBetween(9000000, 98000000);
-    }
-}
-
-if (! function_exists('attachOwnedCharacter')) {
-    /**
-     * Attach an additional owned character to the same user that owns $existing, so a browser test
-     * can exercise the multi-character case — the assets view aggregates over every character the
-     * logged-in user owns, not just the main. Returns the new character. Guarded so each Browser
-     * file can define it standalone without colliding when the suite loads several.
-     */
-    function attachOwnedCharacter(CharacterInfo $existing): CharacterInfo
-    {
-        $user = CharacterUser::query()
-            ->where('character_id', $existing->character_id)
-            ->firstOrFail()
-            ->user;
-
-        $character = CharacterInfo::factory()->create(['character_id' => realCharacterId()]);
-
-        CharacterUser::create([
-            'user_id' => $user->getKey(),
-            'character_id' => $character->character_id,
-            'character_owner_hash' => sha1((string) $character->character_id),
-        ]);
-
-        return $character;
-    }
-}
 
 it('narrows a location to only the top-level items that match the search at any depth', function (string $device) {
     $character = actingAsCharacter();
