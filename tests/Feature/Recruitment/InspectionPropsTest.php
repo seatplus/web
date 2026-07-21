@@ -2,6 +2,7 @@
 
 use Inertia\DeferProp;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Web\Services\CharacterInspectionScrollProps;
 
@@ -22,4 +23,23 @@ it('builds resolvable skills and a wired contacts prop per inspected character',
 
     expect($skills->get($character->character_id))->toHaveCount(1)
         ->and($skills->get($character->character_id)->first()->skill_id)->toBe($skill->skill_id);
+});
+
+// The Corporation History tab renders from a per-character scroll prop (migrated off the legacy
+// axios InfiniteLoadingHelper), so the service must build a corporation_history_<id> prop that
+// paginates the character's history.
+it('builds a paginated corporation-history scroll prop per inspected character', function () {
+    $character = CharacterInfo::factory()->create();
+    $history = CorporationHistory::factory()->create(['character_id' => $character->character_id]);
+
+    $props = app(CharacterInspectionScrollProps::class)->build([(int) $character->character_id], request());
+
+    $key = "corporation_history_{$character->character_id}";
+
+    expect($props)->toHaveKey($key);
+
+    $paginator = ($props[$key])();
+
+    expect($paginator->total())->toBe(1)
+        ->and($paginator->first()->record_id)->toBe($history->record_id);
 });

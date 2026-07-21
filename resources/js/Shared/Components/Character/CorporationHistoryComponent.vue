@@ -11,21 +11,27 @@
         </div>
       </div>
     </template>
-    <div class="max-h-96 overflow-auto">
-      <InfiniteLoadingHelper
-        v-slot="{results}"
-        route-name="corporation.history"
-        :params="{ character_id: character.character_id }"
+    <div
+      class="relative max-h-96 overflow-y-auto"
+      scroll-region=""
+    >
+      <InfiniteScroll
+        :data="scrollKey"
+        :items-element="`#${scrollBodyId}`"
+        preserve-url
       >
         <div class="p-4 sm:p-6 flow-root">
-          <ul class="-mb-8">
+          <ul
+            :id="scrollBodyId"
+            class="-mb-8"
+          >
             <li
-              v-for="(event, eventIdx) in results"
+              v-for="(event, eventIdx) in events"
               :key="event.record_id"
             >
               <div class="relative pb-8">
                 <span
-                  v-if="(eventIdx !== results.length - 1)"
+                  v-if="(eventIdx !== events.length - 1)"
                   class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
                   aria-hidden="true"
                 />
@@ -55,7 +61,7 @@
             </li>
           </ul>
         </div>
-      </InfiniteLoadingHelper>
+      </InfiniteScroll>
     </div>
   </CardWithHeader>
 </template>
@@ -63,18 +69,31 @@
 <script>
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-import InfiniteLoadingHelper from "../../InfiniteLoadingHelper.vue";
+import { InfiniteScroll } from "@inertiajs/vue3";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
 
 export default {
     name: "CorporationHistoryComponent",
-    components: {ResolveIdToName, Time, EveImage, InfiniteLoadingHelper, EntityBlock, CardWithHeader},
+    components: {ResolveIdToName, Time, EveImage, InfiniteScroll, EntityBlock, CardWithHeader},
     props: {
         character: {
             type: Object,
             required: true
+        }
+    },
+    computed: {
+        // The hosting page (CharacterInspectionScrollProps) supplies one scroll prop per inspected
+        // character, so read this character's history straight off the page props.
+        scrollKey() {
+            return `corporation_history_${this.character.character_id}`
+        },
+        scrollBodyId() {
+            return `corporation-history-body-${this.character.character_id}`
+        },
+        events() {
+            return this.$page.props[this.scrollKey]?.data ?? []
         }
     }
 }

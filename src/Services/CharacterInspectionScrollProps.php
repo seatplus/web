@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
@@ -49,7 +50,32 @@ class CharacterInspectionScrollProps
             $this->skillProps($characterIds),
             $this->contactProps($characterIds),
             $this->mailProps($characterIds),
+            $this->corporationHistoryProps($characterIds),
         );
+    }
+
+    /**
+     * Corporation history per character (infinite scroll) — mirrors Character\CorporationHistoryController
+     * so the shared CorporationHistoryComponent renders the recruit's/employee's history in-place instead
+     * of fetching it through the legacy axios/Ziggy InfiniteLoadingHelper.
+     *
+     * @param  array<int, int>  $characterIds
+     * @return array<string, mixed>
+     */
+    private function corporationHistoryProps(array $characterIds): array
+    {
+        $props = [];
+
+        foreach ($characterIds as $characterId) {
+            $props["corporation_history_{$characterId}"] = Inertia::scroll(
+                fn () => CorporationHistory::query()
+                    ->where('character_id', $characterId)
+                    ->orderByDesc('record_id')
+                    ->paginate(pageName: "corporation_history_{$characterId}"),
+            );
+        }
+
+        return $props;
     }
 
     /**
