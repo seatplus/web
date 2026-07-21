@@ -4,6 +4,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 
@@ -213,6 +214,9 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
             'wallet_journable_id' => $applicantCharacter->character_id,
             'wallet_journable_type' => CharacterInfo::class,
         ]);
+    CorporationHistory::factory()
+        ->count(3)
+        ->create(['character_id' => $applicantCharacter->character_id]);
     cache()->flush();
 
     // Desktop only: the tab switcher is clickable text here; on mobile it's a <select>.
@@ -234,4 +238,12 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     $page->click('[data-tab="Assets"]');
     $page->assertNoSmoke();
     snap($page, 'recruitment-review-tab-assets');
+
+    // Corporation History tab — migrated from the axios InfiniteLoadingHelper to a native
+    // <InfiniteScroll> over the per-character corporation_history_<id> scroll prop. Assert the
+    // rows rendered (deterministic) rather than the corp name (resolved async via resolve.id).
+    $page->click('[data-tab="Corporation History"]');
+    $page->assertNoSmoke();
+    $page->assertScript("document.querySelectorAll('#corporation-history-body-{$applicantCharacter->character_id} li').length >= 1");
+    snap($page, 'recruitment-review-tab-corporation-history');
 });
