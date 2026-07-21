@@ -33,7 +33,6 @@ use Inertia\Response;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Models\Recruitment\Enlistment;
 
 class HomeController extends Controller
 {
@@ -44,11 +43,6 @@ class HomeController extends Controller
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
         ]);
-    }
-
-    public function getEnlistments(): LengthAwarePaginator
-    {
-        return Enlistment::with('corporation', 'corporation.alliance')->paginate();
     }
 
     public function getOwnApplications(int $corporation_id): LengthAwarePaginator

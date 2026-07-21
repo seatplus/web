@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Seatplus\Web\Models\Recruitment\Enlistment;
 
 require_once __DIR__.'/helpers.php';
 
@@ -43,6 +44,25 @@ it('renders the dashboard for an authenticated user', function (string $device) 
     snap($page, "dashboard-{$device}");
 
     test()->assertAuthenticated();
+})->with(['desktop', 'iphone']);
+
+it('no longer shows the job postings section on the dashboard', function (string $device) {
+    $character = actingAsCharacter();
+
+    // An open posting for the character's corporation would previously have surfaced here as a
+    // "Job Postings" card; open postings now live solely in the Job Portal.
+    Enlistment::query()->create([
+        'corporation_id' => $character->corporation->corporation_id,
+        'type' => 'user',
+    ]);
+
+    $page = deviceVisit($device, '/home');
+
+    $page->assertNoSmoke();
+    $page->waitForText('Characters');
+    $page->assertDontSee('Job Postings');
+
+    snap($page, "dashboard-no-job-postings-{$device}");
 })->with(['desktop', 'iphone']);
 
 it('renders a dashboard card for every character the user owns', function (string $device) {

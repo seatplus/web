@@ -73,21 +73,15 @@ test('user with permission and affiliations can delete enlistment', function () 
     ]);
 });
 
-test('secondary user can see enlistment', function () {
+test('the dashboard no longer lists enlistments (moved to the job portal)', function () {
     createEnlistment();
 
-    $response = test()->actingAs(test()->secondary_user)
-        ->get(route('list.open.enlistments'))
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has(
-                    'data.0',
-                    fn ($json) => $json
-                        ->where('corporation_id', test()->test_character->corporation->corporation_id)
-                        ->etc()
-                )
-                ->etc()
+    test()->actingAs(test()->test_user)
+        ->get(route('home'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Dashboard/Index')
+            ->has('characters')
+            ->missing('enlistments')
         );
 });
 
