@@ -7,23 +7,17 @@
         :characters="characters"
         class="py-4"
       />
-
-      <Enlistments
-        :key="timestamp"
-        class="py-4"
-      />
     </div>
   </div>
 </template>
 
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
-import Enlistments from "./Enlistments.vue"
 import Characters from "./Characters.vue"
 
 export default {
     name: "Index",
-    components: {Characters, Enlistments, PageHeader},
+    components: {Characters, PageHeader},
     props: {
         characters: {
             type: Array,
@@ -32,11 +26,8 @@ export default {
     },
     setup() {
 
-        const timestamp = +new Date();
-
         return {
             pageTitle: 'Home',
-            timestamp
         }
     },
 }
