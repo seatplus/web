@@ -101,11 +101,13 @@ class ObservationController extends Controller
 
         $characterIds = $user->characters->pluck('character_id')->map(fn (mixed $id): int => (int) $id)->all();
 
+        $watchlistArray = $watchlist->execute($corporation_id);
+
         return Inertia::render('Employment/Inspect', array_merge([
             'recruit' => $user,
-            'watchlist' => $watchlist->execute($corporation_id),
+            'watchlist' => $watchlistArray,
             'targetCorporation' => CorporationInfo::find($corporation_id),
-        ], $inspection->build($characterIds, request())));
+        ], $inspection->build($characterIds, request(), $watchlistArray)));
     }
 
     private function authorizeCorporation(int $corporation_id): void

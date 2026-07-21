@@ -13,14 +13,14 @@
     </template>
 
     <!-- scroll-region lets Inertia track/restore this custom scroll container so
-         <InfiniteScroll> merges the next page without jumping to top. -->
+         <InfiniteScroll> merges the next page without jumping to top. Contracts are delivered as a
+         page scroll prop (the character page's contracts_<id>, or the recruitment/observation
+         watchlist_contracts_<id>) — see the scrollKey the parent passes. -->
     <div
       class="relative max-h-96 overflow-y-auto"
-      :scroll-region="scrollKey ? '' : null"
+      scroll-region=""
     >
-      <!-- Character page: contracts delivered as a page scroll prop → Inertia InfiniteScroll. -->
       <InfiniteScroll
-        v-if="scrollKey"
         :data="scrollKey"
         :items-element="`#${scrollBodyId}`"
         preserve-url
@@ -41,27 +41,6 @@
           </template>
         </StickyHeaderTable>
       </InfiniteScroll>
-
-      <!-- Recruitment (watchlist): still the axios helper against the details endpoint. -->
-      <InfiniteLoadingHelper
-        v-else
-        v-slot="{results}"
-        route-name="character.contracts.details"
-        :params="parameters"
-      >
-        <StickyHeaderTable :header-titles="headerTitles">
-          <template #default="slotProps">
-            <ContractRowComponent
-              v-for="contract in results"
-              :key="contract.contract_id"
-              :contract="contract"
-              :columns="slotProps.columns"
-              :count-columns="slotProps.countColumns"
-              :character-id="id"
-            />
-          </template>
-        </StickyHeaderTable>
-      </InfiniteLoadingHelper>
     </div>
   </CardWithHeader>
 </template>
@@ -70,7 +49,6 @@
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
-import InfiniteLoadingHelper from "@/Shared/InfiniteLoadingHelper.vue";
 import { InfiniteScroll } from "@inertiajs/vue3";
 import ContractRowComponent from "./ContractRowComponent.vue";
 
@@ -79,7 +57,6 @@ export default {
     components: {
         InfiniteScroll,
         ContractRowComponent,
-        InfiniteLoadingHelper,
         StickyHeaderTable,
         CardWithHeader,
         EntityByIdBlock,
@@ -94,17 +71,11 @@ export default {
             type: String,
             default: 'character'
         },
-        watchlist: {
-            required: false,
-            type: Object,
-            default: () => new Object()
-        },
-        // When set (character page) contracts come from this page scroll prop via
-        // <InfiniteScroll>. When null (recruitment) the axios helper + watchlist is used.
+        // The page scroll prop this card renders — contracts_<id> (all) on the character page and
+        // the "All" recruitment sub-tab, or watchlist_contracts_<id> on the "Watchlisted" sub-tab.
         scrollKey: {
-            required: false,
+            required: true,
             type: String,
-            default: null,
         },
     },
     computed: {
@@ -123,9 +94,6 @@ export default {
         scrollEntries() {
             return this.$page.props[this.scrollKey]?.data ?? []
         },
-        parameters() {
-            return {...this.watchlist, character_id: this.id}
-        }
     }
 }
 </script>

@@ -8,7 +8,7 @@
     v-for="character_id in characterIds"
     :id="character_id"
     :key="`${character_id}:${activeTabId}`"
-    :watchlist="activeTabId === 1 ? watchlist : {}"
+    :scroll-key="activeTabId === 1 ? `watchlist_contracts_${character_id}` : `contracts_${character_id}`"
   />
 </template>
 

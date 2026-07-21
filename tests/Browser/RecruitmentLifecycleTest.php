@@ -196,7 +196,7 @@ it('reviews — a reviewer opens an application and sees the shared inspection t
     snap($page, "recruitment-review-detail-{$device}");
 })->with(['desktop', 'iphone']);
 
-it('reviews — the inspection tabs render the applicant\'s data', function () {
+it('reviews — the inspection tabs render the applicant\'s data', function (string $device) {
     $character = actingAsCharacter();
     makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -217,33 +217,54 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     CorporationHistory::factory()
         ->count(3)
         ->create(['character_id' => $applicantCharacter->character_id]);
+    makeCharacterContracts($applicantCharacter, 3);
     cache()->flush();
 
-    // Desktop only: the tab switcher is clickable text here; on mobile it's a <select>.
-    $page = visit("/corporation/recruitment/application/{$application->id}");
+    $page = deviceVisit($device, "/corporation/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->waitForText('Jane Applicant');
 
+    // The tab switcher is a clickable div bar on desktop and a <select id="tabs"> on mobile — switch
+    // the active tab the way the current viewport exposes it (the desktop divs are display:none on
+    // mobile, so a data-tab click there would never land).
+    $switchTab = function (string $tab) use ($page, $device) {
+        if ($device === 'iphone') {
+            $page->script("const s = document.getElementById('tabs'); s.value = ".json_encode($tab).'; s.dispatchEvent(new Event("change", { bubbles: true }));');
+
+            return;
+        }
+
+        $page->click('[data-tab="'.$tab.'"]');
+    };
+
     // Skills tab — the applicant's trained skills.
-    $page->click('[data-tab="Skills"]');
+    $switchTab('Skills');
     $page->waitForText('Gunnery');
-    snap($page, 'recruitment-review-tab-skills');
+    snap($page, "recruitment-review-tab-skills-{$device}");
 
     // Wallets tab — the applicant's wallet journal.
-    $page->click('[data-tab="Wallets"]');
+    $switchTab('Wallets');
     $page->assertNoSmoke();
-    snap($page, 'recruitment-review-tab-wallets');
+    snap($page, "recruitment-review-tab-wallets-{$device}");
 
     // Assets tab — renders through the shared inspection scroll props.
-    $page->click('[data-tab="Assets"]');
+    $switchTab('Assets');
     $page->assertNoSmoke();
-    snap($page, 'recruitment-review-tab-assets');
+    snap($page, "recruitment-review-tab-assets-{$device}");
 
     // Corporation History tab — migrated from the axios InfiniteLoadingHelper to a native
     // <InfiniteScroll> over the per-character corporation_history_<id> scroll prop. Assert the
     // rows rendered (deterministic) rather than the corp name (resolved async via resolve.id).
-    $page->click('[data-tab="Corporation History"]');
+    $switchTab('Corporation History');
     $page->assertNoSmoke();
     $page->assertScript("document.querySelectorAll('#corporation-history-body-{$applicantCharacter->character_id} li').length >= 1");
-    snap($page, 'recruitment-review-tab-corporation-history');
-});
+    snap($page, "recruitment-review-tab-corporation-history-{$device}");
+
+    // Contracts tab — migrated from the axios InfiniteLoadingHelper to a native <InfiniteScroll>
+    // over the contracts_<id> scroll prop (no watchlist here → the "All Contracts" sub-tab). Assert
+    // the rows rendered (deterministic) rather than an async-resolved entity name.
+    $switchTab('Contracts');
+    $page->assertNoSmoke();
+    $page->assertScript("document.querySelectorAll('#contracts-body-{$applicantCharacter->character_id} > *').length >= 1");
+    snap($page, "recruitment-review-tab-contracts-{$device}");
+})->with(['desktop', 'iphone']);

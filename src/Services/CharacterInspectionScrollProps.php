@@ -14,6 +14,7 @@ use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CorporationHistory;
 use Seatplus\Eveapi\Models\Contacts\Contact;
+use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Eveapi\Models\Mail\Mail;
 use Seatplus\Eveapi\Models\Skills\Skill;
@@ -24,7 +25,10 @@ use Seatplus\Eveapi\Models\Wallet\WalletJournal;
 use Seatplus\Eveapi\Models\Wallet\WalletTransaction;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
 use Seatplus\Web\Http\Resources\ContactResource;
+use Seatplus\Web\Http\Resources\ContractRessource;
 use Seatplus\Web\Http\Resources\LocationRessource;
+use Seatplus\Web\Services\Query\LocationWatchListScope;
+use Seatplus\Web\Services\Query\TypeWatchListScope;
 
 /**
  * Builds the Inertia scroll/defer props the shared Asset and Wallet components read, for an arbitrary
@@ -42,7 +46,7 @@ class CharacterInspectionScrollProps
      * @param  array<int, int>  $characterIds
      * @return array<string, mixed>
      */
-    public function build(array $characterIds, Request $request): array
+    public function build(array $characterIds, Request $request, array $watchlist = []): array
     {
         return array_merge(
             $this->assetProps($characterIds, $request),
@@ -51,6 +55,7 @@ class CharacterInspectionScrollProps
             $this->contactProps($characterIds),
             $this->mailProps($characterIds),
             $this->corporationHistoryProps($characterIds),
+            $this->contractProps($characterIds, $watchlist),
         );
     }
 
@@ -76,6 +81,61 @@ class CharacterInspectionScrollProps
         }
 
         return $props;
+    }
+
+    /**
+     * Contracts per character (infinite scroll) — mirrors Character\ContractsController so the shared
+     * ContractComponent renders through a native <InfiniteScroll> instead of the legacy axios
+     * InfiniteLoadingHelper. Always emits an all-contracts prop; when the posting/observed corp defines
+     * a watchlist, also emits a watchlist-filtered prop so the "Watchlisted" sub-tab needs no re-fetch.
+     *
+     * @param  array<int, int>  $characterIds
+     * @param  array<string, mixed>  $watchlist
+     * @return array<string, mixed>
+     */
+    private function contractProps(array $characterIds, array $watchlist): array
+    {
+        $props = [];
+
+        foreach ($characterIds as $characterId) {
+            $props["contracts_{$characterId}"] = Inertia::scroll(
+                fn () => $this->contractsQuery($characterId)
+                    ->paginate(pageName: "contracts_{$characterId}")
+                    ->through(fn (Contract $contract) => (new ContractRessource($contract))->resolve()),
+            );
+
+            if ($this->hasWatchlistCriteria($watchlist)) {
+                $props["watchlist_contracts_{$characterId}"] = Inertia::scroll(
+                    fn () => $this->contractsQuery($characterId)
+                        ->tap(new LocationWatchListScope($watchlist))
+                        ->tap(new TypeWatchListScope($watchlist))
+                        ->paginate(pageName: "watchlist_contracts_{$characterId}")
+                        ->through(fn (Contract $contract) => (new ContractRessource($contract))->resolve()),
+                );
+            }
+        }
+
+        return $props;
+    }
+
+    /**
+     * @param  array<string, mixed>  $watchlist
+     */
+    private function hasWatchlistCriteria(array $watchlist): bool
+    {
+        return collect($watchlist)->flatten()->filter()->isNotEmpty();
+    }
+
+    /**
+     * Base query for a character's contracts with everything the row cells render — mirrors
+     * Character\ContractsController::contractsQuery.
+     *
+     * @return Builder<Contract>
+     */
+    private function contractsQuery(int $characterId): Builder
+    {
+        return Contract::whereHas('characters', fn (Builder $query) => $query->where('character_id', $characterId))
+            ->with(['items', 'items.type', 'items.type.group', 'startLocation.locatable', 'endLocation.locatable', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation']);
     }
 
     /**
