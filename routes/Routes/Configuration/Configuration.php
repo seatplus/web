@@ -38,9 +38,6 @@ Route::middleware([CheckAuthorization::class.':superuser'])->group(function () {
 
     Route::get('/start/impersonate/{user_id}', [SeatPlusController::class, 'impersonate'])->name('impersonate.start');
 
-    // TODO: create own controller for server
-    Route::get('/settings/navigation', [SeatPlusController::class, 'navigation'])->name('settings.navigation');
-
     Route::get('/settings/scopes/overview', OverviewController::class)->name('settings.scopes');
 
     Route::get('/settings/scopes/view/{entity_id}', [SsoSettingsController::class, 'index'])->name('view.scopes.settings');
