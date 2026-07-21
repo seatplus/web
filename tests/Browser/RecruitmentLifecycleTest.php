@@ -228,17 +228,17 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     // Skills tab — the applicant's trained skills.
     $page->click('[data-tab="Skills"]');
     $page->waitForText('Gunnery');
-    snap($page, 'recruitment-review-tab-skills');
+    snap($page, 'recruitment-review-tab-skills-desktop');
 
     // Wallets tab — the applicant's wallet journal.
     $page->click('[data-tab="Wallets"]');
     $page->assertNoSmoke();
-    snap($page, 'recruitment-review-tab-wallets');
+    snap($page, 'recruitment-review-tab-wallets-desktop');
 
     // Assets tab — renders through the shared inspection scroll props.
     $page->click('[data-tab="Assets"]');
     $page->assertNoSmoke();
-    snap($page, 'recruitment-review-tab-assets');
+    snap($page, 'recruitment-review-tab-assets-desktop');
 
     // Corporation History tab — migrated from the axios InfiniteLoadingHelper to a native
     // <InfiniteScroll> over the per-character corporation_history_<id> scroll prop. Assert the
@@ -246,7 +246,7 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     $page->click('[data-tab="Corporation History"]');
     $page->assertNoSmoke();
     $page->assertScript("document.querySelectorAll('#corporation-history-body-{$applicantCharacter->character_id} li').length >= 1");
-    snap($page, 'recruitment-review-tab-corporation-history');
+    snap($page, 'recruitment-review-tab-corporation-history-desktop');
 
     // Contracts tab — migrated from the axios InfiniteLoadingHelper to a native <InfiniteScroll>
     // over the contracts_<id> scroll prop (no watchlist here → the "All Contracts" sub-tab). Assert
@@ -254,5 +254,5 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     $page->click('[data-tab="Contracts"]');
     $page->assertNoSmoke();
     $page->assertScript("document.querySelectorAll('#contracts-body-{$applicantCharacter->character_id} > *').length >= 1");
-    snap($page, 'recruitment-review-tab-contracts');
+    snap($page, 'recruitment-review-tab-contracts-desktop');
 });
