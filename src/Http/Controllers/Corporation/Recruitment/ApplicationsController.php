@@ -116,13 +116,15 @@ class ApplicationsController extends Controller
             $characterIds = [];
         }
 
+        $watchlist = $action->execute($application->corporation_id);
+
         return inertia('Corporation/Recruitment/Application', array_merge([
             'recruit' => $recruit->toArray(),
             'application' => $application,
-            'watchlist' => $action->execute($application->corporation_id),
+            'watchlist' => $watchlist,
             'activeSidebarElement' => 'recruitment.reviews',
             'pageTranslations' => Translations::gather(['web::wallet_journal']),
-        ], $inspectionProps->build($characterIds, request())));
+        ], $inspectionProps->build($characterIds, request(), $watchlist)));
     }
 
     public function reviewApplication(Request $request, string $application_id, ReviewApplicationAction $action, ApplicationGroupService $groupService): RedirectResponse

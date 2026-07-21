@@ -217,6 +217,7 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     CorporationHistory::factory()
         ->count(3)
         ->create(['character_id' => $applicantCharacter->character_id]);
+    makeCharacterContracts($applicantCharacter, 3);
     cache()->flush();
 
     // Desktop only: the tab switcher is clickable text here; on mobile it's a <select>.
@@ -246,4 +247,12 @@ it('reviews — the inspection tabs render the applicant\'s data', function () {
     $page->assertNoSmoke();
     $page->assertScript("document.querySelectorAll('#corporation-history-body-{$applicantCharacter->character_id} li').length >= 1");
     snap($page, 'recruitment-review-tab-corporation-history');
+
+    // Contracts tab — migrated from the axios InfiniteLoadingHelper to a native <InfiniteScroll>
+    // over the contracts_<id> scroll prop (no watchlist here → the "All Contracts" sub-tab). Assert
+    // the rows rendered (deterministic) rather than an async-resolved entity name.
+    $page->click('[data-tab="Contracts"]');
+    $page->assertNoSmoke();
+    $page->assertScript("document.querySelectorAll('#contracts-body-{$applicantCharacter->character_id} > *').length >= 1");
+    snap($page, 'recruitment-review-tab-contracts');
 });

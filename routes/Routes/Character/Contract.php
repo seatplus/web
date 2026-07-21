@@ -37,7 +37,6 @@ Route::prefix('contracts')
 
         Route::middleware($contractPermission)
             ->group(function () {
-                Route::get('/{character_id}', [ContractsController::class, 'getCharacterContractsDetails'])->name('character.contracts.details');
                 Route::get('/{character_id}/contract/{contract_id}', [ContractsController::class, 'getContractDetails'])->name('contract.details');
             });
     });
