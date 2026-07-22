@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
@@ -390,36 +387,6 @@ test('junior hr can dispatch update batch and get status', function () {
     test()->actingAs(test()->test_user)
         ->get(route('get.batch_update', test()->secondary_character->character_id))
         ->assertJsonFragment(['batchable_id' => test()->secondary_character->character_id]);
-});
-
-it('returns activity log entries for closed applications', function () {
-    $application = Event::fakeFor(fn () => Application::factory()->create([
-        'id' => Str::uuid(),
-        'status' => 'rejected',
-    ]));
-
-    $application->logEntries()->create([
-        'causer_type' => CharacterInfo::class,
-        'causer_id' => test()->test_character->character_id,
-        'type' => faker()->randomElement(['decision', 'comment']),
-        'comment' => faker()->text,
-    ]);
-
-    assignPermissionToTestUser('superuser');
-
-    $application = $application->refresh();
-
-    test()->actingAs(test()->test_user)
-        ->get(route('get.activity.log', $application->id))
-        ->assertJson(
-            fn (AssertableJson $json) => $json->where('id', $application->id)
-                ->where('status', 'rejected')
-                ->where(
-                    'log_entries',
-                    fn (Collection $collection) => Arr::has($collection->first(), 'causer')
-                )
-                ->etc()
-        );
 });
 
 // Helpers

@@ -59,7 +59,6 @@ Route::controller(ApplicationsController::class)->group(function () {
             Route::get('/application/{application_id}', 'getApplication')->name('get.application');
             Route::post('/application/{application_id}', 'reviewApplication')->name('review.application');
             Route::put('/application/{application_id}', 'addComment')->name('comment.application');
-            Route::get('/application/{application_id}/log', 'getActivityLog')->name('get.activity.log');
         });
 });
 

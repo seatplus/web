@@ -163,23 +163,6 @@ class ApplicationsController extends Controller
         return back()->with('success', 'comment created');
     }
 
-    public function getActivityLog(string $application_id): ?Application
-    {
-        return Application::query()
-            ->with([
-                'logEntries.causer' => function (MorphTo $morphTo) {
-                    $morphTo->morphWith([User::class => ['mainCharacter']]);
-                },
-                'applicationable' => function (MorphTo $morphTo) {
-                    $morphTo->morphWith([
-                        User::class => ['mainCharacter', 'characters', 'characters.batchUpdate'],
-                        CharacterInfo::class => ['batchUpdate'],
-                    ]);
-                },
-            ])
-            ->find($application_id);
-    }
-
     public function dispatchBatchUpdate(int $character_id): \Illuminate\Http\Response
     {
         $refresh_token = RefreshToken::find($character_id);
