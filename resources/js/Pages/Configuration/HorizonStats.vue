@@ -138,6 +138,7 @@
 </template>
 
 <script>
+    import { router } from '@inertiajs/vue3'
     // horizon.index is a Laravel Horizon (vendor) named route; use its Wayfinder @/routes helper.
     import { index as horizonIndex } from "@/routes/horizon";
 
@@ -145,7 +146,6 @@
         name: "HorizonStats",
         data() {
             return {
-                stats: {},
                 timer: '',
                 symbols: {
                     'running'   : '<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
@@ -155,6 +155,11 @@
             }
         },
         computed : {
+            // Horizon stats arrive as the `queueStats` optional Inertia prop, refreshed by the
+            // partial reload in refreshStats() — no client-side HTTP.
+            stats() {
+                return this.$page.props.queueStats ?? {}
+            },
             horizonUrl() {
                 return horizonIndex.url()
             },
@@ -176,23 +181,10 @@
         },
         methods: {
             /**
-             * Refresh the stats every period of time.
+             * Pull a fresh queueStats prop from the server via an Inertia partial reload.
              */
-            refreshStats: _.throttle(function() {
-                this.loadStats()
-            }, 5000),
-            /*
-             * load stats
-             */
-            loadStats() {
-                return axios
-                    .get('/queue/status')
-                    .then( (response) => {
-                        this.stats = response.data;
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
+            refreshStats() {
+                router.reload({ only: ['queueStats'] })
             }
         },
 
