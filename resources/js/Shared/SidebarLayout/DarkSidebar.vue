@@ -76,7 +76,7 @@
                     <Link
                       v-for="item in category.entries"
                       :key="item.name"
-                      :href="route(item.route)"
+                      :href="item.uri"
                       :class="[item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group flex items-center px-2 py-2 text-base font-medium rounded-md']"
                     >
                       <component
@@ -92,7 +92,7 @@
             </div>
             <div class="shrink-0 flex bg-gray-700 p-4">
               <Link
-                :href="route('user.settings')"
+                :href="userSettingsUri"
                 class="shrink-0 group block"
               >
                 <div class="flex items-center">
@@ -141,7 +141,7 @@
               >
                 <Link
                   v-if="category.entries.length === 1"
-                  :href="route(category.entries[0].route)"
+                  :href="category.entries[0].uri"
                   :class="[category.entries[0].current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group w-full flex items-center px-2 pr-2 py-2 text-sm font-medium rounded-md']"
                 >
                   <component
@@ -177,7 +177,7 @@
                     <Link
                       v-for="subItem in category.entries"
                       :key="subItem.name"
-                      :href="route(subItem.route)"
+                      :href="subItem.uri"
                       :class="[subItem.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'group w-full flex items-center pl-10 pr-2 py-2 text-sm font-medium rounded-md']"
                     >
                       <component
@@ -195,7 +195,7 @@
           <!-- User Menu          -->
           <div class="shrink-0 flex bg-gray-700 p-4">
             <Link
-              :href="route('user.settings')"
+              :href="userSettingsUri"
               class="shrink-0 w-full group block"
             >
               <div class="flex items-center">
@@ -294,13 +294,16 @@ import Toasts from "@/Shared/Toasts/Toasts.vue";
       activeSidebarElement: {
           type: String,
           required: false,
-          default: () => route().current()
+          // The server shares the current route name (HandleInertiaRequests) so the
+          // sidebar can highlight the active entry without Ziggy's route().current().
+          default: () => usePage().props.activeSidebarElement
       },
   })
 
   const sidebarOpen = ref(false)
 
   const logo = usePage().props.images.logo
+  const userSettingsUri = usePage().props.userSettingsUri
   const main = _.get(usePage().props.user, 'data.mainCharacter')
   const component = usePage().component
   const navigation = ref([])
@@ -313,7 +316,7 @@ import Toasts from "@/Shared/Toasts/Toasts.vue";
 
           let subItems = _.map(category.entries, (entry) => {
 
-              let current = props.activeSidebarElement != null ? props.activeSidebarElement : route().current()
+              let current = props.activeSidebarElement != null ? props.activeSidebarElement : usePage().props.activeSidebarElement
 
               return {
                   ...entry,

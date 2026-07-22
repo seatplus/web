@@ -29,7 +29,7 @@
             <div class="order-3 mt-2 shrink-0 w-full sm:order-2 sm:mt-0 sm:w-auto">
               <div class="rounded-md shadow-xs">
                 <Link
-                  :href="route('impersonate.stop')"
+                  :href="stopUrl"
                   class="flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-indigo-600 bg-white hover:text-indigo-500 focus:outline-hidden focus:ring-3 transition ease-in-out duration-150"
                 >
                   Stop
@@ -55,12 +55,16 @@
 
 <script>
 import { Link } from '@inertiajs/vue3';
+import StopImpersonateController from "@/actions/Seatplus/Web/Http/Controllers/Shared/StopImpersonateController";
   export default {
     name: "ImpersonatingBanner",
       components: {Link},
       computed: {
         name() {
             return this.$page.props.user.data.mainCharacter?.name ?? 'Unknown'
+        },
+        stopUrl() {
+            return StopImpersonateController.url()
         }
       }
   }

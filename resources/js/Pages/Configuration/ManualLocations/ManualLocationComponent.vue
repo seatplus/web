@@ -57,6 +57,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
 import {useForm} from "@inertiajs/vue3";
 import {computed, watchEffect} from "vue";
+import { acceptSuggestion } from "@/actions/Seatplus/Web/Http/Controllers/Shared/ManualLocationController";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime)
@@ -85,7 +86,7 @@ const submit = () => {
   form.transform((data) => ({
     ...data,
     id: options.value[form.id].id
-  })).post(route('accept.manuel_locations'), {
+  })).post(acceptSuggestion.url(), {
     onSuccess: () => emit('onSubmittedSuggestion')
   })
 }

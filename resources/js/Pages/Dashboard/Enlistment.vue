@@ -31,7 +31,7 @@
         <CharacterApplication
           v-if="enlistment.type === 'character'"
           :enlistment="enlistment"
-          :application-results="applicationResults.results.value"
+          :application-results="enlistment.applications"
         />
         <span v-else>
           This corporation accepts recruits on a user level. This means once you enlist, every character within your user account must comply with a possible set of scopes at all time.
@@ -45,7 +45,7 @@
         >
           <Link
             v-if="hasApplications"
-            :href="route('delete.user.application')"
+            :href="deleteUserApplicationUrl"
             method="delete"
             :preserve-state="false"
             as="button"
@@ -59,7 +59,7 @@
           </Link>
           <Link
             v-else
-            :href="route('post.application')"
+            :href="postApplicationUrl"
             method="post"
             :preserve-state="false"
             as="button"
@@ -84,9 +84,9 @@ import {computed, ref} from "vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
-import {useLoadCompleteResource} from "@/Functions/useLoadCompleteResource";
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
+import { apply, pullUserApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "Enlistment",
@@ -99,15 +99,17 @@ export default {
     },
     setup(props) {
 
-        const applicationResults = useLoadCompleteResource('list.existing.applications', { corporation_id: props.enlistment.corporation_id })
         const openModal = ref(false)
 
-        const hasApplications = computed(() => !_.isEmpty(applicationResults.results.value))
+        // The server attaches the user's open applications for this enlistment's
+        // corporation (OnboardingController), so no client-side fetch is needed.
+        const hasApplications = computed(() => !_.isEmpty(props.enlistment.applications))
 
         return {
             hasApplications,
             openModal,
-            applicationResults
+            postApplicationUrl: apply.url(),
+            deleteUserApplicationUrl: pullUserApplication.url(),
         }
     }
 }

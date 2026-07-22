@@ -18,7 +18,7 @@
 
       <div class="mt-8">
         <a
-          :href="route('auth.eve')"
+          :href="ssoUrl"
           class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
         >
           <span class="absolute left-0 inset-y pl-3">
@@ -63,6 +63,8 @@ import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
 import { router } from "@inertiajs/vue3";
 import { localeName } from "@/i18n/localeName";
+import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
+import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
 
 export default {
     name: "Login",
@@ -76,6 +78,9 @@ export default {
     computed: {
         locales() {
             return this.$page.props.locales || []
+        },
+        ssoUrl() {
+            return RedirectSSOController.url()
         }
     },
     methods: {
@@ -83,7 +88,7 @@ export default {
         // `translations` is a reactive Inertia prop now — the redirect back re-renders
         // in the newly-selected language without a full page reload.
         switchLocale() {
-            router.post(route('locale.update'), { locale: this.selectedLocale }, {
+            router.post(postLocale.url(), { locale: this.selectedLocale }, {
                 preserveScroll: true,
             })
         }

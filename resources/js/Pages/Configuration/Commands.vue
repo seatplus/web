@@ -13,6 +13,7 @@
 <script>
 
   import { router } from "@inertiajs/vue3";
+  import { clear } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/CommandsController";
 
   export default {
     name: "Commands",
@@ -20,7 +21,7 @@
     methods: {
 
       clearCache() {
-        router.post(route('cache.clear')).
+        router.post(clear.url()).
         catch(function (error) {
           console.log(error)
         })

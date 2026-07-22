@@ -49,7 +49,7 @@
               <div class="mt-4 sm:mt-0 sm:ml-6 sm:shrink-0">
                 <span class="inline-flex rounded-md shadow-xs">
                   <a
-                    :href="route('auth.eve.step_up', { character_id: character.character_id, add_scopes: getMissingScopeString(character.missing_scopes), redirect: currentUrl })"
+                    :href="stepUpUrl(character)"
                     class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-hidden focus:border-blue-300 focus:ring-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150"
                   >
                     Fix
@@ -71,6 +71,7 @@
 import EveImage from "@/Shared/EveImage.vue"
 import {usePage} from "@inertiajs/vue3";
 import {computed} from "vue";
+import StepUpController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/StepUpController";
 
 import {
     Disclosure,
@@ -128,5 +129,13 @@ const getMissingText = function(missing_scopes) {
 const getMissingScopeString = function (missing_scopes) {
     return _.toString(missing_scopes)
 }
+
+const stepUpUrl = (character) => StepUpController.url({
+    character_id: character.character_id,
+    query: {
+        add_scopes: getMissingScopeString(character.missing_scopes),
+        redirect: currentUrl.value,
+    },
+})
 
 </script>

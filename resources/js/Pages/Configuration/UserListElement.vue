@@ -16,7 +16,7 @@
         </div>
         <div>
           <Link
-            :href="route('impersonate.start', user.id)"
+            :href="impersonateUrl"
             class="inline-flex items-center shadow-xs px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50"
           >
             Impersonate
@@ -36,6 +36,7 @@
 <script>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { Link } from '@inertiajs/vue3';
+import { impersonate } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/SeatPlusController";
 export default {
     name: "UserListElement",
     components: {EntityBlock, Link},
@@ -50,6 +51,9 @@ export default {
         }
     },
     computed: {
+        impersonateUrl() {
+            return impersonate.url(this.user.id)
+        },
         characters() {
             return _.reject(this.user.characters, (character)  => _.isEqual(character.character_id, this.user.mainCharacter.character_id))
         },

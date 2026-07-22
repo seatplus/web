@@ -3,7 +3,7 @@
     <PageHeader :page-title="pageTitle">
       <template #primary>
         <Link
-          :href="route('create.scopes')"
+          :href="createScopesUrl"
           method="post"
           as="button"
           :data="{selectedScopes: selected_scopes, selectedEntities: selectedEntities, type: type}"
@@ -18,7 +18,7 @@
       >
         <span class="shadow-xs rounded-md">
           <Link
-            :href="route('delete.scopes', object.id)"
+            :href="deleteScopesUrl"
             method="delete"
             as="button"
             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-hidden focus:ring-blue focus:border-blue-300 active:text-gray-800 active:bg-gray-50 transition duration-150 ease-in-out"
@@ -129,6 +129,7 @@ import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
 import { Link, router } from '@inertiajs/vue3';
+import { create as createScopes, deleteSsoScopeSetting } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/SsoSettings/SsoSettingsController";
 
 export default {
     name: "ScopeSettings",
@@ -155,7 +156,7 @@ export default {
         return {
             selectedEntities: [],
             selected_scopes: _.toArray(_.get(this.entity, 'selected_scopes', {})),
-            creationMode: route().current() === 'view.create.scopes',
+            creationMode: this.$page.props.activeSidebarElement === 'view.create.scopes',
             selectedModula: 0
         }
     },
@@ -175,6 +176,12 @@ export default {
                 : object.alliance_id = this.entity.morphable.alliance_id
 
             return object
+        },
+        createScopesUrl() {
+            return createScopes.url()
+        },
+        deleteScopesUrl() {
+            return deleteSsoScopeSetting.url(this.object.id)
         },
         type() {
             return this.options[this.selectedModula].title
@@ -214,7 +221,7 @@ export default {
     methods: {
         post() {
 
-            const url = route('create.scopes');
+            const url = createScopes.url();
 
             const data = {
                 selectedScopes: this.selectedScopes,

@@ -64,15 +64,13 @@ import {
     ListboxLabel
 } from '@headlessui/vue'
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import { getJson } from "@/Functions/http";
+import { typesOrGroupsOrCategories } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
 export default {
     name: "Autosuggest",
     components: {EntityBlock, Listbox, ListboxOptions, ListboxOption, CheckIcon, ListboxLabel},
     props: {
-        routeName: {
-            required: true,
-            type: String
-        },
         label: {
             required: false,
             type: String
@@ -80,12 +78,6 @@ export default {
         placeholder: {
             required: true,
             type: String
-        },
-        routeParameters: {
-            required: false,
-            type: Object,
-            default: () => {
-            }
         }
     },
     emits: ['selected', 'selectedObject'],
@@ -123,16 +115,14 @@ export default {
 
             let self = this
 
-            //let $queryParams = _.merge({search: query}, this.routeParameters)
-
-            return axios.get(route(this.routeName, {search: query, ...this.routeParameters}))
+            return getJson(typesOrGroupsOrCategories.url({ query: { search: query } }))
                 .then((result) => {
-                    self.suggestions = result.data
+                    self.suggestions = result
 
                     // if previously the suggestions were not shown toggle them
                     if (!this.open)
                         this.toggle()
-                } /*console.log(result.data)*/)
+                })
         },
         selected(newValue) {
             this.query = _.get(newValue, 'name')
