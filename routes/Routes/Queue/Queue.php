@@ -26,12 +26,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Seatplus\Web\Http\Controllers\Queue\DispatchJobController;
-use Seatplus\Web\Http\Controllers\Queue\QueueController;
-
-Route::get('status', [
-    'as' => 'horizon.status',
-    'uses' => QueueController::class,
-]);
 
 Route::post('manual_job/entities', [DispatchJobController::class, 'getEntities'])->name('manual_job.entities');
 Route::get('{batch_id}/status', [DispatchJobController::class, 'getBatchStatus'])->name('get.batch_status');

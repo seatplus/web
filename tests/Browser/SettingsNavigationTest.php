@@ -24,9 +24,10 @@ it('renders the server-settings navigation from a shared prop', function (string
     cache()->flush();
 
     $page = deviceVisit($device, route('server.settings', absolute: false));
-    // No assertNoSmoke here: the settings page's HorizonStats widget polls /queue/status on mount,
-    // which 500s under the test's Queue::fake (Horizon's WaitTimeCalculator calls QueueFake::readyNow).
-    // That console error is unrelated to the navigation this test covers.
+    // No assertNoSmoke here: the settings page's HorizonStats widget refreshes the `queueStats`
+    // prop via an Inertia partial reload on mount, which resolves QueueStatsService (Horizon's
+    // repositories) and can error under the test's Queue::fake. Unrelated to the navigation this
+    // test covers.
     $page->waitForText('Available Settings');
 
     // Every configured tab rendered from the shared prop — no fetch required.

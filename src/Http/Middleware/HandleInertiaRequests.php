@@ -33,6 +33,7 @@ use Inertia\Middleware;
 use Seatplus\Auth\Models\User;
 use Seatplus\Web\Http\Actions\Shared\GetAffiliatedEntitiesAction;
 use Seatplus\Web\Http\Resources\UserRessource;
+use Seatplus\Web\Services\QueueStatsService;
 use Seatplus\Web\Services\Sidebar\SidebarEntries;
 use Seatplus\Web\Support\Locales;
 use Seatplus\Web\Support\Translations;
@@ -115,6 +116,10 @@ class HandleInertiaRequests extends Middleware
             // per-controller wiring. Delegates to the same action the standalone
             // GetAffiliated{Characters,Corporations} endpoints use, so the query lives in one place.
             'affiliatedEntities' => Inertia::optional(fn () => $this->resolveAffiliatedEntities($request)),
+            // Horizon worker stats for the settings-page widget. `optional` so it is resolved only
+            // when HorizonStats polls for it (partial reload with only=['queueStats']) — never on
+            // ordinary page loads — replacing the former axios poll of the /queue/status endpoint.
+            'queueStats' => Inertia::optional(fn () => app(QueueStatsService::class)->get()),
         ]);
     }
 
