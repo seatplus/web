@@ -69,27 +69,22 @@
                 search: this.getSearchParams(),
             }
         },
-        computed: {
-            searchparam() {
-                return route().params
-            }
-        },
         watch: {
             search() {
 
-                let params = route().params
+                // Rebuild the current URL's query string (replacing Ziggy's route().params +
+                // route(current)) and re-visit the same page with the updated search/page.
+                const params = new URLSearchParams(window.location.search)
 
-                if(_.has(params,'search_param') && this.search === '')
-                    _.unset(params, 'search_param')
+                if(params.has('search_param') && this.search === '')
+                    params.delete('search_param')
 
                 if(this.search)
-                    _.set(params,"search_param", this.search);
+                    params.set('search_param', this.search)
 
-                _.set(params, 'page', 1)
+                params.set('page', '1')
 
-                let url_name = route().current()
-
-                router.visit(route(url_name, params), {
+                router.visit(`${window.location.pathname}?${params.toString()}`, {
                     preserveScroll: true,
                     preserveState: true,
                     only: ['users'],
@@ -105,9 +100,7 @@
                 })
             },
             getSearchParams() {
-                let params = route().params
-
-                return _.get(params, 'search_param', '')
+                return new URLSearchParams(window.location.search).get('search_param') ?? ''
             }
         }
     }

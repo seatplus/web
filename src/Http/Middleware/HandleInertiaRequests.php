@@ -102,7 +102,10 @@ class HandleInertiaRequests extends Middleware
             // Server-settings navigation tabs. Static config (name/logo/route per tab), so it is
             // shared eagerly as page chrome rather than fetched post-mount by Settings.vue — which
             // removes an axios + Ziggy round-trip and the flash of empty tabs.
-            'settingsNavigation' => fn () => config('web.settings'),
+            // Each entry's target URL is resolved server-side so the settings tabs need no Ziggy route().
+            'settingsNavigation' => fn () => collect(config('web.settings'))
+                ->map(fn (array $entry) => [...$entry, 'url' => route($entry['route'])])
+                ->all(),
             // The entity-picker slide-over's affiliated character/corporation list. Declared
             // `optional` so it is NOT resolved on ordinary page loads (no DB query, no cost) —
             // only when the picker's <WhenVisible data="affiliatedEntities"> scrolls into view and

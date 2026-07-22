@@ -4,7 +4,7 @@
     <ul class="divide-y divide-gray-200">
       <WideListElement
         v-if="hasGlobalScopes"
-        :url="route('view.global.scopes')"
+        :url="globalScopesUrl"
       >
         <template #avatar>
           <svg
@@ -42,7 +42,7 @@
       <WideListElement
         v-for="(entry) in entities"
         :key="entry.selectedEntity.id"
-        :url="route('view.scopes.settings', entry.selectedEntity.id)"
+        :url="scopesSettingsUrl(entry.selectedEntity.id)"
       >
         <template #avatar>
           <eve-image
@@ -71,7 +71,7 @@
       </WideListElement>
       <li>
         <Link
-          :href="route('view.create.scopes')"
+          :href="createScopesViewUrl"
           class="block hover:bg-gray-50 focus:outline-hidden focus:bg-gray-50 transition duration-150 ease-in-out"
         >
           <div class="flex items-center px-4 py-4 sm:px-6">
@@ -117,6 +117,11 @@
     import EveImage from "@/Shared/EveImage.vue"
     import { Link } from '@inertiajs/vue3';
     import AppHead from "@/Shared/AppHead.vue";
+    // SsoSettingsController@index is mapped to three route names; @/actions can't tell them
+    // apart, so use the @/routes named-route helpers.
+    import { scopes as viewGlobalScopes } from "@/routes/view/global";
+    import { settings as viewScopesSettings } from "@/routes/view/scopes";
+    import { scopes as viewCreateScopes } from "@/routes/view/create";
 
     export default {
         name: "OverviewScopeSettings",
@@ -146,10 +151,18 @@
             },
             hasGlobalScopes() {
                 return _.size(this.entities) !== _.size(this.entries)
+            },
+            globalScopesUrl() {
+                return viewGlobalScopes.url()
+            },
+            createScopesViewUrl() {
+                return viewCreateScopes.url()
             }
         },
         methods: {
-
+            scopesSettingsUrl(entityId) {
+                return viewScopesSettings.url(entityId)
+            }
         },
     }
 </script>

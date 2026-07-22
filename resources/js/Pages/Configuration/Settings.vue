@@ -97,15 +97,19 @@ export default {
             this.currentRoute = active.route
     },
     methods: {
-        isActive(string) {
-            return route().current(string);
+        isActive(name) {
+            // activeSidebarElement is the current route name, shared by HandleInertiaRequests.
+            return this.$page.props.activeSidebarElement === name;
         },
         getRoute(name) {
-            return route(name)
+            return this.navTabs.find(navTab => navTab.route === name)?.url
         },
         visitRoute(name) {
 
-            const url = route(name)
+            const url = this.getRoute(name)
+
+            if (!url)
+                return
 
             router.visit(url,{
                 method: 'get',
