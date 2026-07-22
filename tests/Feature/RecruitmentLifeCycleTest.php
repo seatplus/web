@@ -15,11 +15,6 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
-use Seatplus\Eveapi\Models\Universe\Category;
-use Seatplus\Eveapi\Models\Universe\Group;
-use Seatplus\Eveapi\Models\Universe\Region;
-use Seatplus\Eveapi\Models\Universe\System;
-use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 beforeEach(function () {
@@ -44,7 +39,7 @@ beforeEach(function () {
 
 test('user without permission fails to create enlistment', function () {
     $response = test()->actingAs(test()->test_user)
-        ->post(route('create.corporation.recruitment'), [
+        ->post(route('recruitment.posting.open'), [
             'corporation_id' => test()->secondary_character->corporation->corporation_id,
             'type' => 'user',
         ])->assertForbidden();
@@ -66,7 +61,7 @@ test('user with permission and affiliations can delete enlistment', function () 
     ]);
 
     test()->actingAs(test()->test_user)
-        ->delete(route('delete.enlistment', ['corporation_id' => test()->test_character->corporation->corporation_id]));
+        ->delete(route('recruitment.posting.close', ['corporation_id' => test()->test_character->corporation->corporation_id]));
 
     $this->assertDatabaseMissing('enlistments', [
         'corporation_id' => test()->test_character->corporation->corporation_id,
@@ -166,7 +161,7 @@ test('junior hr handles open user applications', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+        ->assertInertia(fn (Assert $page) => $page->component('Recruitment/Review/Application'));
 
     // Impersonate
     expect($application)->status->toBe('open');
@@ -226,7 +221,7 @@ test('junior hr handles open character applications', function () {
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->component('Corporation/Recruitment/Application'));
+        ->assertInertia(fn (Assert $page) => $page->component('Recruitment/Review/Application'));
 
     // submit review
 
@@ -250,160 +245,6 @@ test('junior hr handles open character applications', function () {
     ]);
 
     expect(test()->secondary_character->refresh()->application)->toBeNull();
-});
-
-test('senior hr can setup watchlist', function () {
-    createEnlistment();
-
-    test()->actingAs(test()->test_user->refresh())
-        ->get(route('edit.enlistment', test()->test_character->corporation->corporation_id))
-        ->assertOk()
-        ->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has('enlistment')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                        ->has('systems', 0)
-                        ->has('regions', 0)
-                        ->has('items', 0)
-                )
-        );
-
-    // create system
-    $system = System::factory()->create();
-
-    // watchlist system
-    $response = test()->actingAs(test()->test_user->refresh())
-        ->followingRedirects()
-        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
-            'systems' => [
-                (object) [
-                    'id' => $system->system_id,
-                ],
-            ],
-        ])
-        ->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                        ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
-                        ->etc()
-                )
-                ->etc()
-        );
-
-    // add region
-    $region = Region::factory()->create();
-    test()->actingAs(test()->test_user->refresh())
-        ->followingRedirects()
-        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
-            'systems' => [
-                (object) [
-                    'id' => $system->system_id,
-                ],
-            ],
-            'regions' => [
-                (object) [
-                    'id' => $region->region_id,
-                ],
-            ],
-        ])
-        ->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                        ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
-                        ->has('regions', 1, fn (Assert $prop) => $prop->where('id', $region->region_id)->etc())
-                        ->etc()
-                )
-                ->etc()
-        );
-
-    // add type and don't submit new system or region,
-    $group = Group::factory()->create(['category_id' => Category::factory()]);
-    $type = Type::factory()->create(['group_id' => $group]);
-    test()->actingAs(test()->test_user->refresh())
-        ->followingRedirects()
-        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
-            'items' => [
-                [
-                    // only watchable_id and type is required
-                    'watchable_id' => $type->type_id,
-                    'watchable_type' => Type::class,
-                ],
-            ],
-        ])->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                    // we expect no change for watchlisted systems and regions
-                        ->has('systems', 1, fn (Assert $prop) => $prop->where('id', $system->system_id)->etc())
-                        ->has('regions', 1, fn (Assert $prop) => $prop->where('id', $region->region_id)->etc())
-                        ->has('items', 1, fn (Assert $prop) => $prop->where('watchable_id', $type->type_id)->etc())
-                        ->etc()
-                )
-                ->etc()
-        );
-
-    test()->actingAs(test()->test_user->refresh())
-        ->followingRedirects()
-        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
-            'items' => [
-                [
-                    // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
-                    'watchable_type' => Group::class,
-                ],
-            ],
-        ])->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                    // we expect no change for watchlisted systems and regions
-                    // however we expect the type previously set to be removed
-                        ->has('items', 1, fn (Assert $prop) => $prop->where('watchable_id', $type->group_id)->etc())
-                        ->etc()
-                )
-                ->etc()
-        );
-
-    test()->actingAs(test()->test_user->refresh())
-        ->followingRedirects()
-        ->post(route('update.watchlist', test()->test_character->corporation->corporation_id), [
-            'items' => [
-                [
-                    // only watchable_id and type is required
-                    'watchable_id' => $type->group_id,
-                    'watchable_type' => Group::class,
-                ],
-                [
-                    // only watchable_id and type is required
-                    'watchable_id' => $type->group->category_id,
-                    'watchable_type' => Category::class,
-                ],
-            ],
-        ])->assertInertia(
-            fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Configuration/Index')
-                ->has(
-                    'watched',
-                    fn (Assert $prop) => $prop
-                    // we expect no change for watchlisted systems and regions
-                        ->has('items', 2)
-                        ->etc()
-                )
-                ->etc()
-        );
 });
 
 test('recruiter can see corporation applications', function () {
@@ -492,7 +333,7 @@ test('recruiter can comment on application', function () {
         ->get(route('get.application', $application->id))
         ->assertInertia(
             fn (Assert $page) => $page
-                ->component('Corporation/Recruitment/Application')
+                ->component('Recruitment/Review/Application')
                 ->has(
                     'application',
                     fn (Assert $page) => $page
@@ -617,7 +458,7 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
 
     // Create Enlistment as test user
     $response = test()->actingAs(test()->test_user)
-        ->post(route('create.corporation.recruitment'), [
+        ->post(route('recruitment.posting.open'), [
             'corporation_id' => test()->test_character->corporation->corporation_id,
             'type' => $type,
             'steps' => null,

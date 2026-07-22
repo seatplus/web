@@ -165,9 +165,9 @@
 <script>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
-import TabComponent from "./TabComponent.vue";
+import TabComponent from "@/Shared/Components/CharacterInspection/TabComponent.vue";
 import {IdentificationIcon} from '@heroicons/vue/24/outline'
-import UpdateCharacterComponent from "./UpdateCharacterComponent.vue";
+import UpdateCharacterComponent from "@/Shared/Components/CharacterInspection/UpdateCharacterComponent.vue";
 import {router} from "@inertiajs/vue3";
 
 export default {

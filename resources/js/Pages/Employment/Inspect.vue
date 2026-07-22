@@ -17,7 +17,7 @@
 
 <script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
-import TabComponent from "@/Pages/Corporation/Recruitment/TabComponent.vue";
+import TabComponent from "@/Shared/Components/CharacterInspection/TabComponent.vue";
 
 defineProps({
   recruit: {

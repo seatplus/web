@@ -185,7 +185,7 @@ it('reviews — a reviewer opens an application and sees the shared inspection t
     $application = seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 0);
     cache()->flush();
 
-    $page = deviceVisit($device, "/corporation/recruitment/application/{$application->id}");
+    $page = deviceVisit($device, "/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
 
     // The detail renders the applicant and the shared inspection tabs (their data is wired into
@@ -220,7 +220,7 @@ it('reviews — the inspection tabs render the applicant\'s data', function (str
     makeCharacterContracts($applicantCharacter, 3);
     cache()->flush();
 
-    $page = deviceVisit($device, "/corporation/recruitment/application/{$application->id}");
+    $page = deviceVisit($device, "/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->waitForText('Jane Applicant');
 
@@ -280,7 +280,7 @@ it('reviews — a reviewer dispatches an on-demand character update (fetch, no a
     // Desktop-only, like the tab test above. The applicant header renders an Update control per
     // covered character; the migrated UpdateCharacterComponent dispatches the batch update via the
     // native fetch (http.js + Wayfinder), not axios.
-    $page = visit("/corporation/recruitment/application/{$application->id}");
+    $page = visit("/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->waitForText('Jane Applicant');
 

@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
+namespace Seatplus\Web\Http\Controllers\Recruitment;
 
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\RedirectResponse;
@@ -118,7 +118,7 @@ class ApplicationsController extends Controller
 
         $watchlist = $action->execute($application->corporation_id);
 
-        return inertia('Corporation/Recruitment/Application', array_merge([
+        return inertia('Recruitment/Review/Application', array_merge([
             'recruit' => $recruit->toArray(),
             'application' => $application,
             'watchlist' => $watchlist,

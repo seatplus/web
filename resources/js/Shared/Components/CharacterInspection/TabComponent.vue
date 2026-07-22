@@ -117,7 +117,7 @@ import MobileMailList from "@/Shared/Components/Mails/MobileMailList.vue";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent.vue";
 import AssetTab from "./Tabs/AssetTab.vue";
 import ContractTab from "./Tabs/ContractTab.vue";
-import LogTab from "@/Pages/Corporation/Recruitment/Tabs/LogTab.vue";
+import LogTab from "./Tabs/LogTab.vue";
 import WalletTab from "./Tabs/WalletTab.vue";
 
 const tabs = [

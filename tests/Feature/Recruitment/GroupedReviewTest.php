@@ -74,7 +74,7 @@ it('shows every covered character when reviewing a grouped application', functio
         ->get(route('get.application', $first->id))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Corporation/Recruitment/Application')
+            ->component('Recruitment/Review/Application')
             ->has('recruit.characters', 2)
         );
 });
