@@ -133,7 +133,7 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <a
                 type="button"
-                :href="route('auth.eve')"
+                :href="ssoUrl"
                 class="flex p-2 lg:col-span-2 border-2 border-dashed border-gray-300 hover:border-gray-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded-lg"
               >
                 <div class="mb-4 shrink-0 sm:mb-0 mr-4 self-center">
@@ -172,6 +172,7 @@
 
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import { UserPlusIcon } from "@heroicons/vue/24/outline";
+import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
 
 defineProps({
   characters: {
@@ -179,4 +180,6 @@ defineProps({
     required: true,
   },
 });
+
+const ssoUrl = RedirectSSOController.url();
 </script>

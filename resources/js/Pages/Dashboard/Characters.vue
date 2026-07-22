@@ -50,7 +50,7 @@
       </li>
       <li class="col-span-1 bg-white rounded-lg shadow-sm flex flex-wrap content-center">
         <a
-          :href="route('auth.eve')"
+          :href="ssoUrl"
           type="button"
           class="py-4 inline-flex items-center justify-center items-center w-full h-full border border-transparent shadow-xs text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
@@ -75,6 +75,7 @@ import LeftAligned from "@/Shared/Layout/DataDisplay/LeftAligned.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData.vue";
 import Time from "@/Shared/Time.vue";
+import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
 export default {
     name: "Characters",
     components: {Time, LeftAlignedData, EntityBlock, LeftAligned},
@@ -89,6 +90,9 @@ export default {
         }
     },
     computed: {
+        ssoUrl() {
+            return RedirectSSOController.url()
+        },
         hasOpenEnlistments() {
             return !_.isEmpty(this.enlistments)
         }
