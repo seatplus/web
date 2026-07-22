@@ -57,7 +57,7 @@ import {computed, ref, watch} from "vue";
 import dayjs from "dayjs";
 import Time from "@/Shared/Time.vue";
 import { getJson, post } from "@/Functions/http";
-import { getBatchUpdate, dispatchBatchUpdate } from "@/actions/Seatplus/Web/Http/Controllers/Corporation/Recruitment/ApplicationsController";
+import { getBatchUpdate, dispatchBatchUpdate } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "UpdateCharacterComponent",

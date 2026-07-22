@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-namespace Seatplus\Web\Http\Controllers\Corporation\Recruitment;
+namespace Seatplus\Web\Http\Controllers\Recruitment;
 
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
