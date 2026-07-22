@@ -11,6 +11,8 @@
 
 <script>
 import {onMounted, onUnmounted, ref} from "vue";
+import { getJson } from "@/Functions/http";
+import { getEntityFromId } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
 export default {
     name: "ResolveIdToName",
@@ -39,9 +41,9 @@ export default {
 
             isLoading.value = true
 
-            await axios.get(route('resolve.id', props.id))
+            await getJson(getEntityFromId.url(props.id))
                 .then(result => {
-                    name.value = result.data.name
+                    name.value = result.name
                     isComplete.value = true
                 })
                 .catch(error => console.log(error));

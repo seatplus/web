@@ -149,7 +149,6 @@
           <label class="block text-sm font-medium text-gray-700">Item types, groups or categories</label>
           <Autosuggest
             :key="itemsKey"
-            route-name="autosuggestion.typesOrGroupOrCategories"
             placeholder="Search for items"
             @selectedObject="addItem"
           />

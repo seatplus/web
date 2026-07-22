@@ -48,7 +48,7 @@
                       You have no character refresh token with required scope.
                       {{ ' ' }}
                       <Link
-                        :href="route('enable_esi_search')"
+                        :href="enableEsiSearchUrl"
                         class="font-medium text-yellow-700 underline hover:text-yellow-600"
                       >
                         Upgrade one token to be able to use this search.
@@ -151,6 +151,11 @@ import {
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import {computed, ref, watch, watchEffect} from "vue";
 import InputWithValidation from "@/Shared/Layout/Forms/InputWithValidation.vue";
+import { getJson } from "@/Functions/http";
+import EnableEsiSearchController from "@/actions/Seatplus/Web/Http/Controllers/Shared/EnableEsiSearchController";
+import { esiSearch, token } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
+
+const enableEsiSearchUrl = EnableEsiSearchController.url();
 
 const open = ref(false);
 const term = ref('');
@@ -212,9 +217,9 @@ const getStuggestions = async () => {
     loading.value = true;
     open.value = true;
 
-    await axios.get(route('autosuggestion.search', {search: term.value, categories: props.categories}))
+    await getJson(esiSearch.url({ query: { search: term.value, categories: props.categories } }))
         .then((result) => {
-            suggestions.value = result.data
+            suggestions.value = result
         }).catch((error) => {
             console.log(error)
         }).finally(() => {
@@ -227,12 +232,12 @@ const checkToken = async () => {
     // If hasToken is null, we don't know yet if the user has a token
     if (_.isNull(hasToken.value)) {
         // check if the user has a token with required scope
-        await axios.get(route('autosuggestion.token'))
+        await getJson(token.url())
             .then(response => {
                 // if the user has a token, set hasToken to true
                 // we don't need to check again
                 // we expect the response to be a 1 or 0 and turn it into a boolean
-                hasToken.value = !!response.data;
+                hasToken.value = !!response;
             }).catch(error => {
                 console.log(error)
             })

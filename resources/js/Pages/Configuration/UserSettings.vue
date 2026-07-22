@@ -158,6 +158,7 @@
     import { localeName } from "@/i18n/localeName";
     import LogoutController from "@/actions/Seatplus/Web/Http/Controllers/Auth/LogoutController";
     import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
+    import SwitchMainCharacterController from "@/actions/Seatplus/Auth/Http/Controllers/SwitchMainCharacterController";
     
     export default {
         name: "UserSettings",
@@ -190,10 +191,9 @@
             })
 
             watch(selected, () =>  {
-                form.transform(() => ({
-                    character_id: selected.value.character_id
-                }))
-                .post(route('change.main_character'))
+                // The route is PUT main-character/switch/{new_character_id}; the id goes in the
+                // path (the controller ignores the body), so build the URL with the selected id.
+                form.put(SwitchMainCharacterController.url({ new_character_id: selected.value.character_id }))
             })
 
             const page = usePage()
