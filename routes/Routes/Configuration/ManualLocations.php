@@ -32,6 +32,5 @@ Route::middleware([CheckAuthorization::class.':manage manual locations'])
     ->prefix('manual_locations')
     ->group(function () {
         Route::get('', [ManualLocationController::class, 'index'])->name('manage.manual_locations');
-        Route::get('suggestions', [ManualLocationController::class, 'getSuggestions'])->name('get.manuel_locations.suggestions');
-        Route::post('suggestions', [ManualLocationController::class, 'acceptSuggestion'])->name('accept.manuel_locations');
+        Route::post('suggestions', [ManualLocationController::class, 'acceptSuggestion'])->name('accept.manual_locations');
     });

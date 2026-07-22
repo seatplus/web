@@ -12,7 +12,7 @@
                 class="leading-6 font-medium text-gray-900"
                 :class="compact ? 'text-sm' : 'text-lg'"
               >
-                {{ location.name ?? 'Unknown Location' }}
+                <LocationName :location="location" />
               </h3>
               <p
                 class="text-sm text-gray-500"
@@ -90,6 +90,7 @@
 import WideLists from "../../WideLists.vue";
 import ItemList from "./ItemList.vue";
 import AddManualLocationModal from "./AddManualLocationModal.vue";
+import LocationName from "./LocationName.vue";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { getJson } from "@/Functions/http";
 import { location as locationAction } from "@/actions/Seatplus/Web/Http/Controllers/Character/AssetsController";

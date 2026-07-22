@@ -89,20 +89,15 @@ test('admin can accept suggestion', function () {
 
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/ManualLocations/ManualLocation'));
 
-    // load suggestions
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.manuel_locations.suggestions'))
-        ->assertOk();
-
-    // check that there are 5 suggestions
-    expect(json_decode((string) $response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(5);
+    // load suggestions via the page's deferred `data` prop (partial Inertia reload)
+    expect(loadSuggestions()->json('props.data'))->toHaveCount(5);
 
     // Make sure there is no suggestion in universe_locations
     test()->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
     $response = test()->actingAs(test()->test_user)
-        ->post(route('get.manuel_locations.suggestions'), [
+        ->post(route('accept.manual_locations'), [
             'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
@@ -112,10 +107,7 @@ test('admin can accept suggestion', function () {
     test()->assertCount(1, Location::where('location_id', 12345)->get());
 
     // check that there there is only one left after accepting
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.manuel_locations.suggestions'))
-        ->assertOk();
-    expect(json_decode((string) $response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(1);
+    expect(loadSuggestions()->json('props.data'))->toHaveCount(1);
 });
 
 test('one get accepted suggestion', function () {
@@ -137,7 +129,7 @@ test('one get accepted suggestion', function () {
 
     // accept one
     $response = test()->actingAs(test()->test_user)
-        ->post(route('get.manuel_locations.suggestions'), [
+        ->post(route('accept.manual_locations'), [
             'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
         ])
@@ -170,15 +162,24 @@ test('if location is resolved via jobs delete manual suggestions', function () {
 
     test()->assignPermissionToTestUser(['manage manual locations']);
 
-    // load suggestions
-    $response = test()->actingAs(test()->test_user)
-        ->get(route('get.manuel_locations.suggestions'))
-        ->assertOk();
-
-    // check that there are no suggestions
-    expect(json_decode((string) $response->content(), null, 512, JSON_THROW_ON_ERROR)->data)->toHaveCount(0)
+    // loading suggestions prunes rows whose location has since been resolved
+    expect(loadSuggestions()->json('props.data'))->toHaveCount(0)
         ->and(ManualLocation::all())->toBeEmpty();
 });
+
+/**
+ * Resolve the Manual Locations page's deferred `data` prop via a partial Inertia reload.
+ */
+function loadSuggestions()
+{
+    return test()->actingAs(test()->test_user)
+        ->get(route('manage.manual_locations'), [
+            'X-Inertia' => 'true',
+            'X-Inertia-Partial-Component' => 'Configuration/ManualLocations/ManualLocation',
+            'X-Inertia-Partial-Data' => 'data',
+        ])
+        ->assertOk();
+}
 
 test('if location does not have system dispatch job', function () {
     $manual_location = ManualLocation::factory()->create();
