@@ -29,8 +29,7 @@
         "seatplus/eveapi": "^4.2.0",
         "seatplus/auth": "^4.2",
         "inertiajs/inertia-laravel": "^3.0",
-        "laravel/wayfinder": "^0.1.16",
-        "tightenco/ziggy": "^2.6"
+        "laravel/wayfinder": "^0.1.16"
     },
     "require-dev": {
         "orchestra/testbench": "^11.0",
