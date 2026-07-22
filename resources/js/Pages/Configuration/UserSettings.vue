@@ -139,7 +139,7 @@
     </div>
 
     <Link
-      :href="route('logout')"
+      :href="logoutUrl"
       method="post"
       as="button"
       class="inline-flex mx-auto w-full items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-xs text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -156,6 +156,8 @@
     import {computed, ref, watch} from "vue";
     import { useForm, usePage, Link } from "@inertiajs/vue3";
     import { localeName } from "@/i18n/localeName";
+    import LogoutController from "@/actions/Seatplus/Web/Http/Controllers/Auth/LogoutController";
+    import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
     
     export default {
         name: "UserSettings",
@@ -205,7 +207,7 @@
             // `translations` is a reactive Inertia prop now — the redirect back re-renders
             // in the newly-selected language without a full page reload.
             const updateLocale = () => {
-                localeForm.post(route('locale.update'), {
+                localeForm.post(postLocale.url(), {
                     preserveScroll: true,
                 })
             }
@@ -218,7 +220,8 @@
                 locales,
                 localeForm,
                 updateLocale,
-                localeName
+                localeName,
+                logoutUrl: LogoutController.url()
             }
         }
     }

@@ -27,7 +27,7 @@
           </p>
           <div class="mt-6">
             <Link
-              :href="route('home')"
+              :href="homeUrl"
               class="text-base font-medium text-indigo-600 hover:text-indigo-500"
             >
               Go back home
@@ -64,6 +64,7 @@
 
 <script>
 import { Link } from '@inertiajs/vue3';
+import { home } from "@/actions/Seatplus/Web/Http/Controllers/HomeController";
 
 export default {
     name: "Error",
@@ -76,6 +77,9 @@ export default {
         }
     },
     computed: {
+        homeUrl() {
+            return home.url()
+        },
         title() {
             return {
                 503: 'Service Unavailable',

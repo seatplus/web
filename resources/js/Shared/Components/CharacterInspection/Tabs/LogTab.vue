@@ -92,7 +92,7 @@
             </ul>
           </div>
           <div class="mt-6">
-            <form @submit.prevent="form.put(route('comment.application', application.id),{ onSuccess: () => form.reset('comment') })">
+            <form @submit.prevent="form.put(commentUrl,{ onSuccess: () => form.reset('comment') })">
               <div class="flex space-x-3">
                 <div class="shrink-0">
                   <div class="relative">
@@ -153,6 +153,7 @@ import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+import { addComment } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "LogTab",
@@ -212,10 +213,13 @@ export default {
         })
         const user = usePage().props.user.data
 
+        const commentUrl = addComment.url(props.application.id)
+
         return {
             activity,
             user,
-            form
+            form,
+            commentUrl
         }
     }
 }

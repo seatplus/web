@@ -51,6 +51,7 @@ import EveImage from "@/Shared/EveImage.vue"
 import {computed, ref} from "vue";
 import { router, usePage } from '@inertiajs/vue3'
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
+import { apply as postApplication, pullCharacterApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "CharacterApplication",
@@ -82,7 +83,7 @@ export default {
         
         const hasApplied = (character_id) =>  _.findIndex(applicants.value, {character_id: character_id}) > -1
 
-        const apply = (character_id) => router.post(route('post.application'), {
+        const apply = (character_id) => router.post(postApplication.url(), {
             corporation_id: props.enlistment.corporation_id,
             character_id: character_id
         }, {
@@ -94,7 +95,7 @@ export default {
             preserveState: true
         })
 
-        const remove = (character_id) => router.delete(route('delete.character.application', character_id), {
+        const remove = (character_id) => router.delete(pullCharacterApplication.url(character_id), {
             preserveState: true,
             onSuccess: () => _.remove(applications.value, function (application) {
                 return _.isEqual(application.applicationable.character_id, character_id)

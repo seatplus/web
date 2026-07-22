@@ -63,6 +63,7 @@ import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
 import AppHead from "@/Shared/AppHead.vue";
 import { router } from "@inertiajs/vue3";
 import { localeName } from "@/i18n/localeName";
+import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
 
 export default {
     name: "Login",
@@ -83,7 +84,7 @@ export default {
         // `translations` is a reactive Inertia prop now — the redirect back re-renders
         // in the newly-selected language without a full page reload.
         switchLocale() {
-            router.post(route('locale.update'), { locale: this.selectedLocale }, {
+            router.post(postLocale.url(), { locale: this.selectedLocale }, {
                 preserveScroll: true,
             })
         }

@@ -169,6 +169,8 @@ import TabComponent from "@/Shared/Components/CharacterInspection/TabComponent.v
 import {IdentificationIcon} from '@heroicons/vue/24/outline'
 import UpdateCharacterComponent from "@/Shared/Components/CharacterInspection/UpdateCharacterComponent.vue";
 import {router} from "@inertiajs/vue3";
+import ImpersonateRecruit from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ImpersonateRecruit";
+import { reviewApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "Application",
@@ -216,10 +218,10 @@ export default {
     },
     methods: {
         impersonate() {
-            return router.visit(route('impersonate.recruit', this.application.id))
+            return router.visit(ImpersonateRecruit.url(this.application.id))
         },
         submit() {
-            return router.post(route('review.application', this.application.id), this.form);
+            return router.post(reviewApplication.url(this.application.id), this.form);
         }
     }
 }

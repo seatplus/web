@@ -45,7 +45,7 @@
         >
           <Link
             v-if="hasApplications"
-            :href="route('delete.user.application')"
+            :href="deleteUserApplicationUrl"
             method="delete"
             :preserve-state="false"
             as="button"
@@ -59,7 +59,7 @@
           </Link>
           <Link
             v-else
-            :href="route('post.application')"
+            :href="postApplicationUrl"
             method="post"
             :preserve-state="false"
             as="button"
@@ -86,6 +86,7 @@ import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
+import { apply, pullUserApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
 export default {
     name: "Enlistment",
@@ -107,6 +108,8 @@ export default {
         return {
             hasApplications,
             openModal,
+            postApplicationUrl: apply.url(),
+            deleteUserApplicationUrl: pullUserApplication.url(),
         }
     }
 }
