@@ -26,12 +26,8 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Auth\Models\User;
-use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 
 class HomeController extends Controller
@@ -43,23 +39,5 @@ class HomeController extends Controller
                 ->whereIn('character_id', auth()->user()->characters->pluck('character_id')->toArray())
                 ->get(),
         ]);
-    }
-
-    public function getOwnApplications(int $corporation_id): LengthAwarePaginator
-    {
-        return Application::whereHasMorph(
-            'applicationable',
-            [User::class, CharacterInfo::class],
-            function (Builder $query, string $type) {
-                match ($type) {
-                    User::class => $query->where('id', auth()->user()->getAuthIdentifier()),
-                    CharacterInfo::class => $query->whereIn('character_id', auth()->user()->characters()->pluck('character_infos.character_id')),
-                    default => null,
-                };
-
-                $query->where('status', 'open');
-            }
-        )->whereCorporationId($corporation_id)
-            ->paginate();
     }
 }

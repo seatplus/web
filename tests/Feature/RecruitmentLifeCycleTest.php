@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Inertia\Testing\AssertableInertia as Assert;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\Permissions\Role;
@@ -12,6 +11,7 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\BatchUpdate;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
+use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 beforeEach(function () {
@@ -104,13 +104,19 @@ test('secondary user can apply as user', function () {
 
     expect(test()->secondary_user->refresh()->application)->toBeNull();
 
-    // first check that existing applications does not exist
+    config(['web.config.ONBOARDING' => true]);
+    test()->withoutMiddleware(OnboardingMiddleware::class);
+    $corporationId = test()->test_character->corporation->corporation_id;
+
+    // the onboarding page attaches the user's open applications per enlistment;
+    // before applying, this enlistment carries none
     test()->actingAs(test()->secondary_user)
-        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) // 'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 0)
-                ->etc()
+        ->get(route('onboarding'))
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Onboarding/Index')
+                ->where('enlistments', fn ($enlistments) => collect($enlistments)
+                    ->firstWhere('corporation_id', $corporationId)['applications'] === [])
         );
 
     applySecondary();
@@ -118,20 +124,19 @@ test('secondary user can apply as user', function () {
     test()->assertNotNull(test()->secondary_user->refresh()->application);
     expect(test()->secondary_user->refresh()->application instanceof Application)->toBeTrue();
 
-    // then check that existing applications does exist
+    // after applying, the same enlistment carries the user's open application
     test()->actingAs(test()->secondary_user)
-        ->get(route('list.existing.applications', test()->test_character->corporation->corporation_id)) // 'corporation_id' => test()->test_character->corporation->corporation_id
-        ->assertJson(
-            fn (AssertableJson $json) => $json
-                ->has('data', 1)
-                ->has(
-                    'data.0',
-                    fn ($json) => $json
-                        ->where('applicationable_id', test()->secondary_user->id)
-                        ->where('corporation_id', test()->test_character->corporation->corporation_id)
-                        ->etc()
-                )
-                ->etc()
+        ->get(route('onboarding'))
+        ->assertInertia(
+            fn (Assert $page) => $page
+                ->component('Onboarding/Index')
+                ->where('enlistments', function ($enlistments) use ($corporationId) {
+                    $applications = collect($enlistments)->firstWhere('corporation_id', $corporationId)['applications'];
+
+                    return count($applications) === 1
+                        && (int) $applications[0]['applicationable_id'] === (int) test()->secondary_user->id
+                        && (int) $applications[0]['corporation_id'] === (int) $corporationId;
+                })
         );
 
     // pull application
