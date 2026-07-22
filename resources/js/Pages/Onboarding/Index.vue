@@ -87,6 +87,7 @@ import { Link } from '@inertiajs/vue3';
 import OnboardingEnlistment from "@/Pages/Onboarding/OnboardingEnlistment.vue";
 import Introduction from "@/Pages/Onboarding/Introduction.vue";
 import AddCharacters from "@/Pages/Onboarding/AddCharacters.vue";
+import { index as onboardingIndex } from "@/actions/Seatplus/Web/Http/Controllers/Onboarding/OnboardingController";
 
 const props = defineProps({
     enlistments: {
@@ -117,14 +118,13 @@ const character_enlistments = computed(() => {
 
 const nextUrl = computed(() => {
 
-    let route_name = route().current()
-
+    // Onboarding maps to a single route; `step` is a query param.
     if(props.step === 1) {
-        return route(route_name, {step: user_enlistments.value.length > 0 ? 2 : 3})
+        return onboardingIndex.url({ query: { step: user_enlistments.value.length > 0 ? 2 : 3 } })
     }
 
     if(props.step > 1) {
-        return route(route_name, {step: props.step + 1})
+        return onboardingIndex.url({ query: { step: props.step + 1 } })
     }
 
     return null

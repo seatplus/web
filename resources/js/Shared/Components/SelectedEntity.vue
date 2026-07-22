@@ -25,7 +25,11 @@ export default {
     components: {EntityByIdBlock},
     computed: {
         selectedIds() {
-            let selectedCharacterIds = _.get(route().params, 'character_ids', null)
+            // Read the character_ids query params off the current URL (replacing Ziggy's
+            // route().params); supports both bracketed and plain array notation.
+            const query = this.$page.url.split('?')[1] ?? ''
+            const params = new URLSearchParams(query)
+            const selectedCharacterIds = params.getAll('character_ids[]').concat(params.getAll('character_ids'))
 
             return _.map(selectedCharacterIds, (id) => parseInt(id))
         }
