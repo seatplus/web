@@ -268,3 +268,28 @@ it('reviews — the inspection tabs render the applicant\'s data', function (str
     $page->assertScript("document.querySelectorAll('#contracts-body-{$applicantCharacter->character_id} > *').length >= 1");
     snap($page, "recruitment-review-tab-contracts-{$device}");
 })->with(['desktop', 'iphone']);
+
+it('reviews — a reviewer dispatches an on-demand character update (fetch, no axios)', function () {
+    $character = actingAsCharacter();
+    makeRecruiterOfCorporation($character, 'can accept or deny applications');
+
+    openPostingWithStages($character->corporation_id, [['label' => 'Open', 'role' => null]]);
+    $application = seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 0);
+    cache()->flush();
+
+    // Desktop-only, like the tab test above. The applicant header renders an Update control per
+    // covered character; the migrated UpdateCharacterComponent dispatches the batch update via the
+    // native fetch (http.js + Wayfinder), not axios.
+    $page = visit("/corporation/recruitment/application/{$application->id}");
+    $page->assertNoSmoke();
+    $page->waitForText('Jane Applicant');
+
+    // Clicking Update flips the control to its "updating" state; assertNoSmoke afterwards proves the
+    // POST to dispatch.batch_update fired cleanly through the fetch wrapper (a broken Wayfinder URL
+    // or fetch would surface as a console error here).
+    $page->click('Update');
+    $page->waitForText('updating');
+    $page->assertNoSmoke();
+
+    snap($page, 'recruitment-review-update-character-desktop');
+});
