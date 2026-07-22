@@ -136,7 +136,7 @@
                 layoutObject: {
                     pageHeader: 'Server Settings',
                     pageDescription: 'Scope',
-                    activeSidebarElement: route('server.settings')
+                    activeSidebarElement: 'server.settings'
                 },
             }
         },

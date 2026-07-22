@@ -70,6 +70,8 @@ class HandleInertiaRequests extends Middleware
             // `pageTranslations` prop and are merged client-side.
             'translations' => fn () => Translations::gather(['web::notifications']),
             'activeSidebarElement' => $request->route()?->getName(),
+            // Resolved server-side so the sidebar's user-settings link needs no Ziggy route().
+            'userSettingsUri' => fn () => route('user.settings'),
             'flash' => fn () => [
                 'success' => session()->pull('success'),
                 'info' => session()->pull('info'),
