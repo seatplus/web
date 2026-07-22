@@ -6,43 +6,11 @@ use Seatplus\Eveapi\Models\Universe\Type;
 
 use function Pest\Laravel\get;
 
-it('returns cached value for resolved ids', function () {
-    $id = test()->test_character->character_id;
-
-    $cached_value = [
-        'id' => $id,
-        'name' => test()->test_character->name,
-        'category' => 'character',
-    ];
-
-    cache([sprintf('name:%s', $id) => $cached_value], now()->addSeconds(2));
-
-    $result = test()->actingAs(test()->test_user)
-        ->post(route('resolve.ids'), [$id]);
-
-    $result->assertJson([
-        $cached_value,
-    ]);
-});
-
 test('esi search validates the search term length', function () {
     test()->actingAs(test()->test_user);
 
     get(route('autosuggestion.search', ['search' => 'J', 'categories' => ['system']]))
         ->assertInvalid(['search' => 'The search field must be at least 3 characters.']);
-});
-
-test('one can get cached market prices without hitting esi', function () {
-    $prices = collect([
-        (object) ['adjusted_price' => 0, 'average_price' => 31_214_609.93, 'type_id' => 43691],
-    ]);
-
-    cache(['market_prices' => $prices], now()->addDay());
-
-    test()->actingAs(test()->test_user)
-        ->get(route('get.markets.prices'))
-        ->assertOk()
-        ->assertJsonFragment(['type_id' => 43691]);
 });
 
 it('has auttosuggest for types, groups and categories', function () {

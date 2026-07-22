@@ -42,20 +42,6 @@ test('renders the assets page with an assets scroll prop', function () {
         );
 });
 
-it('has list affiliated character list route', function () {
-    Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
-        'assetable_type' => CharacterInfo::class,
-    ]);
-
-    test()->actingAs(test()->test_user)
-        ->get(route('get.affiliated.characters', [
-            'permission' => 'assets',
-            'search' => substr((string) test()->test_character->name, 5),
-        ]))
-        ->assertOk();
-});
-
 test('the action paginates locations and honours only_unknown_locations', function () {
     $unknown = Location::factory()->create();
     $known = Location::factory()->for(Station::factory(), 'locatable')->create();

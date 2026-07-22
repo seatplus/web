@@ -105,9 +105,4 @@ it('moderator can add and remove members but cannot manage role settings', funct
     test()->actingAs($moderator)
         ->postJson(route('acl.update.manual', test()->role->id), ['name' => 'renamed'])
         ->assertForbidden();
-
-    // But moderator CAN view the members list
-    test()->actingAs($moderator)
-        ->get(route('acl.members', test()->role->id))
-        ->assertOk();
 });

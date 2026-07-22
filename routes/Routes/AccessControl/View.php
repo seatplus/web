@@ -35,15 +35,12 @@ use Seatplus\Web\Http\Controllers\AccessControl\DeleteControlGroupController;
 use Seatplus\Web\Http\Controllers\AccessControl\DenyApplicationController;
 use Seatplus\Web\Http\Controllers\AccessControl\JoinOptInRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\LeaveControlGroupController;
-use Seatplus\Web\Http\Controllers\AccessControl\ListControlGroupsController;
-use Seatplus\Web\Http\Controllers\AccessControl\ListMembersController;
 use Seatplus\Web\Http\Controllers\AccessControl\ListUserController;
 use Seatplus\Web\Http\Controllers\AccessControl\ManageRoleController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveMemberController;
 use Seatplus\Web\Http\Controllers\AccessControl\RemoveModeratorController;
 use Seatplus\Web\Http\Controllers\AccessControl\RoleHubController;
 use Seatplus\Web\Http\Controllers\AccessControl\RoleHubIndexController;
-use Seatplus\Web\Http\Controllers\AccessControl\SearchAffiliatableController;
 
 // The unified role hub is the single ACL surface. `acl.groups` is kept as a redirect so the many
 // existing route('acl.groups') references (breadcrumbs, post-delete redirects, sidebar history)
@@ -54,8 +51,6 @@ Route::redirect('/', '/acl/hub')->name('acl.groups');
 // administrate / role moderator) so admins and moderators reach them without the view permission.
 Route::get('/hub', RoleHubIndexController::class)->name('acl.hub');
 Route::get('/hub/{role_id}', RoleHubController::class)->name('acl.hub.show');
-Route::get('/acl', ListControlGroupsController::class)->name('get.acl');
-Route::get('acl/{role_id}/members', ListMembersController::class)->name('acl.members');
 Route::post('/acl/{role_id}/apply', ApplyToRoleController::class)->name('acl.apply');
 Route::post('/acl/{role_id}/join', JoinOptInRoleController::class)->name('acl.join');
 Route::post('/acl/{role_id}/approve/{user_id}', ApproveApplicationController::class)->name('acl.approve');
@@ -67,8 +62,6 @@ Route::middleware([CheckAuthorization::class.':administrate access control group
     Route::post('/create', [CreateControlGroupController::class, 'store'])->name('acl.store');
 
     Route::delete('/acl/{role_id}', DeleteControlGroupController::class)->name('acl.delete');
-
-    Route::get('/search', SearchAffiliatableController::class)->name('acl.search.affiliatable');
 });
 
 Route::middleware([CheckAuthorization::class.':administrate access control groups'])->group(function () {

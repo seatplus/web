@@ -37,36 +37,12 @@ use Seatplus\Eveapi\Models\Universe\Category;
 use Seatplus\Eveapi\Models\Universe\Group;
 use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Controllers\Controller;
-use Seatplus\Web\Services\GetCharacterAffiliations;
-use Seatplus\Web\Services\GetCorporationInfo;
 use Seatplus\Web\Services\GetEntityFromId;
-use Seatplus\Web\Services\GetMarketPricesService;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 use Seatplus\Web\Services\SearchService;
 
 class HelperController extends Controller
 {
-    public function ids(EsiClient $esi): string
-    {
-        $result = (new GetNamesFromIdsService)->execute($esi, request()->all());
-
-        return $result->toJson();
-    }
-
-    public function characterAffiliations(EsiClient $esi): string
-    {
-        $result = (new GetCharacterAffiliations)->execute($esi, request()->all());
-
-        return $result->toJson();
-    }
-
-    public function getCorporationInfo(EsiClient $esi, int $corporation_id): string
-    {
-        $result = (new GetCorporationInfo)->execute($esi, $corporation_id);
-
-        return collect([$result])->toJson();
-    }
-
     public function getEntityFromId(EsiClient $esi, int $id): array
     {
         return (new GetEntityFromId($id))->execute($esi);
@@ -141,19 +117,6 @@ class HelperController extends Controller
                     default => Type::class,
                 },
             ]);
-    }
-
-    public function getMarketsPrices(EsiClient $esi): string
-    {
-        if ($prices = cache('market_prices')) {
-            return $prices->toJson();
-        }
-
-        $prices = (new GetMarketPricesService)->execute($esi);
-
-        cache(['market_prices' => $prices], now()->addDay());
-
-        return $prices->toJson();
     }
 
     private function getEsiSearchToken(): ?RefreshToken
