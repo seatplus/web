@@ -68,47 +68,30 @@
   </Listbox>
 </template>
 
-<script>
+<script setup>
 import {ref, watch} from 'vue'
 import { Listbox, ListboxButton, ListboxLabel, ListboxOption, ListboxOptions } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 import EveImage from "../EveImage.vue";
 
-export default {
-    components: {
-        EveImage,
-        Listbox,
-        ListboxButton,
-        ListboxLabel,
-        ListboxOption,
-        ListboxOptions,
-        CheckIcon,
-        ChevronUpDownIcon,
+const props = defineProps({
+    listLabel: {
+        required: false,
+        type: String
     },
-    props: {
-        listLabel: {
-            required: false,
-            type: String
-        },
-        selected: {
-            required: true,
-            type: Object
-        },
-        options: {
-            required: true,
-            type: Array
-        }
+    selected: {
+        required: true,
+        type: Object
     },
-    emits: ['update:selected'],
-    setup(props, {emit}) {
+    options: {
+        required: true,
+        type: Array
+    }
+});
 
-        const selectedOption = ref(_.find(props.options, option =>_.isEqual(option, props.selected)))
+const emit = defineEmits(['update:selected']);
 
-        watch(selectedOption, (newValue) => emit('update:selected',newValue))
+const selectedOption = ref(_.find(props.options, option =>_.isEqual(option, props.selected)))
 
-        return {
-            selectedOption,
-        }
-    },
-}
+watch(selectedOption, (newValue) => emit('update:selected',newValue))
 </script>

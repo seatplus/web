@@ -110,7 +110,9 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import CorporationHistoryComponent from "@/Shared/Components/Character/CorporationHistoryComponent.vue";
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent.vue";
 import MobileMailList from "@/Shared/Components/Mails/MobileMailList.vue";
@@ -131,73 +133,47 @@ const tabs = [
     'Mails'
 ]
 
-export default {
-    name: "TabComponent",
-    components: {
-        WalletTab,
-        LogTab,
-        ContractTab,
-        AssetTab,
-        CharacterContactsComponent,
-        MobileMailList,
-        SkillsComponent,
-        CorporationHistoryComponent
-        },
-    props: {
-        recruit: {
-            type: Object,
-            required: true
-        },
-        watchlist: {
-            type: Object,
-            required: true
-        },
-        targetCorporation: {
-            type: Object,
-            required: false
-        },
-        application: {
-            type: Object,
-            required: false
-        }
+const props = defineProps({
+    recruit: {
+        type: Object,
+        required: true
     },
-    setup() {
-        return {
-            tabs
-        }
+    watchlist: {
+        type: Object,
+        required: true
     },
-    data() {
-        return {
-            active_element: 'Log',
-        }
+    targetCorporation: {
+        type: Object,
+        required: false
     },
-    computed: {
-        characterIds() {
-            return _.map(this.recruit.characters, character => character.character_id)
-        },
-        /*targetCorporation() {
-            return this.application.corporation
-        }*/
-    },
-    methods: {
-        isActive(entry) {
-            return _.isEqual(entry, this.active_element)
-        },
-        select(entry) {
-            this.active_element = entry
-        },
-        // Skills and contacts arrive as deferred page props keyed by character_id (built by
-        // CharacterInspectionScrollProps), so read them off the page rather than threading them through.
-        skillsFor(characterId) {
-            return _.get(this.$page.props, ['skills', characterId], [])
-        },
-        skillQueueFor(characterId) {
-            return _.get(this.$page.props, ['skillQueue', characterId], [])
-        },
-        contactsFor(characterId) {
-            return _.get(this.$page.props, ['contacts', characterId], [])
-        }
+    application: {
+        type: Object,
+        required: false
     }
+});
+
+const page = usePage();
+
+const active_element = ref('Log')
+
+const characterIds = computed(() => _.map(props.recruit.characters, character => character.character_id))
+
+function isActive(entry) {
+    return _.isEqual(entry, active_element.value)
+}
+
+// Skills and contacts arrive as deferred page props keyed by character_id (built by
+// CharacterInspectionScrollProps), so read them off the page rather than threading them through.
+function skillsFor(characterId) {
+    return _.get(page.props, ['skills', characterId], [])
+}
+
+function skillQueueFor(characterId) {
+    return _.get(page.props, ['skillQueue', characterId], [])
+}
+
+function contactsFor(characterId) {
+    return _.get(page.props, ['contacts', characterId], [])
 }
 </script>
 

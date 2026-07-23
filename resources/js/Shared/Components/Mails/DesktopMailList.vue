@@ -47,40 +47,30 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
 
-export default {
-    name: "DesktopMailList",
-    components: {ResolveIdToName, Time, EveImage, InfiniteScroll},
-    props: {
-        selectedId: {
-            required: false
-        },
+const props = defineProps({
+    selectedId: {
+        required: false
     },
-    emits: ['update:selectedId'],
-    setup(props, {emit}) {
+});
 
-        const page = usePage()
+const emit = defineEmits(['update:selectedId']);
 
-        const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
+const page = usePage()
 
-        // Mail headers arrive as the page scroll prop; flag the selected one.
-        const mails = computed(() => _.map(page.props.mailHeaders?.data ?? [], result => ({
-            ...result,
-            current: _.isEqual(props.selectedId, result.id),
-        })))
+const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
 
-        return {
-            mails,
-            emitSelection,
-        }
-    }
-}
+// Mail headers arrive as the page scroll prop; flag the selected one.
+const mails = computed(() => _.map(page.props.mailHeaders?.data ?? [], result => ({
+    ...result,
+    current: _.isEqual(props.selectedId, result.id),
+})))
 </script>
 
 <style scoped>

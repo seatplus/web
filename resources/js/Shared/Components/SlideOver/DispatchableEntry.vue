@@ -51,7 +51,7 @@
   </li>
 </template>
 
-<script>
+<script setup>
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import { PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon} from "@heroicons/vue/24/outline"
@@ -60,67 +60,54 @@ import { usePage } from "@inertiajs/vue3";
 import { getJson, post } from "@/Functions/http";
 import { getBatchStatus, dispatch } from "@/actions/Seatplus/Web/Http/Controllers/Queue/DispatchJobController";
 
-export default {
-    name: "DispatchableEntry",
-    components: {Time, EveImage, PlayIcon, ArrowPathIcon, CheckCircleIcon, XCircleIcon},
-    props: {
-        entry: {
-            type: Object,
-            required: true
-        }
-    },
-    setup(props) {
-        const status = ref(_.get(props.entry, 'batch.state'))
-        const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
-        const updateStatus = ref()
-        const dispatch_transfer_object = computed(() => usePage().props.dispatchTransferObject)
-        const time = computed(() => _.get(props.entry, 'batch.time'))
+const props = defineProps({
+    entry: {
+        type: Object,
+        required: true
+    }
+});
 
-        async function getStatus() {
-            const result = await getJson(getBatchStatus.url(batch_id.value))
-            status.value = result.state
-        }
+const status = ref(_.get(props.entry, 'batch.state'))
+const batch_id = ref(_.get(props.entry, 'batch.batch_id'))
+const updateStatus = ref()
+const dispatch_transfer_object = computed(() => usePage().props.dispatchTransferObject)
+const time = computed(() => _.get(props.entry, 'batch.time'))
 
-        onBeforeMount(() => {
-            if(batch_id.value)
-                getStatus()
+async function getStatus() {
+    const result = await getJson(getBatchStatus.url(batch_id.value))
+    status.value = result.state
+}
+
+onBeforeMount(() => {
+    if(batch_id.value)
+        getStatus()
+})
+
+watch(status, (newValue, oldValue) => {
+    if(newValue === 'pending')
+        updateStatus.value = setInterval(getStatus,1000);
+    if(oldValue === 'pending')
+        clearInterval(updateStatus.value)
+})
+
+onUnmounted(() => {
+    if (updateStatus.value)
+        clearInterval(updateStatus.value)
+})
+
+const dispatchJob = async () => {
+    try {
+        const response = await post(dispatch.url(), {
+            character_id: props.entry.character_id,
+            corporation_id: props.entry.corporation_id,
+            dispatch_transfer_object: dispatch_transfer_object.value,
         })
 
-        watch(status, (newValue, oldValue) => {
-            if(newValue === 'pending')
-                updateStatus.value = setInterval(getStatus,1000);
-            if(oldValue === 'pending')
-                clearInterval(updateStatus.value)
-        })
-
-        onUnmounted(() => {
-            if (updateStatus.value)
-                clearInterval(updateStatus.value)
-        })
-
-        const dispatchJob = async () => {
-            try {
-                const response = await post(dispatch.url(), {
-                    character_id: props.entry.character_id,
-                    corporation_id: props.entry.corporation_id,
-                    dispatch_transfer_object: dispatch_transfer_object.value,
-                })
-
-                batch_id.value = (await response.text()).trim()
-                status.value = 'pending'
-                getStatus()
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        return {
-            status,
-            batch_id,
-            dispatch_transfer_object,
-            dispatchJob,
-            time
-        }
+        batch_id.value = (await response.text()).trim()
+        status.value = 'pending'
+        getStatus()
+    } catch (error) {
+        console.error(error)
     }
 }
 </script>

@@ -15,31 +15,23 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import WalletJournalBalanceChart from "@/Shared/Components/Wallet/Journal/WalletJournalBalanceChart.vue";
 import WalletJournalComponent from "@/Shared/Components/Wallet/Journal/WalletJournalComponent.vue";
 import WalletTransactionComponent from "@/Shared/Components/Wallet/Transaction/WalletTransactionComponent.vue";
 import WalletFilter from "@/Shared/Components/Wallet/WalletFilter.vue";
-export default {
-    name: "WalletTab",
-    components: {WalletFilter, WalletTransactionComponent, WalletJournalComponent, WalletJournalBalanceChart},
-    props: {
-        characterIds: {
-            required: true,
-            type: Array
-        }
-    },
-    data() {
-        return {
-            filter: []
-        }
-    },
-    computed: {
-        ref_types() {
-            return _.map(this.filter, (ref_type) => ref_type.name)
-        }
+
+defineProps({
+    characterIds: {
+        required: true,
+        type: Array
     }
-}
+});
+
+const filter = ref([])
+
+const ref_types = computed(() => _.map(filter.value, (ref_type) => ref_type.name))
 </script>
 
 <style scoped>

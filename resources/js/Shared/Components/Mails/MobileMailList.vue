@@ -55,7 +55,7 @@
   </InfiniteScroll>
 </template>
 
-<script>
+<script setup>
 import MailRepresentation from "./MailRepresentation.vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
@@ -65,39 +65,20 @@ import { computed } from "vue";
 import { ChevronUpIcon } from "@heroicons/vue/20/solid";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 
-export default {
-    name: "MobileMailList",
-    components: {
-        MailRepresentation,
-        EveImage, Time, ResolveIdToName, InfiniteScroll,
-        ChevronUpIcon,
-        Disclosure,
-        DisclosureButton,
-        DisclosurePanel,
-    },
-    props: {
-        selectedId: {
-            type: Number,
-            required: false
-        }
-    },
-    emits: ['update:selectedId'],
-    setup(props, {emit}) {
-
-        const page = usePage()
-
-        const mailHeaders = computed(() => page.props.mailHeaders?.data ?? [])
-
-        const emitSelection = (selectedId) => emit('update:selectedId', selectedId)
-        const isSelected = (mail) => mail.id === props.selectedId
-
-        return {
-            mailHeaders,
-            emitSelection,
-            isSelected
-        }
+const props = defineProps({
+    selectedId: {
+        type: Number,
+        required: false
     }
-}
+});
+
+defineEmits(['update:selectedId']);
+
+const page = usePage()
+
+const mailHeaders = computed(() => page.props.mailHeaders?.data ?? [])
+
+const isSelected = (mail) => mail.id === props.selectedId
 </script>
 
 <style scoped>

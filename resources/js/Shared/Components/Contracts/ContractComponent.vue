@@ -45,55 +45,43 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
 import ContractRowComponent from "./ContractRowComponent.vue";
 
-export default {
-    name: "ContractComponent",
-    components: {
-        InfiniteScroll,
-        ContractRowComponent,
-        StickyHeaderTable,
-        CardWithHeader,
-        EntityByIdBlock,
+const props = defineProps({
+    id: {
+        required: true,
+        type: Number
     },
-    props: {
-        id: {
-            required: true,
-            type: Number
-        },
-        type: {
-            required: false,
-            type: String,
-            default: 'character'
-        },
-        // The page scroll prop this card renders — contracts_<id> (all) on the character page and
-        // the "All" recruitment sub-tab, or watchlist_contracts_<id> on the "Watchlisted" sub-tab.
-        scrollKey: {
-            required: true,
-            type: String,
-        },
+    type: {
+        required: false,
+        type: String,
+        default: 'character'
     },
-    computed: {
-        headerTitles() {
-            return [
-                {title: 'Issuer', columnSpan: 2},
-                {title: 'Assignee', columnSpan: 2},
-                {title: 'Type', columnSpan: 2},
-                {title: 'Details', columnSpan: 4},
-                {title: 'Content', columnSpan: 1, srOnly: true},
-            ]
-        },
-        scrollBodyId() {
-            return `contracts-body-${this.id}`
-        },
-        scrollEntries() {
-            return this.$page.props[this.scrollKey]?.data ?? []
-        },
-    }
-}
+    // The page scroll prop this card renders — contracts_<id> (all) on the character page and
+    // the "All" recruitment sub-tab, or watchlist_contracts_<id> on the "Watchlisted" sub-tab.
+    scrollKey: {
+        required: true,
+        type: String,
+    },
+});
+
+const page = usePage();
+
+const headerTitles = computed(() => [
+    {title: 'Issuer', columnSpan: 2},
+    {title: 'Assignee', columnSpan: 2},
+    {title: 'Type', columnSpan: 2},
+    {title: 'Details', columnSpan: 4},
+    {title: 'Content', columnSpan: 1, srOnly: true},
+])
+
+const scrollBodyId = computed(() => `contracts-body-${props.id}`)
+
+const scrollEntries = computed(() => page.props[props.scrollKey]?.data ?? [])
 </script>

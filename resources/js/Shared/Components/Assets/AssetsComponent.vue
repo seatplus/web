@@ -86,43 +86,36 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 import LocationComponent from "./LocationComponent.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
 
-export default {
-    name: "AssetsComponent",
-    components: {
-        InfiniteScroll,
-        LocationComponent,
+defineProps({
+    context: {
+        required: false,
+        type: String,
+        default: 'character'
     },
-    props: {
-        context: {
-            required: false,
-            type: String,
-            default: 'character'
-        },
-        compact: {
-            required: false,
-            default: false,
-            type: Boolean
-        },
-        loading: {
-            required: false,
-            default: false,
-            type: Boolean
-        },
-        // The applied asset filter, forwarded to each location's lazy per-location fetch.
-        filter: {
-            required: false,
-            type: Object,
-            default: () => ({})
-        }
+    compact: {
+        required: false,
+        default: false,
+        type: Boolean
     },
-    computed: {
-        locations() {
-            return this.$page.props.assets?.data ?? []
-        }
+    loading: {
+        required: false,
+        default: false,
+        type: Boolean
+    },
+    // The applied asset filter, forwarded to each location's lazy per-location fetch.
+    filter: {
+        required: false,
+        type: Object,
+        default: () => ({})
     }
-}
+});
+
+const page = usePage();
+
+const locations = computed(() => page.props.assets?.data ?? [])
 </script>

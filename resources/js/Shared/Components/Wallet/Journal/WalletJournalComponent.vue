@@ -58,56 +58,45 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import WalletJournalRowComponent from "./WalletJournalRowComponent.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 
-export default {
-    name: "WalletJournalComponent",
-    components: {
-        InfiniteScroll,
-        EntityByIdBlock,
-        WalletJournalRowComponent,
-        CardWithHeader
+const props = defineProps({
+    id: {
+        required: true,
+        type: Number
     },
-    props: {
-        id: {
-            required: true,
-            type: Number
-        },
-        division: {
-            required: false,
-            type: Object,
-            default: () => {}
-        },
-        filters: {
-            required: false,
-            type: Object,
-            default: () => new Object()
-        }
+    division: {
+        required: false,
+        type: Object,
+        default: () => {}
     },
-    computed: {
-        // The journal is delivered as a page scroll prop (WalletsController /
-        // CorporationWalletController::index): keyed per character, or per
-        // corporation+division for corporate wallets, and consumed by
-        // <InfiniteScroll :data="scrollKey">.
-        scrollKey() {
-            return this.division
-                ? `journal_${this.id}_${this.division.division_id}`
-                : `journal_${this.id}`
-        },
-        scrollBodyId() {
-            return this.division
-                ? `journal-body-${this.id}-${this.division.division_id}`
-                : `journal-body-${this.id}`
-        },
-        journalEntries() {
-            return this.$page.props[this.scrollKey]?.data ?? []
-        }
+    filters: {
+        required: false,
+        type: Object,
+        default: () => new Object()
     }
-}
+});
+
+const page = usePage();
+
+// The journal is delivered as a page scroll prop (WalletsController /
+// CorporationWalletController::index): keyed per character, or per
+// corporation+division for corporate wallets, and consumed by
+// <InfiniteScroll :data="scrollKey">.
+const scrollKey = computed(() => props.division
+    ? `journal_${props.id}_${props.division.division_id}`
+    : `journal_${props.id}`)
+
+const scrollBodyId = computed(() => props.division
+    ? `journal-body-${props.id}-${props.division.division_id}`
+    : `journal-body-${props.id}`)
+
+const journalEntries = computed(() => page.props[scrollKey.value]?.data ?? [])
 </script>
 
 <style scoped>

@@ -29,44 +29,38 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-export default {
-    name: "SelectionEntity",
-    components: {EntityBlock},
-    props: {
-        entity: {
-            type: Object,
-            required: true
-        },
-        modelValue: {
-            type: Array,
-            default: () => []
-        }
+
+const props = defineProps({
+    entity: {
+        type: Object,
+        required: true
     },
-    emits: ['update:modelValue'],
-    computed: {
-        isSelected() {
-            return this.modelValue.includes(this.entity.id)
-        }
-    },
-    methods: {
-        toggle() {
-
-            const entity = this.entity
-            let selected = this.modelValue
-            let index = selected.indexOf(entity.id)
-
-
-            if(index >= 0) {
-                selected = _.remove(selected, (select) => select !== entity.id)
-            } else {
-                selected.push(entity.id)
-            }
-
-            this.$emit('update:modelValue', selected)
-        }
+    modelValue: {
+        type: Array,
+        default: () => []
     }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const isSelected = computed(() => props.modelValue.includes(props.entity.id))
+
+function toggle() {
+    const entity = props.entity
+    let selected = props.modelValue
+    let index = selected.indexOf(entity.id)
+
+
+    if(index >= 0) {
+        selected = _.remove(selected, (select) => select !== entity.id)
+    } else {
+        selected.push(entity.id)
+    }
+
+    emit('update:modelValue', selected)
 }
 </script>
 

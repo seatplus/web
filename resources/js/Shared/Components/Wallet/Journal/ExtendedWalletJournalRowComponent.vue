@@ -44,24 +44,14 @@
   </div>
 </template>
 
-<script>
-
+<script setup>
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 
-export default {
-    name: "ExtendedWalletJournalRowComponent",
-    components: {EntityByIdBlock},
-    props: {
-        entry: {
-            required: true
-        }
-    },
-    data() {
-        return {
-            expanded: false,
-        }
+defineProps({
+    entry: {
+        required: true
     }
-}
+});
 </script>
 
 <style scoped>
