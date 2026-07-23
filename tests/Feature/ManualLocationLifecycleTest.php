@@ -7,6 +7,7 @@ use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Jobs\Universe\ResolveUniverseSystemBySystemIdJob;
 use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
+use Seatplus\Web\Http\Resources\LocationRessource;
 use Seatplus\Web\Models\ManualLocation;
 
 beforeEach(function () {
@@ -22,6 +23,18 @@ it('resolves unknown location', function () {
         ->get(route('get.manual_location', $manual_loaction->location_id))
         ->assertOk()
         ->assertJson(['name' => $expected_name]);
+});
+
+test('an unresolved location is flagged as a manual location', function () {
+    // A location with no locatable (eager-loaded to null) must still be flagged manual so the
+    // assets view offers "add location information"; a resolved station must not be.
+    $unknown = Location::factory()->create(['location_id' => 424242]);
+    $unknown = Location::with(['locatable' => ['system']])->find($unknown->location_id);
+    $station = Location::factory()->for(Station::factory(), 'locatable')->create();
+    $station = Location::with(['locatable' => ['system']])->find($station->location_id);
+
+    expect((new LocationRessource($unknown))->resolve()['is_manual_location'])->toBeTrue()
+        ->and((new LocationRessource($station))->resolve()['is_manual_location'])->toBeFalse();
 });
 
 test('one can submit suggestion', function () {
