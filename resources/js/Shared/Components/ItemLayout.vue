@@ -67,48 +67,42 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import LocationSlot from "./LocationSlot.vue";
-export default {
-    name: "ItemLayout",
-    components: {LocationSlot},
-    props: {
-        items: {
-            type: Array,
-            required: true
-        },
-    },
-    data() {
-        return {
-            highslots: ['HiSlot0', 'HiSlot1', 'HiSlot2', 'HiSlot3', 'HiSlot4', 'HiSlot5', 'HiSlot6', 'HiSlot7'],
-            midslots: ['MedSlot0', 'MedSlot1', 'MedSlot2', 'MedSlot3', 'MedSlot4', 'MedSlot5', 'MedSlot6', 'MedSlot7'],
-            lowslots: ['LoSlot0', 'LoSlot1', 'LoSlot2', 'LoSlot3', 'LoSlot4', 'LoSlot5', 'LoSlot6', 'LoSlot7'],
-            rigslots: ['RigSlot0', 'RigSlot1', 'RigSlot2', 'RigSlot3', 'RigSlot4', 'RigSlot5', 'RigSlot6', 'RigSlot7'],
-            subsystems: ['SubSystemSlot0', 'SubSystemSlot1', 'SubSystemSlot2', 'SubSystemSlot3', 'SubSystemSlot4', 'SubSystemSlot5', 'SubSystemSlot6', 'SubSystemSlot7'],
-            fleet_hangar: ['FleetHangar'],
-            ship_hangar: ['ShipHangar'],
-            fighter_tubes: ['FighterTube0', 'FighterTube1', 'FighterTube2', 'FighterTube3', 'FighterTube4'],
-            dronebay: ['DroneBay', 'FighterBay'],
-            specialized: [
-                'SpecializedAmmoHold', 'SpecializedCommandCenterHold', 'SpecializedFuelBay', 'SpecializedGasHold',
-                'SpecializedIndustrialShipHold', 'SpecializedLargeShipHold', 'SpecializedMaterialBay', 'SpecializedMediumShipHold',
-                'SpecializedMineralHold', 'SpecializedOreHold', 'SpecializedPlanetaryCommoditiesHold', 'SpecializedSalvageHold',
-                'SpecializedShipHold', 'SpecializedSmallShipHold', 'SubSystemBay'
-            ],
-            everything_else: [
-                'AssetSafety', 'AutoFit', 'BoosterBay', 'Cargo', 'CorpseBay', 'Deliveries', 'FrigateEscapeBay',
-                'HiddenModifiers', 'Implant', 'Locked',  'QuafeBay',  'Skill', 'Unlocked', 'Wardrobe', 'Hangar', 'HangarAll'
-            ]
-        }
-    },
-    computed: {
-        gotSecondColumn() {
-            let possible_items = [...this.fighter_tubes, ...this.fleet_hangar, ...this.ship_hangar]
 
-            return !_.isUndefined(_.find(this.items, (item) => possible_items.includes(item.location_flag)))
-        }
-    }
-}
+const props = defineProps({
+    items: {
+        type: Array,
+        required: true
+    },
+});
+
+const highslots = ['HiSlot0', 'HiSlot1', 'HiSlot2', 'HiSlot3', 'HiSlot4', 'HiSlot5', 'HiSlot6', 'HiSlot7']
+const midslots = ['MedSlot0', 'MedSlot1', 'MedSlot2', 'MedSlot3', 'MedSlot4', 'MedSlot5', 'MedSlot6', 'MedSlot7']
+const lowslots = ['LoSlot0', 'LoSlot1', 'LoSlot2', 'LoSlot3', 'LoSlot4', 'LoSlot5', 'LoSlot6', 'LoSlot7']
+const rigslots = ['RigSlot0', 'RigSlot1', 'RigSlot2', 'RigSlot3', 'RigSlot4', 'RigSlot5', 'RigSlot6', 'RigSlot7']
+const subsystems = ['SubSystemSlot0', 'SubSystemSlot1', 'SubSystemSlot2', 'SubSystemSlot3', 'SubSystemSlot4', 'SubSystemSlot5', 'SubSystemSlot6', 'SubSystemSlot7']
+const fleet_hangar = ['FleetHangar']
+const ship_hangar = ['ShipHangar']
+const fighter_tubes = ['FighterTube0', 'FighterTube1', 'FighterTube2', 'FighterTube3', 'FighterTube4']
+const dronebay = ['DroneBay', 'FighterBay']
+const specialized = [
+    'SpecializedAmmoHold', 'SpecializedCommandCenterHold', 'SpecializedFuelBay', 'SpecializedGasHold',
+    'SpecializedIndustrialShipHold', 'SpecializedLargeShipHold', 'SpecializedMaterialBay', 'SpecializedMediumShipHold',
+    'SpecializedMineralHold', 'SpecializedOreHold', 'SpecializedPlanetaryCommoditiesHold', 'SpecializedSalvageHold',
+    'SpecializedShipHold', 'SpecializedSmallShipHold', 'SubSystemBay'
+]
+const everything_else = [
+    'AssetSafety', 'AutoFit', 'BoosterBay', 'Cargo', 'CorpseBay', 'Deliveries', 'FrigateEscapeBay',
+    'HiddenModifiers', 'Implant', 'Locked',  'QuafeBay',  'Skill', 'Unlocked', 'Wardrobe', 'Hangar', 'HangarAll'
+]
+
+const gotSecondColumn = computed(() => {
+    let possible_items = [...fighter_tubes, ...fleet_hangar, ...ship_hangar]
+
+    return !_.isUndefined(_.find(props.items, (item) => possible_items.includes(item.location_flag)))
+})
 </script>
 
 <style scoped>

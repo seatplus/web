@@ -32,120 +32,108 @@
   </WhenVisible>
 </template>
 
-<script>
+<script setup>
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from "vue";
+import { router, usePage, WhenVisible } from "@inertiajs/vue3";
 import SelectionEntity from "./SelectionEntity.vue";
-import { router, WhenVisible } from "@inertiajs/vue3";
 
-export default {
-    name: "EntitySelection",
-    components: {SelectionEntity, WhenVisible},
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        type: {
-            type: String,
-            default: () => 'character'
-        },
-        search: {
-            type: String,
-            default: ''
-        }
+const props = defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     },
-    data() {
-        return {
-            initial_ids: [],
-            selected_ids: [],
-            searchTimer: null,
-        }
+    type: {
+        type: String,
+        default: () => 'character'
     },
-    computed: {
-        // The picker's affiliated list arrives as the lazily-resolved `affiliatedEntities` shared
-        // prop; undefined until <WhenVisible> has fired its first partial reload once the list
-        // scrolls into view.
-        results() {
-            return this.$page.props.affiliatedEntities ?? []
-        },
-        permission() {
-            return this.dispatchTransferObject.permission
-        },
-        corporationRoles() {
-            return (this.dispatchTransferObject.required_corporation_role ?? []).join(',')
-        },
-        // Mirror the old behaviour: only filter server-side once at least 3 characters are typed.
-        searchParam() {
-            return this.search.length >= 3 ? this.search : ''
-        },
-        // The picker context that rides along with the partial reload so the shared closure can
-        // resolve + filter the right entities. `preserveUrl` keeps this internal context out of the
-        // page URL (which the picker itself uses only for the `${type}_ids` selection).
-        reloadParams() {
-            return {
-                data: {
-                    type: this.type,
-                    permission: this.permission,
-                    corporationRoles: this.corporationRoles,
-                    // Namespaced so the picker's search never collides with a page's own `search`
-                    // query filter (e.g. the assets page) during the partial reload.
-                    search_aff: this.searchParam,
-                },
-                preserveUrl: true,
-            }
-        },
-        changed() {
-            return JSON.stringify(this.initial_ids) !== JSON.stringify(this.selected_ids)
-        }
-    },
-    watch: {
-        // Debounced re-request on search change. <WhenVisible> only fires on its initial
-        // intersection, so once the list is loaded a search change is served by an explicit partial
-        // reload of the same shared prop (the on-demand equivalent of the old debounced getJson).
-        search() {
-            clearTimeout(this.searchTimer)
-            this.searchTimer = setTimeout(() => this.reloadEntities(), 300)
-        }
-    },
-    beforeMount() {
-        // The current selection is carried in the page URL. Ziggy used to serialise it as
-        // `character_ids[0]=…`; Inertia serialises `character_ids[]=…` — both share the
-        // `${type}_ids` key prefix, so collect every matching entry.
-        const params = new URLSearchParams(window.location.search)
-        const ids = []
+    search: {
+        type: String,
+        default: ''
+    }
+});
 
-        for (const [key, value] of params.entries()) {
-            if (key.startsWith(`${this.type}_ids`)) {
-                ids.push(parseInt(value))
-            }
-        }
+const page = usePage();
 
-        this.selected_ids = ids
-        this.initial_ids = [...ids]
+const initial_ids = ref([])
+const selected_ids = ref([])
+const searchTimer = ref(null)
+
+// The picker's affiliated list arrives as the lazily-resolved `affiliatedEntities` shared
+// prop; undefined until <WhenVisible> has fired its first partial reload once the list
+// scrolls into view.
+const results = computed(() => page.props.affiliatedEntities ?? [])
+
+const permission = computed(() => props.dispatchTransferObject.permission)
+
+const corporationRoles = computed(() => (props.dispatchTransferObject.required_corporation_role ?? []).join(','))
+
+// Mirror the old behaviour: only filter server-side once at least 3 characters are typed.
+const searchParam = computed(() => props.search.length >= 3 ? props.search : '')
+
+// The picker context that rides along with the partial reload so the shared closure can
+// resolve + filter the right entities. `preserveUrl` keeps this internal context out of the
+// page URL (which the picker itself uses only for the `${type}_ids` selection).
+const reloadParams = computed(() => ({
+    data: {
+        type: props.type,
+        permission: permission.value,
+        corporationRoles: corporationRoles.value,
+        // Namespaced so the picker's search never collides with a page's own `search`
+        // query filter (e.g. the assets page) during the partial reload.
+        search_aff: searchParam.value,
     },
-    beforeUnmount() {
-        clearTimeout(this.searchTimer)
+    preserveUrl: true,
+}))
 
-        if (!this.changed) {
-            return
-        }
+const changed = computed(() => JSON.stringify(initial_ids.value) !== JSON.stringify(selected_ids.value))
 
-        if (this.selected_ids.length === 0) {
-            router.get(window.location.pathname)
-            return
-        }
-
-        router.get(window.location.pathname, { [`${this.type}_ids`]: this.selected_ids })
-    },
-    methods: {
-        reloadEntities() {
-            router.reload({
-                only: ['affiliatedEntities'],
-                data: this.reloadParams.data,
-                preserveUrl: true,
-            })
-        }
-    },
+function reloadEntities() {
+    router.reload({
+        only: ['affiliatedEntities'],
+        data: reloadParams.value.data,
+        preserveUrl: true,
+    })
 }
+
+// Debounced re-request on search change. <WhenVisible> only fires on its initial
+// intersection, so once the list is loaded a search change is served by an explicit partial
+// reload of the same shared prop (the on-demand equivalent of the old debounced getJson).
+watch(() => props.search, () => {
+    clearTimeout(searchTimer.value)
+    searchTimer.value = setTimeout(() => reloadEntities(), 300)
+})
+
+onBeforeMount(() => {
+    // The current selection is carried in the page URL. Ziggy used to serialise it as
+    // `character_ids[0]=…`; Inertia serialises `character_ids[]=…` — both share the
+    // `${type}_ids` key prefix, so collect every matching entry.
+    const params = new URLSearchParams(window.location.search)
+    const ids = []
+
+    for (const [key, value] of params.entries()) {
+        if (key.startsWith(`${props.type}_ids`)) {
+            ids.push(parseInt(value))
+        }
+    }
+
+    selected_ids.value = ids
+    initial_ids.value = [...ids]
+})
+
+onBeforeUnmount(() => {
+    clearTimeout(searchTimer.value)
+
+    if (!changed.value) {
+        return
+    }
+
+    if (selected_ids.value.length === 0) {
+        router.get(window.location.pathname)
+        return
+    }
+
+    router.get(window.location.pathname, { [`${props.type}_ids`]: selected_ids.value })
+})
 </script>
 
 <style scoped>

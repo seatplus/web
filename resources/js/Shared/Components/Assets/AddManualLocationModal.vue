@@ -104,66 +104,53 @@
   </ModalWithFooter>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from "vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EsiAutosuggest from "@/Shared/Components/EsiAutosuggest.vue";
 import {useForm} from "@inertiajs/vue3";
 import { create as createManualLocation } from "@/actions/Seatplus/Web/Http/Controllers/Shared/ManualLocationController";
 
-export default {
-    name: "AddManualLocationModal",
-    components: {EsiAutosuggest, ModalWithFooter,},
-    props: {
-      modelValue: {
+const props = defineProps({
+    modelValue: {
         required: true
-      },
-        location_id: {
-            required: true,
-            type: Number
-        }
     },
-emits: ['update:modelValue'],
-    data() {
-        return {
-          open: this.modelValue,
-            search_result: [],
-            query: '',
-            suggestions: [],
-            showSuggestions: false,
-            form: useForm({
-                name: '',
-                solar_system_id: null,
-            })
-        }
-    },
-    watch: {
-      modelValue(newVal) {
-        this.open = newVal
-      },
-      open(newVal) {
-        this.$emit('update:modelValue', newVal)
-      }
-    },
-    methods: {
-        submit() {
-            let self = this;
-
-            this.form.transform((data) => ({
-                ...data,
-                location_id: this.location_id
-            })).post(createManualLocation.url(), {
-                onSuccess: () => {
-                    self.form.reset()
-                    self.suggestions = []
-                    self.query = ''
-                    self.open = false
-                }
-            })
-
-
-
-        }
+    location_id: {
+        required: true,
+        type: Number
     }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const open = ref(props.modelValue)
+const query = ref('')
+const suggestions = ref([])
+const form = useForm({
+    name: '',
+    solar_system_id: null,
+})
+
+watch(() => props.modelValue, (newVal) => {
+    open.value = newVal
+})
+
+watch(open, (newVal) => {
+    emit('update:modelValue', newVal)
+})
+
+function submit() {
+    form.transform((data) => ({
+        ...data,
+        location_id: props.location_id
+    })).post(createManualLocation.url(), {
+        onSuccess: () => {
+            form.reset()
+            suggestions.value = []
+            query.value = ''
+            open.value = false
+        }
+    })
 }
 </script>
 

@@ -45,49 +45,43 @@
   </teleport>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import HeaderButton from "../../Layout/HeaderButton.vue";
 import SlideOver from "../../Layout/SlideOver.vue";
 import EntitySelection from "./EntitySelection.vue";
 import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid';
 
-export default {
-    name: "EntitySelectionButton",
-    components: {EntitySelection, SlideOver, HeaderButton, MagnifyingGlassIcon},
-    props: {
-        type: {
-            type: String,
-            default: () => 'character'
-        }
-    },
-    data() {
-        return {
-            open: false,
-            search: ''
-        }
-    },
-    computed: {
-        has_selected() {
-            // The picker writes the current selection into the page URL as `${type}_ids[…]`.
-            const params = new URLSearchParams(window.location.search)
+const props = defineProps({
+    type: {
+        type: String,
+        default: () => 'character'
+    }
+});
 
-            for (const key of params.keys()) {
-                if (key.startsWith(`${this.type}_ids`)) {
-                    return true
-                }
-            }
+const page = usePage();
 
-            return false
-        },
-        dispatchTransferObject() {
-            return this.$page.props.dispatch_transfer_object != null ? this.$page.props.dispatch_transfer_object : this.$page.props.dispatchTransferObject
+const open = ref(false)
+const search = ref('')
+
+const has_selected = computed(() => {
+    // The picker writes the current selection into the page URL as `${type}_ids[…]`.
+    const params = new URLSearchParams(window.location.search)
+
+    for (const key of params.keys()) {
+        if (key.startsWith(`${props.type}_ids`)) {
+            return true
         }
-    },
-    methods: {
-        openSlideOver() {
-            this.open = true
-        },
-    },
+    }
+
+    return false
+})
+
+const dispatchTransferObject = computed(() => page.props.dispatch_transfer_object != null ? page.props.dispatch_transfer_object : page.props.dispatchTransferObject)
+
+function openSlideOver() {
+    open.value = true
 }
 </script>
 

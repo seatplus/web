@@ -55,7 +55,8 @@
   </listbox>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, watch } from "vue";
 import {CheckIcon} from "@heroicons/vue/20/solid";
 import {
     Listbox,
@@ -67,125 +68,71 @@ import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { getJson } from "@/Functions/http";
 import { typesOrGroupsOrCategories } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
-export default {
-    name: "Autosuggest",
-    components: {EntityBlock, Listbox, ListboxOptions, ListboxOption, CheckIcon, ListboxLabel},
-    props: {
-        label: {
-            required: false,
-            type: String
-        },
-        placeholder: {
-            required: true,
-            type: String
-        }
+defineProps({
+    label: {
+        required: false,
+        type: String
     },
-    emits: ['selected', 'selectedObject'],
-    data() {
-        return {
-            search_result: [],
-            selected: null,
-            query: '',
-            suggestions: [],
-            open: false,
-        }
-    },
-    computed: {
-        options() {
-            return _.isArray(this.suggestions) ? this.suggestions : _.get(this.suggestions, 'data', [])
-        }
-    },
-    watch: {
-        query(query) {
+    placeholder: {
+        required: true,
+        type: String
+    }
+});
 
-            if (query === undefined) {
-                return;
-            }
+const emit = defineEmits(['selected', 'selectedObject']);
 
-            /*if (query === '')
-              this.$emit('selected', null)*/
+const selected = ref(null)
+const query = ref('')
+const suggestions = ref([])
+const open = ref(false)
 
-            // In case of a select, the query gets updated, we need to prevent the suggestions from showing again.
-            if (query === _.get(this.selected, 'name')) {
-                return;
-            }
+const options = computed(() => _.isArray(suggestions.value) ? suggestions.value : _.get(suggestions.value, 'data', []))
 
-            if (query.length <= 2)
-                return;
+function toggle() {
+    if (options.value.length > 0)
+        open.value = !open.value
+}
 
-            let self = this
+function handleBackspace() {
+    if (query.value.length > 2)
+        return;
 
-            return getJson(typesOrGroupsOrCategories.url({ query: { search: query } }))
-                .then((result) => {
-                    self.suggestions = result
+    open.value = false
+    suggestions.value = []
+    selected.value = null
+    emit('selected', null)
+}
 
-                    // if previously the suggestions were not shown toggle them
-                    if (!this.open)
-                        this.toggle()
-                })
-        },
-        selected(newValue) {
-            this.query = _.get(newValue, 'name')
-            this.open = false
-            this.$emit('selected', _.get(newValue, 'id'))
-            this.$emit('selectedObject', newValue)
-        }
-    },
-    methods: {
-        select(suggestion) {
-            //TODO: Delete
-            this.selected = suggestion
-            this.query = _.get(suggestion, 'name')
-            this.open = false
-            this.$emit('selected', suggestion.id)
-            this.$emit('selectedObject', suggestion)
-        },
-        toggle() {
+watch(query, (newQuery) => {
 
-            if (this.options.length > 0)
-                this.open = !this.open
-
-            /*if (this.open)
-                new createPopper(this.$refs.inputField, this.$refs.listboxCollabsible, {
-                    placement: 'bottom-start',
-                    modifiers: [
-                        {
-                            name: "sameWidth",
-                            enabled: true,
-                            phase: "beforeWrite",
-                            requires: ["computeStyles"],
-                            fn: ({state}) => {
-                                state.styles.popper.width = `${state.rects.reference.width}px`;
-                            },
-                            effect: ({state}) => {
-                                state.elements.popper.style.width = `${
-                                    state.elements.reference.offsetWidth
-                                }px`;
-                            },
-                        },
-                        {
-                            name: 'offset',
-                            options: {
-                                offset: [0, 8],
-                            },
-                        },
-                    ]
-                })*/
-
-        },
-        handleBackspace() {
-
-            if (this.query.length > 2)
-                return;
-
-            this.open = false
-            this.suggestions = []
-            this.selected = null
-            this.$emit('selected', null)
-        }
+    if (newQuery === undefined) {
+        return;
     }
 
-}
+    // In case of a select, the query gets updated, we need to prevent the suggestions from showing again.
+    if (newQuery === _.get(selected.value, 'name')) {
+        return;
+    }
+
+    if (newQuery.length <= 2)
+        return;
+
+    return getJson(typesOrGroupsOrCategories.url({ query: { search: newQuery } }))
+        .then((result) => {
+            suggestions.value = result
+
+            // if previously the suggestions were not shown toggle them
+            if (!open.value)
+                toggle()
+        })
+})
+
+watch(selected, (newValue) => {
+    query.value = _.get(newValue, 'name')
+    open.value = false
+    emit('selected', _.get(newValue, 'id'))
+    emit('selectedObject', newValue)
+})
 </script>
 
 <style scoped>

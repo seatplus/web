@@ -66,37 +66,31 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ResolveIdToName from "../../ResolveIdToName.vue";
 
-export default {
-    name: "CorporationHistoryComponent",
-    components: {ResolveIdToName, Time, EveImage, InfiniteScroll, EntityBlock, CardWithHeader},
-    props: {
-        character: {
-            type: Object,
-            required: true
-        }
-    },
-    computed: {
-        // The hosting page (CharacterInspectionScrollProps) supplies one scroll prop per inspected
-        // character, so read this character's history straight off the page props.
-        scrollKey() {
-            return `corporation_history_${this.character.character_id}`
-        },
-        scrollBodyId() {
-            return `corporation-history-body-${this.character.character_id}`
-        },
-        events() {
-            return this.$page.props[this.scrollKey]?.data ?? []
-        }
+const props = defineProps({
+    character: {
+        type: Object,
+        required: true
     }
-}
+});
+
+const page = usePage();
+
+// The hosting page (CharacterInspectionScrollProps) supplies one scroll prop per inspected
+// character, so read this character's history straight off the page props.
+const scrollKey = computed(() => `corporation_history_${props.character.character_id}`)
+
+const scrollBodyId = computed(() => `corporation-history-body-${props.character.character_id}`)
+
+const events = computed(() => page.props[scrollKey.value]?.data ?? [])
 </script>
 
 <style scoped>

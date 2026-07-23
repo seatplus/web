@@ -46,55 +46,48 @@
   </Card>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import Card from "../../Layout/Cards/Card.vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 
-export default {
-    name: "WalletFilter",
-    components: { Card, DismissibleButton },
-    props: {
-        // Selected ref_type strings (v-model).
-        modelValue: {
-            required: true,
-            type: Array
-        },
-        // Available ref_type options, provided by the controller (no autosuggest
-        // endpoint — hence no axios / Ziggy on this page).
-        refTypes: {
-            required: false,
-            type: Array,
-            default: () => []
-        }
+const props = defineProps({
+    // Selected ref_type strings (v-model).
+    modelValue: {
+        required: true,
+        type: Array
     },
-    emits: ['update:modelValue'],
-    data() {
-        return {
-            query: ''
-        }
-    },
-    computed: {
-        selected() {
-            return this.modelValue
-        },
-        filteredOptions() {
-            const query = this.query.toLowerCase()
-
-            return this.refTypes
-                .filter((type) => !this.selected.includes(type))
-                .filter((type) => type.toLowerCase().includes(query))
-                .slice(0, 20)
-        }
-    },
-    methods: {
-        select(option) {
-            this.$emit('update:modelValue', [...this.selected, option])
-            this.query = ''
-        },
-        remove(name) {
-            this.$emit('update:modelValue', this.selected.filter((type) => type !== name))
-        }
+    // Available ref_type options, provided by the controller (no autosuggest
+    // endpoint — hence no axios / Ziggy on this page).
+    refTypes: {
+        required: false,
+        type: Array,
+        default: () => []
     }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const query = ref('')
+
+const selected = computed(() => props.modelValue)
+
+const filteredOptions = computed(() => {
+    const q = query.value.toLowerCase()
+
+    return props.refTypes
+        .filter((type) => !selected.value.includes(type))
+        .filter((type) => type.toLowerCase().includes(q))
+        .slice(0, 20)
+})
+
+function select(option) {
+    emit('update:modelValue', [...selected.value, option])
+    query.value = ''
+}
+
+function remove(name) {
+    emit('update:modelValue', selected.value.filter((type) => type !== name))
 }
 </script>
 
