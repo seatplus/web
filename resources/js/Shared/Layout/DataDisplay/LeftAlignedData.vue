@@ -12,11 +12,6 @@
     </dd>
   </div>
 </template>
-<script>
-export default {
-    name: "LeftAlignedData"
-}
-</script>
 
 <style scoped>
 

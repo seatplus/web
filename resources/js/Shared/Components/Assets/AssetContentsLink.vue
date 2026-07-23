@@ -41,7 +41,7 @@
   </teleport>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 import { DialogTitle } from "@headlessui/vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
@@ -49,38 +49,32 @@ import ItemList from "./ItemList.vue";
 import { getJson } from "@/Functions/http";
 import { item as itemAction } from "@/actions/Seatplus/Web/Http/Controllers/Character/AssetsController";
 
-export default {
-    name: "AssetContentsLink",
-    components: { WithDismissButtonModal, DialogTitle, ItemList },
-    // Renders <a> + <teleport> (two roots), so it can't auto-inherit fallthrough attrs.
-    inheritAttrs: false,
-    props: {
-        characterId: {
-            type: Number,
-            required: true,
-        },
-        itemId: {
-            type: Number,
-            required: true,
-        },
+// Renders <a> + <teleport> (two roots), so it can't auto-inherit fallthrough attrs.
+defineOptions({ inheritAttrs: false });
+
+const props = defineProps({
+    characterId: {
+        type: Number,
+        required: true,
     },
-    setup(props) {
-        const openModal = ref(false)
-        const contents = ref([])
+    itemId: {
+        type: Number,
+        required: true,
+    },
+});
 
-        const itemUrl = itemAction.url({ character_id: props.characterId, item_id: props.itemId })
+const openModal = ref(false)
+const contents = ref([])
 
-        const open = async () => {
-            if (! contents.value.length) {
-                // X-Modal returns [the container]; its `content` is the one level of contents.
-                const data = await getJson(itemUrl, { 'X-Modal': true })
-                contents.value = data[0]?.content ?? []
-            }
+const itemUrl = itemAction.url({ character_id: props.characterId, item_id: props.itemId })
 
-            openModal.value = true
-        }
-
-        return { openModal, contents, itemUrl, open }
+const open = async () => {
+    if (! contents.value.length) {
+        // X-Modal returns [the container]; its `content` is the one level of contents.
+        const data = await getJson(itemUrl, { 'X-Modal': true })
+        contents.value = data[0]?.content ?? []
     }
+
+    openModal.value = true
 }
 </script>

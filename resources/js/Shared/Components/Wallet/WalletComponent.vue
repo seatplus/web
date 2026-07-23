@@ -26,29 +26,26 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import WalletJournalComponent from "./Journal/WalletJournalComponent.vue";
 import WalletTransactionComponent from "./Transaction/WalletTransactionComponent.vue";
 import WalletJournalBalanceChart from "./Journal/WalletJournalBalanceChart.vue";
-export default {
-    name: "WalletComponent",
-    components: {WalletJournalBalanceChart, WalletTransactionComponent, WalletJournalComponent},
-    props: {
-        id: {
-            required: true,
-            type: Number
-        },
-        division: {
-            required: false,
-            type: Object
-        },
-        filters: {
-            required: false,
-            type: Object,
-            default: () => new Object()
-        }
+
+defineProps({
+    id: {
+        required: true,
+        type: Number
+    },
+    division: {
+        required: false,
+        type: Object
+    },
+    filters: {
+        required: false,
+        type: Object,
+        default: () => new Object()
     }
-}
+});
 </script>
 
 <style scoped>

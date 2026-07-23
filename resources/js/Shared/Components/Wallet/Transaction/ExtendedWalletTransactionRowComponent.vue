@@ -70,23 +70,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import EveImage from "@/Shared/EveImage.vue"
-export default {
-    name: "ExtendedWalletTransactionRowComponent",
-    components: {EveImage, EntityByIdBlock},
-    props: {
-        entry: {
-            required: true
-        }
-    },
-    data() {
-        return {
-            expanded: false,
-        }
+
+defineProps({
+    entry: {
+        required: true
     }
-}
+});
 </script>
 
 <style scoped>

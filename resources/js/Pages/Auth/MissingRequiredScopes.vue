@@ -3,10 +3,10 @@
     <AppHead app-title="Missing Characters Esi Scopes" />
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
-        {{ $trans('web::missing_required_scopes.title') }}
+        {{ trans('web::missing_required_scopes.title') }}
       </h2>
       <p class="mt-2 text-center text-sm leading-5 text-gray-600 max-w">
-        {{ $trans('web::missing_required_scopes.description') }}
+        {{ trans('web::missing_required_scopes.description') }}
       </p>
     </div>
 
@@ -92,6 +92,9 @@ export default {
 import EveImage from "@/Shared/EveImage.vue"
 import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
 import AppHead from "@/Shared/AppHead.vue";
+import { useTranslations } from "@/composables/useTranslations";
+
+const { trans } = useTranslations();
 
 defineProps({
     characters: {

@@ -45,29 +45,25 @@
   </StickyHeaderTableRow>
 </template>
 
-<script>
+<script setup>
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow.vue";
 import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
 
-export default {
-    name: "CharacterContactsRowComponent",
-    components: { EntityByIdBlock, StickyHeaderTableRow, StickyHeaderCell },
-    props: {
-        entry: {
-            required: true,
-            type: Object,
-        },
-        columns: {
-            required: true,
-            type: Array,
-        },
-        numberColumns: {
-            required: true,
-            type: Number,
-        },
+defineProps({
+    entry: {
+        required: true,
+        type: Object,
     },
-}
+    columns: {
+        required: true,
+        type: Array,
+    },
+    numberColumns: {
+        required: true,
+        type: Number,
+    },
+});
 </script>
 
 <style scoped>

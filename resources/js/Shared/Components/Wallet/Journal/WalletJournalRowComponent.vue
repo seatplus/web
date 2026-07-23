@@ -56,40 +56,34 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import Time from "@/Shared/Time.vue";
 import ExtendedWalletJournalRowComponent from "./ExtendedWalletJournalRowComponent.vue";
+import { useTranslations } from "@/composables/useTranslations";
 
-export default {
-    name: "WalletJournalRowComponent",
-    components: {
-        ExtendedWalletJournalRowComponent, Time
+defineProps({
+    entry: {
+        required: true
     },
-    props: {
-        entry: {
-            required: true
-        },
-        even: {
-            required: true,
-            type: Number
-        }
-    },
-    data() {
-        return {
-            expanded: false
-        }
-    },
-    methods: {
-        getTranslation(entry) {
-
-            let string = 'web::wallet_journal.' + _.toString(entry.ref_type)
-
-            return this.$trans(string)
-        },
-        toggle() {
-            this.expanded = !this.expanded
-        }
+    even: {
+        required: true,
+        type: Number
     }
+});
+
+const { trans } = useTranslations();
+
+const expanded = ref(false)
+
+function getTranslation(entry) {
+    let string = 'web::wallet_journal.' + _.toString(entry.ref_type)
+
+    return trans(string)
+}
+
+function toggle() {
+    expanded.value = !expanded.value
 }
 </script>
 

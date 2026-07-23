@@ -7,13 +7,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Toasts from "@/Shared/Toasts/Toasts.vue";
-
-export default {
-    name: "EmptyLayout",
-    components: {Toasts}
-}
 </script>
 
 <style scoped>

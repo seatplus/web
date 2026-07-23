@@ -9,15 +9,12 @@
   </span>
 </template>
 
-<script>
-  export default {
-      name: "HeaderButton",
-      props: {
-          secondary: {
-              default: false
-          }
-      },
-  }
+<script setup>
+defineProps({
+    secondary: {
+        default: false,
+    },
+});
 </script>
 
 <style scoped>

@@ -12,43 +12,30 @@
   />
 </template>
 
-<script>
+<script setup>
 import BarWithUnderline from "@/Shared/Layout/Tabs/BarWithUnderline.vue";
 import {computed, ref} from "vue";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent.vue";
 
-let raw_tabs = [
+const props = defineProps({
+    characterIds: {
+        required: true,
+        type: Array
+    },
+    watchlist: {
+        required: true,
+        type: Object
+    }
+});
+
+const tabs = [
     {id: 1, name: 'Watchlisted Contracts'},
     {id: 2, name: 'All Contracts'},
 ]
 
-export default {
-    name: "ContractTab",
-    components: {ContractComponent, BarWithUnderline},
-    props: {
-        characterIds: {
-            required: true,
-            type: Array
-        },
-        watchlist: {
-            required: true,
-            type: Object
-        }
-    },
-    setup(props) {
+const changeActiveTab = (tab) => activeTabId.value = tab.id;
 
-        const changeActiveTab = (tab) => activeTabId.value = tab.id;
+const hasWatchlist = computed(() => _.flattenDeep(Object.values(props.watchlist)).length > 0)
 
-        const hasWatchlist = computed(() => _.flattenDeep(Object.values(props.watchlist)).length > 0)
-
-        const activeTabId = ref(hasWatchlist.value ? 1 : 2)
-
-        return {
-            tabs: raw_tabs,
-            changeActiveTab,
-            hasWatchlist,
-            activeTabId
-        }
-    }
-}
+const activeTabId = ref(hasWatchlist.value ? 1 : 2)
   </script>

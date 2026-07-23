@@ -26,29 +26,17 @@
   </p>
 </template>
 
-<script>
+<script setup>
 import { MapPinIcon } from "@heroicons/vue/20/solid";
 
-export default {
-    name: "ContractTypeComponent",
-    components: {MapPinIcon},
-    props: {
-        contract: {
-            required: true,
-            type: Object
-        }
-    },
-    setup() {
+defineProps({
+    contract: {
+        required: true,
+        type: Object
+    }
+});
 
-        const getStartLocation = (contract) => _.get(contract, 'start_location.name', _.get(contract, 'start_location.locatable.name', 'unknown'))
-        const getEndLocation = (contract) => _.get(contract, 'end_location.name', _.get(contract, 'end_location.locatable.name', 'unknown'))
-
-        return {
-            getStartLocation,
-            getEndLocation
-        }
-
-    },
-}
+const getStartLocation = (contract) => _.get(contract, 'start_location.name', _.get(contract, 'start_location.locatable.name', 'unknown'))
+const getEndLocation = (contract) => _.get(contract, 'end_location.name', _.get(contract, 'end_location.locatable.name', 'unknown'))
 </script>
 

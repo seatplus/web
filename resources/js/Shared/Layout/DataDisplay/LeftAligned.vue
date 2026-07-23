@@ -63,12 +63,6 @@
   </div>
 </template>
 
-<script>
-export default {
-    name: "LeftAligned"
-}
-</script>
-
 <style scoped>
 
 </style>

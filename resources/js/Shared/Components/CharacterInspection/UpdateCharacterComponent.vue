@@ -50,7 +50,7 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData.vue";
 import Button from "@/Shared/Layout/Button.vue";
 import {computed, ref, watch} from "vue";
@@ -59,50 +59,37 @@ import Time from "@/Shared/Time.vue";
 import { getJson, post } from "@/Functions/http";
 import { getBatchUpdate, dispatchBatchUpdate } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
-export default {
-    name: "UpdateCharacterComponent",
-    components: {Time, Button, LeftAlignedData},
-    props: {
-        character: {
-            type: Object,
-            required:true
-        }
-    },
-    setup(props) {
-
-        const batchUpdate = ref(props.character.batch_update != null ? props.character.batch_update : {finished_at: null})
-        const isUpdating = ref(false)
-        const interval = ref()
-
-        const canUpdate = computed(() => _.isNil(batchUpdate.value.finished_at) || dayjs(batchUpdate.value.finished_at).isBefore(dayjs().subtract(1,'hour')))
-
-        const getUpdate = async () => getJson(getBatchUpdate.url(props.character.character_id))
-            .then((data) => {
-                batchUpdate.value = data
-
-                if (data?.finished_at) {
-                    isUpdating.value = false
-                }
-            })
-
-        const updateCharacter = function () {
-            isUpdating.value = true;
-
-            post(dispatchBatchUpdate.url(props.character.character_id))
-        }
-
-        watch(isUpdating,(newValue) => {
-            newValue ? interval.value = setInterval(getUpdate,15000) : clearInterval(interval.value)
-        })
-
-        return {
-            batchUpdate,
-            canUpdate,
-            isUpdating,
-            updateCharacter
-        }
+const props = defineProps({
+    character: {
+        type: Object,
+        required:true
     }
+});
+
+const batchUpdate = ref(props.character.batch_update != null ? props.character.batch_update : {finished_at: null})
+const isUpdating = ref(false)
+const interval = ref()
+
+const canUpdate = computed(() => _.isNil(batchUpdate.value.finished_at) || dayjs(batchUpdate.value.finished_at).isBefore(dayjs().subtract(1,'hour')))
+
+const getUpdate = async () => getJson(getBatchUpdate.url(props.character.character_id))
+    .then((data) => {
+        batchUpdate.value = data
+
+        if (data?.finished_at) {
+            isUpdating.value = false
+        }
+    })
+
+const updateCharacter = function () {
+    isUpdating.value = true;
+
+    post(dispatchBatchUpdate.url(props.character.character_id))
 }
+
+watch(isUpdating,(newValue) => {
+    newValue ? interval.value = setInterval(getUpdate,15000) : clearInterval(interval.value)
+})
 </script>
 
 <style scoped>

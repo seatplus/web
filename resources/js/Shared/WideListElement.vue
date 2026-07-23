@@ -74,19 +74,16 @@
   </li>
 </template>
 
-<script>
+<script setup>
 import { Link } from '@inertiajs/vue3';
-export default {
-    name: "WideListElement",
-    components: {Link},
-    props: {
-        url: {
-            type: String,
-            required: false,
-            default: ''
-        },
-    }
-}
+
+defineProps({
+    url: {
+        type: String,
+        required: false,
+        default: '',
+    },
+});
 </script>
 
 <style scoped>

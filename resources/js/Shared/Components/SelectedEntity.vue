@@ -18,23 +18,22 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-export default {
-    name: "SelectedEntity",
-    components: {EntityByIdBlock},
-    computed: {
-        selectedIds() {
-            // Read the character_ids query params off the current URL (replacing Ziggy's
-            // route().params); supports both bracketed and plain array notation.
-            const query = this.$page.url.split('?')[1] ?? ''
-            const params = new URLSearchParams(query)
-            const selectedCharacterIds = params.getAll('character_ids[]').concat(params.getAll('character_ids'))
 
-            return _.map(selectedCharacterIds, (id) => parseInt(id))
-        }
-    }
-}
+const page = usePage();
+
+const selectedIds = computed(() => {
+    // Read the character_ids query params off the current URL (replacing Ziggy's
+    // route().params); supports both bracketed and plain array notation.
+    const query = page.url.split('?')[1] ?? ''
+    const params = new URLSearchParams(query)
+    const selectedCharacterIds = params.getAll('character_ids[]').concat(params.getAll('character_ids'))
+
+    return _.map(selectedCharacterIds, (id) => parseInt(id))
+})
 </script>
 
 <style scoped>

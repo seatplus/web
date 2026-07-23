@@ -8,12 +8,6 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: "WideLists"
-  }
-</script>
-
 <style scoped>
 
 </style>

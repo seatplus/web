@@ -76,53 +76,45 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import EveImage from "@/Shared/EveImage.vue"
 import Time from "@/Shared/Time.vue";
 import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRowComponent.vue";
 
-export default {
-    name: "WalletTransactionRowComponent",
-    components: {ExtendedWalletTransactionRowComponent, Time, EveImage },
-    props: {
-        entry: {
-            required: true
-        },
-        even: {
-            required: true,
-            type: Number
-        }
+const props = defineProps({
+    entry: {
+        required: true
     },
-    data() {
-        return {
-            expanded: false
-        }
-    },
-    computed: {
-        getTypeDescription() {
-
-            let group_name = _.get(this.entry.type, 'group.name')
-            let category_name = _.get(this.entry.type, 'entry.type.category.name')
-
-            if (_.isUndefined(group_name))
-                return ''
-
-            if(_.isUndefined(category_name))
-                return group_name
-
-            return group_name + ' | ' + category_name
-        }
-    },
-    methods: {
-        toggle() {
-            this.expanded = !this.expanded
-        },
-        getTotal() {
-            let total = this.entry.quantity * this.entry.unit_price
-
-            return total.toLocaleString() ?? ''
-        }
+    even: {
+        required: true,
+        type: Number
     }
+});
+
+const expanded = ref(false)
+
+const getTypeDescription = computed(() => {
+    let group_name = _.get(props.entry.type, 'group.name')
+    let category_name = _.get(props.entry.type, 'entry.type.category.name')
+
+    if (_.isUndefined(group_name))
+        return ''
+
+    if(_.isUndefined(category_name))
+        return group_name
+
+    return group_name + ' | ' + category_name
+})
+
+function toggle() {
+    expanded.value = !expanded.value
+}
+
+function getTotal() {
+    let total = props.entry.quantity * props.entry.unit_price
+
+    return total.toLocaleString() ?? ''
 }
 </script>
 

@@ -24,28 +24,15 @@
   />
 </template>
 
-<script>
+<script setup>
 import CompactAssetListElement from "./CompactAssetListElement.vue";
 
-export default {
-    name: "CompactAssetListComponent",
-    components: {CompactAssetListElement,},
-    props: {
-        items: {
-            required: true,
-            type: Array
-        }
-    },
-    computed: {
-        uniqueItems() {
-            return _.uniqBy(this.items, 'item_id')
-        },
-        hasOwnerPicture() {
-            // Show the owner avatar when the user has more than one character.
-            return this.$page.props.user.data.characters.length > 1
-        }
+defineProps({
+    items: {
+        required: true,
+        type: Array
     }
-}
+});
 </script>
 
 <style scoped>

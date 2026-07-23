@@ -57,48 +57,38 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import WalletTransactionRowComponent from "./WalletTransactionRowComponent.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 
-export default {
-    name: "WalletTransactionComponent",
-    components: {
-        InfiniteScroll,
-        WalletTransactionRowComponent,
-        EntityByIdBlock, CardWithHeader
+const props = defineProps({
+    id: {
+        required: true,
+        type: Number
     },
-    props: {
-        id: {
-            required: true,
-            type: Number
-        },
-        division: {
-            required: false,
-            type: Object,
-            default: () => {}
-        }
-    },
-    computed: {
-        // Delivered as a page scroll prop (WalletsController / CorporationWalletController):
-        // keyed per character, or per corporation+division for corporate wallets.
-        scrollKey() {
-            return this.division
-                ? `transaction_${this.id}_${this.division.division_id}`
-                : `transaction_${this.id}`
-        },
-        scrollBodyId() {
-            return this.division
-                ? `transaction-body-${this.id}-${this.division.division_id}`
-                : `transaction-body-${this.id}`
-        },
-        transactionEntries() {
-            return this.$page.props[this.scrollKey]?.data ?? []
-        }
+    division: {
+        required: false,
+        type: Object,
+        default: () => {}
     }
-}
+});
+
+const page = usePage();
+
+// Delivered as a page scroll prop (WalletsController / CorporationWalletController):
+// keyed per character, or per corporation+division for corporate wallets.
+const scrollKey = computed(() => props.division
+    ? `transaction_${props.id}_${props.division.division_id}`
+    : `transaction_${props.id}`)
+
+const scrollBodyId = computed(() => props.division
+    ? `transaction-body-${props.id}-${props.division.division_id}`
+    : `transaction-body-${props.id}`)
+
+const transactionEntries = computed(() => page.props[scrollKey.value]?.data ?? [])
 </script>
 
 <style scoped>
