@@ -19,36 +19,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import MemberTrackingComponent from "./MemberTrackingComponent.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 
-export default {
-    name: "MemberTracking",
-    components: {
-        EntitySelectionButton,
-      RequiredScopesWarning,
-      DispatchUpdateButton,
-      MemberTrackingComponent, PageHeader},
-    props: {
-        corporations: {
-            type: Array,
-            required: true
-        },
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        }
+defineProps({
+    corporations: {
+        type: Array,
+        required: true
     },
-  data() {
-      return {
-        pageTitle: 'Corporation Member Tracking'
-      }
-  }
-}
+    dispatchTransferObject: {
+        required: true,
+        type: Object
+    }
+});
+
+const pageTitle = 'Corporation Member Tracking'
 </script>
 
 <style scoped>

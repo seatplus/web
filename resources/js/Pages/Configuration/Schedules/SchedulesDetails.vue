@@ -44,7 +44,7 @@
           <Link
             method="post"
             as="button"
-            :data="$data"
+            :data="{ expression, job }"
             preserve-state
             :href="storeUrl"
             class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-hidden focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out"
@@ -57,51 +57,42 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, nextTick, onMounted, ref } from "vue";
+import { Link } from '@inertiajs/vue3';
 import InputGroup from "@/Shared/InputGroup.vue"
 import SeatPlusSelect from "@/Shared/SeatPlusSelect.vue"
-import { Link } from '@inertiajs/vue3';
 import AppHead from "@/Shared/AppHead.vue";
 import SchedulesDelete from "@/actions/Seatplus/Web/Http/Controllers/Configuration/Schedules/SchedulesDelete";
 import SchedulesPost from "@/actions/Seatplus/Web/Http/Controllers/Configuration/Schedules/SchedulesPost";
-export default {
-    name: "SchedulesDetails",
-    components: {AppHead, SeatPlusSelect, InputGroup, Link},
-    props: {
-        schedule: {
-            type: Object,
-            required: true
-        },
-        cron: {
-            type: Object,
-            required: true
-        },
-        activeSidebarElement: {
-            type: String,
-            required: true
-        }
-    },
-    computed: {
-        deleteUrl() {
-            return SchedulesDelete.url(this.schedule.id)
-        },
-        storeUrl() {
-            return SchedulesPost.url()
-        }
-    },
-    data() {
-        return {
-            expression: '',
-            job: this.schedule.job
-        }
-    },
-    mounted() {
-        this.$nextTick(function () {
-            this.expression = this.schedule.expression
-        })
 
+const props = defineProps({
+    schedule: {
+        type: Object,
+        required: true
+    },
+    cron: {
+        type: Object,
+        required: true
+    },
+    activeSidebarElement: {
+        type: String,
+        required: true
     }
-}
+});
+
+const expression = ref('')
+const job = ref(props.schedule.job)
+
+const deleteUrl = computed(() => SchedulesDelete.url(props.schedule.id))
+
+const storeUrl = computed(() => SchedulesPost.url())
+
+onMounted(() => {
+    nextTick(function () {
+        expression.value = props.schedule.expression
+    })
+})
 </script>
 
 <style scoped>

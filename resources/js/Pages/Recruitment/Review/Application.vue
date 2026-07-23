@@ -162,68 +162,51 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, reactive } from "vue";
+import {router} from "@inertiajs/vue3";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import HeaderButton from "@/Shared/Layout/HeaderButton.vue";
 import TabComponent from "@/Shared/Components/CharacterInspection/TabComponent.vue";
 import {IdentificationIcon} from '@heroicons/vue/24/outline'
 import UpdateCharacterComponent from "@/Shared/Components/CharacterInspection/UpdateCharacterComponent.vue";
-import {router} from "@inertiajs/vue3";
 import ImpersonateRecruit from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ImpersonateRecruit";
 import { reviewApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
-export default {
-    name: "Application",
-    components: {
-        UpdateCharacterComponent,
-        TabComponent,
-        HeaderButton,
-        PageHeader,
-        IdentificationIcon
+const props = defineProps({
+    recruit: {
+        required: true,
+        type: Object
     },
-    props: {
-        recruit: {
-            required: true,
-            type: Object
-        },
-        application: {
-            required: true,
-            type: Object
-        },
-        watchlist: {
-            required: true,
-            type: Object
-        },
-        activeSidebarElement: {
-            required: true,
-            type: String
-        }
+    application: {
+        required: true,
+        type: Object
     },
-    data() {
-        return {
-            pageTitle: 'Application',
-            form: {
-                decision: null,
-                explanation: null
-            }
-        }
+    watchlist: {
+        required: true,
+        type: Object
     },
-    computed: {
-        characters() {
-            return _.map(this.recruit.characters, (character) => character.name ).join(', ')
-        },
-        canImpersonate() {
-            return this.recruit.id && this.application.status === 'open'
-        }
-    },
-    methods: {
-        impersonate() {
-            return router.visit(ImpersonateRecruit.url(this.application.id))
-        },
-        submit() {
-            return router.post(reviewApplication.url(this.application.id), this.form);
-        }
+    activeSidebarElement: {
+        required: true,
+        type: String
     }
+});
+
+const form = reactive({
+    decision: null,
+    explanation: null
+})
+
+const characters = computed(() => _.map(props.recruit.characters, (character) => character.name).join(', '))
+
+const canImpersonate = computed(() => props.recruit.id && props.application.status === 'open')
+
+function impersonate() {
+    return router.visit(ImpersonateRecruit.url(props.application.id))
+}
+
+function submit() {
+    return router.post(reviewApplication.url(props.application.id), form);
 }
 </script>
 

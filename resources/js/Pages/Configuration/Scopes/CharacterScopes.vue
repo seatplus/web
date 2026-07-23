@@ -14,45 +14,36 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, watch } from "vue";
 import ScopeToggle from "./ScopeToggle.vue";
-export default {
-    name: "CharacterScopes",
-    components: {ScopeToggle},
-    props: {
-        scopes: {
-            type: Object,
-            required: true
-        },
-        selectedScopes: {
-            type: Array,
-            required: false,
-            default: () => []
-        }
+
+const props = defineProps({
+    scopes: {
+        type: Object,
+        required: true
     },
-    emits: ['update:selectedScopes'],
-    data() {
-        return {
-            selected: this.selectedScopes
-        }
-    },
-    computed: {
-        flavours: function () {
-            return _.map(this.scopes, (value, prop) => ({
-                text: _.capitalize(prop),
-                value: value
-            }));
-        },
-        scopesAsString() {
-            return _.toString(this.selectedScopes)
-        }
-    },
-    watch: {
-        selected(newValue) {
-            this.$emit('update:selectedScopes', newValue)
-        }
+    selectedScopes: {
+        type: Array,
+        required: false,
+        default: () => []
     }
-}
+});
+
+const emit = defineEmits(['update:selectedScopes']);
+
+const selected = ref(props.selectedScopes)
+
+const flavours = computed(() => _.map(props.scopes, (value, prop) => ({
+    text: _.capitalize(prop),
+    value: value
+})))
+
+const scopesAsString = computed(() => _.toString(props.selectedScopes))
+
+watch(selected, (newValue) => {
+    emit('update:selectedScopes', newValue)
+})
 </script>
 
 <style scoped>

@@ -70,35 +70,26 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import LeftAligned from "@/Shared/Layout/DataDisplay/LeftAligned.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import LeftAlignedData from "@/Shared/Layout/DataDisplay/LeftAlignedData.vue";
 import Time from "@/Shared/Time.vue";
 import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
-export default {
-    name: "Characters",
-    components: {Time, LeftAlignedData, EntityBlock, LeftAligned},
-    props: {
-        characters: {
-            type: Array,
-            required: true
-        },
-        enlistments: {
-            type: Array,
-            default: () => []
-        }
-    },
-    computed: {
-        ssoUrl() {
-            return RedirectSSOController.url()
-        },
-        hasOpenEnlistments() {
-            return !_.isEmpty(this.enlistments)
-        }
-    }
 
-}
+defineProps({
+    characters: {
+        type: Array,
+        required: true
+    },
+    enlistments: {
+        type: Array,
+        default: () => []
+    }
+});
+
+const ssoUrl = computed(() => RedirectSSOController.url())
 </script>
 
 <style scoped>

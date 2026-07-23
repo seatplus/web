@@ -87,32 +87,21 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import Time from "@/Shared/Time.vue";
 
-export default {
-    name: "MemberTrackingListElementForSmallDevices",
-    components: {Time, EveImage, EntityByIdBlock, EntityBlock},
-    props: {
-        member: {
-            required: true,
-            type: Object
-        }
-    },
-    computed: {
-        locationName() {
-            return _.get(this.member, 'location.name', 'Unknown Location')
-        }
-    },
-    methods: {
-        has(string) {
-            return _.has(this.member, string)
-        }
+const props = defineProps({
+    member: {
+        required: true,
+        type: Object
     }
-}
+});
+
+const locationName = computed(() => _.get(props.member, 'location.name', 'Unknown Location'))
 </script>
 
 <style scoped>

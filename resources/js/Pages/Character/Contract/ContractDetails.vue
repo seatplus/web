@@ -9,38 +9,29 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import ContractDetailsComponent from "@/Shared/Components/Contracts/ContractDetailsComponent.vue";
 import { index as characterContracts } from "@/actions/Seatplus/Web/Http/Controllers/Character/ContractsController";
-export default {
-    name: "ContractDetails",
-    components: {
-        ContractDetailsComponent,
-        PageHeader
+
+defineProps({
+    contract: {
+        required: true,
+        type: Object
     },
-    props: {
-        contract: {
-            required: true,
-            type: Object
-        },
-        activeSidebarElement: {
-            type: String,
-            required: true
-        }
-    },
-    data() {
-        return {
-            pageTitle: 'Contract Details',
-            breadcrumbs: [
-                {
-                    name: 'Character Contracts',
-                    route: characterContracts.url()
-                }
-            ]
-        }
-    },
-}
+    activeSidebarElement: {
+        type: String,
+        required: true
+    }
+});
+
+const pageTitle = 'Contract Details'
+const breadcrumbs = [
+    {
+        name: 'Character Contracts',
+        route: characterContracts.url()
+    }
+]
 </script>
 
 <style scoped>

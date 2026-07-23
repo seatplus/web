@@ -62,61 +62,53 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onMounted, ref, watch } from "vue";
+import { router, usePage } from '@inertiajs/vue3'
 import Commands from "@/Pages/Configuration/Commands.vue"
 import HorizonStats from "./HorizonStats.vue"
-import { router } from '@inertiajs/vue3'
 
-export default {
-    name: "Settings",
-    components: {HorizonStats, Commands},
-    data() {
-        return {
-            pageTitle: 'Server Settings',
-            currentRoute: '',
-        }
-    },
-    computed: {
-        // Nav tabs are static config, shared eagerly by HandleInertiaRequests as page chrome —
-        // read them off the page props rather than fetching them after mount.
-        navTabs() {
-            return this.$page.props.settingsNavigation ?? []
-        }
-    },
-    watch: {
-        currentRoute(currentRoute) {
-            if(this.isActive(currentRoute))
-                return
+const page = usePage()
 
-            this.visitRoute(currentRoute)
-        }
-    },
-    mounted() {
-        const active = this.navTabs.find(navTab => this.isActive(navTab.route))
-        if (active)
-            this.currentRoute = active.route
-    },
-    methods: {
-        isActive(name) {
-            // activeSidebarElement is the current route name, shared by HandleInertiaRequests.
-            return this.$page.props.activeSidebarElement === name;
-        },
-        getRoute(name) {
-            return this.navTabs.find(navTab => navTab.route === name)?.url
-        },
-        visitRoute(name) {
+const currentRoute = ref('')
 
-            const url = this.getRoute(name)
+// Nav tabs are static config, shared eagerly by HandleInertiaRequests as page chrome —
+// read them off the page props rather than fetching them after mount.
+const navTabs = computed(() => page.props.settingsNavigation ?? [])
 
-            if (!url)
-                return
-
-            router.visit(url,{
-                method: 'get',
-                preserveScroll: true
-            })
-        }
-    }
+function isActive(name) {
+    // activeSidebarElement is the current route name, shared by HandleInertiaRequests.
+    return page.props.activeSidebarElement === name;
 }
+
+function getRoute(name) {
+    return navTabs.value.find(navTab => navTab.route === name)?.url
+}
+
+function visitRoute(name) {
+
+    const url = getRoute(name)
+
+    if (!url)
+        return
+
+    router.visit(url,{
+        method: 'get',
+        preserveScroll: true
+    })
+}
+
+watch(currentRoute, (value) => {
+    if(isActive(value))
+        return
+
+    visitRoute(value)
+})
+
+onMounted(() => {
+    const active = navTabs.value.find(navTab => isActive(navTab.route))
+    if (active)
+        currentRoute.value = active.route
+})
 </script>
 

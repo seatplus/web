@@ -10,24 +10,16 @@
   </span>
 </template>
 
-<script>
+<script setup>
+import { router } from "@inertiajs/vue3";
+import { clear } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/CommandsController";
 
-  import { router } from "@inertiajs/vue3";
-  import { clear } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/CommandsController";
-
-  export default {
-    name: "Commands",
-
-    methods: {
-
-      clearCache() {
-        router.post(clear.url()).
-        catch(function (error) {
-          console.log(error)
-        })
-      }
-    }
-  }
+function clearCache() {
+    router.post(clear.url()).
+    catch(function (error) {
+        console.log(error)
+    })
+}
 </script>
 
 <style scoped>

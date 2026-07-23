@@ -46,29 +46,24 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Time from "@/Shared/Time.vue";
-export default {
-    name: "MemberTrackingListElement",
-    components: {Time, EntityByIdBlock, EntityBlock},
-    props: {
-        member: {
-            required: true,
-            type: Object
-        },
-        even: {
-            required: true,
-            type: Number
-        }
+
+const props = defineProps({
+    member: {
+        required: true,
+        type: Object
     },
-    computed: {
-        locationName() {
-            return _.get(this.member, 'location.name', 'Unknown Location')
-        }
+    even: {
+        required: true,
+        type: Number
     }
-}
+});
+
+const locationName = computed(() => _.get(props.member, 'location.name', 'Unknown Location'))
 </script>
 
 <style scoped>

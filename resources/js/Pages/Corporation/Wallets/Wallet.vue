@@ -20,32 +20,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import WalletComponent from "@/Shared/Components/Wallet/WalletComponent.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 
-export default {
-    name: "Wallet",
-    components: {EntitySelectionButton, WalletComponent, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
-    props: {
-        corporationDivisions: {
-            type: Array,
-            required: true
-        },
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        }
+defineProps({
+    corporationDivisions: {
+        type: Array,
+        required: true
     },
-    data() {
-        return {
-            pageTitle: 'Corporation Wallets'
-        }
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     }
-}
+});
+
+const pageTitle = 'Corporation Wallets'
 </script>
 
 <style scoped>
