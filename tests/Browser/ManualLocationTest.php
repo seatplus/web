@@ -64,8 +64,10 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     $manage->assertNoSmoke();
     $manage->waitForText('Manual Locations');
     $manage->waitForText('This location could not be resolved'); // deferred list resolved
-    $manage->waitForText('Some Awesome Fortizar');                // the suggestion option
-    $manage->click('Some Awesome Fortizar');                      // select the radio option
+    // The radio option's label is "{system|'?'} - {name}"; no system is seeded, so match the
+    // exact label text (pest-browser click targets an element by its exact text).
+    $manage->waitForText('? - Some Awesome Fortizar');
+    $manage->click('? - Some Awesome Fortizar');                  // select the radio option
     $manage->click('Save');                                       // accept it
 
     // 4) The assets view now shows the accepted name instead of "Unknown Structure".
