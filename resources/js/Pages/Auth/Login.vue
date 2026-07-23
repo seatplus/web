@@ -12,7 +12,7 @@
           SeAT plus
         </h2>
         <p class="mt-2 text-center text-sm leading-5 text-gray-600 max-w">
-          {{ $trans('web::auth.login_welcome') }}
+          {{ trans('web::auth.login_welcome') }}
         </p>
       </div>
 
@@ -65,11 +65,17 @@ import { router } from "@inertiajs/vue3";
 import { localeName } from "@/i18n/localeName";
 import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
 import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
+import { useTranslations } from "@/composables/useTranslations";
 
 export default {
     name: "Login",
     components: {AppHead},
     layout: (h, page) => h(EmptyLayout, () => page),
+    setup() {
+        const { trans } = useTranslations();
+
+        return { trans };
+    },
     data() {
         return {
             selectedLocale: this.$page.props.locale,
