@@ -8,31 +8,15 @@ use Seatplus\Web\Models\ManualLocation;
 require_once __DIR__.'/helpers.php';
 
 /*
- * Manual Locations browser test — runs against the real assembled core app.
- * The index page ships its suggestion list as an `Inertia::defer`red `data` prop
- * rendered through <Deferred>, so wait for the loaded content rather than asserting
- * immediately.
+ * Manual Locations lifecycle browser test — runs against the real assembled core app.
+ * Walks a missing location end to end and screenshots each stage: it shows as
+ * "Unknown Structure" in the assets view, a submitted suggestion is reviewed and accepted on
+ * the manage page, and the assets view then shows the accepted name. The "add suggestion" step
+ * is seeded (the modal's solar-system field is a live-ESI autosuggest, not drivable offline);
+ * the review/accept and both assets states are exercised through the UI.
  */
 
 uses(RefreshDatabase::class);
-
-it('lists manual-location suggestions for an authorized user', function (string $device) {
-    $character = actingAsCharacter();
-    userOfCharacter($character->character_id)
-        ->givePermissionTo(Permission::findOrCreate('manage manual locations'));
-
-    // Two competing suggestions for one unresolved location (each by its own user).
-    ManualLocation::factory()->count(2)->create(['location_id' => 987654321]);
-
-    $page = deviceVisit($device, route('manage.manual_locations', absolute: false));
-
-    $page->assertNoSmoke();
-    $page->waitForText('Manual Locations');                     // page header
-    $page->waitForText('This location could not be resolved');  // deferred suggestion group rendered
-    $page->assertSee('Save');                                   // the accept action is present
-
-    snap($page, "manual-locations-{$device}");
-})->with(['desktop', 'iphone']);
 
 it('walks a missing location from unknown → suggested → accepted → shown in assets', function (string $device) {
     $character = actingAsCharacter();
@@ -50,6 +34,7 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     $page->assertNoSmoke();
     $page->waitForText('Character Assets');
     assetTextVisible($page, "Unknown Structure ({$unknownId})");
+    snap($page, "manual-locations-lifecycle-1-unknown-{$device}");
 
     // 2) A user submits a suggested name for it. Seeded rather than driven through the modal —
     //    its solar-system field is a live-ESI autosuggest that isn't drivable offline.
@@ -59,7 +44,7 @@ it('walks a missing location from unknown → suggested → accepted → shown i
         'name' => 'Some Awesome Fortizar',
     ]);
 
-    // 3) The admin accepts the suggestion on the manage page.
+    // 3) The admin reviews the suggestion on the manage page, then accepts it.
     $manage = deviceVisit($device, route('manage.manual_locations', absolute: false));
     $manage->assertNoSmoke();
     $manage->waitForText('Manual Locations');
@@ -67,6 +52,7 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     // The radio option's label is "{system|'?'} - {name}"; no system is seeded, so match the
     // exact label text (pest-browser click targets an element by its exact text).
     $manage->waitForText('? - Some Awesome Fortizar');
+    snap($manage, "manual-locations-lifecycle-2-review-{$device}");
     $manage->click('? - Some Awesome Fortizar');                  // select the radio option
     $manage->click('Save');                                       // accept it
 
@@ -75,6 +61,5 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     $resolved->assertNoSmoke();
     $resolved->waitForText('Character Assets');
     assetTextVisible($resolved, 'Some Awesome Fortizar');
-
-    snap($resolved, "manual-locations-lifecycle-{$device}");
+    snap($resolved, "manual-locations-lifecycle-3-resolved-{$device}");
 })->with(['desktop', 'iphone']);
