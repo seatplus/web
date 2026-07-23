@@ -38,12 +38,13 @@ it('walks a missing location from unknown → add → accepted → shown in asse
     snap($page, "manual-locations-lifecycle-1-unknown-{$device}");
 
     // 2) Clicking "Add location information" opens the submission modal (teleported to
-    //    #destination). The button lives in the location header inside the nested-scroll list,
-    //    which click() won't auto-scroll to, so fire its native click (Vue's @click handler
-    //    still runs). Merely opening the modal is safe to screenshot — the solar-system field
-    //    only hits ESI once you type. No assertNoSmoke here: that field's token probe can log
-    //    under the test's faked queue/ESI, which is unrelated to this view.
-    $page->assertScript("(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Add location information'); if (! b) return false; b.click(); return true; })()");
+    //    #destination). Confirm the header button rendered (and let the list scroll), then fire
+    //    its native click — the button sits in the assets list's nested scroll container, which
+    //    click() won't auto-scroll to; a native .click() still runs Vue's @click handler.
+    //    Merely opening the modal is safe to screenshot (its solar-system field only hits ESI on
+    //    type). No assertNoSmoke here: that field's token probe can log under the faked queue/ESI.
+    assetTextVisible($page, 'Add location information');
+    $page->script("[...document.querySelectorAll('button')].find(b => b.textContent.includes('Add location information'))?.click()");
     $page->waitForText("Add location information for unknown structure ({$unknownId})");
     snap($page, "manual-locations-lifecycle-2-add-{$device}");
 
