@@ -23,6 +23,12 @@ export default {
     },
     computed: {
         name() {
+            // An already-resolved name (a location summary carries `name` directly) wins, so a
+            // known location renders immediately without an on-demand fetch.
+            if (this.location.name) {
+                return this.location.name
+            }
+
             return this.location.location != null ? _.get(this.location, 'location.locatable.name') : _.get(this.result, 'name', 'loading ...')
         },
         system() {
@@ -30,7 +36,8 @@ export default {
         }
     },
     created() {
-        if (_.isNull(this.location.location)) {
+        // Only resolve on-demand when there is no known name and no eager relation to read from.
+        if (! this.location.name && this.location.location == null) {
             getJson(getLocation.url(this.location.location_id))
                 .then((data) => {
                     this.result = data

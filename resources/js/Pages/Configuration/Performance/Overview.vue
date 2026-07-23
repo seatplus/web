@@ -2,12 +2,17 @@
   <div class="space-y-3">
     <PageHeader :page-title="pageTitle" />
 
-    <CompleteInertiaLoaderHelper v-slot="{data}">
+    <Deferred data="data">
+      <template #fallback>
+        <Card>
+          <div class="h-64 animate-pulse rounded bg-gray-100" />
+        </Card>
+      </template>
+
       <Card>
         <Line :data="getDate(data)" :options="options" />
       </Card>
-
-    </CompleteInertiaLoaderHelper>
+    </Deferred>
 
 
   </div>
@@ -16,7 +21,7 @@
 <script setup>
 
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
-import CompleteInertiaLoaderHelper from "@/Shared/CompleteInertiaLoaderHelper.vue";
+import { Deferred } from "@inertiajs/vue3";
 import {groupBy, map} from 'lodash'
 import {Line} from 'vue-chartjs'
 import {
@@ -36,6 +41,14 @@ import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 const pageTitle = 'Server Performance'
+
+defineProps({
+  // Deferred prop: the full BatchStatistic series charted below.
+  data: {
+    type: Array,
+    default: () => [],
+  },
+})
 
 ChartJS.register(
     CategoryScale,

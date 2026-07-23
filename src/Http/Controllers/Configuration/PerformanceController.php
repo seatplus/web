@@ -16,7 +16,7 @@ class PerformanceController extends Controller
                 fn () => BatchStatistic::query()
                     ->whereNotNull('finished_at')
                     ->orderBy('finished_at', 'desc')
-                    ->paginate(50)
+                    ->get()
             ),
         ]);
     }

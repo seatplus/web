@@ -28,7 +28,6 @@ namespace Seatplus\Web\Http\Controllers\Shared;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -51,9 +50,9 @@ class ManualLocationController extends Controller
         ]);
     }
 
-    public function getSuggestions(): LengthAwarePaginator
+    private function getSuggestions(): Collection
     {
-
+        // Prune suggestions whose location has since been resolved to a real structure/station.
         $location_subquery = Location::query()
             ->whereHasMorph('locatable', [Structure::class, Station::class])
             ->select('location_id');
@@ -64,7 +63,7 @@ class ManualLocationController extends Controller
 
         return ManualLocation::with('system', 'user.mainCharacter', 'user.characters')
             ->orderByDesc('location_id')
-            ->paginate();
+            ->get();
     }
 
     public function acceptSuggestion(Request $request): RedirectResponse
@@ -81,7 +80,9 @@ class ManualLocationController extends Controller
         Location::updateOrCreate([
             'location_id' => $suggestion->location_id,
         ], [
-            'locatable_id' => $suggestion->location_id,
+            // Point the polymorphic relation at the ManualLocation's own key so `locatable`
+            // resolves (its PK is the auto `id`, not the location_id).
+            'locatable_id' => $suggestion->getKey(),
             'locatable_type' => ManualLocation::class,
         ]);
 
