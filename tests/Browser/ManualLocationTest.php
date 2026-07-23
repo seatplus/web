@@ -38,10 +38,12 @@ it('walks a missing location from unknown → add → accepted → shown in asse
     snap($page, "manual-locations-lifecycle-1-unknown-{$device}");
 
     // 2) Clicking "Add location information" opens the submission modal (teleported to
-    //    #destination). Merely opening it is safe to screenshot — the solar-system field only
-    //    hits ESI once you type. No assertNoSmoke here: that field's token probe can log under
-    //    the test's faked queue/ESI, which is unrelated to this view.
-    $page->click('Add location information');
+    //    #destination). The button lives in the location header inside the nested-scroll list,
+    //    which click() won't auto-scroll to, so fire its native click (Vue's @click handler
+    //    still runs). Merely opening the modal is safe to screenshot — the solar-system field
+    //    only hits ESI once you type. No assertNoSmoke here: that field's token probe can log
+    //    under the test's faked queue/ESI, which is unrelated to this view.
+    $page->assertScript("(() => { const b = [...document.querySelectorAll('button')].find(x => x.textContent.trim() === 'Add location information'); if (! b) return false; b.click(); return true; })()");
     $page->waitForText("Add location information for unknown structure ({$unknownId})");
     snap($page, "manual-locations-lifecycle-2-add-{$device}");
 
