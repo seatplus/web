@@ -120,121 +120,89 @@
   </div>
 </template>
 
-<script>
-
+<script setup>
+import { computed, onMounted, ref } from "vue";
+import { Link, usePage } from '@inertiajs/vue3';
 import CharacterScopes from "./CharacterScopes.vue"
 import CorporationScopes from "./CorporationScopes.vue"
 import EveImage from "@/Shared/EveImage.vue"
 import EsiMultiselect from "@/Shared/Components/EsiMultiselect.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.vue";
-import { Link, router } from '@inertiajs/vue3';
 import { create as createScopes, deleteSsoScopeSetting } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/SsoSettings/SsoSettingsController";
 
-export default {
-    name: "ScopeSettings",
-    components: {
-        EsiMultiselect,
-        RadioListWithDescription,
-        PageHeader, EveImage, CorporationScopes, CharacterScopes, Link},
-    props: {
-        available_scopes: {
-            type: Object,
-            required: true
-        },
-        entity: {
-            type: Object,
-            required: false,
-            default: function () {return {}}
-        },
-        options: {
-            type: Array,
-            required: true
-        }
+const props = defineProps({
+    available_scopes: {
+        type: Object,
+        required: true
     },
-    data() {
-        return {
-            selectedEntities: [],
-            selected_scopes: _.toArray(_.get(this.entity, 'selected_scopes', {})),
-            creationMode: this.$page.props.activeSidebarElement === 'view.create.scopes',
-            selectedModula: 0
-        }
+    entity: {
+        type: Object,
+        required: false,
+        default: function () {return {}}
     },
-    computed: {
-        object() {
-
-            if(_.isUndefined(this.entity.morphable))
-                return {}
-
-            const object =  {
-                name: this.entity.morphable.name,
-                id: this.entity.morphable_id
-            }
-
-            this.entity.morphable.corporation_id
-                ? object.corporation_id = this.entity.morphable.corporation_id
-                : object.alliance_id = this.entity.morphable.alliance_id
-
-            return object
-        },
-        createScopesUrl() {
-            return createScopes.url()
-        },
-        deleteScopesUrl() {
-            return deleteSsoScopeSetting.url(this.object.id)
-        },
-        type() {
-            return this.options[this.selectedModula].title
-        },
-        isGlobal() {
-            return this.options[this.selectedModula].title === 'global';
-        },
-        selectedScopesError() {
-            return _.get(this.$page, 'props.errors.selectedScopes[0]')
-        },
-        selectedEntitiesError() {
-            return _.get(this.$page, 'props.errors.selectedEntities[0]')
-        },
-        scopesAsString() {
-            return _.toString(this.selected_scopes)
-        },
-        pageTitle() {
-
-            let mode = this.creationMode ? 'Create' : 'Edit'
-
-            return `${mode} Scope Settings`
-        },
-    },
-    mounted() {
-        if (_.isUndefined(this.entity.selected_scopes)) {
-            return
-        }
-
-        this.selectedEntities = [{
-            id: this.entity.morphable_id,
-            type: this.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
-        }]
-    },
-    created: function () {
-        this.selectedModula = this.creationMode ? 0 : _.findIndex(this.options, {'title': this.entity?.type});
-    },
-    methods: {
-        post() {
-
-            const url = createScopes.url();
-
-            const data = {
-                selectedScopes: this.selectedScopes,
-                selectedEntities: this.selectedEntities != null ? this.selectedEntities : {
-                    id: 'id',
-                    category: 'category',
-                }
-            }
-
-            return router.post(url, data)
-        }
+    options: {
+        type: Array,
+        required: true
     }
-}
+});
+
+const page = usePage()
+
+const selectedEntities = ref([])
+const selected_scopes = ref(_.toArray(_.get(props.entity, 'selected_scopes', {})))
+const creationMode = page.props.activeSidebarElement === 'view.create.scopes'
+const selectedModula = ref(0)
+
+const object = computed(() => {
+
+    if(_.isUndefined(props.entity.morphable))
+        return {}
+
+    const object =  {
+        name: props.entity.morphable.name,
+        id: props.entity.morphable_id
+    }
+
+    props.entity.morphable.corporation_id
+        ? object.corporation_id = props.entity.morphable.corporation_id
+        : object.alliance_id = props.entity.morphable.alliance_id
+
+    return object
+})
+
+const createScopesUrl = computed(() => createScopes.url())
+
+const deleteScopesUrl = computed(() => deleteSsoScopeSetting.url(object.value.id))
+
+const type = computed(() => props.options[selectedModula.value].title)
+
+const isGlobal = computed(() => props.options[selectedModula.value].title === 'global')
+
+const selectedScopesError = computed(() => _.get(page, 'props.errors.selectedScopes[0]'))
+
+const selectedEntitiesError = computed(() => _.get(page, 'props.errors.selectedEntities[0]'))
+
+const scopesAsString = computed(() => _.toString(selected_scopes.value))
+
+const pageTitle = computed(() => {
+    let mode = creationMode ? 'Create' : 'Edit'
+
+    return `${mode} Scope Settings`
+})
+
+selectedModula.value = creationMode ? 0 : _.findIndex(props.options, {'title': props.entity?.type});
+
+onMounted(() => {
+    if (_.isUndefined(props.entity.selected_scopes)) {
+        return
+    }
+
+    selectedEntities.value = [{
+        id: props.entity.morphable_id,
+        type: props.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
+    }]
+})
 </script>
 
 <style scoped>

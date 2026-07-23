@@ -48,62 +48,47 @@
   </Settings>
 </template>
 
-<script>
-    import Pagination from "@/Shared/Pagination.vue"
-    import { router } from '@inertiajs/vue3'
-    import Settings from "./Settings.vue"
-    import UserListElement from "./UserListElement.vue";
-    import AppHead from "@/Shared/AppHead.vue";
+<script setup>
+import { ref, watch } from "vue";
+import { router } from '@inertiajs/vue3'
+import Pagination from "@/Shared/Pagination.vue"
+import Settings from "./Settings.vue"
+import UserListElement from "./UserListElement.vue";
+import AppHead from "@/Shared/AppHead.vue";
 
-    export default {
-        name: "UserList",
-        components: {AppHead, UserListElement, Settings, Pagination},
-        props: {
-            users: {
-                type: Object,
-                required: true
-            }
-        },
-        data() {
-            return {
-                search: this.getSearchParams(),
-            }
-        },
-        watch: {
-            search() {
-
-                // Rebuild the current URL's query string (replacing Ziggy's route().params +
-                // route(current)) and re-visit the same page with the updated search/page.
-                const params = new URLSearchParams(window.location.search)
-
-                if(params.has('search_param') && this.search === '')
-                    params.delete('search_param')
-
-                if(this.search)
-                    params.set('search_param', this.search)
-
-                params.set('page', '1')
-
-                router.visit(`${window.location.pathname}?${params.toString()}`, {
-                    preserveScroll: true,
-                    preserveState: true,
-                    only: ['users'],
-                })
-            }
-        },
-        methods: {
-            characterWithoutMain(user) {
-
-                return _.reject(user.characters, function (character) {
-                    const {mainCharacter} = user
-                    return _.isEqual(character.character_id, mainCharacter.character_id)
-                })
-            },
-            getSearchParams() {
-                return new URLSearchParams(window.location.search).get('search_param') ?? ''
-            }
-        }
+defineProps({
+    users: {
+        type: Object,
+        required: true
     }
+});
+
+function getSearchParams() {
+    return new URLSearchParams(window.location.search).get('search_param') ?? ''
+}
+
+const search = ref(getSearchParams())
+
+watch(search, () => {
+
+    // Rebuild the current URL's query string (replacing Ziggy's route().params +
+    // route(current)) and re-visit the same page with the updated search/page.
+    const params = new URLSearchParams(window.location.search)
+
+    if(params.has('search_param') && search.value === '')
+        params.delete('search_param')
+
+    if(search.value)
+        params.set('search_param', search.value)
+
+    params.set('page', '1')
+
+    router.visit(`${window.location.pathname}?${params.toString()}`, {
+        preserveScroll: true,
+        preserveState: true,
+        only: ['users'],
+    })
+})
 </script>
 
 <style scoped>

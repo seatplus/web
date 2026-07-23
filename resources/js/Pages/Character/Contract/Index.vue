@@ -22,37 +22,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 import ContractComponent from "@/Shared/Components/Contracts/ContractComponent.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 
-export default {
-    name: "Index",
-    components: {
-      DispatchUpdateButton,
-      RequiredScopesWarning,
-        ContractComponent,
-        EntitySelectionButton,
-        PageHeader},
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        characters: {
-            required: true,
-            type: Array
-        }
+defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     },
-  data() {
-      return {
-        pageTitle: 'Character Contracts'
-      }
-  }
-}
+    characters: {
+        required: true,
+        type: Array
+    }
+});
+
+const pageTitle = 'Character Contracts'
 </script>
 
 <style scoped>

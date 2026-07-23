@@ -33,35 +33,28 @@
   </li>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import { Link } from '@inertiajs/vue3';
 import { impersonate } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/SeatPlusController";
-export default {
-    name: "UserListElement",
-    components: {EntityBlock, Link},
-    props: {
-        user: {
-            type: Object,
-            required: true
-        },
-        index: {
-            type: Number,
-            required: true
-        }
+
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true
     },
-    computed: {
-        impersonateUrl() {
-            return impersonate.url(this.user.id)
-        },
-        characters() {
-            return _.reject(this.user.characters, (character)  => _.isEqual(character.character_id, this.user.mainCharacter.character_id))
-        },
-        characterNames() {
-            return _.join(_.map(this.characters, (character) => character.name), ', ')
-        }
+    index: {
+        type: Number,
+        required: true
     }
-}
+});
+
+const impersonateUrl = computed(() => impersonate.url(props.user.id))
+
+const characters = computed(() => _.reject(props.user.characters, (character) => _.isEqual(character.character_id, props.user.mainCharacter.character_id)))
+
+const characterNames = computed(() => _.join(_.map(characters.value, (character) => character.name), ', '))
 </script>
 
 <style scoped>

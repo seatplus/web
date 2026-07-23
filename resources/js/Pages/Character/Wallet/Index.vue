@@ -27,70 +27,53 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import {computed, ref, watch} from "vue";
+import { router } from "@inertiajs/vue3";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import WalletComponent from "@/Shared/Components/Wallet/WalletComponent.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import WalletFilter from "@/Shared/Components/Wallet/WalletFilter.vue";
-import { router } from "@inertiajs/vue3";
 
-export default {
-    name: "Index",
-    components: {
-        WalletFilter,
-      RequiredScopesWarning,
-      DispatchUpdateButton,
-        EntitySelectionButton,
-        WalletComponent,
-        PageHeader
+const props = defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     },
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        character_ids: {
-            required: true,
-            type: Array
-        },
-        // Available ref_type options for the filter (WalletsController::index) —
-        // passed as a prop so the filter needs no autosuggest endpoint (no axios/Ziggy).
-        ref_types: {
-            required: false,
-            type: Array,
-            default: () => []
-        }
+    character_ids: {
+        required: true,
+        type: Array
     },
-    data() {
-        return {
-            pageTitle: 'Character Wallets',
-            filter: [] // selected ref_type strings
-        }
-    },
-    computed: {
-        // Scroll-prop keys for every character card (WalletsController::index).
-        journalKeys() {
-            return this.character_ids.map((id) => `journal_${id}`)
-        }
-    },
-    watch: {
-        // The ref_type filter is a page-level query param: reload only the journal
-        // scroll props so <InfiniteScroll> resets to the filtered first page.
-        filter(newValue) {
-            router.reload({
-                only: this.journalKeys,
-                // reset: without it InfiniteScroll *merges* the filtered page onto the
-                // existing rows instead of replacing them, so the filter looks ignored.
-                reset: this.journalKeys,
-                data: { ref_type: newValue },
-                preserveState: true,
-                preserveScroll: true,
-            })
-        }
+    // Available ref_type options for the filter (WalletsController::index) —
+    // passed as a prop so the filter needs no autosuggest endpoint (no axios/Ziggy).
+    ref_types: {
+        required: false,
+        type: Array,
+        default: () => []
     }
-}
+});
+
+const pageTitle = 'Character Wallets'
+const filter = ref([]) // selected ref_type strings
+
+// Scroll-prop keys for every character card (WalletsController::index).
+const journalKeys = computed(() => props.character_ids.map((id) => `journal_${id}`))
+
+// The ref_type filter is a page-level query param: reload only the journal
+// scroll props so <InfiniteScroll> resets to the filtered first page.
+watch(filter, (newValue) => {
+    router.reload({
+        only: journalKeys.value,
+        // reset: without it InfiniteScroll *merges* the filtered page onto the
+        // existing rows instead of replacing them, so the filter looks ignored.
+        reset: journalKeys.value,
+        data: { ref_type: newValue },
+        preserveState: true,
+        preserveScroll: true,
+    })
+})
 </script>
 
 <style scoped>

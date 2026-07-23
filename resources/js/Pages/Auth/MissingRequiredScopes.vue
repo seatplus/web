@@ -81,20 +81,23 @@
 </template>
 
 <script>
-    import EveImage from "@/Shared/EveImage.vue"
-    import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
-    import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
-    import AppHead from "@/Shared/AppHead.vue";
-    export default {
-        name: "MissingRequiredScopes",
-        components: {AppHead, ImpersonatingBanner, EveImage},
-        layout: (h, page) => h(EmptyLayout, () => page),
-        props: {
-            characters: {
-                required: true
-            }
-        }
+import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
+
+export default {
+    layout: EmptyLayout,
+}
+</script>
+
+<script setup>
+import EveImage from "@/Shared/EveImage.vue"
+import ImpersonatingBanner from "@/Shared/SidebarLayout/ImpersonatingBanner.vue";
+import AppHead from "@/Shared/AppHead.vue";
+
+defineProps({
+    characters: {
+        required: true
     }
+});
 </script>
 
 <style scoped>

@@ -34,43 +34,36 @@
 </template>
 
 <script>
+export default {
+    layout: null,
+}
+</script>
+
+<script setup>
+import {ref} from "vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 import MultiColumnLayout from "@/Shared/SidebarLayout/MultiColumnLayout.vue";
-import {ref} from "vue";
 import MailRepresentation from "@/Shared/Components/Mails/MailRepresentation.vue";
 import DesktopMailList from "@/Shared/Components/Mails/DesktopMailList.vue";
 import MobileMailList from "@/Shared/Components/Mails/MobileMailList.vue";
-export default {
-    name: "Index",
-    components: {
-        MobileMailList,
-        DesktopMailList,
-        MailRepresentation,
-        MultiColumnLayout, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
-    layout: null,
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        characterIds: {
-            required: true,
-            type: Array
-        }
+
+defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     },
-    setup() {
-
-        const selectedId = ref(null)
-
-        return {
-            pageTitle: 'Character Mails',
-            selectedId
-        }
+    characterIds: {
+        required: true,
+        type: Array
     }
-}
+});
+
+const selectedId = ref(null)
+
+const pageTitle = 'Character Mails'
 </script>
 
 <style scoped>
