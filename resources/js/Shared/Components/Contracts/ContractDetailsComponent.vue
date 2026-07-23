@@ -30,7 +30,7 @@
               <template #avatar>
                 <span class="inline-block relative">
                   <EveImage
-                          v-if="item.type"
+                    v-if="item.type"
                     :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'"
                     :object="item.type"
                     :size="128"
@@ -118,7 +118,7 @@
               <template #avatar>
                 <span class="inline-block relative">
                   <EveImage
-                          v-if="item.type"
+                    v-if="item.type"
                     :tailwind_class="'h-12 w-12 rounded-full text-white shadow-solid bg-white'"
                     :object="item.type"
                     :size="128"

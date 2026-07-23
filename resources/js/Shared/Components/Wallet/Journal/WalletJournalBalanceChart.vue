@@ -12,7 +12,10 @@
       </div>
     </template>
     <div class="relative max-h-48 overflow-y-auto">
-      <Line :data="chartData" :options="chartOptions" />
+      <Line
+        :data="chartData"
+        :options="chartOptions"
+      />
     </div>
   </CardWithHeader>
 </template>

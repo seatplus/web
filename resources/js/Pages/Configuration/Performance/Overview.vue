@@ -10,11 +10,12 @@
       </template>
 
       <Card>
-        <Line :data="getDate(data)" :options="options" />
+        <Line
+          :data="getDate(data)"
+          :options="options"
+        />
       </Card>
     </Deferred>
-
-
   </div>
 </template>
 

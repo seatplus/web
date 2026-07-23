@@ -5,7 +5,7 @@
       :items="items"
     />
     <WideAssetListComponent
-        v-else
+      v-else
       :items="items"
     />
   </div>

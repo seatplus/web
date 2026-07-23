@@ -1,6 +1,9 @@
 <template>
   <div class="space-y-3">
-    <PageHeader :page-title="pageTitle" :breadcrumbs="breadcrumbs" />
+    <PageHeader
+      :page-title="pageTitle"
+      :breadcrumbs="breadcrumbs"
+    />
 
     <ContractDetailsComponent
       v-if="contract.items.length > 0"

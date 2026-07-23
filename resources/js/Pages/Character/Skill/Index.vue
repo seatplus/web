@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-3">
-
     <RequiredScopesWarning :dispatch-transfer-object="dispatchTransferObject" />
 
     <PageHeader :page-title="pageTitle">

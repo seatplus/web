@@ -19,7 +19,11 @@ const icon = computed(() => {
 
 <template>
   <Head :title="appTitle ? `${appTitle} - Seatplus` : 'Seatplus'">
-    <link rel="icon" type="image/svg+xml" :href="icon">
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      :href="icon"
+    >
     <slot />
   </Head>
 </template>

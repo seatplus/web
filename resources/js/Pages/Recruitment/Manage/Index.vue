@@ -26,7 +26,7 @@
             label="Corporation"
             :show-label="false"
             placeholder="Search any corporation"
-            @selectedObject="selection => openForm.corporation = selection"
+            @selected-object="selection => openForm.corporation = selection"
           />
           <div
             v-if="openForm.errors.corporation_id"
