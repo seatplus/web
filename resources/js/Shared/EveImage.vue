@@ -24,102 +24,92 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { computed } from "vue";
 
-    export default {
-        name: "EveImage",
-        props: {
-            object: {
-                type: Object,
-                required: true
-            },
-            size: {
-                type: Number,
-                default: 32
-            },
-            tailwind_class: {
-                required: false,
-                default: "h-12 w-12 rounded-full"
-            },
-            showName: {
-                type: Boolean,
-                required: false,
-                default: false
-            },
-            bpo: {
-                type: Boolean,
-                required: false,
-                default: false
-            }
-        },
-        setup(props) {
-            const resourceId = computed(() => {
-                return _.chain(['type_id', 'character_id', 'corporation_id', 'alliance_id'])
-                    .map(resource => _.get(props.object, resource))
-                    .filter()
-                    .head()
-                    .value()
-            })
-
-            const resourceType = computed(() => {
-                let array = {
-                    'character_id': 'characters',
-                    'corporation_id': 'corporations',
-                    'alliance_id': 'alliances',
-                    'type_id': 'types',
-                }
-
-                return _.chain(array)
-                    .filter( (type, id) => id in props.object )
-                    .map((type) => type)
-                    .head()
-                    .value();
-            })
-
-            // Resolved synchronously — no per-image HTTP roundtrip. characters/corps/alliances are
-            // deterministic; types carry their variation (render/bp/icon) from the backend
-            // (TypeResource.image_variant, derived from the inventory category), defaulting to icon.
-            const resourceVariant = computed(() => {
-                if (!props.object || typeof props.object !== 'object')
-                    return null
-
-                if ('character_id' in props.object)
-                    return 'portrait'
-
-                if ('corporation_id' in props.object || 'alliance_id' in props.object)
-                    return 'logo'
-
-                if (resourceType.value !== 'types')
-                    return null
-
-                return props.bpo ? 'bp' : (props.object.image_variant ?? 'icon')
-            })
-
-            const resourceSize = computed(() => {
-
-                function isRetina() {
-                    return (window.devicePixelRatio > 1 ||	(window.matchMedia && window.matchMedia("(-webkit-min-device-pixel-ratio: 1.5),(-moz-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)").matches));
-                }
-
-                let size = props.size < 32 ? 32 : props.size
-
-                return isRetina() ? size*2 : size;
-            })
-
-            const imageUrl = computed(() => {
-                return `https://images.evetech.net/${resourceType.value}/${resourceId.value}/${resourceVariant.value}?size=${resourceSize.value}&tenant=tranquility`
-            })
-
-            const isReady = computed(() => Boolean(resourceType.value && resourceId.value && resourceVariant.value))
-
-            return {
-                imageUrl,
-                isReady,
-            }
-
-        },
+const props = defineProps({
+    object: {
+        type: Object,
+        required: true
+    },
+    size: {
+        type: Number,
+        default: 32
+    },
+    tailwind_class: {
+        required: false,
+        default: "h-12 w-12 rounded-full"
+    },
+    showName: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    bpo: {
+        type: Boolean,
+        required: false,
+        default: false
     }
+});
+
+const resourceId = computed(() => {
+    return _.chain(['type_id', 'character_id', 'corporation_id', 'alliance_id'])
+        .map(resource => _.get(props.object, resource))
+        .filter()
+        .head()
+        .value()
+})
+
+const resourceType = computed(() => {
+    let array = {
+        'character_id': 'characters',
+        'corporation_id': 'corporations',
+        'alliance_id': 'alliances',
+        'type_id': 'types',
+    }
+
+    return _.chain(array)
+        .filter( (type, id) => id in props.object )
+        .map((type) => type)
+        .head()
+        .value();
+})
+
+// Resolved synchronously — no per-image HTTP roundtrip. characters/corps/alliances are
+// deterministic; types carry their variation (render/bp/icon) from the backend
+// (TypeResource.image_variant, derived from the inventory category), defaulting to icon.
+const resourceVariant = computed(() => {
+    if (!props.object || typeof props.object !== 'object')
+        return null
+
+    if ('character_id' in props.object)
+        return 'portrait'
+
+    if ('corporation_id' in props.object || 'alliance_id' in props.object)
+        return 'logo'
+
+    if (resourceType.value !== 'types')
+        return null
+
+    return props.bpo ? 'bp' : (props.object.image_variant ?? 'icon')
+})
+
+const resourceSize = computed(() => {
+
+    function isRetina() {
+        return (window.devicePixelRatio > 1 ||	(window.matchMedia && window.matchMedia("(-webkit-min-device-pixel-ratio: 1.5),(-moz-min-device-pixel-ratio: 1.5),(min-device-pixel-ratio: 1.5)").matches));
+    }
+
+    let size = props.size < 32 ? 32 : props.size
+
+    return isRetina() ? size*2 : size;
+})
+
+const imageUrl = computed(() => {
+    return `https://images.evetech.net/${resourceType.value}/${resourceId.value}/${resourceVariant.value}?size=${resourceSize.value}&tenant=tranquility`
+})
+
+const isReady = computed(() => Boolean(resourceType.value && resourceId.value && resourceVariant.value))
 </script>
 
 <style scoped>

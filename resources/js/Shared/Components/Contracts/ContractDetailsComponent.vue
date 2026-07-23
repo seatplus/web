@@ -198,58 +198,50 @@
 </template>
 
 <script>
-import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
-import {prefix} from "metric-prefix";
-import WideListElement from "../../WideListElement.vue";
-import EveImage from "@/Shared/EveImage.vue"
-import WideLists from "../../WideLists.vue";
-import AssigneeComponent from "./Cells/AssigneeComponent.vue";
 import {useValidateObject} from "@/Functions/useValidateObject";
-import IssuerComponent from "./Cells/IssuerComponent.vue";
-import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
-import DetailsComponent from "./Cells/DetailsComponent.vue";
-import Card from "../../Layout/Cards/Card.vue";
 
 const schema = {
     items: value => _.isArray(value),
 }
 
 schema.items.required = true
+</script>
 
-export default {
-    name: "ContractDetailsComponent",
-    components: {
-        Card,
-        DetailsComponent,
-        ContractTypeComponent,
-        IssuerComponent, AssigneeComponent, WideLists, EveImage, WideListElement, CardWithHeader},
-    props: {
-        contract: {
-            required: true,
-            type: Object,
-            validator: value => useValidateObject(value, schema)
-        }
-    },
-    computed: {
-        requested_items() {
-            return _.filter(this.contract.items, 'is_included')
-        },
-        included_items() {
-            return _.filter(this.contract.items, !'is_included')
-        }
-    },
-    methods: {
-        getMetricPrefix(numeric_value) {
+<script setup>
+import { computed } from "vue";
+import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
+import {prefix} from "metric-prefix";
+import WideListElement from "../../WideListElement.vue";
+import EveImage from "@/Shared/EveImage.vue"
+import WideLists from "../../WideLists.vue";
+import AssigneeComponent from "./Cells/AssigneeComponent.vue";
+import IssuerComponent from "./Cells/IssuerComponent.vue";
+import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
+import DetailsComponent from "./Cells/DetailsComponent.vue";
+import Card from "../../Layout/Cards/Card.vue";
 
-            return prefix(numeric_value, {precision: 3, unit: 'm³'})
-        },
-        isBlueprint(item) {
-            return _.get(item, 'type.category.name') === 'Blueprint'
-        },
-        isBPO(item) {
-            return this.isBlueprint(item) && item.raw_quantity === -1
-        }
+const props = defineProps({
+    contract: {
+        required: true,
+        type: Object,
+        validator: value => useValidateObject(value, schema)
     }
+});
+
+const requested_items = computed(() => _.filter(props.contract.items, 'is_included'))
+
+const included_items = computed(() => _.filter(props.contract.items, !'is_included'))
+
+function getMetricPrefix(numeric_value) {
+    return prefix(numeric_value, {precision: 3, unit: 'm³'})
+}
+
+function isBlueprint(item) {
+    return _.get(item, 'type.category.name') === 'Blueprint'
+}
+
+function isBPO(item) {
+    return isBlueprint(item) && item.raw_quantity === -1
 }
 </script>
 

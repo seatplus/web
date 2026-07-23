@@ -14,28 +14,25 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Skills from "./Skills.vue";
 import SkillQueue from "./SkillQueue.vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
-export default {
-    name: "SkillsComponent",
-    components: {EntityByIdBlock, SkillQueue, Skills},
-    props: {
-        characterId: {
-            type: Number,
-            required: true
-        },
-        skills: {
-            type: Array,
-            default: () => []
-        },
-        skillQueue: {
-            type: Array,
-            default: () => []
-        }
+
+defineProps({
+    characterId: {
+        type: Number,
+        required: true
+    },
+    skills: {
+        type: Array,
+        default: () => []
+    },
+    skillQueue: {
+        type: Array,
+        default: () => []
     }
-}
+});
 </script>
 
 <style scoped>

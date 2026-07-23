@@ -40,7 +40,7 @@
   </StickyHeaderTableRow>
 </template>
 
-<script>
+<script setup>
 import StickyHeaderTableRow from "@/Shared/Layout/Table/StickyHeaderTableRow.vue";
 import StickyHeaderCell from "@/Shared/Layout/Table/StickyHeaderCell.vue";
 import ExpandContractComponent from "./ExpandContractComponent.vue";
@@ -49,36 +49,24 @@ import AssigneeComponent from "./Cells/AssigneeComponent.vue";
 import ContractTypeComponent from "./Cells/ContractTypeComponent.vue";
 import DetailsComponent from "./Cells/DetailsComponent.vue";
 
-export default {
-    name: "ContractRowComponent",
-    components: {
-        StickyHeaderTableRow,
-        StickyHeaderCell,
-        ExpandContractComponent,
-        IssuerComponent,
-        AssigneeComponent,
-        ContractTypeComponent,
-        DetailsComponent,
+defineProps({
+    contract: {
+        required: true,
+        type: Object,
     },
-    props: {
-        contract: {
-            required: true,
-            type: Object,
-        },
-        // The StickyHeaderTable slot's column definitions + count, threaded through so
-        // the cells lay out identically whether fed by InfiniteScroll or the helper.
-        columns: {
-            required: true,
-            type: Array,
-        },
-        countColumns: {
-            required: true,
-            type: Number,
-        },
-        characterId: {
-            required: true,
-            type: Number,
-        },
+    // The StickyHeaderTable slot's column definitions + count, threaded through so
+    // the cells lay out identically whether fed by InfiniteScroll or the helper.
+    columns: {
+        required: true,
+        type: Array,
     },
-}
+    countColumns: {
+        required: true,
+        type: Number,
+    },
+    characterId: {
+        required: true,
+        type: Number,
+    },
+});
 </script>

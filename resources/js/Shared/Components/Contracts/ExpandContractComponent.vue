@@ -27,7 +27,7 @@
     </WithDismissButtonModal>
   </teleport>
 </template>
-<script>
+<script setup>
 import {ArrowsPointingOutIcon} from "@heroicons/vue/20/solid";
 import {ref} from "vue";
 import WithDismissButtonModal from "@/Shared/Modals/WithDismissButtonModal.vue";
@@ -36,46 +36,32 @@ import ContractDetailsComponent from "./ContractDetailsComponent.vue";
 import { getJson } from "@/Functions/http";
 import { getContractDetails } from "@/actions/Seatplus/Web/Http/Controllers/Character/ContractsController";
 
-export default {
-    name: "ExpandContractComponent",
-    components: {
-        ContractDetailsComponent,
-        WithDismissButtonModal, ArrowsPointingOutIcon, DialogTitle},
-    props: {
-        contract: {
-            required: true,
-            type: Object
-        },
-        characterId: {
-            required: true,
-            type: Number
-        }
+const props = defineProps({
+    contract: {
+        required: true,
+        type: Object
     },
-    setup(props) {
-        const openModal = ref(false)
-        const contractDetails = ref()
-
-        const url = getContractDetails.url({character_id: props.characterId, contract_id: props.contract.contract_id})
-
-        const fetchDetails = async () => {
-            const details = await getJson(url, {'X-Modal': true})
-            contractDetails.value = details[0]
-        }
-
-        const open = () => {
-            if(!contractDetails.value) {
-                fetchDetails()
-            }
-            openModal.value = true
-        }
-
-        return {
-            openModal,
-            open,
-            contractDetails,
-            url
-        }
+    characterId: {
+        required: true,
+        type: Number
     }
+});
+
+const openModal = ref(false)
+const contractDetails = ref()
+
+const url = getContractDetails.url({character_id: props.characterId, contract_id: props.contract.contract_id})
+
+const fetchDetails = async () => {
+    const details = await getJson(url, {'X-Modal': true})
+    contractDetails.value = details[0]
+}
+
+const open = () => {
+    if(!contractDetails.value) {
+        fetchDetails()
+    }
+    openModal.value = true
 }
 </script>
 

@@ -7,17 +7,14 @@
   </div>
 </template>
 
-<script>
-export default {
-    name: "StickyHeaderTableRow",
-    props: {
-        numberColumns: {
-            type: Number,
-            required: true,
-            default: 1
-        }
+<script setup>
+defineProps({
+    numberColumns: {
+        type: Number,
+        required: true,
+        default: 1
     }
-}
+});
 </script>
 
 <style scoped>
