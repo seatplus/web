@@ -23,26 +23,21 @@
   </span>
 </template>
 
-<script>
-export default {
-    name: "DismissibleButton",
-    props: {
-        id: {
-            type: Number,
-            required: true
-        },
-        name: {
-            type: String,
-            required: true
-        },
+<script setup>
+const props = defineProps({
+    id: {
+        type: Number,
+        required: true
     },
-    emits: ['remove'],
-    setup(props, { emit }) {
-        function removeEntry() {
-            emit('remove', props.id)
-        }
+    name: {
+        type: String,
+        required: true
+    },
+});
 
-        return {removeEntry}
-    }
+const emit = defineEmits(['remove']);
+
+function removeEntry() {
+    emit('remove', props.id)
 }
 </script>

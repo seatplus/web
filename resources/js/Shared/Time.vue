@@ -2,7 +2,8 @@
   <span :key="seconds"> {{ getTimeFromNow() }} </span>
 </template>
 
-<script>
+<script setup>
+import { nextTick, ref } from "vue"
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import relativeTime from "dayjs/plugin/relativeTime"
@@ -10,37 +11,27 @@ import relativeTime from "dayjs/plugin/relativeTime"
 dayjs.extend(customParseFormat);
 dayjs.extend(relativeTime)
 
-export default {
-    name: "Time",
-    props: {
-        timestamp: {
-            type: String,
-            required: true
-        },
-        format: {
-            type: String,
-            required: false
-        },
+const props = defineProps({
+    timestamp: {
+        type: String,
+        required: true
     },
-    data() {
-        return {
-            seconds: 0
-        }
+    format: {
+        type: String,
+        required: false
     },
-    created () {
-        this.$nextTick(() => {
+});
 
-            setInterval(()  => {
-                this.seconds += 1
-            }, 1000)
-        })
-    },
-    methods: {
-        getTimeFromNow() {
+const seconds = ref(0)
 
-            return this.format ? dayjs(this.timestamp, this.format).fromNow() : dayjs(this.timestamp).fromNow()
-        }
-    }
+nextTick(() => {
+    setInterval(()  => {
+        seconds.value += 1
+    }, 1000)
+})
+
+function getTimeFromNow() {
+    return props.format ? dayjs(props.timestamp, props.format).fromNow() : dayjs(props.timestamp).fromNow()
 }
 </script>
 

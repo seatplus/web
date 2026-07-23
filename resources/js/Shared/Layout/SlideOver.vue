@@ -84,26 +84,15 @@
   </transition>
 </template>
 
-<script>
-export default {
-  name: "SlideOver",
-  props: {
-      open: Boolean
-  },
-  emits: ['update:open'],
-  data() {
-      return {
-          //open: this.value,
-      }
-  },
-  mounted() {
-      /*this.$eventBus.$on('open-slideOver', () => this.open = true)*/
-  },
-  methods: {
-      flipStatus() {
-          this.$emit('update:open', !this.open)
-      }
-  },
+<script setup>
+const props = defineProps({
+    open: Boolean
+});
+
+const emit = defineEmits(['update:open']);
+
+function flipStatus() {
+    emit('update:open', !props.open)
 }
 </script>
 

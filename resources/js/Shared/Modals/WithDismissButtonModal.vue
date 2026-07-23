@@ -98,43 +98,28 @@
   </TransitionRoot>
 </template>
 
-<script>
+<script setup>
 import { computed } from 'vue'
 import { Dialog, DialogOverlay, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
 
-export default {
-    name: "WithDismissButtonModal",
-    components: {
-        Dialog,
-        DialogOverlay,
-        TransitionChild,
-        TransitionRoot,
-        XMarkIcon,
+const props = defineProps({
+    modelValue: {
+        required: true,
+        type: Boolean
     },
-    props: {
-        modelValue: {
-            required: true,
-            type: Boolean
-        },
-        width: {
-            required: false,
-            type: String,
-            validator: value => ['lg', 'xl', '2xl', '3xl', '4xl', '5xl'].includes(value),
-            default: 'lg'
-        }
-    },
-emits: ['update:modelValue'],
-    setup(props, {emit}) {
-        const open = computed(() => props.modelValue)
-        const close = () => emit('update:modelValue', false)
+    width: {
+        required: false,
+        type: String,
+        validator: value => ['lg', 'xl', '2xl', '3xl', '4xl', '5xl'].includes(value),
+        default: 'lg'
+    }
+});
 
-        return {
-            open,
-            close
-        }
-    },
-}
+const emit = defineEmits(['update:modelValue']);
+
+const open = computed(() => props.modelValue)
+const close = () => emit('update:modelValue', false)
 </script>
 
 <style scoped>

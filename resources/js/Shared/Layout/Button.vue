@@ -1,6 +1,6 @@
 <template>
   <component
-    :is="isInertiaButton ? 'Link': 'div'"
+    :is="isInertiaButton ? Link : 'div'"
     as="button"
     :href="href"
     :method="method"
@@ -13,49 +13,47 @@
   </component>
 </template>
 
-<script>
+<script setup>
 import { Link } from '@inertiajs/vue3';
-export default {
-    name: "Button",
-    components: {Link},
-    props: {
-        buttonSize: {
-            required: false,
-            default: 'medium',
-            type: String,
-            validator: size => [
-                'xs',
-                'small',
-                'medium',
-                'large',
-            ].includes(size)
-        },
-        href: {
-            required: false,
-            default: '',
-            type: String
-        },
-        method: {
-            required: false,
-            default: 'get',
-            type: String,
-            validator: method => [
-                'get',
-                'post',
-                'delete'
-            ].includes(method)
-        },
-        data: {
-            required: false,
-            type: Object,
-            default: () => new Object
-        },
-        isInertiaButton: {
-            type: Boolean,
-            required: false,
-            default: true
-        }
+
+defineProps({
+    buttonSize: {
+        required: false,
+        default: 'medium',
+        type: String,
+        validator: size => [
+            'xs',
+            'small',
+            'medium',
+            'large',
+        ].includes(size)
     },
-    emits: ['click'],
-}
+    href: {
+        required: false,
+        default: '',
+        type: String
+    },
+    method: {
+        required: false,
+        default: 'get',
+        type: String,
+        validator: method => [
+            'get',
+            'post',
+            'delete'
+        ].includes(method)
+    },
+    data: {
+        required: false,
+        type: Object,
+        default: () => new Object
+    },
+    isInertiaButton: {
+        type: Boolean,
+        required: false,
+        default: true
+    }
+});
+
+defineEmits(['click']);
 </script>

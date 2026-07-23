@@ -8,28 +8,17 @@
   </div>
 </template>
 
-<script>
-  export default {
-      name: "InputGroup",
-      props: {
-          for: {
-              type: String,
-              required: true
-          },
-          label: {
-              type: String,
-              required: true
-          }
-      },
-      data() {
-          return {
-              error: ''
-          }
-      },
-      mounted() {
-
-      }
-  }
+<script setup>
+defineProps({
+    for: {
+        type: String,
+        required: true
+    },
+    label: {
+        type: String,
+        required: true
+    }
+});
 </script>
 
 <style scoped>

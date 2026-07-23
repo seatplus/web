@@ -69,40 +69,35 @@
   </Modal>
 </template>
 
-<script>
-    import Modal from "./Modal.vue"
-    export default {
-        name: "ModalWithFooter",
-        components: {Modal},
-        props: {
-            modelValue: {
-              required: true
-            },
-            cancelButton: {
-                type: Boolean,
-                default: true
-            }
-        },
-emits: ['update:modelValue'],
-        data() {
-            return {
-                open: this.modelValue
-            }
-        },
-        watch: {
-          modelValue(newVal) {
-                this.open = newVal
-            },
-            open(newVal) {
-                this.$emit('update:modelValue', newVal)
-            }
-        },
-        methods: {
-            toggle() {
-                this.open = !this.open
-            }
-        }
+<script setup>
+import { ref, watch } from "vue";
+import Modal from "./Modal.vue"
+
+const props = defineProps({
+    modelValue: {
+        required: true
+    },
+    cancelButton: {
+        type: Boolean,
+        default: true
     }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const open = ref(props.modelValue)
+
+watch(() => props.modelValue, (newVal) => {
+    open.value = newVal
+})
+
+watch(open, (newVal) => {
+    emit('update:modelValue', newVal)
+})
+
+function toggle() {
+    open.value = !open.value
+}
 </script>
 
 <style scoped>

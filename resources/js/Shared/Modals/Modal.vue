@@ -44,35 +44,31 @@
   </div>
 </template>
 
-<script>
-  export default {
-      name: "Modal",
-      props: {
-          modelValue: {
-              type: Boolean,
-              default: false
-          }
-      },
-emits: ['update:modelValue'],
-      data() {
-          return {
-              open: this.modelValue
-          }
-      },
-      watch: {
-        modelValue(newVal) {
-              this.open = newVal
-          },
-          open(newVal) {
-              this.$emit('update:modelValue', newVal)
-          }
-      },
-      methods: {
-          toggle() {
-              this.open = !this.open
-          }
-      }
-  }
+<script setup>
+import { ref, watch } from "vue";
+
+const props = defineProps({
+    modelValue: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const open = ref(props.modelValue)
+
+watch(() => props.modelValue, (newVal) => {
+    open.value = newVal
+})
+
+watch(open, (newVal) => {
+    emit('update:modelValue', newVal)
+})
+
+function toggle() {
+    open.value = !open.value
+}
 </script>
 
 <style scoped>

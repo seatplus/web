@@ -9,72 +9,62 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {onMounted, onUnmounted, ref} from "vue";
 import { getJson } from "@/Functions/http";
 import { getEntityFromId } from "@/actions/Seatplus/Web/Http/Controllers/Shared/HelperController";
 
-export default {
-    name: "ResolveIdToName",
-    props: {
-        id: {
-            type: Number,
-            required: true
-        },
-        tailwindClass: {
-            type: String,
-            required: false,
-            default: 'text-sm whitespace-nowrap text-gray-500'
-        }
+const props = defineProps({
+    id: {
+        type: Number,
+        required: true
     },
-    setup(props) {
-        const isLoading = ref(false)
-        const isComplete = ref(false)
-        const name = ref('')
-        const unknownIdRef = ref(null)
-
-
-        const fetch = async () => {
-
-            if(isLoading.value || isComplete.value)
-                return
-
-            isLoading.value = true
-
-            await getJson(getEntityFromId.url(props.id))
-                .then(result => {
-                    name.value = result.name
-                    isComplete.value = true
-                })
-                .catch(error => console.log(error));
-
-            isLoading.value = false
-        }
-
-        const observer = new IntersectionObserver(function(entries) {
-            if(entries[0].isIntersecting === true) {
-                if(isComplete.value)
-                    return
-
-                fetch()
-            }
-        }, { threshold: [1] });
-
-        onMounted(() => {
-            observer.observe(unknownIdRef.value);
-        })
-
-        onUnmounted(() => {
-            observer.disconnect()
-        })
-
-        return {
-            name,
-            isComplete,
-            unknownIdRef
-        }
+    tailwindClass: {
+        type: String,
+        required: false,
+        default: 'text-sm whitespace-nowrap text-gray-500'
     }
+});
+
+const isLoading = ref(false)
+const isComplete = ref(false)
+const name = ref('')
+const unknownIdRef = ref(null)
+
+
+const fetch = async () => {
+
+    if(isLoading.value || isComplete.value)
+        return
+
+    isLoading.value = true
+
+    await getJson(getEntityFromId.url(props.id))
+        .then(result => {
+            name.value = result.name
+            isComplete.value = true
+        })
+        .catch(error => console.log(error));
+
+    isLoading.value = false
 }
+
+const observer = new IntersectionObserver(function(entries) {
+    if(entries[0].isIntersecting === true) {
+        if(isComplete.value)
+            return
+
+        fetch()
+    }
+}, { threshold: [1] });
+
+onMounted(() => {
+    observer.observe(unknownIdRef.value);
+})
+
+onUnmounted(() => {
+    observer.disconnect()
+})
 </script>
 
 <style scoped>
