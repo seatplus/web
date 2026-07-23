@@ -10,15 +10,16 @@ require_once __DIR__.'/helpers.php';
 /*
  * Manual Locations lifecycle browser test — runs against the real assembled core app.
  * Walks a missing location end to end and screenshots each stage: it shows as
- * "Unknown Structure" in the assets view, a submitted suggestion is reviewed and accepted on
- * the manage page, and the assets view then shows the accepted name. The "add suggestion" step
- * is seeded (the modal's solar-system field is a live-ESI autosuggest, not drivable offline);
- * the review/accept and both assets states are exercised through the UI.
+ * "Unknown Structure" in the assets view; a user opens the "Add location information" modal to
+ * submit a name; an admin reviews and accepts the suggestion on the manage page; and the assets
+ * view then shows the accepted name. The submission itself is seeded rather than posted through
+ * the modal (its solar-system field is a live-ESI autosuggest that isn't drivable offline) — but
+ * the modal, the review/accept, and both assets states are exercised through the UI.
  */
 
 uses(RefreshDatabase::class);
 
-it('walks a missing location from unknown → suggested → accepted → shown in assets', function (string $device) {
+it('walks a missing location from unknown → add → accepted → shown in assets', function (string $device) {
     $character = actingAsCharacter();
     $user = userOfCharacter($character->character_id);
     $user->givePermissionTo(Permission::findOrCreate('manage manual locations'));
@@ -36,15 +37,22 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     assetTextVisible($page, "Unknown Structure ({$unknownId})");
     snap($page, "manual-locations-lifecycle-1-unknown-{$device}");
 
-    // 2) A user submits a suggested name for it. Seeded rather than driven through the modal —
-    //    its solar-system field is a live-ESI autosuggest that isn't drivable offline.
+    // 2) Clicking "Add location information" opens the submission modal (teleported to
+    //    #destination). Merely opening it is safe to screenshot — the solar-system field only
+    //    hits ESI once you type. No assertNoSmoke here: that field's token probe can log under
+    //    the test's faked queue/ESI, which is unrelated to this view.
+    $page->click('Add location information');
+    $page->waitForText("Add location information for unknown structure ({$unknownId})");
+    snap($page, "manual-locations-lifecycle-2-add-{$device}");
+
+    // 3) A user submits a suggested name (seeded — the modal's ESI autosuggest isn't drivable
+    //    offline). The admin then reviews and accepts it on the manage page.
     ManualLocation::factory()->create([
         'location_id' => $unknownId,
         'user_id' => $user->id,
         'name' => 'Some Awesome Fortizar',
     ]);
 
-    // 3) The admin reviews the suggestion on the manage page, then accepts it.
     $manage = deviceVisit($device, route('manage.manual_locations', absolute: false));
     $manage->assertNoSmoke();
     $manage->waitForText('Manual Locations');
@@ -52,7 +60,7 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     // The radio option's label is "{system|'?'} - {name}"; no system is seeded, so match the
     // exact label text (pest-browser click targets an element by its exact text).
     $manage->waitForText('? - Some Awesome Fortizar');
-    snap($manage, "manual-locations-lifecycle-2-review-{$device}");
+    snap($manage, "manual-locations-lifecycle-3-review-{$device}");
     $manage->click('? - Some Awesome Fortizar');                  // select the radio option
     $manage->click('Save');                                       // accept it
 
@@ -61,5 +69,5 @@ it('walks a missing location from unknown → suggested → accepted → shown i
     $resolved->assertNoSmoke();
     $resolved->waitForText('Character Assets');
     assetTextVisible($resolved, 'Some Awesome Fortizar');
-    snap($resolved, "manual-locations-lifecycle-3-resolved-{$device}");
+    snap($resolved, "manual-locations-lifecycle-4-resolved-{$device}");
 })->with(['desktop', 'iphone']);
