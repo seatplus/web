@@ -78,9 +78,9 @@
   </teleport>
 </template>
 
-<script>
-import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+<script setup>
 import {computed, ref} from "vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
 import EveImage from "@/Shared/EveImage.vue";
 import CharacterApplication from "./CharacterApplication.vue";
@@ -88,31 +88,21 @@ import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { Link } from '@inertiajs/vue3';
 import { apply, pullUserApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
-export default {
-    name: "Enlistment",
-    components: {CharacterApplication, EveImage, ModalWithFooter, EntityBlock, UserPlusIcon, UserMinusIcon, Link},
-    props: {
-        enlistment: {
-            type: Object,
-            required: true
-        }
-    },
-    setup(props) {
-
-        const openModal = ref(false)
-
-        // The server attaches the user's open applications for this enlistment's
-        // corporation (OnboardingController), so no client-side fetch is needed.
-        const hasApplications = computed(() => !_.isEmpty(props.enlistment.applications))
-
-        return {
-            hasApplications,
-            openModal,
-            postApplicationUrl: apply.url(),
-            deleteUserApplicationUrl: pullUserApplication.url(),
-        }
+const props = defineProps({
+    enlistment: {
+        type: Object,
+        required: true
     }
-}
+});
+
+const openModal = ref(false)
+
+// The server attaches the user's open applications for this enlistment's
+// corporation (OnboardingController), so no client-side fetch is needed.
+const hasApplications = computed(() => !_.isEmpty(props.enlistment.applications))
+
+const postApplicationUrl = apply.url()
+const deleteUserApplicationUrl = pullUserApplication.url()
 </script>
 
 <style scoped>

@@ -49,41 +49,30 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { Deferred } from "@inertiajs/vue3";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import CharacterContactsComponent from "@/Shared/Components/Contacts/CharacterContactsComponent.vue";
-export default {
-    name: "Index",
-    components: {
-        Deferred,
-        CharacterContactsComponent,
-        RequiredScopesWarning,
-        DispatchUpdateButton,
-        EntitySelectionButton, PageHeader},
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        characters: {
-            required: true,
-            type: Array
-        },
-        contacts: {
-            type: Object,
-            default: () => ({})
-        }
+
+defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
     },
-    data() {
-        return {
-            pageTitle: 'Character Contacts',
-        }
+    characters: {
+        required: true,
+        type: Array
+    },
+    contacts: {
+        type: Object,
+        default: () => ({})
     }
-}
+});
+
+const pageTitle = 'Character Contacts'
 </script>
 
 <style scoped>

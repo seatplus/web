@@ -90,42 +90,30 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { InfiniteScroll, usePage } from "@inertiajs/vue3";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import MemberTrackingListElement from "./MemberTrackingListElement.vue";
 import MemberTrackingListElementForSmallDevices from "./MemberTrackingListElementForSmallDevices.vue";
-import { InfiniteScroll } from "@inertiajs/vue3";
 
-export default {
-    name: "MemberTrackingComponent",
-    components: {
-        InfiniteScroll,
-        MemberTrackingListElementForSmallDevices,
-        MemberTrackingListElement,
-        EntityBlock,
-        CardWithHeader
+const props = defineProps({
+    corporation: {
+        required: true,
+        type: Object
     },
-    props: {
-        corporation: {
-            required: true,
-            type: Object
-        },
-    },
-    computed: {
-        // The members list is delivered as a page scroll prop keyed per corporation
-        // (MemberTrackingController::index) and consumed by <InfiniteScroll :data="scrollKey">.
-        scrollKey() {
-            return `members_${this.corporation.corporation_id}`
-        },
-        scrollBodyId() {
-            return `members-body-${this.corporation.corporation_id}`
-        },
-        members() {
-            return this.$page.props[this.scrollKey]?.data ?? []
-        }
-    }
-}
+});
+
+const page = usePage();
+
+// The members list is delivered as a page scroll prop keyed per corporation
+// (MemberTrackingController::index) and consumed by <InfiniteScroll :data="scrollKey">.
+const scrollKey = computed(() => `members_${props.corporation.corporation_id}`)
+
+const scrollBodyId = computed(() => `members-body-${props.corporation.corporation_id}`)
+
+const members = computed(() => page.props[scrollKey.value]?.data ?? [])
 </script>
 
 <style scoped>

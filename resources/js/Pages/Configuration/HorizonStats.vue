@@ -137,61 +137,45 @@
   </div>
 </template>
 
-<script>
-    import { router } from '@inertiajs/vue3'
-    // horizon.index is a Laravel Horizon (vendor) named route; use its Wayfinder @/routes helper.
-    import { index as horizonIndex } from "@/routes/horizon";
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { router, usePage } from '@inertiajs/vue3'
+// horizon.index is a Laravel Horizon (vendor) named route; use its Wayfinder @/routes helper.
+import { index as horizonIndex } from "@/routes/horizon";
 
-    export default {
-        name: "HorizonStats",
-        data() {
-            return {
-                timer: '',
-                symbols: {
-                    'running'   : '<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-                    'inactive'  : '<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>',
-                    'paused'    : '<path d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
-                }
-            }
-        },
-        computed : {
-            // Horizon stats arrive as the `queueStats` optional Inertia prop, refreshed by the
-            // partial reload in refreshStats() — no client-side HTTP.
-            stats() {
-                return this.$page.props.queueStats ?? {}
-            },
-            horizonUrl() {
-                return horizonIndex.url()
-            },
-            isLoading: function () {
-                var obj = this.stats;
-                for(var key in obj) {
-                    if(Object.prototype.hasOwnProperty.call(obj, key))
-                        return false;
-                }
-                return true;
-            }
-        },
-        mounted() {
-            this.refreshStats()
+const page = usePage()
 
-            this.timer = setInterval(() => {
-                this.refreshStats()
-            }, 5000)
-        },
-        methods: {
-            /**
-             * Pull a fresh queueStats prop from the server via an Inertia partial reload.
-             */
-            refreshStats() {
-                router.reload({ only: ['queueStats'] })
-            }
-        },
+const timer = ref('')
+const symbols = {
+    'running'   : '<path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+    'inactive'  : '<path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>',
+    'paused'    : '<path d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+}
 
-        beforeUnmount () {
-            clearInterval(this.timer)
-        }
-    }
+// Horizon stats arrive as the `queueStats` optional Inertia prop, refreshed by the
+// partial reload in refreshStats() — no client-side HTTP.
+const stats = computed(() => page.props.queueStats ?? {})
+
+const horizonUrl = computed(() => horizonIndex.url())
+
+/**
+ * Pull a fresh queueStats prop from the server via an Inertia partial reload.
+ */
+function refreshStats() {
+    router.reload({ only: ['queueStats'] })
+}
+
+onMounted(() => {
+    refreshStats()
+
+    timer.value = setInterval(() => {
+        refreshStats()
+    }, 5000)
+})
+
+onBeforeUnmount(() => {
+    clearInterval(timer.value)
+})
 </script>
 
 <style scoped>

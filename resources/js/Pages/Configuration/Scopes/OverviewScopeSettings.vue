@@ -111,60 +111,41 @@
   </Settings>
 </template>
 
-<script>
-    import Settings from "@/Pages/Configuration/Settings.vue"
-    import WideListElement from "@/Shared/WideListElement.vue"
-    import EveImage from "@/Shared/EveImage.vue"
-    import { Link } from '@inertiajs/vue3';
-    import AppHead from "@/Shared/AppHead.vue";
-    // SsoSettingsController@index is mapped to three route names; @/actions can't tell them
-    // apart, so use the @/routes named-route helpers.
-    import { scopes as viewGlobalScopes } from "@/routes/view/global";
-    import { settings as viewScopesSettings } from "@/routes/view/scopes";
-    import { scopes as viewCreateScopes } from "@/routes/view/create";
+<script setup>
+import { computed } from "vue";
+import { Link } from '@inertiajs/vue3';
+import Settings from "@/Pages/Configuration/Settings.vue"
+import WideListElement from "@/Shared/WideListElement.vue"
+import EveImage from "@/Shared/EveImage.vue"
+import AppHead from "@/Shared/AppHead.vue";
+// SsoSettingsController@index is mapped to three route names; @/actions can't tell them
+// apart, so use the @/routes named-route helpers.
+import { scopes as viewGlobalScopes } from "@/routes/view/global";
+import { settings as viewScopesSettings } from "@/routes/view/scopes";
+import { scopes as viewCreateScopes } from "@/routes/view/create";
 
-    export default {
-        name: "OverviewScopeSettings",
-        components: {AppHead, WideListElement, EveImage, Settings, Link},
-        props: {
-            available_scopes: {
-                type: Object,
-                required: true
-            },
-            entries: {
-                type: Array,
-                required: true
-            },
-        },
-        data() {
-            return {
-                layoutObject: {
-                    pageHeader: 'Server Settings',
-                    pageDescription: 'Scope',
-                    activeSidebarElement: 'server.settings'
-                },
-            }
-        },
-        computed: {
-            entities() {
-                return _.filter(this.entries, (entry) => entry.selectedEntity.id)
-            },
-            hasGlobalScopes() {
-                return _.size(this.entities) !== _.size(this.entries)
-            },
-            globalScopesUrl() {
-                return viewGlobalScopes.url()
-            },
-            createScopesViewUrl() {
-                return viewCreateScopes.url()
-            }
-        },
-        methods: {
-            scopesSettingsUrl(entityId) {
-                return viewScopesSettings.url(entityId)
-            }
-        },
-    }
+const props = defineProps({
+    available_scopes: {
+        type: Object,
+        required: true
+    },
+    entries: {
+        type: Array,
+        required: true
+    },
+});
+
+const entities = computed(() => _.filter(props.entries, (entry) => entry.selectedEntity.id))
+
+const hasGlobalScopes = computed(() => _.size(entities.value) !== _.size(props.entries))
+
+const globalScopesUrl = computed(() => viewGlobalScopes.url())
+
+const createScopesViewUrl = computed(() => viewCreateScopes.url())
+
+function scopesSettingsUrl(entityId) {
+    return viewScopesSettings.url(entityId)
+}
 </script>
 
 <style scoped>

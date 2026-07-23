@@ -84,39 +84,32 @@
   </Settings>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
+import { Link } from '@inertiajs/vue3';
 import Settings from "@/Pages/Configuration/Settings.vue"
 import WideListElement from "@/Shared/WideListElement.vue"
-import { Link } from '@inertiajs/vue3';
 import AppHead from "@/Shared/AppHead.vue";
 import ScheduleDetail from "@/actions/Seatplus/Web/Http/Controllers/Configuration/Schedules/ScheduleDetail";
 import SchedulesCreate from "@/actions/Seatplus/Web/Http/Controllers/Configuration/Schedules/SchedulesCreate";
-export default {
-    name: "SchedulesIndex",
-    components: {AppHead, Settings, WideListElement, Link},
-    props: {
-        schedules: {
-            type: Array,
-            required: true
-        },
-        expressions: {
-            type: Object,
-            required: true
-        }
+
+const props = defineProps({
+    schedules: {
+        type: Array,
+        required: true
     },
-    computed: {
-        inversedExpressions() {
-            return _.invert(this.expressions)
-        },
-        createUrl() {
-            return SchedulesCreate.url()
-        }
-    },
-    methods: {
-        detailsUrl(scheduleId) {
-            return ScheduleDetail.url(scheduleId)
-        }
+    expressions: {
+        type: Object,
+        required: true
     }
+});
+
+const inversedExpressions = computed(() => _.invert(props.expressions))
+
+const createUrl = computed(() => SchedulesCreate.url())
+
+function detailsUrl(scheduleId) {
+    return ScheduleDetail.url(scheduleId)
 }
 </script>
 

@@ -23,61 +23,43 @@
   </SwitchGroup>
 </template>
 
-<script>
+<script setup>
 import { ref, watch} from 'vue'
 import { Switch, SwitchGroup, SwitchLabel } from '@headlessui/vue'
 
-export default {
-    name: "ScopeToggle",
-    components: {
-        Switch,
-        SwitchGroup,
-        SwitchLabel,
+const props = defineProps({
+    scope: {
+        type: Object,
+        required: true
     },
-    props: {
-        scope: {
-            type: Object,
-            required: true
-        },
-        selected: {
-            type: Array,
-            required: false,
-            default: () => []
-        }
-    },
-    emits: ['update:selected'],
-    setup(props, context) {
-
-        const intersection = _.intersection(props.selected, props.scope.value)
-
-        const enabled = ref(_.isEqual([...props.scope.value].sort(), intersection.sort()))
-        const selected = ref(props.selected)
-
-        watch(enabled,() => {
-
-            if(enabled.value) {
-
-                context.emit('update:selected', _.uniq([...selected.value, ...props.scope.value]))
-
-            } else {
-
-                // 1. remove scope props
-                selected.value = selected.value.filter( (el) => !props.scope.value.includes(el))
-
-                context.emit('update:selected', selected.value)
-            }
-        })
-
-        return {
-            enabled,
-        }
-    },
-    methods: {
-        test() {
-            console.log('test')
-        }
+    selected: {
+        type: Array,
+        required: false,
+        default: () => []
     }
-}
+});
+
+const emit = defineEmits(['update:selected']);
+
+const intersection = _.intersection(props.selected, props.scope.value)
+
+const enabled = ref(_.isEqual([...props.scope.value].sort(), intersection.sort()))
+const selected = ref(props.selected)
+
+watch(enabled,() => {
+
+    if(enabled.value) {
+
+        emit('update:selected', _.uniq([...selected.value, ...props.scope.value]))
+
+    } else {
+
+        // 1. remove scope props
+        selected.value = selected.value.filter( (el) => !props.scope.value.includes(el))
+
+        emit('update:selected', selected.value)
+    }
+})
 </script>
 
 <style scoped>

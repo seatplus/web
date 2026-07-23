@@ -69,41 +69,34 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { Deferred } from "@inertiajs/vue3";
 import RequiredScopesWarning from "@/Shared/SidebarLayout/RequiredScopesWarning.vue";
 import PageHeader from "@/Shared/Layout/PageHeader.vue";
 import DispatchUpdateButton from "@/Shared/Components/SlideOver/DispatchUpdateButton.vue";
 import EntitySelectionButton from "@/Shared/Components/SlideOver/EntitySelectionButton.vue";
 import SkillsComponent from "@/Shared/Components/Skills/SkillsComponent.vue";
-export default {
-    name: "Index",
-    components: {Deferred, SkillsComponent, EntitySelectionButton, DispatchUpdateButton, PageHeader, RequiredScopesWarning},
-    props: {
-        dispatchTransferObject: {
-            required: true,
-            type: Object
-        },
-        character_ids: {
-            required: true,
-            type: Array
-        },
-        skills: {
-            type: Object,
-            default: () => ({})
-        },
-        skillQueue: {
-            type: Object,
-            default: () => ({})
-        }
-    },
-    setup() {
 
-        return {
-            pageTitle: 'Character Skills'
-        }
+defineProps({
+    dispatchTransferObject: {
+        required: true,
+        type: Object
+    },
+    character_ids: {
+        required: true,
+        type: Array
+    },
+    skills: {
+        type: Object,
+        default: () => ({})
+    },
+    skillQueue: {
+        type: Object,
+        default: () => ({})
     }
-}
+});
+
+const pageTitle = 'Character Skills'
 </script>
 
 <style scoped>

@@ -58,47 +58,38 @@
 </template>
 
 <script>
-
 import EmptyLayout from "@/Shared/Layout/AuthLayout/EmptyLayout.vue";
+
+export default {
+    layout: EmptyLayout,
+}
+</script>
+
+<script setup>
+import { computed, ref } from "vue";
 import AppHead from "@/Shared/AppHead.vue";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { localeName } from "@/i18n/localeName";
 import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
 import RedirectSSOController from "@/actions/Seatplus/Auth/Http/Controllers/Auth/RedirectSSOController";
 import { useTranslations } from "@/composables/useTranslations";
 
-export default {
-    name: "Login",
-    components: {AppHead},
-    layout: (h, page) => h(EmptyLayout, () => page),
-    setup() {
-        const { trans } = useTranslations();
+const { trans } = useTranslations();
 
-        return { trans };
-    },
-    data() {
-        return {
-            selectedLocale: this.$page.props.locale,
-        }
-    },
-    computed: {
-        locales() {
-            return this.$page.props.locales || []
-        },
-        ssoUrl() {
-            return RedirectSSOController.url()
-        }
-    },
-    methods: {
-        localeName,
-        // `translations` is a reactive Inertia prop now — the redirect back re-renders
-        // in the newly-selected language without a full page reload.
-        switchLocale() {
-            router.post(postLocale.url(), { locale: this.selectedLocale }, {
-                preserveScroll: true,
-            })
-        }
-    }
+const page = usePage();
+
+const selectedLocale = ref(page.props.locale)
+
+const locales = computed(() => page.props.locales || [])
+
+const ssoUrl = computed(() => RedirectSSOController.url())
+
+// `translations` is a reactive Inertia prop now — the redirect back re-renders
+// in the newly-selected language without a full page reload.
+function switchLocale() {
+    router.post(postLocale.url(), { locale: selectedLocale.value }, {
+        preserveScroll: true,
+    })
 }
 </script>
 

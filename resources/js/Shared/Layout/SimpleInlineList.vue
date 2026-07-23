@@ -28,51 +28,38 @@
   </fieldset>
 </template>
 
-<script>
+<script setup>
+import {computed, getCurrentInstance, ref, watch} from "vue";
 
-import {getCurrentInstance} from "vue";
-
-export default {
-    name: "SimpleInlineList",
-    props: {
-        modelValue: {
-            type: String,
-            default: ''
-        },
-        options: {
-            required: false,
-            type: Array,
-            default: () => []
-        },
-        legend: {
-            required: false,
-            type: String,
-            default: 'legend'
-        }
+const props = defineProps({
+    modelValue: {
+        type: String,
+        default: ''
     },
-    emits: ['update:modelValue'],
-    setup() {
-
+    options: {
+        required: false,
+        type: Array,
+        default: () => []
     },
-    data() {
-        return {
-            picked: this.modelValue
-        }
-    },
-    computed: {
-        // Per-instance id so the radios' id/for/name are unique across multiple SimpleInlineList
-        // instances on the same page (e.g. one contacts card per character). Without this the
-        // duplicated `for`/`id` made clicking a later card's label toggle the first card's radio.
-        uid() {
-            return getCurrentInstance().uid
-        }
-    },
-    watch: {
-        picked(newValue) {
-            this.$emit('update:modelValue', newValue)
-        }
+    legend: {
+        required: false,
+        type: String,
+        default: 'legend'
     }
-}
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const picked = ref(props.modelValue)
+
+// Per-instance id so the radios' id/for/name are unique across multiple SimpleInlineList
+// instances on the same page (e.g. one contacts card per character). Without this the
+// duplicated `for`/`id` made clicking a later card's label toggle the first card's radio.
+const uid = computed(() => getCurrentInstance().uid)
+
+watch(picked, (newValue) => {
+    emit('update:modelValue', newValue)
+})
 </script>
 
 <style scoped>

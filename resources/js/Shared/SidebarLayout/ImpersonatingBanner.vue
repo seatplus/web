@@ -53,21 +53,16 @@
   </div>
 </template>
 
-<script>
-import { Link } from '@inertiajs/vue3';
+<script setup>
+import { computed } from "vue";
+import { Link, usePage } from '@inertiajs/vue3';
 import StopImpersonateController from "@/actions/Seatplus/Web/Http/Controllers/Shared/StopImpersonateController";
-  export default {
-    name: "ImpersonatingBanner",
-      components: {Link},
-      computed: {
-        name() {
-            return this.$page.props.user.data.mainCharacter?.name ?? 'Unknown'
-        },
-        stopUrl() {
-            return StopImpersonateController.url()
-        }
-      }
-  }
+
+const page = usePage();
+
+const name = computed(() => page.props.user.data.mainCharacter?.name ?? 'Unknown')
+
+const stopUrl = computed(() => StopImpersonateController.url())
 </script>
 
 <style scoped>

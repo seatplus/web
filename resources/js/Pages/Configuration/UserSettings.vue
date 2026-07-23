@@ -149,82 +149,68 @@
   </div>
 </template>
 
-<script>
-    import PageHeader from "@/Shared/Layout/PageHeader.vue";
-    import SelectComponent from "@/Shared/Components/SelectComponent.vue";
-    import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
-    import {computed, ref, watch} from "vue";
-    import { useForm, usePage, Link } from "@inertiajs/vue3";
-    import { localeName } from "@/i18n/localeName";
-    import LogoutController from "@/actions/Seatplus/Web/Http/Controllers/Auth/LogoutController";
-    import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
-    import SwitchMainCharacterController from "@/actions/Seatplus/Auth/Http/Controllers/SwitchMainCharacterController";
-    
-    export default {
-        name: "UserSettings",
-        components: {EntityBlock, SelectComponent, PageHeader, Link},
-        props: {
-            user: {
-                type: Object,
-                required: true
-            }
-        },
-        setup(props) {
-            const selected = ref({
-                character_id: _.get(props.user, 'data.mainCharacter.character_id'),
-                name: _.get(props.user, 'data.mainCharacter.name'),
-            })
+<script setup>
+import {computed, ref, watch} from "vue";
+import { useForm, usePage, Link } from "@inertiajs/vue3";
+import PageHeader from "@/Shared/Layout/PageHeader.vue";
+import SelectComponent from "@/Shared/Components/SelectComponent.vue";
+import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
+import { localeName } from "@/i18n/localeName";
+import LogoutController from "@/actions/Seatplus/Web/Http/Controllers/Auth/LogoutController";
+import { update as postLocale } from "@/actions/Seatplus/Web/Http/Controllers/LocaleController";
+import SwitchMainCharacterController from "@/actions/Seatplus/Auth/Http/Controllers/SwitchMainCharacterController";
 
-            const form = useForm({
-                character_id: _.get(props.user, 'data.mainCharacter.character_id')
-            })
-
-            const options = computed(() => {
-                let characters = _.get(props.user, 'data.characters', [])
-
-                return _.map(characters, character => {
-                    return {
-                        character_id: character.character_id,
-                        name: character.name
-                    }
-                })
-            })
-
-            watch(selected, () =>  {
-                // The route is PUT main-character/switch/{new_character_id}; the id goes in the
-                // path (the controller ignores the body), so build the URL with the selected id.
-                form.put(SwitchMainCharacterController.url({ new_character_id: selected.value.character_id }))
-            })
-
-            const page = usePage()
-
-            const locales = computed(() => _.get(page.props, 'locales', {}))
-
-            const localeForm = useForm({
-                locale: _.get(page.props, 'locale'),
-            })
-
-            // `translations` is a reactive Inertia prop now — the redirect back re-renders
-            // in the newly-selected language without a full page reload.
-            const updateLocale = () => {
-                localeForm.post(postLocale.url(), {
-                    preserveScroll: true,
-                })
-            }
-
-            return {
-                selected,
-                pageTitle: 'User Settings',
-                form,
-                options,
-                locales,
-                localeForm,
-                updateLocale,
-                localeName,
-                logoutUrl: LogoutController.url()
-            }
-        }
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true
     }
+});
+
+const selected = ref({
+    character_id: _.get(props.user, 'data.mainCharacter.character_id'),
+    name: _.get(props.user, 'data.mainCharacter.name'),
+})
+
+const form = useForm({
+    character_id: _.get(props.user, 'data.mainCharacter.character_id')
+})
+
+const options = computed(() => {
+    let characters = _.get(props.user, 'data.characters', [])
+
+    return _.map(characters, character => {
+        return {
+            character_id: character.character_id,
+            name: character.name
+        }
+    })
+})
+
+watch(selected, () =>  {
+    // The route is PUT main-character/switch/{new_character_id}; the id goes in the
+    // path (the controller ignores the body), so build the URL with the selected id.
+    form.put(SwitchMainCharacterController.url({ new_character_id: selected.value.character_id }))
+})
+
+const page = usePage()
+
+const locales = computed(() => _.get(page.props, 'locales', {}))
+
+const localeForm = useForm({
+    locale: _.get(page.props, 'locale'),
+})
+
+const pageTitle = 'User Settings'
+const logoutUrl = LogoutController.url()
+
+// `translations` is a reactive Inertia prop now — the redirect back re-renders
+// in the newly-selected language without a full page reload.
+const updateLocale = () => {
+    localeForm.post(postLocale.url(), {
+        preserveScroll: true,
+    })
+}
 </script>
 
 <style scoped>

@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import {ref} from "vue";
 import {useValidateObject} from "@/Functions/useValidateObject";
 
 let schema = {
@@ -61,36 +60,31 @@ let schema = {
 
 schema.id.required = true
 schema.name.required = true
+</script>
 
-export default {
-    name: "BarWithUnderline",
-    props: {
-        tabs: {
-            type: Array,
-            required: true,
-            validator: tabs => _.chain(tabs)
-                .map(tab => useValidateObject(tab, schema))
-                .filter()
-                .value()
-                .length === tabs.length
-        },
+<script setup>
+import {ref} from "vue";
+
+const props = defineProps({
+    tabs: {
+        type: Array,
+        required: true,
+        validator: tabs => _.chain(tabs)
+            .map(tab => useValidateObject(tab, schema))
+            .filter()
+            .value()
+            .length === tabs.length
     },
-    emits: ['select'],
-    setup(props, {emit}) {
-        const activeTab = ref(props.tabs[0])
+});
 
-        const isActive = (entry) => _.isEqual(entry, activeTab.value)
-        const select = (tab) => {
-            emit('select', tab)
-            activeTab.value = tab
-        }
+const emit = defineEmits(['select']);
 
-        return {
-            activeTab,
-            isActive,
-            select
-        }
-    }
+const activeTab = ref(props.tabs[0])
+
+const isActive = (entry) => _.isEqual(entry, activeTab.value)
+const select = (tab) => {
+    emit('select', tab)
+    activeTab.value = tab
 }
 </script>
 

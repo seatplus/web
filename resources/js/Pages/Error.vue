@@ -63,41 +63,38 @@
 </template>
 
 <script>
+export default {
+    layout: null,
+}
+</script>
+
+<script setup>
+import { computed } from "vue";
 import { Link } from '@inertiajs/vue3';
 import { home } from "@/actions/Seatplus/Web/Http/Controllers/HomeController";
 
-export default {
-    name: "Error",
-    components: { Link },
-    layout: null,
-    props: {
-        status: {
-            type: Number,
-            required: true
-        }
-    },
-    computed: {
-        homeUrl() {
-            return home.url()
-        },
-        title() {
-            return {
-                503: 'Service Unavailable',
-                500: 'Server Error',
-                404: 'Page Not Found',
-                403: 'Forbidden',
-            }[this.status]
-        },
-        description() {
-            return {
-                503: 'Sorry, we are doing some maintenance. Please check back soon.',
-                500: 'Whoops, something went wrong on our servers.',
-                404: 'Sorry, the page you are looking for could not be found.',
-                403: 'Sorry, you are forbidden from accessing this page.',
-            }[this.status]
-        },
+const props = defineProps({
+    status: {
+        type: Number,
+        required: true
     }
-}
+});
+
+const homeUrl = computed(() => home.url())
+
+const title = computed(() => ({
+    503: 'Service Unavailable',
+    500: 'Server Error',
+    404: 'Page Not Found',
+    403: 'Forbidden',
+}[props.status]))
+
+const description = computed(() => ({
+    503: 'Sorry, we are doing some maintenance. Please check back soon.',
+    500: 'Whoops, something went wrong on our servers.',
+    404: 'Sorry, the page you are looking for could not be found.',
+    403: 'Sorry, you are forbidden from accessing this page.',
+}[props.status]))
 </script>
 
 <style scoped>

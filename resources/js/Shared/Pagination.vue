@@ -131,68 +131,54 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import { Link } from '@inertiajs/vue3';
-    export default {
-        name: "Pagination",
-        components: {Link},
-        props: {
-            collection: {
-                type    : Object,
-                required: true
-            },
-            offset: {
-                type: Number,
-                default: 5
-            }
-        },
-        data() {
-            return {
-                tinted: true
-            }
-        },
-        computed: {
-            pages() {
-                let pages = [];
-                let from = this.collection.meta.current_page - Math.floor(this.offset / 2);
-                if (from < 1) {
-                    from = 1;
-                }
-                let to = from + this.offset - 1;
-                if (to > this.collection.meta.last_page) {
-                    to = this.collection.meta.last_page;
-                }
-                while (from <= to) {
-                    pages.push(from);
-                    from++;
-                }
-                return pages;
-            },
-            currentPage() {
-                return this.collection.meta.current_page
-            },
-            prevDisabled() {
-                return this.collection.meta.current_page <= 1
-            },
-            nextDisabled() {
-                return this.collection.meta.current_page >= this.collection.meta.last_page
-            }
-        },
-        methods: {
-            isCurrentPage(page) {
-                return this.collection.meta.current_page === page;
-            },
-            buildHref(page) {
 
-                let uri = window.location.search.substring(1);
-                let searchParams = new URLSearchParams(uri);
-
-                searchParams.set("page", page);
-
-                return this.collection.meta.path + '?' + searchParams.toString();
-            },
-        },
+const props = defineProps({
+    collection: {
+        type    : Object,
+        required: true
+    },
+    offset: {
+        type: Number,
+        default: 5
     }
+});
+
+const tinted = ref(true)
+
+const pages = computed(() => {
+    let pages = [];
+    let from = props.collection.meta.current_page - Math.floor(props.offset / 2);
+    if (from < 1) {
+        from = 1;
+    }
+    let to = from + props.offset - 1;
+    if (to > props.collection.meta.last_page) {
+        to = props.collection.meta.last_page;
+    }
+    while (from <= to) {
+        pages.push(from);
+        from++;
+    }
+    return pages;
+})
+
+const currentPage = computed(() => props.collection.meta.current_page)
+
+const prevDisabled = computed(() => props.collection.meta.current_page <= 1)
+
+const nextDisabled = computed(() => props.collection.meta.current_page >= props.collection.meta.last_page)
+
+function buildHref(page) {
+    let uri = window.location.search.substring(1);
+    let searchParams = new URLSearchParams(uri);
+
+    searchParams.set("page", page);
+
+    return props.collection.meta.path + '?' + searchParams.toString();
+}
 </script>
 
 <style scoped>

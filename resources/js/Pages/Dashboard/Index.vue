@@ -11,26 +11,18 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import PageHeader from "@/Shared/Layout/PageHeader.vue"
 import Characters from "./Characters.vue"
 
-export default {
-    name: "Index",
-    components: {Characters, PageHeader},
-    props: {
-        characters: {
-            type: Array,
-            default: () => []
-        },
+defineProps({
+    characters: {
+        type: Array,
+        default: () => []
     },
-    setup() {
+});
 
-        return {
-            pageTitle: 'Home',
-        }
-    },
-}
+const pageTitle = 'Home'
 </script>
 
 <style scoped>

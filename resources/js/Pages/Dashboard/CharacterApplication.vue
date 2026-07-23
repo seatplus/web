@@ -46,71 +46,57 @@
   </ul>
 </template>
 
-<script>
-import EveImage from "@/Shared/EveImage.vue"
+<script setup>
 import {computed, ref} from "vue";
 import { router, usePage } from '@inertiajs/vue3'
+import EveImage from "@/Shared/EveImage.vue"
 import {UserPlusIcon, UserMinusIcon} from "@heroicons/vue/20/solid";
 import { apply as postApplication, pullCharacterApplication } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
-export default {
-    name: "CharacterApplication",
-    components: {EveImage, UserPlusIcon, UserMinusIcon},
-    props: {
-        enlistment: {
-            type: Object,
-            required: true
-        },
-        applicationResults: {
-            type: Array,
-            required: true
-        }
+const props = defineProps({
+    enlistment: {
+        type: Object,
+        required: true
     },
-    setup(props) {
-
-        const applications = ref(props.applicationResults)
-
-        const ownedCharacters = computed(() => usePage().props.user.data.characters)
-        const applicants = computed(() => {
-
-            if(!hasApplications.value || props.enlistment.type !== 'character')
-                return []
-
-            return _.map(applications.value, (application) => _.get(application, 'applicationable')) //applicationResults.results.value
-
-        })
-        const hasApplications = computed(() =>  !!applications.value) //applicationResults.results.value
-        
-        const hasApplied = (character_id) =>  _.findIndex(applicants.value, {character_id: character_id}) > -1
-
-        const apply = (character_id) => router.post(postApplication.url(), {
-            corporation_id: props.enlistment.corporation_id,
-            character_id: character_id
-        }, {
-            onSuccess: () => applications.value.push({
-                applicationable: {
-                    character_id: character_id
-                }
-            }),
-            preserveState: true
-        })
-
-        const remove = (character_id) => router.delete(pullCharacterApplication.url(character_id), {
-            preserveState: true,
-            onSuccess: () => _.remove(applications.value, function (application) {
-                return _.isEqual(application.applicationable.character_id, character_id)
-            })
-        })
-
-        
-        return {
-            hasApplied,
-            ownedCharacters,
-            apply,
-            remove
-        }
+    applicationResults: {
+        type: Array,
+        required: true
     }
-}
+});
+
+const applications = ref(props.applicationResults)
+
+const ownedCharacters = computed(() => usePage().props.user.data.characters)
+const applicants = computed(() => {
+
+    if(!hasApplications.value || props.enlistment.type !== 'character')
+        return []
+
+    return _.map(applications.value, (application) => _.get(application, 'applicationable')) //applicationResults.results.value
+
+})
+const hasApplications = computed(() =>  !!applications.value) //applicationResults.results.value
+
+const hasApplied = (character_id) =>  _.findIndex(applicants.value, {character_id: character_id}) > -1
+
+const apply = (character_id) => router.post(postApplication.url(), {
+    corporation_id: props.enlistment.corporation_id,
+    character_id: character_id
+}, {
+    onSuccess: () => applications.value.push({
+        applicationable: {
+            character_id: character_id
+        }
+    }),
+    preserveState: true
+})
+
+const remove = (character_id) => router.delete(pullCharacterApplication.url(character_id), {
+    preserveState: true,
+    onSuccess: () => _.remove(applications.value, function (application) {
+        return _.isEqual(application.applicationable.character_id, character_id)
+    })
+})
 </script>
 
 <style scoped>
