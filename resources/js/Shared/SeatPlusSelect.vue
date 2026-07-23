@@ -41,30 +41,27 @@
   </div>
 </template>
 
-<script>
-export default {
-    name: "SeatPlusSelect",
-    props: ['modelValue', 'id'],
-    emits: ['update:modelValue'],
-    data() {
-        return {
-            selection: this.modelValue
-        }
-    },
-    computed: {
-        error() {
-            return _.get(this.$page, `props.errors[${this.id}][0]`)
-        }
-    },
-    watch: {
-        selection(newValue) {
-            this.$emit('update:modelValue', newValue)
-        },
-        modelValue(newValue) {
-            this.selection = newValue
-        }
-    },
-}
+<script setup>
+import { computed, ref, watch } from "vue";
+import { usePage } from "@inertiajs/vue3";
+
+const props = defineProps(['modelValue', 'id']);
+
+const emit = defineEmits(['update:modelValue']);
+
+const page = usePage();
+
+const selection = ref(props.modelValue)
+
+const error = computed(() => _.get(page, `props.errors[${props.id}][0]`))
+
+watch(selection, (newValue) => {
+    emit('update:modelValue', newValue)
+})
+
+watch(() => props.modelValue, (newValue) => {
+    selection.value = newValue
+})
 </script>
 
 <style scoped>

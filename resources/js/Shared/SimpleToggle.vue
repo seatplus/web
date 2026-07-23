@@ -16,34 +16,25 @@
   </span>
 </template>
 
-<script>
-export default {
-    name: "SimpleToggle",
-    props: {
-        bgClass: {
-            type: String,
-            default: 'bg-indigo-600'
-        },
-        modelValue: {
-            type: Boolean,
-            default: false
-        }
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps({
+    bgClass: {
+        type: String,
+        default: 'bg-indigo-600'
     },
-    emits: ['update:modelValue'],
-    data() {
-        return {
-            focused: false /*This Needed?*/
-        };
-    },
-    computed: {
-        trackClass() {
-            return this.modelValue ? this.bgClass : 'bg-gray-200';
-        }
-    },
-    methods: {
-        toggle() {
-            this.$emit('update:modelValue', !this.modelValue);
-        }
+    modelValue: {
+        type: Boolean,
+        default: false
     }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const trackClass = computed(() => props.modelValue ? props.bgClass : 'bg-gray-200')
+
+function toggle() {
+    emit('update:modelValue', !props.modelValue);
 }
 </script>
