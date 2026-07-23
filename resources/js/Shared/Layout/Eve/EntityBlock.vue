@@ -21,60 +21,48 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue"
 import EveImage from "@/Shared/EveImage.vue"
-export default {
-    name: "EntityBlock",
-    components: {EveImage},
-    props: {
-        entity: {
-            required: true,
-            type: Object
-        },
-        imageSize: {
-            required: false,
-            default: 12,
-            type: Number
-        },
-        nameFontSize: {
-            required: false,
-            default: 'lg',
-            type: String
-        },
-        nameClass: {
-            required: false,
-            type: String,
-            default: ''
-        }
+
+const props = defineProps({
+    entity: {
+        required: true,
+        type: Object
     },
-    computed: {
-        name() {
-            return _.get(this.entity, 'name', 'missing name')
-        },
-        image_class() {
-            return `h-${this.imageSize} w-${this.imageSize} rounded-full`
-        },
-        name_class() {
-            return this.nameClass ? this.nameClass : `text-${this.nameFontSize} leading-6 font-medium text-gray-900`
-        },
-        subText() {
-
-            let alliance = _.get(this.entity, 'alliance', null)
-
-            let names = _.compact([
-                _.get(this.entity, 'corporation.name'),
-                _.isString(alliance) ? alliance : _.get(alliance, 'name', null),
-            ])
-
-            return _.join(names, ' | ')
-        }
+    imageSize: {
+        required: false,
+        default: 12,
+        type: Number
     },
-    methods: {
-        hasAlliance() {
-            return _.has(this.entity, 'alliance.name')
-        }
+    nameFontSize: {
+        required: false,
+        default: 'lg',
+        type: String
+    },
+    nameClass: {
+        required: false,
+        type: String,
+        default: ''
     }
-}
+});
+
+const name = computed(() => _.get(props.entity, 'name', 'missing name'))
+
+const image_class = computed(() => `h-${props.imageSize} w-${props.imageSize} rounded-full`)
+
+const name_class = computed(() => props.nameClass ? props.nameClass : `text-${props.nameFontSize} leading-6 font-medium text-gray-900`)
+
+const subText = computed(() => {
+    let alliance = _.get(props.entity, 'alliance', null)
+
+    let names = _.compact([
+        _.get(props.entity, 'corporation.name'),
+        _.isString(alliance) ? alliance : _.get(alliance, 'name', null),
+    ])
+
+    return _.join(names, ' | ')
+})
 </script>
 
 <style scoped>

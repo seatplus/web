@@ -147,7 +147,7 @@
   </section>
 </template>
 
-<script>
+<script setup>
 import { ChatBubbleBottomCenterTextIcon } from '@heroicons/vue/20/solid'
 import { computed } from "vue";
 import EveImage from "@/Shared/EveImage.vue";
@@ -155,74 +155,61 @@ import Time from "@/Shared/Time.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { addComment } from "@/actions/Seatplus/Web/Http/Controllers/Recruitment/ApplicationsController";
 
-export default {
-    name: "LogTab",
-    components: {Time, EveImage, ChatBubbleBottomCenterTextIcon },
-    props: {
-        application: {
-            required: true,
-            type: Object
-        },
-        withHeader: {
-            required: false,
-            type: Boolean,
-            default: true
-        }
+const props = defineProps({
+    application: {
+        required: true,
+        type: Object
     },
-    setup(props) {
-
-        const form = useForm({
-            comment: null
-        })
-
-        const isFinalDecision = (index) => {
-            return  _.filter(props.application.log_entries, {type: 'decision'}).length === (index+1)
-        }
-
-        const activity = computed(() => {
-
-            let activity = [
-                {
-                    type: 'decision',
-                    character: _.has(props.application, 'applicationable.main_character') ? _.get(props.application, 'applicationable.main_character') : _.get(props.application, 'applicationable'),
-                    comment: 'has applied',
-                    created_at: props.application.created_at
-                }
-            ]
-
-            _.each(props.application.log_entries, (entry, entryIdx) => {
-                activity.push({
-                    type: 'comment',
-                    character: entry.causer.main_character,
-                    comment: entry.comment,
-                    created_at: entry.created_at
-                })
-
-                if(entry.type === 'decision') {
-                    activity.push({
-                        type: 'decision',
-                        character: entry.causer.main_character,
-                        comment: isFinalDecision(entryIdx) ? `${props.application.status} the application` :  'approved step',
-                        created_at: entry.created_at
-                    })
-                }
-
-            })
-
-            return activity
-        })
-        const user = usePage().props.user.data
-
-        const commentUrl = addComment.url(props.application.id)
-
-        return {
-            activity,
-            user,
-            form,
-            commentUrl
-        }
+    withHeader: {
+        required: false,
+        type: Boolean,
+        default: true
     }
+});
+
+const form = useForm({
+    comment: null
+})
+
+const isFinalDecision = (index) => {
+    return  _.filter(props.application.log_entries, {type: 'decision'}).length === (index+1)
 }
+
+const activity = computed(() => {
+
+    let activity = [
+        {
+            type: 'decision',
+            character: _.has(props.application, 'applicationable.main_character') ? _.get(props.application, 'applicationable.main_character') : _.get(props.application, 'applicationable'),
+            comment: 'has applied',
+            created_at: props.application.created_at
+        }
+    ]
+
+    _.each(props.application.log_entries, (entry, entryIdx) => {
+        activity.push({
+            type: 'comment',
+            character: entry.causer.main_character,
+            comment: entry.comment,
+            created_at: entry.created_at
+        })
+
+        if(entry.type === 'decision') {
+            activity.push({
+                type: 'decision',
+                character: entry.causer.main_character,
+                comment: isFinalDecision(entryIdx) ? `${props.application.status} the application` :  'approved step',
+                created_at: entry.created_at
+            })
+        }
+
+    })
+
+    return activity
+})
+const user = usePage().props.user.data
+
+const commentUrl = addComment.url(props.application.id)
 </script>
 
 <style scoped>

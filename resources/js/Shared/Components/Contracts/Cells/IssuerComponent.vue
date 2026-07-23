@@ -17,17 +17,13 @@
   />
 </template>
 
-<script>
+<script setup>
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 
-export default {
-    name: "IssuerComponent",
-    components: {EntityByIdBlock},
-    props: {
-        contract: {
-            required: true,
-            type: Object
-        }
+defineProps({
+    contract: {
+        required: true,
+        type: Object
     }
-}
+});
 </script>

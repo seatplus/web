@@ -12,7 +12,6 @@
 
 <script>
 import {useValidateObject} from "@/Functions/useValidateObject";
-import {computed} from "vue";
 
 var schema = {
     label: value => _.isString(value),
@@ -22,35 +21,31 @@ var schema = {
 
 schema.label.required = true
 schema.columnSpan.required = true
+</script>
 
-export default {
-    name: "StickyHeaderCell",
-    props: {
-        cell: {
-            required: true,
-            type: [String, Object],
-            validator: cell => _.isObject(cell) ? useValidateObject(cell, schema) : _.isString(cell)
-        },
-        mobileColumnSpan: {
-            required: false,
-            type: Number,
-            default: 1
-        }
+<script setup>
+import {computed} from "vue";
+
+const props = defineProps({
+    cell: {
+        required: true,
+        type: [String, Object],
+        validator: cell => _.isObject(cell) ? useValidateObject(cell, schema) : _.isString(cell)
     },
-    setup(props) {
-        const enrichedCell = computed(() => {
-            return {
-                label: _.isString(props.cell) ? props.cell : props.cell.label,
-                columnSpan: _.isString(props.cell) ? 1 : props.cell.columnSpan,
-                mobileColumnSpan: _.isString(props.cell) ? 1 : _.get(props.cell, 'mobileColumnSpan', props.mobileColumnSpan),
-            }
-        })
-
-        return {
-            enrichedCell
-        }
+    mobileColumnSpan: {
+        required: false,
+        type: Number,
+        default: 1
     }
-}
+});
+
+const enrichedCell = computed(() => {
+    return {
+        label: _.isString(props.cell) ? props.cell : props.cell.label,
+        columnSpan: _.isString(props.cell) ? 1 : props.cell.columnSpan,
+        mobileColumnSpan: _.isString(props.cell) ? 1 : _.get(props.cell, 'mobileColumnSpan', props.mobileColumnSpan),
+    }
+})
 </script>
 
 <style scoped>

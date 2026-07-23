@@ -14,12 +14,6 @@
   </div>
 </template>
 
-<script>
-export default {
-    name: "CardWithHeader"
-}
-</script>
-
 <style scoped>
 
 </style>

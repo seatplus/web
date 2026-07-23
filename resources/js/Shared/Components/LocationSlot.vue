@@ -90,7 +90,8 @@
   </CardWithHeader>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import WideLists from "../WideLists.vue";
 import WideListElement from "../WideListElement.vue";
 import EveImage from "../EveImage.vue"
@@ -98,44 +99,35 @@ import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import { prefix } from "metric-prefix";
 import { item as itemRoute } from "@/actions/Seatplus/Web/Http/Controllers/Character/AssetsController";
 
-export default {
-    name: "LocationSlot",
-    components: {CardWithHeader, WideListElement, WideLists, EveImage},
-    props: {
-        name: {
-            type: String,
-            required: true
-        },
-        items: {
-            type: Array,
-            required: true
-        },
-        slots: {
-            type: Array,
-            required: true
-        }
+const props = defineProps({
+    name: {
+        type: String,
+        required: true
     },
-    computed: {
-        filtered_items() {
-            return _.sortBy(_.each(_.filter(this.items, (item) => this.slots.includes(item.location_flag)), (item) => item.index = this.slots.indexOf(item.location_flag)), 'index')
-        },
-        isShown() {
-            return !_.isEmpty(this.filtered_items)
-        }
+    items: {
+        type: Array,
+        required: true
     },
-    methods: {
-        getMetricPrefix(numeric_value) {
-
-            return prefix(numeric_value, {precision: 3, unit: 'm³'})
-        },
-        url(asset) {
-
-            return _.isEmpty(asset.content) ? '' : itemRoute.url({character_id: asset.owner_id, item_id: asset.item_id})
-        },
-        hasContent(content) {
-            return !_.isEmpty(content)
-        }
+    slots: {
+        type: Array,
+        required: true
     }
+});
+
+const filtered_items = computed(() => _.sortBy(_.each(_.filter(props.items, (item) => props.slots.includes(item.location_flag)), (item) => item.index = props.slots.indexOf(item.location_flag)), 'index'))
+
+const isShown = computed(() => !_.isEmpty(filtered_items.value))
+
+function getMetricPrefix(numeric_value) {
+    return prefix(numeric_value, {precision: 3, unit: 'm³'})
+}
+
+function url(asset) {
+    return _.isEmpty(asset.content) ? '' : itemRoute.url({character_id: asset.owner_id, item_id: asset.item_id})
+}
+
+function hasContent(content) {
+    return !_.isEmpty(content)
 }
 </script>
 

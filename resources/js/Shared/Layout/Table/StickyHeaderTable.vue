@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import {computed} from "vue";
 import {useValidateObject} from "@/Functions/useValidateObject";
 
 var schema = {
@@ -36,48 +35,42 @@ var schema = {
 
 schema.title.required = true
 schema.columnSpan.required = true
+</script>
 
-export default {
-    name: "StickyHeaderTable",
-    props: {
-        headerTitles: {
-            required: true,
-            type: Array,
-            validator: titles => _.chain(titles)
-                .map(title => _.isObject(title) ? useValidateObject(title, schema) : _.isString(title))
-                .filter()
-                .value()
-                .length> 0
-        },
-        // Optional id for the row <ul> so an <InfiniteScroll items-element> can target it.
-        bodyId: {
-            required: false,
-            type: String,
-            default: null,
-        }
+<script setup>
+import {computed} from "vue";
+
+const props = defineProps({
+    headerTitles: {
+        required: true,
+        type: Array,
+        validator: titles => _.chain(titles)
+            .map(title => _.isObject(title) ? useValidateObject(title, schema) : _.isString(title))
+            .filter()
+            .value()
+            .length> 0
     },
-    setup(props) {
-
-        const countColumns = computed(() => {
-            return _.sumBy(props.headerTitles, (title) => {
-                return _.isString(title) ? 1 : title.columnSpan
-            })
-        })
-
-        const columns = computed(() => _.map(props.headerTitles, function (title) {
-            return {
-                columnSpan: _.get(title, 'columnSpan', 1),
-                mobileColumnSpan: _.get(title, 'singleRowElement', false) ? 2 : 1,
-                label: _.get(title, 'title', title),
-                srOnly: _.get(title, 'srOnly', false),
-            }
-        }))
-
-        return {
-            countColumns,
-            columns,
-        }
+    // Optional id for the row <ul> so an <InfiniteScroll items-element> can target it.
+    bodyId: {
+        required: false,
+        type: String,
+        default: null,
     }
-}
+});
+
+const countColumns = computed(() => {
+    return _.sumBy(props.headerTitles, (title) => {
+        return _.isString(title) ? 1 : title.columnSpan
+    })
+})
+
+const columns = computed(() => _.map(props.headerTitles, function (title) {
+    return {
+        columnSpan: _.get(title, 'columnSpan', 1),
+        mobileColumnSpan: _.get(title, 'singleRowElement', false) ? 2 : 1,
+        label: _.get(title, 'title', title),
+        srOnly: _.get(title, 'srOnly', false),
+    }
+}))
 </script>
 

@@ -61,45 +61,36 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {onBeforeMount, ref} from "vue";
 import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 import Time from "@/Shared/Time.vue";
 
-export default {
-    name: "MailRepresentation",
-    components: {Time, EntityByIdBlock},
-    props: {
-        mailId: {
-            type: Number,
-            required: true
-        }
-    },
-    setup(props) {
-        const messages = ref([])
-
-        const fetchMails = async () => {
-
-            // Plain same-origin fetch — no axios, no Ziggy route(). (Wayfinder would be
-            // the typed alternative, but its generated routes aren't built in CI yet — B3.)
-            const response = await fetch(`/character/mails/content/${props.mailId}`, {
-                headers: { Accept: 'application/json' },
-            })
-
-            if (! response.ok) {
-                return
-            }
-
-            messages.value.push(...await response.json())
-        }
-
-        onBeforeMount(() => fetchMails())
-
-        return {
-            messages
-        }
+const props = defineProps({
+    mailId: {
+        type: Number,
+        required: true
     }
+});
+
+const messages = ref([])
+
+const fetchMails = async () => {
+
+    // Plain same-origin fetch — no axios, no Ziggy route(). (Wayfinder would be
+    // the typed alternative, but its generated routes aren't built in CI yet — B3.)
+    const response = await fetch(`/character/mails/content/${props.mailId}`, {
+        headers: { Accept: 'application/json' },
+    })
+
+    if (! response.ok) {
+        return
+    }
+
+    messages.value.push(...await response.json())
 }
+
+onBeforeMount(() => fetchMails())
 </script>
 
 <style scoped>

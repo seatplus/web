@@ -45,8 +45,7 @@
   </CardWithHeader>
 </template>
 
-<script>
-
+<script setup>
 import EntityBlock from "@/Shared/Layout/Eve/EntityBlock.vue";
 import CardWithHeader from "@/Shared/Layout/Cards/CardWithHeader.vue";
 import CharacterContactsRowComponent from "./CharacterContactsRowComponent.vue";
@@ -54,85 +53,66 @@ import StickyHeaderTable from "@/Shared/Layout/Table/StickyHeaderTable.vue";
 import SimpleInlineList from "../../Layout/SimpleInlineList.vue";
 import { computed, ref } from "vue";
 
-export default {
-    name: "CharacterContactsComponent",
-    components: {
-        SimpleInlineList,
-        CharacterContactsRowComponent,
-        StickyHeaderTable,
-        CardWithHeader,
-        EntityBlock,
+const props = defineProps({
+    character: {
+        required: true,
+        type: Object
     },
-    props: {
-        character: {
-            required: true,
-            type: Object
-        },
-        contacts: {
-            type: Array,
-            default: () => []
-        },
+    contacts: {
+        type: Array,
+        default: () => []
     },
-    setup(props) {
+});
 
-        const selected_filter = ref('')
-        const options = [
-            {id: 'all', title: 'All contacts'},
-            {id: 'standing', title: 'Only With Standing Offset'},
-        ]
+const selected_filter = ref('')
+const options = [
+    {id: 'all', title: 'All contacts'},
+    {id: 'standing', title: 'Only With Standing Offset'},
+]
 
-        const headerTitles = [
-            {title: 'Contact', columnSpan: 2},
-            {title: 'Labels', columnSpan: 1},
-            {title: 'Standing', columnSpan: 1},
-            {title: 'Corporation standing', columnSpan: 1},
-            {title: 'Alliance standing', columnSpan: 1},
-        ]
+const headerTitles = [
+    {title: 'Contact', columnSpan: 2},
+    {title: 'Labels', columnSpan: 1},
+    {title: 'Standing', columnSpan: 1},
+    {title: 'Corporation standing', columnSpan: 1},
+    {title: 'Alliance standing', columnSpan: 1},
+]
 
-        const diff = (a,b) => a > b ? a - b : b - a
+const diff = (a,b) => a > b ? a - b : b - a
 
-        const filteredContacts = computed(() => {
+const filteredContacts = computed(() => {
 
-            let unsortedContacts = props.contacts
+    let unsortedContacts = props.contacts
 
-            if(selected_filter.value === 'wofaction') {
-                unsortedContacts = _.filter(props.contacts, {contact_type: 'faction'})
-            }
-
-            if(selected_filter.value === 'standing') {
-                unsortedContacts =  _.filter(props.contacts, (contact) => {
-                    if(_.isNil(contact.corporation_standing) && _.isNil(contact.alliance_standing)) {
-                        return false
-                    }
-
-                    let standing = contact.standing
-
-                    if(standing === 0) {
-                        return false
-                    }
-
-                    let corp_standing = contact.corporation_standing != null ? contact.corporation_standing : 0
-                    let alliance_standing = contact.alliance_standing != null ? contact.alliance_standing : 0
-
-                    return !((diff(corp_standing,standing) === 0) || (diff(alliance_standing,standing) === 0));
-
-                })
-            }
-
-            return _.chain(unsortedContacts)
-                .sortBy(['standing', 'corporation_standing', 'alliance_standing'])
-                .reverse()
-                .value()
-        })
-
-        return {
-            filteredContacts,
-            options,
-            selected_filter,
-            headerTitles,
-        }
+    if(selected_filter.value === 'wofaction') {
+        unsortedContacts = _.filter(props.contacts, {contact_type: 'faction'})
     }
-}
+
+    if(selected_filter.value === 'standing') {
+        unsortedContacts =  _.filter(props.contacts, (contact) => {
+            if(_.isNil(contact.corporation_standing) && _.isNil(contact.alliance_standing)) {
+                return false
+            }
+
+            let standing = contact.standing
+
+            if(standing === 0) {
+                return false
+            }
+
+            let corp_standing = contact.corporation_standing != null ? contact.corporation_standing : 0
+            let alliance_standing = contact.alliance_standing != null ? contact.alliance_standing : 0
+
+            return !((diff(corp_standing,standing) === 0) || (diff(alliance_standing,standing) === 0));
+
+        })
+    }
+
+    return _.chain(unsortedContacts)
+        .sortBy(['standing', 'corporation_standing', 'alliance_standing'])
+        .reverse()
+        .value()
+})
 </script>
 
 <style scoped>

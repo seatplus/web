@@ -40,28 +40,20 @@
   </p>
 </template>
 
-<script>
+<script setup>
 import {
     TagIcon,
     SignalIcon,
     BanknotesIcon,
     ArchiveBoxIcon,
 } from "@heroicons/vue/20/solid";
-export default {
-    name: "DetailsComponent",
-    components: {
-        TagIcon,
-        SignalIcon,
-        BanknotesIcon,
-        ArchiveBoxIcon
-    },
-    props: {
-        contract: {
-            required: true,
-            type: Object
-        }
+
+defineProps({
+    contract: {
+        required: true,
+        type: Object
     }
-}
+});
 </script>
 
 <style scoped>
