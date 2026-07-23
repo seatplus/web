@@ -80,7 +80,9 @@ class ManualLocationController extends Controller
         Location::updateOrCreate([
             'location_id' => $suggestion->location_id,
         ], [
-            'locatable_id' => $suggestion->location_id,
+            // Point the polymorphic relation at the ManualLocation's own key so `locatable`
+            // resolves (its PK is the auto `id`, not the location_id).
+            'locatable_id' => $suggestion->getKey(),
             'locatable_type' => ManualLocation::class,
         ]);
 

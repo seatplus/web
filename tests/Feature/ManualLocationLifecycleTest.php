@@ -106,6 +106,12 @@ test('admin can accept suggestion', function () {
     // Make sure there is one suggestion in universe_locations
     test()->assertCount(1, Location::where('location_id', 12345)->get());
 
+    // the accepted location's polymorphic relation resolves to the chosen suggestion, so the
+    // asset views (LocationRessource::name) render its name rather than a blank " - ".
+    $accepted = Location::with('locatable')->firstWhere('location_id', 12345);
+    expect($accepted->locatable)->toBeInstanceOf(ManualLocation::class)
+        ->and($accepted->locatable->name)->toBe($manual_location->name);
+
     // check that there there is only one left after accepting
     expect(loadSuggestions()->json('props.data'))->toHaveCount(1);
 });
