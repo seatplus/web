@@ -51,10 +51,12 @@
           <dt class="text-sm font-medium text-gray-500">
             Message
           </dt>
+          <!-- eslint-disable vue/no-v-html -- mail body is server-rendered EVE mail HTML -->
           <dd
             class="mt-1 text-sm text-gray-900"
             v-html="message.body"
           />
+          <!-- eslint-enable vue/no-v-html -->
         </div>
       </dl>
     </div>

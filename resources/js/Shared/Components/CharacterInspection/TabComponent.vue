@@ -144,11 +144,13 @@ const props = defineProps({
     },
     targetCorporation: {
         type: Object,
-        required: false
+        required: false,
+        default: null
     },
     application: {
         type: Object,
-        required: false
+        required: false,
+        default: null
     }
 });
 

@@ -98,6 +98,7 @@ const { trans } = useTranslations();
 
 defineProps({
     characters: {
+        type: Array,
         required: true
     }
 });

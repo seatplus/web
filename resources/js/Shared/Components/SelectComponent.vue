@@ -36,7 +36,7 @@
           <ListboxOption
             v-for="option in options"
             :key="option.id"
-            v-slot="{ active, selected }"
+            v-slot="{ active, selected: isSelected }"
             as="template"
             :value="option"
           >
@@ -46,13 +46,13 @@
                   :object="option"
                   tailwind_class="shrink-0 h-6 w-6 rounded-full"
                 />
-                <span :class="[selected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate']">
+                <span :class="[isSelected ? 'font-semibold' : 'font-normal', 'ml-3 block truncate']">
                   {{ option.name }}
                 </span>
               </div>
 
               <span
-                v-if="selected"
+                v-if="isSelected"
                 :class="[active ? 'text-white' : 'text-indigo-600', 'absolute inset-y-0 right-0 flex items-center pr-4']"
               >
                 <CheckIcon
@@ -77,7 +77,8 @@ import EveImage from "../EveImage.vue";
 const props = defineProps({
     listLabel: {
         required: false,
-        type: String
+        type: String,
+        default: null
     },
     selected: {
         required: true,

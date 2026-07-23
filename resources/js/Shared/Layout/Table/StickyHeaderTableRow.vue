@@ -11,7 +11,6 @@
 defineProps({
     numberColumns: {
         type: Number,
-        required: true,
         default: 1
     }
 });

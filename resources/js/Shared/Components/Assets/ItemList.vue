@@ -22,7 +22,6 @@
       type: Array
     },
     compact: {
-      required: true,
       default: false,
       type: Boolean
     }

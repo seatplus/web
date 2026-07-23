@@ -38,7 +38,8 @@ defineProps({
     },
     division: {
         required: false,
-        type: Object
+        type: Object,
+        default: null
     },
     filters: {
         required: false,

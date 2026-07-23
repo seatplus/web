@@ -14,9 +14,9 @@
               v-model="expression"
             >
               <option
-                v-for="(expression, description, index) in cron"
+                v-for="(cronExpression, description, index) in cron"
                 :key="index"
-                :value="expression"
+                :value="cronExpression"
               >
                 {{ description }}
               </option>

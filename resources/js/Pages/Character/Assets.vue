@@ -108,12 +108,10 @@ const COMPACT_VIEW_TTL = 365 * 24 * 60 * 60 * 1000
 
 const props = defineProps({
     dispatchTransferObject: {
-        required: true,
         type: Object,
         default: () => {}
     },
     characterIds: {
-        required: true,
         type: Array,
         default: () => []
     },

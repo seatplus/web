@@ -75,6 +75,7 @@ import Modal from "./Modal.vue"
 
 const props = defineProps({
     modelValue: {
+        type: Boolean,
         required: true
     },
     cancelButton: {

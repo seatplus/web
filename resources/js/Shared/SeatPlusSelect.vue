@@ -45,7 +45,16 @@
 import { computed, ref, watch } from "vue";
 import { usePage } from "@inertiajs/vue3";
 
-const props = defineProps(['modelValue', 'id']);
+const props = defineProps({
+    modelValue: {
+        type: [String, Number],
+        default: null,
+    },
+    id: {
+        type: String,
+        default: null,
+    },
+});
 
 const emit = defineEmits(['update:modelValue']);
 

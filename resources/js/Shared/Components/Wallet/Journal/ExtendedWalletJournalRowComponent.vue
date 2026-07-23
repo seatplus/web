@@ -49,7 +49,8 @@ import EntityByIdBlock from "@/Shared/Layout/Eve/EntityByIdBlock.vue";
 
 defineProps({
     entry: {
-        required: true
+        required: true,
+        type: Object
     }
 });
 </script>

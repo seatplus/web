@@ -76,7 +76,8 @@ import EveImage from "@/Shared/EveImage.vue"
 
 defineProps({
     entry: {
-        required: true
+        required: true,
+        type: Object
     }
 });
 </script>

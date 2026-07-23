@@ -125,6 +125,7 @@ import { settings as viewScopesSettings } from "@/routes/view/scopes";
 import { scopes as viewCreateScopes } from "@/routes/view/create";
 
 const props = defineProps({
+    // eslint-disable-next-line vue/prop-name-casing -- controller-provided Inertia prop; mirrors the PHP payload key
     available_scopes: {
         type: Object,
         required: true

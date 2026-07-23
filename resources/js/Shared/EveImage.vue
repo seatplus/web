@@ -36,7 +36,9 @@ const props = defineProps({
         type: Number,
         default: 32
     },
+    // eslint-disable-next-line vue/prop-name-casing -- consumed as :tailwind_class by many call sites; renaming is wide, non-functional churn
     tailwind_class: {
+        type: String,
         required: false,
         default: "h-12 w-12 rounded-full"
     },

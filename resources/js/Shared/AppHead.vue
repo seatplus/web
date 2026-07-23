@@ -6,6 +6,7 @@ import { Head, usePage } from '@inertiajs/vue3';
 defineProps({
     appTitle: {
         type: String,
+        default: null,
     },
 })
 

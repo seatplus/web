@@ -12,6 +12,7 @@
 <script setup>
 defineProps({
     secondary: {
+        type: Boolean,
         default: false,
     },
 });

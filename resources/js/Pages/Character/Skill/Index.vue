@@ -82,6 +82,7 @@ defineProps({
         required: true,
         type: Object
     },
+    // eslint-disable-next-line vue/prop-name-casing -- controller-provided Inertia prop; mirrors the PHP payload key
     character_ids: {
         required: true,
         type: Array
