@@ -3,6 +3,9 @@ import { CheckCircleIcon, InformationCircleIcon, ExclamationCircleIcon, XCircleI
 import { XMarkIcon } from '@heroicons/vue/20/solid'
 import {ref} from "vue";
 import {useToasts} from "@/Functions/useToasts.js";
+import { useTranslations } from "@/composables/useTranslations";
+
+const { trans } = useTranslations();
 
 const props = defineProps({
     toast: {
@@ -38,7 +41,7 @@ const isError = ref(props.toast.appearance === 'error')
           <XCircleIcon v-if="isError" class="h-6 w-6 text-red-400" aria-hidden="true" />
         </div>
         <div class="ml-3 w-0 flex-1 pt-0.5">
-          <p class="text-sm font-medium text-gray-900">{{ $trans(`web::notifications.${toast.appearance}`) }}</p>
+          <p class="text-sm font-medium text-gray-900">{{ trans(`web::notifications.${toast.appearance}`) }}</p>
           <p class="mt-1 text-sm text-gray-500">{{ toast.message }}</p>
         </div>
         <div class="ml-4 flex shrink-0">
