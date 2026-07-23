@@ -46,6 +46,7 @@ it('walks a missing location from unknown → add → accepted → shown in asse
     assetTextVisible($page, 'Add location information');
     $page->script("[...document.querySelectorAll('button')].find(b => b.textContent.includes('Add location information'))?.click()");
     $page->waitForText("Add location information for unknown structure ({$unknownId})");
+    $page->wait(1); // let the modal's 300ms enter transition finish so it's fully visible in the snap
     snap($page, "manual-locations-lifecycle-2-add-{$device}");
 
     // 3) A user submits a suggested name (seeded — the modal's ESI autosuggest isn't drivable
