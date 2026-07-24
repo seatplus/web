@@ -42,12 +42,14 @@ const props = defineProps({
         required: true,
         type: Object
     },
+    // eslint-disable-next-line vue/prop-name-casing -- controller-provided Inertia prop; mirrors the PHP payload key
     character_ids: {
         required: true,
         type: Array
     },
     // Available ref_type options for the filter (WalletsController::index) —
     // passed as a prop so the filter needs no autosuggest endpoint (no axios/Ziggy).
+    // eslint-disable-next-line vue/prop-name-casing -- controller-provided Inertia prop; mirrors the PHP payload key
     ref_types: {
         required: false,
         type: Array,

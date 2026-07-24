@@ -132,6 +132,7 @@ import RadioListWithDescription from "@/Shared/Layout/RadioListWithDescription.v
 import { create as createScopes, deleteSsoScopeSetting } from "@/actions/Seatplus/Web/Http/Controllers/Configuration/SsoSettings/SsoSettingsController";
 
 const props = defineProps({
+    // eslint-disable-next-line vue/prop-name-casing -- controller-provided Inertia prop; mirrors the PHP payload key
     available_scopes: {
         type: Object,
         required: true

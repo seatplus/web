@@ -18,7 +18,8 @@ const props = defineProps({
     },
     format: {
         type: String,
-        required: false
+        required: false,
+        default: null
     },
 });
 

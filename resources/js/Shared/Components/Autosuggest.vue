@@ -28,7 +28,7 @@
         <ListboxOption
           v-for="option in options"
           :key="option"
-          v-slot="{ selected }"
+          v-slot="{ selected: isSelected }"
           :value="option"
           class="text-gray-900 hover:text-white hover:bg-indigo-600 cursor-default select-none relative py-2 pl-8 pr-4"
         >
@@ -37,13 +37,13 @@
             :entity="option"
             class="block truncate"
             :image-size="5"
-            :name-class="selected ? 'font-semibold' : 'font-medium' + ' ' + 'text-sm leading 6 text-gray-900'"
+            :name-class="isSelected ? 'font-semibold' : 'font-medium' + ' ' + 'text-sm leading 6 text-gray-900'"
           />
           <div v-else>
             {{ option.name }}
           </div>
           <span
-            v-show="selected"
+            v-show="isSelected"
             class="absolute inset-y-0 left-0 flex items-center pl-1.5"
           >
             <CheckIcon class="h-5 w-5" />
@@ -71,7 +71,8 @@ import { typesOrGroupsOrCategories } from "@/actions/Seatplus/Web/Http/Controlle
 defineProps({
     label: {
         required: false,
-        type: String
+        type: String,
+        default: null
     },
     placeholder: {
         required: true,

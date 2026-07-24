@@ -56,7 +56,9 @@ import ResolveIdToName from "../../ResolveIdToName.vue";
 
 const props = defineProps({
     selectedId: {
-        required: false
+        type: Number,
+        required: false,
+        default: null
     },
 });
 

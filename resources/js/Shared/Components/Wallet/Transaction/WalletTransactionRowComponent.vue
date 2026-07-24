@@ -84,7 +84,8 @@ import ExtendedWalletTransactionRowComponent from "./ExtendedWalletTransactionRo
 
 const props = defineProps({
     entry: {
-        required: true
+        required: true,
+        type: Object
     },
     even: {
         required: true,

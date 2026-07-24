@@ -150,7 +150,7 @@
           <Autosuggest
             :key="itemsKey"
             placeholder="Search for items"
-            @selectedObject="addItem"
+            @selected-object="addItem"
           />
           <div class="mt-2 flex flex-wrap gap-2">
             <DismissibleButton

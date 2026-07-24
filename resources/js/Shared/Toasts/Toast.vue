@@ -35,19 +35,46 @@ const isError = ref(props.toast.appearance === 'error')
     <div class="p-4">
       <div class="flex items-start">
         <div class="shrink-0">
-          <CheckCircleIcon v-if="isSuccess" class="h-6 w-6 text-green-400" aria-hidden="true" />
-          <InformationCircleIcon v-if="isInfo" class="h-6 w-6 text-blue-400" aria-hidden="true" />
-          <ExclamationCircleIcon v-if="isWarning" class="h-6 w-6 text-amber-400" aria-hidden="true" />
-          <XCircleIcon v-if="isError" class="h-6 w-6 text-red-400" aria-hidden="true" />
+          <CheckCircleIcon
+            v-if="isSuccess"
+            class="h-6 w-6 text-green-400"
+            aria-hidden="true"
+          />
+          <InformationCircleIcon
+            v-if="isInfo"
+            class="h-6 w-6 text-blue-400"
+            aria-hidden="true"
+          />
+          <ExclamationCircleIcon
+            v-if="isWarning"
+            class="h-6 w-6 text-amber-400"
+            aria-hidden="true"
+          />
+          <XCircleIcon
+            v-if="isError"
+            class="h-6 w-6 text-red-400"
+            aria-hidden="true"
+          />
         </div>
         <div class="ml-3 w-0 flex-1 pt-0.5">
-          <p class="text-sm font-medium text-gray-900">{{ trans(`web::notifications.${toast.appearance}`) }}</p>
-          <p class="mt-1 text-sm text-gray-500">{{ toast.message }}</p>
+          <p class="text-sm font-medium text-gray-900">
+            {{ trans(`web::notifications.${toast.appearance}`) }}
+          </p>
+          <p class="mt-1 text-sm text-gray-500">
+            {{ toast.message }}
+          </p>
         </div>
         <div class="ml-4 flex shrink-0">
-          <button type="button" @click="remove" class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <button
+            type="button"
+            class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            @click="remove"
+          >
             <span class="sr-only">Close</span>
-            <XMarkIcon class="h-5 w-5" aria-hidden="true" />
+            <XMarkIcon
+              class="h-5 w-5"
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>

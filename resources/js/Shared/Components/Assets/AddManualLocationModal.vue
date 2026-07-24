@@ -113,8 +113,10 @@ import { create as createManualLocation } from "@/actions/Seatplus/Web/Http/Cont
 
 const props = defineProps({
     modelValue: {
+        type: Boolean,
         required: true
     },
+    // eslint-disable-next-line vue/prop-name-casing -- mirrors the location_id passed by asset rows; renaming is non-functional churn
     location_id: {
         required: true,
         type: Number

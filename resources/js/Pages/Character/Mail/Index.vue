@@ -15,7 +15,7 @@
         </PageHeader>
 
         <div class="block lg:hidden">
-          <MobileMailList v-model:selectedId="selectedId" />
+          <MobileMailList v-model:selected-id="selectedId" />
         </div>
 
         <div class="hidden md:block space-y-3">
@@ -28,7 +28,7 @@
       </div>
     </div>
     <template #aside>
-      <DesktopMailList v-model:selectedId="selectedId" />
+      <DesktopMailList v-model:selected-id="selectedId" />
     </template>
   </MultiColumnLayout>
 </template>

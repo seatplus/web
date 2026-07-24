@@ -68,7 +68,8 @@ import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
 const props = defineProps({
     selectedId: {
         type: Number,
-        required: false
+        required: false,
+        default: null
     }
 });
 

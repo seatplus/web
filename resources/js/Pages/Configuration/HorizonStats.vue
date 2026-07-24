@@ -97,6 +97,7 @@
         <div class="px-4 py-5 sm:p-6">
           <div class="flex items-center">
             <div class="shrink-0 bg-indigo-500 rounded-md p-3">
+              <!-- eslint-disable vue/no-v-html -- static, in-component SVG path markup -->
               <svg
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -107,6 +108,7 @@
                 class="h-6 w-6 text-white"
                 v-html="symbols[stats.status]"
               />
+              <!-- eslint-enable vue/no-v-html -->
             </div>
             <div class="ml-5 w-0 flex-1">
               <dl>

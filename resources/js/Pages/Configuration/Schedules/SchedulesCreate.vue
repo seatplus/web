@@ -14,9 +14,9 @@
               v-model="expression"
             >
               <option
-                v-for="(expression,description, index) in cron"
+                v-for="(cronExpression, description, index) in cron"
                 :key="index"
-                :value="expression"
+                :value="cronExpression"
               >
                 {{ description }}
               </option>
@@ -31,11 +31,11 @@
               v-model="job"
             >
               <option
-                v-for="(job, index) in jobs"
+                v-for="(jobName, index) in jobs"
                 :key="index"
-                :value="job"
+                :value="jobName"
               >
-                {{ job }}
+                {{ jobName }}
               </option>
             </SeatPlusSelect>
           </InputGroup>

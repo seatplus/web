@@ -31,7 +31,6 @@ import {ref, watch} from "vue";
 
 const props = defineProps({
     modelValue: {
-        required: true,
         type: Array,
         default: () => []
     },

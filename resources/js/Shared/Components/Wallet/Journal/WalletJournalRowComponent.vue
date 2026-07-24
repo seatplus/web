@@ -64,7 +64,8 @@ import { useTranslations } from "@/composables/useTranslations";
 
 defineProps({
     entry: {
-        required: true
+        required: true,
+        type: Object
     },
     even: {
         required: true,

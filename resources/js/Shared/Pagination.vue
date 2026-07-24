@@ -72,7 +72,10 @@
             </svg>
           </Link>
 
-          <span v-for="page in pages" :key="page">
+          <span
+            v-for="page in pages"
+            :key="page"
+          >
             <Link
               :href="buildHref(page)"
               class="hidden md:inline-flex -ml-px relative items-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium focus:z-10 focus:outline-hidden focus:border-indigo-300 focus:ring-indigo active:bg-indigo-200 active:text-gray-700 transition ease-in-out duration-150 hover:bg-indigo-50"

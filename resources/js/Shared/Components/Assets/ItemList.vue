@@ -5,7 +5,7 @@
       :items="items"
     />
     <WideAssetListComponent
-        v-else
+      v-else
       :items="items"
     />
   </div>
@@ -22,7 +22,6 @@
       type: Array
     },
     compact: {
-      required: true,
       default: false,
       type: Boolean
     }
