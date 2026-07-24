@@ -269,7 +269,7 @@ it('reviews — the inspection tabs render the applicant\'s data', function (str
     snap($page, "recruitment-review-tab-contracts-{$device}");
 })->with(['desktop', 'iphone']);
 
-it('reviews — a reviewer dispatches an on-demand character update (fetch, no axios)', function () {
+it('reviews — a reviewer dispatches an on-demand character update (fetch, no axios)', function (string $device) {
     $character = actingAsCharacter();
     makeRecruiterOfCorporation($character, 'can accept or deny applications');
 
@@ -277,10 +277,10 @@ it('reviews — a reviewer dispatches an on-demand character update (fetch, no a
     $application = seedApplicantAtStage($character->corporation_id, 'Jane Applicant', stage: 0);
     cache()->flush();
 
-    // Desktop-only, like the tab test above. The applicant header renders an Update control per
-    // covered character; the migrated UpdateCharacterComponent dispatches the batch update via the
-    // native fetch (http.js + Wayfinder), not axios.
-    $page = visit("/recruitment/application/{$application->id}");
+    // The applicant header renders an Update control per covered character; the migrated
+    // UpdateCharacterComponent dispatches the batch update via the native fetch (http.js +
+    // Wayfinder), not axios. Captured on both viewports for the Desktop | iPhone matrix.
+    $page = deviceVisit($device, "/recruitment/application/{$application->id}");
     $page->assertNoSmoke();
     $page->waitForText('Jane Applicant');
 
@@ -291,5 +291,5 @@ it('reviews — a reviewer dispatches an on-demand character update (fetch, no a
     $page->waitForText('updating');
     $page->assertNoSmoke();
 
-    snap($page, 'recruitment-review-update-character-desktop');
-});
+    snap($page, "recruitment-review-update-character-{$device}");
+})->with(['desktop', 'iphone']);
