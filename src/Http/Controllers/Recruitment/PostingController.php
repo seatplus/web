@@ -139,7 +139,6 @@ class PostingController extends Controller
         $manageableIds = $this->getAffiliatedIds->get(
             permissions: [ManageRecruitmentController::MANAGE_PERMISSION],
             corporationRoles: ['Director'],
-            user: $user,
         );
 
         abort_unless(in_array($corporationId, $manageableIds), 403, 'You may not manage this corporation.');

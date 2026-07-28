@@ -41,7 +41,7 @@ class ObservationController extends Controller
                 ! $user->can('superuser'),
                 fn (Builder $query) => $query->whereIn(
                     'corporation_infos.corporation_id',
-                    (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director'),
+                    (new GetAffiliatedIds)->get(permissions: self::PERMISSION, corporationRoles: 'director'),
                 ),
             )
             ->get(['name', 'corporation_id', 'ticker']);
@@ -119,7 +119,7 @@ class ObservationController extends Controller
             return;
         }
 
-        $observableIds = (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director');
+        $observableIds = (new GetAffiliatedIds)->get(permissions: self::PERMISSION, corporationRoles: 'director');
 
         abort_unless(in_array($corporation_id, $observableIds), 403, 'You may not observe this corporation.');
     }

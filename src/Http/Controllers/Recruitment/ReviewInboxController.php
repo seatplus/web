@@ -36,7 +36,6 @@ class ReviewInboxController extends Controller
         $recruiterCorpIds = $this->getAffiliatedIds->get(
             permissions: [self::RECRUITER_PERMISSION],
             corporationRoles: ['Director'],
-            user: $user,
         );
 
         $applications = Application::query()

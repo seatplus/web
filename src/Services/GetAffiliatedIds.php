@@ -34,10 +34,8 @@ class GetAffiliatedIds
     private const string DIRECTOR_ROLE = 'Director';
 
     public function __construct(
-        private ?User $user = null,
         private ?CanUserService $canUserService = null
     ) {
-        $this->user = $user ?? auth()->user();
         $this->canUserService = $canUserService ?? new CanUserService;
     }
 
@@ -49,15 +47,15 @@ class GetAffiliatedIds
     public function get(
         string|array $permissions,
         string|array $corporationRoles = [],
-        ?User $user = null
     ): array {
         $normalized_permissions = $this->normalizeInput($permissions);
         $normalizedRoles = $this->normalizeInput($corporationRoles);
+
+        // A Director always manages their corporation, so the role is implicitly in scope for every
+        // affiliation lookup regardless of the corporation roles the caller asked for.
         $normalizedRoles[] = self::DIRECTOR_ROLE;
 
-        $this->user = $user ?? $this->user;
-
-        return (new self($user))->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
+        return $this->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
     }
 
     /**
@@ -70,8 +68,8 @@ class GetAffiliatedIds
     public function ownedCharacterIds(?User $user = null): array
     {
         // Re-resolve auth() at call time: a container-injected instance may have been
-        // built before the auth middleware ran, leaving $this->user null.
-        $user = $user ?? $this->user ?? auth()->user();
+        // built before the auth middleware ran.
+        $user = $user ?? auth()->user();
 
         return data_get($this->canUserService->getUserPermissionObject($user), 'owned_character_ids', []);
     }
@@ -83,7 +81,9 @@ class GetAffiliatedIds
      */
     private function collectAffiliatedIds(array $permissions, array $corporationRole): array
     {
-        $userPermission = $this->canUserService->getUserPermissionObject($this->user);
+        // Resolve auth() at call time rather than in the constructor: a container-injected instance
+        // may have been built before the auth middleware ran.
+        $userPermission = $this->canUserService->getUserPermissionObject(auth()->user());
 
         return array_merge(
             $this->getPermissionBasedIds($permissions, $userPermission),

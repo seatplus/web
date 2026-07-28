@@ -51,7 +51,6 @@ class CheckAffiliationForApplication
         $affiliatedIds = $this->getAffiliatedIdsService->get(
             permissions: [$permission],
             corporationRoles: ['director'],
-            user: auth()->user(),
         );
 
         $application = Application::query()

@@ -15,7 +15,7 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public static function make(): self
     {
-        return new self(new GetAffiliatedIds(auth()->user()));
+        return new self(new GetAffiliatedIds);
     }
 
     public function getQuery(): Builder

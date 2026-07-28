@@ -61,7 +61,6 @@ class GetRecruitIdsService
         $affiliated_ids = $this->affiliatedIdsService->get(
             self::PERMISSION,
             self::CORPORATION_ROLE,
-            auth()->user()
         );
 
         return $this->getCachedRecruits($affiliated_ids);

@@ -32,7 +32,6 @@ class ManageRecruitmentController extends Controller
         $manageableIds = $this->getAffiliatedIds->get(
             permissions: [self::MANAGE_PERMISSION],
             corporationRoles: ['Director'],
-            user: $user,
         );
 
         $postings = Enlistment::query()
