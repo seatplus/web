@@ -67,6 +67,31 @@ it('calls corporation info action', function () {
     expect(SsoScopes::where('morphable_id', 1_184_675_423)->first()->selected_scopes)->toHaveCount(3);
 });
 
+it('skips entities without an id', function () {
+    Bus::fake();
+
+    $request = [
+        'selectedEntities' => [
+            [
+                'corporation_id' => null,
+                'id' => null,
+                'name' => 'Amok.',
+                'category' => 'corporation',
+            ],
+        ],
+        'selectedScopes' => [
+            'esi-assets.read_assets.v1,esi-universe.read_structures.v1',
+            'publicData',
+        ],
+        'type' => 'default',
+    ];
+
+    (new UpdateOrCreateSsoSettings($request))->execute();
+
+    Bus::assertNotDispatched(CorporationInfoJob::class);
+    Bus::assertNotDispatched(AllianceInfoJob::class);
+});
+
 /**
  * @runInSeparateProcess
  *
