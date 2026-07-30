@@ -80,12 +80,17 @@ class MemberTrackingController extends Controller
 
     private function getAffiliatedCorporations(DispatchTransferObject $dispatchTransferObject): Collection
     {
-        $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
-
-        return CorporationInfo::query()
-            ->whereIn('corporation_id', $affiliatedIds)
+        $query = CorporationInfo::query()
             ->with('alliance')
-            ->has('members')
-            ->get();
+            ->has('members');
+
+        $this->getAffiliatedIds->scope(
+            query: $query,
+            column: 'corporation_id',
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+
+        return $query->get();
     }
 }

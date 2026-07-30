@@ -35,13 +35,16 @@ class ObservationController extends Controller
         // scopes there is nothing to be compliant against, so an unconfigured corp (e.g. an old corp the
         // user merely has a character in) would just be noise.
         $corporations = CorporationInfo::query()
-            ->has('ssoScopes')
-            ->orHas('alliance.ssoScopes')
+            // Group the has/orHas so the affiliation constraint below ANDs against the whole OR-pair,
+            // not just the alliance arm (boolean precedence).
+            ->where(fn (Builder $query) => $query->has('ssoScopes')->orHas('alliance.ssoScopes'))
             ->when(
                 ! $user->can('superuser'),
-                fn (Builder $query) => $query->whereIn(
-                    'corporation_infos.corporation_id',
-                    (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director'),
+                fn (Builder $query) => (new GetAffiliatedIds($user))->scope(
+                    query: $query,
+                    column: 'corporation_infos.corporation_id',
+                    permissions: self::PERMISSION,
+                    corporationRoles: 'director',
                 ),
             )
             ->get(['name', 'corporation_id', 'ticker']);
@@ -119,9 +122,13 @@ class ObservationController extends Controller
             return;
         }
 
-        $observableIds = (new GetAffiliatedIds($user))->get(permissions: self::PERMISSION, corporationRoles: 'director');
+        $mayObserve = (new GetAffiliatedIds($user))->coversCorporation(
+            corporationId: $corporation_id,
+            permissions: self::PERMISSION,
+            corporationRoles: 'director',
+        );
 
-        abort_unless(in_array($corporation_id, $observableIds), 403, 'You may not observe this corporation.');
+        abort_unless($mayObserve, 403, 'You may not observe this corporation.');
     }
 
     /**
