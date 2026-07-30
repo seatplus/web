@@ -45,20 +45,25 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        // A requested character_ids filter is honoured verbatim (unchanged behaviour); otherwise the
-        // authorised set is composed as a subquery instead of a materialised affiliated-id array.
-        $characters = CharacterInfo::query()
+        // Always hard-scope to the authorised set (composed as a subquery, not a materialised
+        // affiliated-id array); a requested character_ids filter only narrows *within* that set. This
+        // route has no CheckAuthorization middleware, so the query is the sole tamper guard — a
+        // character_ids the user isn't affiliated with must never leak through.
+        $query = CharacterInfo::query()
             ->has('contacts')
-            ->with('characterAffiliation')
+            ->with('characterAffiliation');
+
+        $this->getAffiliatedIds->scope(
+            query: $query,
+            column: 'character_id',
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+
+        $characters = $query
             ->when(
                 request()->has('character_ids'),
                 fn (Builder $query) => $query->whereIn('character_id', (array) request('character_ids')),
-                fn (Builder $query) => $this->getAffiliatedIds->scope(
-                    query: $query,
-                    column: 'character_id',
-                    permissions: $dispatchTransferObject->permission,
-                    corporationRoles: $dispatchTransferObject->required_corporation_role,
-                ),
             )
             ->get()
             ->each->append('corporation_id');
