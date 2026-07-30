@@ -26,11 +26,17 @@ class GetAffiliatedEntitiesAction
 
     public function characters(string $permission, ?string $search = null): AnonymousResourceCollection
     {
-        $affiliatedIds = $this->getAffiliatedIds->get($permission);
         $ownedCharacterIds = auth()->user()->characters->pluck('character_id')->toArray();
         $recruitIds = GetRecruitIdsService::get();
 
-        $query = $this->characterInfoQuery($affiliatedIds, $search)
+        // The affiliated branch is composed as a subquery (never materialising the affiliated set);
+        // the recruit + owned branches are already small bounded arrays.
+        $affiliatedQuery = CharacterInfo::query()
+            ->when($search, fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search}%"))
+            ->orderBy('character_infos.name');
+        $this->getAffiliatedIds->scope($affiliatedQuery, 'character_id', $permission);
+
+        $query = $affiliatedQuery
             ->union($this->characterInfoQuery($recruitIds, $search))
             ->union($this->characterInfoQuery($ownedCharacterIds, $search))
             ->distinct()
@@ -46,16 +52,13 @@ class GetAffiliatedEntitiesAction
      */
     public function corporations(string $permission, array $corporationRoles = [], ?string $search = null): AnonymousResourceCollection
     {
-        $affiliatedIds = $this->getAffiliatedIds->get($permission, $corporationRoles);
-
         $query = CorporationInfo::query()
-            ->whereIn('corporation_id', $affiliatedIds)
             ->select('corporation_infos.*')
             ->when($search, fn (Builder $query) => $query->where('name', 'like', "%{$search}%"))
-            ->with('alliance')
-            ->get();
+            ->with('alliance');
+        $this->getAffiliatedIds->scope($query, 'corporation_id', $permission, $corporationRoles);
 
-        return CorporationInfoRessource::collection($query);
+        return CorporationInfoRessource::collection($query->get());
     }
 
     private function characterInfoQuery(array $ids, ?string $search = null): Builder

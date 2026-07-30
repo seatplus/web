@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
+use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -44,12 +45,21 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        $ids = request('character_ids', $this->getAffiliatedIds($dispatchTransferObject));
-
+        // A requested character_ids filter is honoured verbatim (unchanged behaviour); otherwise the
+        // authorised set is composed as a subquery instead of a materialised affiliated-id array.
         $characters = CharacterInfo::query()
             ->has('contacts')
-            ->whereIn('character_id', $ids)
             ->with('characterAffiliation')
+            ->when(
+                request()->has('character_ids'),
+                fn (Builder $query) => $query->whereIn('character_id', (array) request('character_ids')),
+                fn (Builder $query) => $this->getAffiliatedIds->scope(
+                    query: $query,
+                    column: 'character_id',
+                    permissions: $dispatchTransferObject->permission,
+                    corporationRoles: $dispatchTransferObject->required_corporation_role,
+                ),
+            )
             ->get()
             ->each->append('corporation_id');
 

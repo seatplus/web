@@ -50,25 +50,30 @@ class Controller extends BaseController
         DispatchTransferObject $dispatchTransferObject,
         ?string $characterRelation = null
     ): Collection {
-        $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
-        $filteredIds = $this->filterByRequestedCharacterIds($affiliatedIds);
-
-        return $this->fetchAffiliatedCharacterIdsWithRelation($filteredIds, $characterRelation);
-    }
-
-    protected function fetchAffiliatedCharacterIdsWithRelation(
-        array $characterIds,
-        ?string $characterRelation = null
-    ): Collection {
         // The frontend iterates this as a list of scalar character_ids
         // (`:id="character_id"`, typed Number). Returning full CharacterInfo models
         // made each element an object, so pages built route('…', ['character_id' =>
         // <object>]) and Ziggy threw "object passed as 'character_id' parameter …",
         // crashing the setup() of components that resolve a route on mount (e.g.
         // WalletJournalBalanceChart) and taking the page down. Pluck plain ids.
-        return CharacterInfo::query()
-            ->select('character_id')
-            ->whereIn('character_id', $characterIds)
+        //
+        // The affiliated set is composed as a subquery (never materialised); when the request carries
+        // a character_ids filter it is ANDed on as a second whereIn — the SQL equivalent of the old
+        // array_intersect, so a tampered id outside the authorised set can never leak through.
+        $query = CharacterInfo::query()->select('character_id');
+
+        $this->getAffiliatedIds->scope(
+            query: $query,
+            column: 'character_id',
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+
+        return $query
+            ->when(
+                $this->request->has(self::CHARACTER_IDS_FILTER),
+                fn (Builder $query) => $query->whereIn('character_id', (array) $this->request->get(self::CHARACTER_IDS_FILTER)),
+            )
             ->when(
                 $characterRelation,
                 fn (Builder $query) => $query->with($characterRelation),
@@ -87,17 +92,5 @@ class Controller extends BaseController
     protected function getOwnedCharacterIds(): array
     {
         return auth()->user()->characters->pluck('character_id')->toArray();
-    }
-
-    private function filterByRequestedCharacterIds(array $affiliatedIds): array
-    {
-        if ($this->request->has(self::CHARACTER_IDS_FILTER)) {
-            return array_intersect(
-                $affiliatedIds,
-                $this->request->get(self::CHARACTER_IDS_FILTER)
-            );
-        }
-
-        return $affiliatedIds;
     }
 }

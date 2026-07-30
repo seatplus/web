@@ -26,6 +26,8 @@
 
 namespace Seatplus\Web\Services;
 
+use Illuminate\Database\Eloquent\Builder;
+use InvalidArgumentException;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Permissions\CanUserService;
 use Seatplus\Auth\Services\Roles\AffiliationResolver;
@@ -78,6 +80,86 @@ class GetAffiliatedIds
     }
 
     /**
+     * Constrain $column to the entities affiliated via $permissions / $corporationRoles, composed as a
+     * grouped subquery rather than a materialised id array: the affiliated set is resolved in SQL by
+     * {@see AffiliationResolver}, so an inverse or alliance-wide role never pulls a whole *_infos table
+     * into PHP the way get() does.
+     *
+     * The whole affiliation constraint is wrapped in a single nested where(), so it stays safe to chain
+     * next to an existing orWhere (no boolean-precedence surprise). $column selects the id-space — the
+     * two spaces get() ever filtered against:
+     *  - a character_id column matches the affiliated characters OR the user's own characters;
+     *  - a corporation_id column matches the affiliated corporations OR the corporations the user holds
+     *    $corporationRoles (+ Director) in.
+     * Any other column throws (fail closed).
+     *
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function scope(
+        Builder $query,
+        string $column,
+        string|array $permissions,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): Builder {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+        $resolver = new AffiliationResolver;
+
+        if (str_contains($column, 'character_id')) {
+            $ownedCharacterIds = data_get($userPermission, 'owned_character_ids', []);
+
+            return $query->where(fn (Builder $builder) => $builder
+                ->whereIn($column, $resolver->characterIdsSubquery($roleIds))
+                ->orWhereIn($column, $ownedCharacterIds));
+        }
+
+        if (str_contains($column, 'corporation_id')) {
+            $normalizedRoles = $this->normalizeInput($corporationRoles);
+            $normalizedRoles[] = self::DIRECTOR_ROLE;
+            $corporationRoleIds = $this->corporationRoleIds($normalizedRoles, $userPermission);
+
+            return $query->where(fn (Builder $builder) => $builder
+                ->whereIn($column, $resolver->corporationIdsSubquery($roleIds))
+                ->orWhereIn($column, $corporationRoleIds));
+        }
+
+        throw new InvalidArgumentException("GetAffiliatedIds::scope() cannot resolve an id-space for column [{$column}].");
+    }
+
+    /**
+     * Whether $corporationId is one of the corporations affiliated via $permissions / $corporationRoles —
+     * a bounded membership test that never materialises the affiliated set. Replaces
+     * `in_array($corporationId, $this->get(...))` on the corporation id-space.
+     *
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function coversCorporation(
+        int $corporationId,
+        string|array $permissions,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): bool {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        $normalizedRoles = $this->normalizeInput($corporationRoles);
+        $normalizedRoles[] = self::DIRECTOR_ROLE;
+
+        if (in_array($corporationId, $this->corporationRoleIds($normalizedRoles, $userPermission), true)) {
+            return true;
+        }
+
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        return (new AffiliationResolver)->coveredIds($roleIds, [$corporationId]) !== [];
+    }
+
+    /**
      * @param  array<int,string>  $permissions
      * @param  array<int,string>  $corporationRole
      * @return array<int,int>
@@ -124,11 +206,7 @@ class GetAffiliatedIds
      */
     private function getPermissionBasedIds(array $permissions, array $userPermission): array
     {
-        $roleIds = collect($permissions)
-            ->flatMap(fn (string $permission) => data_get($userPermission, "permission_roles.$permission", []))
-            ->unique()
-            ->values()
-            ->all();
+        $roleIds = $this->permissionRoleIds($permissions, $userPermission);
 
         if ($roleIds === []) {
             return [];
@@ -151,9 +229,40 @@ class GetAffiliatedIds
      */
     private function getCorporationRoleBasedIds(array $corporation_role, array $userPermission): array
     {
-        return collect($corporation_role)
-            ->map(fn (string $corporation_role) => data_get($userPermission, "corporation_roles.$corporation_role", []))
-            ->collapse()
-            ->toArray();
+        return $this->corporationRoleIds($corporation_role, $userPermission);
+    }
+
+    /**
+     * The ids of the user's roles that grant any of $permissions, from the cached `permission_roles` slice.
+     *
+     * @param  array<int,string>  $permissions
+     * @param  array<string,mixed>  $userPermission
+     * @return array<int,int>
+     */
+    private function permissionRoleIds(array $permissions, array $userPermission): array
+    {
+        return collect($permissions)
+            ->flatMap(fn (string $permission) => data_get($userPermission, "permission_roles.$permission", []))
+            ->map(fn (mixed $id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * The corporation ids the user holds any of $corporationRoles in, from the cached `corporation_roles` slice.
+     *
+     * @param  array<int,string>  $corporationRoles
+     * @param  array<string,mixed>  $userPermission
+     * @return array<int,int>
+     */
+    private function corporationRoleIds(array $corporationRoles, array $userPermission): array
+    {
+        return collect($corporationRoles)
+            ->flatMap(fn (string $role) => data_get($userPermission, "corporation_roles.$role", []))
+            ->map(fn (mixed $id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

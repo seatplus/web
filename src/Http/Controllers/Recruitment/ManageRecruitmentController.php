@@ -29,19 +29,19 @@ class ManageRecruitmentController extends Controller
         $user = auth()->user();
         $isSuperuser = $user->can('superuser');
 
-        $manageableIds = $this->getAffiliatedIds->get(
-            permissions: [self::MANAGE_PERMISSION],
-            corporationRoles: ['Director'],
-            user: $user,
-        );
-
         $postings = Enlistment::query()
             ->with([
                 'corporation.alliance',
                 'corporation.ssoScopes',
                 'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
-            ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $manageableIds))
+            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->scope(
+                query: $query,
+                column: 'corporation_id',
+                permissions: [self::MANAGE_PERMISSION],
+                corporationRoles: ['Director'],
+                user: $user,
+            ))
             ->get()
             ->map(function (Enlistment $posting) {
                 /** @var CorporationInfo $corporation */

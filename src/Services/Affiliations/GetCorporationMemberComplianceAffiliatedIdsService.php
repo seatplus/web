@@ -20,13 +20,8 @@ class GetCorporationMemberComplianceAffiliatedIdsService
 
     public function getQuery(): Builder
     {
-        $affiliated_ids = $this->getAffiliatedIds->get(
-            permissions: 'member compliance: review user',
-            corporationRoles: 'director'
-        );
-
-        // Find users who have at least one character in the affiliated IDs
-        // AND whose characters are in corporations/alliances with SSO scopes configured.
+        // Find users who have at least one character in the affiliated set (composed as a subquery,
+        // never materialised) AND whose characters are in corporations/alliances with SSO scopes.
         $user_ids = User::query()
             ->whereHas(
                 'characters',
@@ -36,7 +31,12 @@ class GetCorporationMemberComplianceAffiliatedIdsService
                             ->whereHas('corporation', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                             ->orWhereHas('alliance', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                     )
-                    ->whereIn('character_infos.character_id', $affiliated_ids)
+                    ->tap(fn (Builder $q) => $this->getAffiliatedIds->scope(
+                        query: $q,
+                        column: 'character_infos.character_id',
+                        permissions: 'member compliance: review user',
+                        corporationRoles: 'director',
+                    ))
             )
             ->pluck('users.id')
             ->toArray();
