@@ -29,26 +29,47 @@ namespace Seatplus\Web\Services\Sidebar;
 use Illuminate\Database\Eloquent\Builder;
 use Seatplus\Auth\Models\AccessControl\RoleMembership;
 use Seatplus\Auth\Models\User;
-use Seatplus\Auth\Services\Permissions\CanUserService;
-use Seatplus\Auth\Services\Permissions\DTO\ValidateIdsDTO;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
+use Seatplus\Web\Services\HasCharacterNecessaryRole;
 
 class SidebarPermissionChecker
 {
     public function __construct(
         private readonly User $user,
-        private ?CanUserService $canUserService = null,
     ) {
-        $this->canUserService = $canUserService ?? new CanUserService;
+        // eager-load once so the corporation-role check below never lazy-loads per character
+        $this->user->loadMissing('characters.roles');
     }
 
+    /**
+     * Whether a sidebar entry should be shown: a superuser sees everything (the `Gate::before` rule),
+     * the user holds one of the permissions (Spatie), or one of their characters holds one of the required
+     * in-game corporation roles (Director always matches).
+     *
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $characterRoles
+     */
     public function hasPermissionOrCorporationRole(string|array $permissions, string|array $characterRoles = ''): bool
     {
-        return $this->canUserService->check(
-            user: $this->user,
-            idsDTO: (new ValidateIdsDTO),
-            permissions: $this->normalizeInput($permissions),
-            corporation_roles: $this->normalizeInput($characterRoles),
-        );
+        // superuser short-circuits via the Gate::before rule; safe even if the permission is unregistered
+        if ($this->user->can('superuser')) {
+            return true;
+        }
+
+        $permissions = $this->normalizeInput($permissions);
+
+        if ($permissions !== [] && $this->user->hasAnyPermission($permissions)) {
+            return true;
+        }
+
+        $characterRoles = $this->normalizeInput($characterRoles);
+
+        if ($characterRoles === []) {
+            return false;
+        }
+
+        return $this->user->characters
+            ->contains(fn (CharacterInfo $character) => HasCharacterNecessaryRole::check($character, $characterRoles));
     }
 
     public function isRoleModerator(): bool

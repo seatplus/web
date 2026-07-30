@@ -8,6 +8,15 @@ beforeEach(function () {
     test()->test_character->roles()->update(['roles' => ['']]);
 });
 
+test('rendering the sidebar does not build the heavy user_permissions cache', function () {
+    test()->actingAs(test()->test_user);
+
+    (new SidebarEntries)->getFilteredEntries();
+
+    // the sidebar now checks permissions/corp-roles directly, without CanUserService::getUserPermissionObject()
+    expect(cache()->has('user_permissions_'.test()->test_user->id))->toBeFalse();
+});
+
 test('user without superuser does not see access control', function () {
     test()->actingAs(test()->test_user);
 
