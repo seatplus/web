@@ -84,12 +84,24 @@ class MemberTrackingController extends Controller
             ->with('alliance')
             ->has('members');
 
-        $this->getAffiliatedIds->scope(
-            query: $query,
-            column: 'corporation_id',
-            permissions: $dispatchTransferObject->permission,
-            corporationRoles: $dispatchTransferObject->required_corporation_role,
-        );
+        // Default view = the corporations the user operates (member + required role / Director); an
+        // explicit corporation_ids selection is honoured only within the authorised set (that ∪ the
+        // affiliated corps, composed as a subquery).
+        if (request()->has('corporation_ids')) {
+            $this->getAffiliatedIds->scope(
+                query: $query,
+                column: 'corporation_id',
+                permissions: $dispatchTransferObject->permission,
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+            $query->whereIn('corporation_id', request()->get('corporation_ids'));
+        } else {
+            $this->getAffiliatedIds->scopeOwned(
+                query: $query,
+                column: 'corporation_id',
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+        }
 
         return $query->get();
     }

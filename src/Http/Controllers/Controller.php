@@ -57,23 +57,26 @@ class Controller extends BaseController
         // crashing the setup() of components that resolve a route on mount (e.g.
         // WalletJournalBalanceChart) and taking the page down. Pluck plain ids.
         //
-        // The affiliated set is composed as a subquery (never materialised); when the request carries
-        // a character_ids filter it is ANDed on as a second whereIn — the SQL equivalent of the old
-        // array_intersect, so a tampered id outside the authorised set can never leak through.
+        // Default view = the user's own characters. An explicit character_ids selection is honoured
+        // only *within* the authorised set (own ∪ affiliated, composed as a subquery): the affiliation
+        // scope() and the requested whereIn() are ANDed, so a submitted id the user isn't affiliated
+        // with is dropped — a tampered URL can't reach out-of-scope characters (this route carries no
+        // CheckAuthorization middleware, so the query is the sole tamper guard).
         $query = CharacterInfo::query()->select('character_id');
 
-        $this->getAffiliatedIds->scope(
-            query: $query,
-            column: 'character_id',
-            permissions: $dispatchTransferObject->permission,
-            corporationRoles: $dispatchTransferObject->required_corporation_role,
-        );
+        if ($this->request->has(self::CHARACTER_IDS_FILTER)) {
+            $this->getAffiliatedIds->scope(
+                query: $query,
+                column: 'character_id',
+                permissions: $dispatchTransferObject->permission,
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+            $query->whereIn('character_id', (array) $this->request->get(self::CHARACTER_IDS_FILTER));
+        } else {
+            $this->getAffiliatedIds->scopeOwned($query, 'character_id');
+        }
 
         return $query
-            ->when(
-                $this->request->has(self::CHARACTER_IDS_FILTER),
-                fn (Builder $query) => $query->whereIn('character_id', (array) $this->request->get(self::CHARACTER_IDS_FILTER)),
-            )
             ->when(
                 $characterRelation,
                 fn (Builder $query) => $query->with($characterRelation),

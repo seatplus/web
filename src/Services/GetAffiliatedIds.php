@@ -93,6 +93,9 @@ class GetAffiliatedIds
      *    $corporationRoles (+ Director) in.
      * Any other column throws (fail closed).
      *
+     * A superuser is authorised for everything, so no constraint is added (mirrors the `superuser`
+     * bypass CanUserService/`Gate::before` apply everywhere else).
+     *
      * @param  string|array<int,string>  $permissions
      * @param  string|array<int,string>  $corporationRoles
      */
@@ -104,6 +107,11 @@ class GetAffiliatedIds
         ?User $user = null,
     ): Builder {
         $user = $user ?? $this->user ?? auth()->user();
+
+        if ($user->can('superuser')) {
+            return $query;
+        }
+
         $userPermission = $this->canUserService->getUserPermissionObject($user);
 
         $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
@@ -128,6 +136,41 @@ class GetAffiliatedIds
         }
 
         throw new InvalidArgumentException("GetAffiliatedIds::scope() cannot resolve an id-space for column [{$column}].");
+    }
+
+    /**
+     * Constrain $column to the entities the user *owns / operates* — the default view before any
+     * explicit selection:
+     *  - a character_id column matches only the user's own characters;
+     *  - a corporation_id column matches only the corporations the user is a member of AND holds
+     *    $corporationRoles (or Director) in — i.e. the cached `corporation_roles` slice.
+     * Unlike {@see scope()} this deliberately excludes the merely-affiliated set (entities reachable
+     * through a permission, e.g. an alliance-wide auditor role); those appear only when the user
+     * explicitly selects them, and a selection is validated through scope().
+     *
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function scopeOwned(
+        Builder $query,
+        string $column,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): Builder {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        if (str_contains($column, 'character_id')) {
+            return $query->whereIn($column, data_get($userPermission, 'owned_character_ids', []));
+        }
+
+        if (str_contains($column, 'corporation_id')) {
+            $normalizedRoles = $this->normalizeInput($corporationRoles);
+            $normalizedRoles[] = self::DIRECTOR_ROLE;
+
+            return $query->whereIn($column, $this->corporationRoleIds($normalizedRoles, $userPermission));
+        }
+
+        throw new InvalidArgumentException("GetAffiliatedIds::scopeOwned() cannot resolve an id-space for column [{$column}].");
     }
 
     /**

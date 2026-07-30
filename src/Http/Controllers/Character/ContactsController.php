@@ -26,7 +26,6 @@
 
 namespace Seatplus\Web\Http\Controllers\Character;
 
-use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
@@ -45,26 +44,27 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        // Always hard-scope to the authorised set (composed as a subquery, not a materialised
-        // affiliated-id array); a requested character_ids filter only narrows *within* that set. This
-        // route has no CheckAuthorization middleware, so the query is the sole tamper guard — a
-        // character_ids the user isn't affiliated with must never leak through.
+        // Default view = the user's own characters; an explicit character_ids selection is honoured
+        // only within the authorised set (own ∪ affiliated, composed as a subquery). This route has no
+        // CheckAuthorization middleware, so the query is the sole tamper guard — a character_ids the
+        // user isn't affiliated with must never leak through.
         $query = CharacterInfo::query()
             ->has('contacts')
             ->with('characterAffiliation');
 
-        $this->getAffiliatedIds->scope(
-            query: $query,
-            column: 'character_id',
-            permissions: $dispatchTransferObject->permission,
-            corporationRoles: $dispatchTransferObject->required_corporation_role,
-        );
+        if (request()->has('character_ids')) {
+            $this->getAffiliatedIds->scope(
+                query: $query,
+                column: 'character_id',
+                permissions: $dispatchTransferObject->permission,
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+            $query->whereIn('character_id', (array) request('character_ids'));
+        } else {
+            $this->getAffiliatedIds->scopeOwned($query, 'character_id');
+        }
 
         $characters = $query
-            ->when(
-                request()->has('character_ids'),
-                fn (Builder $query) => $query->whereIn('character_id', (array) request('character_ids')),
-            )
             ->get()
             ->each->append('corporation_id');
 

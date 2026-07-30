@@ -112,18 +112,28 @@ class CorporationWalletController extends Controller
 
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject): Collection
     {
-        return CorporationDivision::query()
-            ->where('division_type', 'wallet')
-            ->when(
-                request()->has('corporation_ids'),
-                fn (Builder $query) => $query->whereIn('corporation_id', request()->get('corporation_ids')),
-                fn (Builder $query) => $this->getAffiliatedIds->scope(
-                    query: $query,
-                    column: 'corporation_id',
-                    permissions: $dispatchTransferObject->permission,
-                    corporationRoles: $dispatchTransferObject->required_corporation_role,
-                ),
-            )
+        $query = CorporationDivision::query()->where('division_type', 'wallet');
+
+        // Default view = the corporations the user operates (member + required role / Director); an
+        // explicit corporation_ids selection is honoured only within the authorised set (that ∪ the
+        // affiliated corps, composed as a subquery).
+        if (request()->has('corporation_ids')) {
+            $this->getAffiliatedIds->scope(
+                query: $query,
+                column: 'corporation_id',
+                permissions: $dispatchTransferObject->permission,
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+            $query->whereIn('corporation_id', request()->get('corporation_ids'));
+        } else {
+            $this->getAffiliatedIds->scopeOwned(
+                query: $query,
+                column: 'corporation_id',
+                corporationRoles: $dispatchTransferObject->required_corporation_role,
+            );
+        }
+
+        return $query
             ->select('corporation_divisions.*')
             ->distinct()
             ->get();
