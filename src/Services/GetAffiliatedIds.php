@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services;
 
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Permissions\CanUserService;
+use Seatplus\Auth\Services\Roles\AffiliationResolver;
 
 class GetAffiliatedIds
 {
@@ -111,15 +112,37 @@ class GetAffiliatedIds
     }
 
     /**
+     * Resolve the affiliated ids granted by the given permissions live, via {@see AffiliationResolver}.
+     *
+     * The cached permission object no longer carries a materialised `permissions` id-array slice (removed in
+     * auth 5.0); it carries `permission_roles` (permission → the ids of the user's roles that grant it). We
+     * union those role ids and enumerate their affiliated character/corporation/alliance ids through the
+     * resolver's set-based subqueries — the conflated, cross-id-space array shape the consumers expect.
+     *
      * @param  array<int,string>  $permissions
      * @return array<int,int>
      */
     private function getPermissionBasedIds(array $permissions, array $userPermission): array
     {
-        return collect($permissions)
-            ->map(fn (string $permission) => data_get($userPermission, "permissions.$permission", []))
-            ->collapse()
-            ->toArray();
+        $roleIds = collect($permissions)
+            ->flatMap(fn (string $permission) => data_get($userPermission, "permission_roles.$permission", []))
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($roleIds === []) {
+            return [];
+        }
+
+        $resolver = new AffiliationResolver;
+
+        $affiliatedIds = array_merge(
+            $resolver->characterIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
+            $resolver->corporationIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
+            $resolver->allianceIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
+        );
+
+        return array_map('intval', $affiliatedIds);
     }
 
     /**

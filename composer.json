@@ -26,8 +26,8 @@
         "php": "^8.5",
         "laravel/framework": "^13.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^4.2.0",
-        "seatplus/auth": "^4.2",
+        "seatplus/eveapi": "^5.0",
+        "seatplus/auth": "^5.0",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/wayfinder": "^0.1.16"
     },
