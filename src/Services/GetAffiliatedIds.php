@@ -80,6 +80,39 @@ class GetAffiliatedIds
     }
 
     /**
+     * The data-page filter. Constrain $column to the user's explicit selection when one is present —
+     * honoured only *within* the authorised set (own ∪ affiliated) — otherwise to the owned/operated
+     * default. This is the single place the "a submitted id is dropped unless the user is affiliated
+     * with it" tamper guard lives, for the pages whose route carries no CheckAuthorization middleware.
+     *
+     * @param  mixed  $selectedIds  raw request value (null / scalar / array); cast and emptied here
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function constrainToSelectionOrOwned(
+        Builder $query,
+        string $column,
+        mixed $selectedIds,
+        string|array $permissions,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): void {
+        $selected = array_values(array_filter(
+            (array) $selectedIds,
+            fn (mixed $id): bool => $id !== null && $id !== '',
+        ));
+
+        if ($selected === []) {
+            $this->constrainToOwned($query, $column, $corporationRoles, $user);
+
+            return;
+        }
+
+        $this->constrainToAffiliated($query, $column, $permissions, $corporationRoles, $user);
+        $query->whereIn($column, $selected);
+    }
+
+    /**
      * Constrain $column to the entities affiliated via $permissions / $corporationRoles, composed as a
      * grouped subquery rather than a materialised id array: the affiliated set is resolved in SQL by
      * {@see AffiliationResolver}, so an inverse or alliance-wide role never pulls a whole *_infos table
@@ -94,48 +127,48 @@ class GetAffiliatedIds
      * Any other column throws (fail closed).
      *
      * A superuser is authorised for everything, so no constraint is added (mirrors the `superuser`
-     * bypass CanUserService/`Gate::before` apply everywhere else).
+     * bypass CanUserService/`Gate::before` apply everywhere else). Mutates $query in place.
      *
      * @param  string|array<int,string>  $permissions
      * @param  string|array<int,string>  $corporationRoles
      */
-    public function scope(
+    public function constrainToAffiliated(
         Builder $query,
         string $column,
         string|array $permissions,
         string|array $corporationRoles = [],
         ?User $user = null,
-    ): Builder {
+    ): void {
         $user = $user ?? $this->user ?? auth()->user();
 
         if ($user->can('superuser')) {
-            return $query;
+            return;
         }
 
         $userPermission = $this->canUserService->getUserPermissionObject($user);
-
         $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
         $resolver = new AffiliationResolver;
 
         if (str_contains($column, 'character_id')) {
-            $ownedCharacterIds = data_get($userPermission, 'owned_character_ids', []);
-
-            return $query->where(fn (Builder $builder) => $builder
+            $query->where(fn (Builder $builder) => $builder
                 ->whereIn($column, $resolver->characterIdsSubquery($roleIds))
-                ->orWhereIn($column, $ownedCharacterIds));
+                ->orWhereIn($column, data_get($userPermission, 'owned_character_ids', [])));
+
+            return;
         }
 
         if (str_contains($column, 'corporation_id')) {
             $normalizedRoles = $this->normalizeInput($corporationRoles);
             $normalizedRoles[] = self::DIRECTOR_ROLE;
-            $corporationRoleIds = $this->corporationRoleIds($normalizedRoles, $userPermission);
 
-            return $query->where(fn (Builder $builder) => $builder
+            $query->where(fn (Builder $builder) => $builder
                 ->whereIn($column, $resolver->corporationIdsSubquery($roleIds))
-                ->orWhereIn($column, $corporationRoleIds));
+                ->orWhereIn($column, $this->corporationRoleIds($normalizedRoles, $userPermission)));
+
+            return;
         }
 
-        throw new InvalidArgumentException("GetAffiliatedIds::scope() cannot resolve an id-space for column [{$column}].");
+        throw new InvalidArgumentException("GetAffiliatedIds::constrainToAffiliated() cannot resolve an id-space for column [{$column}].");
     }
 
     /**
@@ -144,33 +177,38 @@ class GetAffiliatedIds
      *  - a character_id column matches only the user's own characters;
      *  - a corporation_id column matches only the corporations the user is a member of AND holds
      *    $corporationRoles (or Director) in — i.e. the cached `corporation_roles` slice.
-     * Unlike {@see scope()} this deliberately excludes the merely-affiliated set (entities reachable
-     * through a permission, e.g. an alliance-wide auditor role); those appear only when the user
-     * explicitly selects them, and a selection is validated through scope().
+     * Unlike {@see constrainToAffiliated()} this deliberately excludes the merely-affiliated set
+     * (entities reachable through a permission, e.g. an alliance-wide auditor role); those appear only
+     * when the user explicitly selects them, and a selection is validated through constrainToAffiliated().
+     * Mutates $query in place.
      *
      * @param  string|array<int,string>  $corporationRoles
      */
-    public function scopeOwned(
+    public function constrainToOwned(
         Builder $query,
         string $column,
         string|array $corporationRoles = [],
         ?User $user = null,
-    ): Builder {
+    ): void {
         $user = $user ?? $this->user ?? auth()->user();
         $userPermission = $this->canUserService->getUserPermissionObject($user);
 
         if (str_contains($column, 'character_id')) {
-            return $query->whereIn($column, data_get($userPermission, 'owned_character_ids', []));
+            $query->whereIn($column, data_get($userPermission, 'owned_character_ids', []));
+
+            return;
         }
 
         if (str_contains($column, 'corporation_id')) {
             $normalizedRoles = $this->normalizeInput($corporationRoles);
             $normalizedRoles[] = self::DIRECTOR_ROLE;
 
-            return $query->whereIn($column, $this->corporationRoleIds($normalizedRoles, $userPermission));
+            $query->whereIn($column, $this->corporationRoleIds($normalizedRoles, $userPermission));
+
+            return;
         }
 
-        throw new InvalidArgumentException("GetAffiliatedIds::scopeOwned() cannot resolve an id-space for column [{$column}].");
+        throw new InvalidArgumentException("GetAffiliatedIds::constrainToOwned() cannot resolve an id-space for column [{$column}].");
     }
 
     /**
@@ -213,7 +251,7 @@ class GetAffiliatedIds
 
         return array_merge(
             $this->getPermissionBasedIds($permissions, $userPermission),
-            $this->getCorporationRoleBasedIds($corporationRole, $userPermission),
+            $this->corporationRoleIds($corporationRole, $userPermission),
             data_get($userPermission, 'owned_character_ids', [])
         );
     }
@@ -264,15 +302,6 @@ class GetAffiliatedIds
         );
 
         return array_map('intval', $affiliatedIds);
-    }
-
-    /**
-     * @param  array<int,string>  $corporation_role
-     * @return array<int,int>
-     */
-    private function getCorporationRoleBasedIds(array $corporation_role, array $userPermission): array
-    {
-        return $this->corporationRoleIds($corporation_role, $userPermission);
     }
 
     /**

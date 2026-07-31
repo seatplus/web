@@ -35,6 +35,21 @@ it('has details', function () {
                 ->where("contacts.{$character_id}.0.contact_id", $contact->contact_id)));
 });
 
+it('drops a submitted character_id the user is not affiliated with', function () {
+    // The character.contacts route carries no CheckAuthorization middleware, so the query is the sole
+    // tamper guard: a hand-built ?character_ids[]=<foreign id> must not leak that character. The foreign
+    // character is given a contact so the has('contacts') filter can't be what excludes it — only the
+    // affiliation guard can. test_user owns test_character and holds no affiliating role.
+    $foreign = CharacterInfo::factory()->create();
+    $foreign->contacts()->create(Contact::factory()->make()->toArray());
+
+    test()->actingAs(test()->test_user)
+        ->get(route('character.contacts', ['character_ids' => [$foreign->character_id]]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Character/Contact/Index')
+            ->has('characters', 0));
+});
+
 it('has corporation standing', function (string $contact_type, string $corp_contact_level) {
     $affiliation = CharacterAffiliation::factory()->create([
         'alliance_id' => faker()->numberBetween(99_000_000, 100_000_000),

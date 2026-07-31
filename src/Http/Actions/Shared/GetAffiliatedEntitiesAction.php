@@ -34,7 +34,7 @@ class GetAffiliatedEntitiesAction
         $affiliatedQuery = CharacterInfo::query()
             ->when($search, fn (Builder $query) => $query->where('character_infos.name', 'like', "%{$search}%"))
             ->orderBy('character_infos.name');
-        $this->getAffiliatedIds->scope($affiliatedQuery, 'character_id', $permission);
+        $this->getAffiliatedIds->constrainToAffiliated($affiliatedQuery, 'character_id', $permission);
 
         $query = $affiliatedQuery
             ->union($this->characterInfoQuery($recruitIds, $search))
@@ -56,7 +56,7 @@ class GetAffiliatedEntitiesAction
             ->select('corporation_infos.*')
             ->when($search, fn (Builder $query) => $query->where('name', 'like', "%{$search}%"))
             ->with('alliance');
-        $this->getAffiliatedIds->scope($query, 'corporation_id', $permission, $corporationRoles);
+        $this->getAffiliatedIds->constrainToAffiliated($query, 'corporation_id', $permission, $corporationRoles);
 
         return CorporationInfoRessource::collection($query->get());
     }

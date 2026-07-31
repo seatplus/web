@@ -64,17 +64,13 @@ class Controller extends BaseController
         // CheckAuthorization middleware, so the query is the sole tamper guard).
         $query = CharacterInfo::query()->select('character_id');
 
-        if ($this->request->has(self::CHARACTER_IDS_FILTER)) {
-            $this->getAffiliatedIds->scope(
-                query: $query,
-                column: 'character_id',
-                permissions: $dispatchTransferObject->permission,
-                corporationRoles: $dispatchTransferObject->required_corporation_role,
-            );
-            $query->whereIn('character_id', (array) $this->request->get(self::CHARACTER_IDS_FILTER));
-        } else {
-            $this->getAffiliatedIds->scopeOwned($query, 'character_id');
-        }
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $query,
+            column: 'character_id',
+            selectedIds: $this->request->get(self::CHARACTER_IDS_FILTER),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
 
         return $query
             ->when(

@@ -40,7 +40,7 @@ class ObservationController extends Controller
             ->where(fn (Builder $query) => $query->has('ssoScopes')->orHas('alliance.ssoScopes'))
             ->when(
                 ! $user->can('superuser'),
-                fn (Builder $query) => (new GetAffiliatedIds($user))->scope(
+                fn (Builder $query) => (new GetAffiliatedIds($user))->constrainToAffiliated(
                     query: $query,
                     column: 'corporation_infos.corporation_id',
                     permissions: self::PERMISSION,

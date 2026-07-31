@@ -34,7 +34,7 @@ class ReviewInboxController extends Controller
         $isSuperuser = $user->can('superuser');
 
         $applications = Application::query()
-            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->scope(
+            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->constrainToAffiliated(
                 query: $query,
                 column: 'corporation_id',
                 permissions: [self::RECRUITER_PERMISSION],

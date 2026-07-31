@@ -35,7 +35,7 @@ class ManageRecruitmentController extends Controller
                 'corporation.ssoScopes',
                 'reviewRounds' => fn (HasMany $query) => $query->orderBy('position'),
             ])
-            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->scope(
+            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->constrainToAffiliated(
                 query: $query,
                 column: 'corporation_id',
                 permissions: [self::MANAGE_PERMISSION],

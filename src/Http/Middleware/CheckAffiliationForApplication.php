@@ -52,7 +52,7 @@ class CheckAffiliationForApplication
             ->where('id', $application_id)
             ->with(['applicationable', 'corporation']);
 
-        $this->getAffiliatedIdsService->scope(
+        $this->getAffiliatedIdsService->constrainToAffiliated(
             query: $query,
             column: 'corporation_id',
             permissions: [$permission],

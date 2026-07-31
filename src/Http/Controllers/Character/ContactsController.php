@@ -52,17 +52,13 @@ class ContactsController extends Controller
             ->has('contacts')
             ->with('characterAffiliation');
 
-        if (request()->has('character_ids')) {
-            $this->getAffiliatedIds->scope(
-                query: $query,
-                column: 'character_id',
-                permissions: $dispatchTransferObject->permission,
-                corporationRoles: $dispatchTransferObject->required_corporation_role,
-            );
-            $query->whereIn('character_id', (array) request('character_ids'));
-        } else {
-            $this->getAffiliatedIds->scopeOwned($query, 'character_id');
-        }
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $query,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
 
         $characters = $query
             ->get()

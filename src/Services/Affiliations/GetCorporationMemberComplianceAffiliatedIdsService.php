@@ -31,7 +31,7 @@ class GetCorporationMemberComplianceAffiliatedIdsService
                             ->whereHas('corporation', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                             ->orWhereHas('alliance', fn (Builder $q) => $q->whereHas('ssoScopes', fn (Builder $q) => $q->whereIn('type', ['global', 'user'])))
                     )
-                    ->tap(fn (Builder $q) => $this->getAffiliatedIds->scope(
+                    ->tap(fn (Builder $q) => $this->getAffiliatedIds->constrainToAffiliated(
                         query: $q,
                         column: 'character_infos.character_id',
                         permissions: 'member compliance: review user',
