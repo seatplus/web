@@ -80,14 +80,6 @@ class Controller extends BaseController
             ->pluck('character_id');
     }
 
-    protected function getAffiliatedIds(DispatchTransferObject $dispatchTransferObject): array
-    {
-        return $this->getAffiliatedIds->get(
-            $dispatchTransferObject->permission,
-            $dispatchTransferObject->required_corporation_role
-        );
-    }
-
     protected function getOwnedCharacterIds(): array
     {
         return auth()->user()->characters->pluck('character_id')->toArray();
