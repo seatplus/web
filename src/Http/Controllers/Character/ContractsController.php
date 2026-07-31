@@ -31,7 +31,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
@@ -93,20 +92,8 @@ class ContractsController extends Controller
 
     public function getContractDetails(int $character_id, int $contract_id): string|Response
     {
-        // Authorise the character_id path param: a user may inspect a contract only for a character they
-        // own or are affiliated with. Without this the param was unchecked — any user could read any
-        // character's contract details by URL (IDOR). This route has no CheckAuthorization middleware.
-        $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Contract::class);
-
-        $authorized = CharacterInfo::query()->where('character_id', $character_id);
-        $this->getAffiliatedIds->constrainToAffiliated(
-            query: $authorized,
-            column: 'character_id',
-            permissions: $dispatchTransferObject->permission,
-            corporationRoles: $dispatchTransferObject->required_corporation_role,
-        );
-        abort_unless($authorized->exists(), 403, 'You are not allowed to view this contract.');
-
+        // Authorisation (incl. the recruiter → recruit extended-scope case) is handled by the
+        // CheckAuthorizationWithExtendedScope middleware on the contract.details route.
         $query = Contract::query()->whereHas('characters', fn (Builder $query) => $query->where('character_id', $character_id))
             ->where('contract_id', $contract_id)
             ->with('items', 'items.type', 'startLocation', 'endLocation', 'assigneeCharacter', 'assigneeCorporation', 'issuerCharacter', 'issuerCorporation');
