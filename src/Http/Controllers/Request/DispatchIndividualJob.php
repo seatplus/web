@@ -26,10 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Request;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
@@ -50,21 +49,10 @@ class DispatchIndividualJob extends FormRequest
      */
     public function rules(): array
     {
-        $dispatchData = $this->get('dispatch_transfer_object');
-        $affiliatedIds = $this->getAffiliatedIdsForDispatch($dispatchData);
-
         return [
             ...$this->getDispatchObjectRules(),
-            ...$this->getIdentificationRules($affiliatedIds),
+            ...$this->getIdentificationRules($this->get('dispatch_transfer_object')),
         ];
-    }
-
-    private function getAffiliatedIdsForDispatch(array $dispatchData): array
-    {
-        return (new GetAffiliatedIds)->get(
-            permissions: data_get($dispatchData, 'permission'),
-            corporationRoles: data_get($dispatchData, 'required_corporation_role') ?? '',
-        );
     }
 
     private function getDispatchObjectRules(): array
@@ -78,37 +66,37 @@ class DispatchIndividualJob extends FormRequest
         ];
     }
 
-    private function getIdentificationRules(array $affiliatedIds): array
+    /**
+     * Validate the submitted character_id / corporation_id against the user's affiliated set with a
+     * bounded membership probe (coversCharacter / coversCorporation) rather than materialising the whole
+     * affiliated set into a Rule::in list — an inverse/alliance-wide role no longer pulls a *_infos table
+     * into PHP just to validate one id.
+     *
+     * @param  array<string, mixed>|null  $dispatchData
+     * @return array<string, array<int, mixed>>
+     */
+    private function getIdentificationRules(?array $dispatchData): array
     {
+        $permission = data_get($dispatchData, 'permission') ?? '';
+        $corporationRole = data_get($dispatchData, 'required_corporation_role') ?? '';
+
         return [
             'character_id' => [
                 Rule::requiredIf(fn () => ! $this->get('corporation_id')),
-                Rule::in($this->getAffiliatedCharacterIds($affiliatedIds)),
+                function (string $attribute, mixed $value, Closure $fail) use ($permission): void {
+                    if (! (new GetAffiliatedIds)->coversCharacter((int) $value, $permission)) {
+                        $fail('The selected character is not among your affiliated characters.');
+                    }
+                },
             ],
             'corporation_id' => [
                 Rule::requiredIf(fn () => ! $this->get('character_id')),
-                Rule::in($this->getAffiliatedCorporationIds($affiliatedIds)),
+                function (string $attribute, mixed $value, Closure $fail) use ($permission, $corporationRole): void {
+                    if (! (new GetAffiliatedIds)->coversCorporation((int) $value, $permission, $corporationRole)) {
+                        $fail('The selected corporation is not among your affiliated corporations.');
+                    }
+                },
             ],
         ];
-    }
-
-    private function getAffiliatedCharacterIds(array $affiliatedIds): array
-    {
-
-        return CharacterInfo::query()
-            ->whereIn('character_id', $affiliatedIds)
-            ->pluck('character_id')
-            ->values()
-            ->toArray();
-    }
-
-    private function getAffiliatedCorporationIds(array $affiliatedIds): array
-    {
-
-        return CorporationInfo::query()
-            ->whereIn('corporation_id', $affiliatedIds)
-            ->pluck('corporation_id')
-            ->values()
-            ->toArray();
     }
 }

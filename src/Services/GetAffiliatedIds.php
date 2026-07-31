@@ -281,6 +281,31 @@ class GetAffiliatedIds
     }
 
     /**
+     * Whether $characterId is one of the characters affiliated via $permissions — a bounded membership
+     * test that never materialises the affiliated set. The character id-space analog of
+     * {@see coversCorporation()}: it matches the user's own characters or the affiliated ones.
+     * (Corporation roles play no part on the character id-space, so there is no $corporationRoles arg.)
+     *
+     * @param  string|array<int,string>  $permissions
+     */
+    public function coversCharacter(
+        int $characterId,
+        string|array $permissions,
+        ?User $user = null,
+    ): bool {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        if (in_array($characterId, data_get($userPermission, 'owned_character_ids', []), true)) {
+            return true;
+        }
+
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        return (new AffiliationResolver)->coveredIds($roleIds, [$characterId]) !== [];
+    }
+
+    /**
      * A cache-key fingerprint of the *inputs* a corporation-space {@see constrainToAffiliated()} scope is
      * built from, for a caller that caches a result of that scope. Replaces keying a cache on get()'s
      * resolved id array — the awkward case where the affiliated set had to be materialised only to name
