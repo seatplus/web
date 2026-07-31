@@ -44,7 +44,15 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'mails');
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $ids = $characterIdQuery->pluck('character_id');
 
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,
@@ -69,15 +77,23 @@ class MailsController extends Controller
 
     public function getMail(EsiClient $esi, int $mail_id): Collection
     {
+        $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $userIsSuperuser = auth()->user()->can('superuser');
-
+        // A non-superuser may only read a mail that has a recipient among the characters they're
+        // authorised for (own ∪ affiliated), composed as a subquery. Superusers skip the recipient
+        // filter entirely (any mail). (Previously this passed an array to where() instead of whereIn,
+        // so a non-superuser hitting this errored.)
         $mail = Mail::query()
             ->with(['recipients'])
-            ->when(! $userIsSuperuser, fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
+            ->when(! auth()->user()->can('superuser'), fn (Builder $query) => $query->whereHas('recipients', fn (Builder $query) => $query->whereHasMorph(
                 'receivable',
                 CharacterInfo::class,
-                fn (Builder $query) => $query->where('character_id', $this->getAuthorizedMailCharacterIds())
+                fn (Builder $query) => $this->getAffiliatedIds->constrainToAffiliated(
+                    query: $query,
+                    column: 'character_id',
+                    permissions: $dispatchTransferObject->permission,
+                    corporationRoles: $dispatchTransferObject->required_corporation_role,
+                ),
             )))
             ->firstWhere('id', $mail_id);
 
@@ -89,12 +105,5 @@ class MailsController extends Controller
     private function getDispatchTransferObject(): DispatchTransferObject
     {
         return CreateDispatchTransferObject::new()->create(Mail::class);
-    }
-
-    private function getAuthorizedMailCharacterIds(): array
-    {
-        $dispatchTransferObject = $this->getDispatchTransferObject();
-
-        return $this->getAffiliatedIds($dispatchTransferObject);
     }
 }

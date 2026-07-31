@@ -136,12 +136,13 @@ class PostingController extends Controller
             return;
         }
 
-        $manageableIds = $this->getAffiliatedIds->get(
+        $mayManage = $this->getAffiliatedIds->coversCorporation(
+            corporationId: $corporationId,
             permissions: [ManageRecruitmentController::MANAGE_PERMISSION],
             corporationRoles: ['Director'],
             user: $user,
         );
 
-        abort_unless(in_array($corporationId, $manageableIds), 403, 'You may not manage this corporation.');
+        abort_unless($mayManage, 403, 'You may not manage this corporation.');
     }
 }

@@ -48,17 +48,19 @@ class CheckAffiliationForApplication
 
         abort_unless($application_id, 404, 'required url parameter application_id is missing');
 
-        $affiliatedIds = $this->getAffiliatedIdsService->get(
+        $query = Application::query()
+            ->where('id', $application_id)
+            ->with(['applicationable', 'corporation']);
+
+        $this->getAffiliatedIdsService->constrainToAffiliated(
+            query: $query,
+            column: 'corporation_id',
             permissions: [$permission],
             corporationRoles: ['director'],
             user: auth()->user(),
         );
 
-        $application = Application::query()
-            ->whereIn('corporation_id', $affiliatedIds)
-            ->where('id', $application_id)
-            ->with(['applicationable', 'corporation'])
-            ->exists();
+        $application = $query->exists();
 
         abort_unless($application, 403, 'You are not allowed to review the recruit');
 

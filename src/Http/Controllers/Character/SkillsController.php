@@ -29,6 +29,7 @@ namespace Seatplus\Web\Http\Controllers\Character;
 use Illuminate\Database\Eloquent\Builder;
 use Inertia\Inertia;
 use Inertia\Response;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Skills\Skill;
 use Seatplus\Eveapi\Models\Skills\SkillQueue;
 use Seatplus\Web\Http\Controllers\Controller;
@@ -40,7 +41,15 @@ class SkillsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(Skill::class);
 
-        $characterIds = $this->getCharacterIds($dispatchTransferObject, 'skills');
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $characterIds = $characterIdQuery->pluck('character_id');
 
         return inertia('Character/Skill/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

@@ -48,7 +48,16 @@ class AssetsController extends Controller
     public function index(Request $request, GetCharacterAssetLocationAction $action, GetAssetLocationFilterOptionsAction $filterOptionsAction): Response
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
-        $characterIds = $this->getCharacterIds($dispatchTransferObject, 'assets');
+
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: $request->input('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $characterIds = $characterIdQuery->pluck('character_id');
 
         // Filters + (a subset of) character scope come from the page query. Constrain requested
         // character_ids to the authorised set; default to all of it.
@@ -79,14 +88,24 @@ class AssetsController extends Controller
     /**
      * A single location's top-level items (filtered-top-level via root_item_id), paginated and
      * lazy-loaded when the location scrolls into view. Authorised identically to index(): the
-     * requested character_ids are intersected with getCharacterIds('assets') — own + assets-
-     * permission-affiliated (corp/alliance member management) + Director + superuser (+ recruits
-     * once impersonated) — and the query is hard-scoped to that set, so an arbitrary location_id
-     * or character_id can only ever return authorised assets.
+     * requested character_ids are intersected with the affiliation-scoped set (own + assets-
+     * permission-affiliated (corp/alliance member management) + Director + superuser) resolved via
+     * GetAffiliatedIds::constrainToSelectionOrOwned — and the query is hard-scoped to that set, so an
+     * arbitrary location_id or character_id can only ever return authorised assets.
      */
     public function location(int $location_id, Request $request, GetLocationTopLevelAssetsAction $action): JsonResponse
     {
-        $authorized = $this->getCharacterIds($this->getDispatchTransferObject(), 'assets');
+        $dispatchTransferObject = $this->getDispatchTransferObject();
+
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: $request->input('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $authorized = $characterIdQuery->pluck('character_id');
 
         $requested = collect($request->input('character_ids'))->map(fn (mixed $id): int => (int) $id)->filter();
 

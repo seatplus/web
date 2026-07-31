@@ -33,14 +33,14 @@ class ReviewInboxController extends Controller
         $user = auth()->user();
         $isSuperuser = $user->can('superuser');
 
-        $recruiterCorpIds = $this->getAffiliatedIds->get(
-            permissions: [self::RECRUITER_PERMISSION],
-            corporationRoles: ['Director'],
-            user: $user,
-        );
-
         $applications = Application::query()
-            ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $recruiterCorpIds))
+            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->constrainToAffiliated(
+                query: $query,
+                column: 'corporation_id',
+                permissions: [self::RECRUITER_PERMISSION],
+                corporationRoles: ['Director'],
+                user: $user,
+            ))
             ->with([
                 'logEntries',
                 'corporation',
