@@ -45,7 +45,15 @@ class WalletsController extends Controller
     {
         $dispatchTransferObject = CreateDispatchTransferObject::new()->create(WalletJournal::class);
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'walletJournals');
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $ids = $characterIdQuery->pluck('character_id');
 
         // One infinite-scroll prop per character — the page renders a wallet card
         // per id. Each paginator uses its own pageName so their scroll state never

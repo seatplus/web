@@ -44,7 +44,15 @@ class MailsController extends Controller
     {
         $dispatchTransferObject = $this->getDispatchTransferObject();
 
-        $ids = $this->getCharacterIds($dispatchTransferObject, 'mails');
+        $characterIdQuery = CharacterInfo::query()->select('character_id');
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $characterIdQuery,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+        $ids = $characterIdQuery->pluck('character_id');
 
         return inertia('Character/Mail/Index', [
             'dispatchTransferObject' => $dispatchTransferObject,

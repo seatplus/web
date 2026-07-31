@@ -26,62 +26,17 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Services\Controller\DispatchTransferObject;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
 class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    private const string CHARACTER_IDS_FILTER = 'character_ids';
-
     public function __construct(
         protected readonly Request $request,
         protected readonly GetAffiliatedIds $getAffiliatedIds
     ) {}
-
-    protected function getCharacterIds(
-        DispatchTransferObject $dispatchTransferObject,
-        ?string $characterRelation = null
-    ): Collection {
-        // The frontend iterates this as a list of scalar character_ids
-        // (`:id="character_id"`, typed Number). Returning full CharacterInfo models
-        // made each element an object, so pages built route('…', ['character_id' =>
-        // <object>]) and Ziggy threw "object passed as 'character_id' parameter …",
-        // crashing the setup() of components that resolve a route on mount (e.g.
-        // WalletJournalBalanceChart) and taking the page down. Pluck plain ids.
-        //
-        // Default view = the user's own characters. An explicit character_ids selection is honoured
-        // only *within* the authorised set (own ∪ affiliated, composed as a subquery): the affiliation
-        // scope() and the requested whereIn() are ANDed, so a submitted id the user isn't affiliated
-        // with is dropped — a tampered URL can't reach out-of-scope characters (this route carries no
-        // CheckAuthorization middleware, so the query is the sole tamper guard).
-        $query = CharacterInfo::query()->select('character_id');
-
-        $this->getAffiliatedIds->constrainToSelectionOrOwned(
-            query: $query,
-            column: 'character_id',
-            selectedIds: $this->request->get(self::CHARACTER_IDS_FILTER),
-            permissions: $dispatchTransferObject->permission,
-            corporationRoles: $dispatchTransferObject->required_corporation_role,
-        );
-
-        return $query
-            ->when(
-                $characterRelation,
-                fn (Builder $query) => $query->with($characterRelation),
-            )
-            ->pluck('character_id');
-    }
-
-    protected function getOwnedCharacterIds(): array
-    {
-        return auth()->user()->characters->pluck('character_id')->toArray();
-    }
 }

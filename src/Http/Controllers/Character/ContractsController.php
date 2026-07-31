@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
+use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contracts\Contract;
 use Seatplus\Web\Http\Controllers\Controller;
 use Seatplus\Web\Http\Resources\ContractRessource;
@@ -46,9 +46,9 @@ class ContractsController extends Controller
         // Default view = own characters; a submitted character_ids selection is honoured only within the
         // authorised set (own ∪ affiliated). This route has no CheckAuthorization middleware, so the
         // query is the sole guard — previously a submitted character_ids was used verbatim (tamper).
-        $charactersQuery = CharacterAffiliation::query()
-            ->has('character.contracts')
-            ->with(['character.corporation', 'character.alliance']);
+        // Mirrors ContactsController: CharacterInfo scoped by constrainToSelectionOrOwned, filtered to
+        // those with contracts. The view only reads character_id (the scroll prop carries the rows).
+        $charactersQuery = CharacterInfo::query()->has('contracts');
 
         $this->getAffiliatedIds->constrainToSelectionOrOwned(
             query: $charactersQuery,
@@ -63,10 +63,10 @@ class ContractsController extends Controller
         // One InfiniteScroll prop per character (mirrors the wallet migration). Each
         // paginator carries the ContractRessource shape and its own pageName so the
         // per-character scroll state never collides.
-        $contracts = $characters->mapWithKeys(fn (CharacterAffiliation $affiliation): array => [
-            "contracts_{$affiliation->character_id}" => Inertia::scroll(
-                fn () => $this->contractsQuery($affiliation->character_id)
-                    ->paginate(pageName: "contracts_{$affiliation->character_id}")
+        $contracts = $characters->mapWithKeys(fn (CharacterInfo $character): array => [
+            "contracts_{$character->character_id}" => Inertia::scroll(
+                fn () => $this->contractsQuery($character->character_id)
+                    ->paginate(pageName: "contracts_{$character->character_id}")
                     ->through(fn (Contract $contract) => (new ContractRessource($contract))->resolve()),
             ),
         ])->all();
