@@ -35,6 +35,12 @@ running core app.
   package's Pest run — they execute only against the assembled core app in core's
   "Browser (vs core)" CI job, which uses core's `laravel` DB (not `laravel_web`).
   They're authored + shipped here, run there.
+  Their Playwright driver is a plain **devDependency of this package's
+  `package.json`** — which `vendor:publish --tag=web-static` puts at core's
+  `package.json`, so core's `npm install` provides it. Never
+  `npm install --save-dev playwright` ad hoc in a workflow. The browser *binary*
+  is a separate download: `npm run playwright:install`
+  (`playwright install --with-deps chromium`).
 
 > See the "Working in Orca" section of core's `CLAUDE.md` for the per-package
 > test-DB rationale. Limit: two worktrees of *this* package share `laravel_web`.
@@ -44,3 +50,9 @@ Follow the frontend rules in core's `CLAUDE.md` (Inertia v3, Wayfinder, Tailwind
 v4, native-fetch `http.js` over axios/Ziggy). New PHP files omit the license
 header (match the newest sibling files). See `docs/ROADMAP.md` for in-flight
 migrations.
+
+## Shipping work: branch → commit → PR is the default
+Finished work lands as a **pull request against `5.x`**, not as uncommitted files
+in the worktree. Once a change is complete and verified, commit it on a topic
+branch, push, and open the PR with `gh pr create` — no need to ask first. `5.x` is
+the main branch; never commit to it directly.

@@ -6,7 +6,8 @@
         "build": "vite build",
         "prod": "node --max-old-space-size=1024 ./node_modules/vite/bin/vite build",
         "debug": "node --max-old-space-size=1024 ./node_modules/vite/bin/vite build --mode debug",
-        "lint": "eslint resources/js"
+        "lint": "eslint resources/js",
+        "playwright:install": "playwright install --with-deps chromium"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -18,16 +19,17 @@
         "acorn": "^8.18",
         "eslint": "^10.8.0",
         "eslint-plugin-vue": "^10.10.0",
-        "vue-eslint-parser": "^10.4.1",
         "globals": "^17.8.0",
         "laravel-vite-plugin": "^3.1",
+        "playwright": "^1.62.1",
         "postcss": "^8.5.25",
         "rollup-plugin-copy": "^3.4.0",
         "sass": "^1.102.0",
         "tailwindcss": "^4.3.3",
         "vite": "^8.2",
         "vite-plugin-run": "^0.9.0",
-        "vue": "^3.5.40"
+        "vue": "^3.5.40",
+        "vue-eslint-parser": "^10.4.1"
     },
     "dependencies": {
         "@headlessui/vue": "^1.0.0",
