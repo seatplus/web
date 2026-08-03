@@ -27,15 +27,17 @@ running core app.
 ## What DOES run here
 - **Lint:** `npm run lint` (ESLint) — no app needed.
 - **PHP unit/feature tests:** `composer run test` (Pint + PHPStan + type-coverage +
-  Pest) under Orchestra Testbench. Needs PostgreSQL + Redis. The test DB is pinned
-  with `force="true"` in `phpunit.xml`; **tests must never touch `seatplus`.**
+  Pest) under Orchestra Testbench. Needs PostgreSQL + Redis. The test DB is
+  **`laravel_web`** — a per-package name so this suite runs in parallel with other
+  packages' suites — pinned with `force="true"` in `phpunit.xml`; **tests must
+  never touch `seatplus`.** Create it once: `createdb laravel_web`.
 - **Browser tests** live in `tests/Browser/` but are **excluded** from this
   package's Pest run — they execute only against the assembled core app in core's
-  "Browser (vs core)" CI job. They're authored + shipped here, run there.
+  "Browser (vs core)" CI job, which uses core's `laravel` DB (not `laravel_web`).
+  They're authored + shipped here, run there.
 
-> Per-package test-DB names (e.g. `laravel_web`) — which let each package's suite
-> run in parallel without collisions — are introduced by a companion change; see
-> the "Working in Orca" section of core's `CLAUDE.md`.
+> See the "Working in Orca" section of core's `CLAUDE.md` for the per-package
+> test-DB rationale. Limit: two worktrees of *this* package share `laravel_web`.
 
 ## Conventions
 Follow the frontend rules in core's `CLAUDE.md` (Inertia v3, Wayfinder, Tailwind
