@@ -1,9 +1,9 @@
 includes:
     - vendor/larastan/larastan/extension.neon
-    # Pest-aware static analysis. `tests` is intentionally kept out of `paths`
-    # below for now — analysing the suite surfaces Mockery false-positives and
-    # redundant-expectation findings handled in a dedicated follow-up.
+    # Pest-aware static analysis (understands it()/expect()/$this).
     - vendor/pestphp/pest-plugin-phpstan/extension.neon
+    # Understands Mockery's dynamic API (shouldReceive(), etc.).
+    - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
     configDirectories:
@@ -18,6 +18,11 @@ parameters:
         - src
         - config
         - database
+        - tests
+    # Browser tests run in core (with pest-plugin-browser, which isn't a web dep);
+    # web's phpunit excludes them too, so PHPStan can't resolve Pest\Browser\* here.
+    excludePaths:
+        - tests/Browser
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
@@ -30,4 +35,50 @@ parameters:
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
+        # --- test-suite analysis (pest-plugin-phpstan) false-positives ---
+        # Style rule; pest.expectation.impossible (real bugs) stays active.
+        -
+            identifier: pest.expectation.redundant
+        # Pest higher-order proxy: dynamic test-state props (test()->x / $this->x set
+        # in setUp/helpers) are not statically declared on the proxy type.
+        -
+            message: '#Access to an undefined property Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy).*::\$#'
+        # Pest higher-order expectation/describe chaining (expect()->x, describe()->only()).
+        -
+            message: '#Call to an undefined method Pest\\(Expectation|Expectations\\HigherOrderExpectation|PendingCalls\\(TestCall|DescribeCall))#'
+        # Dataset-driven test matches are exhaustive for their datasets; src unaffected.
+        -
+            message: '#Match expression does not handle remaining value#'
+        # Intentional env() call: the setUp() dev-DB safety guard.
+        -
+            identifier: larastan.noEnvCallsOutsideOfConfig
+        # Base-class-typed vars miss subclass/trait members: seatplus Role adds
+        # $type/affiliations()/roles() over Spatie's base; factory/query results
+        # typed as the generic Eloquent Model.
+        -
+            message: '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$#'
+        -
+            message: '#(Access to an undefined property Spatie\\Permission\\Contracts\\Role::|Call to an undefined method Spatie\\Permission\\(Contracts|Models)\\Role::|Method Spatie\\Permission\\Contracts\\Role::hasPermissionTo\(\) invoked)#'
+        # Test helpers declare the seatplus Role return type; Larastan infers broader.
+        -
+            message: '#should return Seatplus\\Auth\\Models\\Permissions\\Role#'
+        # Larastan infers RefreshToken::$token as never (model-property inference gap).
+        -
+            message: '#Property Seatplus\\Eveapi\\Models\\RefreshToken::\$token#'
+        # Test stub Kernel (array phpdoc) + a Testbench middleware class that moved.
+        -
+            message: '#PHPDoc type array of property Seatplus\\Web\\Tests\\Stubs\\Kernel::#'
+        -
+            message: '#Orchestra\\Testbench\\Http\\Middleware\\RedirectIfAuthenticated#'
+        # Redundant instanceof asserting a resource is its own type (test intent).
+        -
+            message: '#Instanceof between Seatplus\\Web\\Http\\Resources\\Universe\\(Group|Type)Resource#'
+        # Value is null via a nullable return; runtime path returns a model.
+        -
+            identifier: pest.expectation.impossible
+            path: tests/Feature/ScopeSettingsTest.php
+        # toHaveCount() on a value Larastan widened to string; countable at runtime.
+        -
+            identifier: pest.expectation.requiresCountableOrIterable
+            path: tests/Unit/Services/SsoSettings/UpdateOrCreateSsoSettingsTest.php
 
