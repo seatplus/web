@@ -221,13 +221,15 @@ jobs:
         with:
           node-version: '22'
 
+      # `playwright` is a devDependency of this package's package.json (which the
+      # web-static publish put at core/package.json), so plain `npm install` brings
+      # in the driver — only the browser binary still needs a separate download.
       - name: Build assets + Playwright
         working-directory: core
         run: |
           npm install
-          npm install --save-dev playwright
           npm run build
-          npx playwright install --with-deps chromium
+          npm run playwright:install
 
       - name: Run browser tests
         working-directory: core
