@@ -57,7 +57,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: laravel
+          POSTGRES_DB: laravel_web
           POSTGRES_USER: seatplus
           POSTGRES_PASSWORD: secret
         ports:
