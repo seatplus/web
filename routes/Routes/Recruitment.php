@@ -62,6 +62,12 @@ Route::controller(ApplicationsController::class)->group(function () {
         });
 });
 
-Route::middleware(CheckAuthorization::class.':can accept or deny applications')
+// Impersonation is a reviewer action on a single application, so it is scoped exactly like the review
+// routes above: the recruiter must be affiliated with the corporation applied to. CheckAuthorization
+// alone was not enough — it validates only the entity ids present on the request, and this route
+// carries none, so it degraded to "does this user hold the permission anywhere". That matters most
+// here: impersonation is not a read-only view, the recruiter goes on to act AS the applicant, with
+// the applicant's own permissions.
+Route::middleware(CheckAffiliationForApplication::class.':can accept or deny applications')
     ->get('/application/{application_id}/impersonate', ImpersonateRecruit::class)
     ->name('impersonate.recruit');

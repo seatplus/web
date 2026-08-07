@@ -134,6 +134,10 @@ class ReviewInboxController extends Controller
     /**
      * A settled application for the history list: who, which corp, the decision and when.
      *
+     * Deliberately no `review_url`. A decision ends the recruiter's access to the applicant's character
+     * data (see CheckAffiliationForApplication), so `get.application` would 403 for every row here. What
+     * remains is the corporation's record of its own decision, not the applicant's data.
+     *
      * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
      * @return array<string, mixed>
      */
@@ -150,7 +154,6 @@ class ReviewInboxController extends Controller
             'status' => $application->status,
             'decided_at' => $application->updated_at?->toDateTimeString(),
             'total_stages' => $rounds->count(),
-            'review_url' => route('get.application', $application->id),
         ];
     }
 

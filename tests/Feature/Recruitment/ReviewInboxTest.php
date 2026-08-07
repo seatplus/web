@@ -57,5 +57,8 @@ it('moves settled applications out of the queue and into the history list', func
             ->has('pending', 0)
             ->has('history', 1)
             ->where('history.0.status', 'accepted')
+            // A decision ends access to the applicant's data, so a history row carries the decision
+            // record and no link back into the inspection tabs (#1662).
+            ->missing('history.0.review_url')
         );
 });
