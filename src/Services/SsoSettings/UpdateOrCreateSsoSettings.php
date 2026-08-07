@@ -76,11 +76,13 @@ class UpdateOrCreateSsoSettings
 
                     (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
+                    // Matched on the whole morph, not on the id alone: a corporation and an alliance
+                    // may share an id, and matching by id would let one hijack the other's record.
                     SsoScopes::updateOrCreate([
                         'morphable_id' => $entity_id,
+                        'morphable_type' => $morphable_type,
                     ], [
                         'selected_scopes' => $this->selected_scopes->unique(),
-                        'morphable_type' => $morphable_type,
                         'type' => $this->type,
                     ]);
                 })

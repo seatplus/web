@@ -171,7 +171,7 @@
         class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-500"
         @click="scopesOpen = !scopesOpen"
       >
-        {{ scopesOpen ? 'Hide' : 'Manage' }} required SSO scopes
+        {{ scopesOpen ? 'Hide' : 'Manage' }} corporation-wide SSO scopes
         <span
           v-if="form.selected_scopes.length > 0"
           class="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
@@ -185,17 +185,37 @@
         v-if="scopesOpen"
         class="space-y-4"
       >
-        <p class="text-xs text-gray-500">
-          Characters must have granted these ESI scopes to be compliant for this corporation — checked
-          both while reviewing an applicant and while observing an employee. Clearing every scope removes
-          the corporation from Observation.
-        </p>
+        <div class="rounded-md border border-amber-200 bg-amber-50 p-3 space-y-1">
+          <p class="text-xs font-medium text-amber-900">
+            This edits the corporation's SSO requirement, not a posting-only setting.
+          </p>
+          <p class="text-xs text-amber-800">
+            The same record is used by Configuration &rarr; Scopes (superuser only), by member
+            compliance and by Observation. Characters must have granted these ESI scopes to be
+            compliant for this corporation, so changes here apply to
+            <span class="font-medium">every</span> character in it, not only to applicants.
+          </p>
+          <p class="text-xs text-amber-800">
+            Applies to: <span class="font-medium">{{ scopeTypeLabel }}</span>
+            <template v-if="posting.required_scopes_type">
+              &mdash; kept as configured; only Configuration &rarr; Scopes can change the level.
+            </template>
+          </p>
+        </div>
 
+        <!--
+          Both pickers snapshot their props during setup and emit the whole selection, so the one
+          that was not touched would otherwise write back its stale array and drop the other's
+          scopes. Re-key them on the shared selection to force a resync — the same pattern as
+          Configuration/Scopes/ScopeSettings.vue.
+        -->
         <CharacterScopes
+          :key="`character ${scopesAsString}`"
           v-model:selected-scopes="form.selected_scopes"
           :scopes="availableScopes.character"
         />
         <CorporationScopes
+          :key="`corporation ${scopesAsString}`"
           v-model:selected-scopes="form.selected_scopes"
           :scopes="availableScopes.corporation"
         />
@@ -220,6 +240,29 @@
         Save posting
       </button>
     </div>
+
+    <teleport to="#destination">
+      <ModalWithFooter v-model="confirmScopeClearing">
+        <template #title>
+          Remove the SSO requirement of {{ posting.corporation.name }}?
+        </template>
+        <template #description>
+          Saving with nothing selected deletes the corporation's SSO requirement outright: the
+          corporation leaves Observation and member compliance, no scope is asked of its applicants or
+          members any more, and the configured level ({{ scopeTypeLabel }}) is lost — adding scopes
+          back later starts again from the default level.
+        </template>
+        <template #buttons>
+          <button
+            type="button"
+            class="inline-flex w-full justify-center rounded-md bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 sm:w-auto"
+            @click="submit"
+          >
+            Remove and save
+          </button>
+        </template>
+      </ModalWithFooter>
+    </teleport>
   </div>
 </template>
 
@@ -233,6 +276,14 @@ import Autosuggest from "@/Shared/Components/Autosuggest.vue";
 import DismissibleButton from "@/Shared/Layout/Buttons/DismissibleButton.vue";
 import CharacterScopes from "@/Pages/Configuration/Scopes/CharacterScopes.vue";
 import CorporationScopes from "@/Pages/Configuration/Scopes/CorporationScopes.vue";
+import ModalWithFooter from "@/Shared/Modals/ModalWithFooter.vue";
+
+// How far a configured requirement reaches, in the words of Configuration -> Scopes.
+const SCOPE_TYPE_LABELS = {
+  default: "only the characters in this corporation",
+  user: "every character of an account with a character in this corporation",
+  global: "every character in this installation",
+};
 
 const props = defineProps({
   posting: {
@@ -265,11 +316,25 @@ const closeForm = useForm({});
 
 const watchlistOpen = ref(false);
 const scopesOpen = ref(false);
+const confirmScopeClearing = ref(false);
 // Re-key the items autosuggest after each selection so it clears its input.
 const itemsKey = ref(0);
 
 // Surfaced on the (collapsed) toggle so a configured watchlist is visible at a glance.
 const watchlistCount = computed(() => form.systems.length + form.regions.length + form.items.length);
+
+// Re-key for the two scope pickers (see the template).
+const scopesAsString = computed(() => form.selected_scopes.join(","));
+
+const scopeTypeLabel = computed(
+  () => SCOPE_TYPE_LABELS[props.posting.required_scopes_type] ?? "nothing yet — no requirement is configured",
+);
+
+// Only a save that removes an existing requirement is destructive; saving a corporation that never
+// had one is not worth a modal.
+const clearsRequiredScopes = computed(
+  () => form.selected_scopes.length === 0 && (props.posting.required_scopes?.length ?? 0) > 0,
+);
 
 function addStage() {
   form.stages.push({ label: "", role_id: null });
@@ -291,6 +356,18 @@ function removeItem(id) {
 }
 
 function save() {
+  if (clearsRequiredScopes.value) {
+    confirmScopeClearing.value = true;
+
+    return;
+  }
+
+  submit();
+}
+
+function submit() {
+  confirmScopeClearing.value = false;
+
   form.put(props.posting.save_url, {
     preserveScroll: true,
   });

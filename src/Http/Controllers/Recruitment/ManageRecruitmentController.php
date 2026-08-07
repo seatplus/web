@@ -66,6 +66,10 @@ class ManageRecruitmentController extends Controller
                     'watched' => (new WatchedArrayAction)->execute($posting->corporation_id),
                     // The corporation's currently required SSO scopes (compliance + application), edited here.
                     'required_scopes' => $ssoScopes instanceof SsoScopes ? ($ssoScopes->selected_scopes ?? []) : [],
+                    // The requirement level of that record ('default' | 'user' | 'global'), null while
+                    // none is configured. Surfaced so the card can state what it is editing; a posting
+                    // save preserves it rather than resetting it to 'default'.
+                    'required_scopes_type' => $ssoScopes instanceof SsoScopes ? $ssoScopes->type : null,
                 ];
             })
             ->all();
