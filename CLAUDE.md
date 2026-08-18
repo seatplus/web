@@ -51,6 +51,17 @@ v4, native-fetch `http.js` over axios/Ziggy). New PHP files omit the license
 header (match the newest sibling files). See `docs/ROADMAP.md` for in-flight
 migrations.
 
+## Migrations are forward-only — do **not** write `down()`
+No `seatplus/*` package believes in rollbacks. Nothing written since early 2022
+ships a `down()`, and nothing new should: `migrate:rollback` is not a supported
+recovery path anywhere in the stack. Recovery is roll-forward — a new migration
+that fixes the schema — or restore from backup.
+
+So: new migrations implement `up()` only. Don't "fix" an existing migration by
+adding a `down()`, and don't flag a missing one in review. The pre-2022 `down()`
+methods still lying around (e.g. `2021_02_14_193606_create_manual_locations.php`)
+are historical, not a pattern to copy.
+
 ## Shipping work: branch → commit → PR is the default
 Finished work lands as a **pull request against `5.x`**, not as uncommitted files
 in the worktree. Once a change is complete and verified, commit it on a topic
