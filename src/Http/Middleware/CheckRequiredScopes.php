@@ -45,18 +45,23 @@ class CheckRequiredScopes extends CheckRequiredScopesMiddleware
         return parent::handle($request, $next);
     }
 
+    /**
+     * @param  array<int, array{character: CharacterInfo, required_scopes: array<int, string>, missing_scopes: array<int, string>}>  $missing_character_scopes
+     */
     protected function redirectTo(array $missing_character_scopes): Response
     {
         $missing_character = collect($missing_character_scopes)->map(function (array $missing) {
-            $missing = (object) $missing;
+            $character = $missing['character'];
 
             return [
-                'character_id' => $missing->character->character_id,
-                'name' => $missing->character->name,
-                'corporation' => CharacterInfo::find($missing->character->character_id)->corporation->name ?? 'Unknown Corporation',
+                'character_id' => $character->character_id,
+                'name' => $character->name,
+                // The corporation comes eager-loaded with the character (BuildScopesArrayService's
+                // CHARACTER_RELATIONS), so re-finding it here was a query per non-compliant character.
+                'corporation' => $character->corporation->name ?? 'Unknown Corporation',
                 'upgrade_url' => route('auth.eve.step_up', [
-                    'character_id' => $missing->character->character_id,
-                    'add_scopes' => implode(',', $missing->missing_scopes),
+                    'character_id' => $character->character_id,
+                    'add_scopes' => implode(',', $missing['missing_scopes']),
                 ]),
             ];
         });
