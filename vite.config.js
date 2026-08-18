@@ -36,11 +36,18 @@ export default defineConfig(({mode}) => {
             }),
             run([
                 {
-                    // Keep the Wayfinder output (@/actions, @/routes) generated and in sync.
-                    // Runs on dev/build startup so a fresh checkout always has it, and re-runs
-                    // when backend routes/controllers change. Avoids the drift where @/actions
-                    // goes missing while components still import from it.
+                    // Keep the Wayfinder output (@/actions, @/routes) generated and in sync
+                    // while developing: runs on `vite`/dev startup and re-runs when backend
+                    // routes/controllers change. Avoids the drift where @/actions goes missing
+                    // while components still import from it.
+                    //
+                    // `build: false` is load-bearing, not tidiness: production builds run in a
+                    // node-only container (base-app's node service is node:current-alpine, no
+                    // php binary), so `vite build` must never shell out to php. @/actions is
+                    // produced in the php container instead, by core's post-update-cmd during
+                    // `composer update` — see seatplus/web#1678.
                     startup: true,
+                    build: false,
                     name: 'wayfinder generate',
                     run: ['php', 'artisan', 'wayfinder:generate'],
                     pattern: [
@@ -50,7 +57,9 @@ export default defineConfig(({mode}) => {
                     ],
                 },
                 {
+                    // Dev-only as well: only fires on hot update, and never during a build.
                     startup: false,
+                    build: false,
                     name: 'copy vendor',
                     run: ['php', 'artisan', 'vendor:publish', '--tag=web', '--force'],
                     pattern: ['vendor/seatplus/**/resources/js/**']
