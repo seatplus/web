@@ -56,7 +56,13 @@ class UpdateOrCreateSsoSettings
         $this->entities->whenEmpty(
             function (Collection $collection) {
                 if ($this->type === 'global') {
-                    SsoScopes::updateOrCreate(['type' => 'global'], ['selected_scopes' => $this->selected_scopes]);
+                    // Matched on the absence of a morphable, not on the type alone: an entity row
+                    // carrying type 'global' would otherwise be hijacked and have this installation-wide
+                    // list written over its corporation's own requirement.
+                    SsoScopes::updateOrCreate(
+                        ['morphable_id' => null, 'morphable_type' => null],
+                        ['selected_scopes' => $this->selected_scopes->unique()->values(), 'type' => 'global'],
+                    );
                 }
             },
             fn (Collection $collection) => $collection
@@ -76,11 +82,13 @@ class UpdateOrCreateSsoSettings
 
                     (new DispatchCorporationOrAllianceInfoJob)->handle($morphable_type, $entity_id);
 
+                    // Matched on the whole morph, not on the id alone: a corporation and an alliance
+                    // may share an id, and matching by id lets one hijack the other's record.
                     SsoScopes::updateOrCreate([
                         'morphable_id' => $entity_id,
+                        'morphable_type' => $morphable_type,
                     ], [
                         'selected_scopes' => $this->selected_scopes->unique(),
-                        'morphable_type' => $morphable_type,
                         'type' => $this->type,
                     ]);
                 })
