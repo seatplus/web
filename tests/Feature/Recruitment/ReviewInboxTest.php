@@ -35,6 +35,9 @@ it('lists open applications with their current stage', function () {
             ->where('pending.0.total_stages', 2)
             ->where('pending.0.stage.position', 0)
             ->where('pending.0.stage.label', 'Screen')
+            // An open application is still inspectable, so the row keeps its link to the review page.
+            // Paired with the missing() assertion on a history row below.
+            ->has('pending.0.review_url')
         );
 });
 
