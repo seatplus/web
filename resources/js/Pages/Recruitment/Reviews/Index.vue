@@ -67,7 +67,8 @@
         History
       </h2>
       <p class="text-sm text-gray-500">
-        Past decisions for the corporations you recruit for.
+        Past decisions for the corporations you recruit for. Once an application is decided the
+        applicant's character data is no longer accessible.
       </p>
       <ul
         role="list"
@@ -101,12 +102,6 @@
           >
             {{ row.status }}
           </span>
-          <Link
-            :href="row.review_url"
-            class="text-sm font-medium text-indigo-600 hover:text-indigo-500 whitespace-nowrap"
-          >
-            View
-          </Link>
         </li>
       </ul>
     </div>

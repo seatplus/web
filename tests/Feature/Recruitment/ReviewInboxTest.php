@@ -35,6 +35,9 @@ it('lists open applications with their current stage', function () {
             ->where('pending.0.total_stages', 2)
             ->where('pending.0.stage.position', 0)
             ->where('pending.0.stage.label', 'Screen')
+            // An open application is still inspectable, so the row keeps its link to the review page.
+            // Paired with the missing() assertion on a history row below.
+            ->has('pending.0.review_url')
         );
 });
 
@@ -57,5 +60,8 @@ it('moves settled applications out of the queue and into the history list', func
             ->has('pending', 0)
             ->has('history', 1)
             ->where('history.0.status', 'accepted')
+            // A decision ends access to the applicant's data, so a history row carries the decision
+            // record and no link back into the inspection tabs (#1662).
+            ->missing('history.0.review_url')
         );
 });
