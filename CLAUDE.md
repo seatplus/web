@@ -62,6 +62,21 @@ adding a `down()`, and don't flag a missing one in review. The pre-2022 `down()`
 methods still lying around (e.g. `2021_02_14_193606_create_manual_locations.php`)
 are historical, not a pattern to copy.
 
+## The whole suite shares one process — no Mockery `overload:` mocks
+`phpunit.xml` sets `processIsolation="false"`, so every test runs in the same PHP
+process. `Mockery::mock('overload:'.Foo::class)` works by defining a class alias:
+it needs `Foo` unloaded, and once installed it replaces `Foo` for the rest of the
+run. Any other test that uses the real `Foo` then fails — and with
+`executionOrder="random"`, which of the two reports it varies, so it reads like a
+flake when it is deterministic (this is what #1683 was).
+
+Fake the boundary instead of replacing the class: `Bus::fake()`, `Event::fake()`,
+`Http::fake()`, or `test()->mock()` on a container-resolved dependency.
+`tests/Architecture/MockeryOverloadTest.php` fails the build if an `overload:`
+mock reappears anywhere under `tests/`. Same reasoning applies to
+`@runInSeparateProcess` — Pest never applies it to a `it()`/`test()` closure
+(PHPUnit reads annotations off methods), so it is a comment, not isolation.
+
 ## Shipping work: branch → commit → PR is the default
 Finished work lands as a **pull request against `5.x`**, not as uncommitted files
 in the worktree. Once a change is complete and verified, commit it on a topic

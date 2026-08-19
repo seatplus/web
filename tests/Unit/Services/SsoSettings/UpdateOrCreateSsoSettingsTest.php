@@ -8,11 +8,6 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Services\SsoSettings\UpdateOrCreateSsoSettings;
 
 it('calls alliance info action', function () {
-    /*$mock = Mockery::mock('overload:' . AllianceInfoAction::class);
-    $mock->shouldReceive('execute')
-       ->once()
-       ->andReturn(null);*/
-
     Bus::fake();
 
     $request = [
@@ -36,11 +31,6 @@ it('calls alliance info action', function () {
     Bus::assertDispatched(AllianceInfoJob::class);
 });
 
-/**
- * @runInSeparateProcess
- *
- * @preserveGlobalState disabled
- */
 it('calls corporation info action', function () {
     Bus::fake();
 
@@ -68,11 +58,6 @@ it('calls corporation info action', function () {
     expect(SsoScopes::where('morphable_id', 1_184_675_423)->first()->selected_scopes)->toHaveCount(3);
 });
 
-/**
- * @runInSeparateProcess
- *
- * @preserveGlobalState disabled
- */
 it('creates sso settings', function () {
     Bus::fake();
 
