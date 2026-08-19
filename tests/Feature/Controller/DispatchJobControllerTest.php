@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
-use Seatplus\Web\Jobs\ManualDispatchedJob;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
@@ -28,25 +29,28 @@ beforeEach(function () {
 });
 
 it('dispatches job', function () {
-    $mock = Mockery::mock('overload:'.ManualDispatchedJob::class);
-    $mock->shouldReceive('handle')->andReturn(1);
-    $mock->shouldReceive('setName')->andReturn($mock);
-    $mock->shouldReceive('setJobs')->andReturn($mock);
+    // Bus::fake() intercepts the batch the controller dispatches without replacing
+    // ManualDispatchedJob itself — a Mockery overload mock would alias the class away
+    // for every later test in this process. See tests/Architecture/MockeryOverloadTest.php.
+    Bus::fake();
 
     $dispatch_transfer_object = test()->dispatch_transfer_object;
 
     $character_id = test()->test_character->character_id;
 
     $cache_key = sprintf('%s:%s', $dispatch_transfer_object['manual_job'], $character_id);
+    $batch_name = sprintf('Manual batch update of %s', $cache_key);
 
     expect(cache($cache_key))->toBeNull();
 
-    $response = test()->actingAs(test()->test_user)
+    test()->actingAs(test()->test_user)
         ->post(route('dispatch.job'), [
             'character_id' => $character_id,
             'dispatch_transfer_object' => $dispatch_transfer_object,
         ])
         ->assertOk();
+
+    Bus::assertBatched(fn (PendingBatch $batch): bool => $batch->name === $batch_name);
 
     test()->assertNotNull(cache($cache_key));
 });
