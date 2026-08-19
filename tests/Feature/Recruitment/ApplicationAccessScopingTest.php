@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Event;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Application;
+use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 
 /**
@@ -158,6 +160,85 @@ test('an intermediate stage decision keeps the application open and inspectable'
         ->assertForbidden();
 });
 
+// A recruiter is routinely responsible for more than one corporation — a main corp plus sister corps
+// (an alt/mining branch, a holding corp). Affiliation scoping expresses that directly, so tightening
+// impersonation onto it does not narrow anyone's legitimate reach. These two pin that down.
+
+test('an alliance affiliated recruiter reaches an application to a sister corporation', function () {
+    $alliance = AllianceInfo::factory()->create();
+
+    // The sister corp — in the alliance, unrelated to any corporation the recruiter is a member of.
+    // Membership is irrelevant here: the role's alliance affiliation is what grants the reach.
+    $sisterCorporation = CorporationInfo::factory()->create(['alliance_id' => $alliance->alliance_id]);
+    Enlistment::query()->create(['corporation_id' => $sisterCorporation->corporation_id, 'type' => 'user']);
+
+    $application = openApplicationTo($sisterCorporation->corporation_id);
+
+    // Affiliated at ALLIANCE level: AffiliationResolver expands that to every member corporation.
+    createRoleViaHttp(
+        roleName: 'alliance-recruiter',
+        affiliations: [
+            [
+                'entity_id' => $alliance->alliance_id,
+                'entity_type' => 'alliance',
+                'affiliation_type' => 'allowed',
+            ],
+        ],
+        member: test()->test_user,
+        permissions: ['can accept or deny applications'],
+    );
+
+    cache()->flush();
+
+    test()->actingAs(test()->test_user->refresh())
+        ->get(route('get.application', ['application_id' => $application->id]))
+        ->assertOk();
+
+    test()->actingAs(test()->test_user->refresh())
+        ->get(route('impersonate.recruit', ['application_id' => $application->id]))
+        ->assertRedirect(route('home'));
+});
+
+test('a recruiter reaches applications to sister corporations that share no alliance', function () {
+    // The sister/sub corp is often NOT in the recruiter's alliance — a separate holding or alt corp,
+    // or one in no alliance at all. Affiliation scoping covers that too: the role simply lists each
+    // corporation. Deliberately one corp per distinct alliance plus one with none, so nothing here
+    // can pass by way of a shared alliance.
+    $corporations = [
+        CorporationInfo::factory()->create(['alliance_id' => AllianceInfo::factory()->create()->alliance_id]),
+        CorporationInfo::factory()->create(['alliance_id' => AllianceInfo::factory()->create()->alliance_id]),
+        CorporationInfo::factory()->create(['alliance_id' => null]),
+    ];
+
+    expect(collect($corporations)->pluck('alliance_id')->unique())->toHaveCount(3);
+
+    $applications = [];
+
+    foreach ($corporations as $corporation) {
+        Enlistment::query()->create(['corporation_id' => $corporation->corporation_id, 'type' => 'user']);
+        $applications[] = openApplicationTo($corporation->corporation_id);
+    }
+
+    createRoleViaHttp(
+        roleName: 'multi-corp-recruiter',
+        affiliations: array_map(fn (CorporationInfo $corporation): array => [
+            'entity_id' => $corporation->corporation_id,
+            'entity_type' => 'corporation',
+            'affiliation_type' => 'allowed',
+        ], $corporations),
+        member: test()->test_user,
+        permissions: ['can accept or deny applications'],
+    );
+
+    cache()->flush();
+
+    foreach ($applications as $application) {
+        test()->actingAs(test()->test_user->refresh())
+            ->get(route('get.application', ['application_id' => $application->id]))
+            ->assertOk();
+    }
+});
+
 // Helpers
 
 /**
@@ -236,4 +317,17 @@ function decideAsTestUser(Application $application, string $decision): void
             'explanation' => 'Some reason',
         ])
         ->assertRedirect(route('recruitment.reviews'));
+}
+
+/** An open whole-account application to $corporationId, by a fresh applicant. */
+function openApplicationTo(int $corporationId): Application
+{
+    $applicant = Event::fakeFor(fn () => User::factory()->create());
+
+    return Application::factory()->create([
+        'corporation_id' => $corporationId,
+        'applicationable_type' => User::class,
+        'applicationable_id' => $applicant->getKey(),
+        'status' => 'open',
+    ]);
 }
