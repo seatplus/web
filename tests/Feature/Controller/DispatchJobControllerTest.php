@@ -4,12 +4,12 @@ use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\GetAffiliatedIds;
 
 beforeEach(function () {
     // The real DispatchTransferObject always emits required_corporation_role as an
@@ -155,15 +155,34 @@ test('partitions entities into owned and affiliated by the ownership flag', func
     $affiliated_character = $affiliated_user->characters->first();
     updateRefreshTokenWithScopes($affiliated_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
 
-    // owned resolves straight from the cached permission object; the affiliated set is
-    // the full manageable scope (owned is diffed out by the controller).
-    test()->mock(GetAffiliatedIds::class, function ($mock) use ($affiliated_character) {
-        $mock->shouldReceive('ownedCharacterIds')->andReturn([test()->test_character->character_id]);
-        $mock->shouldReceive('get')->andReturn([
-            test()->test_character->character_id,
-            $affiliated_character->character_id,
-        ]);
+    // No mock: owned resolves from the cached permission object, and the affiliated section is
+    // scoped by an AffiliationResolver subquery — so the partition has to be earned with a real
+    // role, not asserted by a stubbed id array.
+    test()->superuser = Event::fakeFor(function () {
+        $user = User::factory()->create();
+        $user->givePermissionTo(Permission::findOrCreate('superuser'));
+
+        return $user;
     });
+
+    // The role covers BOTH corporations, so the resolved affiliated set contains the user's own
+    // character too — which is what makes the affiliated section's owned-subtraction load-bearing
+    // here rather than incidentally true because the two characters sit in different corps.
+    createRoleViaHttp(
+        roleName: 'contact-manager',
+        affiliations: array_map(fn (int $corporation_id): array => [
+            'entity_id' => $corporation_id,
+            'entity_type' => 'corporation',
+            'affiliation_type' => 'allowed',
+        ], [
+            test()->test_character->corporation->corporation_id,
+            $affiliated_character->corporation->corporation_id,
+        ]),
+        member: test()->test_user,
+        permissions: [test()->dispatch_transfer_object['permission']],
+    );
+
+    cache()->flush();
 
     test()->actingAs(test()->test_user)
         ->postJson(route('manual_job.entities'), [...test()->dispatch_transfer_object, 'ownership' => 'owned'])

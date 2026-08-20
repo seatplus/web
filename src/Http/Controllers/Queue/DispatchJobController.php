@@ -99,21 +99,23 @@ class DispatchJobController extends Controller
 
         $isCorporationScope = filled($corporation_roles);
 
-        // The user's own characters come from the cached permission object (no query). The
-        // owned section scopes straight to them; only the affiliated section pays for the
-        // broader affiliation resolve — and it drops owned characters so the two sections
-        // never overlap and the eager owned list stays O(own characters), not O(affiliated).
+        // The user's own characters come from the cached permission object (no query). The owned
+        // section scopes straight to them; the affiliated section resolves the broader affiliation
+        // in SQL and subtracts the owned characters there, so the two sections never overlap and
+        // neither pulls an affiliated id-set into PHP (an inverse or alliance-wide role would
+        // otherwise mean a whole character_infos table just to feed this whereIn).
         $owned_character_ids = $this->getAffiliatedIds->ownedCharacterIds();
 
-        $character_ids = $ownership === 'owned'
-            ? $owned_character_ids
-            : array_values(array_diff(
-                $this->getAffiliatedIds->get(permissions: [$permission], corporationRoles: $corporation_roles),
-                $owned_character_ids,
-            ));
-
         $tokens = RefreshToken::query()
-            ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $character_ids))
+            ->whereHas('character', function (Builder $query) use ($ownership, $owned_character_ids, $permission): void {
+                if ($ownership === 'owned') {
+                    $query->whereIn('character_id', $owned_character_ids);
+
+                    return;
+                }
+
+                $this->getAffiliatedIds->constrainToAffiliatedCharactersExceptOwned($query, 'character_id', $permission);
+            })
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn (RefreshToken $token) => collect($validated_data['required_scopes'])->intersect($token->scopes)->isNotEmpty())

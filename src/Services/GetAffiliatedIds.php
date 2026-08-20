@@ -172,6 +172,45 @@ class GetAffiliatedIds
     }
 
     /**
+     * Constrain a character_id $column to the affiliated characters *minus* the user's own — the
+     * "affiliated" half of a listing that partitions entities into an owned and an affiliated section.
+     *
+     * This is affiliated ∖ owned, not the affiliated ∪ owned of {@see constrainToAffiliated()}, so it
+     * cannot be expressed with that method. Like it, the affiliated set is composed as an
+     * {@see AffiliationResolver} subquery instead of being materialised: an inverse or alliance-wide
+     * role never pulls a whole character_infos table into PHP the way get() does.
+     *
+     * Character id-space only — a corporation_id column (or anything else) throws (fail closed).
+     * Corporation roles therefore play no part: they contribute *corporation* ids, which never match a
+     * character_id (EVE draws every entity id from one global sequence), so they were only ever dead
+     * weight in the array get() handed to a character-space whereIn.
+     *
+     * Deliberately no superuser bypass — get() had none either, so the affiliated section stays
+     * role-derived: a superuser holding no role that grants $permissions sees an empty one, as before.
+     * Mutates $query in place.
+     *
+     * @param  string|array<int,string>  $permissions
+     */
+    public function constrainToAffiliatedCharactersExceptOwned(
+        Builder $query,
+        string $column,
+        string|array $permissions,
+        ?User $user = null,
+    ): void {
+        if (! str_contains($column, 'character_id')) {
+            throw new InvalidArgumentException("GetAffiliatedIds::constrainToAffiliatedCharactersExceptOwned() only covers the character id-space, got column [{$column}].");
+        }
+
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        $query
+            ->whereIn($column, (new AffiliationResolver)->characterIdsSubquery($roleIds))
+            ->whereNotIn($column, data_get($userPermission, 'owned_character_ids', []));
+    }
+
+    /**
      * Constrain $column to the entities the user *owns / operates* — the default view before any
      * explicit selection:
      *  - a character_id column matches only the user's own characters;
