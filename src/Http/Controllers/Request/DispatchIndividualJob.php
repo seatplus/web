@@ -26,10 +26,9 @@
 
 namespace Seatplus\Web\Http\Controllers\Request;
 
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Contracts\WebJobsRepository;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
@@ -50,21 +49,10 @@ class DispatchIndividualJob extends FormRequest
      */
     public function rules(): array
     {
-        $dispatchData = $this->get('dispatch_transfer_object');
-        $affiliatedIds = $this->getAffiliatedIdsForDispatch($dispatchData);
-
         return [
             ...$this->getDispatchObjectRules(),
-            ...$this->getIdentificationRules($affiliatedIds),
+            ...$this->getIdentificationRules(),
         ];
-    }
-
-    private function getAffiliatedIdsForDispatch(array $dispatchData): array
-    {
-        return (new GetAffiliatedIds)->get(
-            permissions: data_get($dispatchData, 'permission'),
-            corporationRoles: data_get($dispatchData, 'required_corporation_role') ?? '',
-        );
     }
 
     private function getDispatchObjectRules(): array
@@ -78,37 +66,40 @@ class DispatchIndividualJob extends FormRequest
         ];
     }
 
-    private function getIdentificationRules(array $affiliatedIds): array
+    /**
+     * One submitted id, one bounded probe. `coversCharacter()` / `coversCorporation()` each resolve to a
+     * single AffiliationResolver::coveredIds() call against just that id — an index-driven predicate —
+     * where Rule::in() used to need the user's entire affiliated set materialised in PHP first (for an
+     * inverse or alliance-wide role, effectively a whole *_infos table) to check one value.
+     *
+     * Closure rules match Rule::in()'s presence semantics: ClosureValidationRule is not an ImplicitRule,
+     * so an absent character_id/corporation_id is skipped rather than rejected — which is what makes the
+     * either/or pairing with requiredIf() work.
+     */
+    private function getIdentificationRules(): array
     {
+        $dispatchData = $this->get('dispatch_transfer_object');
+        $permission = data_get($dispatchData, 'permission') ?? '';
+        $corporationRoles = data_get($dispatchData, 'required_corporation_role') ?? '';
+        $getAffiliatedIds = new GetAffiliatedIds;
+
         return [
             'character_id' => [
                 Rule::requiredIf(fn () => ! $this->get('corporation_id')),
-                Rule::in($this->getAffiliatedCharacterIds($affiliatedIds)),
+                function (string $attribute, mixed $value, Closure $fail) use ($getAffiliatedIds, $permission): void {
+                    if (! $getAffiliatedIds->coversCharacter((int) $value, $permission)) {
+                        $fail('The selected character is invalid.');
+                    }
+                },
             ],
             'corporation_id' => [
                 Rule::requiredIf(fn () => ! $this->get('character_id')),
-                Rule::in($this->getAffiliatedCorporationIds($affiliatedIds)),
+                function (string $attribute, mixed $value, Closure $fail) use ($getAffiliatedIds, $permission, $corporationRoles): void {
+                    if (! $getAffiliatedIds->coversCorporation((int) $value, $permission, $corporationRoles)) {
+                        $fail('The selected corporation is invalid.');
+                    }
+                },
             ],
         ];
-    }
-
-    private function getAffiliatedCharacterIds(array $affiliatedIds): array
-    {
-
-        return CharacterInfo::query()
-            ->whereIn('character_id', $affiliatedIds)
-            ->pluck('character_id')
-            ->values()
-            ->toArray();
-    }
-
-    private function getAffiliatedCorporationIds(array $affiliatedIds): array
-    {
-
-        return CorporationInfo::query()
-            ->whereIn('corporation_id', $affiliatedIds)
-            ->pluck('corporation_id')
-            ->values()
-            ->toArray();
     }
 }

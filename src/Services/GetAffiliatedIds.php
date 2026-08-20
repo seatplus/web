@@ -241,6 +241,36 @@ class GetAffiliatedIds
     }
 
     /**
+     * Whether $characterId is one of the characters the user owns or reaches through $permissions — the
+     * character id-space analog of {@see coversCorporation()}, and a bounded membership test that never
+     * materialises the affiliated set. Replaces `in_array($characterId, $this->get(...))`.
+     *
+     * Corporation roles play no part: the cached `corporation_roles` slice holds *corporation* ids, so it
+     * can never cover a character id — which is why get() only ever reached characters through the
+     * permission side and the owned slice.
+     *
+     * @param  string|array<int,string>  $permissions
+     */
+    public function coversCharacter(
+        int $characterId,
+        string|array $permissions,
+        ?User $user = null,
+    ): bool {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        $ownedCharacterIds = array_map('intval', data_get($userPermission, 'owned_character_ids', []));
+
+        if (in_array($characterId, $ownedCharacterIds, true)) {
+            return true;
+        }
+
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        return (new AffiliationResolver)->coveredIds($roleIds, [$characterId]) !== [];
+    }
+
+    /**
      * @param  array<int,string>  $permissions
      * @param  array<int,string>  $corporationRole
      * @return array<int,int>
