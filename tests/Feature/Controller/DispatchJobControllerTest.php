@@ -4,12 +4,13 @@ use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Testing\Fluent\AssertableJson;
+use Seatplus\Auth\Enums\AffiliationType;
+use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\Controller\CreateDispatchTransferObject;
-use Seatplus\Web\Services\GetAffiliatedIds;
 
 beforeEach(function () {
     // The real DispatchTransferObject always emits required_corporation_role as an
@@ -155,15 +156,9 @@ test('partitions entities into owned and affiliated by the ownership flag', func
     $affiliated_character = $affiliated_user->characters->first();
     updateRefreshTokenWithScopes($affiliated_character->refreshToken, test()->dispatch_transfer_object['required_scopes']);
 
-    // owned resolves straight from the cached permission object; the affiliated set is
-    // the full manageable scope (owned is diffed out by the controller).
-    test()->mock(GetAffiliatedIds::class, function ($mock) use ($affiliated_character) {
-        $mock->shouldReceive('ownedCharacterIds')->andReturn([test()->test_character->character_id]);
-        $mock->shouldReceive('get')->andReturn([
-            test()->test_character->character_id,
-            $affiliated_character->character_id,
-        ]);
-    });
+    // Affiliate through a real role covering *both* characters, so the affiliated section proving
+    // it drops the owned one is a genuine assertion about the subquery, not about the fixture.
+    affiliateTestUserWithCharacters([test()->test_character, $affiliated_character]);
 
     test()->actingAs(test()->test_user)
         ->postJson(route('manual_job.entities'), [...test()->dispatch_transfer_object, 'ownership' => 'owned'])
@@ -177,3 +172,71 @@ test('partitions entities into owned and affiliated by the ownership flag', func
         ->assertJsonFragment(['character_id' => $affiliated_character->character_id])
         ->assertJsonMissing(['character_id' => test()->test_character->character_id]);
 });
+
+test('the affiliated corporation section drops corporations the user already manages', function () {
+    $dispatch_transfer_object = test()->dispatch_transfer_object;
+    Arr::set($dispatch_transfer_object, 'required_corporation_role', ['Director']);
+
+    // The affiliated director — a character in another corporation the test user may manage.
+    $affiliated_user = Event::fakeFor(fn () => User::factory()->create());
+    $affiliated_character = $affiliated_user->characters->first();
+
+    // Factory corporations are random; the test is meaningless if the two collide.
+    expect($affiliated_character->corporation->corporation_id)
+        ->not->toBe(test()->test_character->corporation->corporation_id);
+
+    // Both characters are directors with the required scopes, so only the owned/affiliated split
+    // decides which corporation lands in which section.
+    Event::fakeFor(function () use ($affiliated_character) {
+        foreach ([test()->test_character, $affiliated_character] as $character) {
+            $roles = $character->roles;
+            $roles->roles = ['Director'];
+            $roles->save();
+        }
+    });
+
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, $dispatch_transfer_object['required_scopes']);
+    updateRefreshTokenWithScopes($affiliated_character->refreshToken, $dispatch_transfer_object['required_scopes']);
+
+    affiliateTestUserWithCharacters([test()->test_character, $affiliated_character]);
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('manual_job.entities'), [...$dispatch_transfer_object, 'ownership' => 'affiliated'])
+        ->assertOk()
+        ->assertJsonFragment(['corporation_id' => $affiliated_character->corporation->corporation_id])
+        ->assertJsonMissing(['corporation_id' => test()->test_character->corporation->corporation_id]);
+});
+
+/**
+ * Affiliate the test user with $characters through a real role — an ALLOWED character affiliation on a
+ * role granting the dispatch permission, with test_user as its member. That is what the ACL screens
+ * produce, so the entities endpoint resolves it through AffiliationResolver; mocking GetAffiliatedIds
+ * instead would stub out the very subquery under test.
+ *
+ * @param  array<int, CharacterInfo>  $characters
+ */
+function affiliateTestUserWithCharacters(array $characters): void
+{
+    $superuser = Event::fakeFor(function () {
+        $user = User::factory()->create();
+        $user->givePermissionTo(Permission::findOrCreate('superuser'));
+
+        return $user;
+    });
+
+    createRoleViaHttp(
+        roleName: 'dispatch-auditor',
+        affiliations: array_map(fn (CharacterInfo $character): array => [
+            'entity_id' => $character->character_id,
+            'entity_type' => 'character',
+            'affiliation_type' => AffiliationType::ALLOWED->value,
+        ], $characters),
+        member: test()->test_user,
+        permissions: [test()->dispatch_transfer_object['permission']],
+        actor: $superuser,
+    );
+
+    // The permission object is cached per user; the fresh role has to be visible to the endpoint.
+    cache()->flush();
+    test()->test_user = test()->test_user->refresh();
+}

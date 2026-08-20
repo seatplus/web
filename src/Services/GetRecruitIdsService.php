@@ -58,27 +58,25 @@ class GetRecruitIdsService
 
     private function fetchRecruits(): array
     {
-        $affiliated_ids = $this->affiliatedIdsService->get(
-            self::PERMISSION,
-            self::CORPORATION_ROLE,
-            auth()->user()
+        $user = auth()->user();
+
+        // Keyed on the affiliation *inputs* (the user, the permission/role names and their cached
+        // role-id slices) rather than on a resolved id array — the recruit list no longer resolves
+        // the whole affiliated set just to build a cache key. A role-affiliation edit therefore
+        // surfaces on the TTL below, the same way a newly submitted application does.
+        $cacheKey = sprintf(
+            'recruit_ids:%s',
+            $this->affiliatedIdsService->affiliationCacheKey(self::PERMISSION, self::CORPORATION_ROLE, $user)
         );
-
-        return $this->getCachedRecruits($affiliated_ids);
-    }
-
-    private function getCachedRecruits(array $affiliatedIds): array
-    {
-        $cacheKey = hash('sha256', implode(', ', $affiliatedIds));
 
         return Cache::remember(
             $cacheKey,
             now()->addMinutes(self::CACHE_DURATION_MINUTES),
-            fn () => $this->queryRecruits($affiliatedIds)
+            fn () => $this->queryRecruits($user)
         );
     }
 
-    private function queryRecruits(array $affiliatedIds): array
+    private function queryRecruits(?User $user): array
     {
         return Application::query()
             ->with([
@@ -86,10 +84,16 @@ class GetRecruitIdsService
                     User::class => ['characters'],
                 ]),
             ])
-            ->when(
-                ! auth()->user()->can('superuser'),
-                fn (Builder $query) => $query->whereIn('corporation_id', $affiliatedIds)
-            )
+            // Superuser bypass lives inside constrainToAffiliated(); the user is passed explicitly
+            // because this service is a process-lifetime singleton, so the GetAffiliatedIds it holds
+            // may have been constructed for a different (or no) user.
+            ->tap(fn (Builder $query) => $this->affiliatedIdsService->constrainToAffiliated(
+                query: $query,
+                column: 'corporation_id',
+                permissions: self::PERMISSION,
+                corporationRoles: self::CORPORATION_ROLE,
+                user: $user,
+            ))
             ->where('status', 'open')
             ->get()
             ->map(function (Application $recruit) {

@@ -34,6 +34,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\LazyCollection;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -99,21 +100,23 @@ class DispatchJobController extends Controller
 
         $isCorporationScope = filled($corporation_roles);
 
-        // The user's own characters come from the cached permission object (no query). The
-        // owned section scopes straight to them; only the affiliated section pays for the
-        // broader affiliation resolve — and it drops owned characters so the two sections
-        // never overlap and the eager owned list stays O(own characters), not O(affiliated).
+        // The user's own characters come from the cached permission object (no query). The owned
+        // section scopes straight to them; the affiliated section is composed as a subquery
+        // (affiliated ∖ owned, resolved in SQL) so the two sections never overlap and neither one
+        // materialises the affiliated set — an inverse or alliance-wide role would otherwise mean
+        // pulling a whole character table into PHP just to array_diff it.
         $owned_character_ids = $this->getAffiliatedIds->ownedCharacterIds();
 
-        $character_ids = $ownership === 'owned'
-            ? $owned_character_ids
-            : array_values(array_diff(
-                $this->getAffiliatedIds->get(permissions: [$permission], corporationRoles: $corporation_roles),
-                $owned_character_ids,
-            ));
-
         $tokens = RefreshToken::query()
-            ->whereHas('character', fn (Builder $query) => $query->whereIn('character_id', $character_ids))
+            ->whereHas('character', function (Builder $query) use ($ownership, $owned_character_ids, $permission): void {
+                if ($ownership === 'owned') {
+                    $query->whereIn('character_id', $owned_character_ids);
+
+                    return;
+                }
+
+                $this->getAffiliatedIds->constrainToAffiliatedExcludingOwned($query, 'character_id', [$permission]);
+            })
             ->with('character', 'character.roles', 'character.corporation')
             ->cursor()
             ->filter(fn (RefreshToken $token) => collect($validated_data['required_scopes'])->intersect($token->scopes)->isNotEmpty())
@@ -131,9 +134,11 @@ class DispatchJobController extends Controller
             ->collect();
 
         // Corp scope, affiliated section: drop corporations the user already manages through
-        // one of their own characters, so a corporation never appears in both sections.
+        // one of their own characters, so a corporation never appears in both sections. The
+        // corporation lives on character_affiliations — CharacterInfo::corporation_id is an
+        // accessor over that relation, not a column, so plucking it off character_infos throws.
         if ($isCorporationScope && $ownership === 'affiliated') {
-            $owned_corporation_ids = CharacterInfo::query()
+            $owned_corporation_ids = CharacterAffiliation::query()
                 ->whereIn('character_id', $owned_character_ids)
                 ->pluck('corporation_id');
 

@@ -3,6 +3,7 @@
 use Seatplus\Auth\Models\User;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
+use Seatplus\Web\Services\GetAffiliatedIds;
 use Seatplus\Web\Services\GetRecruitIdsService;
 
 it('returns recruit ids and caches values', function () {
@@ -20,9 +21,11 @@ it('returns recruit ids and caches values', function () {
 
     test()->actingAs(test()->test_user);
 
-    $character_id = test()->test_character->character_id;
-
-    $cache_key = hash('sha256', implode(', ', [$character_id]));
+    // The cache key is derived from the affiliation *inputs* (user, permission/role, their cached
+    // role-id slices) — not from the resolved affiliated set, which used to be materialised just
+    // to hash it.
+    $cache_key = 'recruit_ids:'.(new GetAffiliatedIds(test()->test_user))
+        ->affiliationCacheKey('can accept or deny applications', 'Director');
 
     $recruit_ids = GetRecruitIdsService::get();
 

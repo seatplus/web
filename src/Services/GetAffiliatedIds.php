@@ -172,6 +172,81 @@ class GetAffiliatedIds
     }
 
     /**
+     * Constrain a character-id $column to the affiliated characters *minus* the user's own — the
+     * "affiliated, but not mine" partition the dispatch entity picker renders as its own section.
+     *
+     * Composed in SQL: the affiliated set is the {@see AffiliationResolver} subquery and the owned ids
+     * are removed with a bounded whereNotIn, so an inverse or alliance-wide role never pulls a whole
+     * character table into PHP the way `array_diff(get(...), ownedCharacterIds())` did.
+     *
+     * Unlike {@see constrainToAffiliated()} there is deliberately *no* superuser bypass. A superuser
+     * with no affiliation role sees an empty affiliated section today, and bypassing would widen it to
+     * every character on the install — the caller then walks that list in PHP, so the bypass would be
+     * unbounded work, not a shortcut.
+     *
+     * Only the character id-space has an owned counterpart to subtract, so any other column throws
+     * (fail closed). Mutates $query in place.
+     *
+     * @param  string|array<int,string>  $permissions
+     */
+    public function constrainToAffiliatedExcludingOwned(
+        Builder $query,
+        string $column,
+        string|array $permissions,
+        ?User $user = null,
+    ): void {
+        if (! str_contains($column, 'character_id')) {
+            throw new InvalidArgumentException("GetAffiliatedIds::constrainToAffiliatedExcludingOwned() only covers the character id-space, got column [{$column}].");
+        }
+
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        // Both clauses in one nested where() so the pair stays atomic next to a sibling orWhere.
+        $query->where(fn (Builder $builder) => $builder
+            ->whereIn($column, (new AffiliationResolver)->characterIdsSubquery($roleIds))
+            ->whereNotIn($column, data_get($userPermission, 'owned_character_ids', [])));
+    }
+
+    /**
+     * A stable fingerprint of the *inputs* that decide what $permissions / $corporationRoles resolve to
+     * for this user: the user, the normalised permission/role names, the role-id slices of the cached
+     * permission object, and the superuser flag — all small and already cached.
+     *
+     * Lets a consumer key a cache on the affiliation *question* instead of resolving the whole affiliated
+     * set just to hash it (what {@see GetRecruitIdsService} used to do). Trade-off: the key moves when the
+     * user's roles move, but not when a role's own affiliations are edited — that edit surfaces on the
+     * consumer's TTL, the same way a newly created row does.
+     *
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function affiliationCacheKey(
+        string|array $permissions,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): string {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        $normalizedPermissions = $this->normalizeInput($permissions);
+        $normalizedRoles = $this->normalizeInput($corporationRoles);
+        $normalizedRoles[] = self::DIRECTOR_ROLE;
+
+        // Positional, '|'-separated fields: normalizeInput() splits on ',' and '|', so no field can
+        // contain either separator and the concatenation stays unambiguous.
+        return hash('sha256', implode('|', [
+            $user->id,
+            $user->can('superuser') ? 'superuser' : '-',
+            implode(',', $this->sorted($normalizedPermissions)),
+            implode(',', $this->sorted($normalizedRoles)),
+            implode(',', $this->sorted($this->permissionRoleIds($normalizedPermissions, $userPermission))),
+            implode(',', $this->sorted($this->corporationRoleIds($normalizedRoles, $userPermission))),
+        ]));
+    }
+
+    /**
      * Constrain $column to the entities the user *owns / operates* — the default view before any
      * explicit selection:
      *  - a character_id column matches only the user's own characters;
@@ -319,6 +394,19 @@ class GetAffiliatedIds
             ->unique()
             ->values()
             ->all();
+    }
+
+    /**
+     * Order-insensitive copy, so id/name ordering noise never moves a cache key.
+     *
+     * @param  array<int, int|string>  $values
+     * @return array<int, int|string>
+     */
+    private function sorted(array $values): array
+    {
+        sort($values);
+
+        return $values;
     }
 
     /**
