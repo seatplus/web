@@ -25,15 +25,26 @@ jobs:
           extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
           coverage: none
 
+      # pest-plugin-type-coverage keeps a *mutable* cache inside the cached tree
+      # (.temp/vN.php, a `<?php return array(...)` file). A run killed mid-write —
+      # `cancel-in-progress` does exactly that, and racing forks are a second way in —
+      # leaves it truncated, and since the key is keyed on composer.json the poisoned
+      # entry latches until that file changes, parse-erroring every later run (#1687).
+      # So: never save it, and drop whatever an older entry restores.
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
-          path: vendor
+          path: |
+            vendor
+            !vendor/pestphp/pest-plugin-type-coverage/.temp
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Drop the type-coverage plugin's mutable cache
+        run: rm -rf vendor/pestphp/pest-plugin-type-coverage/.temp
 
       - name: Check Coding Standards
         run: composer run test:lint
@@ -88,15 +99,26 @@ jobs:
           extensions: mbstring, dom, fileinfo, pgsql, pdo_pgsql, redis
           coverage: none
 
+      # pest-plugin-type-coverage keeps a *mutable* cache inside the cached tree
+      # (.temp/vN.php, a `<?php return array(...)` file). A run killed mid-write —
+      # `cancel-in-progress` does exactly that, and racing forks are a second way in —
+      # leaves it truncated, and since the key is keyed on composer.json the poisoned
+      # entry latches until that file changes, parse-erroring every later run (#1687).
+      # So: never save it, and drop whatever an older entry restores.
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
-          path: vendor
+          path: |
+            vendor
+            !vendor/pestphp/pest-plugin-type-coverage/.temp
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Dependencies
         run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Drop the type-coverage plugin's mutable cache
+        run: rm -rf vendor/pestphp/pest-plugin-type-coverage/.temp
 
       - name: Run Tests
         run: vendor/bin/pest --no-coverage --shard=${{ matrix.shard }}/4
