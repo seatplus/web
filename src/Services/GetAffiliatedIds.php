@@ -28,6 +28,7 @@ namespace Seatplus\Web\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use InvalidArgumentException;
+use Seatplus\Auth\Models\Permissions\Affiliation;
 use Seatplus\Auth\Models\User;
 use Seatplus\Auth\Services\Permissions\CanUserService;
 use Seatplus\Auth\Services\Roles\AffiliationResolver;
@@ -277,6 +278,81 @@ class GetAffiliatedIds
         $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
 
         return (new AffiliationResolver)->coveredIds($roleIds, [$corporationId]) !== [];
+    }
+
+    /**
+     * A cache-key fingerprint of the *inputs* a corporation-space {@see constrainToAffiliated()} scope is
+     * built from, for a caller that caches a result of that scope. Replaces keying a cache on get()'s
+     * resolved id array — the awkward case where the affiliated set had to be materialised only to name
+     * a cache entry.
+     *
+     * It covers everything that scope reads: the superuser bypass, the ids of the roles granting
+     * $permissions, and the corporation ids $corporationRoles (+ Director) covers — the latter two from
+     * the cached permission object, no query — plus a fingerprint of those roles' affiliation rows. Those
+     * rows are in here because editing a role's affiliations moves the resolved set while leaving the
+     * role ids alone, and the mutation site rewrites every row of the role in one go, so count +
+     * max(updated_at) shifts on any edit. That is one small indexed aggregate against `affiliations`,
+     * not an enumeration of the entities the role reaches.
+     *
+     * Corporation id-space only: it deliberately omits `owned_character_ids`, which a corporation_id
+     * scope never reads.
+     *
+     * @param  string|array<int,string>  $permissions
+     * @param  string|array<int,string>  $corporationRoles
+     */
+    public function affiliatedCorporationScopeFingerprint(
+        string|array $permissions,
+        string|array $corporationRoles = [],
+        ?User $user = null,
+    ): string {
+        $user = $user ?? $this->user ?? auth()->user();
+        $userPermission = $this->canUserService->getUserPermissionObject($user);
+
+        $roleIds = $this->permissionRoleIds($this->normalizeInput($permissions), $userPermission);
+
+        $normalizedRoles = $this->normalizeInput($corporationRoles);
+        $normalizedRoles[] = self::DIRECTOR_ROLE;
+
+        $corporationIds = $this->corporationRoleIds($normalizedRoles, $userPermission);
+
+        // Sorted so the same scope keys the same entry regardless of the order the cached slices
+        // happen to list its ids in.
+        sort($roleIds);
+        sort($corporationIds);
+
+        return hash('sha256', json_encode([
+            'superuser' => $user->can('superuser'),
+            'permission_role_ids' => $roleIds,
+            'corporation_role_ids' => $corporationIds,
+            'affiliations' => $this->affiliationRowsFingerprint($roleIds),
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * Row count + latest touch of the affiliation rows of $roleIds — see
+     * {@see affiliatedCorporationScopeFingerprint()}.
+     *
+     * @param  array<int,int>  $roleIds
+     * @return array{int, string|null}
+     */
+    private function affiliationRowsFingerprint(array $roleIds): array
+    {
+        if ($roleIds === []) {
+            return [0, null];
+        }
+
+        $aggregate = Affiliation::query()
+            ->whereIn('role_id', $roleIds)
+            ->selectRaw('count(*) as affiliation_count, max(updated_at) as latest_affiliation')
+            ->first();
+
+        $count = data_get($aggregate, 'affiliation_count');
+        $latest = data_get($aggregate, 'latest_affiliation');
+
+        return [
+            is_numeric($count) ? (int) $count : 0,
+            is_scalar($latest) ? (string) $latest : null,
+        ];
     }
 
     /**
