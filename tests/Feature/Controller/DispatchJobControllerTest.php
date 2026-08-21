@@ -196,3 +196,57 @@ test('partitions entities into owned and affiliated by the ownership flag', func
         ->assertJsonFragment(['character_id' => $affiliated_character->character_id])
         ->assertJsonMissing(['character_id' => test()->test_character->character_id]);
 });
+
+test('the affiliated corporation section drops corporations the user already manages', function () {
+    // The corp-scope counterpart of the partition test above, and the only path that reaches the
+    // owned-corporation reject — which is why that reject shipped broken: it plucked corporation_id
+    // off character_infos, where it is an accessor over character_affiliations rather than a column.
+    $dispatch_transfer_object = test()->dispatch_transfer_object;
+    Arr::set($dispatch_transfer_object, 'required_corporation_role', ['Director']);
+
+    $affiliated_user = Event::fakeFor(fn () => User::factory()->create());
+    $affiliated_character = $affiliated_user->characters->first();
+
+    // Factory corporations are random; the test says nothing if the two collide.
+    expect($affiliated_character->corporation->corporation_id)
+        ->not->toBe(test()->test_character->corporation->corporation_id);
+
+    // Both characters are directors holding the required scopes, so the owned/affiliated split is
+    // the only thing deciding which corporation lands in which section.
+    Event::fakeFor(function () use ($affiliated_character) {
+        foreach ([test()->test_character, $affiliated_character] as $character) {
+            $roles = $character->roles;
+            $roles->roles = ['Director'];
+            $roles->save();
+        }
+    });
+
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, $dispatch_transfer_object['required_scopes']);
+    updateRefreshTokenWithScopes($affiliated_character->refreshToken, $dispatch_transfer_object['required_scopes']);
+
+    test()->superuser = Event::fakeFor(function () {
+        $user = User::factory()->create();
+        $user->givePermissionTo(Permission::findOrCreate('superuser'));
+
+        return $user;
+    });
+
+    createRoleViaHttp(
+        roleName: 'corporation-contact-manager',
+        affiliations: array_map(fn (CharacterInfo $character): array => [
+            'entity_id' => $character->character_id,
+            'entity_type' => 'character',
+            'affiliation_type' => 'allowed',
+        ], [test()->test_character, $affiliated_character]),
+        member: test()->test_user,
+        permissions: [test()->dispatch_transfer_object['permission']],
+    );
+
+    cache()->flush();
+
+    test()->actingAs(test()->test_user)
+        ->postJson(route('manual_job.entities'), [...$dispatch_transfer_object, 'ownership' => 'affiliated'])
+        ->assertOk()
+        ->assertJsonFragment(['corporation_id' => $affiliated_character->corporation->corporation_id])
+        ->assertJsonMissing(['corporation_id' => test()->test_character->corporation->corporation_id]);
+});

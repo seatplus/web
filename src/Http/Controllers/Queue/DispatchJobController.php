@@ -34,6 +34,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\LazyCollection;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -133,9 +134,11 @@ class DispatchJobController extends Controller
             ->collect();
 
         // Corp scope, affiliated section: drop corporations the user already manages through
-        // one of their own characters, so a corporation never appears in both sections.
+        // one of their own characters, so a corporation never appears in both sections. The
+        // corporation lives on character_affiliations — CharacterInfo::corporation_id is an
+        // accessor over that relation, not a column, so plucking it off character_infos throws.
         if ($isCorporationScope && $ownership === 'affiliated') {
-            $owned_corporation_ids = CharacterInfo::query()
+            $owned_corporation_ids = CharacterAffiliation::query()
                 ->whereIn('character_id', $owned_character_ids)
                 ->pluck('corporation_id');
 
