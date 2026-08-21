@@ -38,9 +38,10 @@
         "driftingly/rector-laravel": "^2.0",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.9",
-        "pestphp/pest": "^4.0",
-        "pestphp/pest-plugin-laravel": "^4.0",
-        "pestphp/pest-plugin-type-coverage": "^4"
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "pestphp/pest-plugin-phpstan": "^5.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0"
     },
     "extra": {
         "laravel": {
@@ -54,7 +55,7 @@
         "test:lint": "vendor/bin/pint --test",
         "test:types": "vendor/bin/phpstan --ansi",
         "test:type-coverage": "__PEST_PLUGIN_ENV=1 vendor/bin/pest --type-coverage --min=100",
-        "test:unit": "vendor/bin/pest --colors=always --no-coverage",
+        "test:unit": "vendor/bin/pest --tia --colors=always",
         "test:unit-coverage": "XDEBUG_MODE=coverage vendor/bin/pest --coverage --colors=always",
         "test": [
             "@test:lint",
