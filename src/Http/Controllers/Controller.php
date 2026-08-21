@@ -26,78 +26,17 @@
 
 namespace Seatplus\Web\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Collection;
-use Seatplus\Eveapi\Models\Character\CharacterInfo;
-use Seatplus\Web\Services\Controller\DispatchTransferObject;
 use Seatplus\Web\Services\GetAffiliatedIds;
 
 class Controller extends BaseController
 {
     use ValidatesRequests;
 
-    private const string CHARACTER_IDS_FILTER = 'character_ids';
-
     public function __construct(
         protected readonly Request $request,
         protected readonly GetAffiliatedIds $getAffiliatedIds
     ) {}
-
-    protected function getCharacterIds(
-        DispatchTransferObject $dispatchTransferObject,
-        ?string $characterRelation = null
-    ): Collection {
-        $affiliatedIds = $this->getAffiliatedIds($dispatchTransferObject);
-        $filteredIds = $this->filterByRequestedCharacterIds($affiliatedIds);
-
-        return $this->fetchAffiliatedCharacterIdsWithRelation($filteredIds, $characterRelation);
-    }
-
-    protected function fetchAffiliatedCharacterIdsWithRelation(
-        array $characterIds,
-        ?string $characterRelation = null
-    ): Collection {
-        // The frontend iterates this as a list of scalar character_ids
-        // (`:id="character_id"`, typed Number). Returning full CharacterInfo models
-        // made each element an object, so pages built route('…', ['character_id' =>
-        // <object>]) and Ziggy threw "object passed as 'character_id' parameter …",
-        // crashing the setup() of components that resolve a route on mount (e.g.
-        // WalletJournalBalanceChart) and taking the page down. Pluck plain ids.
-        return CharacterInfo::query()
-            ->select('character_id')
-            ->whereIn('character_id', $characterIds)
-            ->when(
-                $characterRelation,
-                fn (Builder $query) => $query->with($characterRelation),
-            )
-            ->pluck('character_id');
-    }
-
-    protected function getAffiliatedIds(DispatchTransferObject $dispatchTransferObject): array
-    {
-        return $this->getAffiliatedIds->get(
-            $dispatchTransferObject->permission,
-            $dispatchTransferObject->required_corporation_role
-        );
-    }
-
-    protected function getOwnedCharacterIds(): array
-    {
-        return auth()->user()->characters->pluck('character_id')->toArray();
-    }
-
-    private function filterByRequestedCharacterIds(array $affiliatedIds): array
-    {
-        if ($this->request->has(self::CHARACTER_IDS_FILTER)) {
-            return array_intersect(
-                $affiliatedIds,
-                $this->request->get(self::CHARACTER_IDS_FILTER)
-            );
-        }
-
-        return $affiliatedIds;
-    }
 }

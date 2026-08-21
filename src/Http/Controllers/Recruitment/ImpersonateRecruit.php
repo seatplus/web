@@ -36,6 +36,9 @@ class ImpersonateRecruit extends Controller
 {
     public function __invoke(string $application_id)
     {
+        // Corporation scoping and the open-only rule are enforced by CheckAffiliationForApplication on
+        // the route. The status filter is kept here as defence in depth: impersonation is the one action
+        // that must never outlive the application it was granted for.
         $application = Application::query()
             ->whereStatus('open')
             ->find($application_id);

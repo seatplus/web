@@ -33,14 +33,14 @@ class ReviewInboxController extends Controller
         $user = auth()->user();
         $isSuperuser = $user->can('superuser');
 
-        $recruiterCorpIds = $this->getAffiliatedIds->get(
-            permissions: [self::RECRUITER_PERMISSION],
-            corporationRoles: ['Director'],
-            user: $user,
-        );
-
         $applications = Application::query()
-            ->when(! $isSuperuser, fn (Builder $query) => $query->whereIn('corporation_id', $recruiterCorpIds))
+            ->when(! $isSuperuser, fn (Builder $query) => $this->getAffiliatedIds->constrainToAffiliated(
+                query: $query,
+                column: 'corporation_id',
+                permissions: [self::RECRUITER_PERMISSION],
+                corporationRoles: ['Director'],
+                user: $user,
+            ))
             ->with([
                 'logEntries',
                 'corporation',
@@ -134,6 +134,10 @@ class ReviewInboxController extends Controller
     /**
      * A settled application for the history list: who, which corp, the decision and when.
      *
+     * Deliberately no `review_url`. A decision ends the recruiter's access to the applicant's character
+     * data (see CheckAffiliationForApplication), so `get.application` would 403 for every row here. What
+     * remains is the corporation's record of its own decision, not the applicant's data.
+     *
      * @param  Collection<int|string, Collection<int, EnlistmentReviewRound>>  $roundsByCorporation
      * @return array<string, mixed>
      */
@@ -150,7 +154,6 @@ class ReviewInboxController extends Controller
             'status' => $application->status,
             'decided_at' => $application->updated_at?->toDateTimeString(),
             'total_stages' => $rounds->count(),
-            'review_url' => route('get.application', $application->id),
         ];
     }
 

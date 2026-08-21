@@ -44,12 +44,23 @@ class ContactsController extends Controller
         $dispatchTransferObject = CreateDispatchTransferObject::new()
             ->create(Contact::class);
 
-        $ids = request('character_ids', $this->getAffiliatedIds($dispatchTransferObject));
-
-        $characters = CharacterInfo::query()
+        // Default view = the user's own characters; an explicit character_ids selection is honoured
+        // only within the authorised set (own ∪ affiliated, composed as a subquery). This route has no
+        // CheckAuthorization middleware, so the query is the sole tamper guard — a character_ids the
+        // user isn't affiliated with must never leak through.
+        $query = CharacterInfo::query()
             ->has('contacts')
-            ->whereIn('character_id', $ids)
-            ->with('characterAffiliation')
+            ->with('characterAffiliation');
+
+        $this->getAffiliatedIds->constrainToSelectionOrOwned(
+            query: $query,
+            column: 'character_id',
+            selectedIds: request('character_ids'),
+            permissions: $dispatchTransferObject->permission,
+            corporationRoles: $dispatchTransferObject->required_corporation_role,
+        );
+
+        $characters = $query
             ->get()
             ->each->append('corporation_id');
 

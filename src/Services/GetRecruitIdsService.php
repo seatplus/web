@@ -56,29 +56,35 @@ class GetRecruitIdsService
         return self::$instance->fetchRecruits();
     }
 
+    /**
+     * The recruit scope is keyed and queried straight from its inputs — the affiliated corporation set
+     * is never resolved into PHP:
+     *  - the cache key is a fingerprint of what the scope is built from (roles, corporation roles,
+     *    their affiliation rows, superuser), instead of a hash of the resolved id array;
+     *  - the query constrains `corporation_id` with an AffiliationResolver subquery instead of a
+     *    whereIn over that array.
+     *
+     * Both take the user explicitly: the service is a process-lived singleton, so the GetAffiliatedIds
+     * it holds may have captured a *different* user (or none) when it was constructed.
+     */
     private function fetchRecruits(): array
     {
-        $affiliated_ids = $this->affiliatedIdsService->get(
+        $user = auth()->user();
+
+        $cacheKey = 'recruit_character_ids_'.$this->affiliatedIdsService->affiliatedCorporationScopeFingerprint(
             self::PERMISSION,
             self::CORPORATION_ROLE,
-            auth()->user()
+            $user,
         );
-
-        return $this->getCachedRecruits($affiliated_ids);
-    }
-
-    private function getCachedRecruits(array $affiliatedIds): array
-    {
-        $cacheKey = hash('sha256', implode(', ', $affiliatedIds));
 
         return Cache::remember(
             $cacheKey,
             now()->addMinutes(self::CACHE_DURATION_MINUTES),
-            fn () => $this->queryRecruits($affiliatedIds)
+            fn () => $this->queryRecruits($user)
         );
     }
 
-    private function queryRecruits(array $affiliatedIds): array
+    private function queryRecruits(?User $user): array
     {
         return Application::query()
             ->with([
@@ -86,10 +92,14 @@ class GetRecruitIdsService
                     User::class => ['characters'],
                 ]),
             ])
-            ->when(
-                ! auth()->user()->can('superuser'),
-                fn (Builder $query) => $query->whereIn('corporation_id', $affiliatedIds)
-            )
+            // Superuser bypass included, so this replaces the former when(! superuser) wrapper.
+            ->tap(fn (Builder $query) => $this->affiliatedIdsService->constrainToAffiliated(
+                query: $query,
+                column: 'corporation_id',
+                permissions: self::PERMISSION,
+                corporationRoles: self::CORPORATION_ROLE,
+                user: $user,
+            ))
             ->where('status', 'open')
             ->get()
             ->map(function (Application $recruit) {

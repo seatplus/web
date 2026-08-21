@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Http\Controllers\Configuration\SsoSettings;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -74,9 +75,33 @@ class SsoSettingsController extends Controller
 
     public function deleteSsoScopeSetting(?int $entity_id = null): RedirectResponse
     {
-        is_null($entity_id) ? SsoScopes::global()->delete() : SsoScopes::where('morphable_id', $entity_id)->delete();
+        // Deleted one model at a time, never as a mass query: seatplus/auth's SsoScopeObserver flushes
+        // every user's permission cache on the model's deleted event, and a query-builder delete fires
+        // no model events at all.
+        $this->rowsToDelete($entity_id)->each(fn (SsoScopes $row) => $row->delete());
 
         return redirect()->route('settings.scopes')->with('success', 'SSO Settings Deleted');
+    }
+
+    /**
+     * @return Collection<int, SsoScopes>
+     */
+    private function rowsToDelete(?int $entity_id): Collection
+    {
+        // No id means the installation-wide entry, which is the row with no morphable — not merely
+        // "typed global". SsoScopes::global() filters on the type alone, so it would also delete a
+        // corporation or alliance row that happens to carry that type.
+        if (is_null($entity_id)) {
+            return SsoScopes::query()->where('type', 'global')->whereNull('morphable_id')->get();
+        }
+
+        // Still matched on the id alone, because that is all this route carries — a corporation and an
+        // alliance sharing an id would both be deleted. Disambiguating needs the morphable type in the
+        // route, which the single-screen rewrite introduces; not fixable here without changing the URL.
+        return SsoScopes::query()
+            ->where('morphable_id', $entity_id)
+            ->whereNotNull('morphable_type')
+            ->get();
     }
 
     private function getEntity(?int $entity_id = null): SsoScopes|\stdClass

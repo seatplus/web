@@ -17,7 +17,7 @@ use Seatplus\Web\Services\Query\TypeWatchListScope;
  *    `WHERE item_id IN (SELECT DISTINCT root_item_id WHERE root_location_id = :loc AND <filter>)`.
  *  - unfiltered: the location's direct children (`location_id = :loc`).
  *
- * `character_ids` must already be the authorised set (AssetsController scopes it via getCharacterIds);
+ * `character_ids` must already be the authorised set (AssetsController scopes it via GetAffiliatedIds::constrainToSelectionOrOwned);
  * every query is hard-scoped to it, so an arbitrary location_id can only ever return authorised assets.
  */
 class GetLocationTopLevelAssetsAction
