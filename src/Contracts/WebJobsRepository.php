@@ -19,6 +19,7 @@ use Seatplus\Eveapi\Jobs\Wallet\CharacterWalletJournalJob;
 use Seatplus\Eveapi\Jobs\Wallet\CharacterWalletTransactionJob;
 use Seatplus\Eveapi\Jobs\Wallet\CorporationBalanceJob;
 use Seatplus\Eveapi\Jobs\Wallet\CorporationWalletJournalJob;
+use Seatplus\Eveapi\Models\Character\CharacterAffiliation;
 use Seatplus\Eveapi\Models\RefreshToken;
 
 class WebJobsRepository
@@ -83,8 +84,13 @@ class WebJobsRepository
 
         // if refresh token has scope for reading alliance contacts add the job to the jobs array
         if ($refresh_token->hasScope('esi-alliances.read_contacts.v1')) {
-            /** @phpstan-ignore-next-line */
-            $alliance_id = (int) $refresh_token->alliance_id;
+            // The alliance lives on character_affiliations. RefreshToken exposes a corporationId()
+            // accessor but nothing for the alliance, so reading $refresh_token->alliance_id resolved
+            // to null for every token — (int) null being 0, the guard below was never true and these
+            // two jobs could not dispatch at all. An ignore annotation on the line hid it from analysis.
+            $alliance_id = (int) CharacterAffiliation::query()
+                ->where('character_id', $refresh_token->character_id)
+                ->value('alliance_id');
 
             if ($alliance_id) {
                 $jobs[] = [

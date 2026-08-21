@@ -71,10 +71,22 @@ class DispatchJobController extends Controller
             return redirect()->back()->with('error', 'job was already queued');
         }
 
+        // Affiliation is validated upstream (DispatchIndividualJob's bounded coversCharacter /
+        // coversCorporation probes), but being affiliated with an id says nothing about a usable
+        // token existing for it: the character may have none, and FindCorporationRefreshToken
+        // returns null when no token in the corporation carries the required scopes and role.
+        // getConstructedJobs() takes a non-nullable RefreshToken, so passing that null through
+        // was a TypeError — a 500 on an otherwise legitimate request.
+        $refresh_token = $this->getRefreshToken($job);
+
+        if (! $refresh_token instanceof RefreshToken) {
+            return redirect()->back()->with('error', 'no token with the required scopes is available for this request');
+        }
+
         $batch_name = sprintf('Manual batch update of %s', $cache_key);
 
         $batch_id = (new ManualDispatchedJob)
-            ->setJobs($this->web_jobs->getConstructedJobs($manual_job, $this->getRefreshToken($job)))
+            ->setJobs($this->web_jobs->getConstructedJobs($manual_job, $refresh_token))
             ->setName($batch_name)
             ->handle();
 

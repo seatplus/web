@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Seatplus\Auth\Models\Permissions\Permission;
 use Seatplus\Auth\Models\User;
+use Seatplus\Eveapi\Jobs\Contacts\AllianceContactJob;
+use Seatplus\Eveapi\Jobs\Contacts\AllianceContactLabelJob;
 use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
@@ -249,4 +251,92 @@ test('the affiliated corporation section drops corporations the user already man
         ->assertOk()
         ->assertJsonFragment(['corporation_id' => $affiliated_character->corporation->corporation_id])
         ->assertJsonMissing(['corporation_id' => test()->test_character->corporation->corporation_id]);
+});
+
+test('dispatches the alliance contact jobs when the character is in an alliance', function () {
+    // Regression: the alliance gate read $refresh_token->alliance_id. RefreshToken defines a
+    // corporationId() accessor but nothing for the alliance, so that resolved to null on every
+    // token, (int) null was 0, and these two jobs could not dispatch for anybody. An ignore
+    // annotation above the line kept it out of sight of static analysis.
+    Bus::fake();
+
+    // The factory's alliance_id is fake()->optional(), so it has to be pinned here — otherwise the
+    // test passes or fails at random depending on whether the character drew an alliance.
+    $alliance_id = 99000042;
+    $affiliation = test()->test_character->characterAffiliation;
+    $affiliation->alliance_id = $alliance_id;
+    $affiliation->save();
+
+    // eveapi's character.contacts scope list includes esi-alliances.read_contacts.v1, which is the
+    // scope the alliance branch gates on.
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, config('eveapi.scopes.character.contacts'));
+
+    test()->actingAs(test()->test_user)
+        ->post(route('dispatch.job'), [
+            'character_id' => test()->test_character->character_id,
+            'dispatch_transfer_object' => test()->dispatch_transfer_object,
+        ])
+        ->assertOk();
+
+    Bus::assertBatched(function (PendingBatch $batch) use ($alliance_id): bool {
+        // getContactJobs() returns chains (arrays of jobs), hence the flatten.
+        $alliance_jobs = collect($batch->jobs)
+            ->flatten()
+            ->filter(fn (object $job): bool => $job instanceof AllianceContactJob || $job instanceof AllianceContactLabelJob);
+
+        return $alliance_jobs->count() === 2
+            && $alliance_jobs->every(fn (object $job): bool => $job->allianceId === $alliance_id);
+    });
+});
+
+test('does not dispatch the alliance contact jobs for a character in no alliance', function () {
+    // The other half of the branch: the guard above must still hold, so that fixing the id lookup
+    // did not turn "no alliance" into an AllianceContactJob(0).
+    Bus::fake();
+
+    $affiliation = test()->test_character->characterAffiliation;
+    $affiliation->alliance_id = null;
+    $affiliation->save();
+
+    updateRefreshTokenWithScopes(test()->test_character->refreshToken, config('eveapi.scopes.character.contacts'));
+
+    test()->actingAs(test()->test_user)
+        ->post(route('dispatch.job'), [
+            'character_id' => test()->test_character->character_id,
+            'dispatch_transfer_object' => test()->dispatch_transfer_object,
+        ])
+        ->assertOk();
+
+    Bus::assertBatched(fn (PendingBatch $batch): bool => collect($batch->jobs)
+        ->flatten()
+        ->every(fn (object $job): bool => ! $job instanceof AllianceContactJob && ! $job instanceof AllianceContactLabelJob));
+});
+
+test('rejects a dispatch for an affiliated character that has no usable token', function () {
+    // Affiliation and token availability are independent: coversCharacter() passes on an owned
+    // character whether or not a token still exists for it. getConstructedJobs() takes a
+    // non-nullable RefreshToken, so the null used to surface as a TypeError (500) rather than as
+    // the handled redirect every other rejection in this action returns.
+    Bus::fake();
+
+    $character_id = test()->test_character->character_id;
+
+    // A revoked token, which is how this arises in practice.
+    test()->test_character->refreshToken->delete();
+
+    $cache_key = sprintf('%s:%s', test()->dispatch_transfer_object['manual_job'], $character_id);
+
+    test()->actingAs(test()->test_user)
+        ->post(route('dispatch.job'), [
+            'character_id' => $character_id,
+            'dispatch_transfer_object' => test()->dispatch_transfer_object,
+        ])
+        ->assertRedirect()
+        ->assertSessionHas('error');
+
+    Bus::assertNothingBatched();
+
+    // Nothing may be cached for a dispatch that never happened, or the id would be locked out for
+    // the hour it takes the entry to expire.
+    expect(cache($cache_key))->toBeNull();
 });
