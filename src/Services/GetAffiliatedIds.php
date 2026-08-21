@@ -46,28 +46,9 @@ class GetAffiliatedIds
     }
 
     /**
-     * @param  string|array<int,string>  $permissions
-     * @param  string|array<int,string>  $corporationRoles
-     * @return array<int,int>
-     */
-    public function get(
-        string|array $permissions,
-        string|array $corporationRoles = [],
-        ?User $user = null
-    ): array {
-        $normalized_permissions = $this->normalizeInput($permissions);
-        $normalizedRoles = $this->normalizeInput($corporationRoles);
-        $normalizedRoles[] = self::DIRECTOR_ROLE;
-
-        $this->user = $user ?? $this->user;
-
-        return (new self($user))->collectAffiliatedIds($normalized_permissions, $normalizedRoles);
-    }
-
-    /**
      * The user's own character ids, taken straight from the cached permission object
-     * (user_permissions_{id}, 5-min TTL) rather than a fresh query — the same slice
-     * collectAffiliatedIds() merges in as `owned_character_ids`.
+     * (user_permissions_{id}, 5-min TTL) rather than a fresh query — the `owned_character_ids`
+     * slice.
      *
      * @return array<int, int>
      */
@@ -117,11 +98,11 @@ class GetAffiliatedIds
      * Constrain $column to the entities affiliated via $permissions / $corporationRoles, composed as a
      * grouped subquery rather than a materialised id array: the affiliated set is resolved in SQL by
      * {@see AffiliationResolver}, so an inverse or alliance-wide role never pulls a whole *_infos table
-     * into PHP the way get() does.
+     * into PHP the way the removed get() did.
      *
      * The whole affiliation constraint is wrapped in a single nested where(), so it stays safe to chain
      * next to an existing orWhere (no boolean-precedence surprise). $column selects the id-space — the
-     * two spaces get() ever filtered against:
+     * two spaces get() ever filtered against, before it was removed:
      *  - a character_id column matches the affiliated characters OR the user's own characters;
      *  - a corporation_id column matches the affiliated corporations OR the corporations the user holds
      *    $corporationRoles (+ Director) in.
@@ -179,14 +160,14 @@ class GetAffiliatedIds
      * This is affiliated ∖ owned, not the affiliated ∪ owned of {@see constrainToAffiliated()}, so it
      * cannot be expressed with that method. Like it, the affiliated set is composed as an
      * {@see AffiliationResolver} subquery instead of being materialised: an inverse or alliance-wide
-     * role never pulls a whole character_infos table into PHP the way get() does.
+     * role never pulls a whole character_infos table into PHP the way the removed get() did.
      *
      * Character id-space only — a corporation_id column (or anything else) throws (fail closed).
      * Corporation roles therefore play no part: they contribute *corporation* ids, which never match a
      * character_id (EVE draws every entity id from one global sequence), so they were only ever dead
-     * weight in the array get() handed to a character-space whereIn.
+     * weight in the array get() used to hand a character-space whereIn.
      *
-     * Deliberately no superuser bypass — get() had none either, so the affiliated section stays
+     * Deliberately no superuser bypass — get() never had one either, so the affiliated section stays
      * role-derived: a superuser holding no role that grants $permissions sees an empty one, as before.
      * Mutates $query in place.
      *
@@ -254,7 +235,7 @@ class GetAffiliatedIds
     /**
      * Whether $corporationId is one of the corporations affiliated via $permissions / $corporationRoles —
      * a bounded membership test that never materialises the affiliated set. Replaces
-     * `in_array($corporationId, $this->get(...))` on the corporation id-space.
+     * `in_array($corporationId, get(...))` on the corporation id-space, back when that set was materialised.
      *
      * @param  string|array<int,string>  $permissions
      * @param  string|array<int,string>  $corporationRoles
@@ -307,7 +288,7 @@ class GetAffiliatedIds
 
     /**
      * A cache-key fingerprint of the *inputs* a corporation-space {@see constrainToAffiliated()} scope is
-     * built from, for a caller that caches a result of that scope. Replaces keying a cache on get()'s
+     * built from, for a caller that caches a result of that scope. Replaces keying a cache on the removed get()'s
      * resolved id array — the awkward case where the affiliated set had to be materialised only to name
      * a cache entry.
      *
@@ -381,22 +362,6 @@ class GetAffiliatedIds
     }
 
     /**
-     * @param  array<int,string>  $permissions
-     * @param  array<int,string>  $corporationRole
-     * @return array<int,int>
-     */
-    private function collectAffiliatedIds(array $permissions, array $corporationRole): array
-    {
-        $userPermission = $this->canUserService->getUserPermissionObject($this->user);
-
-        return array_merge(
-            $this->getPermissionBasedIds($permissions, $userPermission),
-            $this->corporationRoleIds($corporationRole, $userPermission),
-            data_get($userPermission, 'owned_character_ids', [])
-        );
-    }
-
-    /**
      * @param  string|array<int,string>  $input
      * @return array<int,string>
      */
@@ -412,36 +377,6 @@ class GetAffiliatedIds
             ->unique()
             ->values()
             ->toArray();
-    }
-
-    /**
-     * Resolve the affiliated ids granted by the given permissions live, via {@see AffiliationResolver}.
-     *
-     * The cached permission object no longer carries a materialised `permissions` id-array slice (removed in
-     * auth 5.0); it carries `permission_roles` (permission → the ids of the user's roles that grant it). We
-     * union those role ids and enumerate their affiliated character/corporation/alliance ids through the
-     * resolver's set-based subqueries — the conflated, cross-id-space array shape the consumers expect.
-     *
-     * @param  array<int,string>  $permissions
-     * @return array<int,int>
-     */
-    private function getPermissionBasedIds(array $permissions, array $userPermission): array
-    {
-        $roleIds = $this->permissionRoleIds($permissions, $userPermission);
-
-        if ($roleIds === []) {
-            return [];
-        }
-
-        $resolver = new AffiliationResolver;
-
-        $affiliatedIds = array_merge(
-            $resolver->characterIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
-            $resolver->corporationIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
-            $resolver->allianceIdsSubquery($roleIds)->pluck('affiliated_id')->all(),
-        );
-
-        return array_map('intval', $affiliatedIds);
     }
 
     /**
