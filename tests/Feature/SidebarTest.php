@@ -121,7 +121,11 @@ test('user with director role can see corporation wallet', function () {
 
     cache()->flush();
 
-    expect(test()->test_character->refresh()->roles->hasRole('roles', 'Director'))->toBeTrue();
+    // Re-read into a variable: expecting the identical expression to be false above
+    // narrows it to false for PHPStan, which the write does not invalidate.
+    $roles = test()->test_character->refresh()->roles;
+
+    expect($roles->hasRole('roles', 'Director'))->toBeTrue();
 
     $sidebar = (new SidebarEntries)->getFilteredEntries();
 

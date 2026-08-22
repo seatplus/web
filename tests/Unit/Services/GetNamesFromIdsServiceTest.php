@@ -15,13 +15,17 @@ it('resolves ids to names via esi and caches them', function () {
         ],
     ]));
 
-    expect(cache(sprintf('name:%s', $id)))->toBeNull();
+    $cacheKey = sprintf('name:%s', $id);
+
+    // has() rather than expecting cache($cacheKey) to be null: the latter narrows that
+    // expression to null for PHPStan, and the read below is then an impossible access.
+    expect(cache()->has($cacheKey))->toBeFalse();
 
     $result = (new GetNamesFromIdsService)->execute($esi, [$id]);
 
     expect($result)->toHaveCount(1);
     expect($result->first()->name)->toEqual(test()->test_character->name);
-    expect(cache(sprintf('name:%s', $id))->name)->toEqual(test()->test_character->name);
+    expect(cache($cacheKey)->name)->toEqual(test()->test_character->name);
 });
 
 it('returns cached names without calling esi', function () {

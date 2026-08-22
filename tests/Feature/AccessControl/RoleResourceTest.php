@@ -62,7 +62,11 @@ it('can_edit follows the administrate permission, not the old mismatched string'
     assignPermissionToTestUser('administrate access control groups');
     test()->test_user->forgetCachedPermissions();
 
-    expect(resolveRole($role)['can_edit'])->toBeTrue();
+    // Re-read into a variable: expecting the identical expression to be false above
+    // narrows it to false for PHPStan, which the grant does not invalidate.
+    $afterGrant = resolveRole($role);
+
+    expect($afterGrant['can_edit'])->toBeTrue();
 });
 
 it('my_status reflects an active membership and enables leave for non-automatic roles', function () {
