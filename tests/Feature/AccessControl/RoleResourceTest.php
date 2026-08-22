@@ -57,16 +57,17 @@ it('can_edit follows the administrate permission, not the old mismatched string'
     $role = makeRole();
     test()->actingAs(test()->test_user);
 
-    expect(resolveRole($role)['can_edit'])->toBeFalse();
+    // Capture the pre-grant read: expecting it to be false narrows that expression for
+    // the rest of the test, and the grant below does not invalidate the narrowing —
+    // so the post-grant assertion has to run on an expression PHPStan has not seen.
+    $beforeGrant = resolveRole($role);
+
+    expect($beforeGrant['can_edit'])->toBeFalse();
 
     assignPermissionToTestUser('administrate access control groups');
     test()->test_user->forgetCachedPermissions();
 
-    // Re-read into a variable: expecting the identical expression to be false above
-    // narrows it to false for PHPStan, which the grant does not invalidate.
-    $afterGrant = resolveRole($role);
-
-    expect($afterGrant['can_edit'])->toBeTrue();
+    expect(resolveRole($role)['can_edit'])->toBeTrue();
 });
 
 it('my_status reflects an active membership and enables leave for non-automatic roles', function () {
