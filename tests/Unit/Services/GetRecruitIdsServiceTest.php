@@ -29,8 +29,8 @@ it('returns recruit ids and caches values', function () {
 
     cache()->flush();
 
-    expect(test()->test_user)->can('superuser')->toBeTrue()
-        ->and(test()->test_user)->can('can accept or deny applications')->toBeTrue();
+    expect(test()->test_user->can('superuser'))->toBeTrue()
+        ->and(test()->test_user->can('can accept or deny applications'))->toBeTrue();
 
     test()->actingAs(test()->test_user);
 
@@ -161,7 +161,11 @@ function openApplicationsTo(int $corporation_id, int $count): array
         'corporation_id' => $corporation_id,
         'status' => 'open',
     ]))
-        ->flatMap(fn (Application $application) => $application->applicationable->characters->pluck('character_id'))
+        ->flatMap(function (Application $application) {
+            $applicant = $application->applicationable;
+
+            return $applicant instanceof User ? $applicant->characters->pluck('character_id') : collect();
+        })
         ->map(fn (int|string $character_id) => intval($character_id))
         ->all();
 }

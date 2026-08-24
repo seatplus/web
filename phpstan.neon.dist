@@ -27,58 +27,46 @@ parameters:
     checkOctaneCompatibility: true
     checkModelProperties: true
     ignoreErrors:
-        # filterBy*Ids methods are Eloquent query scopes exposed via Builder macro magic;
-        # PHPStan cannot see them on the raw Builder type.
+        # ---------------------------------------------------------------------------
+        # Root-caused upstream in eveapi; these go away with the release that carries
+        # the fixes, not by being fixed here.
+        # ---------------------------------------------------------------------------
+        # filterBy*Ids are query scopes on the watch-list models. The WatchList
+        # interfaces do not declare them, so they are invisible on the raw Builder.
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(System|Region)Ids\\(\\)\\.$#"
             path: src/Services/Query/LocationWatchListScope.php
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
-        # --- test-suite analysis (pest-plugin-phpstan) false-positives ---
-        # Style rule; pest.expectation.impossible (real bugs) stays active.
+        # CharacterInfo::corporation() is an ungenerified HasOneThrough, so the related
+        # CorporationInfo degrades to a bare Eloquent Model.
         -
-            identifier: pest.expectation.redundant
-        # Pest higher-order proxy: dynamic test-state props (test()->x / $this->x set
-        # in setUp/helpers) are not statically declared on the proxy type.
+            message: '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$corporation_id#'
+            paths:
+                - tests/Feature/ContactTest.php
+                - tests/Unit/Middleware/CheckRequiredScopesMiddlewareTest.php
+        # RefreshToken::$token is an Attribute accessor Larastan infers as never.
         -
-            message: '#Access to an undefined property Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy).*::\$#'
-        # Pest higher-order expectation/describe chaining (expect()->x, describe()->only()).
-        -
-            message: '#Call to an undefined method Pest\\(Expectation|Expectations\\HigherOrderExpectation|PendingCalls\\(TestCall|DescribeCall))#'
-        # Dataset-driven test matches are exhaustive for their datasets; src unaffected.
-        -
-            message: '#Match expression does not handle remaining value#'
-        # Intentional env() call: the setUp() dev-DB safety guard.
-        -
-            identifier: larastan.noEnvCallsOutsideOfConfig
-        # Base-class-typed vars miss subclass/trait members: seatplus Role adds
-        # $type/affiliations()/roles() over Spatie's base; factory/query results
-        # typed as the generic Eloquent Model.
-        -
-            message: '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$#'
-        -
-            message: '#(Access to an undefined property Spatie\\Permission\\Contracts\\Role::|Call to an undefined method Spatie\\Permission\\(Contracts|Models)\\Role::|Method Spatie\\Permission\\Contracts\\Role::hasPermissionTo\(\) invoked)#'
-        # Test helpers declare the seatplus Role return type; Larastan infers broader.
-        -
-            message: '#should return Seatplus\\Auth\\Models\\Permissions\\Role#'
-        # Larastan infers RefreshToken::$token as never (model-property inference gap).
-        -
-            message: '#Property Seatplus\\Eveapi\\Models\\RefreshToken::\$token#'
-        # Test stub Kernel (array phpdoc) + a Testbench middleware class that moved.
-        -
-            message: '#PHPDoc type array of property Seatplus\\Web\\Tests\\Stubs\\Kernel::#'
-        -
-            message: '#Orchestra\\Testbench\\Http\\Middleware\\RedirectIfAuthenticated#'
-        # Redundant instanceof asserting a resource is its own type (test intent).
-        -
-            message: '#Instanceof between Seatplus\\Web\\Http\\Resources\\Universe\\(Group|Type)Resource#'
-        # Value is null via a nullable return; runtime path returns a model.
-        -
-            identifier: pest.expectation.impossible
-            path: tests/Feature/ScopeSettingsTest.php
-        # toHaveCount() on a value Larastan widened to string; countable at runtime.
+            identifier: assign.propertyType
+            path: tests/Pest.php
+        # SsoScopes casts selected_scopes to array in casts(); Larastan does not read the
+        # method form and falls back to the text column type.
         -
             identifier: pest.expectation.requiresCountableOrIterable
             path: tests/Unit/Services/SsoSettings/UpdateOrCreateSsoSettingsTest.php
 
+        # ---------------------------------------------------------------------------
+        # Pest's test() is typed as TestCall — only expect() has a return-type
+        # extension — so every test()->property and test()->method() is unresolvable.
+        # Removed by the follow-up that converts test()-> to $this->, which the plugin
+        # binds to the TestCase.
+        # ---------------------------------------------------------------------------
+        -
+            message: '#Access to an undefined property Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy).*::\$#'
+            paths:
+                - tests/*
+        -
+            message: '#Call to an undefined method Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy)#'
+            paths:
+                - tests/*

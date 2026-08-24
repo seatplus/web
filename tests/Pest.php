@@ -176,7 +176,9 @@ function createRoleViaHttp(
         ->followingRedirects()
         ->postJson(route('acl.store'), ['name' => $roleName, 'type' => $roleType]);
 
-    $role = Role::findByName($roleName);
+    // Queried rather than Role::findByName(), which is declared to return Spatie's
+    // base model and drops the concrete seatplus Role this helper promises.
+    $role = Role::query()->where('name', $roleName)->firstOrFail();
 
     if (! empty($affiliations)) {
         test()->actingAs($actor)
@@ -193,5 +195,5 @@ function createRoleViaHttp(
         ->post(route('acl.member.add', [$role->id, $member->id]))
         ->assertRedirect();
 
-    return $role->fresh();
+    return $role->refresh();
 }

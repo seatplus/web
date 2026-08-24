@@ -155,10 +155,9 @@ test('junior hr handles open user applications', function () {
 
     // open application
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
@@ -215,10 +214,9 @@ test('junior hr handles open character applications', function () {
     applySecondary(false);
 
     // open application
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     $response = test()->actingAs(test()->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
@@ -270,10 +268,9 @@ test('recruiter can see corporation applications', function () {
     // Apply with secondary user
     applySecondary(false);
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     // Get the test_users Applicaton // /application/{application_id}
     $response = test()->actingAs($recruiter)
@@ -313,10 +310,9 @@ test('recruiter can comment on application', function () {
     // Apply with secondary user
     applySecondary(false);
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     // Get the test_users Application // /application/{application_id}
     $response = test()->actingAs($recruiter)

@@ -20,9 +20,10 @@ it('get affiliated corporations', function () {
         'roles' => ['Director'],
     ]);
 
-    expect(test()->test_character->roles)
-        ->hasRole('roles', 'Director')->toBeTrue()
-        ->hasRole('roles', 'Accountant')->toBeTrue();
+    $roles = test()->test_character->roles;
+
+    expect($roles->hasRole('roles', 'Director'))->toBeTrue()
+        ->and($roles->hasRole('roles', 'Accountant'))->toBeTrue();
 
     WalletJournal::factory()->count(5)->create([
         'wallet_journable_type' => CorporationInfo::class,

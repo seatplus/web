@@ -61,6 +61,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
         'corporation' => $affiliation->corporation_id,
         'alliance' => $affiliation->alliance_id,
         'faction' => $affiliation->faction_id,
+        default => throw new UnhandledMatchError(sprintf('Unsupported contact type: %s.', $contact_type)),
     };
 
     $contact = Contact::factory()->create([
@@ -81,6 +82,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
             'corporation' => ['corporation', 'faction', 'character'],
             'faction' => ['faction', 'character'],
             'character' => ['character'],
+            default => throw new UnhandledMatchError(sprintf('Unsupported contact level: %s.', $corp_contact_level)),
         };
 
         $getIdFromAffiliationByType = fn (string $type) => match ($type) {
@@ -88,6 +90,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
             'corporation' => $affiliation->corporation_id,
             'alliance' => $affiliation->alliance_id,
             'faction' => $affiliation->faction_id,
+            default => throw new UnhandledMatchError(sprintf('Unsupported contact type: %s.', $type)),
         };
 
         foreach ($contacts_array as $contact_type) {

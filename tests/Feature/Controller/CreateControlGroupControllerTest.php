@@ -65,7 +65,7 @@ it('creates a fully configured group in one request via acl.store', function () 
         ])
         ->assertRedirect();
 
-    $role = Role::findByName('Fleet Commanders');
+    $role = Role::query()->where('name', 'Fleet Commanders')->firstOrFail();
 
     expect($role->type)->toBe(RoleType::OPT_IN)
         ->and($role->affiliations()->where('type', 'allowed')->exists())->toBeTrue()
@@ -90,7 +90,7 @@ it('creates an open-to-all, applies-to-everything group via acl.store', function
         ])
         ->assertRedirect();
 
-    $role = Role::findByName('Everyone');
+    $role = Role::query()->where('name', 'Everyone')->firstOrFail();
 
     expect($role->affiliations()->where('type', 'inverse')->where('affiliatable_id', 1000001)->exists())->toBeTrue()
         ->and($role->roleMemberships()->where('entity_type', CorporationInfo::class)->where('entity_id', 1000001)->exists())->toBeTrue();

@@ -9,7 +9,6 @@ test('correct data is returned in response', function () {
 
     $resource = (new GroupResource($group));
 
-    expect($resource instanceof GroupResource)->toBeTrue();
     expect($resource->name)->toEqual($group->name);
 });
 

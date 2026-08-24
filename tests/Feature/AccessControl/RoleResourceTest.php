@@ -18,7 +18,9 @@ function makeRole(RoleType $type = RoleType::MANUAL): Role
     $role = Role::create(['name' => 'test']);
     $role->update(['type' => $type]);
 
-    return Role::findById($role->id);
+    // Queried rather than Role::findById()/refresh(): both are declared to return
+    // Spatie's model, dropping the concrete seatplus Role and its $type/affiliations().
+    return Role::query()->findOrFail($role->id);
 }
 
 function resolveRole(Role $role): array
