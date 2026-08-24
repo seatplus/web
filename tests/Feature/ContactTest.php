@@ -22,7 +22,9 @@ test('see component', function () {
 it('has details', function () {
     $this->test_character->contacts()->create(Contact::factory()->make()->toArray());
 
-    $contact = $this->test_character->contacts->first();
+    $contact = Contact::query()
+        ->where('contactable_id', $this->test_character->character_id)
+        ->firstOrFail();
     $character_id = $this->test_character->character_id;
 
     $this->actingAs($this->test_user)

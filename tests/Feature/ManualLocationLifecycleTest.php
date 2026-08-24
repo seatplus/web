@@ -123,8 +123,16 @@ test('admin can accept suggestion', function () {
     // the accepted location's polymorphic relation resolves to the chosen suggestion, so the
     // asset views (LocationRessource::name) render its name rather than a blank " - ".
     $accepted = Location::with('locatable')->firstWhere('location_id', 12345);
-    expect($accepted->locatable)->toBeInstanceOf(ManualLocation::class)
-        ->and($accepted->locatable->name)->toBe($manual_location->name);
+    $locatable = $accepted->locatable;
+
+    expect($locatable)->toBeInstanceOf(ManualLocation::class);
+
+    // locatable is a morphTo, so it is a bare Model statically. The expectation above
+    // already fails loudly on the wrong type; this narrows it to read ManualLocation's
+    // own columns.
+    if ($locatable instanceof ManualLocation) {
+        expect($locatable->name)->toBe($manual_location->name);
+    }
 
     // check that there there is only one left after accepting
     expect(loadSuggestions($this)->json('props.data'))->toHaveCount(1);
