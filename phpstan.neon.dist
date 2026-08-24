@@ -28,8 +28,8 @@ parameters:
     checkModelProperties: true
     ignoreErrors:
         # ---------------------------------------------------------------------------
-        # Root-caused upstream in eveapi; these go away with the release that carries
-        # the fixes, not by being fixed here.
+        # Root-caused upstream in eveapi (seatplus/eveapi#723); these go away with the
+        # release that carries the fixes, not by being fixed here.
         # ---------------------------------------------------------------------------
         # filterBy*Ids are query scopes on the watch-list models. The WatchList
         # interfaces do not declare them, so they are invisible on the raw Builder.
