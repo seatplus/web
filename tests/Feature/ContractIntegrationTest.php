@@ -8,13 +8,13 @@ use Seatplus\Eveapi\Models\Contracts\ContractItem;
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
-    test()->test_user->givePermissionTo($permission);
+    $this->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
 });
 
 test('has dispatchable job', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('character.contracts'));
 
     $response->assertInertia(
@@ -29,9 +29,9 @@ test('one can call transaction endpoint', function () {
         'contract_id' => Contract::factory(),
     ]);
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('contract.details', [
-            'character_id' => test()->test_character->character_id,
+            'character_id' => $this->test_character->character_id,
             'contract_id' => 1234,
         ]))
         ->assertOk();

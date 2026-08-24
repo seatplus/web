@@ -5,7 +5,7 @@ use Seatplus\Eveapi\Models\Universe\System;
 use Seatplus\Web\Services\SearchService;
 
 it('searches esi with a scoped token and returns the raw result', function () {
-    $token = test()->test_character->refreshToken;
+    $token = $this->test_character->refreshToken;
     updateRefreshTokenWithScopes($token, ['esi-search.search_structures.v1']);
 
     $system = System::factory()->create(['name' => 'jita']);

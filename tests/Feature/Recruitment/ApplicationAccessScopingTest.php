@@ -7,6 +7,7 @@ use Seatplus\Eveapi\Models\Alliance\AllianceInfo;
 use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Models\Recruitment\Enlistment;
+use Seatplus\Web\Tests\TestCase;
 
 /**
  * Access scoping for the application review routes — the two properties that must hold for every route
@@ -22,11 +23,11 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
  * The helpers at the bottom are local to this file so it can be run on its own.
  */
 beforeEach(function () {
-    test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
-    test()->secondary_character = test()->secondary_user->characters->first();
+    $this->secondary_user = Event::fakeFor(fn () => User::factory()->create());
+    $this->secondary_character = $this->secondary_user->characters->first();
 
-    // createRoleViaHttp() defaults its actor to test()->superuser, which TestCase does not seed.
-    test()->superuser = Event::fakeFor(function () {
+    // createRoleViaHttp($this, $this->superuser) defaults its actor to $this->superuser, which TestCase does not seed.
+    $this->superuser = Event::fakeFor(function () {
         $user = User::factory()->create();
         $user->givePermissionTo(Permission::findOrCreate('superuser'));
 
@@ -35,127 +36,127 @@ beforeEach(function () {
 });
 
 test('a recruiter cannot impersonate an applicant to a corporation they are not affiliated with', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
     expect($application)->status->toBe('open');
 
-    $outsider = recruiterForTheirOwnCorporation();
+    $outsider = recruiterForTheirOwnCorporation($this, $this->superuser);
 
-    test()->actingAs($outsider)
+    $this->actingAs($outsider)
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertForbidden()
         ->assertSessionMissing('impersonation_origin');
 });
 
 test('a recruiter cannot inspect an applicant to a corporation they are not affiliated with', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
 
-    $outsider = recruiterForTheirOwnCorporation();
+    $outsider = recruiterForTheirOwnCorporation($this, $this->superuser);
 
-    test()->actingAs($outsider)
+    $this->actingAs($outsider)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertForbidden();
 });
 
 test('rejecting an application ends the recruiter access to the applicant data', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
 
     // While open the affiliated recruiter reaches the full inspection page.
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk();
 
-    decideAsTestUser($application, 'rejected');
+    decideAsTestUser($this, $application, 'rejected');
 
     expect($application->refresh())->status->toBe('rejected');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertForbidden();
 });
 
 test('accepting an application ends the recruiter access to the applicant data', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk();
 
-    decideAsTestUser($application, 'accepted');
+    decideAsTestUser($this, $application, 'accepted');
 
     expect($application->refresh())->status->toBe('accepted');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertForbidden();
 });
 
 test('a decided application can no longer be impersonated', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
 
-    decideAsTestUser($application, 'accepted');
+    decideAsTestUser($this, $application, 'accepted');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertForbidden()
         ->assertSessionMissing('impersonation_origin');
 });
 
 test('a decided application can no longer be commented on', function () {
-    openPostingForTestUser();
-    applyAsSecondary();
+    openPostingForTestUser($this, $this->superuser);
+    applyAsSecondary($this);
 
     $application = Application::first();
 
-    decideAsTestUser($application, 'rejected');
+    decideAsTestUser($this, $application, 'rejected');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->put(route('comment.application', ['application_id' => $application->id]), ['comment' => 'after the fact'])
         ->assertForbidden();
 });
 
 test('an intermediate stage decision keeps the application open and inspectable', function () {
-    openPostingForTestUser();
+    openPostingForTestUser($this, $this->superuser);
 
     // A second round: the engine only writes a terminal status when accepting on the *final* round, so
     // the first acceptance must leave the application open — and therefore still reachable.
     Enlistment::query()
-        ->findOrFail(test()->test_character->corporation->corporation_id)
+        ->findOrFail($this->test_character->corporation->corporation_id)
         ->reviewRounds()
         ->create(['position' => 1, 'label' => 'Senior', 'role_id' => null]);
 
-    applyAsSecondary();
+    applyAsSecondary($this);
 
     $application = Application::first();
 
-    decideAsTestUser($application, 'accepted');
+    decideAsTestUser($this, $application, 'accepted');
 
     expect($application->refresh())->status->toBe('open');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk();
 
     // The final round closes it, and access ends with it.
-    decideAsTestUser($application, 'accepted');
+    decideAsTestUser($this, $application, 'accepted');
 
     expect($application->refresh())->status->toBe('accepted');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertForbidden();
 });
@@ -175,7 +176,7 @@ test('an alliance affiliated recruiter reaches an application to a sister corpor
     $application = openApplicationTo($sisterCorporation->corporation_id);
 
     // Affiliated at ALLIANCE level: AffiliationResolver expands that to every member corporation.
-    createRoleViaHttp(
+    createRoleViaHttp($this, $this->superuser,
         roleName: 'alliance-recruiter',
         affiliations: [
             [
@@ -184,17 +185,17 @@ test('an alliance affiliated recruiter reaches an application to a sister corpor
                 'affiliation_type' => 'allowed',
             ],
         ],
-        member: test()->test_user,
+        member: $this->test_user,
         permissions: ['can accept or deny applications'],
     );
 
     cache()->flush();
 
-    test()->actingAs(test()->test_user->refresh())
+    $this->actingAs($this->test_user->refresh())
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk();
 
-    test()->actingAs(test()->test_user->refresh())
+    $this->actingAs($this->test_user->refresh())
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertRedirect(route('home'));
 });
@@ -219,21 +220,21 @@ test('a recruiter reaches applications to sister corporations that share no alli
         $applications[] = openApplicationTo($corporation->corporation_id);
     }
 
-    createRoleViaHttp(
+    createRoleViaHttp($this, $this->superuser,
         roleName: 'multi-corp-recruiter',
         affiliations: array_map(fn (CorporationInfo $corporation): array => [
             'entity_id' => $corporation->corporation_id,
             'entity_type' => 'corporation',
             'affiliation_type' => 'allowed',
         ], $corporations),
-        member: test()->test_user,
+        member: $this->test_user,
         permissions: ['can accept or deny applications'],
     );
 
     cache()->flush();
 
     foreach ($applications as $application) {
-        test()->actingAs(test()->test_user->refresh())
+        $this->actingAs($this->test_user->refresh())
             ->get(route('get.application', ['application_id' => $application->id]))
             ->assertOk();
     }
@@ -246,36 +247,36 @@ test('a recruiter reaches applications to sister corporations that share no alli
  * whole-account posting there. PostingController::open seeds a single round (position 0, no control
  * group), so one acceptance settles the application unless more rounds are added.
  */
-function openPostingForTestUser(): void
+function openPostingForTestUser(TestCase $case, User $actor): void
 {
-    createRoleViaHttp(
+    createRoleViaHttp($case, $actor,
         roleName: 'test',
         affiliations: [
             [
-                'entity_id' => test()->test_character->corporation->corporation_id,
+                'entity_id' => $case->test_character->corporation->corporation_id,
                 'entity_type' => 'corporation',
                 'affiliation_type' => 'allowed',
             ],
         ],
-        member: test()->test_user,
+        member: $case->test_user,
         permissions: ['can open or close corporations for recruitment', 'can accept or deny applications'],
     );
 
-    test()->actingAs(test()->test_user)
+    $case->actingAs($case->test_user)
         ->post(route('recruitment.posting.open'), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'corporation_id' => $case->test_character->corporation->corporation_id,
             'type' => 'user',
         ])->assertRedirect();
 
-    test()->test_user = test()->test_user->refresh();
+    $case->test_user = $case->test_user->refresh();
     cache()->flush();
 }
 
-function applyAsSecondary(): void
+function applyAsSecondary(TestCase $case): void
 {
-    test()->actingAs(test()->secondary_user)
+    $case->actingAs($case->secondary_user)
         ->post(route('post.application'), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'corporation_id' => $case->test_character->corporation->corporation_id,
         ])->assertRedirect();
 }
 
@@ -283,15 +284,15 @@ function applyAsSecondary(): void
  * A recruiter holding the review permission, but affiliated with their own corporation rather than the
  * one applied to — the cross-corporation case.
  */
-function recruiterForTheirOwnCorporation(): User
+function recruiterForTheirOwnCorporation(TestCase $case, User $actor): User
 {
     $outsider = Event::fakeFor(fn () => User::factory()->create());
     $outsiderCorporationId = $outsider->characters->first()->corporation->corporation_id;
 
     // Guard the fixture: factory corporations are random, and the test is meaningless if they collide.
-    expect($outsiderCorporationId)->not->toBe(test()->test_character->corporation->corporation_id);
+    expect($outsiderCorporationId)->not->toBe($case->test_character->corporation->corporation_id);
 
-    createRoleViaHttp(
+    createRoleViaHttp($case, $actor,
         roleName: 'outside-recruiter',
         affiliations: [
             [
@@ -309,9 +310,9 @@ function recruiterForTheirOwnCorporation(): User
     return $outsider->refresh();
 }
 
-function decideAsTestUser(Application $application, string $decision): void
+function decideAsTestUser(TestCase $case, Application $application, string $decision): void
 {
-    test()->actingAs(test()->test_user)
+    $case->actingAs($case->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
             'decision' => $decision,
             'explanation' => 'Some reason',

@@ -8,10 +8,11 @@ use Seatplus\Eveapi\Models\Application;
 use Seatplus\Eveapi\Models\Character\CharacterRole;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 use Seatplus\Web\Services\GetRecruitIdsService;
+use Seatplus\Web\Tests\TestCase;
 
 beforeEach(function () {
-    // createRoleViaHttp() defaults its actor to test()->superuser, which TestCase does not seed.
-    test()->superuser = Event::fakeFor(function () {
+    // createRoleViaHttp($this, $this->superuser) defaults its actor to $this->superuser, which TestCase does not seed.
+    $this->superuser = Event::fakeFor(function () {
         $user = User::factory()->create();
         $user->givePermissionTo(Permission::findOrCreate('superuser'));
 
@@ -20,7 +21,7 @@ beforeEach(function () {
 });
 
 it('returns recruit ids and caches values', function () {
-    assignPermissionToTestUser('superuser');
+    assignPermission($this->test_user, 'superuser');
 
     Application::factory()->count(5)->create([
         'applicationable_type' => User::class,
@@ -29,10 +30,10 @@ it('returns recruit ids and caches values', function () {
 
     cache()->flush();
 
-    expect(test()->test_user->can('superuser'))->toBeTrue()
-        ->and(test()->test_user->can('can accept or deny applications'))->toBeTrue();
+    expect($this->test_user->can('superuser'))->toBeTrue()
+        ->and($this->test_user->can('can accept or deny applications'))->toBeTrue();
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     $recruit_ids = GetRecruitIdsService::get();
 
@@ -50,21 +51,21 @@ it('returns recruit ids for directors', function () {
     Application::factory()->count(5)->create([
         'applicationable_type' => User::class,
         'applicationable_id' => User::factory(),
-        'corporation_id' => test()->test_character->corporation->corporation_id,
+        'corporation_id' => $this->test_character->corporation->corporation_id,
     ]);
 
     CharacterRole::query()->cursor()->each(fn ($role) => $role->delete());
 
     $character_role = CharacterRole::factory()->create([
         'roles' => ['Director'],
-        'character_id' => test()->test_character->character_id,
+        'character_id' => $this->test_character->character_id,
     ]);
 
     expect($character_role->hasRole('roles', 'Director'))->toBeTrue();
 
-    expect(test()->test_user->can('superuser'))->toBeFalse();
+    expect($this->test_user->can('superuser'))->toBeFalse();
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     expect(GetRecruitIdsService::get())
         ->toHaveCount(5);
@@ -80,9 +81,9 @@ it('scopes recruits to the corporations the role is affiliated with', function (
     $mine = openApplicationsTo($recruited_for->corporation_id, 3);
     openApplicationsTo($someone_else->corporation_id, 2);
 
-    affiliateTestUserWith($recruited_for->corporation_id);
+    affiliateTestUserWith($this, $this->superuser, $recruited_for->corporation_id);
 
-    test()->actingAs(test()->test_user->refresh());
+    $this->actingAs($this->test_user->refresh());
 
     expect(GetRecruitIdsService::get())
         ->toHaveCount(3)
@@ -100,14 +101,14 @@ it('re-keys the cache when the role affiliations change', function () {
     $mine = openApplicationsTo($recruited_for->corporation_id, 1);
     $sisters = openApplicationsTo($sister_corporation->corporation_id, 1);
 
-    $role = affiliateTestUserWith($recruited_for->corporation_id);
+    $role = affiliateTestUserWith($this, $this->superuser, $recruited_for->corporation_id);
 
-    test()->actingAs(test()->test_user->refresh());
+    $this->actingAs($this->test_user->refresh());
 
     expect(array_values(GetRecruitIdsService::get()))->toEqualCanonicalizing($mine);
 
     // Widen the role to the sister corporation — deliberately without flushing the cache.
-    test()->actingAs(test()->superuser)
+    $this->actingAs($this->superuser)
         ->postJson(route('acl.update.manual', $role->id), [
             'affiliated' => array_map(fn (int $corporation_id): array => [
                 'entity_id' => $corporation_id,
@@ -117,7 +118,7 @@ it('re-keys the cache when the role affiliations change', function () {
         ])
         ->assertRedirect();
 
-    test()->actingAs(test()->test_user->refresh());
+    $this->actingAs($this->test_user->refresh());
 
     expect(array_values(GetRecruitIdsService::get()))
         ->toEqualCanonicalizing([...$mine, ...$sisters]);
@@ -132,7 +133,7 @@ it('does not serve a superuser recruit list to a user with the same empty scope'
         'applicationable_id' => User::factory(),
     ]);
 
-    assignPermissionToTestUser('superuser');
+    assignPermission($this->test_user, 'superuser');
 
     $nobody = Event::fakeFor(fn () => User::factory()->create());
     CharacterRole::query()
@@ -141,10 +142,10 @@ it('does not serve a superuser recruit list to a user with the same empty scope'
 
     cache()->flush();
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
     expect(GetRecruitIdsService::get())->toHaveCount(5);
 
-    test()->actingAs($nobody);
+    $this->actingAs($nobody);
     expect(GetRecruitIdsService::get())->toBe([]);
 });
 
@@ -173,9 +174,9 @@ function openApplicationsTo(int $corporation_id, int $count): array
 /**
  * Give the test user a role that grants the recruiter permission, affiliated to $corporation_id.
  */
-function affiliateTestUserWith(int $corporation_id): Role
+function affiliateTestUserWith(TestCase $case, User $actor, int $corporation_id): Role
 {
-    $role = createRoleViaHttp(
+    $role = createRoleViaHttp($case, $actor,
         roleName: 'recruiter',
         affiliations: [
             [
@@ -184,7 +185,7 @@ function affiliateTestUserWith(int $corporation_id): Role
                 'affiliation_type' => 'allowed',
             ],
         ],
-        member: test()->test_user,
+        member: $case->test_user,
         permissions: ['can accept or deny applications'],
     );
 

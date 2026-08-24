@@ -4,13 +4,13 @@ use Seatplus\EsiClient\EsiClient;
 use Seatplus\Web\Services\GetNamesFromIdsService;
 
 it('resolves ids to names via esi and caches them', function () {
-    $id = test()->test_character->character_id;
+    $id = $this->test_character->character_id;
 
     $esi = Mockery::mock(EsiClient::class);
     mockEsiTransport($esi, makeEsiResult([
         (object) [
             'id' => $id,
-            'name' => test()->test_character->name,
+            'name' => $this->test_character->name,
             'category' => 'character',
         ],
     ]));
@@ -24,16 +24,16 @@ it('resolves ids to names via esi and caches them', function () {
     $result = (new GetNamesFromIdsService)->execute($esi, [$id]);
 
     expect($result)->toHaveCount(1);
-    expect($result->first()->name)->toEqual(test()->test_character->name);
-    expect(cache($cacheKey)->name)->toEqual(test()->test_character->name);
+    expect($result->first()->name)->toEqual($this->test_character->name);
+    expect(cache($cacheKey)->name)->toEqual($this->test_character->name);
 });
 
 it('returns cached names without calling esi', function () {
-    $id = test()->test_character->character_id;
+    $id = $this->test_character->character_id;
 
     $cached = (object) [
         'id' => $id,
-        'name' => test()->test_character->name,
+        'name' => $this->test_character->name,
         'category' => 'character',
     ];
 
@@ -44,5 +44,5 @@ it('returns cached names without calling esi', function () {
 
     $result = (new GetNamesFromIdsService)->execute($esi, [$id]);
 
-    expect($result->first()->name)->toEqual(test()->test_character->name);
+    expect($result->first()->name)->toEqual($this->test_character->name);
 });

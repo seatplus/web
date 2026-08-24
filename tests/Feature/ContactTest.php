@@ -8,7 +8,7 @@ use Seatplus\Eveapi\Models\Contacts\Contact;
 use Seatplus\Eveapi\Models\Corporation\CorporationInfo;
 
 test('see component', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('character.contacts'));
 
     // The per-character contacts arrive as a deferred prop (contacts): absent from the
@@ -20,12 +20,12 @@ test('see component', function () {
 });
 
 it('has details', function () {
-    test()->test_character->contacts()->create(Contact::factory()->make()->toArray());
+    $this->test_character->contacts()->create(Contact::factory()->make()->toArray());
 
-    $contact = test()->test_character->contacts->first();
-    $character_id = test()->test_character->character_id;
+    $contact = $this->test_character->contacts->first();
+    $character_id = $this->test_character->character_id;
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.contacts', ['character_ids' => [$character_id]]))
         ->assertInertia(fn (Assert $page) => $page
             ->component('Character/Contact/Index')
@@ -43,7 +43,7 @@ it('drops a submitted character_id the user is not affiliated with', function ()
     $foreign = CharacterInfo::factory()->create();
     $foreign->contacts()->create(Contact::factory()->make()->toArray());
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.contacts', ['character_ids' => [$foreign->character_id]]))
         ->assertInertia(fn (Assert $page) => $page
             ->component('Character/Contact/Index')
@@ -118,7 +118,7 @@ it('has corporation standing', function (string $contact_type, string $corp_cont
     $corp_standing = $getCorpStanding($affiliation);
     $character_id = $this->test_character->character_id;
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.contacts', ['character_ids' => [$character_id]]))
         ->assertInertia(fn (Assert $page) => $page
             ->component('Character/Contact/Index')

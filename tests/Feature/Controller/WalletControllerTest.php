@@ -6,13 +6,13 @@ use Seatplus\Auth\Models\Permissions\Permission;
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
-    test()->test_user->givePermissionTo($permission);
+    $this->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
 });
 
 test('has dispatchable job', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('character.wallets'));
 
     $response->assertInertia(
@@ -23,9 +23,9 @@ test('has dispatchable job', function () {
 });
 
 test('one can call corporation wallet endpoint', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('corporation.wallet', [
-            'corporation_ids' => [test()->test_character->corporation->corporation_id],
+            'corporation_ids' => [$this->test_character->corporation->corporation_id],
         ]))
         ->assertOk();
 });

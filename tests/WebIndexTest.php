@@ -6,30 +6,30 @@ use Seatplus\Web\Tests\TestCase;
 uses(TestCase::class);
 
 test('redirects to login if unauthorized', function () {
-    $response = test()->get('/home');
+    $response = $this->get('/home');
 
     $response->assertRedirect('login');
 });
 
 test('redirects to login vue component if unauthorized', function () {
-    $response = test()->followingRedirects()
+    $response = $this->followingRedirects()
         ->get('/home');
 
     $response->assertInertia(fn (Assert $page) => $page->component('Auth/Login'));
 });
 
 test('redirects to home if authorized', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get('/home');
 
     $response->assertInertia(fn (Assert $page) => $page->component('Dashboard/Index'));
 
-    test()->assertAuthenticatedAs(test()->test_user);
+    $this->assertAuthenticatedAs($this->test_user);
     expect(auth()->check())->toBeTrue();
 });
 
 test('logout if authorized', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->followingRedirects()
         ->post(route('logout'));
 

@@ -15,28 +15,28 @@ beforeEach(function () {
 });
 
 test('see success flash messages', function () {
-    $response = test()->withSession(['success', 'SuccessFlashMessage'])
+    $response = $this->withSession(['success', 'SuccessFlashMessage'])
         ->get('auth/login');
 
     $response->assertInertia(fn (Assert $page) => $page->has('flash.success'));
 });
 
 test('see error flash messages', function () {
-    $response = test()->withSession(['error', 'ErrorFlashMessage'])
+    $response = $this->withSession(['error', 'ErrorFlashMessage'])
         ->get('auth/login');
 
     $response->assertInertia(fn (Assert $page) => $page->has('flash.error'));
 });
 
 test('see warning flash messages', function () {
-    $response = test()->withSession(['warning', 'WarningFlashMessage'])
+    $response = $this->withSession(['warning', 'WarningFlashMessage'])
         ->get('auth/login');
 
     $response->assertInertia(fn (Assert $page) => $page->has('flash.warning'));
 });
 
 test('see info flash messages', function () {
-    $response = test()->withSession(['info', 'InfoFlashMessage'])
+    $response = $this->withSession(['info', 'InfoFlashMessage'])
         ->get('auth/login');
 
     $response->assertInertia(fn (Assert $page) => $page->has('flash.info'));

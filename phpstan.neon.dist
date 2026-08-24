@@ -39,13 +39,17 @@ parameters:
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
-        # CharacterInfo::corporation() is an ungenerified HasOneThrough, so the related
-        # CorporationInfo degrades to a bare Eloquent Model.
+        # CharacterInfo::corporation() is an ungenerified HasOneThrough, and Contact's
+        # contactable is a morphTo, so the related model degrades to a bare Eloquent
+        # Model wherever a test reaches through one.
         -
-            message: '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$corporation_id#'
+            message: '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$(corporation_id|name|contact_id)#'
             paths:
-                - tests/Feature/ContactTest.php
-                - tests/Unit/Middleware/CheckRequiredScopesMiddlewareTest.php
+                - tests/*
+        -
+            message: '#Call to an undefined method Illuminate\\Database\\Eloquent\\Model::contacts\(\)#'
+            paths:
+                - tests/*
         # RefreshToken::$token is an Attribute accessor Larastan infers as never.
         -
             identifier: assign.propertyType
@@ -55,18 +59,3 @@ parameters:
         -
             identifier: pest.expectation.requiresCountableOrIterable
             path: tests/Unit/Services/SsoSettings/UpdateOrCreateSsoSettingsTest.php
-
-        # ---------------------------------------------------------------------------
-        # Pest's test() is typed as TestCall — only expect() has a return-type
-        # extension — so every test()->property and test()->method() is unresolvable.
-        # Removed by the follow-up that converts test()-> to $this->, which the plugin
-        # binds to the TestCase.
-        # ---------------------------------------------------------------------------
-        -
-            message: '#Access to an undefined property Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy).*::\$#'
-            paths:
-                - tests/*
-        -
-            message: '#Call to an undefined method Pest\\(PendingCalls\\TestCall|Support\\HigherOrderTapProxy)#'
-            paths:
-                - tests/*

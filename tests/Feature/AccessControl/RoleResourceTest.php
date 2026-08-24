@@ -30,7 +30,7 @@ function resolveRole(Role $role): array
 
 it('exposes the join-method label and description from the metadata helper', function () {
     $role = makeRole(RoleType::OPT_IN);
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     $data = resolveRole($role);
 
@@ -45,19 +45,19 @@ it('reports can_moderate for a moderator of an OPT-IN role (regression: old reso
     RoleMembership::create([
         'role_id' => $role->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'can_moderate' => true,
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     expect(resolveRole($role)['can_moderate'])->toBeTrue();
 });
 
 it('can_edit follows the administrate permission, not the old mismatched string', function () {
     $role = makeRole();
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     // Capture the pre-grant read: expecting it to be false narrows that expression for
     // the rest of the test, and the grant below does not invalidate the narrowing —
@@ -66,8 +66,8 @@ it('can_edit follows the administrate permission, not the old mismatched string'
 
     expect($beforeGrant['can_edit'])->toBeFalse();
 
-    assignPermissionToTestUser('administrate access control groups');
-    test()->test_user->forgetCachedPermissions();
+    assignPermission($this->test_user, 'administrate access control groups');
+    $this->test_user->forgetCachedPermissions();
 
     expect(resolveRole($role)['can_edit'])->toBeTrue();
 });
@@ -78,11 +78,11 @@ it('my_status reflects an active membership and enables leave for non-automatic 
     RoleMembership::create([
         'role_id' => $role->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     $data = resolveRole($role);
 
@@ -98,12 +98,12 @@ it('an automatic role is never moderatable or leavable', function () {
     RoleMembership::create([
         'role_id' => $role->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'can_moderate' => true,
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user);
+    $this->actingAs($this->test_user);
 
     $data = resolveRole($role);
 

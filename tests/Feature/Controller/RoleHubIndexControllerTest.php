@@ -14,20 +14,20 @@ beforeEach(function () {
 });
 
 it('denies the hub index to an unauthenticated user', function () {
-    test()->get(route('acl.hub'))
+    $this->get(route('acl.hub'))
         ->assertRedirect();
 });
 
 it('denies the hub index without the view permission', function () {
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.hub'))
         ->assertForbidden();
 });
 
 it('renders the hub index for a user with view access control', function () {
-    assignPermissionToTestUser(['view access control']);
+    assignPermission($this->test_user, ['view access control']);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.hub'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -40,12 +40,12 @@ it('renders the hub index for a user with view access control', function () {
 });
 
 it('exposes every group to a manager on the hub index', function () {
-    assignPermissionToTestUser(['superuser']);
+    assignPermission($this->test_user, ['superuser']);
 
     $managed = Role::findById(Role::create(['name' => 'managed'])->id);
     $managed->update(['type' => RoleType::MANUAL]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.hub'))
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/RoleHubIndex')
@@ -56,18 +56,18 @@ it('exposes every group to a manager on the hub index', function () {
 });
 
 it('lists a group the user belongs to under my groups', function () {
-    assignPermissionToTestUser(['view access control']);
+    assignPermission($this->test_user, ['view access control']);
 
     $mine = Role::findById(Role::create(['name' => 'mine'])->id);
     $mine->update(['type' => RoleType::OPT_IN]);
     RoleMembership::create([
         'role_id' => $mine->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.hub'))
         ->assertInertia(fn (Assert $page) => $page
             ->has('myGroups', 1)

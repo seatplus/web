@@ -10,48 +10,48 @@ use Seatplus\Auth\Models\User;
 
 beforeEach(function () {
     Queue::fake();
-    assignPermissionToTestUser(['administrate access control groups']);
+    assignPermission($this->test_user, ['administrate access control groups']);
 
     $role = Role::create(['name' => 'automatic role']);
-    test()->role = Role::findById($role->id);
-    test()->test_character = test()->test_character->refresh();
+    $this->role = Role::query()->findOrFail($role->id);
+    $this->test_character = $this->test_character->refresh();
 });
 
 it('sets automatic type and affiliations via HTTP', function () {
-    expect(test()->role->type)->toBe(RoleType::MANUAL);
+    expect($this->role->type)->toBe(RoleType::MANUAL);
 
-    test()->actingAs(test()->test_user)
-        ->postJson(route('acl.update.automatic', test()->role->id), [
+    $this->actingAs($this->test_user)
+        ->postJson(route('acl.update.automatic', $this->role->id), [
             'affiliated' => [
                 [
-                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_id' => $this->test_character->corporation->corporation_id,
                     'entity_type' => 'corporation',
                     'affiliation_type' => AffiliationType::ALLOWED->value,
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
-    expect(test()->role->fresh()->type)->toBe(RoleType::AUTOMATIC)
-        ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
+    expect($this->role->fresh()->type)->toBe(RoleType::AUTOMATIC)
+        ->and($this->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 });
 
 it('sets assigned criteria for automatic role via HTTP', function () {
-    test()->actingAs(test()->test_user)
-        ->postJson(route('acl.update.automatic', test()->role->id), [
+    $this->actingAs($this->test_user)
+        ->postJson(route('acl.update.automatic', $this->role->id), [
             'assigned' => [
                 [
-                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_id' => $this->test_character->corporation->corporation_id,
                     'entity_type' => 'corporation',
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
     // Verify a role_membership criterion was created for the corporation
     expect(
-        test()->role->fresh()->roleMemberships()
-            ->where('entity_id', test()->test_character->corporation->corporation_id)
+        $this->role->fresh()->roleMemberships()
+            ->where('entity_id', $this->test_character->corporation->corporation_id)
             ->exists()
     )->toBeTrue();
 });
@@ -61,24 +61,24 @@ it('open-to-all automatic role assigns every user, including unaffiliated ones',
     $other_user = User::factory()->create();
 
     // Doomheim (1000001) as the criterion = open to all
-    test()->actingAs(test()->test_user)
-        ->postJson(route('acl.update.automatic', test()->role->id), [
+    $this->actingAs($this->test_user)
+        ->postJson(route('acl.update.automatic', $this->role->id), [
             'assigned' => [
                 ['entity_id' => 1000001, 'entity_type' => 'corporation'],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
-    expect(test()->test_user->fresh()->hasRole(test()->role->name))->toBeTrue()
-        ->and($other_user->fresh()->hasRole(test()->role->name))->toBeTrue();
+    expect($this->test_user->fresh()->hasRole($this->role->name))->toBeTrue()
+        ->and($other_user->fresh()->hasRole($this->role->name))->toBeTrue();
 });
 
 it('automatic role rejects moderator assignment', function () {
-    test()->actingAs(test()->test_user)
-        ->postJson(route('acl.update.automatic', test()->role->id), [])
+    $this->actingAs($this->test_user)
+        ->postJson(route('acl.update.automatic', $this->role->id), [])
         ->assertRedirect();
 
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.moderator.add', [test()->role->id, test()->test_user->id]))
+    $this->actingAs($this->test_user)
+        ->post(route('acl.moderator.add', [$this->role->id, $this->test_user->id]))
         ->assertForbidden();
 });
