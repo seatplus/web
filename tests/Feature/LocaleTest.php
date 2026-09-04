@@ -87,7 +87,7 @@ test('gather falls back to the fallback locale for untranslated groups', functio
 });
 
 test('a page declares its own translation groups as a pageTranslations prop', function () {
-    test()->get(route('login'))
+    $this->get(route('login'))
         ->assertInertia(fn (Assert $page) => $page->has('pageTranslations.web::.auth.login_welcome'));
 });
 
@@ -96,20 +96,20 @@ test('a page declares its own translation groups as a pageTranslations prop', fu
  */
 
 test('a guest switch is stored in the session', function () {
-    test()->post(route('locale.update'), ['locale' => 'de'])
+    $this->post(route('locale.update'), ['locale' => 'de'])
         ->assertRedirect()
         ->assertSessionHas('locale', 'de');
 });
 
 test('an unsupported locale is rejected', function () {
-    test()->post(route('locale.update'), ['locale' => 'klingon'])
+    $this->post(route('locale.update'), ['locale' => 'klingon'])
         ->assertSessionHasErrors('locale');
 
-    test()->assertNull(session('locale'));
+    $this->assertNull(session('locale'));
 });
 
 test('the missing translation keys command runs', function () {
-    test()->artisan('seatplus:i18n:missing-keys')->assertSuccessful();
+    $this->artisan('seatplus:i18n:missing-keys')->assertSuccessful();
 });
 
 /*
@@ -118,16 +118,16 @@ test('the missing translation keys command runs', function () {
  */
 
 test('an authenticated choice persists to the account', function () {
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('locale.update'), ['locale' => 'de'])
         ->assertRedirect();
 
-    expect(test()->test_user->refresh()->locale)->toBe('de');
+    expect($this->test_user->refresh()->locale)->toBe('de');
 });
 
 test('the account locale wins over the browser language', function () {
-    test()->test_user->update(['locale' => 'de']);
-    test()->actingAs(test()->test_user);
+    $this->test_user->update(['locale' => 'de']);
+    $this->actingAs($this->test_user);
 
     expect(localeFor(['HTTP_ACCEPT_LANGUAGE' => 'en']))->toBe('de');
 });

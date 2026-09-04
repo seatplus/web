@@ -9,27 +9,27 @@ beforeEach(function () {
     Queue::fake();
 
     $role = Role::create(['name' => 'test']);
-    test()->role = Role::findById($role->id);
+    $this->role = Role::query()->findOrFail($role->id);
 });
 
 it('denies DeleteControlGroupController to unauthenticated user', function () {
-    test()->delete(route('acl.delete', test()->role->id))
+    $this->delete(route('acl.delete', $this->role->id))
         ->assertRedirect();
 });
 
 it('denies DeleteControlGroupController without permission', function () {
-    test()->actingAs(test()->test_user)
-        ->delete(route('acl.delete', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->delete(route('acl.delete', $this->role->id))
         ->assertForbidden();
 });
 
 it('admin can delete a control group', function () {
-    assignPermissionToTestUser(['administrate access control groups']);
+    assignPermission($this->test_user, ['administrate access control groups']);
 
     \Pest\Laravel\assertDatabaseHas('roles', ['name' => 'test']);
 
-    test()->actingAs(test()->test_user)
-        ->delete(route('acl.delete', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->delete(route('acl.delete', $this->role->id))
         ->assertRedirect(route('acl.groups'));
 
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'test']);

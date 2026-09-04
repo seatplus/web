@@ -121,17 +121,6 @@ function mockEsiTransport(MockInterface $esi, mixed $result): void
     $esi->shouldReceive('invoke')->andReturn(makeEsiRawResponse($result));
 }
 
-function assignPermissionToTestUser(array|string $permission_strings)
-{
-    $permission_strings = is_array($permission_strings) ? $permission_strings : [$permission_strings];
-
-    foreach ($permission_strings as $string) {
-        $permission = Permission::findOrCreate($string);
-
-        test()->test_user->givePermissionTo($permission);
-    }
-}
-
 function assignPermission(User $user, array|string $permission_strings): void
 {
     $permission_strings = is_array($permission_strings) ? $permission_strings : [$permission_strings];
@@ -159,27 +148,31 @@ function updateRefreshTokenWithScopes(RefreshToken $refreshToken, array $scopes)
  * Uses the ACL HTTP endpoints so tests exercise the real request/response cycle.
  * Permissions are still assigned directly — no HTTP endpoint exists for that.
  *
+ * Both collaborators are passed in: a helper function has no $this, and Pest's test()
+ * is typed as TestCall, so reaching the running case through it is unresolvable.
+ *
  * @param  array<array{entity_id: int, entity_type: string, affiliation_type: string}>  $affiliations
  * @param  string[]  $permissions
  */
 function createRoleViaHttp(
+    TestCase $case,
+    User $actor,
     string $roleName,
     array $affiliations,
     User $member,
     array $permissions = [],
     string $roleType = 'manual',
-    ?User $actor = null,
 ): Role {
-    $actor ??= test()->superuser;
-
-    test()->actingAs($actor)
+    $case->actingAs($actor)
         ->followingRedirects()
         ->postJson(route('acl.store'), ['name' => $roleName, 'type' => $roleType]);
 
-    $role = Role::findByName($roleName);
+    // Queried rather than Role::findByName(), which is declared to return Spatie's
+    // base model and drops the concrete seatplus Role this helper promises.
+    $role = Role::query()->where('name', $roleName)->firstOrFail();
 
     if (! empty($affiliations)) {
-        test()->actingAs($actor)
+        $case->actingAs($actor)
             ->postJson(route('acl.update.'.$roleType, $role->id), ['affiliated' => $affiliations])
             ->assertRedirect();
         $role->refresh();
@@ -189,9 +182,9 @@ function createRoleViaHttp(
         $role->givePermissionTo(Permission::findOrCreate($permissionName));
     }
 
-    test()->actingAs($actor)
+    $case->actingAs($actor)
         ->post(route('acl.member.add', [$role->id, $member->id]))
         ->assertRedirect();
 
-    return $role->fresh();
+    return $role->refresh();
 }

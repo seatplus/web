@@ -1,9 +1,9 @@
 includes:
     - vendor/larastan/larastan/extension.neon
-    # Pest-aware static analysis. `tests` is intentionally kept out of `paths`
-    # below for now — analysing the suite surfaces Mockery false-positives and
-    # redundant-expectation findings handled in a dedicated follow-up.
+    # Pest-aware static analysis (understands it()/expect()/$this).
     - vendor/pestphp/pest-plugin-phpstan/extension.neon
+    # Understands Mockery's dynamic API (shouldReceive(), etc.).
+    - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
     configDirectories:
@@ -18,16 +18,29 @@ parameters:
         - src
         - config
         - database
+        - tests
+    # Browser tests run in core (with pest-plugin-browser, which isn't a web dep);
+    # web's phpunit excludes them too, so PHPStan can't resolve Pest\Browser\* here.
+    excludePaths:
+        - tests/Browser
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
+
+    # The only exceptions left, and they are a Larastan limitation rather than ours.
+    #
+    # filterBy*Ids are eveapi query scopes, declared `protected #[Scope]` — the shape
+    # Larastan requires (seatplus/eveapi#723). Larastan resolves a scope from the model
+    # behind `Builder<TModel>`, but these scope classes run against *any* model carrying
+    # the watch-list marker interface, so the concrete model is unknowable here.
+    #
+    # Verified unresolvable, not assumed: typing the builder as
+    # `Builder<Model&TypeWatchListInterface>` does not resolve them, and neither does
+    # adding `@method scopeFilterBy*Ids` tags to the marker interface.
     ignoreErrors:
-        # filterBy*Ids methods are Eloquent query scopes exposed via Builder macro magic;
-        # PHPStan cannot see them on the raw Builder type.
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(System|Region)Ids\\(\\)\\.$#"
             path: src/Services/Query/LocationWatchListScope.php
         -
             message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder.*::filterBy(Type|Group|Category)Ids\\(\\)\\.$#"
             path: src/Services/Query/TypeWatchListScope.php
-

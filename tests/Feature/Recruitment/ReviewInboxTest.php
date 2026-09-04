@@ -9,7 +9,7 @@ use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 
 beforeEach(function () {
-    assignPermissionToTestUser('superuser');
+    assignPermission($this->test_user, 'superuser');
     cache()->flush();
 });
 
@@ -26,7 +26,7 @@ it('lists open applications with their current stage', function () {
         'applicationable_id' => $applicant->getKey(),
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.reviews'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -54,7 +54,7 @@ it('moves settled applications out of the queue and into the history list', func
         'status' => 'accepted',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.reviews'))
         ->assertInertia(fn (Assert $page) => $page
             ->has('pending', 0)

@@ -6,13 +6,13 @@ use Seatplus\Auth\Models\Permissions\Permission;
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
-    test()->test_user->givePermissionTo($permission);
+    $this->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
 });
 
 test('has dispatchable job', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('character.skills'));
 
     $response->assertInertia(
@@ -23,9 +23,9 @@ test('has dispatchable job', function () {
 });
 
 test('skills and skill queue are deferred and keyed by character id', function () {
-    $characterId = test()->test_character->character_id;
+    $characterId = $this->test_character->character_id;
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('character.skills'));
 
     // Deferred props are absent from the initial render, then resolved on the partial reload.

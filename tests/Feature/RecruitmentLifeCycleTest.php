@@ -13,13 +13,14 @@ use Seatplus\Eveapi\Models\Character\CharacterInfo;
 use Seatplus\Eveapi\Models\Recruitment\ApplicationLogs;
 use Seatplus\Web\Http\Middleware\OnboardingMiddleware;
 use Seatplus\Web\Models\Recruitment\Enlistment;
+use Seatplus\Web\Tests\TestCase;
 
 beforeEach(function () {
     /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-    test()->secondary_user = Event::fakeFor(fn () => User::factory()->create());
+    $this->secondary_user = Event::fakeFor(fn () => User::factory()->create());
 
     /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
-    test()->superuser = Event::fakeFor(function () {
+    $this->superuser = Event::fakeFor(function () {
         $user = User::factory()->create();
 
         $permission = Permission::findOrCreate('superuser');
@@ -31,13 +32,13 @@ beforeEach(function () {
         return $user;
     });
 
-    test()->secondary_character = test()->secondary_user->characters->first();
+    $this->secondary_character = $this->secondary_user->characters->first();
 });
 
 test('user without permission fails to create enlistment', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(route('recruitment.posting.open'), [
-            'corporation_id' => test()->secondary_character->corporation->corporation_id,
+            'corporation_id' => $this->secondary_character->corporation->corporation_id,
             'type' => 'user',
         ])->assertForbidden();
 });
@@ -45,30 +46,30 @@ test('user without permission fails to create enlistment', function () {
 test('user with permission and affiliations succeeds to create enlistment', function () {
     expect(Enlistment::all())->toHaveCount(0);
 
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
     expect(Enlistment::all())->toHaveCount(1);
 });
 
 test('user with permission and affiliations can delete enlistment', function () {
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
     $this->assertDatabaseHas('enlistments', [
-        'corporation_id' => test()->test_character->corporation->corporation_id,
+        'corporation_id' => $this->test_character->corporation->corporation_id,
     ]);
 
-    test()->actingAs(test()->test_user)
-        ->delete(route('recruitment.posting.close', ['corporation_id' => test()->test_character->corporation->corporation_id]));
+    $this->actingAs($this->test_user)
+        ->delete(route('recruitment.posting.close', ['corporation_id' => $this->test_character->corporation->corporation_id]));
 
     $this->assertDatabaseMissing('enlistments', [
-        'corporation_id' => test()->test_character->corporation->corporation_id,
+        'corporation_id' => $this->test_character->corporation->corporation_id,
     ]);
 });
 
 test('the dashboard no longer lists enlistments (moved to the job portal)', function () {
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('home'))
         ->assertInertia(fn (Assert $page) => $page
             ->component('Dashboard/Index')
@@ -78,39 +79,39 @@ test('the dashboard no longer lists enlistments (moved to the job portal)', func
 });
 
 test('secondary user can apply as character', function () {
-    createEnlistment('character');
+    createEnlistment($this, $this->superuser, 'character');
 
-    expect(test()->secondary_character->refresh()->application)->toBeNull();
+    expect($this->secondary_character->refresh()->application)->toBeNull();
 
-    $response = test()->actingAs(test()->secondary_user)
+    $response = $this->actingAs($this->secondary_user)
         ->post(route('post.application'), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
-            'character_id' => test()->secondary_character->character_id,
+            'corporation_id' => $this->test_character->corporation->corporation_id,
+            'character_id' => $this->secondary_character->character_id,
         ])->assertRedirect();
 
-    test()->assertNotNull(test()->secondary_character->refresh()->application);
-    expect(test()->secondary_character->refresh()->application instanceof Application)->toBeTrue();
+    $this->assertNotNull($this->secondary_character->refresh()->application);
+    expect($this->secondary_character->refresh()->application instanceof Application)->toBeTrue();
 
     // Pull application
-    $response = test()->actingAs(test()->secondary_user)
-        ->delete(route('delete.character.application', test()->secondary_character->character_id))
+    $response = $this->actingAs($this->secondary_user)
+        ->delete(route('delete.character.application', $this->secondary_character->character_id))
         ->assertRedirect();
 
-    expect(test()->secondary_character->refresh()->application)->toBeNull();
+    expect($this->secondary_character->refresh()->application)->toBeNull();
 });
 
 test('secondary user can apply as user', function () {
-    createEnlistment('user');
+    createEnlistment($this, $this->superuser, 'user');
 
-    expect(test()->secondary_user->refresh()->application)->toBeNull();
+    expect($this->secondary_user->refresh()->application)->toBeNull();
 
     config(['web.config.ONBOARDING' => true]);
-    test()->withoutMiddleware(OnboardingMiddleware::class);
-    $corporationId = test()->test_character->corporation->corporation_id;
+    $this->withoutMiddleware(OnboardingMiddleware::class);
+    $corporationId = $this->test_character->corporation->corporation_id;
 
     // the onboarding page attaches the user's open applications per enlistment;
     // before applying, this enlistment carries none
-    test()->actingAs(test()->secondary_user)
+    $this->actingAs($this->secondary_user)
         ->get(route('onboarding'))
         ->assertInertia(
             fn (Assert $page) => $page
@@ -119,13 +120,13 @@ test('secondary user can apply as user', function () {
                     ->firstWhere('corporation_id', $corporationId)['applications'] === [])
         );
 
-    applySecondary();
+    applySecondary($this);
 
-    test()->assertNotNull(test()->secondary_user->refresh()->application);
-    expect(test()->secondary_user->refresh()->application instanceof Application)->toBeTrue();
+    $this->assertNotNull($this->secondary_user->refresh()->application);
+    expect($this->secondary_user->refresh()->application instanceof Application)->toBeTrue();
 
     // after applying, the same enlistment carries the user's open application
-    test()->actingAs(test()->secondary_user)
+    $this->actingAs($this->secondary_user)
         ->get(route('onboarding'))
         ->assertInertia(
             fn (Assert $page) => $page
@@ -134,33 +135,32 @@ test('secondary user can apply as user', function () {
                     $applications = collect($enlistments)->firstWhere('corporation_id', $corporationId)['applications'];
 
                     return count($applications) === 1
-                        && (int) $applications[0]['applicationable_id'] === (int) test()->secondary_user->id
+                        && (int) $applications[0]['applicationable_id'] === (int) $this->secondary_user->id
                         && (int) $applications[0]['corporation_id'] === (int) $corporationId;
                 })
         );
 
     // pull application
-    $response = test()->actingAs(test()->secondary_user)
+    $response = $this->actingAs($this->secondary_user)
         ->delete(route('delete.user.application'));
 
-    expect(test()->secondary_user->refresh()->application)->toBeNull();
+    expect($this->secondary_user->refresh()->application)->toBeNull();
 });
 
 test('junior hr handles open user applications', function () {
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
-    test()->test_user = test()->test_user->refresh();
+    $this->test_user = $this->test_user->refresh();
 
-    applySecondary();
+    applySecondary($this);
 
     // open application
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Recruitment/Review/Application'));
@@ -168,17 +168,17 @@ test('junior hr handles open user applications', function () {
     // Impersonate
     expect($application)->status->toBe('open');
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('impersonate.recruit', ['application_id' => $application->id]))
         ->assertRedirect(route('home'))
         ->assertSessionHas('impersonation_origin', function ($user) {
-            return $user->id === test()->test_user->id;
+            return $user->id === $this->test_user->id;
         });
 
     // Stop Impersonate
 
-    test()->actingAs(test()->secondary_user)
-        ->withSession(['impersonation_origin' => test()->test_user, 'route' => route('home')])
+    $this->actingAs($this->secondary_user)
+        ->withSession(['impersonation_origin' => $this->test_user, 'route' => route('home')])
         ->get(route('impersonate.stop'))
         ->assertRedirect(route('home'))
         ->assertSessionMissing(['impersonation_origin', 'route']);
@@ -186,12 +186,12 @@ test('junior hr handles open user applications', function () {
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id' => $this->secondary_user->id,
         'applicationable_type' => User::class,
         'status' => 'open',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
             'decision' => 'rejected',
             'explanation' => 'Some reason',
@@ -199,28 +199,27 @@ test('junior hr handles open user applications', function () {
         ->assertRedirect(route('recruitment.reviews'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_user->id,
+        'applicationable_id' => $this->secondary_user->id,
         'applicationable_type' => User::class,
         'status' => 'rejected',
     ]);
 
-    expect(test()->secondary_user->refresh()->application)->toBeNull();
+    expect($this->secondary_user->refresh()->application)->toBeNull();
 });
 
 test('junior hr handles open character applications', function () {
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
-    test()->test_user = test()->test_user->refresh();
+    $this->test_user = $this->test_user->refresh();
 
-    applySecondary(false);
+    applySecondary($this, false);
 
     // open application
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('get.application', ['application_id' => $application->id]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Recruitment/Review/Application'));
@@ -228,12 +227,12 @@ test('junior hr handles open character applications', function () {
     // submit review
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id' => $this->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
         'status' => 'open',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('review.application', ['application_id' => $application->id]), [
             'decision' => 'rejected',
             'explanation' => 'Some reason',
@@ -241,17 +240,17 @@ test('junior hr handles open character applications', function () {
         ->assertRedirect(route('recruitment.reviews'));
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id' => $this->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
         'status' => 'rejected',
     ]);
 
-    expect(test()->secondary_character->refresh()->application)->toBeNull();
+    expect($this->secondary_character->refresh()->application)->toBeNull();
 });
 
 test('recruiter can see corporation applications', function () {
     // Create Enlistment
-    createEnlistment('character');
+    createEnlistment($this, $this->superuser, 'character');
 
     // create Senior Recruiter user
 
@@ -261,40 +260,39 @@ test('recruiter can see corporation applications', function () {
 
     $role = Role::findByName('test');
 
-    test()->actingAs(test()->superuser)
+    $this->actingAs($this->superuser)
         ->post(route('acl.member.add', [$role->id, $recruiter->id]))
         ->assertRedirect();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
     // Apply with secondary user
-    applySecondary(false);
+    applySecondary($this, false);
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     // Get the test_users Applicaton // /application/{application_id}
-    $response = test()->actingAs($recruiter)
+    $response = $this->actingAs($recruiter)
         ->get(route('get.application', $application->id))
         ->assertOk();
 
     // Hit a recruit-specific extended-scope endpoint (contract.details) as an example that a
     // recruiter gets permission to any recruit-specific endpoint.
-    $response = test()->actingAs($recruiter)
-        ->get(route('contract.details', ['character_id' => test()->secondary_character->character_id, 'contract_id' => 1]))
+    $response = $this->actingAs($recruiter)
+        ->get(route('contract.details', ['character_id' => $this->secondary_character->character_id, 'contract_id' => 1]))
         ->assertOk();
 
     // Any other character should be forbidden
-    test()->actingAs($recruiter)
-        ->get(route('contract.details', ['character_id' => test()->secondary_character->character_id + 1, 'contract_id' => 1]))
+    $this->actingAs($recruiter)
+        ->get(route('contract.details', ['character_id' => $this->secondary_character->character_id + 1, 'contract_id' => 1]))
         ->assertForbidden();
 });
 
 test('recruiter can comment on application', function () {
     // Create Enlistment
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
     // create Senior Recruiter user
 
@@ -304,34 +302,33 @@ test('recruiter can comment on application', function () {
 
     $role = Role::findByName('test');
 
-    test()->actingAs(test()->superuser)
+    $this->actingAs($this->superuser)
         ->post(route('acl.member.add', [$role->id, $recruiter->id]))
         ->assertRedirect();
 
     expect($recruiter->refresh()->hasRole($role))->toBeTrue();
 
     // Apply with secondary user
-    applySecondary(false);
+    applySecondary($this, false);
 
-    expect(Application::all())->toHaveCount(1)
-        ->first()->id->toBeString();
+    expect(Application::all())->toHaveCount(1);
 
-    $application = Application::first();
+    $application = Application::firstOrFail();
 
     // Get the test_users Application // /application/{application_id}
-    $response = test()->actingAs($recruiter)
+    $response = $this->actingAs($recruiter)
         ->get(route('get.application', $application->id))
         ->assertOk();
 
     $comment = faker()->text;
 
-    test()->actingAs($recruiter)
+    $this->actingAs($recruiter)
         ->put(route('comment.application', $application->id), ['comment' => $comment])
         ->assertRedirect();
 
     expect(ApplicationLogs::all())->toHaveCount(1);
 
-    $response = test()->actingAs($recruiter)
+    $response = $this->actingAs($recruiter)
         ->get(route('get.application', $application->id))
         ->assertInertia(
             fn (Assert $page) => $page
@@ -359,16 +356,16 @@ test('recruiter can comment on application', function () {
 });
 
 test('junior hr can dispatch update batch and get status', function () {
-    createEnlistment();
+    createEnlistment($this, $this->superuser);
 
-    test()->test_user = test()->test_user->refresh();
+    $this->test_user = $this->test_user->refresh();
 
-    applySecondary(false);
+    applySecondary($this, false);
 
     // Check if secondary has applied
 
     \Pest\Laravel\assertDatabaseHas('applications', [
-        'applicationable_id' => test()->secondary_character->character_id,
+        'applicationable_id' => $this->secondary_character->character_id,
         'applicationable_type' => CharacterInfo::class,
         'status' => 'open',
     ]);
@@ -377,61 +374,61 @@ test('junior hr can dispatch update batch and get status', function () {
     Queue::assertNothingPushed();
 
     // first dispatch a update batch
-    test()->actingAs(test()->test_user)
-        ->post(route('dispatch.batch_update', test()->secondary_character->character_id))
+    $this->actingAs($this->test_user)
+        ->post(route('dispatch.batch_update', $this->secondary_character->character_id))
         ->assertOk();
 
     Queue::assertPushedOn('high', UpdateCharacter::class);
 
     BatchUpdate::firstOrCreate([
-        'batchable_id' => test()->secondary_character->character_id,
+        'batchable_id' => $this->secondary_character->character_id,
         'batchable_type' => CharacterInfo::class,
     ]);
 
     // then get update job information
-    test()->actingAs(test()->test_user)
-        ->get(route('get.batch_update', test()->secondary_character->character_id))
-        ->assertJsonFragment(['batchable_id' => test()->secondary_character->character_id]);
+    $this->actingAs($this->test_user)
+        ->get(route('get.batch_update', $this->secondary_character->character_id))
+        ->assertJsonFragment(['batchable_id' => $this->secondary_character->character_id]);
 });
 
 // Helpers
-function applySecondary(bool $user = true)
+function applySecondary(TestCase $case, bool $user = true)
 {
     $payload = $user
-        ? ['corporation_id' => test()->test_character->corporation->corporation_id]
-        : ['corporation_id' => test()->test_character->corporation->corporation_id, 'character_id' => test()->secondary_character->character_id];
+        ? ['corporation_id' => $case->test_character->corporation->corporation_id]
+        : ['corporation_id' => $case->test_character->corporation->corporation_id, 'character_id' => $case->secondary_character->character_id];
 
-    test()->actingAs(test()->secondary_user)
+    $case->actingAs($case->secondary_user)
         ->post(route('post.application'), $payload);
 }
 
-function createEnlistment($type = 'user', string $affiliation = 'allowed')
+function createEnlistment(TestCase $case, User $actor, $type = 'user', string $affiliation = 'allowed')
 {
-    createRoleViaHttp(
+    createRoleViaHttp($case, $actor,
         roleName: 'test',
         affiliations: [
             [
-                'entity_id' => test()->test_character->corporation->corporation_id,
+                'entity_id' => $case->test_character->corporation->corporation_id,
                 'entity_type' => 'corporation',
                 'affiliation_type' => $affiliation,
             ],
         ],
-        member: test()->test_user,
+        member: $case->test_user,
         permissions: ['can open or close corporations for recruitment', 'can accept or deny applications'],
     );
 
-    expect(test()->test_user->refresh()->hasRole('test'))->toBeTrue();
+    expect($case->test_user->refresh()->hasRole('test'))->toBeTrue();
 
     // Create Enlistment
 
     \Pest\Laravel\assertDatabaseMissing('enlistments', [
-        'corporation_id' => test()->test_character->corporation->corporation_id,
+        'corporation_id' => $case->test_character->corporation->corporation_id,
     ]);
 
     // Create Enlistment as test user
-    $response = test()->actingAs(test()->test_user)
+    $response = $case->actingAs($case->test_user)
         ->post(route('recruitment.posting.open'), [
-            'corporation_id' => test()->test_character->corporation->corporation_id,
+            'corporation_id' => $case->test_character->corporation->corporation_id,
             'type' => $type,
             'steps' => null,
         ]);
@@ -439,6 +436,6 @@ function createEnlistment($type = 'user', string $affiliation = 'allowed')
     expect($response)->exception->toBeNull();
 
     \Pest\Laravel\assertDatabaseHas('enlistments', [
-        'corporation_id' => test()->test_character->corporation->corporation_id,
+        'corporation_id' => $case->test_character->corporation->corporation_id,
     ]);
 }

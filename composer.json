@@ -26,7 +26,7 @@
         "php": "^8.5",
         "laravel/framework": "^13.0",
         "laravel/socialite": "^5.0",
-        "seatplus/eveapi": "^5.0",
+        "seatplus/eveapi": "^5.1.1",
         "seatplus/auth": "^5.1.1",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/wayfinder": "^0.1.16"
@@ -41,7 +41,8 @@
         "pestphp/pest": "^5.0",
         "pestphp/pest-plugin-laravel": "^5.0",
         "pestphp/pest-plugin-phpstan": "^5.0",
-        "pestphp/pest-plugin-type-coverage": "^5.0"
+        "pestphp/pest-plugin-type-coverage": "^5.0",
+        "phpstan/phpstan-mockery": "^2.0"
     },
     "extra": {
         "laravel": {

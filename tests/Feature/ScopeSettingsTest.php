@@ -12,13 +12,13 @@ use Seatplus\Eveapi\Models\SsoScopes;
 beforeEach(function () {
     $permission = Permission::findOrCreate('superuser');
 
-    test()->test_user->givePermissionTo($permission);
+    $this->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
 });
 
 it('has scope settings', function () {
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('settings.scopes'));
 
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/Scopes/OverviewScopeSettings'));
@@ -31,10 +31,10 @@ test('one can create sso setting', function () {
     mockEsiTransport($mock, makeEsiResult((object) $corporation->attributesToArray()));
     app()->instance(EsiClient::class, $mock);
 
-    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
-        ->toBeNull();
+    expect(SsoScopes::query()->where('morphable_id', (string) $corporation->corporation_id)->exists())
+        ->toBeFalse();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(
             route('create.scopes'),
             [
@@ -53,20 +53,19 @@ test('one can create sso setting', function () {
             ]
         );
 
-    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
-        ->not()->toBeNull()
+    expect(SsoScopes::query()->where('morphable_id', (string) $corporation->corporation_id)->first())
         ->toBeInstanceOf(SsoScopes::class);
 });
 
 test('one can delete sso setting', function () {
     $corporation = CorporationInfo::factory()->make();
 
-    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
-        ->toBeNull();
+    expect(SsoScopes::query()->where('morphable_id', (string) $corporation->corporation_id)->exists())
+        ->toBeFalse();
 
     Bus::fake();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(
             route('create.scopes'),
             [
@@ -87,14 +86,13 @@ test('one can delete sso setting', function () {
 
     Bus::assertDispatched(CorporationInfoJob::class);
 
-    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())
-        ->not()->toBeNull()
+    expect(SsoScopes::query()->where('morphable_id', (string) $corporation->corporation_id)->first())
         ->toBeInstanceOf(SsoScopes::class);
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', $corporation->corporation_id));
 
-    expect(SsoScopes::where('morphable_id', (string) $corporation->corporation_id)->first())->toBeNull();
+    expect(SsoScopes::query()->where('morphable_id', (string) $corporation->corporation_id)->count())->toBe(0);
 });
 
 it('leaves the installation-wide entry alone when deleting an entity', function () {
@@ -115,7 +113,7 @@ it('leaves the installation-wide entry alone when deleting an entity', function 
         'selected_scopes' => ['esi-skills.read_skills.v1'],
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', $corporation->corporation_id))
         ->assertRedirect();
 
@@ -141,7 +139,7 @@ it('deletes the installation-wide entry without touching an entity row typed glo
         'selected_scopes' => ['esi-skills.read_skills.v1'],
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', null))
         ->assertRedirect();
 
@@ -166,7 +164,7 @@ it('deletes through the model so the sso scope observer fires', function () {
         $deleted++;
     });
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', $corporation->corporation_id))
         ->assertRedirect();
 
@@ -183,7 +181,7 @@ it('does not overwrite an entity row typed global when saving the installation-w
         'selected_scopes' => ['esi-skills.read_skills.v1'],
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('create.scopes'), [
             'selectedScopes' => ['esi-assets.read_assets.v1'],
             'type' => 'global',
@@ -200,7 +198,7 @@ it('does not overwrite an entity row typed global when saving the installation-w
 test('one can create and delete global sso setting', function () {
     expect(setting('global_sso_scopes'))->toBeNull();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(
             route('create.scopes'),
             [
@@ -211,8 +209,8 @@ test('one can create and delete global sso setting', function () {
             ]
         );
 
-    test()->assertNotNull(SsoScopes::global()->first());
+    $this->assertNotNull(SsoScopes::global()->first());
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', null));
 });

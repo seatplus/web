@@ -12,26 +12,26 @@ use Seatplus\Eveapi\Models\Universe\Type;
 use Seatplus\Web\Http\Actions\Character\Asset\GetCharacterAssetLocationAction;
 
 // Run the location action for the test character with the given filters and return its locations.
-function assetLocations(array $filters = []): Collection
+function assetLocations(CharacterInfo $character, array $filters = []): Collection
 {
-    $validated = array_merge(['character_ids' => [test()->test_character->character_id]], $filters);
+    $validated = array_merge(['character_ids' => [$character->character_id]], $filters);
 
     return collect((new GetCharacterAssetLocationAction)->execute($validated)->items());
 }
 
 test('is protected by authentication', function () {
-    test()->followingRedirects()
+    $this->followingRedirects()
         ->get(route('character.assets'))
         ->assertInertia(fn (Assert $page) => $page->component('Auth/Login'));
 });
 
 test('renders the assets page with an assets scroll prop', function () {
     Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.assets'))
         ->assertInertia(
             fn (Assert $page) => $page
@@ -48,15 +48,15 @@ test('the action paginates locations and honours only_unknown_locations', functi
 
     foreach ([$known, $unknown] as $location) {
         Asset::factory()->create([
-            'assetable_id' => test()->test_character->character_id,
+            'assetable_id' => $this->test_character->character_id,
             'location_id' => $location->location_id,
             'root_location_id' => $location->location_id,
             'location_flag' => 'Hangar',
         ]);
     }
 
-    expect(assetLocations())->toHaveCount(2)
-        ->and(assetLocations(['only_unknown_locations' => true]))->toHaveCount(1);
+    expect(assetLocations($this->test_character))->toHaveCount(2)
+        ->and(assetLocations($this->test_character, ['only_unknown_locations' => true]))->toHaveCount(1);
 });
 
 test('the action filters locations by a matching asset at any nesting depth', function () {
@@ -64,19 +64,19 @@ test('the action filters locations by a matching asset at any nesting depth', fu
 
     // capital (depth 1) → freighter (depth 2) → container (depth 3), all rooted in $location.
     $asset = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'location_id' => $location->location_id,
         'root_location_id' => $location->location_id,
         'location_flag' => 'Hangar',
     ]);
     $content = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'location_id' => $asset->item_id,
         'root_location_id' => $location->location_id,
         'group_id' => Group::factory(),
     ]);
     $contentContent = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'location_id' => $content->item_id,
         'root_location_id' => $location->location_id,
         'type_id' => Type::factory(),
@@ -93,7 +93,7 @@ test('the action filters locations by a matching asset at any nesting depth', fu
     ];
 
     foreach ($filters as $key => $value) {
-        expect(assetLocations([$key => $value]))->toHaveCount(1);
+        expect(assetLocations($this->test_character, [$key => $value]))->toHaveCount(1);
     }
 });
 
@@ -104,7 +104,7 @@ test('the action filters locations by region and system (excludes the others)', 
 
     foreach ([$locationA, $locationB] as $location) {
         Asset::factory()->create([
-            'assetable_id' => test()->test_character->character_id,
+            'assetable_id' => $this->test_character->character_id,
             'location_id' => $location->location_id,
             'root_location_id' => $location->location_id,
             'location_flag' => 'Hangar',
@@ -113,13 +113,13 @@ test('the action filters locations by region and system (excludes the others)', 
 
     // Both show unfiltered; each single filter keeps only its own location (proving the other
     // is excluded — a single-location fixture can't tell "filtered" from "ignored").
-    expect(assetLocations())->toHaveCount(2);
+    expect(assetLocations($this->test_character))->toHaveCount(2);
 
-    $byRegion = assetLocations(['regions' => [$locationA->locatable->system->region->region_id]]);
+    $byRegion = assetLocations($this->test_character, ['regions' => [$locationA->locatable->system->region->region_id]]);
     expect($byRegion)->toHaveCount(1)
         ->and($byRegion->first()->location_id)->toBe($locationA->location_id);
 
-    $bySystem = assetLocations(['systems' => [$locationB->locatable->system->system_id]]);
+    $bySystem = assetLocations($this->test_character, ['systems' => [$locationB->locatable->system->system_id]]);
     expect($bySystem)->toHaveCount(1)
         ->and($bySystem->first()->location_id)->toBe($locationB->location_id);
 });
@@ -130,33 +130,33 @@ test('the action text search is case-insensitive', function () {
     // name_normalized is generated as PascalCase ("SodiaTradealinasIbis"); a lower-cased
     // search term must still match it (regression: `like` was case-sensitive on Postgres).
     Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'location_id' => $location->location_id,
         'root_location_id' => $location->location_id,
         'location_flag' => 'Hangar',
         'name' => 'Sodia Tradealinas Ibis',
     ]);
 
-    expect(assetLocations(['search' => 'sodia']))->toHaveCount(1);
-    expect(assetLocations(['search' => 'SODIA']))->toHaveCount(1);
-    expect(assetLocations(['search' => 'nomatch']))->toHaveCount(0);
+    expect(assetLocations($this->test_character, ['search' => 'sodia']))->toHaveCount(1);
+    expect(assetLocations($this->test_character, ['search' => 'SODIA']))->toHaveCount(1);
+    expect(assetLocations($this->test_character, ['search' => 'nomatch']))->toHaveCount(0);
 });
 
 test('item() returns the item plus one level of contents as JSON for the modal', function () {
     $container = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
     ]);
     $inside = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
         'location_id' => $container->item_id,
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->withHeader('X-Modal', 'true')
         ->getJson(route('character.item', [
-            'character_id' => test()->test_character->character_id,
+            'character_id' => $this->test_character->character_id,
             'item_id' => $container->item_id,
         ]))
         ->assertOk()
@@ -165,13 +165,13 @@ test('item() returns the item plus one level of contents as JSON for the modal',
 
 test('item() renders the ItemDetails page on a direct (shareable) visit', function () {
     $container = Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.item', [
-            'character_id' => test()->test_character->character_id,
+            'character_id' => $this->test_character->character_id,
             'item_id' => $container->item_id,
         ]))
         ->assertInertia(fn (Assert $page) => $page->component('Character/ItemDetails')->has('item'));
@@ -179,9 +179,9 @@ test('item() renders the ItemDetails page on a direct (shareable) visit', functi
 
 // A location + a top-level container (100) holding a depth-2 matching asset (200), plus a
 // separate non-matching top-level item (300). Returns the character id and the location.
-function seedLocationWithNestedMatch(): array
+function seedLocationWithNestedMatch(CharacterInfo $character): array
 {
-    $characterId = test()->test_character->character_id;
+    $characterId = $character->character_id;
     $location = Location::factory()->for(Station::factory(), 'locatable')->create();
 
     Asset::factory()->create([
@@ -204,9 +204,9 @@ function seedLocationWithNestedMatch(): array
 }
 
 test('location() returns only the top-level items that match at any depth (filtered)', function () {
-    [$characterId, $location] = seedLocationWithNestedMatch();
+    [$characterId, $location] = seedLocationWithNestedMatch($this->test_character);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->getJson(route('character.location', [
             'location_id' => $location->location_id,
             'character_ids' => [$characterId],
@@ -219,9 +219,9 @@ test('location() returns only the top-level items that match at any depth (filte
 });
 
 test('location() returns the location direct children unfiltered', function () {
-    [$characterId, $location] = seedLocationWithNestedMatch();
+    [$characterId, $location] = seedLocationWithNestedMatch($this->test_character);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->getJson(route('character.location', [
             'location_id' => $location->location_id,
             'character_ids' => [$characterId],
@@ -244,7 +244,7 @@ test('location() returns nothing for a character the user is not authorised for'
         'root_item_id' => 999, 'location_flag' => 'Hangar',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->getJson(route('character.location', [
             'location_id' => $location->location_id,
             'character_ids' => [$other->character_id],
@@ -256,14 +256,14 @@ test('location() returns nothing for a character the user is not authorised for'
 test('index provides region/system filter options from the character locations', function () {
     $location = Location::factory()->for(Station::factory(), 'locatable')->create();
     Asset::factory()->create([
-        'assetable_id' => test()->test_character->character_id,
+        'assetable_id' => $this->test_character->character_id,
         'assetable_type' => CharacterInfo::class,
         'location_id' => $location->location_id,
         'root_location_id' => $location->location_id,
         'location_flag' => 'Hangar',
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('character.assets'))
         ->assertInertia(fn (Assert $page) => $page
             ->has('filterOptions.regions', 1)

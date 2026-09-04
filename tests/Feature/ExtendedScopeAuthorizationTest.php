@@ -9,8 +9,8 @@ use Seatplus\Eveapi\Models\SsoScopes;
 use Seatplus\Web\Services\Affiliations\GetCorporationMemberComplianceAffiliatedIdsService;
 
 beforeEach(function () {
-    // createRoleViaHttp() defaults its actor to test()->superuser.
-    test()->superuser = Event::fakeFor(function () {
+    // createRoleViaHttp($this, $this->superuser, ) defaults its actor to $this->superuser.
+    $this->superuser = Event::fakeFor(function () {
         $user = User::factory()->create();
         $user->givePermissionTo(Permission::findOrCreate('superuser'));
 
@@ -38,7 +38,7 @@ it('affiliates member-compliance ids for extended scope', function () {
     expect($first_character->character_id)->not()->toEqual($second_character->character_id);
 
     // create role with affiliation and permission via HTTP
-    createRoleViaHttp(
+    createRoleViaHttp($this, $this->superuser,
         roleName: faker()->name(),
         affiliations: [
             [
@@ -47,12 +47,12 @@ it('affiliates member-compliance ids for extended scope', function () {
                 'affiliation_type' => 'allowed',
             ],
         ],
-        member: test()->test_user,
+        member: $this->test_user,
         permissions: ['member compliance: review user'],
     );
 
     // check if test user has permission
-    expect(test()->test_user->refresh()->can('member compliance: review user'))->toBeTrue();
+    expect($this->test_user->refresh()->can('member compliance: review user'))->toBeTrue();
 
     // create sso scope
     SsoScopes::factory()->create([
@@ -62,7 +62,7 @@ it('affiliates member-compliance ids for extended scope', function () {
         'selected_scopes' => collect(['esi-alliances.read_corporations.v1'])->toJson(),
     ]);
 
-    \Pest\Laravel\actingAs(test()->test_user);
+    \Pest\Laravel\actingAs($this->test_user);
     $affiliated_ids = GetCorporationMemberComplianceAffiliatedIdsService::make()->getQuery()->get();
     $affiliated_character_ids = $affiliated_ids->pluck('affiliated_id');
 
@@ -71,7 +71,7 @@ it('affiliates member-compliance ids for extended scope', function () {
         ->and($affiliated_character_ids)->toContain($second_character->character_id);
 
     // The reviewer can reach the character skills page via extended-scope authorization.
-    $response = test()->actingAs(test()->test_user)->get(route('character.skills'));
+    $response = $this->actingAs($this->test_user)->get(route('character.skills'));
 
     $response->assertOk();
 });
