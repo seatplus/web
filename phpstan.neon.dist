@@ -19,10 +19,6 @@ parameters:
         - config
         - database
         - tests
-    # Browser tests run in core (with pest-plugin-browser, which isn't a web dep);
-    # web's phpunit excludes them too, so PHPStan can't resolve Pest\Browser\* here.
-    excludePaths:
-        - tests/Browser
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true
