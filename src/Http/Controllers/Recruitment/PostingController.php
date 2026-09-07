@@ -66,8 +66,8 @@ class PostingController extends Controller
     }
 
     /**
-     * Persist a posting's configuration in one request: its ordered review stages and its
-     * item/location watchlist.
+     * Persist a posting's configuration in one request: its ordered review stages, its item/location
+     * watchlist and — the one part that is not posting-local — the corporation's required SSO scopes.
      */
     public function save(Request $request, int $corporation_id, UpdateWatchlistAction $watchlist): RedirectResponse
     {
@@ -82,8 +82,11 @@ class PostingController extends Controller
             'items' => ['array'],
             'items.*.watchable_id' => ['required'],
             'items.*.watchable_type' => ['required'],
-            // The corporation's required SSO scopes (managed here as the corp 'default' type).
-            'selected_scopes' => ['array'],
+            // The corporation-wide required SSO scopes. 'sometimes' matters: a request that omits the
+            // key must leave the corporation's record alone, and only an explicitly submitted empty
+            // array clears it. (Were this form ever to carry a file, Inertia would switch to FormData,
+            // which drops empty arrays — a clear would then arrive as an omission and no-op.)
+            'selected_scopes' => ['sometimes', 'array'],
             'selected_scopes.*' => ['string'],
         ]);
 
@@ -102,21 +105,37 @@ class PostingController extends Controller
 
         $watchlist->execute($corporation_id, $validated);
 
-        $this->saveRequiredScopes($corporation_id, $validated['selected_scopes'] ?? []);
+        if (array_key_exists('selected_scopes', $validated)) {
+            $this->saveRequiredScopes($corporation_id, array_values($validated['selected_scopes']));
+        }
 
         return back()->with('success', 'Posting saved');
     }
 
     /**
-     * Persist (or clear) the corporation's required SSO scopes as the corp 'default' type. Clearing
-     * removes the record entirely, so the corporation drops out of the SSO-gated observation list.
+     * Persist (or clear) the corporation's required SSO scopes.
+     *
+     * This is not posting-local state. sso_scopes holds at most one row per corporation — both
+     * CorporationInfo::ssoScopes() and every reader treat it as a morphOne — and that row is shared
+     * with Configuration -> Scopes, member compliance and Observation. A posting save therefore
+     * carries the configured requirement level ('type') over rather than forcing it back to
+     * 'default', which used to silently downgrade a stricter 'user' requirement.
      *
      * @param  array<int, string>  $selectedScopes
      */
     private function saveRequiredScopes(int $corporation_id, array $selectedScopes): void
     {
+        $existing = SsoScopes::query()
+            ->where('morphable_id', $corporation_id)
+            ->where('morphable_type', CorporationInfo::class)
+            ->first();
+
         if ($selectedScopes === []) {
-            SsoScopes::query()->where('morphable_id', $corporation_id)->delete();
+            // Scoped to this corporation's own row (an alliance may share the id) and deleted through
+            // the model, so seatplus/auth's SsoScopeObserver flushes the permission caches — a mass
+            // delete skips model events entirely. Keeping an empty row instead is not an option: it
+            // would leave the corporation in Observation and member compliance with nothing to check.
+            $existing?->delete();
 
             return;
         }
@@ -124,7 +143,7 @@ class PostingController extends Controller
         (new UpdateOrCreateSsoSettings([
             'selectedScopes' => $selectedScopes,
             'selectedEntities' => [['id' => $corporation_id, 'category' => 'corporation']],
-            'type' => 'default',
+            'type' => $existing instanceof SsoScopes ? $existing->type : 'default',
         ]))->execute();
     }
 
