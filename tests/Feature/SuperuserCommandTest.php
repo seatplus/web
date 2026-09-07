@@ -13,7 +13,7 @@ beforeEach(function () {
 
 it('accepts legal user id', function () {
     $this->artisan('seatplus:assign:superuser', ['characterName' => $this->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?', $this->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', (string) $this->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 });
@@ -22,7 +22,7 @@ it('does not accepts illegal user id', function () {
     \Pest\Laravel\assertDatabaseMissing('users', ['id' => $this->test_user->id + 1]);
 
     $this->artisan('seatplus:assign:superuser', ['characterName' => $this->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?', $this->test_user->id + 1)
+        ->expectsQuestion('Who should be superadmin?', (string) ($this->test_user->id + 1))
         ->assertExitCode(0);
 });
 
@@ -30,7 +30,7 @@ it('creates role', function () {
     \Pest\Laravel\assertDatabaseMissing('roles', ['name' => 'Superuser']);
 
     $this->artisan('seatplus:assign:superuser', ['characterName' => $this->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?', $this->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', (string) $this->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 
@@ -41,7 +41,7 @@ it('assigns super user to user', function () {
     expect($this->test_user->can('superuser'))->toBeFalse();
 
     $this->artisan('seatplus:assign:superuser', ['characterName' => $this->test_user->characters->first()->name])
-        ->expectsQuestion('Who should be superadmin?', $this->test_user->id)
+        ->expectsQuestion('Who should be superadmin?', (string) $this->test_user->id)
         ->expectsQuestion('Do you wish to a continue?', 'y')
         ->assertExitCode(0);
 

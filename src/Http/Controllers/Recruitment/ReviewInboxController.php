@@ -55,6 +55,7 @@ class ReviewInboxController extends Controller
             ->whereIn('corporation_id', $applications->pluck('corporation_id')->unique())
             ->orderBy('position')
             ->get()
+            ->toBase()
             ->groupBy('corporation_id');
 
         // Multi-character applications are one review: collapse a group into a single row and expose how

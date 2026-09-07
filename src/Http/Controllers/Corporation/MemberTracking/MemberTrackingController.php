@@ -78,6 +78,9 @@ class MemberTrackingController extends Controller
             ->with('character', 'location.locatable', 'ship');
     }
 
+    /**
+     * @return Collection<int, CorporationInfo>
+     */
     private function getAffiliatedCorporations(DispatchTransferObject $dispatchTransferObject): Collection
     {
         $query = CorporationInfo::query()

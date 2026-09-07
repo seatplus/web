@@ -54,7 +54,7 @@ class CreateApplicationLogEntryAction
 
     public function setType(string $type): CreateApplicationLogEntryAction
     {
-        throw_unless(in_array($type, ['comment', 'decision']), 404, 'type must be comment or decision');
+        abort_unless(in_array($type, ['comment', 'decision']), 404, 'type must be comment or decision');
 
         $this->type = $type;
 
