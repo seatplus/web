@@ -43,7 +43,44 @@ running core app.
   (`playwright install --with-deps chromium`).
 
 > See the "Working in Orca" section of core's `CLAUDE.md` for the per-package
-> test-DB rationale. Limit: two worktrees of *this* package share `laravel_web`.
+> test-DB rationale.
+
+## ⚠️ Two shared resources — take a lease before you use them
+
+Several worktrees of this package run in parallel, and two things they need are
+**global, not per-worktree**. Neither conflict is detectable from inside your
+worktree, and both produce failures that look like real bugs, so the rule is:
+*acquire, use, release.* Current state for this worktree: @.orca-state.md
+
+**1. Core's live preview** — `vendor/seatplus/web`, the symlink core resolves the
+frontend through. Core's `orca.yaml` symlink-shares `vendor/` across every core
+worktree, and symlinks resolve through the *physical* path, so this pointer is a
+single global one: **one core install can live-serve exactly one web worktree.**
+Repointing it unleased silently hijacks another agent's HMR.
+
+```bash
+# core sits beside this package's PRIMARY clone — which is NOT `../core` from a
+# worktree, so derive it from the shared git dir instead of a relative hop.
+core="$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")/../core"
+"$core/orca-web-worktree.sh" "$PWD"           # acquire + serve this worktree
+"$core/orca-web-worktree.sh" status           # who holds it
+"$core/orca-web-worktree.sh" release "$PWD"   # ALWAYS release when done
+```
+
+Exit code 3 means another worktree holds it. That is not a blocker for most
+tasks — **editing, `npm run lint` and PHPStan are worktree-local, and the Pest
+suite needs the lease below, not this one.** Do that work, and say in your
+summary that the preview was unavailable so visual verification is outstanding.
+Only `--force` (which breaks the holder's preview) if the user explicitly asks.
+
+**2. The `laravel_web` test database** — pinned with `force="true"` in
+`phpunit.xml`, so every worktree's suite hits the same database whatever its
+`.env` says. Two parallel runs `migrate:fresh` over each other. Wrap the suite:
+
+```bash
+./orca-test-lease.sh composer run test        # waits up to 5 min, then fails
+./orca-test-lease.sh --status
+```
 
 ## Conventions
 Follow the frontend rules in core's `CLAUDE.md` (Inertia v3, Wayfinder, Tailwind
