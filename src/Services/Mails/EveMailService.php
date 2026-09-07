@@ -31,7 +31,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Seatplus\EsiClient\EsiClient;
 use Seatplus\Eveapi\Models\Mail\Mail;
-use Seatplus\Eveapi\Models\Mail\MailRecipients;
 use Seatplus\Web\Services\GetIdsFromNamesService;
 
 class EveMailService
@@ -73,7 +72,7 @@ class EveMailService
     {
         return [
             'from' => ['id' => $this->mail->from],
-            'recipients' => $this->mail->recipients->map(fn (MailRecipients $recipient) => ['id' => $recipient->receivable_id]),
+            'recipients' => $this->mail->recipients->pluck('receivable_id')->map(fn (mixed $receivable_id) => ['id' => $receivable_id]),
             'timestamp' => carbon($this->mail->timestamp),
             'subject' => $this->mail->subject,
             'body' => $mail,

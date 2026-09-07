@@ -165,12 +165,12 @@ class DispatchJobController extends Controller
                 /** @var CorporationInfo $corporation */
                 $corporation = $token->corporation;
 
-                return collect([
+                return array_filter([
                     'character_id' => $isCorporationScope ? null : $token->character_id,
                     'corporation_id' => $isCorporationScope ? $token->corporation_id : null,
                     'name' => $isCorporationScope ? $corporation->name : $character->name,
                     'batch' => $this->getBatchStatus(cache($this->getCacheKey($validated_data['manual_job'], $isCorporationScope ? $token->corporation_id : $token->character_id))),
-                ])->filter()->toArray();
+                ]);
             })
             ->values();
 
@@ -178,7 +178,9 @@ class DispatchJobController extends Controller
     }
 
     /**
-     * @param  Collection<int, array<string, mixed>>  $items
+     * @template TRow of array<string, mixed>
+     *
+     * @param  Collection<int, TRow>  $items
      */
     private function paginate(Collection $items, Request $request): LengthAwarePaginator
     {

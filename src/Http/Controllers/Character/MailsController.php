@@ -97,7 +97,7 @@ class MailsController extends Controller
             )))
             ->firstWhere('id', $mail_id);
 
-        abort_unless($mail, 404, 'Mail not found');
+        abort_if($mail === null, 404, 'Mail not found');
 
         return EveMailService::make($mail)->getThreads($esi);
     }

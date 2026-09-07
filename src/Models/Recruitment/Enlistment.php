@@ -39,32 +39,49 @@ class Enlistment extends Enlistments
 {
     /**
      * The structured review stages for this posting, replacing the legacy `; `-delimited steps string.
+     *
+     * @return HasMany<EnlistmentReviewRound, $this>
      */
     public function reviewRounds(): HasMany
     {
         return $this->hasMany(EnlistmentReviewRound::class, 'corporation_id', 'corporation_id');
     }
 
+    /**
+     * @return MorphToMany<System, $this>
+     */
     public function systems(): MorphToMany
     {
         return $this->morphedByMany(System::class, 'watchlistable', null, 'corporation_id');
     }
 
+    /**
+     * @return MorphToMany<Region, $this>
+     */
     public function regions(): MorphToMany
     {
         return $this->morphedByMany(Region::class, 'watchlistable', null, 'corporation_id');
     }
 
+    /**
+     * @return MorphToMany<Type, $this>
+     */
     public function types(): MorphToMany
     {
         return $this->morphedByMany(Type::class, 'watchlistable', null, 'corporation_id');
     }
 
+    /**
+     * @return MorphToMany<Group, $this>
+     */
     public function groups(): MorphToMany
     {
         return $this->morphedByMany(Group::class, 'watchlistable', null, 'corporation_id');
     }
 
+    /**
+     * @return MorphToMany<Category, $this>
+     */
     public function categories(): MorphToMany
     {
         return $this->morphedByMany(Category::class, 'watchlistable', null, 'corporation_id');

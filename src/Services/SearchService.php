@@ -26,6 +26,7 @@
 
 namespace Seatplus\Web\Services;
 
+use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Cache;
 use Seatplus\Auth\Models\User;
 use Seatplus\EsiClient\EsiClient;
@@ -60,7 +61,7 @@ class SearchService
         $user_id = auth()->user()->getAuthIdentifier();
 
         /** @var RefreshToken|null $token */
-        $token = Cache::remember("esi-search:$user_id", now()->addHour()->diffInSeconds(), function () {
+        $token = Cache::remember("esi-search:$user_id", (int) CarbonInterval::hour()->totalSeconds, function () {
             $user = User::query()
                 ->with('characters.refreshToken')
                 ->find(auth()->user()->getAuthIdentifier());

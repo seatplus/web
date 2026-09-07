@@ -110,6 +110,9 @@ class CorporationWalletController extends Controller
             ->orderByDesc('date');
     }
 
+    /**
+     * @return Collection<int, CorporationDivision>
+     */
     private function getAffiliatedCorporateWalletDivisions(object $dispatchTransferObject): Collection
     {
         $query = CorporationDivision::query()->where('division_type', 'wallet');
