@@ -2,9 +2,9 @@
 
 namespace Seatplus\Web\Tests\Stubs;
 
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Session\Middleware\StartSession;
 use Orchestra\Testbench\Foundation\Http\Kernel as OrchestraHttpKernel;
-use Orchestra\Testbench\Http\Middleware\RedirectIfAuthenticated;
 use Seatplus\Web\Http\Middleware\Authenticate;
 
 class Kernel extends OrchestraHttpKernel
@@ -14,7 +14,7 @@ class Kernel extends OrchestraHttpKernel
      *
      * These middleware may be assigned to groups or used individually.
      *
-     * @var array
+     * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
         'auth' => Authenticate::class,
@@ -26,7 +26,7 @@ class Kernel extends OrchestraHttpKernel
      *
      * These middleware are run during every request to your application.
      *
-     * @var array
+     * @var array<int, class-string|string>
      */
     protected $middleware = [
         StartSession::class,

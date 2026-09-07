@@ -42,7 +42,12 @@ abstract class TestCase extends OrchestraTestCase
         // in the local dev container (the shell exports DB_DATABASE=seatplus), in which case
         // LazilyRefreshDatabase would migrate:fresh the dev DB and wipe it. Abort loudly
         // before parent::setUp() boots anything or a factory touches the connection.
-        if (env('DB_DATABASE') === 'seatplus') {
+        // Read every source env() consults rather than env() itself, which larastan
+        // (rightly) flags outside config/: narrowing this to one source would weaken a
+        // guard whose whole job is to be impossible to slip past.
+        $resolved_databases = [$_ENV['DB_DATABASE'] ?? null, $_SERVER['DB_DATABASE'] ?? null, getenv('DB_DATABASE')];
+
+        if (in_array('seatplus', $resolved_databases, true)) {
             throw new \RuntimeException('Test suite resolved DB_DATABASE=seatplus (the dev database) — aborting to avoid wiping dev data. The phpunit force override did not hold.');
         }
 
@@ -57,6 +62,7 @@ abstract class TestCase extends OrchestraTestCase
                 Str::startsWith($modelName, 'Seatplus\Auth') => 'Seatplus\\Auth\\Database\\Factories\\'.class_basename($modelName).'Factory',
                 Str::startsWith($modelName, 'Seatplus\Eveapi') => 'Seatplus\\Eveapi\\Database\\Factories\\'.class_basename($modelName).'Factory',
                 Str::startsWith($modelName, 'Seatplus\Web') => 'Seatplus\\Web\\Database\\Factories\\'.class_basename($modelName).'Factory',
+                default => throw new \UnhandledMatchError(sprintf('No factory namespace is registered for %s.', $modelName)),
             }
         );
 

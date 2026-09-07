@@ -12,74 +12,74 @@ beforeEach(function () {
     Queue::fake();
 
     $role = Role::create(['name' => 'opt-in role']);
-    test()->role = Role::findById($role->id);
+    $this->role = Role::query()->findOrFail($role->id);
 
     // Dedicated admin so test_user can be the member
-    test()->admin = User::factory()->create();
-    assignPermission(test()->admin, ['administrate access control groups']);
+    $this->admin = User::factory()->create();
+    assignPermission($this->admin, ['administrate access control groups']);
 
-    test()->test_character = test()->test_character->refresh();
+    $this->test_character = $this->test_character->refresh();
 });
 
 it('sets opt-in type and affiliations via HTTP', function () {
-    expect(test()->role->type)->toBe(RoleType::MANUAL);
+    expect($this->role->type)->toBe(RoleType::MANUAL);
 
-    test()->actingAs(test()->admin)
-        ->postJson(route('acl.update.opt-in', test()->role->id), [
+    $this->actingAs($this->admin)
+        ->postJson(route('acl.update.opt-in', $this->role->id), [
             'affiliated' => [
                 [
-                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_id' => $this->test_character->corporation->corporation_id,
                     'entity_type' => 'corporation',
                     'affiliation_type' => AffiliationType::ALLOWED->value,
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
-    expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN)
-        ->and(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
+    expect($this->role->fresh()->type)->toBe(RoleType::OPT_IN)
+        ->and($this->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 });
 
 it('eligible user can join opt-in role and then leave via HTTP', function () {
     // Set opt-in type and join criteria via HTTP
-    test()->actingAs(test()->admin)
-        ->postJson(route('acl.update.opt-in', test()->role->id), [
+    $this->actingAs($this->admin)
+        ->postJson(route('acl.update.opt-in', $this->role->id), [
             'assigned' => [
                 [
-                    'entity_id' => test()->test_character->corporation->corporation_id,
+                    'entity_id' => $this->test_character->corporation->corporation_id,
                     'entity_type' => 'corporation',
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
-    expect(test()->role->fresh()->type)->toBe(RoleType::OPT_IN);
+    expect($this->role->fresh()->type)->toBe(RoleType::OPT_IN);
 
     // Eligible user joins via HTTP
-    assignPermissionToTestUser(['view access control']);
+    assignPermission($this->test_user, ['view access control']);
 
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.join', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->post(route('acl.join', $this->role->id))
         ->assertRedirect();
 
-    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeTrue();
+    expect($this->test_user->fresh()->hasRole($this->role))->toBeTrue();
 
     // Member leaves via HTTP
-    test()->actingAs(test()->test_user)
-        ->delete(route('acl.leave', [test()->role->id, test()->test_user->id]))
+    $this->actingAs($this->test_user)
+        ->delete(route('acl.leave', [$this->role->id, $this->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->test_user->fresh()->hasRole(test()->role))->toBeFalse();
+    expect($this->test_user->fresh()->hasRole($this->role))->toBeFalse();
 });
 
 it('opt-in role accepts moderator assignment', function () {
-    test()->actingAs(test()->admin)
-        ->postJson(route('acl.update.opt-in', test()->role->id), [])
+    $this->actingAs($this->admin)
+        ->postJson(route('acl.update.opt-in', $this->role->id), [])
         ->assertRedirect();
 
-    test()->actingAs(test()->admin)
-        ->post(route('acl.moderator.add', [test()->role->id, test()->admin->id]))
+    $this->actingAs($this->admin)
+        ->post(route('acl.moderator.add', [$this->role->id, $this->admin->id]))
         ->assertRedirect();
 
-    expect(test()->role->refresh()->roleMemberships()->where('can_moderate', true)->exists())->toBeTrue();
+    expect($this->role->refresh()->roleMemberships()->where('can_moderate', true)->exists())->toBeTrue();
 });

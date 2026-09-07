@@ -10,51 +10,51 @@ beforeEach(function () {
     Queue::fake();
 
     $role = Role::create(['name' => 'test']);
-    test()->role = Role::findById($role->id);
+    $this->role = Role::query()->findOrFail($role->id);
 });
 
 it('denies ApproveApplicationController to unauthenticated user', function () {
-    test()->post(route('acl.approve', [test()->role->id, 1]))
+    $this->post(route('acl.approve', [$this->role->id, 1]))
         ->assertRedirect();
 });
 
 it('non-moderator cannot approve an applicant', function () {
     $other_user = User::factory()->create();
 
-    test()->actingAs($other_user)
-        ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
+    $this->actingAs($other_user)
+        ->post(route('acl.approve', [$this->role->id, $this->test_user->id]))
         ->assertForbidden();
 });
 
 it('moderator can approve an applicant', function () {
     $setup_admin = User::factory()->create();
     assignPermission($setup_admin, ['superuser']);
-    test()->actingAs($setup_admin)
-        ->postJson(route('acl.update.on-request', test()->role->id), [
+    $this->actingAs($setup_admin)
+        ->postJson(route('acl.update.on-request', $this->role->id), [
             'affiliated' => [
-                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
+                ['entity_id' => $this->test_character->corporation->corporation_id, 'entity_type' => 'corporation', 'affiliation_type' => 'allowed'],
             ],
             'assigned' => [
-                ['entity_id' => test()->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
+                ['entity_id' => $this->test_character->corporation->corporation_id, 'entity_type' => 'corporation'],
             ],
         ])
         ->assertRedirect();
 
-    assignPermissionToTestUser(['view access control']);
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.apply', test()->role->id))
+    assignPermission($this->test_user, ['view access control']);
+    $this->actingAs($this->test_user)
+        ->post(route('acl.apply', $this->role->id))
         ->assertRedirect();
 
     $moderator = User::factory()->create();
     $admin = User::factory()->create();
     assignPermission($admin, ['administrate access control groups']);
-    test()->actingAs($admin)
-        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+    $this->actingAs($admin)
+        ->post(route('acl.moderator.add', [$this->role->id, $moderator->id]))
         ->assertRedirect();
 
-    test()->actingAs($moderator)
-        ->post(route('acl.approve', [test()->role->id, test()->test_user->id]))
+    $this->actingAs($moderator)
+        ->post(route('acl.approve', [$this->role->id, $this->test_user->id]))
         ->assertRedirect();
 
-    expect(test()->test_user->refresh()->hasRole(test()->role))->toBeTrue();
+    expect($this->test_user->refresh()->hasRole($this->role))->toBeTrue();
 });

@@ -11,7 +11,7 @@ test('if post cache clear clears cache', function () {
 
     $permission = Permission::findOrCreate('superuser');
 
-    test()->test_user->givePermissionTo($permission);
+    $this->test_user->givePermissionTo($permission);
 
     // now re-register all the roles and permissions
 
@@ -20,6 +20,6 @@ test('if post cache clear clears cache', function () {
         ->with('seatplus:cache:clear --force')
         ->andReturn(1);
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post($route)->assertOk();
 });

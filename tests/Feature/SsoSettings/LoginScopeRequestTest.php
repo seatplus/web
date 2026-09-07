@@ -22,7 +22,7 @@ function ssoRedirectScopes(string $location): array
 it('requests only the minimum scopes when nothing is configured installation-wide', function () {
     // The controller stashes the previous URL to return to, which Session::previousUrl() types as a
     // non-nullable string — so give the session one.
-    $response = test()->actingAs(test()->test_user)->from('/')->get(route('auth.eve'));
+    $response = $this->actingAs($this->test_user)->from('/')->get(route('auth.eve'));
 
     $response->assertRedirect();
 
@@ -39,7 +39,7 @@ it('requests the installation-wide scopes as a flat list', function () {
 
     // The controller stashes the previous URL to return to, which Session::previousUrl() types as a
     // non-nullable string — so give the session one.
-    $response = test()->actingAs(test()->test_user)->from('/')->get(route('auth.eve'));
+    $response = $this->actingAs($this->test_user)->from('/')->get(route('auth.eve'));
 
     $response->assertRedirect();
 
@@ -64,7 +64,7 @@ it('does not request a corporation requirement at sign-in', function () {
 
     // The controller stashes the previous URL to return to, which Session::previousUrl() types as a
     // non-nullable string — so give the session one.
-    $response = test()->actingAs(test()->test_user)->from('/')->get(route('auth.eve'));
+    $response = $this->actingAs($this->test_user)->from('/')->get(route('auth.eve'));
 
     $response->assertRedirect();
 

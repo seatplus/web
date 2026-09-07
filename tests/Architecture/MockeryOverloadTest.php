@@ -8,7 +8,7 @@ it('never uses Mockery overload mocks in the test suite', function () {
     // every later test. phpunit.xml sets processIsolation="false", so nothing undoes it —
     // any test touching the real class then fails, and executionOrder="random" makes it
     // look like a flake. Fake the boundary instead (Bus::fake(), Event::fake(),
-    // test()->mock()) rather than replacing the class.
+    // $this->mock()) rather than replacing the class.
     $offenders = collect(
         Finder::create()
             ->in(__DIR__.'/..')

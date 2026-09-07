@@ -13,34 +13,34 @@ beforeEach(function () {
     Queue::fake();
 
     $role = Role::create(['name' => 'test', 'type' => 'on-request']);
-    test()->role = Role::findById($role->id);
+    $this->role = Role::query()->findOrFail($role->id);
 });
 
 it('denies the hub to an unauthenticated user', function () {
-    test()->get(route('acl.hub.show', test()->role->id))
+    $this->get(route('acl.hub.show', $this->role->id))
         ->assertRedirect();
 });
 
 it('forbids the hub to a user with no relationship to the role', function () {
     // A managed group the user is neither a member of, a moderator of, nor eligible to join.
-    test()->role->update(['type' => RoleType::MANUAL]);
+    $this->role->update(['type' => RoleType::MANUAL]);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', $this->role->id))
         ->assertForbidden();
 });
 
 it('shows a member only the overview, with no management payloads', function () {
-    test()->role->update(['type' => RoleType::MANUAL]);
+    $this->role->update(['type' => RoleType::MANUAL]);
     RoleMembership::create([
-        'role_id' => test()->role->id,
+        'role_id' => $this->role->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', $this->role->id))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/RoleHub')
@@ -56,15 +56,15 @@ it('shows a member only the overview, with no management payloads', function () 
 
 it('gives a moderator the members payload but not configuration', function () {
     RoleMembership::create([
-        'role_id' => test()->role->id,
+        'role_id' => $this->role->id,
         'entity_type' => User::class,
-        'entity_id' => test()->test_user->getKey(),
+        'entity_id' => $this->test_user->getKey(),
         'can_moderate' => true,
         'status' => 'active',
     ]);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', $this->role->id))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/RoleHub')
@@ -76,10 +76,10 @@ it('gives a moderator the members payload but not configuration', function () {
 });
 
 it('gives an admin every tab and payload', function () {
-    assignPermissionToTestUser(['administrate access control groups']);
+    assignPermission($this->test_user, ['administrate access control groups']);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', test()->role->id))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', $this->role->id))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('AccessControl/RoleHub')
@@ -94,13 +94,13 @@ it('gives an admin every tab and payload', function () {
 });
 
 it('honours a valid requested tab and defaults unknown tabs to overview', function () {
-    assignPermissionToTestUser(['administrate access control groups']);
+    assignPermission($this->test_user, ['administrate access control groups']);
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', ['role_id' => test()->role->id, 'tab' => 'configure']))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', ['role_id' => $this->role->id, 'tab' => 'configure']))
         ->assertInertia(fn (Assert $page) => $page->where('initialTab', 'configure'));
 
-    test()->actingAs(test()->test_user)
-        ->get(route('acl.hub.show', ['role_id' => test()->role->id, 'tab' => 'bogus']))
+    $this->actingAs($this->test_user)
+        ->get(route('acl.hub.show', ['role_id' => $this->role->id, 'tab' => 'bogus']))
         ->assertInertia(fn (Assert $page) => $page->where('initialTab', 'overview'));
 });

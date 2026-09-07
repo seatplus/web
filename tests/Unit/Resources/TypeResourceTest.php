@@ -10,7 +10,6 @@ test('correct data is returned in response', function () {
 
     $resource = (new TypeResource($type));
 
-    expect($resource instanceof TypeResource)->toBeTrue();
     expect($resource->name)->toEqual($type->name);
 });
 

@@ -19,7 +19,7 @@ it('lists open postings across corporations with their stages', function () {
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corpA->corporation_id, 'position' => 0, 'label' => 'Screen']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corpA->corporation_id, 'position' => 1, 'label' => 'Final']);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.portal'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -31,14 +31,14 @@ it('lists open postings across corporations with their stages', function () {
 });
 
 it('sorts the applicant\'s current corporation to the bottom of the portal', function () {
-    $ownCorp = test()->test_character->corporation;
+    $ownCorp = $this->test_character->corporation;
     $otherCorp = CorporationInfo::factory()->create();
 
     // Own-corp posting is created first, so only the sort can push it below the other corp.
     Enlistment::query()->create(['corporation_id' => $ownCorp->corporation_id, 'type' => 'user']);
     Enlistment::query()->create(['corporation_id' => $otherCorp->corporation_id, 'type' => 'user']);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.portal'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -53,9 +53,9 @@ it('surfaces the user\'s own application with its progress', function () {
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
 
-    test()->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
+    $this->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.portal'))
         ->assertInertia(fn (Assert $page) => $page
             ->has('myApplications', 1)
@@ -69,7 +69,7 @@ it('submits an account-wide application from the portal', function () {
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('recruitment.apply'), ['corporation_id' => $corp->corporation_id])
         ->assertRedirect();
 
@@ -83,15 +83,15 @@ it('submits a multi-character application covering a subset of the account', fun
     // test_user starts with one character; give it two more so we can apply with a subset.
     $alt1 = CharacterUser::factory()->make();
     $alt2 = CharacterUser::factory()->make();
-    test()->test_user->characterUsers()->save($alt1);
-    test()->test_user->characterUsers()->save($alt2);
+    $this->test_user->characterUsers()->save($alt1);
+    $this->test_user->characterUsers()->save($alt2);
     // The base TestCase already loaded ->characters (1 char) on this instance; a real request resolves
     // the auth user fresh, so refresh the relation to reflect all three characters.
-    test()->test_user->load('characters');
+    $this->test_user->load('characters');
 
-    $covered = [test()->test_character->character_id, $alt1->character_id];
+    $covered = [$this->test_character->character_id, $alt1->character_id];
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('recruitment.apply'), [
             'corporation_id' => $corp->corporation_id,
             'character_ids' => $covered,
@@ -110,9 +110,9 @@ it('submits a multi-character application covering a subset of the account', fun
 it('withdraws the user\'s own application', function () {
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'user']);
-    $application = test()->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
+    $application = $this->test_user->application()->create(['corporation_id' => $corp->corporation_id]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->delete(route('recruitment.withdraw', $application->id))
         ->assertRedirect();
 

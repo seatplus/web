@@ -14,20 +14,20 @@ beforeEach(function () {
 });
 
 it('denies the create wizard page to an unauthenticated user', function () {
-    test()->get(route('acl.create'))->assertRedirect();
+    $this->get(route('acl.create'))->assertRedirect();
 });
 
 it('denies the create wizard page without the administrate permission', function () {
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.create'))
         ->assertForbidden();
 });
 
 it('renders the create wizard with join methods and available permissions', function () {
-    assignPermissionToTestUser('administrate access control groups');
+    assignPermission($this->test_user, 'administrate access control groups');
     Permission::findOrCreate('view access control');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('acl.create'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -39,7 +39,7 @@ it('renders the create wizard with join methods and available permissions', func
 });
 
 it('denies acl.store without the administrate permission', function () {
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('acl.store'), ['name' => 'test', 'type' => 'manual'])
         ->assertForbidden();
 
@@ -47,11 +47,11 @@ it('denies acl.store without the administrate permission', function () {
 });
 
 it('creates a fully configured group in one request via acl.store', function () {
-    assignPermissionToTestUser('administrate access control groups');
+    assignPermission($this->test_user, 'administrate access control groups');
     $corporation = CorporationInfo::factory()->create();
     Permission::findOrCreate('view access control');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('acl.store'), [
             'name' => 'Fleet Commanders',
             'type' => 'opt-in',
@@ -65,7 +65,7 @@ it('creates a fully configured group in one request via acl.store', function () 
         ])
         ->assertRedirect();
 
-    $role = Role::findByName('Fleet Commanders');
+    $role = Role::query()->where('name', 'Fleet Commanders')->firstOrFail();
 
     expect($role->type)->toBe(RoleType::OPT_IN)
         ->and($role->affiliations()->where('type', 'allowed')->exists())->toBeTrue()
@@ -74,10 +74,10 @@ it('creates a fully configured group in one request via acl.store', function () 
 });
 
 it('creates an open-to-all, applies-to-everything group via acl.store', function () {
-    assignPermissionToTestUser('administrate access control groups');
+    assignPermission($this->test_user, 'administrate access control groups');
 
     // Doomheim (1000001): inverse affiliation = applies to everything; as a criterion = open to all.
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('acl.store'), [
             'name' => 'Everyone',
             'type' => 'opt-in',
@@ -90,16 +90,16 @@ it('creates an open-to-all, applies-to-everything group via acl.store', function
         ])
         ->assertRedirect();
 
-    $role = Role::findByName('Everyone');
+    $role = Role::query()->where('name', 'Everyone')->firstOrFail();
 
     expect($role->affiliations()->where('type', 'inverse')->where('affiliatable_id', 1000001)->exists())->toBeTrue()
         ->and($role->roleMemberships()->where('entity_type', CorporationInfo::class)->where('entity_id', 1000001)->exists())->toBeTrue();
 });
 
 it('rejects an invalid join method', function () {
-    assignPermissionToTestUser('administrate access control groups');
+    assignPermission($this->test_user, 'administrate access control groups');
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('acl.store'), ['name' => 'Bad', 'type' => 'nonsense'])
         ->assertInvalid(['type']);
 });

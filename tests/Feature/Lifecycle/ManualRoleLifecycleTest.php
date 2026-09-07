@@ -10,99 +10,99 @@ use Seatplus\Auth\Models\User;
 
 beforeEach(function () {
     Queue::fake();
-    assignPermissionToTestUser(['administrate access control groups']);
+    assignPermission($this->test_user, ['administrate access control groups']);
 
     $role = Role::create(['name' => 'manual role']);
-    test()->role = Role::findById($role->id);
+    $this->role = Role::query()->findOrFail($role->id);
 });
 
 it('full lifecycle: create affiliations add member kick member', function () {
     // 1. Role created with MANUAL type by default
-    expect(test()->role->type)->toBe(RoleType::MANUAL);
+    expect($this->role->type)->toBe(RoleType::MANUAL);
 
     // 2. Set affiliations via HTTP
-    test()->actingAs(test()->test_user)
-        ->postJson(route('acl.update.manual', test()->role->id), [
+    $this->actingAs($this->test_user)
+        ->postJson(route('acl.update.manual', $this->role->id), [
             'affiliated' => [
                 [
-                    'entity_id' => test()->test_character->character_id,
+                    'entity_id' => $this->test_character->character_id,
                     'entity_type' => 'character',
                     'affiliation_type' => AffiliationType::ALLOWED->value,
                 ],
             ],
         ])
-        ->assertRedirect(route('acl.hub.show', test()->role->id));
+        ->assertRedirect(route('acl.hub.show', $this->role->id));
 
-    expect(test()->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
+    expect($this->role->fresh()->affiliations->isNotEmpty())->toBeTrue();
 
     // 3. Add a second user as member via HTTP
     $member = User::factory()->create();
 
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.member.add', [test()->role->id, $member->id]))
+    $this->actingAs($this->test_user)
+        ->post(route('acl.member.add', [$this->role->id, $member->id]))
         ->assertRedirect();
 
-    expect($member->fresh()->hasRole(test()->role))->toBeTrue();
+    expect($member->fresh()->hasRole($this->role))->toBeTrue();
 
     // 4. Set a moderator via HTTP
     $moderator = User::factory()->create();
 
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+    $this->actingAs($this->test_user)
+        ->post(route('acl.moderator.add', [$this->role->id, $moderator->id]))
         ->assertRedirect();
 
     expect(
-        test()->role->roleMemberships()
+        $this->role->roleMemberships()
             ->where('can_moderate', true)
             ->where('entity_id', $moderator->id)
             ->exists()
     )->toBeTrue();
 
     // 5. Remove moderator via HTTP
-    test()->actingAs(test()->test_user)
-        ->delete(route('acl.moderator.remove', [test()->role->id, $moderator->id]))
+    $this->actingAs($this->test_user)
+        ->delete(route('acl.moderator.remove', [$this->role->id, $moderator->id]))
         ->assertRedirect();
 
     expect(
-        test()->role->roleMemberships()
+        $this->role->roleMemberships()
             ->where('can_moderate', true)
             ->where('entity_id', $moderator->id)
             ->exists()
     )->toBeFalse();
 
     // 6. Remove member via HTTP
-    test()->actingAs(test()->test_user)
-        ->delete(route('acl.member.remove', [test()->role->id, $member->id]))
+    $this->actingAs($this->test_user)
+        ->delete(route('acl.member.remove', [$this->role->id, $member->id]))
         ->assertRedirect();
 
-    expect($member->fresh()->hasRole(test()->role))->toBeFalse();
+    expect($member->fresh()->hasRole($this->role))->toBeFalse();
 });
 
 it('moderator can add and remove members but cannot manage role settings', function () {
     // Set up a moderator via admin action
     $moderator = User::factory()->create();
-    test()->actingAs(test()->test_user)
-        ->post(route('acl.moderator.add', [test()->role->id, $moderator->id]))
+    $this->actingAs($this->test_user)
+        ->post(route('acl.moderator.add', [$this->role->id, $moderator->id]))
         ->assertRedirect();
 
     $member = User::factory()->create();
 
     // Moderator CAN add members
-    test()->actingAs($moderator)
-        ->post(route('acl.member.add', [test()->role->id, $member->id]))
+    $this->actingAs($moderator)
+        ->post(route('acl.member.add', [$this->role->id, $member->id]))
         ->assertRedirect();
 
-    expect($member->fresh()->hasRole(test()->role))->toBeTrue();
+    expect($member->fresh()->hasRole($this->role))->toBeTrue();
 
     // Moderator CAN remove members
-    test()->actingAs($moderator)
-        ->delete(route('acl.member.remove', [test()->role->id, $member->id]))
+    $this->actingAs($moderator)
+        ->delete(route('acl.member.remove', [$this->role->id, $member->id]))
         ->assertRedirect();
 
-    expect($member->fresh()->hasRole(test()->role))->toBeFalse();
+    expect($member->fresh()->hasRole($this->role))->toBeFalse();
 
     // But moderator CANNOT change role type/affiliations (admin-only)
-    test()->actingAs($moderator)
-        ->postJson(route('acl.update.manual', test()->role->id), ['name' => 'renamed'])
+    $this->actingAs($moderator)
+        ->postJson(route('acl.update.manual', $this->role->id), ['name' => 'renamed'])
         ->assertForbidden();
 });

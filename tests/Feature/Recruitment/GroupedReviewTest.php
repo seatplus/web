@@ -10,9 +10,10 @@ use Seatplus\Web\Models\Recruitment\ApplicationGroupMember;
 use Seatplus\Web\Models\Recruitment\Enlistment;
 use Seatplus\Web\Models\Recruitment\EnlistmentReviewRound;
 use Seatplus\Web\Services\Recruitment\ApplicationGroupService;
+use Seatplus\Web\Tests\TestCase;
 
 beforeEach(function () {
-    assignPermissionToTestUser('superuser');
+    assignPermission($this->test_user, 'superuser');
     cache()->flush();
 });
 
@@ -22,15 +23,15 @@ beforeEach(function () {
  *
  * @return array{0: Application, 1: Application}
  */
-function groupedApplications(CorporationInfo $corp): array
+function groupedApplications(TestCase $case, CorporationInfo $corp): array
 {
     $alt = CharacterUser::factory()->make();
-    test()->test_user->characterUsers()->save($alt);
+    $case->test_user->characterUsers()->save($alt);
 
     $first = Application::factory()->create([
         'corporation_id' => $corp->corporation_id,
         'applicationable_type' => CharacterInfo::class,
-        'applicationable_id' => test()->test_character->character_id,
+        'applicationable_id' => $case->test_character->character_id,
     ]);
     $second = Application::factory()->create([
         'corporation_id' => $corp->corporation_id,
@@ -41,7 +42,7 @@ function groupedApplications(CorporationInfo $corp): array
     (new ApplicationGroupService)->create([(string) $first->id, (string) $second->id]);
 
     // Refresh the in-memory user so its characters relation reflects the newly added alt.
-    test()->test_user->load('characters');
+    $case->test_user->load('characters');
 
     return [$first, $second];
 }
@@ -51,9 +52,9 @@ it('collapses a multi-character group into one inbox row with its covered count'
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Screen']);
 
-    groupedApplications($corp);
+    groupedApplications($this, $corp);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.reviews'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -65,12 +66,12 @@ it('collapses a multi-character group into one inbox row with its covered count'
 it('shows every covered character when reviewing a grouped application', function () {
     $corp = CorporationInfo::factory()->create();
 
-    [$first] = groupedApplications($corp);
+    [$first] = groupedApplications($this, $corp);
 
     // The affiliation middleware is exercised elsewhere; here we assert the grouped character set.
-    test()->withoutMiddleware();
+    $this->withoutMiddleware();
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.application', $first->id))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
@@ -84,11 +85,11 @@ it('hires every covered character when a grouped application is accepted', funct
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
     EnlistmentReviewRound::factory()->create(['corporation_id' => $corp->corporation_id, 'position' => 0, 'label' => 'Open']);
 
-    [$first, $second] = groupedApplications($corp);
+    [$first, $second] = groupedApplications($this, $corp);
 
-    test()->withoutMiddleware();
+    $this->withoutMiddleware();
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->post(route('review.application', $first->id), ['decision' => 'accepted'])
         ->assertRedirect(route('recruitment.reviews'));
 
@@ -101,9 +102,9 @@ it('hires every covered character when a grouped application is accepted', funct
 it('withdraws the whole group when one member is withdrawn', function () {
     $corp = CorporationInfo::factory()->create();
 
-    [$first, $second] = groupedApplications($corp);
+    [$first, $second] = groupedApplications($this, $corp);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->delete(route('recruitment.withdraw', $first->id))
         ->assertRedirect();
 
@@ -116,9 +117,9 @@ it('collapses the applicant\'s own group into a single portal entry listing its 
     $corp = CorporationInfo::factory()->create();
     Enlistment::query()->create(['corporation_id' => $corp->corporation_id, 'type' => 'character']);
 
-    groupedApplications($corp);
+    groupedApplications($this, $corp);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('recruitment.portal'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page

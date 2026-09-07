@@ -4,7 +4,7 @@ use Seatplus\EsiClient\EsiClient;
 use Seatplus\Web\Services\GetCorporationInfo;
 
 it('resolves corporation info via esi', function () {
-    $corporation = test()->test_character->corporation;
+    $corporation = $this->test_character->corporation;
 
     $esi = Mockery::mock(EsiClient::class);
     mockEsiTransport($esi, makeEsiResult((object) $corporation->toArray()));

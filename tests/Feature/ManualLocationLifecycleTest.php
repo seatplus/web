@@ -9,6 +9,7 @@ use Seatplus\Eveapi\Models\Universe\Location;
 use Seatplus\Eveapi\Models\Universe\Station;
 use Seatplus\Web\Http\Resources\LocationRessource;
 use Seatplus\Web\Models\ManualLocation;
+use Seatplus\Web\Tests\TestCase;
 
 beforeEach(function () {
     Queue::fake();
@@ -19,7 +20,7 @@ it('resolves unknown location', function () {
 
     $expected_name = sprintf('Unknown Structure (%s)', $manual_loaction->location_id);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.manual_location', $manual_loaction->location_id))
         ->assertOk()
         ->assertJson(['name' => $expected_name]);
@@ -42,7 +43,7 @@ test('one can submit suggestion', function () {
 
     $manual_loaction = ManualLocation::factory()->make();
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(route('post.manual_location'), [
             'name' => $manual_loaction->name,
             'location_id' => $manual_loaction->location_id,
@@ -54,10 +55,10 @@ test('one can submit suggestion', function () {
 
 test('one get own suggestion', function () {
     $manual_loaction = ManualLocation::factory()->create([
-        'user_id' => test()->test_user->id,
+        'user_id' => $this->test_user->id,
     ]);
 
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('get.manual_location', $manual_loaction->location_id))
         ->assertOk()
         ->assertJson(['name' => $manual_loaction->name]);
@@ -75,7 +76,7 @@ test('one get suggestion of other user', function () {
         'user_id' => User::factory(),
     ]);
 
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.manual_location', 12345))
         ->assertOk()
         ->assertJson(['name' => $manual_loaction->name]);
@@ -93,23 +94,23 @@ test('admin can accept suggestion', function () {
         'user_id' => User::factory(),
     ]);
 
-    test()->assignPermissionToTestUser(['manage manual locations']);
+    assignPermission($this->test_user, ['manage manual locations']);
 
     // first visit Manage view
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->get(route('manage.manual_locations'))
         ->assertOk();
 
     $response->assertInertia(fn (Assert $page) => $page->component('Configuration/ManualLocations/ManualLocation'));
 
     // load suggestions via the page's deferred `data` prop (partial Inertia reload)
-    expect(loadSuggestions()->json('props.data'))->toHaveCount(5);
+    expect(loadSuggestions($this)->json('props.data'))->toHaveCount(5);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
+    $this->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(route('accept.manual_locations'), [
             'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
@@ -117,16 +118,24 @@ test('admin can accept suggestion', function () {
         ->assertRedirect(route('manage.manual_locations'));
 
     // Make sure there is one suggestion in universe_locations
-    test()->assertCount(1, Location::where('location_id', 12345)->get());
+    $this->assertCount(1, Location::where('location_id', 12345)->get());
 
     // the accepted location's polymorphic relation resolves to the chosen suggestion, so the
     // asset views (LocationRessource::name) render its name rather than a blank " - ".
     $accepted = Location::with('locatable')->firstWhere('location_id', 12345);
-    expect($accepted->locatable)->toBeInstanceOf(ManualLocation::class)
-        ->and($accepted->locatable->name)->toBe($manual_location->name);
+    $locatable = $accepted->locatable;
+
+    expect($locatable)->toBeInstanceOf(ManualLocation::class);
+
+    // locatable is a morphTo, so it is a bare Model statically. The expectation above
+    // already fails loudly on the wrong type; this narrows it to read ManualLocation's
+    // own columns.
+    if ($locatable instanceof ManualLocation) {
+        expect($locatable->name)->toBe($manual_location->name);
+    }
 
     // check that there there is only one left after accepting
-    expect(loadSuggestions()->json('props.data'))->toHaveCount(1);
+    expect(loadSuggestions($this)->json('props.data'))->toHaveCount(1);
 });
 
 test('one get accepted suggestion', function () {
@@ -141,13 +150,13 @@ test('one get accepted suggestion', function () {
         'location_id' => 12345,
     ]);
 
-    test()->assignPermissionToTestUser(['manage manual locations']);
+    assignPermission($this->test_user, ['manage manual locations']);
 
     // Make sure there is no suggestion in universe_locations
-    test()->assertNull(Location::firstWhere(['location_id' => 12345]));
+    $this->assertNull(Location::firstWhere(['location_id' => 12345]));
 
     // accept one
-    $response = test()->actingAs(test()->test_user)
+    $response = $this->actingAs($this->test_user)
         ->post(route('accept.manual_locations'), [
             'id' => $manual_location->id,
             'location_id' => $manual_location->location_id,
@@ -155,10 +164,10 @@ test('one get accepted suggestion', function () {
         ->assertRedirect(route('manage.manual_locations'));
 
     // Make sure there is one suggestion in universe_locations
-    test()->assertCount(1, Location::where('location_id', 12345)->get());
+    $this->assertCount(1, Location::where('location_id', 12345)->get());
 
     // Lookup name
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.manual_location', $manual_location->location_id))
         ->assertOk()
         ->assertJson(['name' => $manual_location->name]);
@@ -179,19 +188,19 @@ test('if location is resolved via jobs delete manual suggestions', function () {
         'locatable_type' => Station::class,
     ]);
 
-    test()->assignPermissionToTestUser(['manage manual locations']);
+    assignPermission($this->test_user, ['manage manual locations']);
 
     // loading suggestions prunes rows whose location has since been resolved
-    expect(loadSuggestions()->json('props.data'))->toHaveCount(0)
+    expect(loadSuggestions($this)->json('props.data'))->toHaveCount(0)
         ->and(ManualLocation::all())->toBeEmpty();
 });
 
 /**
  * Resolve the Manual Locations page's deferred `data` prop via a partial Inertia reload.
  */
-function loadSuggestions()
+function loadSuggestions(TestCase $case)
 {
-    return test()->actingAs(test()->test_user)
+    return $case->actingAs($case->test_user)
         ->get(route('manage.manual_locations'), [
             'X-Inertia' => 'true',
             'X-Inertia-Partial-Component' => 'Configuration/ManualLocations/ManualLocation',
@@ -204,7 +213,7 @@ test('if location does not have system dispatch job', function () {
     $manual_location = ManualLocation::factory()->create();
 
     // Lookup name
-    test()->actingAs(test()->test_user)
+    $this->actingAs($this->test_user)
         ->get(route('get.manual_location', $manual_location->location_id))
         ->assertOk()
         ->assertJson(['name' => $manual_location->name]);

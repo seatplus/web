@@ -250,7 +250,7 @@ function grantAclAdmin(int $characterId): User
 
 function makeManualRole(string $name): Role
 {
-    $role = Role::findById(Role::create(['name' => $name])->id);
+    $role = Role::query()->findOrFail(Role::create(['name' => $name])->id);
     $role->update(['type' => RoleType::MANUAL]);
 
     return $role;
@@ -258,7 +258,7 @@ function makeManualRole(string $name): Role
 
 function makeOnRequestRole(string $name): Role
 {
-    $role = Role::findById(Role::create(['name' => $name])->id);
+    $role = Role::query()->findOrFail(Role::create(['name' => $name])->id);
     $role->update(['type' => RoleType::ON_REQUEST]);
 
     return $role;
@@ -266,7 +266,7 @@ function makeOnRequestRole(string $name): Role
 
 function makeOptInRoleForCorporation(string $name, int $corporationId): Role
 {
-    $role = Role::findById(Role::create(['name' => $name])->id);
+    $role = Role::query()->findOrFail(Role::create(['name' => $name])->id);
     $role->update(['type' => RoleType::OPT_IN]);
 
     RoleMembership::create([
@@ -353,7 +353,7 @@ function seedObservableCorporation(CharacterInfo $character): void
 
 function makeControlGroup(string $name): Role
 {
-    return Role::findById(Role::create(['name' => $name])->id);
+    return Role::query()->findOrFail(Role::create(['name' => $name])->id);
 }
 
 function addGroupMember(Role $role, User $user): void

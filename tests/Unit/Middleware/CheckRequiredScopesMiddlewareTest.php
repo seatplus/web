@@ -10,8 +10,8 @@ use Seatplus\Web\Http\Middleware\CheckRequiredScopes;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 beforeEach(function () {
-    test()->request = Mockery::mock(Request::class);
-    test()->next = function ($request) {
+    $this->request = Mockery::mock(Request::class);
+    $this->next = function ($request) {
         $request->forward();
 
         return new Response;
@@ -44,7 +44,7 @@ function requireUnheldScopeOf(User $user): void
 }
 
 it('should skip handle if environment is not production', function () {
-    test()->request->shouldReceive('forward')->times(1);
+    $this->request->shouldReceive('forward')->times(1);
 
     $middleware = Mockery::mock(CheckRequiredScopes::class, [])
         ->makePartial()
@@ -52,21 +52,21 @@ it('should skip handle if environment is not production', function () {
 
     $middleware->shouldReceive('redirectTo')->times(0);
 
-    $middleware->handle(test()->request, test()->next);
+    $middleware->handle($this->request, $this->next);
 });
 
 it('denies an unauthenticated request rather than skipping the check', function () {
     app()->detectEnvironment(fn () => 'production');
 
-    test()->request->shouldReceive('user')->andReturnNull();
-    test()->request->shouldReceive('forward')->times(0);
+    $this->request->shouldReceive('user')->andReturnNull();
+    $this->request->shouldReceive('forward')->times(0);
 
     // The guard itself now lives in seatplus/auth's parent handle(); this pins that web still inherits
     // it, because passing an unauthenticated request on would skip scope enforcement altogether.
     try {
-        (new CheckRequiredScopes)->handle(test()->request, test()->next);
+        (new CheckRequiredScopes)->handle($this->request, $this->next);
 
-        test()->fail('An unauthenticated request should not have been allowed through.');
+        $this->fail('An unauthenticated request should not have been allowed through.');
     } catch (HttpException $exception) {
         expect($exception->getStatusCode())->toBe(403);
     }
@@ -75,28 +75,28 @@ it('denies an unauthenticated request rather than skipping the check', function 
 it('lets a compliant user through in production', function () {
     app()->detectEnvironment(fn () => 'production');
 
-    test()->request->shouldReceive('user')->andReturn(test()->test_user);
-    test()->request->shouldReceive('forward')->times(1);
+    $this->request->shouldReceive('user')->andReturn($this->test_user);
+    $this->request->shouldReceive('forward')->times(1);
 
     // Nothing is required of anyone, so the acting user is compliant.
-    (new CheckRequiredScopes)->handle(test()->request, test()->next);
+    (new CheckRequiredScopes)->handle($this->request, $this->next);
 });
 
 it('renders the re-authorise page for a non-compliant user', function () {
     app()->detectEnvironment(fn () => 'production');
 
-    requireUnheldScopeOf(test()->test_user);
+    requireUnheldScopeOf($this->test_user);
     respondToInertia();
 
-    test()->request->shouldReceive('user')->andReturn(test()->test_user);
-    test()->request->shouldReceive('forward')->times(0);
+    $this->request->shouldReceive('user')->andReturn($this->test_user);
+    $this->request->shouldReceive('forward')->times(0);
 
     // Not a mocked redirectTo: the real renderer used to fatal here, because the parent handed it
     // pluck('missing_scopes') — scope strings with the character dropped — while it dereferences
     // ->character->character_id.
-    $response = (new CheckRequiredScopes)->handle(test()->request, test()->next);
+    $response = (new CheckRequiredScopes)->handle($this->request, $this->next);
 
-    $character = test()->test_character;
+    $character = $this->test_character;
     $page = json_decode($response->getContent(), true, flags: JSON_THROW_ON_ERROR);
 
     expect($response->getStatusCode())->toBe(200)
@@ -114,14 +114,14 @@ it('renders the re-authorise page for a non-compliant user', function () {
 it('judges the acting user, not an arbitrary one', function () {
     app()->detectEnvironment(fn () => 'production');
 
-    requireUnheldScopeOf(test()->test_user);
+    requireUnheldScopeOf($this->test_user);
 
     $actor = Event::fakeFor(fn () => User::factory()->create());
 
-    expect($actor->getKey())->toBeGreaterThan(test()->test_user->getKey());
+    expect($actor->getKey())->toBeGreaterThan($this->test_user->getKey());
 
-    test()->request->shouldReceive('user')->andReturn($actor);
-    test()->request->shouldReceive('forward')->times(1);
+    $this->request->shouldReceive('user')->andReturn($actor);
+    $this->request->shouldReceive('forward')->times(1);
 
-    (new CheckRequiredScopes)->handle(test()->request, test()->next);
+    (new CheckRequiredScopes)->handle($this->request, $this->next);
 });
