@@ -29,3 +29,7 @@ public/js/
 /tests/Browser/Screenshots/
 
 .claude/skills
+
+# Live lease state for this worktree, written by Orca's setup hook and imported
+# by CLAUDE.md. Per-worktree and machine-specific — never committed.
+/.orca-state.md
