@@ -1,109 +1,79 @@
-# seatplus/web — Roadmap
+# seatplus/web — open work
 
-Tracks open work, upcoming PRs, and known issues. Update this file when work is started or completed.
+**GitHub is the source of truth.** Every item below is an issue or a PR; this file
+is a hand-maintained snapshot and will drift the moment one of them moves. Check
+the live state first:
 
----
+```bash
+gh pr list --state open
+gh issue list --state open
+```
+
+Snapshot verified **2026-09-08**, against `5.x` at `2696202a`.
 
 ## Open PRs
 
-### [#1479](https://github.com/seatplus/web/pull/1479) — `CheckAuthorizationWithExtendedScope` middleware
-**Branch**: `web/feat/check-auth-extended-scope` → `5.x`  
-**Status**: Open, CI passing
+| PR | What |
+|----|------|
+| [#1697](https://github.com/seatplus/web/pull/1697) | dependabot: bump `brace-expansion` |
+| [#1714](https://github.com/seatplus/web/pull/1714) | dependabot: bump `eslint` 10.9.1 → 10.10.0 |
 
-Drop-in replacement for `CheckAuthorization` on all 7 character route files. Adds two fallback
-authorization paths (only triggered when a single `character_id` is in the route and the primary
-`CanUserService` check fails):
+## Open issues
 
-1. **Compliance reviewer** (`member compliance: review user`) — can access characters in their
-   affiliated compliance scope via `GetCorporationMemberComplianceAffiliatedIdsService`.
-2. **Recruiter** (`can accept or deny applications`) — can access characters with an open
-   application to their managed corporations via `GetRecruitIdsService`.
+**Tooling / quality**
 
-Resolves the two `->todo()` stubs in `ComplianceLifeCycleTest` and `RecruitmentLifeCycleTest`.  
-Also deletes 3 dead `Pipelines/Check*Pipe.php` files and cleans up PHPStan excludes.
+- [#1649](https://github.com/seatplus/web/issues/1649) — Adopt Rector on tests.
+  Blocked on `rector.php` itself: it still targets `LaravelSetList::LARAVEL_100` /
+  `SetList::PHP_81` and references rector-1.x classes that moved or were removed
+  (`Rector\Core\ValueObject\PhpVersion`, `Rector\Php81\Rector\Array_\FirstClassCallableRector`),
+  so it cannot run under the installed rector 2.x. Fix the config first, then add
+  `LARAVEL_TYPE_DECLARATIONS` + `pest-plugin-rector`, mirroring seatplus/eveapi#708.
+- [#1490](https://github.com/seatplus/web/issues/1490) — Reach and enforce 100%
+  line coverage. Type coverage is already at 100% and enforced
+  (`composer run test:type-coverage --min=100`); line coverage is neither measured
+  nor gated (CI runs `pest --no-coverage --shard=...`).
 
----
+**UI / behaviour**
 
-## Open Issues (near-term)
+- [#1466](https://github.com/seatplus/web/issues/1466) — Open assets missing
+  `character_ids`. Reported 2024 against a much older frontend and never
+  reproduced since; needs a browser check against current `5.x` before anyone
+  writes code.
+- [#1457](https://github.com/seatplus/web/issues/1457) — Assets: open a modal
+  instead of navigating away.
+- [#1456](https://github.com/seatplus/web/issues/1456) — Recruitment update. Only
+  one box is left unticked: show an explicit empty state when the location list
+  has no entries.
 
-### [#1478](https://github.com/seatplus/web/issues/1478) — Allow moderators on opt-in roles
-Currently moderators can only be set on `manual` and `on-request` roles. There is no technical
-reason to block them on `opt-in` roles. `SetModeratorController` / `RemoveModeratorController`
-need the guard updated.
+**Long-standing backlog** (open since 2020/2021, no active work)
 
-### [#1480](https://github.com/seatplus/web/issues/1480) — `GetAffiliatedIds` DI violation + dead code
-`GetAffiliatedIds::get()` creates `new self()` internally, silently discarding the injected
-`CanUserService`. Also contains a dead `$this->user` mutation and an unused `?User $user` 3rd
-parameter. Surgical fix across 3 files, no behaviour change.
+- [#223](https://github.com/seatplus/web/issues/223) — let users dispatch their own
+  updates. Single-resource updates are done; per-character updates are not.
+- [#892](https://github.com/seatplus/web/issues/892) — improve character adding
+  (async list, only show available characters).
+- [#893](https://github.com/seatplus/web/issues/893) — account bags (group up to
+  three characters).
 
-### [#1477](https://github.com/seatplus/web/issues/1477) — Upgrade to Pest 4 *(blocked)*
-Blocked by a PHPStan type-coverage bug in `pest-plugin-type-coverage`. Re-evaluate once upstream
-releases a fix.
+## Finished since the last revision of this file
 
----
+The previous version tracked the Laravel-11 / ACL / Inertia-v3 push. All of it has
+landed, which is why none of it appears above:
 
-## Upcoming work (not yet tracked as issues)
-
-### PR 1.5-J-2 — Frontend Vue components
-Implement the Vue pages that the backend controllers now serve:
-
-- `resources/js/Pages/AccessControl/RoleDetail.vue` — currently a bare stub; needs full implementation
-- `resources/js/Pages/AccessControl/Types/AutomaticDetail.vue`
-- `resources/js/Pages/AccessControl/Types/ManualDetail.vue`
-- `resources/js/Pages/AccessControl/Types/OnRequestDetail.vue`
-- `resources/js/Pages/AccessControl/Types/OptInDetail.vue`
-
-Reuse the existing `AclTypes/` building blocks (Affiliations, Members, Moderators, Users components).
-
----
-
-## Frontend modernization — Inertia v3 (in progress)
-
-Rolling the frontend onto native Inertia v3 primitives and off the legacy axios/Ziggy stack.
-Three parallel tracks:
-
-- **B1 — InfiniteScroll rollout.** Replace the custom axios-based `InfiniteLoadingHelper`
-  with page-level `Inertia::scroll()` props rendered by `<InfiniteScroll>`. Pattern: one
-  scroll prop per character/entity, each with a distinct `pageName`, streamed into an
-  `items-element` inside a `scroll-region` container.
-  - ✅ Character + corporation wallet journals ([#1536](https://github.com/seatplus/web/pull/1536), [#1537](https://github.com/seatplus/web/pull/1537))
-  - ✅ Mail ([#1541](https://github.com/seatplus/web/pull/1541))
-  - 🔷 Contracts ([#1547](https://github.com/seatplus/web/pull/1547)) — dual-mode `ContractComponent`:
-    `scroll-key` prop on the character page, `InfiniteLoadingHelper` fallback kept for the
-    recruitment/watchlist endpoint (which still needs the details route).
-  - ⏭️ Remaining axios-fed lists (assets, transactions, …) to migrate as the pattern proves out.
-- **B2 — Remove axios.** Native `fetch` wrapper at `resources/js/Functions/http.js`
-  (`getJson`/`post`, `X-XSRF-TOKEN` from the `XSRF-TOKEN` cookie). Done for the dispatch/update
-  sidebar; retire per surface alongside B1.
-- **B3 — Remove Ziggy** ([#1462](https://github.com/seatplus/web/issues/1462)). Replace
-  `route()` calls with Wayfinder imports from `@/actions/` (controllers) / `@/routes/` (named).
-  Wayfinder output is gitignored and generated in CI (`php artisan wayfinder:generate` in
-  core's browser job; package "Frontend Lint" is lint-only).
-
----
-
-## Older open issues (lower priority)
-
-| Issue | Title |
-|-------|-------|
-| [#1466](https://github.com/seatplus/web/issues/1466) | Open assets missing character_ids? |
-| [#1462](https://github.com/seatplus/web/issues/1462) | Remove Ziggy |
-| [#1457](https://github.com/seatplus/web/issues/1457) | Asset: open Modal instead of link |
-| [#1456](https://github.com/seatplus/web/issues/1456) | Recruitment Update |
-
----
-
-## Recently completed
-
-| PR | Description |
-|----|-------------|
-| [#1546](https://github.com/seatplus/web/pull/1546) | `ManualDispatchedJob` `->allowFailures()` — one job's failure no longer cancels the Update batch |
-| [#1545](https://github.com/seatplus/web/pull/1545) | Dispatch/update sidebar — owned vs affiliated sections, axios→fetch + Wayfinder, cached `getEntities` |
-| [#1544](https://github.com/seatplus/web/pull/1544) | Dispatch sidebar fix (`required_corporation_role` array validation) + owned/affiliated partition + browser tests |
-| [#1542](https://github.com/seatplus/web/pull/1542), [#1543](https://github.com/seatplus/web/pull/1543) | `GetEntityFromId` — resolve-id 404 fallback + alliance `[object Object]` name fix |
-| [#1541](https://github.com/seatplus/web/pull/1541) | Mail → InfiniteScroll; axios/Ziggy→fetch; fix `app.js` `layout:null` double-sidebar |
-| [#1537](https://github.com/seatplus/web/pull/1537), [#1536](https://github.com/seatplus/web/pull/1536) | Wallet journals (char + corp) → Inertia InfiniteScroll |
-| [#1476](https://github.com/seatplus/web/pull/1476) | ACL typed controllers — SOLID single-action controllers, new routes, feature tests |
-| [#1473](https://github.com/seatplus/web/pull/1473) | Controllers, actions, services, resources refactor (1-C) |
-| [#1472](https://github.com/seatplus/web/pull/1472) | Middleware overhaul — remove dead pipeline middleware, fix auth routing (1-B) |
-| [#1471](https://github.com/seatplus/web/pull/1471) | Laravel 11 baseline (1-A) |
+- The frontend modernization tracks are complete. `axios`, `ziggy-js` and
+  `InfiniteLoadingHelper` are gone from `resources/js` (the only remaining hits are
+  comments recording what replaced them): lists use `Inertia::scroll()` with
+  `<InfiniteScroll>`, one-off requests use the native-fetch wrapper
+  `resources/js/Functions/http.js`, and URLs come from Wayfinder. [#1462](https://github.com/seatplus/web/issues/1462)
+  (remove Ziggy) was closed as not-planned once nothing was left to remove.
+- `CheckAuthorizationWithExtendedScope` shipped ([#1479](https://github.com/seatplus/web/pull/1479)),
+  as did moderators on opt-in roles ([#1478](https://github.com/seatplus/web/issues/1478))
+  and the `GetAffiliatedIds` DI fix ([#1480](https://github.com/seatplus/web/issues/1480)).
+- The SSO-settings `TypeError` ([#1387](https://github.com/seatplus/web/issues/1387))
+  is fixed: [#1637](https://github.com/seatplus/web/pull/1637) merged 2026-09-08,
+  repairing the scope-settings edit screen and surfacing skipped entities instead of
+  dropping them silently.
+- [#1477](https://github.com/seatplus/web/issues/1477) ("upgrade to Pest 4,
+  blocked") is obsolete: the repo runs **Pest 5** with PHPUnit 13 on PHP 8.5 /
+  Laravel 13 ([#1489](https://github.com/seatplus/web/issues/1489),
+  [#1647](https://github.com/seatplus/web/issues/1647)), and PHPStan sits at level 5
+  with 100% type coverage.

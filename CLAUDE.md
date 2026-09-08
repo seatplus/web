@@ -31,6 +31,14 @@ running core app.
   **`laravel_web`** — a per-package name so this suite runs in parallel with other
   packages' suites — pinned with `force="true"` in `phpunit.xml`; **tests must
   never touch `seatplus`.** Create it once: `createdb laravel_web`.
+  `test:unit` runs `pest --no-coverage` like CI: `phpunit.xml` declares
+  `<coverage>` reports and `failOnWarning="true"`, so a missing Xdebug/PCOV fails
+  the run before any test executes. TIA and coverage are opt-in:
+  `composer run test:unit-tia` / `test:unit-coverage`.
+- **Dependencies are NOT in git.** `vendor/` and `node_modules/` are gitignored, so a
+  fresh clone has neither — that is expected; install them if you need them locally.
+  Never commit them, not even as symlinks: a dangling
+  `vendor -> /workspace/packages/web/vendor` shipped in every archive until #1717.
 - **Browser tests** live in `tests/Browser/` but are **excluded** from this
   package's Pest run — they execute only against the assembled core app in core's
   "Browser (vs core)" CI job, which uses core's `laravel` DB (not `laravel_web`).
