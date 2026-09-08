@@ -199,9 +199,21 @@ onMounted(() => {
         return
     }
 
+    // The installation-wide entry has no morphable. An empty selection is exactly what tells
+    // UpdateOrCreateSsoSettings to write the row matched on a null morph; synthesising an entity
+    // from it instead sent a null id down the per-entity branch, which threw a TypeError (#1387)
+    // and left the global scopes unchanged.
+    if (_.isNil(props.entity.morphable_id)) {
+        return
+    }
+
     selectedEntities.value = [{
         id: props.entity.morphable_id,
-        type: props.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
+        name: _.get(props.entity, 'morphable.name'),
+        // `category`, not `type`: the server reads Arr::get($entity, 'category'). `type` is the
+        // requirement level (default/user/global) and means something else entirely — sending it
+        // under that key left the category null, so every edit was silently skipped.
+        category: props.entity.morphable_type === "Seatplus\\Eveapi\\Models\\Corporation\\CorporationInfo" ? 'corporation' : 'alliance'
     }]
 })
 </script>
