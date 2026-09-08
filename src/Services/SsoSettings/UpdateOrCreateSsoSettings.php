@@ -42,6 +42,16 @@ class UpdateOrCreateSsoSettings
 
     private readonly string $type;
 
+    /**
+     * Entities that were submitted but could not be saved. Reported back to the caller so a
+     * malformed selection surfaces in the UI instead of being dropped without a trace.
+     *
+     * @var list<array{label: string, reason: string}>
+     */
+    private array $skipped = [];
+
+    private int $saved = 0;
+
     public function __construct(
         private readonly array $request
     ) {
@@ -63,6 +73,8 @@ class UpdateOrCreateSsoSettings
                         ['morphable_id' => null, 'morphable_type' => null],
                         ['selected_scopes' => $this->selected_scopes->unique()->values(), 'type' => 'global'],
                     );
+
+                    $this->saved++;
                 }
             },
             fn (Collection $collection) => $collection
@@ -71,6 +83,10 @@ class UpdateOrCreateSsoSettings
                     $category = Arr::get($entity, 'category');
 
                     if ($entity_id === null) {
+                        // Without this the null would reach DispatchCorporationOrAllianceInfoJob::handle(),
+                        // whose $id is a non-nullable int, and throw a TypeError (#1387).
+                        $this->skip($entity, 'no id was submitted');
+
                         return;
                     }
 
@@ -81,6 +97,8 @@ class UpdateOrCreateSsoSettings
                     };
 
                     if ($morphable_type === null) {
+                        $this->skip($entity, 'unknown category');
+
                         return;
                     }
 
@@ -95,8 +113,53 @@ class UpdateOrCreateSsoSettings
                         'selected_scopes' => $this->selected_scopes->unique(),
                         'type' => $this->type,
                     ]);
+
+                    $this->saved++;
                 })
         );
+    }
+
+    /**
+     * Entities that were submitted but not saved, so the caller can tell the user which of their
+     * selections did not take effect.
+     *
+     * @return list<array{label: string, reason: string}>
+     */
+    public function skippedEntities(): array
+    {
+        return $this->skipped;
+    }
+
+    /**
+     * How many sso_scopes rows this run wrote. Zero means nothing was saved, so a caller must not
+     * report success.
+     */
+    public function savedCount(): int
+    {
+        return $this->saved;
+    }
+
+    /**
+     * @param  array<string, mixed>  $entity
+     */
+    private function skip(array $entity, string $reason): void
+    {
+        $name = Arr::get($entity, 'name');
+        $category = Arr::get($entity, 'category');
+
+        $this->skipped[] = [
+            'label' => match (true) {
+                is_string($name) && $name !== '' => $name,
+                is_string($category) && $category !== '' => $category,
+                default => 'unknown entity',
+            },
+            'reason' => $reason,
+        ];
+
+        logger()->warning('Skipped an SSO settings entity that could not be saved', [
+            'reason' => $reason,
+            'entity' => $entity,
+        ]);
     }
 
     private function buildSelectedScopes(): void

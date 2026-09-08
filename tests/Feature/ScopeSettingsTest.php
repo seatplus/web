@@ -214,3 +214,60 @@ test('one can create and delete global sso setting', function () {
     $response = $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', null));
 });
+
+it('tells the user which selected entities were skipped', function () {
+    Bus::fake();
+
+    $corporation = CorporationInfo::factory()->create();
+
+    $response = $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [
+                [
+                    'id' => $corporation->corporation_id,
+                    'name' => $corporation->name,
+                    'category' => 'corporation',
+                ],
+                [
+                    'id' => null,
+                    'name' => 'Amok.',
+                    'category' => 'corporation',
+                ],
+            ],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'default',
+        ]);
+
+    $response->assertRedirect(route('settings.scopes'));
+
+    // The valid selection still saved, so success is reported…
+    expect(SsoScopes::query()->where('morphable_id', $corporation->corporation_id)->exists())->toBeTrue();
+    $response->assertSessionHas('success');
+
+    // …and the malformed one is named rather than silently dropped.
+    $response->assertSessionHas('error', fn (string $message) => str_contains($message, 'Amok.')
+        && str_contains($message, 'no id was submitted'));
+});
+
+it('does not report success when every selected entity was skipped', function () {
+    Bus::fake();
+
+    $response = $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [
+                [
+                    'id' => null,
+                    'name' => 'Amok.',
+                    'category' => 'corporation',
+                ],
+            ],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'default',
+        ]);
+
+    $response->assertRedirect(route('settings.scopes'));
+    $response->assertSessionMissing('success');
+    $response->assertSessionHas('error');
+
+    expect(SsoScopes::query()->count())->toBe(0);
+});

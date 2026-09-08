@@ -68,9 +68,32 @@ class SsoSettingsController extends Controller
 
     public function create(CreateSsoScopeSettingsValidation $validation): RedirectResponse
     {
-        (new UpdateOrCreateSsoSettings($validation->all()))->execute();
+        $settings = new UpdateOrCreateSsoSettings($validation->all());
+        $settings->execute();
 
-        return redirect()->route('settings.scopes')->with('success', 'SSO Settings Saved');
+        $redirect = redirect()->route('settings.scopes');
+
+        // Only claim success for what was actually written — a selection in which every entity was
+        // malformed saves nothing, and saying "Saved" there would be a lie.
+        if ($settings->savedCount() > 0) {
+            $redirect->with('success', 'SSO Settings Saved');
+        }
+
+        $skipped = $settings->skippedEntities();
+
+        if ($skipped !== []) {
+            // Reported rather than dropped in silence: the user picked these entities and would
+            // otherwise believe they are configured. 'error' is deliberate — it is the one toast
+            // appearance that does not auto-dismiss (see useToasts.js), and this needs to be read.
+            $redirect->with('error', sprintf(
+                'Some selected entities could not be saved and were skipped: %s. Please select them again.',
+                collect($skipped)
+                    ->map(fn (array $entry): string => sprintf('%s (%s)', $entry['label'], $entry['reason']))
+                    ->implode(', '),
+            ));
+        }
+
+        return $redirect;
     }
 
     public function deleteSsoScopeSetting(?int $entity_id = null): RedirectResponse
