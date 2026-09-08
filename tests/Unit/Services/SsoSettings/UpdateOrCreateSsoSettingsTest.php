@@ -58,6 +58,102 @@ it('calls corporation info action', function () {
     expect(SsoScopes::where('morphable_id', 1_184_675_423)->first()->selected_scopes)->toHaveCount(3);
 });
 
+it('skips entities without an id and reports them', function () {
+    Bus::fake();
+
+    $request = [
+        'selectedEntities' => [
+            [
+                'corporation_id' => null,
+                'id' => null,
+                'name' => 'Amok.',
+                'category' => 'corporation',
+            ],
+        ],
+        'selectedScopes' => [
+            'esi-assets.read_assets.v1,esi-universe.read_structures.v1',
+            'publicData',
+        ],
+        'type' => 'default',
+    ];
+
+    $settings = new UpdateOrCreateSsoSettings($request);
+    $settings->execute();
+
+    Bus::assertNotDispatched(CorporationInfoJob::class);
+    Bus::assertNotDispatched(AllianceInfoJob::class);
+
+    // Nor is a half-formed row written with a null morphable_id.
+    \Pest\Laravel\assertDatabaseCount('sso_scopes', 0);
+
+    // Skipped, but not in silence — the caller can name what did not take effect.
+    expect($settings->savedCount())->toBe(0)
+        ->and($settings->skippedEntities())->toBe([
+            ['label' => 'Amok.', 'reason' => 'no id was submitted'],
+        ]);
+});
+
+it('reports an entity whose category it cannot morph', function () {
+    Bus::fake();
+
+    $settings = new UpdateOrCreateSsoSettings([
+        'selectedEntities' => [
+            ['id' => 1_184_675_423, 'name' => 'Amok.', 'category' => 'character'],
+        ],
+        'selectedScopes' => ['esi-assets.read_assets.v1'],
+        'type' => 'default',
+    ]);
+    $settings->execute();
+
+    Bus::assertNotDispatched(CorporationInfoJob::class);
+    \Pest\Laravel\assertDatabaseCount('sso_scopes', 0);
+
+    expect($settings->savedCount())->toBe(0)
+        ->and($settings->skippedEntities())->toBe([
+            ['label' => 'Amok.', 'reason' => 'unknown category'],
+        ]);
+});
+
+it('falls back to the category when a skipped entity has no name', function () {
+    Bus::fake();
+
+    $settings = new UpdateOrCreateSsoSettings([
+        'selectedEntities' => [
+            ['id' => null, 'category' => 'alliance'],
+        ],
+        'selectedScopes' => ['esi-assets.read_assets.v1'],
+        'type' => 'default',
+    ]);
+    $settings->execute();
+
+    expect($settings->skippedEntities())->toBe([
+        ['label' => 'alliance', 'reason' => 'no id was submitted'],
+    ]);
+});
+
+it('saves the valid entities alongside a skipped one', function () {
+    Bus::fake();
+
+    $settings = new UpdateOrCreateSsoSettings([
+        'selectedEntities' => [
+            ['id' => 1_184_675_423, 'name' => 'Amok.', 'category' => 'corporation'],
+            ['id' => null, 'name' => 'Goonswarm Federation', 'category' => 'alliance'],
+        ],
+        'selectedScopes' => ['esi-assets.read_assets.v1'],
+        'type' => 'default',
+    ]);
+    $settings->execute();
+
+    // The good half of the selection still lands — one malformed entry does not cost the rest.
+    expect($settings->savedCount())->toBe(1)
+        ->and($settings->skippedEntities())->toBe([
+            ['label' => 'Goonswarm Federation', 'reason' => 'no id was submitted'],
+        ]);
+
+    \Pest\Laravel\assertDatabaseHas('sso_scopes', ['morphable_id' => 1_184_675_423]);
+    \Pest\Laravel\assertDatabaseCount('sso_scopes', 1);
+});
+
 it('creates sso settings', function () {
     Bus::fake();
 

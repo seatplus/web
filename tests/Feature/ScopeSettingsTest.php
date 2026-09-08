@@ -214,3 +214,119 @@ test('one can create and delete global sso setting', function () {
     $response = $this->actingAs($this->test_user)
         ->delete(route('delete.scopes', null));
 });
+
+it('tells the user which selected entities were skipped', function () {
+    Bus::fake();
+
+    $corporation = CorporationInfo::factory()->create();
+
+    $response = $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [
+                [
+                    'id' => $corporation->corporation_id,
+                    'name' => $corporation->name,
+                    'category' => 'corporation',
+                ],
+                [
+                    'id' => null,
+                    'name' => 'Amok.',
+                    'category' => 'corporation',
+                ],
+            ],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'default',
+        ]);
+
+    $response->assertRedirect(route('settings.scopes'));
+
+    // The valid selection still saved, so success is reported…
+    expect(SsoScopes::query()->where('morphable_id', $corporation->corporation_id)->exists())->toBeTrue();
+    $response->assertSessionHas('success');
+
+    // …and the malformed one is named rather than silently dropped.
+    $response->assertSessionHas('error', fn (string $message) => str_contains($message, 'Amok.')
+        && str_contains($message, 'no id was submitted'));
+});
+
+it('does not report success when every selected entity was skipped', function () {
+    Bus::fake();
+
+    $response = $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [
+                [
+                    'id' => null,
+                    'name' => 'Amok.',
+                    'category' => 'corporation',
+                ],
+            ],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'default',
+        ]);
+
+    $response->assertRedirect(route('settings.scopes'));
+    $response->assertSessionMissing('success');
+    $response->assertSessionHas('error');
+
+    expect(SsoScopes::query()->count())->toBe(0);
+});
+
+// The two payloads ScopeSettings.vue submits from the edit route. They are asserted here because
+// the Vue that builds them cannot run in this package — web has no app skeleton — so the server
+// side is where the contract is pinned. Both were silently no-ops before: the entity edit sent the
+// category under a `type` key, and the installation-wide edit synthesised an entity out of a null
+// morphable and sent a null id (#1387).
+it('applies an edit of an entity entry', function () {
+    Bus::fake();
+
+    $corporation = CorporationInfo::factory()->create();
+
+    SsoScopes::factory()->create([
+        'morphable_id' => $corporation->corporation_id,
+        'morphable_type' => CorporationInfo::class,
+        'type' => 'default',
+        'selected_scopes' => ['esi-skills.read_skills.v1'],
+    ]);
+
+    $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [
+                [
+                    'id' => $corporation->corporation_id,
+                    'name' => $corporation->name,
+                    'category' => 'corporation',
+                ],
+            ],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'default',
+        ])
+        ->assertSessionHas('success')
+        ->assertSessionMissing('error');
+
+    expect(SsoScopes::query()->where('morphable_id', $corporation->corporation_id)->sole()->selected_scopes)
+        ->toBe(['esi-assets.read_assets.v1']);
+});
+
+it('applies an edit of the installation-wide entry', function () {
+    Bus::fake();
+
+    SsoScopes::updateOrCreate(
+        ['morphable_id' => null, 'morphable_type' => null],
+        ['selected_scopes' => ['esi-skills.read_skills.v1'], 'type' => 'global'],
+    );
+
+    // An empty selection is what the global entry submits — it has no morphable to send.
+    $this->actingAs($this->test_user)
+        ->post(route('create.scopes'), [
+            'selectedEntities' => [],
+            'selectedScopes' => ['esi-assets.read_assets.v1'],
+            'type' => 'global',
+        ])
+        ->assertSessionHas('success')
+        ->assertSessionMissing('error');
+
+    expect(SsoScopes::query()->whereNull('morphable_id')->sole()->selected_scopes)
+        ->toBe(['esi-assets.read_assets.v1'])
+        ->and(SsoScopes::query()->count())->toBe(1);
+});
